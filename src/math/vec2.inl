@@ -124,4 +124,11 @@ namespace pbrlib::math
 
         return {v.x / l, v.y / l};
     }
+
+    template<typename Type>
+    ostream& operator << (ostream& print, const Vec2<Type>& vec)
+    {
+        print << vec.x << ' ' << vec.y;
+        return print;
+    }
 }
