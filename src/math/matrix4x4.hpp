@@ -69,13 +69,84 @@ namespace pbrlib::math
         */
         void transpose();
 
+        /**
+         * @brief Метод находящий обратную матрицу.
+        */
         void inverse();
 
     private:
         union
         {
-            Type _two_dimensional_array[4][4];;
+            Type _two_dimensional_array[4][4];
             Type _linear_array[16];
+        };
+    };
+
+    template<>
+    class Matrix4x4<float>
+    {
+    public:
+        Matrix4x4(float init_value = 0.0f);
+        Matrix4x4(float v11, float v12, float v13, float v14,
+                  float v21, float v22, float v23, float v24,
+                  float v31, float v32, float v33, float v34,
+                  float v41, float v42, float v43, float v44);
+
+        /**
+         * @brief Констуктор.
+         * 
+         * @details 
+         *      Указатель ptr_data должен указывать на массив, размер 
+         *      которого больше или равняется 16 * sizeof(float).
+         * 
+         * @param ptr_data указатель на массив.
+        */
+        Matrix4x4(const float* ptr_data);
+
+        bool operator == (const Matrix4x4& mat) const;
+        bool operator != (const Matrix4x4& mat) const;
+
+        Matrix4x4 operator + (const Matrix4x4& mat) const;
+        Matrix4x4 operator - (const Matrix4x4& mat) const;
+        Matrix4x4 operator * (const Matrix4x4& mat) const;
+        Matrix4x4 operator * (float scal) const;
+
+        Matrix4x4& operator += (const Matrix4x4& mat);
+        Matrix4x4& operator -= (const Matrix4x4& mat);
+        Matrix4x4& operator *= (const Matrix4x4& mat);
+        Matrix4x4& operator *= (float scal);
+
+        inline float* operator [] (size_t i) noexcept;
+        inline const float* operator [] (size_t i) const noexcept;
+
+        inline float& at (size_t i, size_t j);
+        inline float at (size_t i, size_t j) const;
+
+        /**
+         * @brief Метод необходимый для вычисления определителя.
+         * 
+         * @return определитель матрицы.
+        */
+        float det() const;
+
+        /**
+         * @brief Метод необходимый для транспонирования матрицы.
+        */
+        void transpose();
+
+        /**
+         * TODO: Добавить метод inverse.
+        */
+
+    private:
+        Matrix4x4(const __m256& s1, const __m256& s2);
+
+        union
+        {
+            float _two_dimensional_array[4][4];;
+            float _linear_array[16];
+            __m128 _m128_simd[4];
+            __m256 _m256_simd[2];
         };
     };
 
