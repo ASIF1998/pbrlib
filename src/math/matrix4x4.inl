@@ -317,9 +317,8 @@ namespace pbrlib::math
 
     Matrix4x4<float>::Matrix4x4(const float* ptr_data)
     {
-        for (size_t i{0}; i < 16; i++) {
-            _linear_array[i] = ptr_data[i];
-        }
+        _m256_simd[0] = _mm256_loadu_ps(ptr_data);
+        _m256_simd[1] = _mm256_loadu_ps(ptr_data + 8);
     }
 
     Matrix4x4<float>::Matrix4x4(const __m256& s1, const __m256& s2)
@@ -515,12 +514,15 @@ namespace pbrlib::math
 
     void Matrix4x4<float>::transpose()
     {
-        swap(_two_dimensional_array[0][1], _two_dimensional_array[1][0]);
-        swap(_two_dimensional_array[0][2], _two_dimensional_array[2][0]);
-        swap(_two_dimensional_array[0][3], _two_dimensional_array[3][0]);
-        swap(_two_dimensional_array[1][2], _two_dimensional_array[2][1]);
-        swap(_two_dimensional_array[1][3], _two_dimensional_array[3][1]);
-        swap(_two_dimensional_array[2][3], _two_dimensional_array[3][2]);
+        auto xmm0 = _mm_unpacklo_ps(_m128_simd[0], _m128_simd[1]);
+        auto xmm1 = _mm_unpacklo_ps(_m128_simd[2], _m128_simd[3]);
+        auto xmm2 = _mm_unpackhi_ps(_m128_simd[0], _m128_simd[1]);
+        auto xmm3 = _mm_unpackhi_ps(_m128_simd[2], _m128_simd[3]);
+
+        _m128_simd[0] = _mm_movelh_ps(xmm0, xmm1);
+        _m128_simd[1] = _mm_movehl_ps(xmm1, xmm0);
+        _m128_simd[2] = _mm_movelh_ps(xmm2, xmm3);
+        _m128_simd[3] = _mm_movehl_ps(xmm3, xmm2);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -143,7 +143,7 @@ namespace pbrlib::math
 
         union
         {
-            float _two_dimensional_array[4][4];;
+            float _two_dimensional_array[4][4];
             float _linear_array[16];
             __m128 _m128_simd[4];
             __m256 _m256_simd[2];
