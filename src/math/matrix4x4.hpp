@@ -77,8 +77,8 @@ namespace pbrlib::math
     private:
         union
         {
-            Type _two_dimensional_array[4][4];
-            Type _linear_array[16];
+            Type _array4x4[4][4];
+            Type _array16[16];
         };
     };
 
@@ -135,16 +135,17 @@ namespace pbrlib::math
         void transpose();
 
         /**
-         * TODO: Добавить метод inverse.
+         * @brief Метод находящий обратную матрицу.
         */
+        void inverse();
 
     private:
         Matrix4x4(const __m256& s1, const __m256& s2);
 
         union
         {
-            float _two_dimensional_array[4][4];
-            float _linear_array[16];
+            float _array4x4[4][4];
+            float _array16[16];
             __m128 _m128_simd[4];
             __m256 _m256_simd[2];
         };
