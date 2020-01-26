@@ -540,6 +540,8 @@ namespace pbrlib::math
             float det_a = a[0] * a[3] - a[2] * a[1];
             float det_d = d[0] * d[3] - d[2] * d[1];
 
+            assert(det_a != static_cast<float>(0u) && det_d != static_cast<float>(0u));
+
             auto adj_a = _mm_mul_ps(_mm_shuffle_ps(a, a, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
             auto adj_d = _mm_mul_ps(_mm_shuffle_ps(d, d, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
 
@@ -579,6 +581,8 @@ namespace pbrlib::math
 
             float det_sm1 = sm1[0] * sm1[3] - sm1[2] * sm1[1];
             float det_sm4 = sm4[0] * sm4[3] - sm4[2] * sm4[1];
+
+            assert(det_sm1 != static_cast<float>(0u) && det_sm4 != static_cast<float>(0u));
 
             auto adj_sm1 = _mm_mul_ps(_mm_shuffle_ps(sm1, sm1, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
             auto adj_sm4 = _mm_mul_ps(_mm_shuffle_ps(sm4, sm4, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
