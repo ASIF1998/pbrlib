@@ -1,5 +1,5 @@
 //
-//  matrix4x4.cpp
+//  matrix4x4.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 22/01/2020.

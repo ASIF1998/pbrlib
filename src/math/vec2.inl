@@ -1,5 +1,5 @@
 //
-//  vec2.cpp
+//  vec2.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 21/01/2020.
