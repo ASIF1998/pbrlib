@@ -18,6 +18,9 @@ using namespace std;
 namespace pbrlib::math
 {
     template<typename Type>
+    struct Vec4;
+
+    template<typename Type>
     class Matrix4x4
     {
     public:
@@ -45,6 +48,7 @@ namespace pbrlib::math
         Matrix4x4 operator - (const Matrix4x4& mat) const;
         Matrix4x4 operator * (const Matrix4x4& mat) const;
         Matrix4x4 operator * (Type scal) const;
+        Vec4<Type> operator * (const Vec4<Type>& v) const;
 
         Matrix4x4& operator += (const Matrix4x4& mat);
         Matrix4x4& operator -= (const Matrix4x4& mat);
@@ -110,6 +114,7 @@ namespace pbrlib::math
         Matrix4x4 operator - (const Matrix4x4& mat) const;
         Matrix4x4 operator * (const Matrix4x4& mat) const;
         Matrix4x4 operator * (float scal) const;
+        Vec4<float> operator * (const Vec4<float>& v) const;
 
         Matrix4x4& operator += (const Matrix4x4& mat);
         Matrix4x4& operator -= (const Matrix4x4& mat);

@@ -128,6 +128,21 @@ namespace pbrlib::math
     }
 
     template<typename Type>
+    Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const
+    {
+        Vec4<Type> res;
+
+        for (size_t i{0}; i < 4; i++) {
+            res.x += _array4x4[0][i] * v[i];
+            res.y += _array4x4[1][i] * v[i];
+            res.z += _array4x4[2][i] * v[i];
+            res.w += _array4x4[3][i] * v[i];
+        }
+
+        return res;
+    }
+
+    template<typename Type>
     Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat)
     {
         for (size_t i{0}; i < 16; i++) {
@@ -401,6 +416,53 @@ namespace pbrlib::math
             _mm256_mul_ps(_m256_simd[0], vscal),
             _mm256_mul_ps(_m256_simd[1], vscal)
         };
+    }
+
+    Vec4<float> Matrix4x4<float>::operator * (const Vec4<float>& v) const
+    {
+        Vec4<float> res;
+
+        res.xyzw_simd = _mm_mul_ps(
+                            _mm_setr_ps(
+                                _array4x4[0][0], 
+                                _array4x4[1][0], 
+                                _array4x4[2][0], 
+                                _array4x4[3][0]), 
+                            _mm_set1_ps(v.xyzw_simd[0]));
+
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][1], 
+                                    _array4x4[1][1], 
+                                    _array4x4[2][1], 
+                                    _array4x4[3][1]), 
+                                _mm_set1_ps(v.xyzw_simd[1])), 
+                            res.xyzw_simd);
+
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][2], 
+                                    _array4x4[1][2], 
+                                    _array4x4[2][2], 
+                                    _array4x4[3][2]), 
+                                _mm_set1_ps(v.xyzw_simd[2])), 
+                            res.xyzw_simd);
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][3], 
+                                    _array4x4[1][3], 
+                                    _array4x4[2][3], 
+                                    _array4x4[3][3]), 
+                                _mm_set1_ps(v.xyzw_simd[3])), 
+                            res.xyzw_simd);
+        
+        return res; 
     }
 
     Matrix4x4<float>& Matrix4x4<float>::operator += (const Matrix4x4<float>& mat) 
