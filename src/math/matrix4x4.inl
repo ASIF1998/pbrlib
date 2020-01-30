@@ -80,7 +80,7 @@ namespace pbrlib::math
         Matrix4x4<Type> res;
 
         for (size_t i{0}; i < 16; i++) {
-            res._linear_array[i] = _array16[i] + mat._array16[i];
+            res._array16[i] = _array16[i] + mat._array16[i];
         }
 
         return res;
@@ -92,7 +92,7 @@ namespace pbrlib::math
         Matrix4x4<Type> res;
 
         for (size_t i{0}; i < 16; i++) {
-            res._linear_array[i] = _array16[i] - mat._array16[i];
+            res._array16[i] = _array16[i] - mat._array16[i];
         }
 
         return res;
@@ -107,7 +107,7 @@ namespace pbrlib::math
             for (size_t k{0}; k < 4; k++) {
                 auto v = _array4x4[i][k];
                 for (size_t j{0}; j < 4; j++) {
-                    res._two_dimensional_array[i][j] += v * mat._two_dimensional_array[k][j];
+                    res._array4x4[i][j] += v * mat._array4x4[k][j];
                 }
             }
         }
