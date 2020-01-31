@@ -1,5 +1,5 @@
 //
-//  vec3.cpp
+//  vec3.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 22/01/2020.

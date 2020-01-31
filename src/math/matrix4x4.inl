@@ -1,10 +1,13 @@
 //
-//  matrix4x4.cpp
+//  matrix4x4.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 22/01/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
+
+#include <memory>
+
 namespace pbrlib::math
 {
     template<typename Type>
@@ -18,9 +21,8 @@ namespace pbrlib::math
     template<typename Type>
     Matrix4x4<Type>::Matrix4x4(const Type* ptr_data) 
     {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] = ptr_data[i];
-        }
+        assert(ptr_data);
+        memcpy(_array16, ptr_data, sizeof(Type) * 16);
     }
 
     template<typename Type>
@@ -80,7 +82,7 @@ namespace pbrlib::math
         Matrix4x4<Type> res;
 
         for (size_t i{0}; i < 16; i++) {
-            res._linear_array[i] = _array16[i] + mat._array16[i];
+            res._array16[i] = _array16[i] + mat._array16[i];
         }
 
         return res;
@@ -92,7 +94,7 @@ namespace pbrlib::math
         Matrix4x4<Type> res;
 
         for (size_t i{0}; i < 16; i++) {
-            res._linear_array[i] = _array16[i] - mat._array16[i];
+            res._array16[i] = _array16[i] - mat._array16[i];
         }
 
         return res;
@@ -107,7 +109,7 @@ namespace pbrlib::math
             for (size_t k{0}; k < 4; k++) {
                 auto v = _array4x4[i][k];
                 for (size_t j{0}; j < 4; j++) {
-                    res._two_dimensional_array[i][j] += v * mat._two_dimensional_array[k][j];
+                    res._array4x4[i][j] += v * mat._array4x4[k][j];
                 }
             }
         }
@@ -122,6 +124,21 @@ namespace pbrlib::math
 
         for (size_t i{0}; i < 16; i++) {
             res._array16[i] = _array16[i] * scal;
+        }
+
+        return res;
+    }
+
+    template<typename Type>
+    Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const
+    {
+        Vec4<Type> res;
+
+        for (size_t i{0}; i < 4; i++) {
+            res.x += _array4x4[0][i] * v[i];
+            res.y += _array4x4[1][i] * v[i];
+            res.z += _array4x4[2][i] * v[i];
+            res.w += _array4x4[3][i] * v[i];
         }
 
         return res;
@@ -177,14 +194,14 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Type& Matrix4x4<Type>::at(size_t i, size_t j)
+    inline Type& Matrix4x4<Type>::at(size_t i, size_t j)
     {
         assert(i < 4 && j < 4);
         return _array4x4[i][j];
     }
 
     template<typename Type>
-    Type Matrix4x4<Type>::at(size_t i, size_t j) const
+    inline Type Matrix4x4<Type>::at(size_t i, size_t j) const
     {
         assert(i < 4 && j < 4);
         return _array4x4[i][j];
@@ -317,6 +334,7 @@ namespace pbrlib::math
 
     Matrix4x4<float>::Matrix4x4(const float* ptr_data)
     {
+        assert(ptr_data);
         _m256_simd[0] = _mm256_loadu_ps(ptr_data);
         _m256_simd[1] = _mm256_loadu_ps(ptr_data + 8);
     }
@@ -401,6 +419,53 @@ namespace pbrlib::math
             _mm256_mul_ps(_m256_simd[0], vscal),
             _mm256_mul_ps(_m256_simd[1], vscal)
         };
+    }
+
+    Vec4<float> Matrix4x4<float>::operator * (const Vec4<float>& v) const
+    {
+        Vec4<float> res;
+
+        res.xyzw_simd = _mm_mul_ps(
+                            _mm_setr_ps(
+                                _array4x4[0][0], 
+                                _array4x4[1][0], 
+                                _array4x4[2][0], 
+                                _array4x4[3][0]), 
+                            _mm_set1_ps(v.xyzw_simd[0]));
+
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][1], 
+                                    _array4x4[1][1], 
+                                    _array4x4[2][1], 
+                                    _array4x4[3][1]), 
+                                _mm_set1_ps(v.xyzw_simd[1])), 
+                            res.xyzw_simd);
+
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][2], 
+                                    _array4x4[1][2], 
+                                    _array4x4[2][2], 
+                                    _array4x4[3][2]), 
+                                _mm_set1_ps(v.xyzw_simd[2])), 
+                            res.xyzw_simd);
+
+        res.xyzw_simd = _mm_add_ps(
+                            _mm_mul_ps(
+                                _mm_setr_ps(
+                                    _array4x4[0][3], 
+                                    _array4x4[1][3], 
+                                    _array4x4[2][3], 
+                                    _array4x4[3][3]), 
+                                _mm_set1_ps(v.xyzw_simd[3])), 
+                            res.xyzw_simd);
+        
+        return res; 
     }
 
     Matrix4x4<float>& Matrix4x4<float>::operator += (const Matrix4x4<float>& mat) 
