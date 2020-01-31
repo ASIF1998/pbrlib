@@ -5,6 +5,9 @@
 //  Created by Асиф Мамедов on 22/01/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
+
+#include <memory>
+
 namespace pbrlib::math
 {
     template<typename Type>
@@ -18,9 +21,8 @@ namespace pbrlib::math
     template<typename Type>
     Matrix4x4<Type>::Matrix4x4(const Type* ptr_data) 
     {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] = ptr_data[i];
-        }
+        assert(ptr_data);
+        memcpy(_array16, ptr_data, sizeof(Type) * 16);
     }
 
     template<typename Type>
@@ -192,14 +194,14 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Type& Matrix4x4<Type>::at(size_t i, size_t j)
+    inline Type& Matrix4x4<Type>::at(size_t i, size_t j)
     {
         assert(i < 4 && j < 4);
         return _array4x4[i][j];
     }
 
     template<typename Type>
-    Type Matrix4x4<Type>::at(size_t i, size_t j) const
+    inline Type Matrix4x4<Type>::at(size_t i, size_t j) const
     {
         assert(i < 4 && j < 4);
         return _array4x4[i][j];
@@ -332,6 +334,7 @@ namespace pbrlib::math
 
     Matrix4x4<float>::Matrix4x4(const float* ptr_data)
     {
+        assert(ptr_data);
         _m256_simd[0] = _mm256_loadu_ps(ptr_data);
         _m256_simd[1] = _mm256_loadu_ps(ptr_data + 8);
     }

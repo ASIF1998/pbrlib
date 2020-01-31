@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace pbrlib::math
 {
     template<typename Type>
@@ -53,8 +55,8 @@ namespace pbrlib::math
         inline Type* operator [] (size_t i);
         inline const Type* operator [] (size_t i) const;
 
-        Type& at(size_t i, size_t j);
-        Type at(size_t i, size_t j) const;
+        inline Type& at(size_t i, size_t j);
+        inline Type at(size_t i, size_t j) const;
 
         /**
          * @brief Метод необходимый для вычисления определителя.

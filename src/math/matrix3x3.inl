@@ -10,8 +10,6 @@
 
 #include <algorithm>
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -43,6 +41,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Matrix3x3<Type>::Matrix3x3(const Type* ptr_data)
     {
+        assert(ptr_data);
         memcpy(_array9, ptr_data, 9 * sizeof(Type));
     }
 
@@ -76,7 +75,19 @@ namespace pbrlib::math
         Matrix3x3<Type> res;
 
         for (size_t i{0}; i < 9; i++) {
-            res._linear_array[i] = _array9[i] + mat._array9[i];
+            res._array9[i] = _array9[i] + mat._array9[i];
+        }
+
+        return res;
+    }
+
+    template<typename Type>
+    Matrix3x3<Type> Matrix3x3<Type>::operator - (const Matrix3x3<Type>& mat) const
+    {
+        Matrix3x3<Type> res;
+
+        for (size_t i{0}; i < 9; i++) {
+            res._array9[i] = _array9[i] - mat._array9[i];
         }
 
         return res;
@@ -139,7 +150,7 @@ namespace pbrlib::math
     Matrix3x3<Type>& Matrix3x3<Type>::operator -= (const Matrix3x3<Type>& mat)
     {
         for (size_t i{0}; i < 9; i++) {
-            _array9[i] += mat._array9[i];
+            _array9[i] -= mat._array9[i];
         }
 
         return *this;
@@ -175,14 +186,14 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Type& Matrix3x3<Type>::at(size_t i, size_t j)
+    inline Type& Matrix3x3<Type>::at(size_t i, size_t j)
     {
         assert(i < 3 && j < 3);
         return _array3x3[i][j];
     }
 
     template<typename Type>
-    Type Matrix3x3<Type>::at(size_t i, size_t j) const
+    inline Type Matrix3x3<Type>::at(size_t i, size_t j) const
     {
         assert(i < 3 && j < 3);
         return _array3x3[i][j];
