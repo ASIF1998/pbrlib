@@ -12,6 +12,8 @@
 
 #include "Window.hpp"
 
+#include <SDL2/SDL_vulkan.h>
+
 namespace pbrlib
 {
     bool Window::_is_init_SDL = false;
@@ -25,19 +27,19 @@ namespace pbrlib
             if (SDL_Init(SDL_INIT_EVERYTHING)) {
                 throw runtime_error(SDL_GetError());
             }
+            
+            _is_init_SDL = true;
         }
 
         _num_window++;
 
-        /**
-         *  TODO: Vulkan.
-        */
         _ptr_window = SDL_CreateWindow( title.data(), 
                                         pos_x, 
                                         pos_y, 
                                         width, 
                                         height, 
-                                        SDL_WINDOW_SHOWN | 
+                                        SDL_WINDOW_SHOWN    |
+                                        SDL_WINDOW_VULKAN   |
                                         static_cast<decltype(SDL_WINDOW_SHOWN)>(resizable));
 
         assert(_ptr_window);
@@ -54,7 +56,8 @@ namespace pbrlib
         SDL_DestroyWindow(_ptr_window);
 
         if (!_num_window && _is_init_SDL) {
-            SDL_Quit(); 
+            SDL_Quit();
+            _is_init_SDL = false;
         }
     }
 
@@ -103,5 +106,15 @@ namespace pbrlib
     {
         auto es = (e ? SDL_TRUE : SDL_FALSE);
         SDL_CaptureMouse(es);
+    }
+
+    void Window::getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions)
+    {
+        uint32_t num_extensions_names = 0;
+
+        assert(SDL_Vulkan_GetInstanceExtensions(window._ptr_window, &num_extensions_names, nullptr) == SDL_TRUE);
+        uint32_t offset = static_cast<uint32_t>(out_extensions.size());
+        out_extensions.resize(offset + num_extensions_names);
+        assert(SDL_Vulkan_GetInstanceExtensions(window._ptr_window, &num_extensions_names, out_extensions.data() + offset) == SDL_TRUE);
     }
 }

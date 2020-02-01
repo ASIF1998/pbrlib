@@ -16,6 +16,8 @@
 
 #include <tuple>
 
+#include <vector>
+
 using namespace std;
 
 namespace pbrlib
@@ -74,6 +76,7 @@ namespace pbrlib
 
         static bool showCursor(bool e) noexcept;    
         static void captureMouse(bool e) noexcept;
+        static void getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions);
 
     public:
         static constexpr int WINDOW_POSITION_CENTERED = SDL_WINDOWPOS_CENTERED;
