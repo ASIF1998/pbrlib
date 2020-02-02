@@ -22,16 +22,18 @@ using namespace std;
 
 namespace pbrlib
 {
+    struct PhysicalDevice;
+
     /**
-     * @class VulkanExtensionSupported.
+     * @class VulkanInstanceExtensionSupported.
      * @brief 
      *      Данный класс необходим для проверки поддержки 
      *      расширений экземпляра.
     */
-    class VulkanExtensionSupported
+    class VulkanInstanceExtensionSupported
     {
     public:
-        VulkanExtensionSupported();
+        VulkanInstanceExtensionSupported();
 
         /**
          * @brief Метод проверяющий поддержку расширения.
@@ -46,15 +48,15 @@ namespace pbrlib
     };
 
     /**
-     * @class VulkanLayerSupported.
+     * @class VulkanInstanceLayerSupported.
      * @brief 
      *      Данный класс необходим для проверки поддержки 
      *      слоёв экземпляра.
     */
-    class VulkanLayerSupported
+    class VulkanInstanceLayerSupported
     {
     public:
-        VulkanLayerSupported();
+        VulkanInstanceLayerSupported();
 
         /**
          * @brief Метод проверяющий поддержку слоя.
@@ -71,6 +73,22 @@ namespace pbrlib
     class Instance
     {
     public:
+        /**
+         * @brief Конструктор.
+         * 
+         * @param app_name название приложения.
+         * @param app_version номер приложения.
+        */
+        Instance(const string_view app_name, uint32_t app_version);
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param app_name название приложения.
+         * @param app_version номер приложения.
+         * @param layer_names названия слоёв.
+         * @param extension_names названия расширений.
+        */
         Instance(const string_view app_name, 
                  uint32_t app_version, 
                  const vector<const char*>& layer_names, 
@@ -80,8 +98,8 @@ namespace pbrlib
 
         VkInstance getHandle() const;
 
-        VkPhysicalDevice getGPUHandle(int type) const;
-        vector<VkPhysicalDevice> getAllGPUHandle(int type) const;
+        PhysicalDevice getGPUHandle(int type) const;
+        vector<PhysicalDevice> getAllGPUHandle(int type) const;
 
         /**
          * @brief Статический метод проверяющий поддержку расширения.
@@ -102,10 +120,10 @@ namespace pbrlib
 
     private:
         VkInstance _instance_handle;
-        vector<VkPhysicalDevice> _physical_device_handles;
+        vector<PhysicalDevice> _physical_device_handles;
 
-        static VulkanExtensionSupported _supported_extensions;
-        static VulkanLayerSupported _supported_layers;
+        static VulkanInstanceExtensionSupported _supported_extensions;
+        static VulkanInstanceLayerSupported _supported_layers;
     };
 }
 

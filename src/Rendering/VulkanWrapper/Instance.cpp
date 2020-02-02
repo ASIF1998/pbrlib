@@ -7,15 +7,17 @@
 //
 
 #include "Instance.hpp"
+#include "PhysicalDevice.hpp"
 
 #include "../../core.hpp"
 
 namespace pbrlib
 {
-    VulkanExtensionSupported Instance::_supported_extensions = {};
-    VulkanLayerSupported Instance::_supported_layers = {};
+    VulkanInstanceExtensionSupported Instance::_supported_extensions = {};
+    VulkanInstanceLayerSupported Instance::_supported_layers = {};
 
-    VulkanExtensionSupported::VulkanExtensionSupported()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    VulkanInstanceExtensionSupported::VulkanInstanceExtensionSupported()
     {
         uint32_t num_extension_supported = 0;
         assert(vkEnumerateInstanceExtensionProperties(nullptr, &num_extension_supported, nullptr) == VK_SUCCESS);
@@ -29,12 +31,13 @@ namespace pbrlib
         }
     }
 
-    bool VulkanExtensionSupported::check(const string& name) const
+    bool VulkanInstanceExtensionSupported::check(const string& name) const
     {
         return _extension_supported.find(name) != _extension_supported.end();
     }
 
-    VulkanLayerSupported::VulkanLayerSupported()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    VulkanInstanceLayerSupported::VulkanInstanceLayerSupported()
     {
         uint32_t num_layer_supported = 0;
 
@@ -49,9 +52,53 @@ namespace pbrlib
         }
     }
 
-    bool VulkanLayerSupported::check(const string& name) const
+    bool VulkanInstanceLayerSupported::check(const string& name) const
     {
         return _layer_supported.find(name) != _layer_supported.end();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Instance::Instance(const string_view application_name, uint32_t app_version) :
+        _instance_handle(VK_NULL_HANDLE)
+    {
+        VkApplicationInfo app_info {
+            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pNext = nullptr,
+            .pApplicationName = application_name.data(),
+            .applicationVersion = app_version,
+            .pEngineName = "PBRLib",
+            .engineVersion = EngineVersion,
+            .apiVersion = VK_MAKE_VERSION(1, 0, 0)
+        };
+
+        VkInstanceCreateInfo instance_info {
+            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .pApplicationInfo = &app_info,
+            .enabledLayerCount = 0,
+            .ppEnabledLayerNames = nullptr,
+            .enabledExtensionCount = 0,
+            .ppEnabledExtensionNames = nullptr
+        };
+
+        assert(vkCreateInstance(&instance_info, nullptr, &_instance_handle) == VK_SUCCESS);
+        assert(_instance_handle != VK_NULL_HANDLE);
+
+        uint32_t num_physical_device_handles = 0;
+
+        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, nullptr) == VK_SUCCESS);
+        
+        assert(num_physical_device_handles > 0);
+        _physical_device_handles.reserve(num_physical_device_handles);
+        
+        vector<VkPhysicalDevice> physical_device_handles(num_physical_device_handles);
+        
+        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, physical_device_handles.data()) == VK_SUCCESS);
+        
+        for (size_t i{0}; i < physical_device_handles.size(); i++) {
+            _physical_device_handles.push_back(physical_device_handles[i]);
+        }
     }
 
     Instance::Instance(const string_view application_name, 
@@ -89,9 +136,15 @@ namespace pbrlib
         assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, nullptr) == VK_SUCCESS);
         
         assert(num_physical_device_handles > 0);
-        _physical_device_handles.resize(num_physical_device_handles);
+        _physical_device_handles.reserve(num_physical_device_handles);
         
-        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, _physical_device_handles.data()) == VK_SUCCESS);
+        vector<VkPhysicalDevice> physical_device_handles(num_physical_device_handles);
+        
+        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, physical_device_handles.data()) == VK_SUCCESS);
+        
+        for (size_t i{0}; i < physical_device_handles.size(); i++) {
+            _physical_device_handles.push_back(physical_device_handles[i]);
+        }
     }
 
     Instance::~Instance()
@@ -104,12 +157,12 @@ namespace pbrlib
         return _instance_handle;
     }
 
-    VkPhysicalDevice Instance::getGPUHandle(int type) const
+    PhysicalDevice Instance::getGPUHandle(int type) const
     {
         VkPhysicalDeviceProperties physical_device_property;
 
         for (size_t i{0}; i < _physical_device_handles.size(); i++) {
-            vkGetPhysicalDeviceProperties(_physical_device_handles[i], &physical_device_property);
+            vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
             if (physical_device_property.deviceType & type) {
                 return _physical_device_handles[i];
             }
@@ -118,13 +171,13 @@ namespace pbrlib
         return VK_NULL_HANDLE;
     }
 
-    vector<VkPhysicalDevice> Instance::getAllGPUHandle(int type) const
+    vector<PhysicalDevice> Instance::getAllGPUHandle(int type) const
     {
-        vector<VkPhysicalDevice> handles;
+        vector<PhysicalDevice> handles;
         VkPhysicalDeviceProperties physical_device_property;
 
         for (size_t i{0}; i < _physical_device_handles.size(); i++) {
-            vkGetPhysicalDeviceProperties(_physical_device_handles[i], &physical_device_property);
+            vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
             if (physical_device_property.deviceType & type) {
                 handles.push_back(_physical_device_handles[i]);
             }
