@@ -7,6 +7,7 @@
 //
 
 #include "PhysicalDevice.hpp"
+#include "Device.hpp"
 
 #include <vector>
 
@@ -72,5 +73,10 @@ namespace pbrlib
         vkGetPhysicalDeviceFormatProperties(physical_device_handle, format, &format_properties);
 
         return format_properties;
+    }
+
+    shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info)
+    {
+        return make_shared<Device>(*this, queue_info);
     }
 }

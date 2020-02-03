@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include <memory>
+
 using namespace std;
 
 namespace pbrlib
@@ -23,6 +25,8 @@ namespace pbrlib
      * TODO: 
      *      1) Добавить статический метод make который будет возвращать shared_ptr<Device>.
     */
+
+   class Device;
 
     struct PhysicalDevice
     {
@@ -34,6 +38,14 @@ namespace pbrlib
 
         bool isFormatSupported(VkFormat format, VkImageType image_type, VkImageTiling image_tiling, VkImageUsageFlags image_usage) const;
         VkFormatProperties getFormatProperties(VkFormat format) const;
+
+        /**
+         * @brief Метод создающий логическое устройство.
+         * 
+         * @param queue_info информация о создаваемых очередях логического устройства.
+         * @return лгическое устройство.
+        */
+        shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info);
 
     public:
         VkPhysicalDevice physical_device_handle;

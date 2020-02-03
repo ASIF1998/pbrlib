@@ -10,11 +10,12 @@
 
 #include <stdexcept>
 
+#include "PhysicalDevice.hpp"
+
 namespace pbrlib
 {
-    Device::Device(PhysicalDevice physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
-        _device_handle(VK_NULL_HANDLE),
-        _physical_device(physical_device)
+    Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
+        _device_handle(VK_NULL_HANDLE)
     {
         vector<VkQueueFamilyProperties> queue_properties (queue_info.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
@@ -44,12 +45,11 @@ namespace pbrlib
         assert(_device_handle != VK_NULL_HANDLE);
     }
 
-    Device::Device(PhysicalDevice physical_device, 
+    Device::Device(const PhysicalDevice& physical_device, 
                    const vector<VkDeviceQueueCreateInfo>& queue_info, 
                    const vector<const char*>& layer_names, 
                    const vector<const char*>& extension_names) :
-        _device_handle(VK_NULL_HANDLE),
-        _physical_device(physical_device)
+        _device_handle(VK_NULL_HANDLE)
     {
         vector<VkQueueFamilyProperties> queue_properties (queue_info.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
@@ -88,30 +88,6 @@ namespace pbrlib
     {
         return _device_handle;
     }
-
-    PhysicalDevice& Device::getPhysicalDevice() noexcept
-    {
-        return _physical_device;
-    }
-
-    const PhysicalDevice& Device::getPhysicalDevice() const noexcept
-    {
-        return _physical_device;
-    }
-
-    // VkQueue Device::getQueue(uint32_t famili_index, uint32_t index) const
-    // {
-    //     VkQueue queue = VK_NULL_HANDLE;
-
-    //     vkGetDeviceQueue(_device_handle, famili_index, index, &queue);
-
-    //     return queue;
-    // }
-
-    // VkQueue Device::getQueueByPresent() const
-    // {
-    //     return _present_queue_handle;
-    // }
 
     void Device::waitIdle() const
     {

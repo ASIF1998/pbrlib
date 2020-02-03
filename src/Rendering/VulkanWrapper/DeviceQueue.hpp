@@ -43,7 +43,6 @@ namespace pbrlib
         VkQueue getHandle() const noexcept;
         uint32_t getFamilyIndex() const noexcept;
         uint32_t getIndex() const noexcept;
-        VkQueueFamilyProperties getFamilyProperties() const noexcept;
 
         /**
          * @brief Метод ожидающий пока все команды в очереди не будут выполнены.

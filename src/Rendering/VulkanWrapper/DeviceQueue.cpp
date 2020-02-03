@@ -54,18 +54,6 @@ namespace pbrlib
         return _index;
     }
 
-    VkQueueFamilyProperties DeviceQueue::getFamilyProperties() const noexcept
-    {
-        VkQueueFamilyProperties queue_family_properties;
-        uint32_t count = 1;
-
-        vkGetPhysicalDeviceQueueFamilyProperties(_ptr_device->getPhysicalDevice().physical_device_handle, 
-                                                 &count,
-                                                    &queue_family_properties);
-
-        return queue_family_properties;
-    }
-
     void DeviceQueue::waitIdle() const
     {
         vkQueueWaitIdle(_queue_handle);

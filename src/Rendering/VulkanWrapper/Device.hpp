@@ -14,8 +14,6 @@
 #include <vector>
 #include <set>
 
-#include "PhysicalDevice.hpp"
-
 using namespace std;
 
 namespace pbrlib
@@ -36,7 +34,7 @@ namespace pbrlib
          * @param physical_device физическое устройство.
          * @param queue_info информация о создаваемых очередях логического устройства.
         */
-        Device(PhysicalDevice physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info);
+        Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info);
 
         /**
          * Конструктор.
@@ -46,7 +44,7 @@ namespace pbrlib
          * @param layer_names названия слоёв.
          * @param extension_names названия расширений.
         */
-        Device(PhysicalDevice physical_device, 
+        Device(const PhysicalDevice& physical_device, 
                const vector<VkDeviceQueueCreateInfo>& queue_info, 
                const vector<const char*>& layer_names, 
                const vector<const char*>& extension_names);
@@ -54,10 +52,6 @@ namespace pbrlib
         ~Device();
 
         VkDevice getHandle() const noexcept;
-        PhysicalDevice& getPhysicalDevice() noexcept;
-        const PhysicalDevice& getPhysicalDevice() const noexcept;
-        // VkQueue getQueue(uint32_t famili_index, uint32_t index) const;
-        // VkQueue getQueueByPresent() const;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
@@ -66,7 +60,6 @@ namespace pbrlib
 
     private:
         VkDevice _device_handle;
-        PhysicalDevice _physical_device;
     };
 }
 
