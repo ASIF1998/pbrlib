@@ -19,6 +19,11 @@ using namespace std;
 
 namespace pbrlib
 {
+    /**
+     * TODO: 
+     *      1) Добавить статический метод make который будет возвращать shared_ptr<Device>.
+    */
+
     struct PhysicalDevice
     {
     public:

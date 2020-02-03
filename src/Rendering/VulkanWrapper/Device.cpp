@@ -7,14 +7,14 @@
 //
 
 #include "Device.hpp"
-#include "PhysicalDevice.hpp"
 
 #include <stdexcept>
 
 namespace pbrlib
 {
     Device::Device(PhysicalDevice physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
-        _device_handle(VK_NULL_HANDLE)
+        _device_handle(VK_NULL_HANDLE),
+        _physical_device(physical_device)
     {
         vector<VkQueueFamilyProperties> queue_properties (queue_info.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
@@ -23,7 +23,7 @@ namespace pbrlib
 
         for (size_t i{0}; i < queue_properties.size(); i++) {
             if (!(queue_properties[i].queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT))) {
-                throw invalid_argument("Семейство очередей #" + to_string(i) + "не поддерживает графические операции.");
+                throw invalid_argument("Семейство очередей #" + to_string(i) + " не поддерживает графические операции.");
             }
         }
 
@@ -48,7 +48,8 @@ namespace pbrlib
                    const vector<VkDeviceQueueCreateInfo>& queue_info, 
                    const vector<const char*>& layer_names, 
                    const vector<const char*>& extension_names) :
-        _device_handle(VK_NULL_HANDLE)
+        _device_handle(VK_NULL_HANDLE),
+        _physical_device(physical_device)
     {
         vector<VkQueueFamilyProperties> queue_properties (queue_info.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
@@ -57,7 +58,7 @@ namespace pbrlib
 
         for (size_t i{0}; i < queue_properties.size(); i++) {
             if (!(queue_properties[i].queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT))) {
-                throw invalid_argument("Семейство очередей #" + to_string(i) + "не поддерживает графические операции.");
+                throw invalid_argument("Семейство очередей #" + to_string(i) + " не поддерживает графические операции.");
             }
         }
 
@@ -83,10 +84,20 @@ namespace pbrlib
         vkDestroyDevice(_device_handle, nullptr);
     }
 
-    // VkDevice Device::getHandle() const
-    // {
-    //     return _device_handle;
-    // }
+    VkDevice Device::getHandle() const noexcept
+    {
+        return _device_handle;
+    }
+
+    PhysicalDevice& Device::getPhysicalDevice() noexcept
+    {
+        return _physical_device;
+    }
+
+    const PhysicalDevice& Device::getPhysicalDevice() const noexcept
+    {
+        return _physical_device;
+    }
 
     // VkQueue Device::getQueue(uint32_t famili_index, uint32_t index) const
     // {

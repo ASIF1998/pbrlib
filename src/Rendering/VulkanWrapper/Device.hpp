@@ -14,6 +14,8 @@
 #include <vector>
 #include <set>
 
+#include "PhysicalDevice.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -22,8 +24,7 @@ namespace pbrlib
 
     /**
      * TODO: 
-     *      1) Добавить поддержку проверки семейства очередей на возможность осуществления показа.
-     *      2) Доавить возмождность создавать командный пулы.
+     *      1) Добавить возможность создавать командный пулы.
     */
 
     class Device
@@ -43,7 +44,7 @@ namespace pbrlib
          * @param physical_device физическое устройство.
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @param layer_names названия слоёв.
-         * @param extension_names названия расщирений.
+         * @param extension_names названия расширений.
         */
         Device(PhysicalDevice physical_device, 
                const vector<VkDeviceQueueCreateInfo>& queue_info, 
@@ -52,7 +53,9 @@ namespace pbrlib
 
         ~Device();
 
-        // VkDevice getHandle() const;
+        VkDevice getHandle() const noexcept;
+        PhysicalDevice& getPhysicalDevice() noexcept;
+        const PhysicalDevice& getPhysicalDevice() const noexcept;
         // VkQueue getQueue(uint32_t famili_index, uint32_t index) const;
         // VkQueue getQueueByPresent() const;
 
@@ -63,6 +66,7 @@ namespace pbrlib
 
     private:
         VkDevice _device_handle;
+        PhysicalDevice _physical_device;
     };
 }
 
