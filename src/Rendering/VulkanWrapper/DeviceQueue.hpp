@@ -35,7 +35,7 @@ namespace pbrlib
          * @param family_index индекс семейства очередей.
          * @param index индекс очереди в семействе очередей.
         */
-        DeviceQueue(const shared_ptr<Device>& device, uint32_t family_index, uint32_t index);
+        DeviceQueue(const shared_ptr<Device>& ptr_device, uint32_t family_index, uint32_t index);
         ~DeviceQueue();
 
         shared_ptr<Device>& getDevice();
