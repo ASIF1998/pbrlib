@@ -19,15 +19,32 @@ namespace pbrlib
 {
     class Device;
 
+    enum class MapStatus
+    {
+        MAPPED,
+        UNMAPPED
+    };
+
     class DeviceMemory
     {
     public:
         DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
         ~DeviceMemory();
 
+        /**
+         * @brief Метод отображающий память устройства в адресное пространство CPU.
+         * @details 
+         *      Данный объект должен быть выделен из кучи, обладающий 
+         *      флагом VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT.
+        */
         void map();
+
+        /**
+         * @brief Метод завершающий отображение памяти.
+        */
         void unmap();
-        bool isMapped() const noexcept;
+
+        MapStatus isMapped() const noexcept;
 
         uint8_t* getData() noexcept;
         const uint8_t* getData() const noexcept;

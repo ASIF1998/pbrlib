@@ -12,6 +12,7 @@
 #include <vulkan/vulkan.h>
 
 #include <set>
+#include <vector>
 
 #include <string>
 
@@ -38,9 +39,27 @@ namespace pbrlib
          * @brief Метод создающий логическое устройство.
          * 
          * @param queue_info информация о создаваемых очередях логического устройства.
-         * @return лгическое устройство.
+         * @return логическое устройство.
         */
         shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info);
+
+        /**
+         * @brief Метод возвращающий индекс типа памяти.
+         * @details Типом памяти является набор флагов VkMemoryPropertyFlags и индекс кучи.
+         * 
+         * @param type набор флагов VkMemoryPropertyFlags.
+         * @return индекс типа памяти.
+        */
+        uint32_t getMemoryTypeIndex(uint32_t type) const;
+
+        /**
+         * @brief Метод возвращающий все индексы типа памяти.
+         * @details Типом памяти является набор флагов VkMemoryPropertyFlags и индекс кучи.
+         * 
+         * @param type набор флагов VkMemoryPropertyFlags.
+         * @return индексы типа памяти.
+        */
+        vector<uint32_t> getAllMemoryTypeIndicies(uint32_t type) const;
 
     public:
         VkPhysicalDevice physical_device_handle;

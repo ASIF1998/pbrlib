@@ -31,7 +31,7 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param device указатель на устройство.
+         * @param ptr_device указатель на устройство.
          * @param family_index индекс семейства очередей.
          * @param index индекс очереди в семействе очередей.
         */

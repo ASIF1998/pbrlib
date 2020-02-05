@@ -9,7 +9,7 @@
 #include "PhysicalDevice.hpp"
 #include "Device.hpp"
 
-#include <vector>
+#include <numeric>
 
 namespace pbrlib
 {
@@ -78,5 +78,38 @@ namespace pbrlib
     shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info)
     {
         return make_shared<Device>(*this, queue_info);
+    }
+
+    uint32_t PhysicalDevice::getMemoryTypeIndex(uint32_t type) const
+    {
+        constexpr uint32_t invalid_type_index = numeric_limits<uint32_t>::max();
+
+        VkPhysicalDeviceMemoryProperties memory_properties;
+
+        vkGetPhysicalDeviceMemoryProperties(physical_device_handle, &memory_properties);
+
+        for (uint32_t i{0}; i < memory_properties.memoryTypeCount; i++) {
+            if ((memory_properties.memoryTypes[i].propertyFlags & type) == type) {
+                return i;
+            }
+        }
+
+        return invalid_type_index;
+    }
+
+    vector<uint32_t> PhysicalDevice::getAllMemoryTypeIndicies(uint32_t type) const
+    {
+        vector<uint32_t> memory_type_indicies;
+        VkPhysicalDeviceMemoryProperties memory_properties;
+
+        vkGetPhysicalDeviceMemoryProperties(physical_device_handle, &memory_properties);
+
+        for (uint32_t i{0}; i < memory_properties.memoryTypeCount; i++) {
+            if ((memory_properties.memoryTypes[i].propertyFlags & type) == type) {
+                memory_type_indicies.push_back(i);
+            }
+        }
+
+        return memory_type_indicies;
     }
 }

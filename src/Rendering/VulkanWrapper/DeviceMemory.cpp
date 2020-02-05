@@ -55,9 +55,9 @@ namespace pbrlib
         }
     }
 
-    bool DeviceMemory::isMapped() const noexcept
+    MapStatus DeviceMemory::isMapped() const noexcept
     {
-        return _ptr_mapped_data;
+        return (_ptr_mapped_data ? MapStatus::MAPPED : MapStatus::UNMAPPED);
     }
 
     uint8_t* DeviceMemory::getData() noexcept
