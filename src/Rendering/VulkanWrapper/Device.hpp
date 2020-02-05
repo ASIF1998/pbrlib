@@ -51,7 +51,7 @@ namespace pbrlib
 
         ~Device();
 
-        VkDevice getHandle() const noexcept;
+        VkDevice getDeviceHandle() const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.

@@ -34,7 +34,7 @@ namespace pbrlib
         shared_ptr<Device>& getDevice() noexcept;
         const shared_ptr<Device>& getDevice() const noexcept;
         uint32_t getFamilyIndex() const noexcept;
-        VkCommandPool getHandle() const noexcept;
+        VkCommandPool getCommandPoolHandle() const noexcept;
 
     private:
         shared_ptr<Device> _ptr_device;

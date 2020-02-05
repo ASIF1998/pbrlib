@@ -84,7 +84,7 @@ namespace pbrlib
         vkDestroyDevice(_device_handle, nullptr);
     }
 
-    VkDevice Device::getHandle() const noexcept
+    VkDevice Device::getDeviceHandle() const noexcept
     {
         return _device_handle;
     }

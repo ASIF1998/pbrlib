@@ -24,19 +24,19 @@ namespace pbrlib
             .memoryTypeIndex = memory_type_index
         };
 
-        assert(vkAllocateMemory(_ptr_device->getHandle(), &alloc_info, nullptr, &_device_memory_handle) == VK_SUCCESS);
+        assert(vkAllocateMemory(_ptr_device->getDeviceHandle(), &alloc_info, nullptr, &_device_memory_handle) == VK_SUCCESS);
         assert(_device_memory_handle != VK_NULL_HANDLE);
     }
 
     DeviceMemory::~DeviceMemory()
     {
-        vkFreeMemory(_ptr_device->getHandle(), _device_memory_handle, nullptr);
+        vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);
     }
 
     void DeviceMemory::map()
     {
         if (!_ptr_mapped_data) {
-            assert(vkMapMemory(_ptr_device->getHandle(), 
+            assert(vkMapMemory(_ptr_device->getDeviceHandle(),
                                _device_memory_handle, 
                                0, 
                                _memory_size, 
@@ -50,7 +50,7 @@ namespace pbrlib
     void DeviceMemory::unmap()
     {
         if (_ptr_mapped_data) {
-            vkUnmapMemory(_ptr_device->getHandle(), _device_memory_handle);
+            vkUnmapMemory(_ptr_device->getDeviceHandle(), _device_memory_handle);
             _ptr_mapped_data = nullptr;
         }
     }
@@ -70,7 +70,7 @@ namespace pbrlib
         return _ptr_mapped_data;
     }
 
-    VkDeviceMemory DeviceMemory::getHandle() const noexcept
+    VkDeviceMemory DeviceMemory::getDeviceMemoryHandle() const noexcept
     {
         return _device_memory_handle;
     }

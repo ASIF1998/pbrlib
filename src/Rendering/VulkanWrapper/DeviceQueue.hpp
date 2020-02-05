@@ -40,7 +40,7 @@ namespace pbrlib
 
         shared_ptr<Device>& getDevice();
         const shared_ptr<Device>& getDevice() const;
-        VkQueue getHandle() const noexcept;
+        VkQueue getQueueHandle() const noexcept;
         uint32_t getFamilyIndex() const noexcept;
         uint32_t getIndex() const noexcept;
 

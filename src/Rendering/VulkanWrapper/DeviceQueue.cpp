@@ -18,7 +18,7 @@ namespace pbrlib
         _family_index(family_index),
         _index(index)
     {
-        vkGetDeviceQueue(_ptr_device->getHandle(), _family_index, _index, &_queue_handle);
+        vkGetDeviceQueue(_ptr_device->getDeviceHandle(), _family_index, _index, &_queue_handle);
         assert(_queue_handle != VK_NULL_HANDLE);
     }
 
@@ -39,7 +39,7 @@ namespace pbrlib
         return _ptr_device;
     }
 
-    VkQueue DeviceQueue::getHandle() const noexcept
+    VkQueue DeviceQueue::getQueueHandle() const noexcept
     {
         return _queue_handle;
     }

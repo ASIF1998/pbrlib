@@ -28,6 +28,13 @@ namespace pbrlib
     class DeviceMemory
     {
     public:
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_device указатель на устройство.
+         * @param size размер требуемой памяти.
+         * @param memory_type_index индекс типа памяти.
+        */
         DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
         ~DeviceMemory();
 
@@ -48,7 +55,7 @@ namespace pbrlib
 
         uint8_t* getData() noexcept;
         const uint8_t* getData() const noexcept;
-        VkDeviceMemory getHandle() const noexcept;
+        VkDeviceMemory getDeviceMemoryHandle() const noexcept;
         shared_ptr<Device>& getDevice() noexcept;
         const shared_ptr<Device>& getDevice() const noexcept;
 

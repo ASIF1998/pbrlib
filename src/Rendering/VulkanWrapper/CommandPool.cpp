@@ -24,13 +24,13 @@ namespace pbrlib
             .queueFamilyIndex = _queue_family_index
         };
         
-        assert(vkCreateCommandPool(_ptr_device->getHandle(), &command_pool_info, nullptr, &_command_pool_handle) == VK_SUCCESS);
+        assert(vkCreateCommandPool(_ptr_device->getDeviceHandle(), &command_pool_info, nullptr, &_command_pool_handle) == VK_SUCCESS);
         assert(_command_pool_handle != VK_NULL_HANDLE);
     }
 
     CommandPool::~CommandPool()
     {
-        vkDestroyCommandPool(_ptr_device->getHandle(), _command_pool_handle, nullptr);
+        vkDestroyCommandPool(_ptr_device->getDeviceHandle(), _command_pool_handle, nullptr);
     }
 
     shared_ptr<Device>& CommandPool::getDevice() noexcept
@@ -48,7 +48,7 @@ namespace pbrlib
         return _queue_family_index;
     }
 
-    VkCommandPool CommandPool::getHandle() const noexcept
+    VkCommandPool CommandPool::getCommandPoolHandle() const noexcept
     {
         return _command_pool_handle;
     }
