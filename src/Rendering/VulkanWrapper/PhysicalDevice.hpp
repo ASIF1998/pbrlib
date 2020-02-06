@@ -61,6 +61,8 @@ namespace pbrlib
         */
         vector<uint32_t> getAllMemoryTypeIndicies(uint32_t type) const;
 
+        vector<VkQueueFamilyProperties> getQueueFamilyProperties() const;
+
     public:
         VkPhysicalDevice physical_device_handle;
 

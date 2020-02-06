@@ -98,8 +98,8 @@ namespace pbrlib
 
         VkInstance getHandle() const;
 
-        PhysicalDevice getGPUHandle(int type) const;
-        vector<PhysicalDevice> getAllGPUHandle(int type) const;
+        PhysicalDevice& getPhysicalDevice(int type);
+        vector<PhysicalDevice> getAllPhysicalDevice(int type) const;
 
         /**
          * @brief Статический метод проверяющий поддержку расширения.

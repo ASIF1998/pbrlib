@@ -112,4 +112,18 @@ namespace pbrlib
 
         return memory_type_indicies;
     }
+
+    vector<VkQueueFamilyProperties> PhysicalDevice::getQueueFamilyProperties() const
+    {
+        uint32_t num_queue_families = 0;
+        
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_handle, &num_queue_families, nullptr);
+        assert(num_queue_families);
+
+        vector<VkQueueFamilyProperties> properties (num_queue_families);
+
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_handle, &num_queue_families, properties.data());
+
+        return properties;
+    }
 }

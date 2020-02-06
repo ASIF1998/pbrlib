@@ -157,7 +157,7 @@ namespace pbrlib
         return _instance_handle;
     }
 
-    PhysicalDevice Instance::getGPUHandle(int type) const
+    PhysicalDevice& Instance::getPhysicalDevice(int type)
     {
         VkPhysicalDeviceProperties physical_device_property;
 
@@ -168,10 +168,10 @@ namespace pbrlib
             }
         }
 
-        return VK_NULL_HANDLE;
+        throw invalid_argument ("Такого типа устройства нет.");
     }
 
-    vector<PhysicalDevice> Instance::getAllGPUHandle(int type) const
+    vector<PhysicalDevice> Instance::getAllPhysicalDevice(int type) const
     {
         vector<PhysicalDevice> handles;
         VkPhysicalDeviceProperties physical_device_property;
