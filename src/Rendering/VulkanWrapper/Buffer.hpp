@@ -43,13 +43,13 @@ namespace pbrlib
          * @param size размер буффера.
          * @param usage флаг говорящий о том, как мы собираемся использоват буффер.
          * @param memory_type_index индекс типа памяти.
-         * @param queue_family_indicies индексы семейства очередей.
+         * @param queue_family_indices индексы семейства очередей.
         */
         Buffer(const shared_ptr<Device>& ptr_device, 
                VkDeviceSize size, 
                VkBufferUsageFlags usage, 
                uint32_t memory_type_index, 
-               vector<uint32_t> queue_family_indicies);
+               vector<uint32_t> queue_family_indices);
 
         ~Buffer();
 
