@@ -7,7 +7,6 @@
 //
 
 #include "Image.hpp"
-#include "Device.hpp"
 
 namespace pbrlib
 {
@@ -119,23 +118,34 @@ namespace pbrlib
         assert(vkBindImageMemory(_ptr_device->getDeviceHandle(), _image_handle, _device_memory_handle, 0) == VK_SUCCESS);
     }
 
-    Image::~Image()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ImageView::ImageView(const shared_ptr<Image>& ptr_image, 
+                         VkFormat format, 
+                         const VkImageSubresourceRange& subresource_range, 
+                         VkImageViewType type) :
+        _ptr_image(ptr_image),
+        _format(format),
+        _image_view_handle(VK_NULL_HANDLE),
+        _subresource_range(subresource_range),
+        _type(type)
     {
-        vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
-    }
+        VkImageViewCreateInfo image_view_info {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .image = _ptr_image->getImageHandle(),
+            .viewType = _type,
+            .format = _format,
+            .components = {
+                VK_COMPONENT_SWIZZLE_IDENTITY, 
+                VK_COMPONENT_SWIZZLE_IDENTITY, 
+                VK_COMPONENT_SWIZZLE_IDENTITY, 
+                VK_COMPONENT_SWIZZLE_IDENTITY
+            },
+            .subresourceRange = _subresource_range
+        };
 
-    ImageInfo& Image::getImageInfo()
-    {
-        return _image_info;
-    }
-
-    const ImageInfo& Image::getImageInfo() const
-    {
-        return _image_info;
-    }
-
-    VkImage Image::getImageHandle() const
-    {
-        return _image_handle;
+        assert(vkCreateImageView(_ptr_image->getDevice()->getDeviceHandle(), &image_view_info, nullptr, &_image_view_handle) == VK_SUCCESS);
+        assert(_image_view_handle != VK_NULL_HANDLE);
     }
 }
