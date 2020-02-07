@@ -64,14 +64,4 @@ namespace pbrlib
         assert(_buffer_handle != VK_NULL_HANDLE);
         assert(vkBindBufferMemory(_ptr_device->getDeviceHandle(), _buffer_handle, _device_memory_handle, 0) == VK_SUCCESS);
     }
-
-    Buffer::~Buffer()
-    {
-        vkDestroyBuffer(_ptr_device->getDeviceHandle(), _buffer_handle, nullptr);
-    }
-
-    VkBuffer Buffer::getBufferHandle() const noexcept
-    {
-        return _buffer_handle;
-    }
 }

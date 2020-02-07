@@ -78,19 +78,4 @@ namespace pbrlib
         assert(vkCreateDevice(physical_device.physical_device_handle, &device_info, nullptr, &_device_handle) == VK_SUCCESS);
         assert(_device_handle != VK_NULL_HANDLE);
     }
-
-    Device::~Device()
-    {
-        vkDestroyDevice(_device_handle, nullptr);
-    }
-
-    VkDevice Device::getDeviceHandle() const noexcept
-    {
-        return _device_handle;
-    }
-
-    void Device::waitIdle() const
-    {
-        vkDeviceWaitIdle(_device_handle);
-    }
 }

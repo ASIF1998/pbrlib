@@ -31,11 +31,6 @@ namespace pbrlib
         }
     }
 
-    bool VulkanInstanceExtensionSupported::check(const string& name) const
-    {
-        return _extension_supported.find(name) != _extension_supported.end();
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     VulkanInstanceLayerSupported::VulkanInstanceLayerSupported()
     {
@@ -50,11 +45,6 @@ namespace pbrlib
         for (size_t i{0}; i < layer_properties.size(); i++) {
             _layer_supported.insert(layer_properties[i].layerName);
         }
-    }
-
-    bool VulkanInstanceLayerSupported::check(const string& name) const
-    {
-        return _layer_supported.find(name) != _layer_supported.end();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,16 +137,6 @@ namespace pbrlib
         }
     }
 
-    Instance::~Instance()
-    {
-        vkDestroyInstance(_instance_handle, nullptr);
-    }
-
-    VkInstance Instance::getHandle() const
-    {
-        return _instance_handle;
-    }
-
     PhysicalDevice& Instance::getPhysicalDevice(int type)
     {
         VkPhysicalDeviceProperties physical_device_property;
@@ -186,16 +166,6 @@ namespace pbrlib
         handles.shrink_to_fit();
 
         return handles;
-    }
-
-    bool Instance::isExtensionSupported(const string& name)
-    {
-        return _supported_extensions.check(name);
-    }
-
-    bool Instance::isLayerSupported(const string& name)
-    {
-        return _supported_layers.check(name);
     }
 
     vector<string> Instance::getExtensionNames()

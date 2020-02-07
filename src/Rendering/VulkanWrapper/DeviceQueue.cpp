@@ -21,41 +21,4 @@ namespace pbrlib
         vkGetDeviceQueue(_ptr_device->getDeviceHandle(), _family_index, _index, &_queue_handle);
         assert(_queue_handle != VK_NULL_HANDLE);
     }
-
-    DeviceQueue::~DeviceQueue()
-    {
-        /// Деструктор должен завершиться только после того,
-        /// как все команды в данной очереди будут выполнены.
-        vkQueueWaitIdle(_queue_handle);
-    }
-
-    shared_ptr<Device>& DeviceQueue::getDevice() 
-    {
-        return _ptr_device;
-    }
-
-    const shared_ptr<Device>& DeviceQueue::getDevice() const
-    {
-        return _ptr_device;
-    }
-
-    VkQueue DeviceQueue::getQueueHandle() const noexcept
-    {
-        return _queue_handle;
-    }
-
-    uint32_t DeviceQueue::getFamilyIndex() const noexcept
-    {
-        return _family_index;
-    }
-
-    uint32_t DeviceQueue::getIndex() const noexcept
-    {
-        return _index;
-    }
-
-    void DeviceQueue::waitIdle() const
-    {
-        vkQueueWaitIdle(_queue_handle);
-    }
 }

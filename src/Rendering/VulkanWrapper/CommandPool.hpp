@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "Device.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -29,18 +31,44 @@ namespace pbrlib
          * @param queue_family_index индекс семейства очередей.
         */
         CommandPool(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
-        ~CommandPool();
+        inline ~CommandPool();
 
-        shared_ptr<Device>& getDevice() noexcept;
-        const shared_ptr<Device>& getDevice() const noexcept;
-        uint32_t getFamilyIndex() const noexcept;
-        VkCommandPool getCommandPoolHandle() const noexcept;
+        inline shared_ptr<Device>& getDevice() noexcept;
+        inline const shared_ptr<Device>& getDevice() const noexcept;
+        inline uint32_t getFamilyIndex() const noexcept;
+        inline VkCommandPool getCommandPoolHandle() const noexcept;
 
     private:
         shared_ptr<Device> _ptr_device;
         VkCommandPool _command_pool_handle;
         uint32_t _queue_family_index;
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline CommandPool::~CommandPool()
+    {
+        vkDestroyCommandPool(_ptr_device->getDeviceHandle(), _command_pool_handle, nullptr);
+    }
+
+    inline shared_ptr<Device>& CommandPool::getDevice() noexcept
+    {
+        return _ptr_device;
+    }
+
+    inline const shared_ptr<Device>& CommandPool::getDevice() const noexcept
+    {
+        return _ptr_device;
+    }
+
+    inline uint32_t CommandPool::getFamilyIndex() const noexcept
+    {
+        return _queue_family_index;
+    }
+
+    inline VkCommandPool CommandPool::getCommandPoolHandle() const noexcept
+    {
+        return _command_pool_handle;
+    }
 }
 
 #endif /* CommandPool_hpp */

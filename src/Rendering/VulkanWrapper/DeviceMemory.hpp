@@ -13,6 +13,8 @@
 
 #include <memory>
 
+#include "Device.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -36,7 +38,7 @@ namespace pbrlib
          * @param memory_type_index индекс типа памяти.
         */
         DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
-        ~DeviceMemory();
+        inline ~DeviceMemory();
 
         /**
          * @brief Метод отображающий память устройства в адресное пространство CPU.
@@ -51,13 +53,13 @@ namespace pbrlib
         */
         void unmap();
 
-        MapStatus isMapped() const noexcept;
+        inline MapStatus isMapped() const noexcept;
 
-        uint8_t* getData() noexcept;
-        const uint8_t* getData() const noexcept;
-        VkDeviceMemory getDeviceMemoryHandle() const noexcept;
-        shared_ptr<Device>& getDevice() noexcept;
-        const shared_ptr<Device>& getDevice() const noexcept;
+        inline uint8_t* getData() noexcept;
+        inline const uint8_t* getData() const noexcept;
+        inline VkDeviceMemory getDeviceMemoryHandle() const noexcept;
+        inline shared_ptr<Device>& getDevice() noexcept;
+        inline const shared_ptr<Device>& getDevice() const noexcept;
 
     protected:
         shared_ptr<Device> _ptr_device;
@@ -65,6 +67,42 @@ namespace pbrlib
         VkDeviceSize _memory_size;
         uint8_t* _ptr_mapped_data;
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline DeviceMemory::~DeviceMemory()
+    {
+        vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);
+    }
+
+    inline MapStatus DeviceMemory::isMapped() const noexcept
+    {
+        return (_ptr_mapped_data ? MapStatus::MAPPED : MapStatus::UNMAPPED);
+    }
+
+    inline uint8_t* DeviceMemory::getData() noexcept
+    {
+        return _ptr_mapped_data;
+    }
+
+    inline const uint8_t* DeviceMemory::getData() const noexcept
+    {
+        return _ptr_mapped_data;
+    }
+
+    inline VkDeviceMemory DeviceMemory::getDeviceMemoryHandle() const noexcept
+    {
+        return _device_memory_handle;
+    }
+
+    inline shared_ptr<Device>& DeviceMemory::getDevice() noexcept
+    {
+        return _ptr_device;
+    }
+
+    inline const shared_ptr<Device>& DeviceMemory::getDevice() const noexcept
+    {
+        return _ptr_device;
+    }
 }
 
 #endif /* DeviceMemory_hpp */

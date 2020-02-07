@@ -49,18 +49,34 @@ namespace pbrlib
                const vector<const char*>& layer_names, 
                const vector<const char*>& extension_names);
 
-        ~Device();
+        inline ~Device();
 
-        VkDevice getDeviceHandle() const noexcept;
+        inline VkDevice getDeviceHandle() const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
         */
-        void waitIdle() const;
+        inline void waitIdle() const;
 
     private:
         VkDevice _device_handle;
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline Device::~Device()
+    {
+        vkDestroyDevice(_device_handle, nullptr);
+    }
+
+    inline VkDevice Device::getDeviceHandle() const noexcept
+    {
+        return _device_handle;
+    }
+
+    inline void Device::waitIdle() const
+    {
+        vkDeviceWaitIdle(_device_handle);
+    }
 }
 
 #endif /* Device_hpp */

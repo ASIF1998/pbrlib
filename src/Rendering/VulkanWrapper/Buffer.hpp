@@ -51,15 +51,26 @@ namespace pbrlib
                uint32_t memory_type_index, 
                vector<uint32_t> queue_family_indices);
 
-        ~Buffer();
+        inline ~Buffer();
 
-        VkBuffer getBufferHandle() const noexcept;
+        inline VkBuffer getBufferHandle() const noexcept;
 
     private:
         VkBuffer _buffer_handle;
         VkBufferUsageFlags _usage;
         vector<uint32_t> _queue_family_indicies;
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline Buffer::~Buffer()
+    {
+        vkDestroyBuffer(_ptr_device->getDeviceHandle(), _buffer_handle, nullptr);
+    }
+
+    inline VkBuffer Buffer::getBufferHandle() const noexcept
+    {
+        return _buffer_handle;
+    }
 }
 
 #endif /* Buffer_hpp */

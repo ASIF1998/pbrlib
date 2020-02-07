@@ -7,7 +7,6 @@
 //
 
 #include "DeviceMemory.hpp"
-#include "Device.hpp"
 
 namespace pbrlib
 {
@@ -26,11 +25,6 @@ namespace pbrlib
 
         assert(vkAllocateMemory(_ptr_device->getDeviceHandle(), &alloc_info, nullptr, &_device_memory_handle) == VK_SUCCESS);
         assert(_device_memory_handle != VK_NULL_HANDLE);
-    }
-
-    DeviceMemory::~DeviceMemory()
-    {
-        vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);
     }
 
     void DeviceMemory::map()
@@ -53,35 +47,5 @@ namespace pbrlib
             vkUnmapMemory(_ptr_device->getDeviceHandle(), _device_memory_handle);
             _ptr_mapped_data = nullptr;
         }
-    }
-
-    MapStatus DeviceMemory::isMapped() const noexcept
-    {
-        return (_ptr_mapped_data ? MapStatus::MAPPED : MapStatus::UNMAPPED);
-    }
-
-    uint8_t* DeviceMemory::getData() noexcept
-    {
-        return _ptr_mapped_data;
-    }
-
-    const uint8_t* DeviceMemory::getData() const noexcept
-    {
-        return _ptr_mapped_data;
-    }
-
-    VkDeviceMemory DeviceMemory::getDeviceMemoryHandle() const noexcept
-    {
-        return _device_memory_handle;
-    }
-
-    shared_ptr<Device>& DeviceMemory::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const shared_ptr<Device>& DeviceMemory::getDevice() const noexcept
-    {
-        return _ptr_device;
     }
 }

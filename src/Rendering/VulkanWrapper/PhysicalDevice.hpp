@@ -18,6 +18,8 @@
 
 #include <memory>
 
+#include "Device.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -29,8 +31,8 @@ namespace pbrlib
     public:
         PhysicalDevice(VkPhysicalDevice physical_device_handle);
 
-        bool isExtensionSupported(const string& name) const;
-        bool isLayerSupported(const string& name) const;
+        inline bool isExtensionSupported(const string& name) const;
+        inline bool isLayerSupported(const string& name) const;
 
         bool isFormatSupported(VkFormat format, VkImageType image_type, VkImageTiling image_tiling, VkImageUsageFlags image_usage) const;
         VkFormatProperties getFormatProperties(VkFormat format) const;
@@ -41,7 +43,7 @@ namespace pbrlib
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @return логическое устройство.
         */
-        shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info);
+        inline shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info);
 
         /**
          * @brief Метод возвращающий индекс типа памяти.
@@ -70,6 +72,22 @@ namespace pbrlib
         set<string> _search_extension_names;
         set<string> _search_layer_names;
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline bool PhysicalDevice::isExtensionSupported(const string& name) const
+    {
+        return _search_extension_names.find(name) != _search_extension_names.end();
+    }
+
+    inline bool PhysicalDevice::isLayerSupported(const string& name) const
+    {
+        return _search_layer_names.find(name) != _search_layer_names.end();
+    }
+
+    inline shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info)
+    {
+        return make_shared<Device>(*this, queue_info);
+    }
 }
 
 #endif /* PhysicalDevice_hpp */
