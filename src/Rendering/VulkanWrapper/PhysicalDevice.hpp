@@ -9,8 +9,6 @@
 #ifndef PhysicalDevice_hpp
 #define PhysicalDevice_hpp
 
-#include <vulkan/vulkan.h>
-
 #include <set>
 #include <vector>
 

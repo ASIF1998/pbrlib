@@ -9,8 +9,6 @@
 #ifndef CommandPool_hpp
 #define CommandPool_hpp
 
-#include <vulkan/vulkan.h>
-
 #include <memory>
 
 #include "Device.hpp"

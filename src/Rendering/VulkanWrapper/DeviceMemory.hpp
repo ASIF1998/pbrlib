@@ -9,8 +9,6 @@
 #ifndef DeviceMemory_hpp
 #define DeviceMemory_hpp
 
-#include <vulkan/vulkan.h>
-
 #include <memory>
 
 #include "Device.hpp"
