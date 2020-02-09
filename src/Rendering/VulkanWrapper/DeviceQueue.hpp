@@ -9,7 +9,7 @@
 #ifndef DeviceQueue_hpp
 #define DeviceQueue_hpp
 
-#include <vulkan/vulkan.h>
+#include "Surface.hpp"
 
 #include <memory>
 
@@ -18,13 +18,7 @@ using namespace std;
 namespace pbrlib
 {
     class Device;
-
-    /**
-     * TODO:
-     *      1) Добавить метод позволяющий узнать поддержку показа семейством очередей;
-     *      2) Добавить метод помещающий в очередь команду показа.
-    */
-
+    
     class DeviceQueue
     {
     public:
@@ -48,6 +42,8 @@ namespace pbrlib
          * @brief Метод ожидающий пока все команды в очереди не будут выполнены.
         */
         inline void waitIdle() const;
+
+        inline static bool isPresentSuppoerted(uint32_t queue_family_index, const PhysicalDevice& physocal_device, const Surface& surface);
 
     private:
         shared_ptr<Device> _ptr_device;
@@ -92,6 +88,14 @@ namespace pbrlib
     inline void DeviceQueue::waitIdle() const
     {
         vkQueueWaitIdle(_queue_handle);
+    }
+
+    inline bool DeviceQueue::isPresentSuppoerted(uint32_t queue_family_index, const PhysicalDevice& physocal_device, const Surface& surface)
+    {
+        VkBool32 res;
+
+        vkGetPhysicalDeviceSurfaceSupportKHR(physocal_device.physical_device_handle, queue_family_index, surface.getSurfaceHandle(), &res);
+        return res == VK_TRUE;
     }
 }
 

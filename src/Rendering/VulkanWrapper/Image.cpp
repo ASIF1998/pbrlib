@@ -118,6 +118,32 @@ namespace pbrlib
         assert(vkBindImageMemory(_ptr_device->getDeviceHandle(), _image_handle, _device_memory_handle, 0) == VK_SUCCESS);
     }
 
+    Image::Image(const shared_ptr<Device>& ptr_device,
+                 VkImage image,
+                 ImageInfo image_info,
+                 uint32_t queue_family_index) :
+        DeviceMemory(
+            ptr_device
+        ),
+        _image_handle(image),
+        _image_info(image_info),
+        _queue_family_indicies(1)
+    {
+        _queue_family_indicies[0] = queue_family_index;
+    }
+
+    Image::Image(const shared_ptr<Device>& ptr_device,
+                 VkImage image,
+                 ImageInfo image_info,
+                 vector<uint32_t> queue_family_indicies) :
+        DeviceMemory(
+            ptr_device
+        ),
+        _image_handle(image),
+        _image_info(image_info),
+        _queue_family_indicies(queue_family_indicies)
+    {}
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ImageView::ImageView(const shared_ptr<Image>& ptr_image, 
                          VkFormat format, 

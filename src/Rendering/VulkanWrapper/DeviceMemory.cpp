@@ -29,7 +29,7 @@ namespace pbrlib
 
     void DeviceMemory::map()
     {
-        if (!_ptr_mapped_data) {
+        if (!_ptr_mapped_data && _device_memory_handle != VK_NULL_HANDLE) {
             assert(vkMapMemory(_ptr_device->getDeviceHandle(),
                                _device_memory_handle, 
                                0, 

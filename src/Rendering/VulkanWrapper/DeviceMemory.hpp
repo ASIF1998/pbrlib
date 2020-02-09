@@ -32,6 +32,13 @@ namespace pbrlib
          * @brief Конструктор.
          * 
          * @param ptr_device указатель на устройство.
+        */
+        inline DeviceMemory(const shared_ptr<Device>& ptr_device) noexcept;
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_device указатель на устройство.
          * @param size размер требуемой памяти.
          * @param memory_type_index индекс типа памяти.
         */
@@ -67,6 +74,13 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline DeviceMemory::DeviceMemory(const shared_ptr<Device>& ptr_device) noexcept :
+        _ptr_device(ptr_device),
+        _device_memory_handle(VK_NULL_HANDLE),
+        _memory_size(0),
+        _ptr_mapped_data(nullptr)
+    {}
+
     inline DeviceMemory::~DeviceMemory()
     {
         vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);

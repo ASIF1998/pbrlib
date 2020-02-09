@@ -37,6 +37,8 @@ namespace pbrlib
     */
     class Window
     {
+        friend class Surface;
+
     public:
         /**
          * @brief Используется с методом Window::getExtent() и Window::getDrawableExtent().

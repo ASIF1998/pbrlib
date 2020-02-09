@@ -42,6 +42,10 @@ namespace pbrlib
          * @return логическое устройство.
         */
         inline shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info);
+        
+        inline shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info,
+                                             const vector<const char*>& layer_names,
+                                             const vector<const char*>& extension_names);
 
         /**
          * @brief Метод возвращающий индекс типа памяти.
@@ -85,6 +89,13 @@ namespace pbrlib
     inline shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info)
     {
         return make_shared<Device>(*this, queue_info);
+    }
+
+    inline shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info,
+                                                         const vector<const char*>& layer_names,
+                                                         const vector<const char*>& extension_names)
+    {
+        return make_shared<Device>(*this, queue_info, layer_names, extension_names);
     }
 }
 

@@ -76,7 +76,7 @@ namespace pbrlib
         int width = 0;
         int height = 0;
 
-        SDL_GL_GetDrawableSize(_ptr_window, &width, &height);
+        SDL_Vulkan_GetDrawableSize(_ptr_window, &width, &height);
 
         return make_tuple(width, height);
     }

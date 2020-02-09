@@ -9,14 +9,15 @@
 #ifndef Instance_hpp
 #define Instance_hpp
 
-#include <vulkan/vulkan.h>
-
 #include <vector>
+#include <set>
 
 #include <string_view>
 #include <string>
 
-#include <set>
+#include <memory>
+
+#include "PhysicalDevice.hpp"
 
 using namespace std;
 
@@ -118,6 +119,27 @@ namespace pbrlib
         static vector<string> getExtensionNames();
         static vector<string> getLayerNames();
 
+        /**
+         * @brief Статический метод создающий экземпляр Vulkan'а.
+         * 
+         * @param app_name название приложения.
+         * @param app_version номер приложения.
+        */
+        inline static shared_ptr<Instance> makeInstance(const string_view app_name, uint32_t app_version);
+
+        /**
+         * @brief Статический метод создающий экземпляр Vulkan'а.
+         * 
+         * @param app_name название приложения.
+         * @param app_version номер приложения.
+         * @param layer_names названия слоёв.
+         * @param extension_names названия расширений.
+        */
+        inline static shared_ptr<Instance> makeInstance(const string_view app_name, 
+                                                        uint32_t app_version,
+                                                        const vector<const char*>& layer_names,
+                                                        const vector<const char*>& extension_names);
+
     private:
         VkInstance _instance_handle;
         vector<PhysicalDevice> _physical_device_handles;
@@ -157,6 +179,19 @@ namespace pbrlib
     inline bool Instance::isLayerSupported(const string& name)
     {
         return _supported_layers.check(name);
+    }
+
+    inline shared_ptr<Instance> Instance::makeInstance(const string_view app_name, uint32_t app_version)
+    {
+        return make_shared<Instance>(app_name, app_version);
+    }
+
+    inline shared_ptr<Instance> Instance::makeInstance(const string_view app_name, 
+                                                       uint32_t app_version,
+                                                       const vector<const char*>& layer_names,
+                                                       const vector<const char*>& extension_names)
+    {
+        return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
     }
 }
 

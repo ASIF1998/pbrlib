@@ -39,6 +39,8 @@ namespace pbrlib
     class Image: 
         public DeviceMemory
     {
+        friend class Swapchain;
+
     public:
         /**
          * @brief Конструктор.
@@ -67,6 +69,32 @@ namespace pbrlib
               uint32_t memory_type_index, 
               const ImageInfo& image_info, 
               vector<uint32_t> queue_family_indices);
+
+        /**
+         * @brief Конструктор.
+         *
+         * @param ptr_device указатель на устройство.
+         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info информация об изображении.
+         * @param queue_family_index индекс семейства очередей.
+        */
+        Image(const shared_ptr<Device>& ptr_device,
+              VkImage image,
+              ImageInfo image_info,
+              uint32_t queue_family_index);
+        
+        /**
+         * @brief Конструктор.
+         *
+         * @param ptr_device указатель на устройство.
+         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info информация об изображении.
+         * @param queue_family_indicies индексы семейства очередей.
+        */
+        Image(const shared_ptr<Device>& ptr_device,
+              VkImage image,
+              ImageInfo image_info,
+              vector<uint32_t> queue_family_indicies);
 
         inline ~Image();
 
@@ -97,10 +125,38 @@ namespace pbrlib
          * @param queue_family_indices индексы семейства очередей.
          * @return указатель на Image.
         */
-        static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device, 
-                                           uint32_t memory_type_index, 
-                                           const ImageInfo& image_info, 
-                                           vector<uint32_t> queue_family_indices);
+        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
+                                                  uint32_t memory_type_index,
+                                                  const ImageInfo& image_info,
+                                                  vector<uint32_t> queue_family_indices);
+
+        /**
+         * @brief Статический метод для создания Image.
+         *
+         * @param ptr_device указатель на устройство.
+         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info информация об изображении.
+         * @param queue_family_index индекс семейства очередей.
+         * @return указатель на Image.
+        */
+        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
+                                                  VkImage image,
+                                                  ImageInfo image_info,
+                                                  uint32_t queue_family_index);
+
+        /**
+         * @brief Статический метод для создания Image.
+         *
+         * @param ptr_device указатель на устройство.
+         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info информация об изображении.
+         * @param queue_family_indicies индексы семейства очередей.
+         * @return указатель на Image.
+        */
+        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
+                                                  VkImage image,
+                                                  ImageInfo image_info,
+                                                  vector<uint32_t> queue_family_indicies);
 
     private:
         VkImage _image_handle;
@@ -110,11 +166,23 @@ namespace pbrlib
 
     class ImageView
     {
+
+        friend class Swapchain;
     public:
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_image указатель нк изображение.
+         * @param format формат текселя изображения.
+         * @param subresource_range аргумент задающий подмножество изображения на которое указывает ptr_image.
+         * @param type тип вида изображения.
+        */
         ImageView(const shared_ptr<Image>& ptr_image, 
                   VkFormat format, 
                   const VkImageSubresourceRange& subresource_range, 
                   VkImageViewType type);
+
+        inline ImageView(ImageView&& image_view);
 
         inline ~ImageView();
 
@@ -171,10 +239,40 @@ namespace pbrlib
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
     }
 
+    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device,
+                                              VkImage image,
+                                              ImageInfo image_info,
+                                              uint32_t queue_family_index)
+    {
+        return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
+    }
+
+    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device,
+                                              VkImage image,
+                                              ImageInfo image_info,
+                                              vector<uint32_t> queue_family_indicies)
+    {
+        return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline ImageView::ImageView(ImageView&& image_view) :
+        _image_view_handle(VK_NULL_HANDLE),
+        _ptr_image(nullptr)
+    {
+        swap(image_view._image_view_handle, _image_view_handle);
+        swap(image_view._ptr_image, _ptr_image);
+
+        _format = image_view._format;
+        _subresource_range = image_view._subresource_range;
+        _type = image_view._type;
+    }
+
     inline ImageView::~ImageView()
     {
-        vkDestroyImageView(_ptr_image->getDevice()->getDeviceHandle(), _image_view_handle, nullptr);
+        if (_image_view_handle != VK_NULL_HANDLE) {
+            vkDestroyImageView(_ptr_image->getDevice()->getDeviceHandle(), _image_view_handle, nullptr);
+        }
     }
 
     inline shared_ptr<Image>& ImageView::getImage() noexcept
