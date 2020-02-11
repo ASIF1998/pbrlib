@@ -46,8 +46,8 @@ namespace pbrlib
          * @param surface поверхность.
         */
         inline Swapchain(const shared_ptr<Device>& ptr_device,
-                  uint32_t queue_family_index,
-                  const shared_ptr<Surface> & surface);
+                         uint32_t queue_family_index,
+                         const shared_ptr<Surface> & surface);
 
         inline ~Swapchain();
 
