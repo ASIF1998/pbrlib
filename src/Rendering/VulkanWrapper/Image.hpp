@@ -166,8 +166,8 @@ namespace pbrlib
 
     class ImageView
     {
-
         friend class Swapchain;
+        
     public:
         /**
          * @brief Конструктор.
