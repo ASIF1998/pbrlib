@@ -49,7 +49,13 @@ namespace pbrlib
                          uint32_t queue_family_index,
                          const shared_ptr<Surface> & surface);
 
+        inline Swapchain(Swapchain&& swapchain);
+        Swapchain(const Swapchain&) = delete;
+
         inline ~Swapchain();
+
+        Swapchain& operator = (Swapchain&&) = delete;
+        Swapchain& operator = (const Swapchain&) = delete;
 
         /**
          * @brief Функция создающая список показа.
@@ -97,15 +103,25 @@ namespace pbrlib
         create(ptr_device, queue_family_indicies, VK_SHARING_MODE_EXCLUSIVE);
     }
 
+    inline Swapchain:: Swapchain(Swapchain&& swapchain) :
+        _swapchain_handle(VK_NULL_HANDLE),
+        _ptr_surface(swapchain._ptr_surface),
+        _images_view(move(swapchain._images_view))
+    {
+        swap(_swapchain_handle, swapchain._swapchain_handle);
+    }
+
     inline Swapchain::~Swapchain()
     {
-        for (size_t i{0}; i < _images_view.size(); i++) {
-            vkDestroyImageView(_images_view[i].getImage()->getDevice()->getDeviceHandle(), _images_view[i]._image_view_handle, nullptr);
-            _images_view[i]._image_view_handle = VK_NULL_HANDLE;
-            _images_view[i]._ptr_image->_image_handle = VK_NULL_HANDLE;
+        if (_swapchain_handle != VK_NULL_HANDLE) {
+            for (size_t i{0}; i < _images_view.size(); i++) {
+                vkDestroyImageView(_images_view[i].getImage()->getDevice()->getDeviceHandle(), _images_view[i]._image_view_handle, nullptr);
+                _images_view[i]._image_view_handle = VK_NULL_HANDLE;
+                _images_view[i]._ptr_image->_image_handle = VK_NULL_HANDLE;
+            }
+            
+            vkDestroySwapchainKHR(_images_view[0]._ptr_image->getDevice()->getDeviceHandle(), _swapchain_handle, nullptr);
         }
-        
-        vkDestroySwapchainKHR(_images_view[0]._ptr_image->getDevice()->getDeviceHandle(), _swapchain_handle, nullptr);
     }
 
     inline void Swapchain::setPresent(DeviceQueue& queue, uint32_t image_index,  const VkSemaphore* semaphores, uint32_t semaphore_count)

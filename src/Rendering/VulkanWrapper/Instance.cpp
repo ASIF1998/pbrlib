@@ -47,13 +47,17 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Instance::Instance(const string_view application_name, uint32_t app_version) :
-        _instance_handle(VK_NULL_HANDLE)
+    void Instance::_create_instance(const string_view app_name,
+                              uint32_t app_version, 
+                              uint32_t enabled_layer_count,
+                              const char* const* ptr_enable_layers,
+                              uint32_t enabled_extension_count,
+                              const char* const* ptr_extensions)
     {
         VkApplicationInfo app_info {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
-            .pApplicationName = application_name.data(),
+            .pApplicationName = app_name.data(),
             .applicationVersion = app_version,
             .pEngineName = "PBRLib",
             .engineVersion = EngineVersion,
@@ -65,56 +69,10 @@ namespace pbrlib
             .pNext = nullptr,
             .flags = 0,
             .pApplicationInfo = &app_info,
-            .enabledLayerCount = 0,
-            .ppEnabledLayerNames = nullptr,
-            .enabledExtensionCount = 0,
-            .ppEnabledExtensionNames = nullptr
-        };
-
-        assert(vkCreateInstance(&instance_info, nullptr, &_instance_handle) == VK_SUCCESS);
-        assert(_instance_handle != VK_NULL_HANDLE);
-
-        uint32_t num_physical_device_handles = 0;
-
-        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, nullptr) == VK_SUCCESS);
-        
-        assert(num_physical_device_handles > 0);
-        _physical_device_handles.reserve(num_physical_device_handles);
-        
-        vector<VkPhysicalDevice> physical_device_handles(num_physical_device_handles);
-        
-        assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, physical_device_handles.data()) == VK_SUCCESS);
-        
-        for (size_t i{0}; i < physical_device_handles.size(); i++) {
-            _physical_device_handles.push_back(physical_device_handles[i]);
-        }
-    }
-
-    Instance::Instance(const string_view application_name, 
-                       uint32_t app_version, 
-                       const vector<const char*>& layer_names, 
-                       const vector<const char*>& extension_names) :
-        _instance_handle(VK_NULL_HANDLE)
-    {
-        VkApplicationInfo app_info {
-            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pNext = nullptr,
-            .pApplicationName = application_name.data(),
-            .applicationVersion = app_version,
-            .pEngineName = "PBRLib",
-            .engineVersion = EngineVersion,
-            .apiVersion = VK_MAKE_VERSION(1, 0, 0)
-        };
-
-        VkInstanceCreateInfo instance_info {
-            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .pApplicationInfo = &app_info,
-            .enabledLayerCount = static_cast<uint32_t>(layer_names.size()),
-            .ppEnabledLayerNames = layer_names.data(),
-            .enabledExtensionCount = static_cast<uint32_t>(extension_names.size()),
-            .ppEnabledExtensionNames = extension_names.data()
+            .enabledLayerCount = enabled_layer_count,
+            .ppEnabledLayerNames = ptr_enable_layers,
+            .enabledExtensionCount = enabled_extension_count,
+            .ppEnabledExtensionNames = ptr_extensions
         };
 
         assert(vkCreateInstance(&instance_info, nullptr, &_instance_handle) == VK_SUCCESS);

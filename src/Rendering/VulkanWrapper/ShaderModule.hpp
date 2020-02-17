@@ -23,7 +23,13 @@ namespace pbrlib
             size_t shader_code_size
         );
 
+        inline ShaderModule(ShaderModule&& shader_module);
+        ShaderModule(const ShaderModule&) = delete;
+        
         inline ~ShaderModule();
+
+        ShaderModule& operator = (ShaderModule&&) = delete;
+        ShaderModule& operator = (const ShaderModule&) = delete;
 
         inline shared_ptr<Device>& getDevice() noexcept;
         inline const shared_ptr<Device>& getDevice() const noexcept;
@@ -37,9 +43,19 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline ShaderModule::ShaderModule(ShaderModule&& shader_module) :
+        _ptr_device(shader_module._ptr_device),
+        _shader_type(shader_module._shader_type),
+        _shader_handle(VK_NULL_HANDLE)
+    {
+        swap(_shader_handle, shader_module._shader_handle);
+    }
+
     inline ShaderModule::~ShaderModule()
     {
-        vkDestroyShaderModule(_ptr_device->getDeviceHandle(), _shader_handle, nullptr);
+        if (_shader_handle != VK_NULL_HANDLE) {
+            vkDestroyShaderModule(_ptr_device->getDeviceHandle(), _shader_handle, nullptr);
+        }
     }
 
     inline shared_ptr<Device>& ShaderModule::getDevice() noexcept

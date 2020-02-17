@@ -30,7 +30,14 @@ namespace pbrlib
          * @param index индекс очереди в семействе очередей.
         */
         DeviceQueue(const shared_ptr<Device>& ptr_device, uint32_t family_index, uint32_t index);
+
+        inline DeviceQueue(DeviceQueue&& device_queue);
+        DeviceQueue(const DeviceQueue&) = delete;
+
         inline ~DeviceQueue();
+
+        DeviceQueue& operator = (DeviceQueue&&) = delete;
+        DeviceQueue& operator = (const DeviceQueue&) = delete;
 
         inline shared_ptr<Device>& getDevice();
         inline const shared_ptr<Device>& getDevice() const;
@@ -53,6 +60,15 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline DeviceQueue::DeviceQueue(DeviceQueue&& device_queue) :
+        _ptr_device(device_queue._ptr_device),
+        _queue_handle(VK_NULL_HANDLE),
+        _family_index(device_queue._family_index),
+        _index(device_queue._index)
+    {
+        swap(_queue_handle, device_queue._queue_handle);
+    }
+
     inline DeviceQueue::~DeviceQueue()
     {
         /// Деструктор должен завершиться только после того,

@@ -43,7 +43,14 @@ namespace pbrlib
          * @param memory_type_index индекс типа памяти.
         */
         DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
+
+        inline DeviceMemory(DeviceMemory&& device_memory);
+        DeviceMemory(const DeviceMemory&) = delete;
+
         inline ~DeviceMemory();
+
+        DeviceMemory& operator = (DeviceMemory&&) = delete;
+        DeviceMemory& operator = (const DeviceMemory&) = delete;
 
         /**
          * @brief Метод отображающий память устройства в адресное пространство CPU.
@@ -80,6 +87,15 @@ namespace pbrlib
         _memory_size(0),
         _ptr_mapped_data(nullptr)
     {}
+
+    inline DeviceMemory::DeviceMemory(DeviceMemory&& device_memory) :
+        _ptr_device(device_memory._ptr_device),
+        _device_memory_handle(VK_NULL_HANDLE),
+        _memory_size(device_memory._memory_size),
+        _ptr_mapped_data(device_memory._ptr_mapped_data)
+    {
+        swap(_device_memory_handle, device_memory._device_memory_handle);
+    }
 
     inline DeviceMemory::~DeviceMemory()
     {

@@ -35,7 +35,13 @@ namespace pbrlib
          * @param physical_device физическое устройтсво.
         */
         inline Surface(const Window& window, const shared_ptr<Instance>& ptr_instance, const PhysicalDevice& physical_device);
+        inline Surface(Surface&& surface);
+        Surface(const Surface&) = delete;
+        
         inline ~Surface();
+
+        Surface& operator = (Surface&&) = delete;
+        Surface& operator = (const Surface&) = delete;
 
         inline VkSurfaceKHR getSurfaceHandle() const noexcept;
         inline shared_ptr<Instance>& getInstance() noexcept;
@@ -68,9 +74,20 @@ namespace pbrlib
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device.physical_device_handle, _surface_handle, &_surface_capabilities);
     }
 
+    inline Surface::Surface(Surface&& surface) :
+        _ptr_instance(surface._ptr_instance),
+        _surface_handle(VK_NULL_HANDLE),
+        _surface_capabilities(surface._surface_capabilities),
+        _surface_format(surface._surface_format)
+    {
+        swap(_surface_handle, surface._surface_handle);
+    }
+
     inline Surface::~Surface()
     {
-        vkDestroySurfaceKHR(_ptr_instance->getHandle(), _surface_handle, nullptr);
+        if (_surface_handle != VK_NULL_HANDLE) {
+            vkDestroySurfaceKHR(_ptr_instance->getHandle(), _surface_handle, nullptr);
+        }
     }
 
     inline shared_ptr<Surface> Surface::makeSurface(const Window& window, const shared_ptr<Instance>& ptr_instance, const PhysicalDevice& physical_device)

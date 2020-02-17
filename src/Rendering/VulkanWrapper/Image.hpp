@@ -96,7 +96,13 @@ namespace pbrlib
               ImageInfo image_info,
               vector<uint32_t> queue_family_indicies);
 
+        inline Image(Image&& image);
+        Image(const Image&) = delete;
+
         inline ~Image();
+
+        Image& operator = (Image&&) = delete;
+        Image& operator = (const Image&) = delete;
 
         inline ImageInfo& getImageInfo();
         inline const ImageInfo& getImageInfo() const;
@@ -183,8 +189,12 @@ namespace pbrlib
                   VkImageViewType type);
 
         inline ImageView(ImageView&& image_view);
+        ImageView(const ImageView&) = delete;
 
         inline ~ImageView();
+
+        ImageView& operator = (ImageView&&) = delete;
+        ImageView& operator = (const ImageView&) = delete;
 
         inline shared_ptr<Image>& getImage() noexcept;
         inline const shared_ptr<Image>& getImage() const noexcept;
@@ -203,9 +213,20 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline Image::Image(Image&& image) :
+        DeviceMemory(move(image)),
+        _image_handle(VK_NULL_HANDLE),
+        _image_info(image._image_info),
+        _queue_family_indicies(move(image._queue_family_indicies))
+    {
+        swap(_image_handle, image._image_handle);
+    }
+
     inline Image::~Image()
     {
-        vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
+        if (_image_handle != VK_NULL_HANDLE) {
+            vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
+        }
     }
 
     inline ImageInfo& Image::getImageInfo()
@@ -258,14 +279,12 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline ImageView::ImageView(ImageView&& image_view) :
         _image_view_handle(VK_NULL_HANDLE),
-        _ptr_image(nullptr)
+        _ptr_image(image_view._ptr_image),
+        _format(image_view._format),
+        _subresource_range(image_view._subresource_range),
+        _type(image_view._type)
     {
         swap(image_view._image_view_handle, _image_view_handle);
-        swap(image_view._ptr_image, _ptr_image);
-
-        _format = image_view._format;
-        _subresource_range = image_view._subresource_range;
-        _type = image_view._type;
     }
 
     inline ImageView::~ImageView()

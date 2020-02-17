@@ -29,7 +29,14 @@ namespace pbrlib
          * @param queue_family_index индекс семейства очередей.
         */
         CommandPool(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
+
+        inline CommandPool(CommandPool&& command_pool);
+        CommandPool(const CommandPool&) = delete;
+
         inline ~CommandPool();
+
+        CommandPool& operator = (CommandPool&&) = delete;
+        CommandPool& operator = (const CommandPool&) = delete;
 
         inline shared_ptr<Device>& getDevice() noexcept;
         inline const shared_ptr<Device>& getDevice() const noexcept;
@@ -43,9 +50,19 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline CommandPool::CommandPool(CommandPool&& command_pool) :
+        _ptr_device(command_pool._ptr_device),
+        _command_pool_handle(VK_NULL_HANDLE),
+        _queue_family_index(command_pool._queue_family_index)
+    {
+        swap(_command_pool_handle, command_pool._command_pool_handle);
+    }
+
     inline CommandPool::~CommandPool()
     {
-        vkDestroyCommandPool(_ptr_device->getDeviceHandle(), _command_pool_handle, nullptr);
+        if (_command_pool_handle != VK_NULL_HANDLE) {
+            vkDestroyCommandPool(_ptr_device->getDeviceHandle(), _command_pool_handle, nullptr);
+        }
     }
 
     inline shared_ptr<Device>& CommandPool::getDevice() noexcept

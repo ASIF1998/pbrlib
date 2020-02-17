@@ -80,7 +80,7 @@ namespace pbrlib
          * @param app_name название приложения.
          * @param app_version номер приложения.
         */
-        Instance(const string_view app_name, uint32_t app_version);
+        inline Instance(const string_view app_name, uint32_t app_version);
 
         /**
          * @brief Конструктор.
@@ -90,12 +90,18 @@ namespace pbrlib
          * @param layer_names названия слоёв.
          * @param extension_names названия расширений.
         */
-        Instance(const string_view app_name, 
+        inline Instance(const string_view app_name, 
                  uint32_t app_version, 
                  const vector<const char*>& layer_names, 
                  const vector<const char*>& extension_names);
+
+        inline Instance(Instance&& instance);
+        Instance(const Instance&) = delete;
         
         inline ~Instance();
+
+        Instance& operator = (Instance&&) = delete;
+        Instance& operator = (const Instance&) = delete;
 
         inline VkInstance getHandle() const;
 
@@ -141,6 +147,14 @@ namespace pbrlib
                                                         const vector<const char*>& extension_names);
 
     private:
+        void _create_instance(const string_view app_name,
+                              uint32_t app_version, 
+                              uint32_t enabled_layer_count,
+                              const char* const* ptr_enable_layers,
+                              uint32_t enabled_extension_count,
+                              const char* const* ptr_extensions);
+
+    private:
         VkInstance _instance_handle;
         vector<PhysicalDevice> _physical_device_handles;
 
@@ -161,9 +175,38 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline Instance::Instance(const string_view app_name, uint32_t app_version) :
+        _instance_handle(VK_NULL_HANDLE)
+    {
+        _create_instance(app_name, app_version, 0, nullptr, 0, nullptr);
+    }
+
+    inline Instance::Instance(const string_view app_name, 
+                              uint32_t app_version, 
+                              const vector<const char*>& layer_names, 
+                              const vector<const char*>& extension_names) :
+        _instance_handle(VK_NULL_HANDLE)
+    {
+        _create_instance(app_name,
+                         app_version,
+                         static_cast<uint32_t>(layer_names.size()),
+                         layer_names.data(),
+                         static_cast<uint32_t>(extension_names.size()),
+                         extension_names.data());
+    }
+
+    inline Instance::Instance(Instance&& instance) :
+        _instance_handle(VK_NULL_HANDLE),
+        _physical_device_handles(move(instance._physical_device_handles))
+    {
+        swap(_instance_handle, instance._instance_handle);
+    }
+
     inline Instance::~Instance()
     {
-        vkDestroyInstance(_instance_handle, nullptr);
+        if (_instance_handle != VK_NULL_HANDLE) {
+            vkDestroyInstance(_instance_handle, nullptr);
+        }
     }
 
     inline VkInstance Instance::getHandle() const

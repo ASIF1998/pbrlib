@@ -51,7 +51,13 @@ namespace pbrlib
                uint32_t memory_type_index, 
                vector<uint32_t> queue_family_indices);
 
+        inline Buffer(Buffer&& buffer);
+        inline Buffer(const Buffer&) = delete;
+
         inline ~Buffer();
+
+        Buffer& operator = (Buffer&&) = delete;
+        Buffer& operator = (const Buffer&) = delete;
 
         inline VkBuffer getBufferHandle() const noexcept;
 
@@ -62,9 +68,20 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline Buffer::Buffer(Buffer&& buffer) :
+        DeviceMemory(move(buffer)),
+        _buffer_handle(VK_NULL_HANDLE),
+        _usage(buffer._usage),
+        _queue_family_indicies(move(buffer._queue_family_indicies))
+    {
+        swap(_buffer_handle, buffer._buffer_handle);
+    }
+
     inline Buffer::~Buffer()
     {
-        vkDestroyBuffer(_ptr_device->getDeviceHandle(), _buffer_handle, nullptr);
+        if (_buffer_handle != VK_NULL_HANDLE) {
+            vkDestroyBuffer(_ptr_device->getDeviceHandle(), _buffer_handle, nullptr);
+        }
     }
 
     inline VkBuffer Buffer::getBufferHandle() const noexcept
