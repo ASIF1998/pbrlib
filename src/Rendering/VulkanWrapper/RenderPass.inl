@@ -10,7 +10,8 @@ namespace pbrlib
 {
     inline SubpassDescription::SubpassDescription(size_t num_input_attachment,
                                                   size_t num_color_attachment,
-                                                  size_t num_present_attachment)
+                                                  size_t num_present_attachment) :
+        _use_depth_stencil_attachment(false)
     {
         _input_attachment.reserve(num_input_attachment);
         _color_attachment.reserve(num_color_attachment);
@@ -18,7 +19,8 @@ namespace pbrlib
     }
 
     inline SubpassDescription::SubpassDescription(SubpassDescription&& subpass_descriptoin) :
-        _depth_stencil_attachment(subpass_descriptoin._depth_stencil_attachment)
+        _depth_stencil_attachment(subpass_descriptoin._depth_stencil_attachment),
+        _use_depth_stencil_attachment(subpass_descriptoin._use_depth_stencil_attachment)
     {
         swap(_input_attachment, subpass_descriptoin._input_attachment);
         swap(_color_attachment, subpass_descriptoin._color_attachment);
@@ -29,7 +31,8 @@ namespace pbrlib
         _input_attachment(subpass_descriptoin._input_attachment),
         _color_attachment(subpass_descriptoin._color_attachment),
         _present_attachment(subpass_descriptoin._present_attachment),
-        _depth_stencil_attachment(subpass_descriptoin._depth_stencil_attachment)
+        _depth_stencil_attachment(subpass_descriptoin._depth_stencil_attachment),
+        _use_depth_stencil_attachment(subpass_descriptoin._use_depth_stencil_attachment)
     {}
 
     inline void SubpassDescription::addInputAttachment(uint32_t attachment, VkImageLayout layout)
@@ -55,10 +58,17 @@ namespace pbrlib
 
     inline void SubpassDescription::setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout) 
     {
+        _use_depth_stencil_attachment = true;
+
         _depth_stencil_attachment = {
             .attachment = attachment,
             .layout = layout
         };
+    }
+
+    inline void SubpassDescription::resetDepthStencilAttahment() noexcept
+    {
+        _use_depth_stencil_attachment = false;
     }
 
     inline vector<VkAttachmentReference>& SubpassDescription::getInputAttachment() noexcept
@@ -99,6 +109,11 @@ namespace pbrlib
     inline const VkAttachmentReference& SubpassDescription::getDepthStencilAttachment() const noexcept
     {
         return _depth_stencil_attachment;
+    }
+
+    inline bool SubpassDescription::useDepthStencilAttachment() const noexcept
+    {
+        return _use_depth_stencil_attachment;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +273,8 @@ namespace pbrlib
                 .colorAttachmentCount = static_cast<uint32_t>(psubpass_descritions[i].getColorAttachment().size()),
                 .pColorAttachments = psubpass_descritions[i].getColorAttachment().data(),
                 .pResolveAttachments = nullptr,
-                .pDepthStencilAttachment = &psubpass_descritions[i].getDepthStencilAttachment(),
+                .pDepthStencilAttachment = (psubpass_descritions[i].useDepthStencilAttachment() ?
+                                            &psubpass_descritions[i].getDepthStencilAttachment() : nullptr),
                 .preserveAttachmentCount = static_cast<uint32_t>(psubpass_descritions[i].getPresentAttachment().size()),
                 .pPreserveAttachments = psubpass_descritions[i].getPresentAttachment().data()
             };

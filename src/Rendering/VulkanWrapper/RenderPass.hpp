@@ -44,6 +44,7 @@ namespace pbrlib
         inline void addColorAttachment(uint32_t attachment, VkImageLayout layout);
         inline void addPresentAttachment(uint32_t attachment);
         inline void setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout);
+        inline void resetDepthStencilAttahment() noexcept;
 
         inline vector<VkAttachmentReference>& getInputAttachment() noexcept;
         inline const vector<VkAttachmentReference>& getInputAttachment() const noexcept;
@@ -54,11 +55,19 @@ namespace pbrlib
         inline VkAttachmentReference& getDepthStencilAttachment() noexcept;
         inline const VkAttachmentReference& getDepthStencilAttachment() const noexcept;
 
+        /**
+         * @brief Метод сообщающий о том, использует ли подпроход подключение глубина-трафарет.
+         * 
+         * @return true - в случае если испоьлзует, иначе false.
+        */
+        inline bool useDepthStencilAttachment() const noexcept;
+
     private:
         vector<VkAttachmentReference> _input_attachment;
         vector<VkAttachmentReference> _color_attachment;
         vector<uint32_t> _present_attachment;
         VkAttachmentReference _depth_stencil_attachment;
+        bool _use_depth_stencil_attachment;
     };
 
     /**
