@@ -2,7 +2,7 @@
 //  RenderPass.inl
 //  PBRLib
 //
-//  Created by Асиф Мамедов on 17/02/2020.
+//  Created by Асиф Мамедов on 19/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
@@ -56,7 +56,7 @@ namespace pbrlib
         _present_attachment.push_back(attachment);
     }
 
-    inline void SubpassDescription::setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout) 
+    inline void SubpassDescription::setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout)
     {
         _use_depth_stencil_attachment = true;
 
@@ -179,7 +179,7 @@ namespace pbrlib
         _subpass_descriptions.push_back(subpass_description);
     }
 
-    inline void RenderPassInfo::addSubpassDependency(uint32_t src_subpass, 
+    inline void RenderPassInfo::addSubpassDependency(uint32_t src_subpass,
                                                      uint32_t dst_subpass,
                                                      VkPipelineStageFlags src_stage_mask,
                                                      VkPipelineStageFlags dst_stage_mask,
@@ -228,7 +228,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, const RenderPassInfo& render_pass_info) :
+    inline RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, const RenderPassInfo& render_pass_info) :
         _render_pass_info(render_pass_info),
         _render_pass_handle(VK_NULL_HANDLE),
         _ptr_device(ptr_device)
@@ -236,7 +236,7 @@ namespace pbrlib
         _create_render_pass();
     }
 
-    RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info) :
+    inline RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info) :
         _render_pass_info(move(render_pass_info)),
         _render_pass_handle(VK_NULL_HANDLE),
         _ptr_device(ptr_device)
@@ -244,7 +244,7 @@ namespace pbrlib
         _create_render_pass();
     }
 
-    RenderPass::RenderPass(RenderPass&& render_pass) :
+    inline RenderPass::RenderPass(RenderPass&& render_pass) :
         _render_pass_info(move(render_pass._render_pass_info)),
         _render_pass_handle(VK_NULL_HANDLE),
         _ptr_device(render_pass._ptr_device)
@@ -259,7 +259,7 @@ namespace pbrlib
         }
     }
 
-    void RenderPass::_create_render_pass()
+    inline void RenderPass::_create_render_pass()
     {
         auto& psubpass_descritions = _render_pass_info.getSubpassDescriptions();
         vector<VkSubpassDescription> subpass_description (psubpass_descritions.size());

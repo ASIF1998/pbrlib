@@ -2,20 +2,14 @@
 //  RenderPass.hpp
 //  PBRLib
 //
-//  Created by Асиф Мамедов on 17/02/2020.
+//  Created by Асиф Мамедов on 19/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
 #ifndef RenderPass_hpp
 #define RenderPass_hpp
 
-#include <vulkan/vulkan.h>
-
-#include <memory>
-
 #include "Device.hpp"
-
-using namespace std;
 
 namespace pbrlib
 {
@@ -28,14 +22,14 @@ namespace pbrlib
     public:
         /**
          * @brief Конструктор.
-         * 
+         *
          * @param num_input_attachment количество входящих подключений.
          * @param num_color_attachment количество цветовых подключить.
          * @param num_present_attachment количество подключений, для которых вы хотите, что бы они пережили подпроход.
         */
         inline SubpassDescription(size_t num_input_attachment = 1,
                                   size_t num_color_attachment = 1,
-                                  size_t num_present_attachment = 1);   
+                                  size_t num_present_attachment = 1);
 
         inline SubpassDescription(SubpassDescription&& subpass_descriptoin);
         inline SubpassDescription(const SubpassDescription& subpass_descriptoin);
@@ -57,7 +51,7 @@ namespace pbrlib
 
         /**
          * @brief Метод сообщающий о том, использует ли подпроход подключение глубина-трафарет.
-         * 
+         *
          * @return true - в случае если испоьлзует, иначе false.
         */
         inline bool useDepthStencilAttachment() const noexcept;
@@ -81,11 +75,11 @@ namespace pbrlib
 
         /**
          * @brief Конструктор.
-         * @details 
-         *      При передачи в качестве аргумента num_subpass_descriptions отличное от нуля число, 
+         * @details
+         *      При передачи в качестве аргумента num_subpass_descriptions отличное от нуля число,
          *      то все num_subpass_descriptions объектов будут доступны сразу же. Это касается только
          *      объектов типа SubpassDescription (описателей подпрохода).
-         * 
+         *
          * @param num_attribute_descriptions количество определителей подключения.
          * @param num_subpass_descriptions количество описателей подпрохода.
          * @param num_subpass_dependencies количество определителей зависимостей подпроходов.
@@ -99,14 +93,14 @@ namespace pbrlib
 
         /**
          * @brief Метод необходимый для выделения num_subpass_description количество описателей подпрохода.
-         * 
+         *
          * @param num_subpass_description количество описателей подпрохода.
         */
         inline void setNumSubpassDescription(size_t num_subpass_description);
 
         /**
          * @brief Метод возвращающий i'ый описатель подпрохода.
-         * 
+         *
          * @param i индекс подпрохода.
          * @return i'ый описатель подпрохода.
         */
@@ -114,7 +108,7 @@ namespace pbrlib
 
         /**
          * @brief Метод возвращающий i'ый описатель подпрохода.
-         * 
+         *
          * @param i индекс подпрохода.
          * @return i'ый описатель подпрохода.
         */
@@ -122,14 +116,14 @@ namespace pbrlib
 
         /**
          * @brief Метод необходимый для добавления определения подключения.
-         * 
+         *
          * @param format формат подключения.
          * @param samples число образцов в изображении.
          * @param load_op операция, определяющая то, что нужно делать с подключением, когда проход рендеринга начинается.
          * @param store_op операция, определяющая то, что нужно делать с подключением, когда проход рендеринга завершается.
-         * @param stencil_load_op операция, определяющая то, что нужно делать с подключением, соответствующий трафарету, 
+         * @param stencil_load_op операция, определяющая то, что нужно делать с подключением, соответствующий трафарету,
          *                      когда проход рендеринга начинается (если подключение является совмещённым типа глубина-трафарет).
-         * @param stencil_store_op операция, определяющая то, что нужно делать с подключением, соответствующий трафарету, 
+         * @param stencil_store_op операция, определяющая то, что нужно делать с подключением, соответствующий трафарету,
          *                      когда проход рендеринга завершается (если подключение является совмещённым типа глубина-трафарет).
          * @param initial_layout в каком размещении будет изображение в начале прохода рендеринга.
          * @param final_layout в каком размещении изображение нужно оставить по завершению прохода рендеринга.
@@ -145,21 +139,21 @@ namespace pbrlib
 
         /**
          * @brief Метод добавляющий описатель подпрохода.
-         * 
+         *
          * @param subpass_description ссылка на объект типа SubpassDescription.
         */
         inline void addSubpassDescription(SubpassDescription&& subpass_description);
 
         /**
          * @brief Метод добавляющий описатель подпрохода.
-         * 
+         *
          * @param subpass_description константная ссылка на объект типа SubpassDescription.
         */
         inline void addSubpassDescription(const SubpassDescription& subpass_description);
 
         /**
          * @brief Метод добавляющий определитель зависимостей подпроходов.
-         * 
+         *
          * @param src_subpass ссылка на исходный подпроход.
          * @param dst_subpass ссылка на целевой подпроход.
          * @param src_stage_mask маска, задающая, какие стадии конвейера в исходном подпроходе создают данные.
@@ -167,7 +161,7 @@ namespace pbrlib
          * @param src_access_mask задаёт, как исходный подпроход обращался к данным.
          * @param dst_access_mask задаёт, как целевой подпроход будет обращаться к данным.
         */
-        inline void addSubpassDependency(uint32_t src_subpass, 
+        inline void addSubpassDependency(uint32_t src_subpass,
                                          uint32_t dst_subpass,
                                          VkPipelineStageFlags src_stage_mask,
                                          VkPipelineStageFlags dst_stage_mask,
@@ -220,7 +214,7 @@ namespace pbrlib
         inline const shared_ptr<Device>& getDevice() const noexcept;
 
     private:
-        void _create_render_pass();
+        inline void _create_render_pass();
 
     private:
         RenderPassInfo _render_pass_info;
