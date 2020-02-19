@@ -72,6 +72,20 @@ namespace pbrlib
 
         /**
          * @brief Конструктор.
+         * @details На данный момент поддерживаются только типы float.
+         * 
+         * @param ptr_device указатель на устройство.
+         * @param memory_type_index индекс типа памяти.
+         * @param image_info информация об изображении.
+         * @param queue_family_indices индексы семейства очередей.
+        */
+        Image(const shared_ptr<Device>& ptr_device,
+              uint32_t memory_type_index, 
+              const ImageInfo& image_info, 
+              vector<uint32_t>&& queue_family_indices);
+
+        /**
+         * @brief Конструктор.
          *
          * @param ptr_device указатель на устройство.
          * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
@@ -95,6 +109,19 @@ namespace pbrlib
               VkImage image,
               ImageInfo image_info,
               const vector<uint32_t>& queue_family_indicies);
+
+        /**
+         * @brief Конструктор.
+         *
+         * @param ptr_device указатель на устройство.
+         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info информация об изображении.
+         * @param queue_family_indicies индексы семейства очередей.
+        */
+        Image(const shared_ptr<Device>& ptr_device,
+              VkImage image,
+              ImageInfo image_info,
+            vector<uint32_t>&& queue_family_indicies);
 
         inline Image(Image&& image);
         Image(const Image&) = delete;
@@ -163,6 +190,9 @@ namespace pbrlib
                                              VkImage image,
                                              const ImageInfo& image_info,
                                              const vector<uint32_t>& queue_family_indicies);
+
+    private:
+        void _create_image();
 
     private:
         VkImage _image_handle;
