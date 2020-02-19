@@ -131,7 +131,7 @@ namespace pbrlib
          * @param app_name название приложения.
          * @param app_version номер приложения.
         */
-        inline static shared_ptr<Instance> makeInstance(const string_view app_name, uint32_t app_version);
+        inline static shared_ptr<Instance> make(const string_view app_name, uint32_t app_version);
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
@@ -141,10 +141,10 @@ namespace pbrlib
          * @param layer_names названия слоёв.
          * @param extension_names названия расширений.
         */
-        inline static shared_ptr<Instance> makeInstance(const string_view app_name, 
-                                                        uint32_t app_version,
-                                                        const vector<const char*>& layer_names,
-                                                        const vector<const char*>& extension_names);
+        inline static shared_ptr<Instance> make(const string_view app_name,
+                                                uint32_t app_version,
+                                                const vector<const char*>& layer_names,
+                                                const vector<const char*>& extension_names);
 
     private:
         void _create_instance(const string_view app_name,
@@ -224,15 +224,15 @@ namespace pbrlib
         return _supported_layers.check(name);
     }
 
-    inline shared_ptr<Instance> Instance::makeInstance(const string_view app_name, uint32_t app_version)
+    inline shared_ptr<Instance> Instance::make(const string_view app_name, uint32_t app_version)
     {
         return make_shared<Instance>(app_name, app_version);
     }
 
-    inline shared_ptr<Instance> Instance::makeInstance(const string_view app_name, 
-                                                       uint32_t app_version,
-                                                       const vector<const char*>& layer_names,
-                                                       const vector<const char*>& extension_names)
+    inline shared_ptr<Instance> Instance::make(const string_view app_name,
+                                               uint32_t app_version,
+                                               const vector<const char*>& layer_names,
+                                               const vector<const char*>& extension_names)
     {
         return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
     }

@@ -219,7 +219,7 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        inline static shared_ptr<RenderPass> makeRenderPass(const shared_ptr<Device>& ptr_device, const RenderPassInfo& render_pass_info);
+        inline static shared_ptr<RenderPass> make(const shared_ptr<Device>& ptr_device, const RenderPassInfo& render_pass_info);
 
         /**
          * @brief Статический метод создающий объект типа shared_ptr<RenderPass>.
@@ -227,7 +227,7 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        inline static shared_ptr<RenderPass> makeRenderPass(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info);
+        inline static shared_ptr<RenderPass> make(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info);
 
     private:
         inline void _create_render_pass();

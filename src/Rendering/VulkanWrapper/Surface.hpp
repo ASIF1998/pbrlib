@@ -51,9 +51,9 @@ namespace pbrlib
 
         inline void setFormat(const VkSurfaceFormatKHR& format) noexcept;
         
-        inline static shared_ptr<Surface> makeSurface(const Window& window,
-                                                      const shared_ptr<Instance>& ptr_instance,
-                                                      const PhysicalDevice& physical_device);
+        inline static shared_ptr<Surface> make(const Window& window,
+                                               const shared_ptr<Instance>& ptr_instance,
+                                               const PhysicalDevice& physical_device);
         
         inline static vector<VkSurfaceFormatKHR> getAllSurfaceFormats(const Surface& surface, const PhysicalDevice& physical_device);
 
@@ -90,7 +90,9 @@ namespace pbrlib
         }
     }
 
-    inline shared_ptr<Surface> Surface::makeSurface(const Window& window, const shared_ptr<Instance>& ptr_instance, const PhysicalDevice& physical_device)
+    inline shared_ptr<Surface> Surface::make(const Window& window,
+                                             const shared_ptr<Instance>& ptr_instance,
+                                             const PhysicalDevice& physical_device)
     {
         return make_shared<Surface>(window, ptr_instance, physical_device);
     }

@@ -74,7 +74,7 @@ namespace pbrlib
         _images_view.reserve(num_images);
 
         for (size_t i{0}; i < vk_images.size(); i++) {
-            ptr_images.push_back(Image::makeImage(ptr_device, vk_images[i], image_info, queue_family_indices));
+            ptr_images.push_back(Image::make(ptr_device, vk_images[i], image_info, queue_family_indices));
         }
 
         for (size_t i{0}; i < ptr_images.size(); i++) {

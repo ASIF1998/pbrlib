@@ -68,7 +68,7 @@ namespace pbrlib
         Image(const shared_ptr<Device>& ptr_device,
               uint32_t memory_type_index, 
               const ImageInfo& image_info, 
-              vector<uint32_t> queue_family_indices);
+              const vector<uint32_t>& queue_family_indices);
 
         /**
          * @brief Конструктор.
@@ -94,7 +94,7 @@ namespace pbrlib
         Image(const shared_ptr<Device>& ptr_device,
               VkImage image,
               ImageInfo image_info,
-              vector<uint32_t> queue_family_indicies);
+              const vector<uint32_t>& queue_family_indicies);
 
         inline Image(Image&& image);
         Image(const Image&) = delete;
@@ -117,10 +117,10 @@ namespace pbrlib
          * @param queue_family_index индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device, 
-                                                  uint32_t memory_type_index, 
-                                                  const ImageInfo& image_info, 
-                                                  uint32_t queue_family_index);
+        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
+                                             uint32_t memory_type_index,
+                                             const ImageInfo& image_info,
+                                             uint32_t queue_family_index);
 
         /**
          * @brief Статический метод для создания Image.
@@ -131,10 +131,10 @@ namespace pbrlib
          * @param queue_family_indices индексы семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
-                                                  uint32_t memory_type_index,
-                                                  const ImageInfo& image_info,
-                                                  vector<uint32_t> queue_family_indices);
+        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
+                                             uint32_t memory_type_index,
+                                             const ImageInfo& image_info,
+                                             const vector<uint32_t>& queue_family_indices);
 
         /**
          * @brief Статический метод для создания Image.
@@ -145,10 +145,10 @@ namespace pbrlib
          * @param queue_family_index индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
-                                                  VkImage image,
-                                                  ImageInfo image_info,
-                                                  uint32_t queue_family_index);
+        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
+                                             VkImage image,
+                                             const ImageInfo& image_info,
+                                             uint32_t queue_family_index);
 
         /**
          * @brief Статический метод для создания Image.
@@ -159,10 +159,10 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> makeImage(const shared_ptr<Device>& ptr_device,
-                                                  VkImage image,
-                                                  ImageInfo image_info,
-                                                  vector<uint32_t> queue_family_indicies);
+        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
+                                             VkImage image,
+                                             const ImageInfo& image_info,
+                                             const vector<uint32_t>& queue_family_indicies);
 
     private:
         VkImage _image_handle;
@@ -244,34 +244,34 @@ namespace pbrlib
         return _image_handle;
     }
 
-    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device, 
-                                                  uint32_t memory_type_index, 
-                                                  const ImageInfo& image_info, 
-                                                  uint32_t queue_family_index)
+    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
+                                         uint32_t memory_type_index,
+                                         const ImageInfo& image_info,
+                                         uint32_t queue_family_index)
     {
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
     }
 
-    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device, 
-                                       uint32_t memory_type_index, 
-                                       const ImageInfo& image_info, 
-                                       vector<uint32_t> queue_family_indices)
+    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
+                                         uint32_t memory_type_index,
+                                         const ImageInfo& image_info,
+                                         const vector<uint32_t>& queue_family_indices)
     {
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
     }
 
-    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device,
-                                              VkImage image,
-                                              ImageInfo image_info,
-                                              uint32_t queue_family_index)
+    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
+                                         VkImage image,
+                                         const ImageInfo& image_info,
+                                         uint32_t queue_family_index)
     {
         return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
     }
 
-    inline shared_ptr<Image> Image::makeImage(const shared_ptr<Device>& ptr_device,
-                                              VkImage image,
-                                              ImageInfo image_info,
-                                              vector<uint32_t> queue_family_indicies)
+    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
+                                         VkImage image,
+                                         const ImageInfo& image_info,
+                                         const vector<uint32_t>& queue_family_indicies)
     {
         return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
     }
