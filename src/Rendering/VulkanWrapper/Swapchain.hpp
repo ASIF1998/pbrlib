@@ -32,8 +32,8 @@ namespace pbrlib
          * @param surface поверхность.
         */
         inline Swapchain(const shared_ptr<Device>& ptr_device,
-                        vector<uint32_t> queue_family_indices,
-                        const shared_ptr<Surface> & surface);
+                         vector<uint32_t> queue_family_indices,
+                         const shared_ptr<Surface>& surface);
         
         /**
          * @brief Конструктор.
@@ -47,7 +47,7 @@ namespace pbrlib
         */
         inline Swapchain(const shared_ptr<Device>& ptr_device,
                          uint32_t queue_family_index,
-                         const shared_ptr<Surface> & surface);
+                         const shared_ptr<Surface>& surface);
 
         inline Swapchain(Swapchain&& swapchain);
         Swapchain(const Swapchain&) = delete;
@@ -76,6 +76,28 @@ namespace pbrlib
         inline VkSwapchainKHR getSwapchainHandle() const noexcept;
         inline shared_ptr<Surface>& getSurface() noexcept;
         inline const shared_ptr<Surface>& getSurface() const noexcept;
+
+        /**
+         * @brief Статический метод создающий объект типа shared_ptr<Swapchain>.
+         * 
+         * @param ptr_device указатель на устройство.
+         * @param queue_family_indices индексы семейства очередей.
+         * @param surface поверхность.
+        */
+        inline static shared_ptr<Swapchain> makeSwapchain(const shared_ptr<Device>& ptr_device,
+                                                          vector<uint32_t> queue_family_indices,
+                                                          const shared_ptr<Surface>& surface);
+
+        /**
+         * @brief Статический метод создающий объект типа shared_ptr<Swapchain>.
+         * 
+         * @param ptr_device указатель на устройство.
+         * @param queue_family_index индекс семейства очередей.
+         * @param surface поверхность.
+        */
+        inline static shared_ptr<Swapchain> makeSwapchain(const shared_ptr<Device>& ptr_device,
+                                                          uint32_t queue_family_index,
+                                                          const shared_ptr<Surface>& surface);
 
     private:
         VkSwapchainKHR _swapchain_handle;
@@ -170,6 +192,20 @@ namespace pbrlib
     inline const shared_ptr<Surface>& Swapchain::getSurface() const noexcept
     {
         return _ptr_surface;
+    }
+
+    inline shared_ptr<Swapchain> Swapchain::makeSwapchain(const shared_ptr<Device>& ptr_device,
+                                                          vector<uint32_t> queue_family_indices,
+                                                          const shared_ptr<Surface>& surface)
+    {
+        return make_shared<Swapchain>(ptr_device, queue_family_indices, surface);
+    }
+
+    inline shared_ptr<Swapchain> Swapchain::makeSwapchain(const shared_ptr<Device>& ptr_device,
+                                                          uint32_t queue_family_index,
+                                                          const shared_ptr<Surface>& surface)
+    {
+        return make_shared<Swapchain>(ptr_device, queue_family_index, surface);
     }
 }
 

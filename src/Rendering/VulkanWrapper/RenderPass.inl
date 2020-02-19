@@ -315,4 +315,16 @@ namespace pbrlib
     {
          return _ptr_device;
     }
+
+    inline shared_ptr<RenderPass> RenderPass::makeRenderPass(const shared_ptr<Device>& ptr_device,
+                                                             const RenderPassInfo& render_pass_info)
+    {
+        return make_shared<RenderPass>(ptr_device, render_pass_info);
+    }
+
+    inline shared_ptr<RenderPass> RenderPass::makeRenderPass(const shared_ptr<Device>& ptr_device,
+                                                             RenderPassInfo&& render_pass_info)
+    {
+        return make_shared<RenderPass>(ptr_device, move(render_pass_info));
+    }
 }

@@ -8,45 +8,96 @@
 
 namespace pbrlib
 {
-    inline Framebuffer::Framebuffer(const shared_ptr<RenderPass>& ptr_render_pass,
+    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
+                                    uint32_t swapchain_attachment_indx,
+                                    const shared_ptr<RenderPass>& ptr_render_pass,
                                     vector<ImageView>&& attachments,
                                     uint32_t width,
                                     uint32_t height,
                                     uint32_t layers) :
+        _ptr_swapchain(ptr_swapchain),
         _ptr_render_pass(ptr_render_pass),
+        _swapchain_attachment_indx(swapchain_attachment_indx),
         _attachments(move(attachments)),
         _framebuffer_handle(VK_NULL_HANDLE),
         _width(width),
         _height(height),
         _layers(layers)
     {
-        vector<VkImageView> images_view (_attachments.size());
+        _create_framebuffer();
+    }
 
-        for (size_t i{0}; i < images_view.size(); i++) {
-            images_view[i] = _attachments[i].getImageViewHandle();
+    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
+                                    uint32_t swapchain_attachment_indx,
+                                    const shared_ptr<RenderPass>& ptr_render_pass,
+                                    uint32_t width,
+                                    uint32_t height,
+                                    uint32_t layers) :
+        _ptr_swapchain(ptr_swapchain),
+        _ptr_render_pass(ptr_render_pass),
+        _swapchain_attachment_indx(swapchain_attachment_indx),
+        _framebuffer_handle(VK_NULL_HANDLE),
+        _width(width),
+        _height(height),
+        _layers(layers)
+    {
+        _create_framebuffer();
+    }
+
+    inline Framebuffer::Framebuffer(vector<ImageView>&& attachments,
+                                    const shared_ptr<RenderPass>& ptr_render_pass,
+                                    uint32_t width,
+                                    uint32_t height,
+                                    uint32_t layers) :
+        _ptr_swapchain(nullptr),
+        _ptr_render_pass(ptr_render_pass),
+        _swapchain_attachment_indx(0),
+        _attachments(move(attachments)),
+        _framebuffer_handle(VK_NULL_HANDLE),
+        _width(width),
+        _height(height),
+        _layers(layers)
+    {
+        _create_framebuffer();
+    }
+
+    void Framebuffer::_create_framebuffer()
+    {
+        assert(_width && _height && _layers);
+
+        vector<VkImageView> attachments;
+
+        if (isUsedSwapchain()) {
+            attachments.reserve(_attachments.size() + 1);
+            attachments.push_back(_ptr_swapchain->getImagesView()[_swapchain_attachment_indx].getImageViewHandle());
+        } else {
+            attachments.reserve(_attachments.size());
         }
 
-        VkFramebufferCreateInfo framebuffer_info {
+        for (size_t i{0}; i < _attachments.size(); i++) {
+            attachments.push_back(_attachments[i].getImageViewHandle());
+        }
+
+        VkFramebufferCreateInfo framebuffer_info = {
             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
             .renderPass = _ptr_render_pass->getRenderPassHandle(),
-            .attachmentCount = static_cast<uint32_t>(images_view.size()),
-            .pAttachments = images_view.data(),
+            .attachmentCount = static_cast<uint32_t>(attachments.size()),
+            .pAttachments = attachments.data(),
             .width = _width,
             .height = _height,
             .layers = _layers
         };
 
-        assert(vkCreateFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(),
-                                   &framebuffer_info,
-                                   nullptr,
-                                   &_framebuffer_handle) == VK_SUCCESS);
+        assert(vkCreateFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), &framebuffer_info, nullptr, &_framebuffer_handle) == VK_SUCCESS);
         assert(_framebuffer_handle != VK_NULL_HANDLE);
-    }
+    }  
 
     inline Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
+        _ptr_swapchain(move(framebuffer._ptr_swapchain)),
         _ptr_render_pass(move(framebuffer._ptr_render_pass)),
+        _swapchain_attachment_indx(framebuffer._swapchain_attachment_indx),
         _attachments(move(framebuffer._attachments)),
         _framebuffer_handle(VK_NULL_HANDLE),
         _width(framebuffer._width),
@@ -61,6 +112,21 @@ namespace pbrlib
         if (_framebuffer_handle != VK_NULL_HANDLE) {
             vkDestroyFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), _framebuffer_handle, nullptr);
         }
+    }
+
+    inline bool Framebuffer::isUsedSwapchain() const noexcept     
+    {
+        return _ptr_swapchain != nullptr;
+    }
+
+    inline shared_ptr<Swapchain>& Framebuffer::getSwapchain() noexcept
+    {
+        return _ptr_swapchain;
+    }
+
+    inline const shared_ptr<Swapchain>& Framebuffer::getSwapchain() const noexcept
+    {
+        return _ptr_swapchain;
     }
 
     inline shared_ptr<RenderPass>& Framebuffer::getRenderPass() noexcept
@@ -83,6 +149,28 @@ namespace pbrlib
         return _attachments;
     }
 
+    inline ImageView& Framebuffer::getSwapchainAttachment() noexcept
+    {
+        assert(_ptr_swapchain != nullptr);
+        return _ptr_swapchain->getImagesView()[_swapchain_attachment_indx];
+    }
+
+    inline const ImageView& Framebuffer::getSwapchainAttachment() const noexcept
+    {
+        assert(_ptr_swapchain != nullptr);
+        return _ptr_swapchain->getImagesView()[_swapchain_attachment_indx];
+    }
+
+    inline uint32_t Framebuffer::getSwapchainAttachmentIndex() const noexcept
+    {
+        return _swapchain_attachment_indx;
+    }
+
+    inline VkFramebuffer Framebuffer::getFramebufferHandle() const noexcept
+    {
+        return _framebuffer_handle;
+    }
+
     inline uint32_t Framebuffer::getWidth() const noexcept
     {
         return _width;
@@ -93,7 +181,7 @@ namespace pbrlib
         return _height;
     }
 
-    inline uint32_t Framebuffer::getLayers() const noexcept
+    inline uint32_t Framebuffer::getNumLayers() const noexcept
     {
         return _layers;
     }

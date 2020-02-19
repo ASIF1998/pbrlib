@@ -11,36 +11,94 @@
 
 #include "Image.hpp"
 #include "RenderPass.hpp"
+#include "Swapchain.hpp"
 
 namespace pbrlib
 {
     class Framebuffer
     {
     public:
-        inline Framebuffer(const shared_ptr<RenderPass>& ptr_render_pass,
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_swapchain указатель на список отображения.
+         * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param attachments иные виды изображения (например глубина-трафарет), 
+         *                    которые, при создании фреймбуфера, будут идти после 
+         *                    видов изображения в списке отображения.
+         * @param width ширина фреймбуфера.
+         * @param height высота фреймбуфера.
+         * @param layers количество слоёв фреймбуфера.
+        */
+        inline Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
+                           uint32_t swapchain_attachment_indx,
+                           const shared_ptr<RenderPass>& ptr_render_pass,
                            vector<ImageView>&& attachments,
                            uint32_t width,
                            uint32_t height,
                            uint32_t layers);
 
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_swapchain указатель на список отображения.
+         * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param width ширина фреймбуфера.
+         * @param height высота фреймбуфера.
+         * @param layers количество слоёв фреймбуфера.
+        */  
+        inline Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain, 
+                           uint32_t swapchain_attachment_indx,
+                           const shared_ptr<RenderPass>& ptr_render_pass,
+                           uint32_t width,
+                           uint32_t height,
+                           uint32_t layers);
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param attachments виды изображений.
+         * @param width ширина фреймбуфера.
+         * @param height высота фреймбуфера.
+         * @param layers количество слоёв фреймбуфера.
+        */  
+        inline Framebuffer(vector<ImageView>&& attachments,
+                           const shared_ptr<RenderPass>& ptr_render_pass,
+                           uint32_t width,
+                           uint32_t height,
+                           uint32_t layers);
+
         inline Framebuffer(Framebuffer&& framebuffer);
-        Framebuffer(const Framebuffer&) = delete;
+        Framebuffer(const Framebuffer& framebuffer) = delete;
 
         inline ~Framebuffer();
 
-        Framebuffer operator = (Framebuffer&&) = delete;
-        Framebuffer operator = (const Framebuffer&) = delete;
+        Framebuffer& operator = (Framebuffer&&) = delete;
+        Framebuffer& operator = (const Framebuffer&) = delete;
 
-        inline shared_ptr<RenderPass>& getRenderPass() noexcept;    
+        inline bool isUsedSwapchain() const noexcept;
+
+        inline shared_ptr<Swapchain>& getSwapchain() noexcept;
+        inline const shared_ptr<Swapchain>& getSwapchain() const noexcept;
+        inline shared_ptr<RenderPass>& getRenderPass() noexcept;
         inline const shared_ptr<RenderPass>& getRenderPass() const noexcept;
         inline vector<ImageView>& getAttachments() noexcept;
         inline const vector<ImageView>& getAttachments() const noexcept;
+        inline ImageView& getSwapchainAttachment() noexcept;
+        inline const ImageView& getSwapchainAttachment() const noexcept;
+        inline uint32_t getSwapchainAttachmentIndex() const noexcept;
+        inline VkFramebuffer getFramebufferHandle() const noexcept;
         inline uint32_t getWidth() const noexcept;
         inline uint32_t getHeight() const noexcept;
-        inline uint32_t getLayers() const noexcept;
+        inline uint32_t getNumLayers() const noexcept;
 
     private:
+        void _create_framebuffer();
+
+    private:  
+        shared_ptr<Swapchain> _ptr_swapchain;
         shared_ptr<RenderPass> _ptr_render_pass;
+        uint32_t _swapchain_attachment_indx;
         vector<ImageView> _attachments;
         VkFramebuffer _framebuffer_handle;
         uint32_t _width;
