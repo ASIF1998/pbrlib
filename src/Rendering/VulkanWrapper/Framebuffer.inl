@@ -11,7 +11,26 @@ namespace pbrlib
     inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
                                     uint32_t swapchain_attachment_indx,
                                     const shared_ptr<RenderPass>& ptr_render_pass,
-                                    vector<ImageView>&& attachments,
+                                    PtrAttachments&& attachments,
+                                    uint32_t width,
+                                    uint32_t height,
+                                    uint32_t layers) :
+        _ptr_swapchain(ptr_swapchain),
+        _ptr_render_pass(ptr_render_pass),
+        _swapchain_attachment_indx(swapchain_attachment_indx),
+        _attachments(move(attachments)),
+        _framebuffer_handle(VK_NULL_HANDLE),
+        _width(width),
+        _height(height),
+        _layers(layers)
+    {
+        _create_framebuffer();
+    }
+
+    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
+                                    uint32_t swapchain_attachment_indx,
+                                    const shared_ptr<RenderPass>& ptr_render_pass,
+                                    const PtrAttachments& attachments,
                                     uint32_t width,
                                     uint32_t height,
                                     uint32_t layers) :
@@ -35,6 +54,7 @@ namespace pbrlib
                                     uint32_t layers) :
         _ptr_swapchain(ptr_swapchain),
         _ptr_render_pass(ptr_render_pass),
+        _attachments(nullptr),
         _swapchain_attachment_indx(swapchain_attachment_indx),
         _framebuffer_handle(VK_NULL_HANDLE),
         _width(width),
@@ -44,7 +64,7 @@ namespace pbrlib
         _create_framebuffer();
     }
 
-    inline Framebuffer::Framebuffer(vector<ImageView>&& attachments,
+    inline Framebuffer::Framebuffer(PtrAttachments&& attachments,
                                     const shared_ptr<RenderPass>& ptr_render_pass,
                                     uint32_t width,
                                     uint32_t height,
@@ -61,38 +81,22 @@ namespace pbrlib
         _create_framebuffer();
     }
 
-    void Framebuffer::_create_framebuffer()
+    inline Framebuffer::Framebuffer(const PtrAttachments& attachments,
+                                    const shared_ptr<RenderPass>& ptr_render_pass,
+                                    uint32_t width,
+                                    uint32_t height,
+                                    uint32_t layers) :
+        _ptr_swapchain(nullptr),
+        _ptr_render_pass(ptr_render_pass),
+        _swapchain_attachment_indx(0),
+        _attachments(move(attachments)),
+        _framebuffer_handle(VK_NULL_HANDLE),
+        _width(width),
+        _height(height),
+        _layers(layers)
     {
-        assert(_width && _height && _layers);
-
-        vector<VkImageView> attachments;
-
-        if (isUsedSwapchain()) {
-            attachments.reserve(_attachments.size() + 1);
-            attachments.push_back(_ptr_swapchain->getImagesView()[_swapchain_attachment_indx].getImageViewHandle());
-        } else {
-            attachments.reserve(_attachments.size());
-        }
-
-        for (size_t i{0}; i < _attachments.size(); i++) {
-            attachments.push_back(_attachments[i].getImageViewHandle());
-        }
-
-        VkFramebufferCreateInfo framebuffer_info = {
-            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .renderPass = _ptr_render_pass->getRenderPassHandle(),
-            .attachmentCount = static_cast<uint32_t>(attachments.size()),
-            .pAttachments = attachments.data(),
-            .width = _width,
-            .height = _height,
-            .layers = _layers
-        };
-
-        assert(vkCreateFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), &framebuffer_info, nullptr, &_framebuffer_handle) == VK_SUCCESS);
-        assert(_framebuffer_handle != VK_NULL_HANDLE);
-    }  
+        _create_framebuffer();
+    }
 
     inline Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
         _ptr_swapchain(move(framebuffer._ptr_swapchain)),
@@ -113,6 +117,38 @@ namespace pbrlib
             vkDestroyFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), _framebuffer_handle, nullptr);
         }
     }
+
+    void Framebuffer::_create_framebuffer()
+    {
+        assert(_width && _height && _layers && (_attachments != nullptr || isUsedSwapchain()));
+
+        vector<VkImageView> attachments;
+
+        if (isUsedSwapchain()) {
+            attachments.push_back(_ptr_swapchain->getImagesView()[_swapchain_attachment_indx].getImageViewHandle());
+        }
+
+        if (_attachments != nullptr) {
+            for (size_t i{0}; i < _attachments->size(); i++) {
+                attachments.push_back(_attachments->at(i).getImageViewHandle());
+            }
+        }
+
+        VkFramebufferCreateInfo framebuffer_info = {
+            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .renderPass = _ptr_render_pass->getRenderPassHandle(),
+            .attachmentCount = static_cast<uint32_t>(attachments.size()),
+            .pAttachments = attachments.data(),
+            .width = _width,
+            .height = _height,
+            .layers = _layers
+        };
+
+        assert(vkCreateFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), &framebuffer_info, nullptr, &_framebuffer_handle) == VK_SUCCESS);
+        assert(_framebuffer_handle != VK_NULL_HANDLE);
+    }  
 
     inline bool Framebuffer::isUsedSwapchain() const noexcept     
     {
@@ -139,12 +175,12 @@ namespace pbrlib
         return _ptr_render_pass;
     }
 
-    inline vector<ImageView>& Framebuffer::getAttachments() noexcept
+    inline PtrAttachments& Framebuffer::getAttachments() noexcept
     {
         return _attachments;
     }
 
-    inline const vector<ImageView>& Framebuffer::getAttachments() const noexcept
+    inline const PtrAttachments& Framebuffer::getAttachments() const noexcept
     {
         return _attachments;
     }

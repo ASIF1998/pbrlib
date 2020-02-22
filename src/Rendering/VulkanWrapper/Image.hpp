@@ -13,7 +13,6 @@
 #include "Device.hpp"
 
 #include <vector>
-
 #include <memory>
 
 using namespace std;
@@ -121,7 +120,7 @@ namespace pbrlib
         Image(const shared_ptr<Device>& ptr_device,
               VkImage image,
               ImageInfo image_info,
-            vector<uint32_t>&& queue_family_indicies);
+              vector<uint32_t>&& queue_family_indicies);
 
         inline Image(Image&& image);
         Image(const Image&) = delete;

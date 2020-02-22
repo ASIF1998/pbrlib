@@ -91,9 +91,9 @@ namespace pbrlib
          * @param extension_names названия расширений.
         */
         inline Instance(const string_view app_name, 
-                 uint32_t app_version, 
-                 const vector<const char*>& layer_names, 
-                 const vector<const char*>& extension_names);
+                        uint32_t app_version,
+                        const vector<const char*>& layer_names,
+                        const vector<const char*>& extension_names);
 
         inline Instance(Instance&& instance);
         Instance(const Instance&) = delete;
