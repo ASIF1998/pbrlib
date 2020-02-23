@@ -182,7 +182,7 @@ namespace pbrlib
         return _sampler_info;
     }
 
-    inline VkSampler Sampler::getSamplerHandle() const noexcept
+    inline const VkSampler& Sampler::getSamplerHandle() const noexcept
     {
         return _sampler_handle;
     }

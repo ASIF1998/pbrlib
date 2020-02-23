@@ -159,7 +159,7 @@ namespace pbrlib
         inline const shared_ptr<Device>& getDevice() const noexcept;
         inline SamplerInfo& getSamplerInfo() noexcept;
         inline const SamplerInfo& getSamplerInfo() const noexcept;
-        inline VkSampler getSamplerHandle() const noexcept;
+        inline const VkSampler& getSamplerHandle() const noexcept;
         
     private:
         shared_ptr<Device> _ptr_device;
