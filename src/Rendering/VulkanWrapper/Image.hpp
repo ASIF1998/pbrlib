@@ -132,7 +132,7 @@ namespace pbrlib
 
         inline ImageInfo& getImageInfo();
         inline const ImageInfo& getImageInfo() const;
-        inline VkImage getImageHandle() const;
+        inline const VkImage& getImageHandle() const;
 
         /**
          * @brief Статический метод для создания Image.
@@ -231,7 +231,7 @@ namespace pbrlib
         inline VkFormat getFormat() const noexcept;
         inline VkImageSubresourceRange& getSubresourceRange() noexcept;
         inline const VkImageSubresourceRange& getSubresourceRange() const noexcept;
-        inline VkImageView getImageViewHandle() const noexcept;
+        inline const VkImageView& getImageViewHandle() const noexcept;
 
     private:
         shared_ptr<Image> _ptr_image;
@@ -268,7 +268,7 @@ namespace pbrlib
         return _image_info;
     }
 
-    inline VkImage Image::getImageHandle() const
+    inline const VkImage& Image::getImageHandle() const
     {
         return _image_handle;
     }
@@ -353,7 +353,7 @@ namespace pbrlib
         return _subresource_range;
     }
 
-    inline VkImageView ImageView::getImageViewHandle() const noexcept
+    inline const VkImageView& ImageView::getImageViewHandle() const noexcept
     {
         return _image_view_handle;
     }

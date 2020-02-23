@@ -123,7 +123,7 @@ namespace pbrlib
         inline ImageView& getSwapchainAttachment() noexcept;
         inline const ImageView& getSwapchainAttachment() const noexcept;
         inline uint32_t getSwapchainAttachmentIndex() const noexcept;
-        inline VkFramebuffer getFramebufferHandle() const noexcept;
+        inline const VkFramebuffer& getFramebufferHandle() const noexcept;
         inline uint32_t getWidth() const noexcept;
         inline uint32_t getHeight() const noexcept;
         inline uint32_t getNumLayers() const noexcept;

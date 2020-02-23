@@ -73,7 +73,7 @@ namespace pbrlib
         inline vector<ImageView>& getImagesView() noexcept;
         inline const vector<ImageView>& getImagesView() const noexcept;
         inline void getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence = VK_NULL_HANDLE);
-        inline VkSwapchainKHR getSwapchainHandle() const noexcept;
+        inline const VkSwapchainKHR& getSwapchainHandle() const noexcept;
         inline shared_ptr<Surface>& getSurface() noexcept;
         inline const shared_ptr<Surface>& getSurface() const noexcept;
 
@@ -179,7 +179,7 @@ namespace pbrlib
         vkAcquireNextImageKHR(device_handle, _swapchain_handle, numeric_limits<uint64_t>::max(), semaphore, fence, &image_index);
     }
 
-    inline VkSwapchainKHR Swapchain::getSwapchainHandle() const noexcept
+    inline const VkSwapchainKHR& Swapchain::getSwapchainHandle() const noexcept
     {
         return _swapchain_handle;
     }

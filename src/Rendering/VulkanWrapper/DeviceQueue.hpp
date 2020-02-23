@@ -41,7 +41,7 @@ namespace pbrlib
 
         inline shared_ptr<Device>& getDevice();
         inline const shared_ptr<Device>& getDevice() const;
-        inline VkQueue getQueueHandle() const noexcept;
+        inline const VkQueue& getQueueHandle() const noexcept;
         inline uint32_t getFamilyIndex() const noexcept;
         inline uint32_t getIndex() const noexcept;
 
@@ -86,7 +86,7 @@ namespace pbrlib
         return _ptr_device;
     }
 
-    inline VkQueue DeviceQueue::getQueueHandle() const noexcept
+    inline const VkQueue& DeviceQueue::getQueueHandle() const noexcept
     {
         return _queue_handle;
     }

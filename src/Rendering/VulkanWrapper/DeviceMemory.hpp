@@ -69,7 +69,7 @@ namespace pbrlib
 
         inline uint8_t* getData() noexcept;
         inline const uint8_t* getData() const noexcept;
-        inline VkDeviceMemory getDeviceMemoryHandle() const noexcept;
+        inline const VkDeviceMemory& getDeviceMemoryHandle() const noexcept;
         inline shared_ptr<Device>& getDevice() noexcept;
         inline const shared_ptr<Device>& getDevice() const noexcept;
 
@@ -117,7 +117,7 @@ namespace pbrlib
         return _ptr_mapped_data;
     }
 
-    inline VkDeviceMemory DeviceMemory::getDeviceMemoryHandle() const noexcept
+    inline const VkDeviceMemory& DeviceMemory::getDeviceMemoryHandle() const noexcept
     {
         return _device_memory_handle;
     }

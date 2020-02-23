@@ -43,7 +43,7 @@ namespace pbrlib
         Surface& operator = (Surface&&) = delete;
         Surface& operator = (const Surface&) = delete;
 
-        inline VkSurfaceKHR getSurfaceHandle() const noexcept;
+        inline const VkSurfaceKHR& getSurfaceHandle() const noexcept;
         inline shared_ptr<Instance>& getInstance() noexcept;
         inline const shared_ptr<Instance>& getInstance() const noexcept;
         inline const VkSurfaceCapabilitiesKHR& getSurfaceCapabilities() const noexcept;
@@ -97,7 +97,7 @@ namespace pbrlib
         return make_shared<Surface>(window, ptr_instance, physical_device);
     }
 
-    inline VkSurfaceKHR Surface::getSurfaceHandle() const noexcept
+    inline const VkSurfaceKHR& Surface::getSurfaceHandle() const noexcept
     {
         return _surface_handle;
     }

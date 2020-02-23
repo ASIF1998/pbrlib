@@ -202,7 +202,7 @@ namespace pbrlib
         return _swapchain_attachment_indx;
     }
 
-    inline VkFramebuffer Framebuffer::getFramebufferHandle() const noexcept
+    inline const VkFramebuffer& Framebuffer::getFramebufferHandle() const noexcept
     {
         return _framebuffer_handle;
     }

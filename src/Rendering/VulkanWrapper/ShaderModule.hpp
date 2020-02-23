@@ -34,7 +34,7 @@ namespace pbrlib
         inline shared_ptr<Device>& getDevice() noexcept;
         inline const shared_ptr<Device>& getDevice() const noexcept;
         inline VkShaderStageFlagBits getShaderType() const noexcept;
-        inline VkShaderModule getShaderHandle() const noexcept;
+        inline const VkShaderModule& getShaderHandle() const noexcept;
 
     private:
         shared_ptr<Device> _ptr_device;
@@ -73,7 +73,7 @@ namespace pbrlib
         return _shader_type;
     }
 
-    inline VkShaderModule ShaderModule::getShaderHandle() const noexcept
+    inline const VkShaderModule& ShaderModule::getShaderHandle() const noexcept
     {
         return _shader_handle;
     }

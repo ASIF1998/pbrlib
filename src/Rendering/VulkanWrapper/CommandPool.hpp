@@ -41,7 +41,7 @@ namespace pbrlib
         inline shared_ptr<Device>& getDevice() noexcept;
         inline const shared_ptr<Device>& getDevice() const noexcept;
         inline uint32_t getFamilyIndex() const noexcept;
-        inline VkCommandPool getCommandPoolHandle() const noexcept;
+        inline const VkCommandPool& getCommandPoolHandle() const noexcept;
 
     private:
         shared_ptr<Device> _ptr_device;
@@ -80,7 +80,7 @@ namespace pbrlib
         return _queue_family_index;
     }
 
-    inline VkCommandPool CommandPool::getCommandPoolHandle() const noexcept
+    inline const VkCommandPool& CommandPool::getCommandPoolHandle() const noexcept
     {
         return _command_pool_handle;
     }

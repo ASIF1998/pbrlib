@@ -301,7 +301,7 @@ namespace pbrlib
         return _render_pass_info;
     }
 
-    inline VkRenderPass RenderPass::getRenderPassHandle() const noexcept
+    inline const VkRenderPass& RenderPass::getRenderPassHandle() const noexcept
     {
         return _render_pass_handle;
     }

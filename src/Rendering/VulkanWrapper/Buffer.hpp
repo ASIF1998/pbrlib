@@ -59,7 +59,7 @@ namespace pbrlib
         Buffer& operator = (Buffer&&) = delete;
         Buffer& operator = (const Buffer&) = delete;
 
-        inline VkBuffer getBufferHandle() const noexcept;
+        inline const VkBuffer& getBufferHandle() const noexcept;
 
     private:
         VkBuffer _buffer_handle;
@@ -84,7 +84,7 @@ namespace pbrlib
         }
     }
 
-    inline VkBuffer Buffer::getBufferHandle() const noexcept
+    inline const VkBuffer& Buffer::getBufferHandle() const noexcept
     {
         return _buffer_handle;
     }

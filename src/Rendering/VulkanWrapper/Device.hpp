@@ -57,7 +57,7 @@ namespace pbrlib
         Device& operator = (Device&&) = delete;
         Device& operator = (const Device&) = delete;
 
-        inline VkDevice getDeviceHandle() const noexcept;
+        inline const VkDevice& getDeviceHandle() const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
@@ -109,7 +109,7 @@ namespace pbrlib
         }
     }
 
-    inline VkDevice Device::getDeviceHandle() const noexcept
+    inline const VkDevice& Device::getDeviceHandle() const noexcept
     {
         return _device_handle;
     }

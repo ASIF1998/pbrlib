@@ -103,7 +103,7 @@ namespace pbrlib
         Instance& operator = (Instance&&) = delete;
         Instance& operator = (const Instance&) = delete;
 
-        inline VkInstance getHandle() const;
+        inline const VkInstance& getHandle() const;
 
         PhysicalDevice& getPhysicalDevice(int type);
         vector<PhysicalDevice> getAllPhysicalDevice(int type) const;
@@ -209,7 +209,7 @@ namespace pbrlib
         }
     }
 
-    inline VkInstance Instance::getHandle() const
+    inline const VkInstance& Instance::getHandle() const
     {
         return _instance_handle;
     }
