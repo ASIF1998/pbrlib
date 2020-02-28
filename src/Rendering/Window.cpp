@@ -19,9 +19,16 @@ namespace pbrlib
     bool Window::_is_init_SDL = false;
     uint32_t Window::_num_window = 0;
 
-    Window::Window(const string_view title, int width, int height, int pos_x, int pos_y, ResizableWindow resizable) :
-        _ptr_window(nullptr),
-        _title(title)
+    Window::Window(
+        const string_view   title, 
+        int                 width, 
+        int                 height, 
+        int                 pos_x, 
+        int                 pos_y, 
+        ResizableWindow     resizable
+    ) :
+        _ptr_window (nullptr),
+        _title      (title)
     {
         if (!_is_init_SDL) {
             if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -33,14 +40,14 @@ namespace pbrlib
 
         _num_window++;
 
-        _ptr_window = SDL_CreateWindow( title.data(), 
-                                        pos_x, 
-                                        pos_y, 
-                                        width, 
-                                        height, 
-                                        SDL_WINDOW_SHOWN    |
-                                        SDL_WINDOW_VULKAN   |
-                                        static_cast<decltype(SDL_WINDOW_SHOWN)>(resizable));
+        _ptr_window = SDL_CreateWindow(
+            title.data(), 
+            pos_x, 
+            pos_y, 
+            width, 
+            height, 
+            SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | static_cast<decltype(SDL_WINDOW_SHOWN)>(resizable)
+        );
 
         assert(_ptr_window);
     }
@@ -63,8 +70,8 @@ namespace pbrlib
 
     tuple<int, int> Window::getExtent() const
     {
-        int width = 0;
-        int height = 0;
+        int width   = 0;
+        int height  = 0;
 
         SDL_GetWindowSize(_ptr_window, &width, &height);
 
@@ -73,8 +80,8 @@ namespace pbrlib
 
     tuple<int, int> Window::getDrawableExtent() const
     {
-        int width = 0;
-        int height = 0;
+        int width   = 0;
+        int height  = 0;
 
         SDL_Vulkan_GetDrawableSize(_ptr_window, &width, &height);
 

@@ -31,7 +31,11 @@ namespace pbrlib
         VkSamplerCreateInfo::mipmapMode = mipmap_mode;
     }
 
-    inline void SamplerInfo::setAdressMode(VkSamplerAddressMode u, VkSamplerAddressMode v, VkSamplerAddressMode w) noexcept
+    inline void SamplerInfo::setAdressMode(
+        VkSamplerAddressMode u, 
+        VkSamplerAddressMode v, 
+        VkSamplerAddressMode w
+    ) noexcept
     {
         VkSamplerCreateInfo::addressModeU = u;
         VkSamplerCreateInfo::addressModeV = v;
@@ -136,21 +140,24 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    inline Sampler::Sampler(const shared_ptr<Device>& ptr_device, const SamplerInfo& sampler_info) :
-        _ptr_device(ptr_device),
-        _sampler_info(sampler_info),
-        _sampler_handle(VK_NULL_HANDLE)
+        _ptr_device     (ptr_device),
+        _sampler_info   (sampler_info),
+        _sampler_handle (VK_NULL_HANDLE)
     {
-        assert(vkCreateSampler(_ptr_device->getDeviceHandle(),
-                               reinterpret_cast<VkSamplerCreateInfo*>(&_sampler_info),
-                               nullptr,
-                               &_sampler_handle) == VK_SUCCESS);
+        assert(vkCreateSampler(
+            _ptr_device->getDeviceHandle(),
+            reinterpret_cast<VkSamplerCreateInfo*>(&_sampler_info),
+            nullptr,
+            &_sampler_handle
+        ) == VK_SUCCESS);
+
         assert(_sampler_handle != VK_NULL_HANDLE);
     }
 
     inline Sampler::Sampler(Sampler&& sampler) :
-        _ptr_device(move(sampler._ptr_device)),
-        _sampler_info(sampler._sampler_info),
-        _sampler_handle(VK_NULL_HANDLE)
+        _ptr_device     (move(sampler._ptr_device)),
+        _sampler_info   (sampler._sampler_info),
+        _sampler_handle (VK_NULL_HANDLE)
     {
         swap(_sampler_handle, sampler._sampler_handle);
     }

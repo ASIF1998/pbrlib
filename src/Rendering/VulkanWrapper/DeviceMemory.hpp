@@ -38,8 +38,8 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param size размер требуемой памяти.
+         * @param ptr_device        указатель на устройство.
+         * @param size              размер требуемой памяти.
          * @param memory_type_index индекс типа памяти.
         */
         DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
@@ -49,8 +49,8 @@ namespace pbrlib
 
         inline ~DeviceMemory();
 
-        DeviceMemory& operator = (DeviceMemory&&) = delete;
-        DeviceMemory& operator = (const DeviceMemory&) = delete;
+        DeviceMemory& operator = (DeviceMemory&&)       = delete;
+        DeviceMemory& operator = (const DeviceMemory&)  = delete;
 
         /**
          * @brief Метод отображающий память устройства в адресное пространство CPU.
@@ -67,32 +67,32 @@ namespace pbrlib
 
         inline MapStatus isMapped() const noexcept;
 
-        inline uint8_t* getData() noexcept;
-        inline const uint8_t* getData() const noexcept;
-        inline const VkDeviceMemory& getDeviceMemoryHandle() const noexcept;
-        inline shared_ptr<Device>& getDevice() noexcept;
-        inline const shared_ptr<Device>& getDevice() const noexcept;
+        inline uint8_t*                     getData()               noexcept;
+        inline const uint8_t*               getData()               const noexcept;
+        inline const VkDeviceMemory&        getDeviceMemoryHandle() const noexcept;
+        inline shared_ptr<Device>&          getDevice()             noexcept;
+        inline const shared_ptr<Device>&    getDevice()             const noexcept;
 
     protected:
-        shared_ptr<Device> _ptr_device;
-        VkDeviceMemory _device_memory_handle;
-        VkDeviceSize _memory_size;
-        uint8_t* _ptr_mapped_data;
+        shared_ptr<Device>  _ptr_device;
+        VkDeviceMemory      _device_memory_handle;
+        VkDeviceSize        _memory_size;
+        uint8_t*            _ptr_mapped_data;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline DeviceMemory::DeviceMemory(const shared_ptr<Device>& ptr_device) noexcept :
-        _ptr_device(ptr_device),
-        _device_memory_handle(VK_NULL_HANDLE),
-        _memory_size(0),
-        _ptr_mapped_data(nullptr)
+        _ptr_device             (ptr_device),
+        _device_memory_handle   (VK_NULL_HANDLE),
+        _memory_size            (0),
+        _ptr_mapped_data        (nullptr)
     {}
 
     inline DeviceMemory::DeviceMemory(DeviceMemory&& device_memory) :
-        _ptr_device(device_memory._ptr_device),
-        _device_memory_handle(VK_NULL_HANDLE),
-        _memory_size(device_memory._memory_size),
-        _ptr_mapped_data(device_memory._ptr_mapped_data)
+        _ptr_device             (device_memory._ptr_device),
+        _device_memory_handle   (VK_NULL_HANDLE),
+        _memory_size            (device_memory._memory_size),
+        _ptr_mapped_data        (device_memory._ptr_mapped_data)
     {
         swap(_device_memory_handle, device_memory._device_memory_handle);
     }

@@ -8,105 +8,115 @@
 
 namespace pbrlib
 {
-    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
-                                    uint32_t swapchain_attachment_indx,
-                                    const shared_ptr<RenderPass>& ptr_render_pass,
-                                    PtrAttachments&& attachments,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t layers) :
-        _ptr_swapchain(ptr_swapchain),
-        _ptr_render_pass(ptr_render_pass),
-        _swapchain_attachment_indx(swapchain_attachment_indx),
-        _attachments(move(attachments)),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(width),
-        _height(height),
-        _layers(layers)
+    inline Framebuffer::Framebuffer(
+        const shared_ptr<Swapchain>&    ptr_swapchain,
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        PtrAttachments&&                attachments,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    ) :
+        _ptr_swapchain              (ptr_swapchain),
+        _ptr_render_pass            (ptr_render_pass),
+        _swapchain_attachment_indx  (swapchain_attachment_indx),
+        _attachments                (move(attachments)),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (width),
+        _height                     (height),
+        _layers                     (layers)
     {
         _create_framebuffer();
     }
 
-    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
-                                    uint32_t swapchain_attachment_indx,
-                                    const shared_ptr<RenderPass>& ptr_render_pass,
-                                    const PtrAttachments& attachments,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t layers) :
-        _ptr_swapchain(ptr_swapchain),
-        _ptr_render_pass(ptr_render_pass),
-        _swapchain_attachment_indx(swapchain_attachment_indx),
-        _attachments(move(attachments)),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(width),
-        _height(height),
-        _layers(layers)
+    inline Framebuffer::Framebuffer(
+        const shared_ptr<Swapchain>&    ptr_swapchain,
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        const PtrAttachments&           attachments,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    ) :
+        _ptr_swapchain              (ptr_swapchain),
+        _ptr_render_pass            (ptr_render_pass),
+        _swapchain_attachment_indx  (swapchain_attachment_indx),
+        _attachments                (move(attachments)),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (width),
+        _height                     (height),
+        _layers                     (layers)
     {
         _create_framebuffer();
     }
 
-    inline Framebuffer::Framebuffer(const shared_ptr<Swapchain>& ptr_swapchain,
-                                    uint32_t swapchain_attachment_indx,
-                                    const shared_ptr<RenderPass>& ptr_render_pass,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t layers) :
-        _ptr_swapchain(ptr_swapchain),
-        _ptr_render_pass(ptr_render_pass),
-        _attachments(nullptr),
-        _swapchain_attachment_indx(swapchain_attachment_indx),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(width),
-        _height(height),
-        _layers(layers)
+    inline Framebuffer::Framebuffer(
+        const shared_ptr<Swapchain>&    ptr_swapchain,
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    ) :
+        _ptr_swapchain              (ptr_swapchain),
+        _ptr_render_pass            (ptr_render_pass),
+        _attachments                (nullptr),
+        _swapchain_attachment_indx  (swapchain_attachment_indx),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (width),
+        _height                     (height),
+        _layers                     (layers)
     {
         _create_framebuffer();
     }
 
-    inline Framebuffer::Framebuffer(PtrAttachments&& attachments,
-                                    const shared_ptr<RenderPass>& ptr_render_pass,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t layers) :
-        _ptr_swapchain(nullptr),
-        _ptr_render_pass(ptr_render_pass),
-        _swapchain_attachment_indx(0),
-        _attachments(move(attachments)),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(width),
-        _height(height),
-        _layers(layers)
+    inline Framebuffer::Framebuffer(
+        PtrAttachments&&                attachments,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    ) :
+        _ptr_swapchain              (nullptr),
+        _ptr_render_pass            (ptr_render_pass),
+        _swapchain_attachment_indx  (0),
+        _attachments                (move(attachments)),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (width),
+        _height                     (height),
+        _layers                     (layers)
     {
         _create_framebuffer();
     }
 
-    inline Framebuffer::Framebuffer(const PtrAttachments& attachments,
-                                    const shared_ptr<RenderPass>& ptr_render_pass,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t layers) :
-        _ptr_swapchain(nullptr),
-        _ptr_render_pass(ptr_render_pass),
-        _swapchain_attachment_indx(0),
-        _attachments(move(attachments)),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(width),
-        _height(height),
-        _layers(layers)
+    inline Framebuffer::Framebuffer(
+        const PtrAttachments&           attachments,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    ) :
+        _ptr_swapchain              (nullptr),
+        _ptr_render_pass            (ptr_render_pass),
+        _swapchain_attachment_indx  (0),
+        _attachments                (move(attachments)),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (width),
+        _height                     (height),
+        _layers                     (layers)
     {
         _create_framebuffer();
     }
 
     inline Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
-        _ptr_swapchain(move(framebuffer._ptr_swapchain)),
-        _ptr_render_pass(move(framebuffer._ptr_render_pass)),
-        _swapchain_attachment_indx(framebuffer._swapchain_attachment_indx),
-        _attachments(move(framebuffer._attachments)),
-        _framebuffer_handle(VK_NULL_HANDLE),
-        _width(framebuffer._width),
-        _height(framebuffer._height),
-        _layers(framebuffer._layers)
+        _ptr_swapchain              (move(framebuffer._ptr_swapchain)),
+        _ptr_render_pass            (move(framebuffer._ptr_render_pass)),
+        _swapchain_attachment_indx  (framebuffer._swapchain_attachment_indx),
+        _attachments                (move(framebuffer._attachments)),
+        _framebuffer_handle         (VK_NULL_HANDLE),
+        _width                      (framebuffer._width),
+        _height                     (framebuffer._height),
+        _layers                     (framebuffer._layers)
     {
         swap(_framebuffer_handle, framebuffer._framebuffer_handle);
     }
@@ -135,18 +145,24 @@ namespace pbrlib
         }
 
         VkFramebufferCreateInfo framebuffer_info = {
-            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .renderPass = _ptr_render_pass->getRenderPassHandle(),
-            .attachmentCount = static_cast<uint32_t>(attachments.size()),
-            .pAttachments = attachments.data(),
-            .width = _width,
-            .height = _height,
-            .layers = _layers
+            .sType              = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .pNext              = nullptr,
+            .flags              = 0,
+            .renderPass         = _ptr_render_pass->getRenderPassHandle(),
+            .attachmentCount    = static_cast<uint32_t>(attachments.size()),
+            .pAttachments       = attachments.data(),
+            .width              = _width,
+            .height             = _height,
+            .layers             = _layers
         };
 
-        assert(vkCreateFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), &framebuffer_info, nullptr, &_framebuffer_handle) == VK_SUCCESS);
+        assert(vkCreateFramebuffer(
+            _ptr_render_pass->getDevice()->getDeviceHandle(), 
+            &framebuffer_info, 
+            nullptr, 
+            &_framebuffer_handle
+        ) == VK_SUCCESS);
+        
         assert(_framebuffer_handle != VK_NULL_HANDLE);
     }  
 

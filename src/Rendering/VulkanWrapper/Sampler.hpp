@@ -54,9 +54,11 @@ namespace pbrlib
          * @param v преобразование к текстурной координате. 
          * @param w преобразование к текстурной координате. 
         */
-        inline void setAdressMode(VkSamplerAddressMode u = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
-                                  VkSamplerAddressMode v = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
-                                  VkSamplerAddressMode w = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE) noexcept;
+        inline void setAdressMode(
+            VkSamplerAddressMode u = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
+            VkSamplerAddressMode v = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
+            VkSamplerAddressMode w = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+        ) noexcept;
 
         /**
          * @brief 
@@ -122,17 +124,17 @@ namespace pbrlib
         */
         inline void unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept;
 
-        inline VkFilter getMagFilter() const noexcept;
-        inline VkFilter getMinFilter() const noexcept;
-        inline VkSamplerMipmapMode getMipmapMode() const noexcept;
-        inline VkBool32 anisotropyEnable() const noexcept;
-        inline float getMaxAnisotropy() const noexcept;
-        inline VkBool32 compareEnable() const noexcept;
-        inline VkCompareOp getCompareOp() const noexcept;
-        inline float getMinLod() const noexcept;
-        inline float getMaxLod() const noexcept;
-        inline VkBorderColor getBorderColor() const noexcept;
-        inline VkBool32 unnormalizedCoordinates() const noexcept;
+        inline VkFilter             getMagFilter()              const noexcept;
+        inline VkFilter             getMinFilter()              const noexcept;
+        inline VkSamplerMipmapMode  getMipmapMode()             const noexcept;
+        inline VkBool32             anisotropyEnable()          const noexcept;
+        inline float                getMaxAnisotropy()          const noexcept;
+        inline VkBool32             compareEnable()             const noexcept;
+        inline VkCompareOp          getCompareOp()              const noexcept;
+        inline float                getMinLod()                 const noexcept;
+        inline float                getMaxLod()                 const noexcept;
+        inline VkBorderColor        getBorderColor()            const noexcept;
+        inline VkBool32             unnormalizedCoordinates()   const noexcept;
     };  
 
     class Sampler
@@ -141,30 +143,32 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param sampler_info информация о создаваемой выборке.
+         * @param ptr_device    указатель на устройство.
+         * @param sampler_info  информация о создаваемой выборке.
         */
-        inline Sampler(const shared_ptr<Device>& ptr_device,
-                       const SamplerInfo& sampler_info);
+        inline Sampler(
+            const shared_ptr<Device>&   ptr_device,
+            const SamplerInfo&          sampler_info
+        );
 
         inline Sampler(Sampler&& sampler);
         Sampler(const Sampler&) = delete;
 
         inline ~Sampler();
 
-        Sampler& operator = (Sampler&&) = delete;
-        Sampler& operator = (const Sampler&) = delete;
+        Sampler& operator = (Sampler&&)         = delete;
+        Sampler& operator = (const Sampler&)    = delete;
 
-        inline shared_ptr<Device>& getDevice() noexcept;
-        inline const shared_ptr<Device>& getDevice() const noexcept;
-        inline SamplerInfo& getSamplerInfo() noexcept;
-        inline const SamplerInfo& getSamplerInfo() const noexcept;
-        inline const VkSampler& getSamplerHandle() const noexcept;
+        inline shared_ptr<Device>&          getDevice()         noexcept;
+        inline const shared_ptr<Device>&    getDevice()         const noexcept;
+        inline SamplerInfo&                 getSamplerInfo()    noexcept;
+        inline const SamplerInfo&           getSamplerInfo()    const noexcept;
+        inline const VkSampler&             getSamplerHandle()  const noexcept;
         
     private:
-        shared_ptr<Device> _ptr_device;
-        SamplerInfo _sampler_info;
-        VkSampler _sampler_handle;
+        shared_ptr<Device>  _ptr_device;
+        SamplerInfo         _sampler_info;
+        VkSampler           _sampler_handle;
     };
 }
 

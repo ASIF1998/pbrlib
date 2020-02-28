@@ -25,14 +25,14 @@ namespace pbrlib
     */
     struct ImageInfo
     {
-        VkImageType image_type;
-        VkExtent3D image_extend;
-        VkFormat format;
-        VkImageUsageFlags usage;
-        VkSampleCountFlagBits num_samples;
-        VkImageTiling tiling;
-        uint32_t mip_levels;
-        uint32_t array_layers;
+        VkImageType             image_type;
+        VkExtent3D              image_extend;
+        VkFormat                format;
+        VkImageUsageFlags       usage;
+        VkSampleCountFlagBits   num_samples;
+        VkImageTiling           tiling;
+        uint32_t                mip_levels;
+        uint32_t                array_layers;
     };
 
     class Image: 
@@ -45,158 +45,178 @@ namespace pbrlib
          * @brief Конструктор.
          * @details На данный момент поддерживаются только типы float.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param memory_type_index индекс типа памяти.
-         * @param image_info информация об изображении.
-         * @param queue_family_index индекс семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_index    индекс семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device, 
-              uint32_t memory_type_index, 
-              const ImageInfo& image_info, 
-              uint32_t queue_family_index);
+        Image(
+            const shared_ptr<Device>&   ptr_device, 
+            uint32_t                    memory_type_index, 
+            const ImageInfo&            image_info, 
+            uint32_t                    queue_family_index
+        );
 
         /**
          * @brief Конструктор.
          * @details На данный момент поддерживаются только типы float.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param memory_type_index индекс типа памяти.
-         * @param image_info информация об изображении.
-         * @param queue_family_indices индексы семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_indices  индексы семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device,
-              uint32_t memory_type_index, 
-              const ImageInfo& image_info, 
-              const vector<uint32_t>& queue_family_indices);
+        Image(
+            const shared_ptr<Device>&   ptr_device,
+            uint32_t                    memory_type_index, 
+            const ImageInfo&            image_info, 
+            const vector<uint32_t>&     queue_family_indices
+        );
 
         /**
          * @brief Конструктор.
          * @details На данный момент поддерживаются только типы float.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param memory_type_index индекс типа памяти.
-         * @param image_info информация об изображении.
-         * @param queue_family_indices индексы семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_indices  индексы семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device,
-              uint32_t memory_type_index, 
-              const ImageInfo& image_info, 
-              vector<uint32_t>&& queue_family_indices);
+        Image(
+            const shared_ptr<Device>&   ptr_device,
+            uint32_t                    memory_type_index, 
+            const ImageInfo&            image_info, 
+            vector<uint32_t>&&          queue_family_indices
+        );
 
         /**
          * @brief Конструктор.
          *
-         * @param ptr_device указатель на устройство.
-         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info информация об изображении.
-         * @param queue_family_index индекс семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
+         * @param queue_family_index    индекс семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device,
-              VkImage image,
-              ImageInfo image_info,
-              uint32_t queue_family_index);
+        Image(
+            const shared_ptr<Device>&   ptr_device,
+            VkImage                     image,
+            ImageInfo                   image_info,
+            uint32_t                    queue_family_index
+        );
         
         /**
          * @brief Конструктор.
          *
-         * @param ptr_device указатель на устройство.
-         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info информация об изображении.
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
          * @param queue_family_indicies индексы семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device,
-              VkImage image,
-              ImageInfo image_info,
-              const vector<uint32_t>& queue_family_indicies);
+        Image(
+            const shared_ptr<Device>&   ptr_device,
+            VkImage                     image,
+            ImageInfo                   image_info,
+            const vector<uint32_t>&     queue_family_indicies
+        );
 
         /**
          * @brief Конструктор.
          *
-         * @param ptr_device указатель на устройство.
-         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info информация об изображении.
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
          * @param queue_family_indicies индексы семейства очередей.
         */
-        Image(const shared_ptr<Device>& ptr_device,
-              VkImage image,
-              ImageInfo image_info,
-              vector<uint32_t>&& queue_family_indicies);
+        Image(
+            const shared_ptr<Device>&   sptr_device,
+            VkImage                     image,
+            ImageInfo                   image_info,
+            vector<uint32_t>&&          queue_family_indicies
+        );
 
         inline Image(Image&& image);
         Image(const Image&) = delete;
 
         inline ~Image();
 
-        Image& operator = (Image&&) = delete;
-        Image& operator = (const Image&) = delete;
+        Image& operator = (Image&&)         = delete;
+        Image& operator = (const Image&)    = delete;
 
-        inline ImageInfo& getImageInfo();
-        inline const ImageInfo& getImageInfo() const;
-        inline const VkImage& getImageHandle() const;
-
-        /**
-         * @brief Статический метод для создания Image.
-         * 
-         * @param ptr_device указатель на устройство.
-         * @param memory_type_index индекс типа памяти.
-         * @param image_info информация об изображении.
-         * @param queue_family_index индекс семейства очередей.
-         * @return указатель на Image.
-        */
-        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
-                                             uint32_t memory_type_index,
-                                             const ImageInfo& image_info,
-                                             uint32_t queue_family_index);
+        inline ImageInfo&       getImageInfo();
+        inline const ImageInfo& getImageInfo()      const;
+        inline const VkImage&   getImageHandle()    const;
 
         /**
          * @brief Статический метод для создания Image.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param memory_type_index индекс типа памяти.
-         * @param image_info информация об изображении.
-         * @param queue_family_indices индексы семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
-                                             uint32_t memory_type_index,
-                                             const ImageInfo& image_info,
-                                             const vector<uint32_t>& queue_family_indices);
+        inline static shared_ptr<Image> make(
+            const shared_ptr<Device>&   ptr_device,
+            uint32_t                    memory_type_index,
+            const ImageInfo&            image_info,
+            uint32_t                    queue_family_index
+        );
+
+        /**
+         * @brief Статический метод для создания Image.
+         * 
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_indices  индексы семейства очередей.
+         * @return указатель на Image.
+        */
+        inline static shared_ptr<Image> make(
+            const shared_ptr<Device>&   ptr_device,
+            uint32_t                    memory_type_index,
+            const ImageInfo&            image_info,
+            const vector<uint32_t>&     queue_family_indices
+        );
 
         /**
          * @brief Статический метод для создания Image.
          *
-         * @param ptr_device указатель на устройство.
-         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info информация об изображении.
-         * @param queue_family_index индекс семейства очередей.
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
+         * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
-                                             VkImage image,
-                                             const ImageInfo& image_info,
-                                             uint32_t queue_family_index);
+        inline static shared_ptr<Image> make(
+            const shared_ptr<Device>&   ptr_device,
+            VkImage                     image,
+            const ImageInfo&            image_info,
+            uint32_t                    queue_family_index
+        );
 
         /**
          * @brief Статический метод для создания Image.
          *
-         * @param ptr_device указатель на устройство.
-         * @param image дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info информация об изображении.
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
          * @param queue_family_indicies индексы семейства очередей.
          * @return указатель на Image.
         */
-        inline static shared_ptr<Image> make(const shared_ptr<Device>& ptr_device,
-                                             VkImage image,
-                                             const ImageInfo& image_info,
-                                             const vector<uint32_t>& queue_family_indicies);
+        inline static shared_ptr<Image> make(
+            const shared_ptr<Device>&   ptr_device,
+            VkImage                     image,
+            const ImageInfo&            image_info,
+            const vector<uint32_t>&     queue_family_indicies
+        );
 
     private:
         void _create_image();
 
     private:
-        VkImage _image_handle;
-        ImageInfo _image_info;
-        vector<uint32_t> _queue_family_indicies;
+        VkImage             _image_handle;
+        ImageInfo           _image_info;
+        vector<uint32_t>    _queue_family_indicies;
     };
 
     class ImageView
@@ -207,46 +227,48 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param ptr_image указатель нк изображение.
-         * @param format формат текселя изображения.
+         * @param ptr_image         указатель нк изображение.
+         * @param format            формат текселя изображения.
          * @param subresource_range аргумент задающий подмножество изображения на которое указывает ptr_image.
-         * @param type тип вида изображения.
+         * @param type              тип вида изображения.
         */
-        ImageView(const shared_ptr<Image>& ptr_image, 
-                  VkFormat format, 
-                  const VkImageSubresourceRange& subresource_range, 
-                  VkImageViewType type);
+        ImageView(
+            const shared_ptr<Image>&        ptr_image, 
+            VkFormat                        format, 
+            const VkImageSubresourceRange&  subresource_range, 
+            VkImageViewType                 type
+        );
 
         inline ImageView(ImageView&& image_view);
         ImageView(const ImageView&) = delete;
 
         inline ~ImageView();
 
-        ImageView& operator = (ImageView&&) = delete;
-        ImageView& operator = (const ImageView&) = delete;
+        ImageView& operator = (ImageView&&)         = delete;
+        ImageView& operator = (const ImageView&)    = delete;
 
-        inline shared_ptr<Image>& getImage() noexcept;
-        inline const shared_ptr<Image>& getImage() const noexcept;
-        inline VkImageViewType getImageViewType() const noexcept;
-        inline VkFormat getFormat() const noexcept;
-        inline VkImageSubresourceRange& getSubresourceRange() noexcept;
-        inline const VkImageSubresourceRange& getSubresourceRange() const noexcept;
-        inline const VkImageView& getImageViewHandle() const noexcept;
+        inline shared_ptr<Image>&               getImage()              noexcept;
+        inline const shared_ptr<Image>&         getImage()              const noexcept;
+        inline VkImageViewType                  getImageViewType()      const noexcept;
+        inline VkFormat                         getFormat()             const noexcept;
+        inline VkImageSubresourceRange&         getSubresourceRange()   noexcept;
+        inline const VkImageSubresourceRange&   getSubresourceRange()   const noexcept;
+        inline const VkImageView&               getImageViewHandle()    const noexcept;
 
     private:
-        shared_ptr<Image> _ptr_image;
-        VkImageView _image_view_handle;
-        VkFormat _format;
+        shared_ptr<Image>       _ptr_image;
+        VkImageView             _image_view_handle;
+        VkFormat                _format;
         VkImageSubresourceRange _subresource_range;
-        VkImageViewType _type;
+        VkImageViewType         _type;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline Image::Image(Image&& image) :
-        DeviceMemory(move(image)),
-        _image_handle(VK_NULL_HANDLE),
-        _image_info(image._image_info),
-        _queue_family_indicies(move(image._queue_family_indicies))
+        DeviceMemory            (move(image)),
+        _image_handle           (VK_NULL_HANDLE),
+        _image_info             (image._image_info),
+        _queue_family_indicies  (move(image._queue_family_indicies))
     {
         swap(_image_handle, image._image_handle);
     }
@@ -273,45 +295,53 @@ namespace pbrlib
         return _image_handle;
     }
 
-    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
-                                         uint32_t memory_type_index,
-                                         const ImageInfo& image_info,
-                                         uint32_t queue_family_index)
+    inline shared_ptr<Image> Image::make(
+        const shared_ptr<Device>&   ptr_device,
+        uint32_t                    memory_type_index,
+        const ImageInfo&            image_info,
+        uint32_t                    queue_family_index
+    )
     {
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
     }
 
-    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
-                                         uint32_t memory_type_index,
-                                         const ImageInfo& image_info,
-                                         const vector<uint32_t>& queue_family_indices)
+    inline shared_ptr<Image> Image::make(
+        const shared_ptr<Device>&  ptr_device,
+        uint32_t                   memory_type_index,
+        const ImageInfo&           image_info,
+        const vector<uint32_t>&    queue_family_indices
+    )
     {
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
     }
 
-    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
-                                         VkImage image,
-                                         const ImageInfo& image_info,
-                                         uint32_t queue_family_index)
+    inline shared_ptr<Image> Image::make(
+        const shared_ptr<Device>&  ptr_device,
+        VkImage                    image,
+        const ImageInfo&           image_info,
+        uint32_t                   queue_family_index
+    )
     {
         return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
     }
 
-    inline shared_ptr<Image> Image::make(const shared_ptr<Device>& ptr_device,
-                                         VkImage image,
-                                         const ImageInfo& image_info,
-                                         const vector<uint32_t>& queue_family_indicies)
+    inline shared_ptr<Image> Image::make(
+        const shared_ptr<Device>&  ptr_device,
+        VkImage                    image,
+        const ImageInfo&           image_info,
+        const vector<uint32_t>&    queue_family_indicies
+    )
     {
         return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline ImageView::ImageView(ImageView&& image_view) :
-        _image_view_handle(VK_NULL_HANDLE),
-        _ptr_image(image_view._ptr_image),
-        _format(image_view._format),
-        _subresource_range(image_view._subresource_range),
-        _type(image_view._type)
+        _image_view_handle  (VK_NULL_HANDLE),
+        _ptr_image          (image_view._ptr_image),
+        _format             (image_view._format),
+        _subresource_range  (image_view._subresource_range),
+        _type               (image_view._type)
     {
         swap(image_view._image_view_handle, _image_view_handle);
     }

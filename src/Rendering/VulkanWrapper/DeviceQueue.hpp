@@ -25,9 +25,9 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param ptr_device указатель на устройство.
-         * @param family_index индекс семейства очередей.
-         * @param index индекс очереди в семействе очередей.
+         * @param ptr_device    указатель на устройство.
+         * @param family_index  индекс семейства очередей.
+         * @param index         индекс очереди в семействе очередей.
         */
         DeviceQueue(const shared_ptr<Device>& ptr_device, uint32_t family_index, uint32_t index);
 
@@ -36,35 +36,39 @@ namespace pbrlib
 
         inline ~DeviceQueue();
 
-        DeviceQueue& operator = (DeviceQueue&&) = delete;
-        DeviceQueue& operator = (const DeviceQueue&) = delete;
+        DeviceQueue& operator = (DeviceQueue&&)         = delete;
+        DeviceQueue& operator = (const DeviceQueue&)    = delete;
 
-        inline shared_ptr<Device>& getDevice();
-        inline const shared_ptr<Device>& getDevice() const;
-        inline const VkQueue& getQueueHandle() const noexcept;
-        inline uint32_t getFamilyIndex() const noexcept;
-        inline uint32_t getIndex() const noexcept;
+        inline shared_ptr<Device>&          getDevice()         noexcept;
+        inline const shared_ptr<Device>&    getDevice()         const noexcept; 
+        inline const VkQueue&               getQueueHandle()    const noexcept;
+        inline uint32_t                     getFamilyIndex()    const noexcept;
+        inline uint32_t                     getIndex()          const noexcept;
 
         /**
          * @brief Метод ожидающий пока все команды в очереди не будут выполнены.
         */
         inline void waitIdle() const;
 
-        inline static bool isPresentSuppoerted(uint32_t queue_family_index, const PhysicalDevice& physocal_device, const Surface& surface);
+        inline static bool isPresentSuppoerted(
+            uint32_t                queue_family_index, 
+            const PhysicalDevice&   physocal_device, 
+            const Surface&          surface
+        );
 
     private:
-        shared_ptr<Device> _ptr_device;
-        VkQueue _queue_handle;
-        uint32_t _family_index;
-        uint32_t _index;
+        shared_ptr<Device>  _ptr_device;
+        VkQueue             _queue_handle;
+        uint32_t            _family_index;
+        uint32_t            _index;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline DeviceQueue::DeviceQueue(DeviceQueue&& device_queue) :
-        _ptr_device(device_queue._ptr_device),
-        _queue_handle(VK_NULL_HANDLE),
-        _family_index(device_queue._family_index),
-        _index(device_queue._index)
+        _ptr_device     (device_queue._ptr_device),
+        _queue_handle   (VK_NULL_HANDLE),
+        _family_index   (device_queue._family_index),
+        _index          (device_queue._index)
     {
         swap(_queue_handle, device_queue._queue_handle);
     }
@@ -76,12 +80,12 @@ namespace pbrlib
         vkQueueWaitIdle(_queue_handle);
     }
 
-    inline shared_ptr<Device>& DeviceQueue::getDevice() 
+    inline shared_ptr<Device>& DeviceQueue::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& DeviceQueue::getDevice() const
+    inline const shared_ptr<Device>& DeviceQueue::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -106,7 +110,11 @@ namespace pbrlib
         vkQueueWaitIdle(_queue_handle);
     }
 
-    inline bool DeviceQueue::isPresentSuppoerted(uint32_t queue_family_index, const PhysicalDevice& physocal_device, const Surface& surface)
+    inline bool DeviceQueue::isPresentSuppoerted(
+        uint32_t                queue_family_index, 
+        const PhysicalDevice&   physocal_device, 
+        const Surface&          surface
+    )
     {
         VkBool32 res;
 

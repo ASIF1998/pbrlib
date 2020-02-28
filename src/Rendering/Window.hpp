@@ -45,39 +45,49 @@ namespace pbrlib
         */
         enum
         {
-            WINDOW_WIDTH = 0,
-            WINDOW_HEIGHT = 1
+            WINDOW_WIDTH    = 0,
+            WINDOW_HEIGHT   = 1
         };
 
     public:
         /**
          * @brief Конструктор.
          * 
-         * @param title заголовок окна.
-         * @param width ширина окна.
-         * @param height высота окна.
-         * @param pos_x позиция окна по координате x.
-         * @param pos_y позиция окна по координате y.
+         * @param title     заголовок окна.
+         * @param width     ширина окна.
+         * @param height    высота окна.
+         * @param pos_x     позиция окна по координате x.
+         * @param pos_y     позиция окна по координате y.
          * @param resizable параметр указывающий возможность изменения размера окна.
         */
-        Window(const string_view title, int width, int height, int pos_x, int pos_y, ResizableWindow resizable = ResizableWindow::STATIC);
+        Window(
+            const string_view   title, 
+            int                 width, 
+            int                 height, 
+            int                 pos_x, 
+            int                 pos_y, 
+            ResizableWindow     resizable = ResizableWindow::STATIC
+        );
+
         Window(Window&& window);
         Window(const Window&) = delete;
+
         ~Window();
 
-        Window& operator = (const Window&) = delete;
-        Window& operator = (Window&&) = delete;
+        Window& operator = (const Window&)  = delete;
+        Window& operator = (Window&&)       = delete;
 
-        tuple<int, int> getExtent() const;
+        tuple<int, int> getExtent()         const;
         tuple<int, int> getDrawableExtent() const;
 
-        string& getTitle();
-        const string& getTitle() const;
+        string&         getTitle();
+        const string&   getTitle() const;
 
         void setTitle(const string_view title);
 
-        static bool showCursor(bool e) noexcept;    
-        static void captureMouse(bool e) noexcept;
+        static bool showCursor  (bool e)      noexcept;    
+        static void captureMouse(bool e)    noexcept;
+
         static void getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions);
 
     public:
@@ -85,9 +95,9 @@ namespace pbrlib
 
     private:
         SDL_Window* _ptr_window;
-        string _title;
+        string      _title;
 
-        static bool _is_init_SDL;
+        static bool     _is_init_SDL;
         static uint32_t _num_window;
     };
 }

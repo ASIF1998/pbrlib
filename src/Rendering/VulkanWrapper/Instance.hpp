@@ -77,31 +77,33 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param app_name название приложения.
-         * @param app_version номер приложения.
+         * @param app_name      название приложения.
+         * @param app_version   номер приложения.
         */
         inline Instance(const string_view app_name, uint32_t app_version);
 
         /**
          * @brief Конструктор.
          * 
-         * @param app_name название приложения.
-         * @param app_version номер приложения.
-         * @param layer_names названия слоёв.
-         * @param extension_names названия расширений.
+         * @param app_name          название приложения.
+         * @param app_version       номер приложения.
+         * @param layer_names       названия слоёв.
+         * @param extension_names   названия расширений.
         */
-        inline Instance(const string_view app_name, 
-                        uint32_t app_version,
-                        const vector<const char*>& layer_names,
-                        const vector<const char*>& extension_names);
+        inline Instance(
+            const string_view           app_name, 
+            uint32_t                    app_version,
+            const vector<const char*>&  layer_names,
+            const vector<const char*>&  extension_names
+        );
 
         inline Instance(Instance&& instance);
         Instance(const Instance&) = delete;
         
         inline ~Instance();
 
-        Instance& operator = (Instance&&) = delete;
-        Instance& operator = (const Instance&) = delete;
+        Instance& operator = (Instance&&)       = delete;
+        Instance& operator = (const Instance&)  = delete;
 
         inline const VkInstance& getHandle() const;
 
@@ -128,38 +130,42 @@ namespace pbrlib
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
          * 
-         * @param app_name название приложения.
-         * @param app_version номер приложения.
+         * @param app_name      название приложения.
+         * @param app_version   номер приложения.
         */
         inline static shared_ptr<Instance> make(const string_view app_name, uint32_t app_version);
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
          * 
-         * @param app_name название приложения.
-         * @param app_version номер приложения.
-         * @param layer_names названия слоёв.
-         * @param extension_names названия расширений.
+         * @param app_name          название приложения.
+         * @param app_version       номер приложения.
+         * @param layer_names       названия слоёв.
+         * @param extension_names   названия расширений.
         */
-        inline static shared_ptr<Instance> make(const string_view app_name,
-                                                uint32_t app_version,
-                                                const vector<const char*>& layer_names,
-                                                const vector<const char*>& extension_names);
+        inline static shared_ptr<Instance> make(
+            const string_view           app_name,
+            uint32_t                    app_version,
+            const vector<const char*>&  layer_names,
+            const vector<const char*>&  extension_names
+        );
 
     private:
-        void _create_instance(const string_view app_name,
-                              uint32_t app_version, 
-                              uint32_t enabled_layer_count,
-                              const char* const* ptr_enable_layers,
-                              uint32_t enabled_extension_count,
-                              const char* const* ptr_extensions);
+        void _create_instance(
+            const string_view   app_name,
+            uint32_t            app_version, 
+            uint32_t            enabled_layer_count,
+            const char* const*  ptr_enable_layers,
+            uint32_t            enabled_extension_count,
+            const char* const*  ptr_extensions
+        );
 
     private:
-        VkInstance _instance_handle;
-        vector<PhysicalDevice> _physical_device_handles;
+        VkInstance              _instance_handle;
+        vector<PhysicalDevice>  _physical_device_handles;
 
         static VulkanInstanceExtensionSupported _supported_extensions;
-        static VulkanInstanceLayerSupported _supported_layers;
+        static VulkanInstanceLayerSupported     _supported_layers;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,22 +187,26 @@ namespace pbrlib
         _create_instance(app_name, app_version, 0, nullptr, 0, nullptr);
     }
 
-    inline Instance::Instance(const string_view app_name, 
-                              uint32_t app_version, 
-                              const vector<const char*>& layer_names, 
-                              const vector<const char*>& extension_names) :
+    inline Instance::Instance(
+        const string_view           app_name, 
+        uint32_t                    app_version, 
+        const vector<const char*>&  layer_names, 
+        const vector<const char*>&  extension_names
+    ) :
         _instance_handle(VK_NULL_HANDLE)
     {
-        _create_instance(app_name,
-                         app_version,
-                         static_cast<uint32_t>(layer_names.size()),
-                         layer_names.data(),
-                         static_cast<uint32_t>(extension_names.size()),
-                         extension_names.data());
+        _create_instance(
+            app_name,
+            app_version,
+            static_cast<uint32_t>(layer_names.size()),
+            layer_names.data(),
+            static_cast<uint32_t>(extension_names.size()),
+            extension_names.data()
+        );
     }
 
     inline Instance::Instance(Instance&& instance) :
-        _instance_handle(VK_NULL_HANDLE),
+        _instance_handle        (VK_NULL_HANDLE),
         _physical_device_handles(move(instance._physical_device_handles))
     {
         swap(_instance_handle, instance._instance_handle);
@@ -229,10 +239,12 @@ namespace pbrlib
         return make_shared<Instance>(app_name, app_version);
     }
 
-    inline shared_ptr<Instance> Instance::make(const string_view app_name,
-                                               uint32_t app_version,
-                                               const vector<const char*>& layer_names,
-                                               const vector<const char*>& extension_names)
+    inline shared_ptr<Instance> Instance::make(
+        const string_view           app_name,
+        uint32_t                    app_version,
+        const vector<const char*>&  layer_names,
+        const vector<const char*>&  extension_names
+    )
     {
         return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
     }

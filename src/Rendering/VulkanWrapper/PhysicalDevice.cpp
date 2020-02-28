@@ -39,20 +39,24 @@ namespace pbrlib
         }
     }
 
-    bool PhysicalDevice::isFormatSupported(VkFormat format, 
-                                           VkImageType image_type, 
-                                           VkImageTiling image_tiling, 
-                                           VkImageUsageFlags image_usage) const
+    bool PhysicalDevice::isFormatSupported(
+        VkFormat            format, 
+        VkImageType         image_type, 
+        VkImageTiling       image_tiling, 
+        VkImageUsageFlags   image_usage
+    ) const
     {
         VkImageFormatProperties image_format_properties;
 
-        return vkGetPhysicalDeviceImageFormatProperties(physical_device_handle, 
-                                                        format, 
-                                                        image_type, 
-                                                        image_tiling, 
-                                                        image_usage, 
-                                                        0, 
-                                                        &image_format_properties) != VK_ERROR_FORMAT_NOT_SUPPORTED;
+        return vkGetPhysicalDeviceImageFormatProperties(
+            physical_device_handle, 
+            format, 
+            image_type, 
+            image_tiling, 
+            image_usage, 
+            0, 
+            &image_format_properties
+        ) != VK_ERROR_FORMAT_NOT_SUPPORTED;
     }
 
     VkFormatProperties PhysicalDevice::getFormatProperties(VkFormat format) const

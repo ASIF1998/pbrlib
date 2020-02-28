@@ -25,8 +25,8 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param ptr_device указатель на устройство. 
-         * @param queue_family_index индекс семейства очередей.
+         * @param ptr_device            указатель на устройство. 
+         * @param queue_family_index    индекс семейства очередей.
         */
         CommandPool(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
 
@@ -35,25 +35,25 @@ namespace pbrlib
 
         inline ~CommandPool();
 
-        CommandPool& operator = (CommandPool&&) = delete;
-        CommandPool& operator = (const CommandPool&) = delete;
+        CommandPool& operator = (CommandPool&&)         = delete;
+        CommandPool& operator = (const CommandPool&)    = delete;
 
-        inline shared_ptr<Device>& getDevice() noexcept;
-        inline const shared_ptr<Device>& getDevice() const noexcept;
-        inline uint32_t getFamilyIndex() const noexcept;
-        inline const VkCommandPool& getCommandPoolHandle() const noexcept;
+        inline shared_ptr<Device>&          getDevice()             noexcept;
+        inline const shared_ptr<Device>&    getDevice()             const noexcept;
+        inline uint32_t                     getFamilyIndex()        const noexcept;
+        inline const VkCommandPool&         getCommandPoolHandle()  const noexcept;
 
     private:
-        shared_ptr<Device> _ptr_device;
-        VkCommandPool _command_pool_handle;
-        uint32_t _queue_family_index;
+        shared_ptr<Device>  _ptr_device;
+        VkCommandPool       _command_pool_handle;
+        uint32_t            _queue_family_index;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline CommandPool::CommandPool(CommandPool&& command_pool) :
-        _ptr_device(command_pool._ptr_device),
+        _ptr_device         (command_pool._ptr_device),
         _command_pool_handle(VK_NULL_HANDLE),
-        _queue_family_index(command_pool._queue_family_index)
+        _queue_family_index (command_pool._queue_family_index)
     {
         swap(_command_pool_handle, command_pool._command_pool_handle);
     }

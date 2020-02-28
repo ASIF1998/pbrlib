@@ -12,11 +12,15 @@
 
 namespace pbrlib
 {
-    DeviceQueue::DeviceQueue(const shared_ptr<Device>& ptr_device, uint32_t family_index, uint32_t index) :
-        _ptr_device(ptr_device),
-        _queue_handle(VK_NULL_HANDLE),
-        _family_index(family_index),
-        _index(index)
+    DeviceQueue::DeviceQueue(
+        const shared_ptr<Device>&   ptr_device, 
+        uint32_t                    family_index, 
+        uint32_t                    index
+    ) :
+        _ptr_device     (ptr_device),
+        _queue_handle   (VK_NULL_HANDLE),
+        _family_index   (family_index),
+        _index          (index)
     {
         vkGetDeviceQueue(_ptr_device->getDeviceHandle(), _family_index, _index, &_queue_handle);
         assert(_queue_handle != VK_NULL_HANDLE);

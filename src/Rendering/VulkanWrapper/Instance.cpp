@@ -12,8 +12,8 @@
 
 namespace pbrlib
 {
-    VulkanInstanceExtensionSupported Instance::_supported_extensions = {};
-    VulkanInstanceLayerSupported Instance::_supported_layers = {};
+    VulkanInstanceExtensionSupported    Instance::_supported_extensions = {};
+    VulkanInstanceLayerSupported        Instance::_supported_layers     = {};
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     VulkanInstanceExtensionSupported::VulkanInstanceExtensionSupported()
@@ -47,32 +47,34 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void Instance::_create_instance(const string_view app_name,
-                              uint32_t app_version, 
-                              uint32_t enabled_layer_count,
-                              const char* const* ptr_enable_layers,
-                              uint32_t enabled_extension_count,
-                              const char* const* ptr_extensions)
+    void Instance::_create_instance(
+        const string_view   app_name,
+        uint32_t            app_version, 
+        uint32_t            enabled_layer_count,
+        const char* const*  ptr_enable_layers,
+        uint32_t            enabled_extension_count,
+        const char* const*  ptr_extensions
+    )
     {
         VkApplicationInfo app_info {
-            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pNext = nullptr,
-            .pApplicationName = app_name.data(),
+            .sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pNext              = nullptr,
+            .pApplicationName   = app_name.data(),
             .applicationVersion = app_version,
-            .pEngineName = "PBRLib",
-            .engineVersion = EngineVersion,
-            .apiVersion = VK_MAKE_VERSION(1, 0, 0)
+            .pEngineName        = "PBRLib",
+            .engineVersion      = EngineVersion,
+            .apiVersion         = VK_MAKE_VERSION(1, 0, 0)
         };
 
         VkInstanceCreateInfo instance_info {
-            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .pApplicationInfo = &app_info,
-            .enabledLayerCount = enabled_layer_count,
-            .ppEnabledLayerNames = ptr_enable_layers,
-            .enabledExtensionCount = enabled_extension_count,
-            .ppEnabledExtensionNames = ptr_extensions
+            .sType                      = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pNext                      = nullptr,
+            .flags                      = 0,
+            .pApplicationInfo           = &app_info,
+            .enabledLayerCount          = enabled_layer_count,
+            .ppEnabledLayerNames        = ptr_enable_layers,
+            .enabledExtensionCount      = enabled_extension_count,
+            .ppEnabledExtensionNames    = ptr_extensions
         };
 
         assert(vkCreateInstance(&instance_info, nullptr, &_instance_handle) == VK_SUCCESS);
