@@ -140,6 +140,22 @@ namespace pbrlib
         inline const vector<VkPushConstantRange>& getPushConstantRanges() const noexcept;
         inline const VkPipelineLayout& getPipelineLayoutHandle() const noexcept;
 
+        inline static shared_ptr<PipelineLayout> make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts);
+
+        inline static shared_ptr<PipelineLayout> make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts);
+
+        inline static shared_ptr<PipelineLayout> make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+                                                      const vector<VkPushConstantRange>& push_constant_ranges);
+
+        inline static shared_ptr<PipelineLayout> make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts,
+                                                      const vector<VkPushConstantRange>& push_constant_ranges);
+
+        inline static shared_ptr<PipelineLayout> make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+                                                      vector<VkPushConstantRange>&& push_constant_ranges);
+
+        inline static shared_ptr<PipelineLayout> make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts,
+                                                      vector<VkPushConstantRange>&& push_constant_ranges);
+
     private:
         inline void _create_pipeline_layout();
     

@@ -8,7 +8,6 @@
 
 namespace pbrlib
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline DescriptorSetLayoutBindings::DescriptorSetLayoutBindings(const shared_ptr<Device>& ptr_device,
                                                                     size_t num_reserve_samplers) :
         _ptr_device(ptr_device)
@@ -74,6 +73,7 @@ namespace pbrlib
         return _samplers;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayoutBindings&& descriptor_set_layout_bindings) :
         _descriptor_set_layout_bindings(move(descriptor_set_layout_bindings)),
         _descriptor_set_layout_handle(VK_NULL_HANDLE)
@@ -257,5 +257,39 @@ namespace pbrlib
     inline const VkPipelineLayout& PipelineLayout::getPipelineLayoutHandle() const noexcept
     {
         return _pipeline_layout_handle;
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts)
+    {
+        return make_shared<PipelineLayout>(descriptor_set_layouts);
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts)
+    {
+        return make_shared<PipelineLayout>(move(descriptor_set_layouts));
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+                                                           const vector<VkPushConstantRange>& push_constant_ranges)
+    {
+        return make_shared<PipelineLayout>(descriptor_set_layouts, push_constant_ranges);
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts,
+                                                           const vector<VkPushConstantRange>& push_constant_ranges)
+    {
+        return make_shared<PipelineLayout>(move(descriptor_set_layouts), push_constant_ranges);
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts,
+                                                           vector<VkPushConstantRange>&& push_constant_ranges)
+    {
+        return make_shared<PipelineLayout>(descriptor_set_layouts, move(push_constant_ranges));
+    }
+                            
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts,
+                                                           vector<VkPushConstantRange>&& push_constant_ranges)
+    {
+        return make_shared<PipelineLayout>(move(descriptor_set_layouts), move(push_constant_ranges));
     }
 }

@@ -13,14 +13,49 @@
 
 namespace pbrlib
 {
+    class SpecializationInfo :
+        private VkSpecializationInfo
+    {
+    public:
+        inline SpecializationInfo(size_t size_data,
+                                  size_t num_map_entires);
+
+        inline SpecializationInfo(SpecializationInfo&& specialization_info);
+        inline SpecializationInfo(const SpecializationInfo& specialization_info);
+
+        inline ~SpecializationInfo();
+
+        SpecializationInfo& operator = (SpecializationInfo&&) = delete;
+        SpecializationInfo& operator = (const SpecializationInfo&) = delete;
+        
+        inline void addMapEntry(const uint8_t* ptr_data, size_t data_size, uint32_t constant_id);
+
+        inline uint8_t* getData() noexcept;
+        inline const uint8_t* getData() const noexcept;
+        inline VkSpecializationMapEntry* getSpecializationMapEntries() noexcept;
+        inline const VkSpecializationMapEntry* getSpecializationMapEntries() const noexcept;
+        inline size_t getDataSize() const noexcept;
+        inline size_t getSpecializationMapEntriesNum() const noexcept;
+        inline size_t capacityData() const noexcept;
+        inline size_t capacitySpecializationMapEntries() const noexcept;
+
+    private:
+        uint8_t* _ptr_data;
+        VkSpecializationMapEntry* _ptr_map_enties;
+        size_t _current_byte_in_data;
+        size_t _current_map_entry;
+    };
+
     class ShaderModule
     {
     public:
-        ShaderModule(
+        inline ShaderModule(
             const shared_ptr<Device>& ptr_device,
             VkShaderStageFlagBits shader_type,
             const uint32_t* ptr_shader_code,
-            size_t shader_code_size
+            size_t shader_code_size,
+            size_t specialization_info_size_data = 0,
+            size_t specialization_info_num_map_entires = 0
         );
 
         inline ShaderModule(ShaderModule&& shader_module);
@@ -35,48 +70,24 @@ namespace pbrlib
         inline const shared_ptr<Device>& getDevice() const noexcept;
         inline VkShaderStageFlagBits getShaderType() const noexcept;
         inline const VkShaderModule& getShaderHandle() const noexcept;
+        inline SpecializationInfo& getSpecializationInfo() noexcept;
+        inline const SpecializationInfo& getSpecializationInfo() const noexcept;
+
+        inline static shared_ptr<ShaderModule> make(const shared_ptr<Device>& ptr_device,
+                                                    VkShaderStageFlagBits shader_type,
+                                                    const uint32_t* ptr_shader_code,
+                                                    size_t shader_code_size,
+                                                    size_t specialization_info_size_data = 0,
+                                                    size_t specialization_info_num_map_entires = 0);
 
     private:
         shared_ptr<Device> _ptr_device;
         VkShaderStageFlagBits _shader_type;
+        SpecializationInfo _specialization_info;
         VkShaderModule _shader_handle;
     };
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline ShaderModule::ShaderModule(ShaderModule&& shader_module) :
-        _ptr_device(shader_module._ptr_device),
-        _shader_type(shader_module._shader_type),
-        _shader_handle(VK_NULL_HANDLE)
-    {
-        swap(_shader_handle, shader_module._shader_handle);
-    }
-
-    inline ShaderModule::~ShaderModule()
-    {
-        if (_shader_handle != VK_NULL_HANDLE) {
-            vkDestroyShaderModule(_ptr_device->getDeviceHandle(), _shader_handle, nullptr);
-        }
-    }
-
-    inline shared_ptr<Device>& ShaderModule::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    inline const shared_ptr<Device>& ShaderModule::getDevice() const noexcept
-    {
-        return _ptr_device;
-    }
-
-    inline VkShaderStageFlagBits ShaderModule::getShaderType() const noexcept
-    {
-        return _shader_type;
-    }
-
-    inline const VkShaderModule& ShaderModule::getShaderHandle() const noexcept
-    {
-        return _shader_handle;
-    }
 }
+
+#include "ShaderModule.inl"
 
 #endif /* ShaderModule_hpp */
