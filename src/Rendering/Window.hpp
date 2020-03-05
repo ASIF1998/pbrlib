@@ -29,7 +29,7 @@ namespace pbrlib
     enum class ResizableWindow
     {
         DYNAMIC = SDL_WINDOW_RESIZABLE,
-        STATIC = 0
+        STATIC  = 0
     };
 
     /**

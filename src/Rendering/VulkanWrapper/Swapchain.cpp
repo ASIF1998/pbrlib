@@ -10,9 +10,11 @@
 
 namespace pbrlib
 {
-    void Swapchain::create(const shared_ptr<Device>& ptr_device,
-                           vector<uint32_t> queue_family_indices,
-                           VkSharingMode sharing_mode)
+    void Swapchain::_create(
+        const shared_ptr<Device>&   ptr_device,
+        const vector<uint32_t>&     queue_family_indices,
+        VkSharingMode               sharing_mode
+    )
     {
         VkSwapchainCreateInfoKHR swapchain_info {
             .sType                  = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,

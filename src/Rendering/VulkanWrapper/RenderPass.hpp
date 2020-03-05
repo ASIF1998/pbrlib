@@ -216,10 +216,10 @@ namespace pbrlib
         RenderPass& operator = (RenderPass&&)       = delete;
         RenderPass& operator = (const RenderPass&)  = delete;
 
-        inline const RenderPassInfo& getRenderPassInfo()    const noexcept;
-        inline const VkRenderPass& getRenderPassHandle()    const noexcept;
-        inline shared_ptr<Device>& getDevice()              noexcept;
-        inline const shared_ptr<Device>& getDevice()        const noexcept;
+        inline const RenderPassInfo&        getRenderPassInfo()         const noexcept;
+        inline const VkRenderPass&          getRenderPassHandle()       const noexcept;
+        inline shared_ptr<Device>&          getDevice()                 noexcept;
+        inline const shared_ptr<Device>&    getDevice()                 const noexcept;
 
         /**
          * @brief Статический метод создающий объект типа shared_ptr<RenderPass>.

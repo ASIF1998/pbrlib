@@ -13,6 +13,10 @@
 
 #include "Device.hpp"
 
+/**
+ * TODO: Добавить функцию создающую командный буфер.
+*/
+
 using namespace std;
 
 namespace pbrlib
@@ -42,6 +46,8 @@ namespace pbrlib
         inline const shared_ptr<Device>&    getDevice()             const noexcept;
         inline uint32_t                     getFamilyIndex()        const noexcept;
         inline const VkCommandPool&         getCommandPoolHandle()  const noexcept;
+
+        inline static shared_ptr<CommandPool> make(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
 
     private:
         shared_ptr<Device>  _ptr_device;
@@ -83,6 +89,14 @@ namespace pbrlib
     inline const VkCommandPool& CommandPool::getCommandPoolHandle() const noexcept
     {
         return _command_pool_handle;
+    }
+
+    inline shared_ptr<CommandPool> CommandPool::make(
+        const shared_ptr<Device>&   ptr_device, 
+        uint32_t                    queue_family_index
+    )
+    {
+        return make_shared<CommandPool>(ptr_device, queue_family_index);
     }
 }
 

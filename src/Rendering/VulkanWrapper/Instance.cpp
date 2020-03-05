@@ -63,7 +63,7 @@ namespace pbrlib
             .applicationVersion = app_version,
             .pEngineName        = "PBRLib",
             .engineVersion      = EngineVersion,
-            .apiVersion         = VK_MAKE_VERSION(1, 0, 0)
+            .apiVersion         = VK_MAKE_VERSION(1, 2, 0)
         };
 
         VkInstanceCreateInfo instance_info {

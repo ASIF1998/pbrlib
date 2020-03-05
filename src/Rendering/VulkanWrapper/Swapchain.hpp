@@ -33,7 +33,7 @@ namespace pbrlib
         */
         inline Swapchain(
             const shared_ptr<Device>&   ptr_device,
-            vector<uint32_t>            queue_family_indices,
+            const vector<uint32_t>&     queue_family_indices,
             const shared_ptr<Surface>&  surface
         );
         
@@ -61,19 +61,6 @@ namespace pbrlib
         Swapchain& operator = (Swapchain&&)         = delete;
         Swapchain& operator = (const Swapchain&)    = delete;
 
-        /**
-         * @brief Функция создающая список показа.
-         * 
-         * @param ptr_device            указатель на устройство.
-         * @param queue_family_indices  индексы семейства очередей.
-         * @param sharing_mode          сообщает о том как изображения будут использоваться в разных очередях.
-        */
-        void create(
-            const shared_ptr<Device>&   ptr_device, 
-            vector<uint32_t>            queue_family_indices,
-            VkSharingMode               sharing_mode
-        );
-
         inline void setPresent(DeviceQueue& queue, uint32_t image_index,  const VkSemaphore* semaphores, uint32_t semaphore_count);
 
         inline vector<ImageView>&           getImagesView()         noexcept;
@@ -81,6 +68,8 @@ namespace pbrlib
         inline const VkSwapchainKHR&        getSwapchainHandle()    const noexcept;
         inline shared_ptr<Surface>&         getSurface()            noexcept;
         inline const shared_ptr<Surface>&   getSurface()            const noexcept;
+        inline shared_ptr<Device>&          getDevice()             noexcept;
+        inline const shared_ptr<Device>&    getDevice()             const noexcept;
 
         inline void getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence = VK_NULL_HANDLE);
 
@@ -111,19 +100,35 @@ namespace pbrlib
         );
 
     private:
+        /**
+         * @brief Функция создающая список показа.
+         * 
+         * @param ptr_device            указатель на устройство.
+         * @param queue_family_indices  индексы семейства очередей.
+         * @param sharing_mode          сообщает о том как изображения будут использоваться в разных очередях.
+        */
+        void _create(
+            const shared_ptr<Device>&   ptr_device, 
+            const vector<uint32_t>&     queue_family_indices,
+            VkSharingMode               sharing_mode
+        );
+
+    private:
         VkSwapchainKHR      _swapchain_handle;
         shared_ptr<Surface> _ptr_surface;
         vector<ImageView>   _images_view;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline Swapchain::Swapchain(const shared_ptr<Device>& ptr_device,
-                         vector<uint32_t> queue_family_indices,
-                         const shared_ptr<Surface> & surface) :
+    inline Swapchain::Swapchain(
+        const shared_ptr<Device>&   ptr_device,
+        const vector<uint32_t>&     queue_family_indices,
+        const shared_ptr<Surface> & surface
+    ) :
         _swapchain_handle(VK_NULL_HANDLE),
         _ptr_surface(surface)
     {
-        create(ptr_device, queue_family_indices, VK_SHARING_MODE_CONCURRENT);
+        _create(ptr_device, queue_family_indices, VK_SHARING_MODE_CONCURRENT);
     }
 
     inline Swapchain::Swapchain(
@@ -135,7 +140,7 @@ namespace pbrlib
         _ptr_surface        (surface)
     {
         vector<uint32_t> queue_family_indicies {queue_family_index};
-        create(ptr_device, queue_family_indicies, VK_SHARING_MODE_EXCLUSIVE);
+        _create(ptr_device, queue_family_indicies, VK_SHARING_MODE_EXCLUSIVE);
     }
 
     inline Swapchain:: Swapchain(Swapchain&& swapchain) :
@@ -207,6 +212,15 @@ namespace pbrlib
     inline const shared_ptr<Surface>& Swapchain::getSurface() const noexcept
     {
         return _ptr_surface;
+    }
+
+    inline shared_ptr<Device>& Swapchain::getDevice() noexcept
+    {
+        return _images_view[0].getImage()->getDevice();
+    }
+    inline const shared_ptr<Device>& Swapchain::getDevice() const noexcept
+    {
+        return _images_view[0].getImage()->getDevice();
     }
 
     inline shared_ptr<Swapchain> Swapchain::make(
