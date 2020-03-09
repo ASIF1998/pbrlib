@@ -118,7 +118,13 @@ namespace pbrlib
     {
         VkBool32 res;
 
-        vkGetPhysicalDeviceSurfaceSupportKHR(physocal_device.physical_device_handle, queue_family_index, surface.getSurfaceHandle(), &res);
+        vkGetPhysicalDeviceSurfaceSupportKHR(
+            physocal_device.physical_device_handle, 
+            queue_family_index, 
+            surface.getSurfaceHandle(), 
+            &res
+        );
+        
         return res == VK_TRUE;
     }
 }

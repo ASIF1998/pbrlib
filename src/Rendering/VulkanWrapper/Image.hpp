@@ -211,7 +211,7 @@ namespace pbrlib
         );
 
     private:
-        void _create_image();
+        void _create();
 
     private:
         VkImage             _image_handle;

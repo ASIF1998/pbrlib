@@ -715,8 +715,76 @@ namespace pbrlib
         inline VkPipelineCache                          getPipelineCacheHandle()    const noexcept;
         inline const vector<shared_ptr<ShaderModule>>&  getShaderModules()          const noexcept;
 
+        /**
+         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
+         * 
+         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param shaders                   шейдеры.
+         * @param ptr_pipeline_layout       указатель на PipelineLayout.
+         * @param ptr_render_pass           указатель на проход рендера.
+         * @param subpass_index             индекс подпрохода.
+        */
+        inline static shared_ptr<GraphicsPipeline> make(
+            const GraphicsPipelineState&            graphics_pipeline_state,
+            const vector<shared_ptr<ShaderModule>>& shaders,
+            const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
+            const shared_ptr<RenderPass>&           ptr_render_pass,
+            uint32_t                                subpass_index
+        );
+
+        /**
+         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
+         * 
+         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param shaders                   шейдеры.
+         * @param ptr_pipeline_layout       указатель на PipelineLayout.
+         * @param ptr_render_pass           указатель на проход рендера.
+         * @param subpass_index             индекс подпрохода.
+        */
+        inline static shared_ptr<GraphicsPipeline> make(
+            const GraphicsPipelineState&        graphics_pipeline_state,
+            vector<shared_ptr<ShaderModule>>&&  shaders,
+            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
+            const shared_ptr<RenderPass>&       ptr_render_pass,
+            uint32_t                            subpass_index
+        );
+
+        /**
+         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
+         * 
+         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param shaders                   шейдеры.
+         * @param ptr_pipeline_layout       указатель на PipelineLayout.
+         * @param ptr_render_pass           указатель на проход рендера.
+         * @param subpass_index             индекс подпрохода.
+        */
+        inline static shared_ptr<GraphicsPipeline> make(
+            GraphicsPipelineState&&                 graphics_pipeline_state,
+            const vector<shared_ptr<ShaderModule>>& shaders,
+            const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
+            const shared_ptr<RenderPass>&           ptr_render_pass,
+            uint32_t                                subpass_index
+        );
+
+        /**
+         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
+         * 
+         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param shaders                   шейдеры.
+         * @param ptr_pipeline_layout       указатель на PipelineLayout.
+         * @param ptr_render_pass           указатель на проход рендера.
+         * @param subpass_index             индекс подпрохода.
+        */
+        inline static shared_ptr<GraphicsPipeline> make(
+            GraphicsPipelineState&&             graphics_pipeline_state,
+            vector<shared_ptr<ShaderModule>>&&  shaders,
+            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
+            const shared_ptr<RenderPass>&       ptr_render_pass,
+            uint32_t                            subpass_index
+        );
+
     private:
-        void _create_graphics_pipeline();
+        void _create();
 
     private:
         uint32_t                            _subpass_index;

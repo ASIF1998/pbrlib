@@ -47,7 +47,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void Instance::_create_instance(
+    void Instance::_create(
         const string_view   app_name,
         uint32_t            app_version, 
         uint32_t            enabled_layer_count,

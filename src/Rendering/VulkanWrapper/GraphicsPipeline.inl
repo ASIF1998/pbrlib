@@ -805,7 +805,7 @@ namespace pbrlib
         _pipeline_cache_handle  (VK_NULL_HANDLE),
         _shaders                (shaders)
     {
-        _create_graphics_pipeline();
+        _create();
     }
     
     inline GraphicsPipeline::GraphicsPipeline(
@@ -823,7 +823,7 @@ namespace pbrlib
         _pipeline_cache_handle  (VK_NULL_HANDLE),
         _shaders                (move(shaders))
     {
-        _create_graphics_pipeline();
+        _create();
     }
 
     inline GraphicsPipeline::GraphicsPipeline(
@@ -841,7 +841,7 @@ namespace pbrlib
         _pipeline_cache_handle  (VK_NULL_HANDLE),
         _shaders                (shaders)
     {
-        _create_graphics_pipeline();
+        _create();
     }
 
     inline GraphicsPipeline::GraphicsPipeline(
@@ -859,7 +859,7 @@ namespace pbrlib
         _pipeline_cache_handle  (VK_NULL_HANDLE),
         _shaders                (move(shaders))
     {
-        _create_graphics_pipeline();
+        _create();
     }
 
     inline GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& graphics_pipeline) :
@@ -888,7 +888,7 @@ namespace pbrlib
         }
     }
 
-    void GraphicsPipeline::_create_graphics_pipeline()
+    void GraphicsPipeline::_create()
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -989,5 +989,73 @@ namespace pbrlib
     inline const vector<shared_ptr<ShaderModule>>& GraphicsPipeline::getShaderModules() const noexcept
     {
         return _shaders;
+    }
+
+    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
+        const GraphicsPipelineState&            graphics_pipeline_state,
+        const vector<shared_ptr<ShaderModule>>& shaders,
+        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
+        const shared_ptr<RenderPass>&           ptr_render_pass,
+        uint32_t                                subpass_index
+    )
+    {
+        return make_shared<GraphicsPipeline>(
+            graphics_pipeline_state,
+            shaders,
+            ptr_pipeline_layout,
+            ptr_render_pass,
+            subpass_index
+        );
+    }
+
+    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
+        const GraphicsPipelineState&        graphics_pipeline_state,
+        vector<shared_ptr<ShaderModule>>&&  shaders,
+        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
+        const shared_ptr<RenderPass>&       ptr_render_pass,
+        uint32_t                            subpass_index
+    )
+    {
+        return make_shared<GraphicsPipeline>(
+            graphics_pipeline_state,
+            move(shaders),
+            ptr_pipeline_layout,
+            ptr_render_pass,
+            subpass_index
+        );
+    }
+
+    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
+        GraphicsPipelineState&&                 graphics_pipeline_state,
+        const vector<shared_ptr<ShaderModule>>& shaders,
+        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
+        const shared_ptr<RenderPass>&           ptr_render_pass,
+        uint32_t                                subpass_index
+    )
+    {
+        return make_shared<GraphicsPipeline>(
+            move(graphics_pipeline_state),
+            shaders,
+            ptr_pipeline_layout,
+            ptr_render_pass,
+            subpass_index
+        );
+    }
+
+    inline shared_ptr<GraphicsPipeline>GraphicsPipeline::make(
+        GraphicsPipelineState&&             graphics_pipeline_state,
+        vector<shared_ptr<ShaderModule>>&&  shaders,
+        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
+        const shared_ptr<RenderPass>&       ptr_render_pass,
+        uint32_t                            subpass_index
+    )
+    {
+        return make_shared<GraphicsPipeline>(
+            move(graphics_pipeline_state),
+            move(shaders),
+            ptr_pipeline_layout,
+            ptr_render_pass,
+            subpass_index
+        );
     }
 }

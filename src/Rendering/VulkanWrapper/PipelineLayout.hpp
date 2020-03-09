@@ -108,7 +108,7 @@ namespace pbrlib
         inline const DescriptorSetLayoutBindings&   getDescriptorSetLayoutBindings()    const noexcept;
     
     private:
-        inline void _create_descriptor_set_layout();
+        inline void _create();
 
     private:
         DescriptorSetLayoutBindings _descriptor_set_layout_bindings;

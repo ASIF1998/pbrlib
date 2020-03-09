@@ -137,6 +137,8 @@ namespace pbrlib
         inline uint32_t                         getWidth()                      const noexcept;
         inline uint32_t                         getHeight()                     const noexcept;
         inline uint32_t                         getNumLayers()                  const noexcept;
+        inline shared_ptr<Device>&              getDevice()                     noexcept;
+        inline const shared_ptr<Device>&        getDevice()                     const noexcept;
 
     private:
         void _create_framebuffer();

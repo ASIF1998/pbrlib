@@ -244,7 +244,7 @@ namespace pbrlib
         );
 
     private:
-        inline void _create_render_pass();
+        inline void _create();
 
     private:
         RenderPassInfo      _render_pass_info;

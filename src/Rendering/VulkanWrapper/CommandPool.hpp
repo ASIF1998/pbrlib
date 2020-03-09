@@ -47,7 +47,10 @@ namespace pbrlib
         inline uint32_t                     getFamilyIndex()        const noexcept;
         inline const VkCommandPool&         getCommandPoolHandle()  const noexcept;
 
-        inline static shared_ptr<CommandPool> make(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
+        inline static shared_ptr<CommandPool> make(
+            const shared_ptr<Device>&   ptr_device, 
+            uint32_t                    queue_family_index
+        );
 
     private:
         shared_ptr<Device>  _ptr_device;

@@ -67,7 +67,7 @@ namespace pbrlib
         inline void waitIdle() const;
 
     private:
-        void _create_device(
+        void _create(
             const PhysicalDevice&                   physical_device,
             const vector<VkDeviceQueueCreateInfo>&  queue_info,
             uint32_t                                enabled_layer_count,
@@ -84,7 +84,7 @@ namespace pbrlib
     inline Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
         _device_handle(VK_NULL_HANDLE)
     {
-        _create_device(physical_device, queue_info, 0, nullptr, 0, nullptr);
+        _create(physical_device, queue_info, 0, nullptr, 0, nullptr);
     }
 
     inline Device::Device(
@@ -95,7 +95,7 @@ namespace pbrlib
     ) :
         _device_handle(VK_NULL_HANDLE)
     {
-        _create_device(
+        _create(
             physical_device, queue_info,
             static_cast<uint32_t>(layer_names.size()),
             layer_names.data(),

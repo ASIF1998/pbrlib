@@ -241,7 +241,7 @@ namespace pbrlib
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
     {
-        _create_render_pass();
+        _create();
     }
 
     inline RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info) :
@@ -249,7 +249,7 @@ namespace pbrlib
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
     {
-        _create_render_pass();
+        _create();
     }
 
     inline RenderPass::RenderPass(RenderPass&& render_pass) :
@@ -267,7 +267,7 @@ namespace pbrlib
         }
     }
 
-    inline void RenderPass::_create_render_pass()
+    inline void RenderPass::_create()
     {
         auto& psubpass_descritions = _render_pass_info.getSubpassDescriptions();
         vector<VkSubpassDescription> subpass_description (psubpass_descritions.size());

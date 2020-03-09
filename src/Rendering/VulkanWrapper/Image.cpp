@@ -56,7 +56,7 @@ namespace pbrlib
         _image_info             (image_info),
         _queue_family_indicies  (1)
     {
-        _create_image();
+        _create();
     }
 
     Image::Image(
@@ -77,7 +77,7 @@ namespace pbrlib
         _image_info             (image_info),
         _queue_family_indicies  (queue_family_indices)
     {
-        _create_image();
+        _create();
     }
 
     Image::Image(
@@ -98,7 +98,7 @@ namespace pbrlib
         _image_info             (image_info),
         _queue_family_indicies  (move(queue_family_indices))
     {
-        _create_image();
+        _create();
     }
 
     Image::Image(
@@ -145,7 +145,7 @@ namespace pbrlib
         _queue_family_indicies(move(queue_family_indicies))
     {}
 
-    void Image::_create_image()
+    void Image::_create()
     {
         uint32_t num_queue_indicies = static_cast<uint32_t>(_queue_family_indicies.size());
 

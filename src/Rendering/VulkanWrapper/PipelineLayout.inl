@@ -82,7 +82,7 @@ namespace pbrlib
         _descriptor_set_layout_bindings (move(descriptor_set_layout_bindings)),
         _descriptor_set_layout_handle   (VK_NULL_HANDLE)
     {
-        _create_descriptor_set_layout();
+        _create();
     }
 
     inline DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout&& descriptor_set_layout) :
@@ -103,7 +103,7 @@ namespace pbrlib
         }
     }
 
-    inline void DescriptorSetLayout::_create_descriptor_set_layout()
+    inline void DescriptorSetLayout::_create()
     {
         VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info {
             .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,

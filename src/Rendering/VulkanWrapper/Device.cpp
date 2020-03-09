@@ -14,7 +14,7 @@
 
 namespace pbrlib
 {
-    void Device::_create_device(
+    void Device::_create(
         const PhysicalDevice&                   physical_device,
         const vector<VkDeviceQueueCreateInfo>&  queue_info,
         uint32_t                                enabled_layer_count,

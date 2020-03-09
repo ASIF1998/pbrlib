@@ -151,7 +151,7 @@ namespace pbrlib
         );
 
     private:
-        void _create_instance(
+        void _create(
             const string_view   app_name,
             uint32_t            app_version, 
             uint32_t            enabled_layer_count,
@@ -184,7 +184,7 @@ namespace pbrlib
     inline Instance::Instance(const string_view app_name, uint32_t app_version) :
         _instance_handle(VK_NULL_HANDLE)
     {
-        _create_instance(app_name, app_version, 0, nullptr, 0, nullptr);
+        _create(app_name, app_version, 0, nullptr, 0, nullptr);
     }
 
     inline Instance::Instance(
@@ -195,7 +195,7 @@ namespace pbrlib
     ) :
         _instance_handle(VK_NULL_HANDLE)
     {
-        _create_instance(
+        _create(
             app_name,
             app_version,
             static_cast<uint32_t>(layer_names.size()),

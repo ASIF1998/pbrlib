@@ -237,4 +237,14 @@ namespace pbrlib
     {
         return _layers;
     }
+
+    inline shared_ptr<Device>&  Framebuffer::getDevice() noexcept
+    {
+        return _ptr_render_pass->getDevice();
+    }
+
+    inline const shared_ptr<Device>& Framebuffer::getDevice() const noexcept
+    {
+        return _ptr_render_pass->getDevice();
+    }
 }
