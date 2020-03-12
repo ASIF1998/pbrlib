@@ -140,6 +140,100 @@ namespace pbrlib
         inline shared_ptr<Device>&              getDevice()                     noexcept;
         inline const shared_ptr<Device>&        getDevice()                     const noexcept;
 
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_swapchain             указатель на список отображения.
+         * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param attachments               иные виды изображения (например глубина-трафарет), 
+         *                                  которые, при создании фреймбуфера, будут идти после 
+         *                                  видов изображения в списке отображения.
+         * @param width                     ширина фреймбуфера.
+         * @param height                    высота фреймбуфера.
+         * @param layers                    количество слоёв фреймбуфера.
+        */
+        inline static shared_ptr<Framebuffer> make(
+            const shared_ptr<Swapchain>&    ptr_swapchain,
+            uint32_t                        swapchain_attachment_indx,
+            const shared_ptr<RenderPass>&   ptr_render_pass,
+            PtrAttachments&&                attachments,
+            uint32_t                        width,
+            uint32_t                        height,
+            uint32_t                        layers
+        );
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_swapchain             указатель на список отображения.
+         * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param attachments               иные виды изображения (например глубина-трафарет), 
+         *                                  которые, при создании фреймбуфера, будут идти после 
+         *                                  видов изображения в списке отображения.
+         * @param width                     ширина фреймбуфера.
+         * @param height                    высота фреймбуфера.
+         * @param layers                    количество слоёв фреймбуфера.
+        */
+        inline static shared_ptr<Framebuffer> make(
+            const shared_ptr<Swapchain>&    ptr_swapchain,
+            uint32_t                        swapchain_attachment_indx,
+            const shared_ptr<RenderPass>&   ptr_render_pass,
+            const PtrAttachments&           attachments,
+            uint32_t                        width,
+            uint32_t                        height,
+            uint32_t                        layers
+        );
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param ptr_swapchain             указатель на список отображения.
+         * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param width                     ширина фреймбуфера.
+         * @param height                    высота фреймбуфера.
+         * @param layers                    количество слоёв фреймбуфера.
+        */  
+        inline static shared_ptr<Framebuffer> make(
+            const shared_ptr<Swapchain>&    ptr_swapchain, 
+            uint32_t                        swapchain_attachment_indx,
+            const shared_ptr<RenderPass>&   ptr_render_pass,
+            uint32_t                        width,
+            uint32_t                        height,
+            uint32_t                        layers
+        );
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param attachments   виды изображений.
+         * @param width         ширина фреймбуфера.
+         * @param height        высота фреймбуфера.
+         * @param layers        количество слоёв фреймбуфера.
+        */  
+        inline static shared_ptr<Framebuffer> make(
+            PtrAttachments&&                attachments,
+            const shared_ptr<RenderPass>&   ptr_render_pass,
+            uint32_t                        width,
+            uint32_t                        height,
+            uint32_t                        layers
+        );
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param attachments   виды изображений.
+         * @param width         ширина фреймбуфера.
+         * @param height        высота фреймбуфера.
+         * @param layers        количество слоёв фреймбуфера.
+        */  
+        inline static shared_ptr<Framebuffer> make(
+            const PtrAttachments&           attachments,
+            const shared_ptr<RenderPass>&   ptr_render_pass,
+            uint32_t                        width,
+            uint32_t                        height,
+            uint32_t                        layers
+        );
+
     private:
         void _create_framebuffer();
 

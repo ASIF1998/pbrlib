@@ -247,4 +247,100 @@ namespace pbrlib
     {
         return _ptr_render_pass->getDevice();
     }
+
+    inline shared_ptr<Framebuffer> Framebuffer::make(
+        const shared_ptr<Swapchain>&    ptr_swapchain,
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        PtrAttachments&&                attachments,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    )
+    {
+        return make_shared<Framebuffer>(
+            ptr_swapchain, 
+            swapchain_attachment_indx, 
+            ptr_render_pass, 
+            move(attachments), 
+            width, 
+            height, 
+            layers
+        );
+    }
+
+    inline shared_ptr<Framebuffer> Framebuffer::make(
+        const shared_ptr<Swapchain>&    ptr_swapchain,
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        const PtrAttachments&           attachments,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    )
+    {
+        return make_shared<Framebuffer>(
+
+            ptr_swapchain,
+            swapchain_attachment_indx,
+            ptr_render_pass, 
+            attachments,
+            width,
+            height,
+            layers
+        );
+    }
+
+    inline shared_ptr<Framebuffer> Framebuffer::make(
+        const shared_ptr<Swapchain>&    ptr_swapchain, 
+        uint32_t                        swapchain_attachment_indx,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    )
+    {
+        return make_shared<Framebuffer>(
+            ptr_swapchain,
+            swapchain_attachment_indx,
+            ptr_render_pass,
+            width,
+            height,
+            layers
+        );
+    }
+
+    inline shared_ptr<Framebuffer> Framebuffer::make(
+        PtrAttachments&&                attachments,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    )
+    {
+        return make_shared<Framebuffer>(
+            move(attachments),
+            ptr_render_pass,
+            width,
+            height,
+            layers
+        );
+    }
+
+    inline shared_ptr<Framebuffer> Framebuffer::make(
+        const PtrAttachments&           attachments,
+        const shared_ptr<RenderPass>&   ptr_render_pass,
+        uint32_t                        width,
+        uint32_t                        height,
+        uint32_t                        layers
+    )
+    {
+        return make_shared<Framebuffer>(
+            attachments,
+            ptr_render_pass,
+            width,
+            height,
+            layers
+        );
+    }
 }
