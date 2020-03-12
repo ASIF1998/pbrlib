@@ -294,7 +294,7 @@ namespace pbrlib
 
         inline shared_ptr<Device>&          getDevice()                 noexcept;
         inline const shared_ptr<Device>&    getDevice()                 const noexcept;
-        inline VkCommandBuffer              getCommandBufferHandle()    const noexcept;
+        inline const VkCommandBuffer&       getCommandBufferHandle()    const noexcept;
 
     protected:
         shared_ptr<CommandPool> _ptr_command_pool;
@@ -319,6 +319,7 @@ namespace pbrlib
 
         inline void begin()                                                     const;
         inline void end()                                                       const;
+        inline void bindToPipeline()                                            const noexcept;
         inline void begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept;
         inline void endRenderPass()                                             const noexcept;
         inline void nextSubpass()                                               const noexcept;
@@ -342,6 +343,8 @@ namespace pbrlib
 
         SecondaryCommandBuffer& operator = (SecondaryCommandBuffer&&)       = delete;
         SecondaryCommandBuffer& operator = (const SecondaryCommandBuffer&)  = delete;
+
+        inline void bindToPipeline(const GraphicsPipeline& pipeline) const noexcept;
 
         /**
          * @brief Метод позволяющий начать запись в командный буфер.

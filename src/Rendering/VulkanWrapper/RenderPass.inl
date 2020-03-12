@@ -125,7 +125,7 @@ namespace pbrlib
         size_t num_subpass_dependencies
     )
     {
-        _subpass_descriptions.resize(num_subpass_descriptions);
+        _subpass_descriptions.reserve(num_subpass_descriptions);
         _subpass_dependencies.reserve(num_subpass_dependencies);
         _attribute_descriptions.reserve(num_attribute_descriptions);
     }

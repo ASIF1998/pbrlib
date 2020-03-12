@@ -319,7 +319,7 @@ namespace pbrlib
         return _ptr_command_pool->getDevice();
     }
 
-    inline VkCommandBuffer CommandBuffer::getCommandBufferHandle() const noexcept
+    inline const VkCommandBuffer& CommandBuffer::getCommandBufferHandle() const noexcept
     {
         return _command_buffer_handle;
     }
@@ -345,6 +345,7 @@ namespace pbrlib
     {
         VkCommandBufferBeginInfo begin_info {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+            .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
         };
 
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
@@ -353,6 +354,11 @@ namespace pbrlib
     inline void PrimaryCommandBuffer::end() const
     {
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
+    }
+
+    inline void PrimaryCommandBuffer::bindToPipeline() const noexcept
+    {
+        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _ptr_pipeline->getPipelineHandle());
     }
 
     inline void PrimaryCommandBuffer::begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept
@@ -405,7 +411,12 @@ namespace pbrlib
 
     inline SecondaryCommandBuffer::SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer))
-    {}   
+    {} 
+
+    inline void SecondaryCommandBuffer::bindToPipeline(const GraphicsPipeline& pipeline) const noexcept
+    {
+        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineHandle());
+    }
 
     inline void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer) const
     {
@@ -419,6 +430,7 @@ namespace pbrlib
 
         VkCommandBufferBeginInfo begin_info {
             .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+            .flags              = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
             .pInheritanceInfo   = &inheritance_info
         };
 
