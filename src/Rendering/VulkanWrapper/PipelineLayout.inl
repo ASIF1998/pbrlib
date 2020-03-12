@@ -149,7 +149,11 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline PipelineLayout::PipelineLayout(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts) :
+    inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                       ptr_device, 
+        const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts
+    ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (descriptor_set_layouts),
         _push_constant_ranges   (0),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -157,7 +161,11 @@ namespace pbrlib
         _create_pipeline_layout();
     }
         
-    inline PipelineLayout::PipelineLayout(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts) :
+    inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                   ptr_device, 
+        vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts
+    ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (move(descriptor_set_layouts)),
         _push_constant_ranges   (0),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -166,9 +174,11 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                       ptr_device, 
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         const vector<VkPushConstantRange>&              push_constant_ranges
     ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (descriptor_set_layouts),
         _push_constant_ranges   (push_constant_ranges),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -177,9 +187,11 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                   ptr_device, 
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         const vector<VkPushConstantRange>&          push_constant_ranges
     ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (move(descriptor_set_layouts)),
         _push_constant_ranges   (push_constant_ranges),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -188,9 +200,11 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                       ptr_device, 
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         vector<VkPushConstantRange>&&                   push_constant_ranges
     ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (descriptor_set_layouts),
         _push_constant_ranges   (move(push_constant_ranges)),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -199,9 +213,11 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
+        const shared_ptr<Device>&                   ptr_device, 
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         vector<VkPushConstantRange>&&               push_constant_ranges
     ) :
+        _ptr_device             (ptr_device),
         _descriptor_set_layouts (move(descriptor_set_layouts)),
         _push_constant_ranges   (move(push_constant_ranges)),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -210,6 +226,7 @@ namespace pbrlib
     }
 
     inline PipelineLayout::PipelineLayout(PipelineLayout&& pipeline_layout) :
+        _ptr_device             (move(pipeline_layout._ptr_device)),
         _descriptor_set_layouts (move(pipeline_layout._descriptor_set_layouts)),
         _push_constant_ranges   (move(pipeline_layout._push_constant_ranges)),
         _pipeline_layout_handle (VK_NULL_HANDLE)
@@ -220,7 +237,7 @@ namespace pbrlib
     inline PipelineLayout::~PipelineLayout() noexcept
     {
         if (_pipeline_layout_handle != VK_NULL_HANDLE) {
-            vkDestroyPipelineLayout(getDevice()->getDeviceHandle(), _pipeline_layout_handle, nullptr);
+            vkDestroyPipelineLayout(_ptr_device->getDeviceHandle(), _pipeline_layout_handle, nullptr);
         }
     }
 
@@ -243,7 +260,7 @@ namespace pbrlib
         };
 
         assert(vkCreatePipelineLayout(
-            getDevice()->getDeviceHandle(), 
+            _ptr_device->getDeviceHandle(), 
             &pipeline_layout_info, 
             nullptr, 
             &_pipeline_layout_handle
@@ -254,12 +271,12 @@ namespace pbrlib
 
     inline shared_ptr<Device>& PipelineLayout::getDevice() noexcept
     {
-        return _descriptor_set_layouts[0]->getDevice();
+        return _ptr_device;
     }
 
     inline const shared_ptr<Device>& PipelineLayout::getDevice() const noexcept
     {
-        return _descriptor_set_layouts[0]->getDevice();
+        return _ptr_device;
     }
 
     inline vector<shared_ptr<DescriptorSetLayout>>& PipelineLayout::getDescriptorSetLayouts() noexcept
@@ -282,45 +299,55 @@ namespace pbrlib
         return _pipeline_layout_handle;
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(const vector<shared_ptr<DescriptorSetLayout>>& descriptor_set_layouts)
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                       ptr_device, 
+        const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts
+    )
     {
-        return make_shared<PipelineLayout>(descriptor_set_layouts);
-    }
-
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(vector<shared_ptr<DescriptorSetLayout>>&& descriptor_set_layouts)
-    {
-        return make_shared<PipelineLayout>(move(descriptor_set_layouts));
+        return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts);
     }
 
     inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                   ptr_device, 
+        vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts
+    )
+    {
+        return make_shared<PipelineLayout>(ptr_device, move(descriptor_set_layouts));
+    }
+
+    inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                       ptr_device, 
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         const vector<VkPushConstantRange>&              push_constant_ranges
     )
     {
-        return make_shared<PipelineLayout>(descriptor_set_layouts, push_constant_ranges);
+        return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts, push_constant_ranges);
     }
 
     inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                   ptr_device, 
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         const vector<VkPushConstantRange>&          push_constant_ranges
     )
     {
-        return make_shared<PipelineLayout>(move(descriptor_set_layouts), push_constant_ranges);
+        return make_shared<PipelineLayout>(ptr_device, move(descriptor_set_layouts), push_constant_ranges);
     }
 
     inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                       ptr_device, 
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         vector<VkPushConstantRange>&&                   push_constant_ranges
     )
     {
-        return make_shared<PipelineLayout>(descriptor_set_layouts, move(push_constant_ranges));
+        return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts, move(push_constant_ranges));
     }
                             
     inline shared_ptr<PipelineLayout> PipelineLayout::make(
+        const shared_ptr<Device>&                   ptr_device, 
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         vector<VkPushConstantRange>&&               push_constant_ranges
     )
     {
-        return make_shared<PipelineLayout>(move(descriptor_set_layouts), move(push_constant_ranges));
+        return make_shared<PipelineLayout>(ptr_device, move(descriptor_set_layouts), move(push_constant_ranges));
     }
 }
