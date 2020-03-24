@@ -128,7 +128,7 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
         */
         Image(
-            const shared_ptr<Device>&   sptr_device,
+            const shared_ptr<Device>&   ptr_device,
             VkImage                     image,
             ImageInfo                   image_info,
             vector<uint32_t>&&          queue_family_indicies

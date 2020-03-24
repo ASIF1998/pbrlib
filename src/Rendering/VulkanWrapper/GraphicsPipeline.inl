@@ -16,8 +16,6 @@ namespace pbrlib
     ) :
         VkPipelineVertexInputStateCreateInfo {
             .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .pNext                              = nullptr,
-            .flags                              = 0,
             .vertexBindingDescriptionCount      = static_cast<uint32_t>(num_vertex_biding_descriptions),
             .vertexAttributeDescriptionCount    = static_cast<uint32_t>(num_vertex_attribute_descriptions),
         },
@@ -33,12 +31,8 @@ namespace pbrlib
     inline VertexInputState::VertexInputState(VertexInputState&& vertex_input_state) :
         VkPipelineVertexInputStateCreateInfo {
             .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .pNext                              = nullptr,
-            .flags                              = 0,
             .vertexBindingDescriptionCount      = vertex_input_state.vertexBindingDescriptionCount,
-            .pVertexBindingDescriptions         = nullptr,
-            .vertexAttributeDescriptionCount    = vertex_input_state.vertexAttributeDescriptionCount,
-            .pVertexAttributeDescriptions       = nullptr
+            .vertexAttributeDescriptionCount    = vertex_input_state.vertexAttributeDescriptionCount
         },
         _ptr_vertex_biding_descriptions     (nullptr),
         _ptr_vertex_attribute_descriptions  (nullptr),
@@ -671,6 +665,16 @@ namespace pbrlib
         _current_attachment++;
     }
 
+    inline void ColorBlendState::logicOpEnable(VkBool32 is_enable) noexcept
+    {
+        VkPipelineColorBlendStateCreateInfo::logicOpEnable = is_enable;
+    }
+
+    inline void ColorBlendState::setLogicOp(VkLogicOp logic_op) noexcept
+    {
+        VkPipelineColorBlendStateCreateInfo::logicOp= logic_op;
+    }
+
     inline const VkPipelineColorBlendAttachmentState* ColorBlendState::getAttachments() const noexcept
     {
         return _ptr_attachments;
@@ -684,6 +688,16 @@ namespace pbrlib
     inline size_t ColorBlendState::capacityAttachments() const noexcept
     {
         return VkPipelineColorBlendStateCreateInfo::attachmentCount;
+    }
+
+    inline bool ColorBlendState::logicOpEnable() const noexcept
+    {
+        return VkPipelineColorBlendStateCreateInfo::logicOpEnable;
+    }
+
+    inline VkLogicOp ColorBlendState::getLogicOp() const noexcept
+    {
+        return VkPipelineColorBlendStateCreateInfo::logicOp;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -792,7 +806,7 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineState&            graphics_pipeline_state,
-        const vector<shared_ptr<ShaderModule>>& shaders,
+        const vector<ShaderModule>&             shaders,
         const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
         const shared_ptr<RenderPass>&           ptr_render_pass,
         uint32_t                                subpass_index
@@ -802,33 +816,14 @@ namespace pbrlib
         _ptr_render_pass        (ptr_render_pass),
         _state                  (graphics_pipeline_state),
         _pipeline_handle        (VK_NULL_HANDLE),
-        _pipeline_cache_handle  (VK_NULL_HANDLE),
-        _shaders                (shaders)
+        _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
-        _create();
+        _create(shaders);
     }
     
     inline GraphicsPipeline::GraphicsPipeline(
-        const GraphicsPipelineState&        graphics_pipeline_state,
-        vector<shared_ptr<ShaderModule>>&&  shaders,
-        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&       ptr_render_pass,
-        uint32_t                            subpass_index
-    ) :
-        _subpass_index          (subpass_index),
-        _ptr_pipeline_layout    (ptr_pipeline_layout),
-        _ptr_render_pass        (ptr_render_pass),
-        _state                  (graphics_pipeline_state),
-        _pipeline_handle        (VK_NULL_HANDLE),
-        _pipeline_cache_handle  (VK_NULL_HANDLE),
-        _shaders                (move(shaders))
-    {
-        _create();
-    }
-
-    inline GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineState&&                 graphics_pipeline_state,
-        const vector<shared_ptr<ShaderModule>>& shaders,
+        const vector<ShaderModule>&             shaders,
         const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
         const shared_ptr<RenderPass>&           ptr_render_pass,
         uint32_t                                subpass_index
@@ -838,28 +833,9 @@ namespace pbrlib
         _ptr_render_pass        (ptr_render_pass),
         _state                  (move(graphics_pipeline_state)),
         _pipeline_handle        (VK_NULL_HANDLE),
-        _pipeline_cache_handle  (VK_NULL_HANDLE),
-        _shaders                (shaders)
+        _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
-        _create();
-    }
-
-    inline GraphicsPipeline::GraphicsPipeline(
-        GraphicsPipelineState&&             graphics_pipeline_state,
-        vector<shared_ptr<ShaderModule>>&&  shaders,
-        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&       ptr_render_pass,
-        uint32_t                            subpass_index
-    ) :
-        _subpass_index          (subpass_index),
-        _ptr_pipeline_layout    (ptr_pipeline_layout),
-        _ptr_render_pass        (ptr_render_pass),
-        _state                  (move(graphics_pipeline_state)),
-        _pipeline_handle        (VK_NULL_HANDLE),
-        _pipeline_cache_handle  (VK_NULL_HANDLE),
-        _shaders                (move(shaders))
-    {
-        _create();
+        _create(shaders);
     }
 
     inline GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& graphics_pipeline) :
@@ -868,8 +844,7 @@ namespace pbrlib
         _ptr_render_pass        (move(graphics_pipeline._ptr_render_pass)),
         _state                  (move(graphics_pipeline._state)),
         _pipeline_handle        (VK_NULL_HANDLE),
-        _pipeline_cache_handle  (VK_NULL_HANDLE),
-        _shaders                (move(graphics_pipeline._shaders))
+        _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
         swap(_pipeline_handle,          graphics_pipeline._pipeline_handle);
         swap(_pipeline_cache_handle,    graphics_pipeline._pipeline_cache_handle);
@@ -888,7 +863,7 @@ namespace pbrlib
         }
     }
 
-    void GraphicsPipeline::_create()
+    void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -905,19 +880,19 @@ namespace pbrlib
 
         assert(_pipeline_cache_handle != VK_NULL_HANDLE);
 
-        vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages_info(_shaders.size());
+       vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages_info(shaders.size());
 
-        for (size_t i{0}; i < pipeline_shader_stages_info.size(); i++) {
-            pipeline_shader_stages_info[i] = {
-                .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .pNext                  = nullptr,
-                .flags                  = 0,
-                .stage                  = _shaders[i]->getShaderType(),
-                .module                 = _shaders[i]->getShaderHandle(),
-                .pName                  = "main",
-                .pSpecializationInfo    = reinterpret_cast<VkSpecializationInfo*>(&_shaders[i]->getSpecializationInfo())
-            };
-        };
+       for (size_t i{0}; i < pipeline_shader_stages_info.size(); i++) {
+           pipeline_shader_stages_info[i] = {
+               .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+               .pNext                  = nullptr,
+               .flags                  = 0,
+               .stage                  = shaders[i].getShaderType(),
+               .module                 = shaders[i].getShaderHandle(),
+               .pName                  = "main",
+               .pSpecializationInfo    = reinterpret_cast<const VkSpecializationInfo*>(&shaders[i].getSpecializationInfo())
+           };
+       };
 
         VkGraphicsPipelineCreateInfo grahics_pipeline_info {
             .sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -986,14 +961,9 @@ namespace pbrlib
         return _pipeline_cache_handle;
     }
 
-    inline const vector<shared_ptr<ShaderModule>>& GraphicsPipeline::getShaderModules() const noexcept
-    {
-        return _shaders;
-    }
-
     inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
         const GraphicsPipelineState&            graphics_pipeline_state,
-        const vector<shared_ptr<ShaderModule>>& shaders,
+        const vector<ShaderModule>&             shaders,
         const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
         const shared_ptr<RenderPass>&           ptr_render_pass,
         uint32_t                                subpass_index
@@ -1002,23 +972,6 @@ namespace pbrlib
         return make_shared<GraphicsPipeline>(
             graphics_pipeline_state,
             shaders,
-            ptr_pipeline_layout,
-            ptr_render_pass,
-            subpass_index
-        );
-    }
-
-    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
-        const GraphicsPipelineState&        graphics_pipeline_state,
-        vector<shared_ptr<ShaderModule>>&&  shaders,
-        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&       ptr_render_pass,
-        uint32_t                            subpass_index
-    )
-    {
-        return make_shared<GraphicsPipeline>(
-            graphics_pipeline_state,
-            move(shaders),
             ptr_pipeline_layout,
             ptr_render_pass,
             subpass_index
@@ -1027,7 +980,7 @@ namespace pbrlib
 
     inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
         GraphicsPipelineState&&                 graphics_pipeline_state,
-        const vector<shared_ptr<ShaderModule>>& shaders,
+        const vector<ShaderModule>&             shaders,
         const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
         const shared_ptr<RenderPass>&           ptr_render_pass,
         uint32_t                                subpass_index
@@ -1036,23 +989,6 @@ namespace pbrlib
         return make_shared<GraphicsPipeline>(
             move(graphics_pipeline_state),
             shaders,
-            ptr_pipeline_layout,
-            ptr_render_pass,
-            subpass_index
-        );
-    }
-
-    inline shared_ptr<GraphicsPipeline>GraphicsPipeline::make(
-        GraphicsPipelineState&&             graphics_pipeline_state,
-        vector<shared_ptr<ShaderModule>>&&  shaders,
-        const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&       ptr_render_pass,
-        uint32_t                            subpass_index
-    )
-    {
-        return make_shared<GraphicsPipeline>(
-            move(graphics_pipeline_state),
-            move(shaders),
             ptr_pipeline_layout,
             ptr_render_pass,
             subpass_index

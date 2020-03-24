@@ -65,6 +65,14 @@ namespace pbrlib
         */
         void unmap();
 
+        /**
+         * @brief Метод позволяющий записать данные в память.
+         * 
+         * @param data данные которые нужно записать в память.
+        */
+        template<typename Container>
+        inline void setData(const Container& data);
+
         inline MapStatus isMapped() const noexcept;
 
         inline uint8_t*                     getData()               noexcept;
@@ -130,6 +138,22 @@ namespace pbrlib
     inline const shared_ptr<Device>& DeviceMemory::getDevice() const noexcept
     {
         return _ptr_device;
+    }
+
+    template<typename Container>
+    inline void DeviceMemory::setData(const Container& data)
+    {
+        MapStatus is_memory_mapped = isMapped();
+
+        if (is_memory_mapped == MapStatus::UNMAPPED) {
+            map();
+        }
+
+        memcpy(_ptr_mapped_data, &data[0], sizeof(data[0]) * data.size());
+
+        if (is_memory_mapped == MapStatus::UNMAPPED) {
+            unmap();
+        }
     }
 }
 

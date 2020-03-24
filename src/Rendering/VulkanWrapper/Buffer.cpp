@@ -23,12 +23,10 @@ namespace pbrlib
         _usage                  (usage),
         _queue_family_indicies  (1)
     {
-        _queue_family_indicies.push_back(queue_family_index);
+        _queue_family_indicies[0] = queue_family_index;
         
         VkBufferCreateInfo buffer_info {
             .sType                  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .pNext                  = nullptr,
-            .flags                  = 0,
             .size                   = size,
             .usage                  = usage,
             .sharingMode            = VK_SHARING_MODE_EXCLUSIVE,

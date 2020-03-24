@@ -85,7 +85,7 @@ namespace pbrlib
 
         void setTitle(const string_view title);
 
-        static bool showCursor  (bool e)      noexcept;    
+        static bool showCursor(bool e)      noexcept;    
         static void captureMouse(bool e)    noexcept;
 
         static void getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions);

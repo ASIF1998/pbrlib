@@ -540,8 +540,8 @@ namespace pbrlib
          * @brief Метод добавляющий подключение.
          * @details
          *      Получение окончательного цвета:
-         *          color_blend_op(src_color_blend_factor * RGBsrc, dst_color_blend_factor * RGBdst) - получение исходного цвета;
-         *          alpha_blend_op(src_alpha_blend_factor * Asrc, dst_alpha_blend_factor * Adst) - получение значения альфа канала. 
+         *          color_blend_op(src_color_blend_factor * RGBsrc, dst_color_blend_factor * RGBdst)    - получение исходного цвета;
+         *          alpha_blend_op(src_alpha_blend_factor * Asrc, dst_alpha_blend_factor * Adst)        - получение значения альфа канала. 
          * 
          * @param blend_enable              определяюет необходимость включения смешивания для цветового подключения.
          * @param src_color_blend_factor    задаёт множитель на который умножается цветовые каналы источника.
@@ -563,9 +563,15 @@ namespace pbrlib
             VkColorComponentFlags   color_write_mask
         );
 
+        inline void logicOpEnable(VkBool32 is_enable) noexcept;
+
+        inline void setLogicOp(VkLogicOp logic_op) noexcept;
+
         inline const VkPipelineColorBlendAttachmentState*   getAttachments()        const noexcept;
         inline size_t                                       numAttachments()        const noexcept;
         inline size_t                                       capacityAttachments()   const noexcept;
+        inline bool                                         logicOpEnable()         const noexcept;
+        inline VkLogicOp                                    getLogicOp()            const noexcept;
 
     private:
         VkPipelineColorBlendAttachmentState*    _ptr_attachments;
@@ -641,27 +647,10 @@ namespace pbrlib
         */
         inline GraphicsPipeline(
             const GraphicsPipelineState&            graphics_pipeline_state,
-            const vector<shared_ptr<ShaderModule>>& shaders,
+            const vector<ShaderModule>&             shaders,
             const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
             const shared_ptr<RenderPass>&           ptr_render_pass,
             uint32_t                                subpass_index
-        );
-
-        /**
-         * @brief Конструктор.
-         * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
-         * @param shaders                   шейдеры.
-         * @param ptr_pipeline_layout       указатель на PipelineLayout.
-         * @param ptr_render_pass           указатель на проход рендера.
-         * @param subpass_index             индекс подпрохода.
-        */
-        inline GraphicsPipeline(
-            const GraphicsPipelineState&        graphics_pipeline_state,
-            vector<shared_ptr<ShaderModule>>&&  shaders,
-            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-            const shared_ptr<RenderPass>&       ptr_render_pass,
-            uint32_t                            subpass_index
         );
 
         /**
@@ -675,27 +664,10 @@ namespace pbrlib
         */
         inline GraphicsPipeline(
             GraphicsPipelineState&&                 graphics_pipeline_state,
-            const vector<shared_ptr<ShaderModule>>& shaders,
+            const vector<ShaderModule>&             shaders,
             const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
             const shared_ptr<RenderPass>&           ptr_render_pass,
             uint32_t                                subpass_index
-        );
-
-        /**
-         * @brief Конструктор.
-         * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
-         * @param shaders                   шейдеры.
-         * @param ptr_pipeline_layout       указатель на PipelineLayout.
-         * @param ptr_render_pass           указатель на проход рендера.
-         * @param subpass_index             индекс подпрохода.
-        */
-        inline GraphicsPipeline(
-            GraphicsPipelineState&&             graphics_pipeline_state,
-            vector<shared_ptr<ShaderModule>>&&  shaders,
-            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-            const shared_ptr<RenderPass>&       ptr_render_pass,
-            uint32_t                            subpass_index
         );
 
         inline  GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
@@ -713,7 +685,6 @@ namespace pbrlib
         inline const GraphicsPipelineState&             getGraphicsPipelineState()  const noexcept;
         inline VkPipeline                               getPipelineHandle()         const noexcept;
         inline VkPipelineCache                          getPipelineCacheHandle()    const noexcept;
-        inline const vector<shared_ptr<ShaderModule>>&  getShaderModules()          const noexcept;
 
         /**
          * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
@@ -726,27 +697,10 @@ namespace pbrlib
         */
         inline static shared_ptr<GraphicsPipeline> make(
             const GraphicsPipelineState&            graphics_pipeline_state,
-            const vector<shared_ptr<ShaderModule>>& shaders,
+            const vector<ShaderModule>&             shaders,
             const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
             const shared_ptr<RenderPass>&           ptr_render_pass,
             uint32_t                                subpass_index
-        );
-
-        /**
-         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
-         * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
-         * @param shaders                   шейдеры.
-         * @param ptr_pipeline_layout       указатель на PipelineLayout.
-         * @param ptr_render_pass           указатель на проход рендера.
-         * @param subpass_index             индекс подпрохода.
-        */
-        inline static shared_ptr<GraphicsPipeline> make(
-            const GraphicsPipelineState&        graphics_pipeline_state,
-            vector<shared_ptr<ShaderModule>>&&  shaders,
-            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-            const shared_ptr<RenderPass>&       ptr_render_pass,
-            uint32_t                            subpass_index
         );
 
         /**
@@ -760,31 +714,14 @@ namespace pbrlib
         */
         inline static shared_ptr<GraphicsPipeline> make(
             GraphicsPipelineState&&                 graphics_pipeline_state,
-            const vector<shared_ptr<ShaderModule>>& shaders,
+            const vector<ShaderModule>&             shaders,
             const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
             const shared_ptr<RenderPass>&           ptr_render_pass,
             uint32_t                                subpass_index
         );
 
-        /**
-         * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
-         * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
-         * @param shaders                   шейдеры.
-         * @param ptr_pipeline_layout       указатель на PipelineLayout.
-         * @param ptr_render_pass           указатель на проход рендера.
-         * @param subpass_index             индекс подпрохода.
-        */
-        inline static shared_ptr<GraphicsPipeline> make(
-            GraphicsPipelineState&&             graphics_pipeline_state,
-            vector<shared_ptr<ShaderModule>>&&  shaders,
-            const shared_ptr<PipelineLayout>&   ptr_pipeline_layout,
-            const shared_ptr<RenderPass>&       ptr_render_pass,
-            uint32_t                            subpass_index
-        );
-
     private:
-        void _create();
+        void _create(const vector<ShaderModule>& shaders);
 
     private:
         uint32_t                            _subpass_index;
@@ -793,7 +730,6 @@ namespace pbrlib
         GraphicsPipelineState               _state;
         VkPipeline                          _pipeline_handle;
         VkPipelineCache                     _pipeline_cache_handle;
-        vector<shared_ptr<ShaderModule>>    _shaders;
     };
 }
 

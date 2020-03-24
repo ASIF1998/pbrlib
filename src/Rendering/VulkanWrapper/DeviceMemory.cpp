@@ -18,7 +18,6 @@ namespace pbrlib
     {
         VkMemoryAllocateInfo alloc_info {
             .sType              = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-            .pNext              = nullptr,
             .allocationSize     = _memory_size,
             .memoryTypeIndex    = memory_type_index
         };
@@ -42,7 +41,7 @@ namespace pbrlib
                 0, 
                 _memory_size, 
                 0, 
-                reinterpret_cast<void**>( &_ptr_mapped_data)
+                reinterpret_cast<void**>(&_ptr_mapped_data)
             ) == VK_SUCCESS);
 
             assert(_ptr_mapped_data);
