@@ -150,10 +150,10 @@ namespace pbrlib
     }
 
     inline ShaderModule::ShaderModule(ShaderModule&& shader_module) :
-        _ptr_device         (shader_module._ptr_device),
+        _ptr_device         (move(shader_module._ptr_device)),
         _shader_type        (shader_module._shader_type),
         _shader_handle      (VK_NULL_HANDLE),
-        _specialization_info(move(shader_module._specialization_info))
+        _specialization_info(shader_module._specialization_info)
     {
         swap(_shader_handle, shader_module._shader_handle);
     }

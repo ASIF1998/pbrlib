@@ -807,8 +807,8 @@ namespace pbrlib
     inline GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineState&            graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const PtrPipelineLayout&       ptr_pipeline_layout,
-        const PtrRenderPass&           ptr_render_pass,
+        const PtrPipelineLayout&                ptr_pipeline_layout,
+        const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),
@@ -824,8 +824,8 @@ namespace pbrlib
     inline GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineState&&                 graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const PtrPipelineLayout&       ptr_pipeline_layout,
-        const PtrRenderPass&           ptr_render_pass,
+        const PtrPipelineLayout&                ptr_pipeline_layout,
+        const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),

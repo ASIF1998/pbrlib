@@ -71,7 +71,7 @@ namespace pbrlib
         );
 
     private:
-        PtrInstance        _ptr_instance;
+        PtrInstance                 _ptr_instance;
         VkSurfaceKHR                _surface_handle;
         VkSurfaceCapabilitiesKHR    _surface_capabilities;
         VkSurfaceFormatKHR          _surface_format;

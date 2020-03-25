@@ -152,7 +152,7 @@ namespace pbrlib
 
     inline Swapchain:: Swapchain(Swapchain&& swapchain) :
         _swapchain_handle   (VK_NULL_HANDLE),
-        _ptr_surface        (swapchain._ptr_surface),
+        _ptr_surface        (move(swapchain._ptr_surface)),
         _images_view        (move(swapchain._images_view))
     {
         swap(_swapchain_handle, swapchain._swapchain_handle);

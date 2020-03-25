@@ -23,7 +23,11 @@ namespace pbrlib
         _samplers                       (move(descriptor_set_layout_bindings._samplers))
     {}
 
-    inline void DescriptorSetLayoutBindings::addBinding(uint32_t binding, VkDescriptorType descriptor_type, VkShaderStageFlags stage_flags)
+    inline void DescriptorSetLayoutBindings::addBinding(
+        uint32_t            binding, 
+        VkDescriptorType    descriptor_type, 
+        VkShaderStageFlags  stage_flags
+    )
     {
         _descriptor_set_layout_bindings.push_back({
             .binding            = binding,

@@ -342,7 +342,7 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline ImageView::ImageView(ImageView&& image_view) :
         _image_view_handle  (VK_NULL_HANDLE),
-        _ptr_image          (image_view._ptr_image),
+        _ptr_image          (move(image_view._ptr_image)),
         _format             (image_view._format),
         _subresource_range  (image_view._subresource_range),
         _type               (image_view._type)

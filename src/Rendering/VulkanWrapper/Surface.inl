@@ -22,7 +22,7 @@ namespace pbrlib
     }
 
     inline Surface::Surface(Surface&& surface) :
-        _ptr_instance           (surface._ptr_instance),
+        _ptr_instance           (move(surface._ptr_instance)),
         _surface_handle         (VK_NULL_HANDLE),
         _surface_capabilities   (surface._surface_capabilities),
         _surface_format         (surface._surface_format)

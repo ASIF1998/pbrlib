@@ -97,7 +97,7 @@ namespace pbrlib
     {}
 
     inline DeviceMemory::DeviceMemory(DeviceMemory&& device_memory) :
-        _ptr_device             (device_memory._ptr_device),
+        _ptr_device             (move(device_memory._ptr_device)),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (device_memory._memory_size),
         _ptr_mapped_data        (device_memory._ptr_mapped_data)

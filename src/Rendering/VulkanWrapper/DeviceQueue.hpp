@@ -90,7 +90,7 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline DeviceQueue::DeviceQueue(DeviceQueue&& device_queue) :
-        _ptr_device     (device_queue._ptr_device),
+        _ptr_device     (move(device_queue._ptr_device)),
         _queue_handle   (VK_NULL_HANDLE),
         _family_index   (device_queue._family_index),
         _index          (device_queue._index)
