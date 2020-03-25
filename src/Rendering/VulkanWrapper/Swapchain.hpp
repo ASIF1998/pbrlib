@@ -12,12 +12,17 @@
 #include "Image.hpp"
 #include "Surface.hpp"
 
-#include "DeviceQueue.hpp"
+//#include "DeviceQueue.hpp"
 
 #include <numeric>
 
 namespace pbrlib
 {
+    class Swapchain;
+    class DeviceQueue;
+
+    using PtrSwapchain = shared_ptr<Swapchain>;
+
     class Swapchain
     {
     public:
@@ -32,9 +37,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         inline Swapchain(
-            const shared_ptr<Device>&   ptr_device,
+            const PtrDevice&            ptr_device,
             const vector<uint32_t>&     queue_family_indices,
-            const shared_ptr<Surface>&  surface
+            const PtrSurface&           surface
         );
         
         /**
@@ -48,9 +53,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         inline Swapchain(
-            const shared_ptr<Device>&   ptr_device,
+            const PtrDevice&            ptr_device,
             uint32_t                    queue_family_index,
-            const shared_ptr<Surface>&  surface
+            const PtrSurface&           surface
         );
 
         inline Swapchain(Swapchain&& swapchain);
@@ -61,40 +66,42 @@ namespace pbrlib
         Swapchain& operator = (Swapchain&&)         = delete;
         Swapchain& operator = (const Swapchain&)    = delete;
 
-        inline void setPresent(DeviceQueue& queue, uint32_t image_index,  const VkSemaphore* semaphores, uint32_t semaphore_count);
-
         inline vector<ImageView>&           getImagesView()         noexcept;
         inline const vector<ImageView>&     getImagesView()         const noexcept;
         inline const VkSwapchainKHR&        getSwapchainHandle()    const noexcept;
-        inline shared_ptr<Surface>&         getSurface()            noexcept;
-        inline const shared_ptr<Surface>&   getSurface()            const noexcept;
-        inline shared_ptr<Device>&          getDevice()             noexcept;
-        inline const shared_ptr<Device>&    getDevice()             const noexcept;
+        inline PtrSurface&                  getSurface()            noexcept;
+        inline const PtrSurface&            getSurface()            const noexcept;
+        inline PtrDevice&                   getDevice()             noexcept;
+        inline const PtrDevice&             getDevice()             const noexcept;
 
-        inline void getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence = VK_NULL_HANDLE);
+        inline void getNextPresentImageIndex(
+            uint32_t&   image_index, 
+            VkSemaphore semaphore, 
+            VkFence     fence = VK_NULL_HANDLE
+        );
 
         /**
-         * @brief Статический метод создающий объект типа shared_ptr<Swapchain>.
+         * @brief Статический метод создающий объект типа PtrSwapchain.
          * 
          * @param ptr_device            указатель на устройство.
          * @param queue_family_indices  индексы семейства очередей.
          * @param surface               поверхность.
         */
-        inline static shared_ptr<Swapchain> make(
-            const shared_ptr<Device>&   ptr_device,
+        inline static PtrSwapchain make(
+            const PtrDevice&            ptr_device,
             vector<uint32_t>            queue_family_indices,
             const shared_ptr<Surface>&  surface
         );
 
         /**
-         * @brief Статический метод создающий объект типа shared_ptr<Swapchain>.
+         * @brief Статический метод создающий объект типа PtrSwapchain.
          * 
          * @param ptr_device            указатель на устройство.
          * @param queue_family_index    индекс семейства очередей.
          * @param surface               поверхность.
         */
-        inline static shared_ptr<Swapchain> make(
-            const shared_ptr<Device>&   ptr_device,
+        inline static PtrSwapchain make(
+            const PtrDevice&            ptr_device,
             uint32_t                    queue_family_index,
             const shared_ptr<Surface>&  surface
         );
@@ -108,22 +115,22 @@ namespace pbrlib
          * @param sharing_mode          сообщает о том как изображения будут использоваться в разных очередях.
         */
         void _create(
-            const shared_ptr<Device>&   ptr_device, 
-            const vector<uint32_t>&     queue_family_indices,
-            VkSharingMode               sharing_mode
+            const PtrDevice&        ptr_device, 
+            const vector<uint32_t>& queue_family_indices,
+            VkSharingMode           sharing_mode
         );
 
     private:
         VkSwapchainKHR      _swapchain_handle;
-        shared_ptr<Surface> _ptr_surface;
+        PtrSurface          _ptr_surface;
         vector<ImageView>   _images_view;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline Swapchain::Swapchain(
-        const shared_ptr<Device>&   ptr_device,
+        const PtrDevice&            ptr_device,
         const vector<uint32_t>&     queue_family_indices,
-        const shared_ptr<Surface> & surface
+        const PtrSurface&           surface
     ) :
         _swapchain_handle(VK_NULL_HANDLE),
         _ptr_surface(surface)
@@ -132,9 +139,9 @@ namespace pbrlib
     }
 
     inline Swapchain::Swapchain(
-        const shared_ptr<Device>&   ptr_device,
+        const PtrDevice&            ptr_device,
         uint32_t                    queue_family_index,
-        const shared_ptr<Surface> & surface
+        const PtrSurface& surface
     ) :
         _swapchain_handle   (VK_NULL_HANDLE),
         _ptr_surface        (surface)
@@ -165,22 +172,6 @@ namespace pbrlib
         }
     }
 
-    inline void Swapchain::setPresent(DeviceQueue& queue, uint32_t image_index,  const VkSemaphore* semaphores, uint32_t semaphore_count)
-    {
-        VkPresentInfoKHR present_info {
-            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .pNext              = nullptr,
-            .waitSemaphoreCount = semaphore_count,
-            .pWaitSemaphores    = semaphores,
-            .swapchainCount     = 1,
-            .pSwapchains        = &_swapchain_handle,
-            .pImageIndices      = &image_index,
-            .pResults           = nullptr
-        };
-
-        assert(vkQueuePresentKHR(queue.getQueueHandle(), &present_info) == VK_SUCCESS);
-    }
-
     inline vector<ImageView>& Swapchain::getImagesView() noexcept
     {
         return _images_view;
@@ -204,27 +195,27 @@ namespace pbrlib
         return _swapchain_handle;
     }
 
-    inline shared_ptr<Surface>& Swapchain::getSurface() noexcept
+    inline PtrSurface& Swapchain::getSurface() noexcept
     {
         return _ptr_surface;
     }
 
-    inline const shared_ptr<Surface>& Swapchain::getSurface() const noexcept
+    inline const PtrSurface& Swapchain::getSurface() const noexcept
     {
         return _ptr_surface;
     }
 
-    inline shared_ptr<Device>& Swapchain::getDevice() noexcept
+    inline PtrDevice& Swapchain::getDevice() noexcept
     {
         return _images_view[0].getImage()->getDevice();
     }
-    inline const shared_ptr<Device>& Swapchain::getDevice() const noexcept
+    inline const PtrDevice& Swapchain::getDevice() const noexcept
     {
         return _images_view[0].getImage()->getDevice();
     }
 
-    inline shared_ptr<Swapchain> Swapchain::make(
-        const shared_ptr<Device>&   ptr_device,
+    inline PtrSwapchain Swapchain::make(
+        const PtrDevice&   ptr_device,
         vector<uint32_t>            queue_family_indices,
         const shared_ptr<Surface>&  surface
     )
@@ -232,8 +223,8 @@ namespace pbrlib
         return make_shared<Swapchain>(ptr_device, queue_family_indices, surface);
     }
 
-    inline shared_ptr<Swapchain> Swapchain::make(
-        const shared_ptr<Device>&   ptr_device,
+    inline PtrSwapchain Swapchain::make(
+        const PtrDevice&   ptr_device,
         uint32_t                    queue_family_index,
         const shared_ptr<Surface>&  surface
     )

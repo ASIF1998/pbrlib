@@ -119,7 +119,7 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline ShaderModule::ShaderModule(
-        const shared_ptr<Device>&   ptr_device,
+        const PtrDevice&            ptr_device,
         VkShaderStageFlagBits       shader_type,
         const uint32_t*             ptr_shader_code,
         size_t                      shader_code_size,
@@ -165,12 +165,12 @@ namespace pbrlib
         }
     }
 
-    inline shared_ptr<Device>& ShaderModule::getDevice() noexcept
+    inline PtrDevice& ShaderModule::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& ShaderModule::getDevice() const noexcept
+    inline const PtrDevice& ShaderModule::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -195,8 +195,8 @@ namespace pbrlib
         return _specialization_info;
     }
 
-    inline shared_ptr<ShaderModule> ShaderModule::make(
-        const shared_ptr<Device>&   ptr_device,
+    inline PtrShaderModule ShaderModule::make(
+        const PtrDevice&            ptr_device,
         VkShaderStageFlagBits       shader_type,
         const uint32_t*             ptr_shader_code,
         size_t                      shader_code_size,

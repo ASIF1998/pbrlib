@@ -10,7 +10,7 @@
 
 namespace pbrlib
 {
-    DeviceMemory::DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index) :
+    DeviceMemory::DeviceMemory(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index) :
         _ptr_device             (ptr_device),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (size),

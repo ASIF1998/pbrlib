@@ -23,6 +23,9 @@ using namespace std;
 namespace pbrlib
 {
     class Swapchain;
+    class Surface;
+
+    using PtrSurface = shared_ptr<Surface>;
 
     class Surface
     {
@@ -36,7 +39,7 @@ namespace pbrlib
         */
         inline Surface(
             const Window&               window, 
-            const shared_ptr<Instance>& ptr_instance, 
+            const PtrInstance&          ptr_instance, 
             const PhysicalDevice&       physical_device
         );
 
@@ -49,16 +52,16 @@ namespace pbrlib
         Surface& operator = (const Surface&)    = delete;
 
         inline const VkSurfaceKHR&              getSurfaceHandle()          const noexcept;
-        inline shared_ptr<Instance>&            getInstance()               noexcept;
-        inline const shared_ptr<Instance>&      getInstance()               const noexcept;
+        inline PtrInstance&                     getInstance()               noexcept;
+        inline const PtrInstance&               getInstance()               const noexcept;
         inline const VkSurfaceCapabilitiesKHR&  getSurfaceCapabilities()    const noexcept;
         inline const VkSurfaceFormatKHR&        getSurfaceFormat()          const noexcept;
 
         inline void setFormat(const VkSurfaceFormatKHR& format) noexcept;
         
-        inline static shared_ptr<Surface> make(
+        inline static PtrSurface make(
             const Window&               window,
-            const shared_ptr<Instance>& ptr_instance,
+            const PtrInstance&          ptr_instance,
             const PhysicalDevice&       physical_device
         );
         
@@ -68,7 +71,7 @@ namespace pbrlib
         );
 
     private:
-        shared_ptr<Instance>        _ptr_instance;
+        PtrInstance        _ptr_instance;
         VkSurfaceKHR                _surface_handle;
         VkSurfaceCapabilitiesKHR    _surface_capabilities;
         VkSurfaceFormatKHR          _surface_format;

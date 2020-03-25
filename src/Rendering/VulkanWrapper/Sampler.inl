@@ -139,7 +139,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   inline Sampler::Sampler(const shared_ptr<Device>& ptr_device, const SamplerInfo& sampler_info) :
+   inline Sampler::Sampler(const PtrDevice& ptr_device, const SamplerInfo& sampler_info) :
         _ptr_device     (ptr_device),
         _sampler_info   (sampler_info),
         _sampler_handle (VK_NULL_HANDLE)
@@ -169,12 +169,12 @@ namespace pbrlib
         }
     }
 
-    inline shared_ptr<Device>& Sampler::getDevice() noexcept
+    inline PtrDevice& Sampler::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& Sampler::getDevice() const noexcept
+    inline const PtrDevice& Sampler::getDevice() const noexcept
     {
         return _ptr_device;
     }

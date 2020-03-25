@@ -13,7 +13,7 @@
 namespace pbrlib
 {
     DeviceQueue::DeviceQueue(
-        const shared_ptr<Device>&   ptr_device, 
+        const PtrDevice&            ptr_device, 
         uint32_t                    family_index, 
         uint32_t                    index
     ) :

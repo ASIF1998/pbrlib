@@ -10,7 +10,7 @@ namespace pbrlib
 {
     inline Surface::Surface(
         const Window&               window, 
-        const shared_ptr<Instance>& ptr_instance, 
+        const PtrInstance&          ptr_instance, 
         const PhysicalDevice&       physical_device
     ) :
         _ptr_instance   (ptr_instance),
@@ -39,7 +39,7 @@ namespace pbrlib
 
     inline shared_ptr<Surface> Surface::make(
         const Window&               window,
-        const shared_ptr<Instance>& ptr_instance,
+        const PtrInstance&          ptr_instance,
         const PhysicalDevice&       physical_device
     )
     {
@@ -51,12 +51,12 @@ namespace pbrlib
         return _surface_handle;
     }
 
-    inline shared_ptr<Instance>& Surface::getInstance() noexcept
+    inline PtrInstance& Surface::getInstance() noexcept
     {
         return _ptr_instance;
     }
 
-    inline const shared_ptr<Instance>& Surface::getInstance() const noexcept
+    inline const PtrInstance& Surface::getInstance() const noexcept
     {
         return _ptr_instance;
     }

@@ -7,11 +7,12 @@
 //
 
 #include "Swapchain.hpp"
+#include "DeviceQueue.hpp"
 
 namespace pbrlib
 {
     void Swapchain::_create(
-        const shared_ptr<Device>&   ptr_device,
+        const PtrDevice&            ptr_device,
         const vector<uint32_t>&     queue_family_indices,
         VkSharingMode               sharing_mode
     )
@@ -75,7 +76,7 @@ namespace pbrlib
         assert(num_images);
 
         vector<VkImage>             vk_images (num_images);
-        vector<shared_ptr<Image>>   ptr_images;
+        vector<PtrImage>   ptr_images;
 
         vkGetSwapchainImagesKHR(ptr_device->getDeviceHandle(), _swapchain_handle, &num_images, vk_images.data());
         

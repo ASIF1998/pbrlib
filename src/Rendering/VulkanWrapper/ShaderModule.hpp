@@ -13,6 +13,10 @@
 
 namespace pbrlib
 {
+    class ShaderModule;
+
+    using PtrShaderModule = shared_ptr<ShaderModule>;
+
     class SpecializationInfo :
         private VkSpecializationInfo
     {
@@ -52,7 +56,7 @@ namespace pbrlib
     {
     public:
         inline ShaderModule(
-            const shared_ptr<Device>&   ptr_device,
+            const PtrDevice&            ptr_device,
             VkShaderStageFlagBits       shader_type,
             const uint32_t*             ptr_shader_code,
             size_t                      shader_code_size,
@@ -68,15 +72,15 @@ namespace pbrlib
         ShaderModule& operator = (ShaderModule&&)       = delete;
         ShaderModule& operator = (const ShaderModule&)  = delete;
 
-        inline shared_ptr<Device>&          getDevice()             noexcept;
-        inline const shared_ptr<Device>&    getDevice()             const noexcept;
+        inline PtrDevice&                   getDevice()             noexcept;
+        inline const PtrDevice&             getDevice()             const noexcept;
         inline VkShaderStageFlagBits        getShaderType()         const noexcept;
         inline const VkShaderModule&        getShaderHandle()       const noexcept;
         inline SpecializationInfo&          getSpecializationInfo() noexcept;
         inline const SpecializationInfo&    getSpecializationInfo() const noexcept;
 
-        inline static shared_ptr<ShaderModule> make(
-            const shared_ptr<Device>&   ptr_device,
+        inline static PtrShaderModule make(
+            const PtrDevice&            ptr_device,
             VkShaderStageFlagBits       shader_type,
             const uint32_t*             ptr_shader_code,
             size_t                      shader_code_size,
@@ -85,7 +89,7 @@ namespace pbrlib
         );
 
     private:
-        shared_ptr<Device>      _ptr_device;
+        PtrDevice               _ptr_device;
         VkShaderStageFlagBits   _shader_type;
         SpecializationInfo      _specialization_info;
         VkShaderModule          _shader_handle;

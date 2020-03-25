@@ -14,16 +14,16 @@
 #include <vector>
 #include <set>
 
+#include <memory>
+
 using namespace std;
 
 namespace pbrlib
 {
-    struct PhysicalDevice;
+    struct  PhysicalDevice;
+    class   Device;
 
-    /**
-     * TODO: 
-     *      1) Добавить возможность создавать командный пулы.
-    */
+    using PtrDevice = shared_ptr<Device>;
 
     class Device
     {

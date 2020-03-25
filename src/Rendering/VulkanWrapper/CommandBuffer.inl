@@ -9,8 +9,8 @@
 namespace pbrlib
 {
     inline CommandBuffer::CommandBuffer(
-        const shared_ptr<CommandPool>&  ptr_command_pool, 
-        VkCommandBufferLevel            level
+        const PtrCommandPool&   ptr_command_pool, 
+        VkCommandBufferLevel    level
     ) :
         _ptr_command_pool       (ptr_command_pool),
         _command_buffer_handle  (VK_NULL_HANDLE)
@@ -309,12 +309,12 @@ namespace pbrlib
             0, nullptr
         );
     }
-    inline shared_ptr<Device>& CommandBuffer::getDevice() noexcept
+    inline PtrDevice& CommandBuffer::getDevice() noexcept
     {
         return _ptr_command_pool->getDevice();
     }
 
-    inline const shared_ptr<Device>& CommandBuffer::getDevice() const noexcept
+    inline const PtrDevice& CommandBuffer::getDevice() const noexcept
     {
         return _ptr_command_pool->getDevice();
     }
@@ -326,9 +326,9 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline PrimaryCommandBuffer::PrimaryCommandBuffer(
-        const shared_ptr<CommandPool>&      ptr_command_pool,
-        const shared_ptr<Framebuffer>&      ptr_framebuffer,
-        const shared_ptr<GraphicsPipeline>  ptr_pipeline
+        const PtrCommandPool&       ptr_command_pool,
+        const PtrFramebuffer&       ptr_framebuffer,
+        const PtrGraphicsPipeline&  ptr_pipeline
     ) :
         CommandBuffer       (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY),
         _ptr_framebuffer    (ptr_framebuffer),
@@ -394,18 +394,18 @@ namespace pbrlib
         vkCmdNextSubpass(_command_buffer_handle, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    inline const shared_ptr<Framebuffer>& PrimaryCommandBuffer::getFramebuffer() const noexcept
+    inline const PtrFramebuffer& PrimaryCommandBuffer::getFramebuffer() const noexcept
     {
         return _ptr_framebuffer;
     }
 
-    inline const shared_ptr<GraphicsPipeline>& PrimaryCommandBuffer::getPipeline() const noexcept
+    inline const PtrGraphicsPipeline& PrimaryCommandBuffer::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline SecondaryCommandBuffer::SecondaryCommandBuffer(const shared_ptr<CommandPool>& ptr_command_pool) :
+    inline SecondaryCommandBuffer::SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool) :
         CommandBuffer(ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_SECONDARY)
     {}
 

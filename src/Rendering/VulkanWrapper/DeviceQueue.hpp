@@ -10,6 +10,7 @@
 #define DeviceQueue_hpp
 
 #include "Surface.hpp"
+#include "CommandBuffer.hpp"
 
 #include <memory>
 
@@ -29,7 +30,7 @@ namespace pbrlib
          * @param family_index  индекс семейства очередей.
          * @param index         индекс очереди в семействе очередей.
         */
-        DeviceQueue(const shared_ptr<Device>& ptr_device, uint32_t family_index, uint32_t index);
+        DeviceQueue(const PtrDevice& ptr_device, uint32_t family_index, uint32_t index);
 
         inline DeviceQueue(DeviceQueue&& device_queue);
         DeviceQueue(const DeviceQueue&) = delete;
@@ -39,11 +40,35 @@ namespace pbrlib
         DeviceQueue& operator = (DeviceQueue&&)         = delete;
         DeviceQueue& operator = (const DeviceQueue&)    = delete;
 
-        inline shared_ptr<Device>&          getDevice()         noexcept;
-        inline const shared_ptr<Device>&    getDevice()         const noexcept; 
-        inline const VkQueue&               getQueueHandle()    const noexcept;
-        inline uint32_t                     getFamilyIndex()    const noexcept;
-        inline uint32_t                     getIndex()          const noexcept;
+        inline void submit(const CommandBuffer& command_buffer);
+
+        inline PtrDevice&           getDevice()         noexcept;
+        inline const PtrDevice&     getDevice()         const noexcept; 
+        inline const VkQueue&       getQueueHandle()    const noexcept;
+        inline uint32_t             getFamilyIndex()    const noexcept;
+        inline uint32_t             getIndex()          const noexcept;
+
+        /**
+         * @brief Метод позволяющий показать пользователю изображение.
+         * 
+         * @param ptr_swapchain указатель на список показа.
+         * @param image_index   индекс изображения в списке показа.
+        */
+        inline void setPresent(
+            const PtrSwapchain& ptr_swapchain,
+            uint32_t            image_index
+        );
+
+        /**
+         * @brief Метод позволяющий показать пользователю изображение.
+         * 
+         * @param swapchain     список показа.
+         * @param image_index   индекс изображения в списке показа.
+        */
+        inline void setPresent(
+            const Swapchain&    swapchain,
+            uint32_t            image_index
+        );
 
         /**
          * @brief Метод ожидающий пока все команды в очереди не будут выполнены.
@@ -57,10 +82,10 @@ namespace pbrlib
         );
 
     private:
-        shared_ptr<Device>  _ptr_device;
-        VkQueue             _queue_handle;
-        uint32_t            _family_index;
-        uint32_t            _index;
+        PtrDevice   _ptr_device;
+        VkQueue     _queue_handle;
+        uint32_t    _family_index;
+        uint32_t    _index;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,12 +105,28 @@ namespace pbrlib
         vkQueueWaitIdle(_queue_handle);
     }
 
-    inline shared_ptr<Device>& DeviceQueue::getDevice() noexcept
+   inline void DeviceQueue::submit(const CommandBuffer& command_buffer)
+   {
+       VkSubmitInfo submit_info {
+           .sType                  = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+           .commandBufferCount     = 1,
+           .pCommandBuffers        = &command_buffer.getCommandBufferHandle()
+       };
+
+       assert(vkQueueSubmit(
+           _queue_handle,
+           1,
+           &submit_info,
+           VK_NULL_HANDLE
+       ) == VK_SUCCESS);
+   }
+
+    inline PtrDevice& DeviceQueue::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& DeviceQueue::getDevice() const noexcept
+    inline const PtrDevice& DeviceQueue::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -103,6 +144,36 @@ namespace pbrlib
     inline uint32_t DeviceQueue::getIndex() const noexcept
     {
         return _index;
+    }
+
+    inline void DeviceQueue::setPresent(
+        const PtrSwapchain& ptr_swapchain,
+        uint32_t            image_index
+    )
+    {
+        VkPresentInfoKHR present_info {
+            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .swapchainCount     = 1,
+            .pSwapchains        = &ptr_swapchain->getSwapchainHandle(),
+            .pImageIndices      = &image_index,
+        };
+
+        assert(vkQueuePresentKHR(_queue_handle, &present_info) == VK_SUCCESS);
+    }
+
+    inline void DeviceQueue::setPresent(
+        const Swapchain&    swapchain,
+        uint32_t            image_index
+    )
+    {
+        VkPresentInfoKHR present_info {
+            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .swapchainCount     = 1,
+            .pSwapchains        = &swapchain.getSwapchainHandle(),
+            .pImageIndices      = &image_index,
+        };
+
+        assert(vkQueuePresentKHR(_queue_handle, &present_info) == VK_SUCCESS);
     }
 
     inline void DeviceQueue::waitIdle() const

@@ -236,7 +236,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, const RenderPassInfo& render_pass_info) :
+    inline RenderPass::RenderPass(const PtrDevice& ptr_device, const RenderPassInfo& render_pass_info) :
         _render_pass_info   (render_pass_info),
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
@@ -244,7 +244,7 @@ namespace pbrlib
         _create();
     }
 
-    inline RenderPass::RenderPass(const shared_ptr<Device>& ptr_device, RenderPassInfo&& render_pass_info) :
+    inline RenderPass::RenderPass(const PtrDevice& ptr_device, RenderPassInfo&& render_pass_info) :
         _render_pass_info   (move(render_pass_info)),
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
@@ -320,26 +320,26 @@ namespace pbrlib
         return _render_pass_handle;
     }
 
-    inline shared_ptr<Device>& RenderPass::getDevice() noexcept
+    inline PtrDevice& RenderPass::getDevice() noexcept
     {
         return _ptr_device;   
     }
 
-    inline const shared_ptr<Device>& RenderPass::getDevice() const noexcept
+    inline const PtrDevice& RenderPass::getDevice() const noexcept
     {
          return _ptr_device;
     }
 
-    inline shared_ptr<RenderPass> RenderPass::make(
-        const shared_ptr<Device>&   ptr_device,
+    inline PtrRenderPass RenderPass::make(
+        const PtrDevice&   ptr_device,
         const RenderPassInfo&       render_pass_info
     )
     {
         return make_shared<RenderPass>(ptr_device, render_pass_info);
     }
 
-    inline shared_ptr<RenderPass> RenderPass::make(
-        const shared_ptr<Device>&   ptr_device,
+    inline PtrRenderPass RenderPass::make(
+        const PtrDevice&   ptr_device,
         RenderPassInfo&&            render_pass_info
     )
     {

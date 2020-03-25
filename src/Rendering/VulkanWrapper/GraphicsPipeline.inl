@@ -150,7 +150,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MultisampleState::MultisampleState(
+    inline MultisampleState::MultisampleState(
         VkSampleCountFlagBits   num_samples,
         VkBool32                sample_shading_enable,
         float                   min_sample_shading,
@@ -807,8 +807,8 @@ namespace pbrlib
     inline GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineState&            graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&           ptr_render_pass,
+        const PtrPipelineLayout&       ptr_pipeline_layout,
+        const PtrRenderPass&           ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),
@@ -824,8 +824,8 @@ namespace pbrlib
     inline GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineState&&                 graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&           ptr_render_pass,
+        const PtrPipelineLayout&       ptr_pipeline_layout,
+        const PtrRenderPass&           ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),
@@ -863,7 +863,7 @@ namespace pbrlib
         }
     }
 
-    void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
+    inline void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -931,12 +931,12 @@ namespace pbrlib
         return _subpass_index;
     }
 
-    inline shared_ptr<PipelineLayout>& GraphicsPipeline::getPipelineLayout() noexcept
+    inline PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() noexcept
     {
         return _ptr_pipeline_layout;
     }
 
-    inline const shared_ptr<PipelineLayout>& GraphicsPipeline::getPipelineLayout() const noexcept
+    inline const PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() const noexcept
     {
         return _ptr_pipeline_layout;
     }
@@ -961,11 +961,11 @@ namespace pbrlib
         return _pipeline_cache_handle;
     }
 
-    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
+    inline PtrGraphicsPipeline GraphicsPipeline::make(
         const GraphicsPipelineState&            graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&           ptr_render_pass,
+        const PtrPipelineLayout&       ptr_pipeline_layout,
+        const PtrRenderPass&           ptr_render_pass,
         uint32_t                                subpass_index
     )
     {
@@ -978,11 +978,11 @@ namespace pbrlib
         );
     }
 
-    inline shared_ptr<GraphicsPipeline> GraphicsPipeline::make(
+    inline PtrGraphicsPipeline GraphicsPipeline::make(
         GraphicsPipelineState&&                 graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
-        const shared_ptr<PipelineLayout>&       ptr_pipeline_layout,
-        const shared_ptr<RenderPass>&           ptr_render_pass,
+        const PtrPipelineLayout&       ptr_pipeline_layout,
+        const PtrRenderPass&           ptr_render_pass,
         uint32_t                                subpass_index
     )
     {

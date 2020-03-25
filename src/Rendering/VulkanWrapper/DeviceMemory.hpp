@@ -33,7 +33,7 @@ namespace pbrlib
          * 
          * @param ptr_device указатель на устройство.
         */
-        inline DeviceMemory(const shared_ptr<Device>& ptr_device) noexcept;
+        inline DeviceMemory(const PtrDevice& ptr_device) noexcept;
 
         /**
          * @brief Конструктор.
@@ -42,7 +42,7 @@ namespace pbrlib
          * @param size              размер требуемой памяти.
          * @param memory_type_index индекс типа памяти.
         */
-        DeviceMemory(const shared_ptr<Device>& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
+        DeviceMemory(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
 
         inline DeviceMemory(DeviceMemory&& device_memory);
         DeviceMemory(const DeviceMemory&) = delete;
@@ -73,23 +73,23 @@ namespace pbrlib
         template<typename Container>
         inline void setData(const Container& data);
 
-        inline MapStatus isMapped() const noexcept;
+        inline MapStatus getMapStatus() const noexcept;
 
-        inline uint8_t*                     getData()               noexcept;
-        inline const uint8_t*               getData()               const noexcept;
-        inline const VkDeviceMemory&        getDeviceMemoryHandle() const noexcept;
-        inline shared_ptr<Device>&          getDevice()             noexcept;
-        inline const shared_ptr<Device>&    getDevice()             const noexcept;
+        inline uint8_t*                 getData()               noexcept;
+        inline const uint8_t*           getData()               const noexcept;
+        inline const VkDeviceMemory&    getDeviceMemoryHandle() const noexcept;
+        inline PtrDevice&               getDevice()             noexcept;
+        inline const PtrDevice&         getDevice()             const noexcept;
 
     protected:
-        shared_ptr<Device>  _ptr_device;
-        VkDeviceMemory      _device_memory_handle;
-        VkDeviceSize        _memory_size;
-        uint8_t*            _ptr_mapped_data;
+        PtrDevice       _ptr_device;
+        VkDeviceMemory  _device_memory_handle;
+        VkDeviceSize    _memory_size;
+        uint8_t*        _ptr_mapped_data;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline DeviceMemory::DeviceMemory(const shared_ptr<Device>& ptr_device) noexcept :
+    inline DeviceMemory::DeviceMemory(const PtrDevice& ptr_device) noexcept :
         _ptr_device             (ptr_device),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (0),
@@ -110,7 +110,7 @@ namespace pbrlib
         vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);
     }
 
-    inline MapStatus DeviceMemory::isMapped() const noexcept
+    inline MapStatus DeviceMemory::getMapStatus() const noexcept
     {
         return (_ptr_mapped_data ? MapStatus::MAPPED : MapStatus::UNMAPPED);
     }
@@ -130,12 +130,12 @@ namespace pbrlib
         return _device_memory_handle;
     }
 
-    inline shared_ptr<Device>& DeviceMemory::getDevice() noexcept
+    inline PtrDevice& DeviceMemory::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& DeviceMemory::getDevice() const noexcept
+    inline const PtrDevice& DeviceMemory::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -143,7 +143,7 @@ namespace pbrlib
     template<typename Container>
     inline void DeviceMemory::setData(const Container& data)
     {
-        MapStatus is_memory_mapped = isMapped();
+        MapStatus is_memory_mapped = getMapStatus();
 
         if (is_memory_mapped == MapStatus::UNMAPPED) {
             map();

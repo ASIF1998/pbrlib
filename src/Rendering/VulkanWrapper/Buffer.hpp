@@ -31,11 +31,11 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
         */
         Buffer(
-            const shared_ptr<Device>&   ptr_device, 
-            VkDeviceSize                size, 
-            VkBufferUsageFlags          usage, 
-            uint32_t                    memory_type_index, 
-            uint32_t                    queue_family_index
+            const PtrDevice&    ptr_device, 
+            VkDeviceSize        size, 
+            VkBufferUsageFlags  usage, 
+            uint32_t            memory_type_index, 
+            uint32_t            queue_family_index
         );
 
         /**
@@ -48,11 +48,11 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
         */
         Buffer(
-            const shared_ptr<Device>&   ptr_device, 
-            VkDeviceSize                size, 
-            VkBufferUsageFlags          usage, 
-            uint32_t                    memory_type_index, 
-            vector<uint32_t>            queue_family_indices
+            const PtrDevice&    ptr_device, 
+            VkDeviceSize        size, 
+            VkBufferUsageFlags  usage, 
+            uint32_t            memory_type_index, 
+            vector<uint32_t>    queue_family_indices
         );
 
         inline Buffer(Buffer&& buffer);

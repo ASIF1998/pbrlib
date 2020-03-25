@@ -147,7 +147,7 @@ namespace pbrlib
          * @param sampler_info  информация о создаваемой выборке.
         */
         inline Sampler(
-            const shared_ptr<Device>&   ptr_device,
+            const PtrDevice&            ptr_device,
             const SamplerInfo&          sampler_info
         );
 
@@ -159,16 +159,16 @@ namespace pbrlib
         Sampler& operator = (Sampler&&)         = delete;
         Sampler& operator = (const Sampler&)    = delete;
 
-        inline shared_ptr<Device>&          getDevice()         noexcept;
-        inline const shared_ptr<Device>&    getDevice()         const noexcept;
-        inline SamplerInfo&                 getSamplerInfo()    noexcept;
-        inline const SamplerInfo&           getSamplerInfo()    const noexcept;
-        inline const VkSampler&             getSamplerHandle()  const noexcept;
+        inline PtrDevice&           getDevice()         noexcept;
+        inline const PtrDevice&     getDevice()         const noexcept;
+        inline SamplerInfo&         getSamplerInfo()    noexcept;
+        inline const SamplerInfo&   getSamplerInfo()    const noexcept;
+        inline const VkSampler&     getSamplerHandle()  const noexcept;
         
     private:
-        shared_ptr<Device>  _ptr_device;
-        SamplerInfo         _sampler_info;
-        VkSampler           _sampler_handle;
+        PtrDevice   _ptr_device;
+        SamplerInfo _sampler_info;
+        VkSampler   _sampler_handle;
     };
 }
 

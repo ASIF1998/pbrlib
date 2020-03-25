@@ -13,15 +13,14 @@
 
 #include "Device.hpp"
 
-/**
- * TODO: Добавить функцию создающую командный буфер.
-*/
-
 using namespace std;
 
 namespace pbrlib
 {
     class Device;
+    class CommandPool;
+
+    using PtrCommandPool = shared_ptr<CommandPool>;
 
     class CommandPool
     {
@@ -32,7 +31,7 @@ namespace pbrlib
          * @param ptr_device            указатель на устройство. 
          * @param queue_family_index    индекс семейства очередей.
         */
-        CommandPool(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index);
+        CommandPool(const PtrDevice& ptr_device, uint32_t queue_family_index);
 
         inline CommandPool(CommandPool&& command_pool);
         CommandPool(const CommandPool&) = delete;
@@ -42,20 +41,20 @@ namespace pbrlib
         CommandPool& operator = (CommandPool&&)         = delete;
         CommandPool& operator = (const CommandPool&)    = delete;
 
-        inline shared_ptr<Device>&          getDevice()             noexcept;
-        inline const shared_ptr<Device>&    getDevice()             const noexcept;
-        inline uint32_t                     getFamilyIndex()        const noexcept;
-        inline const VkCommandPool&         getCommandPoolHandle()  const noexcept;
+        inline PtrDevice&           getDevice()             noexcept;
+        inline const PtrDevice&     getDevice()             const noexcept;
+        inline uint32_t             getFamilyIndex()        const noexcept;
+        inline const VkCommandPool& getCommandPoolHandle()  const noexcept;
 
-        inline static shared_ptr<CommandPool> make(
-            const shared_ptr<Device>&   ptr_device, 
-            uint32_t                    queue_family_index
+        inline static PtrCommandPool make(
+            const PtrDevice&    ptr_device, 
+            uint32_t            queue_family_index
         );
 
     private:
-        shared_ptr<Device>  _ptr_device;
-        VkCommandPool       _command_pool_handle;
-        uint32_t            _queue_family_index;
+        PtrDevice       _ptr_device;
+        VkCommandPool   _command_pool_handle;
+        uint32_t        _queue_family_index;
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,12 +73,12 @@ namespace pbrlib
         }
     }
 
-    inline shared_ptr<Device>& CommandPool::getDevice() noexcept
+    inline PtrDevice& CommandPool::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& CommandPool::getDevice() const noexcept
+    inline const PtrDevice& CommandPool::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -94,9 +93,9 @@ namespace pbrlib
         return _command_pool_handle;
     }
 
-    inline shared_ptr<CommandPool> CommandPool::make(
-        const shared_ptr<Device>&   ptr_device, 
-        uint32_t                    queue_family_index
+    inline PtrCommandPool CommandPool::make(
+        const PtrDevice&    ptr_device, 
+        uint32_t            queue_family_index
     )
     {
         return make_shared<CommandPool>(ptr_device, queue_family_index);

@@ -35,8 +35,8 @@ namespace pbrlib
          * @param level             уровень командного буфера.
         */
         inline CommandBuffer(
-            const shared_ptr<CommandPool>&  ptr_command_pool, 
-            VkCommandBufferLevel            level
+            const PtrCommandPool&   ptr_command_pool, 
+            VkCommandBufferLevel    level
         );
 
         inline CommandBuffer(CommandBuffer&& command_buffer);
@@ -292,13 +292,13 @@ namespace pbrlib
             VkDeviceSize                    size
         ) const noexcept;
 
-        inline shared_ptr<Device>&          getDevice()                 noexcept;
-        inline const shared_ptr<Device>&    getDevice()                 const noexcept;
-        inline const VkCommandBuffer&       getCommandBufferHandle()    const noexcept;
+        inline PtrDevice&               getDevice()                 noexcept;
+        inline const PtrDevice&         getDevice()                 const noexcept;
+        inline const VkCommandBuffer&   getCommandBufferHandle()    const noexcept;
 
     protected:
-        shared_ptr<CommandPool> _ptr_command_pool;
-        VkCommandBuffer         _command_buffer_handle;
+        PtrCommandPool  _ptr_command_pool;
+        VkCommandBuffer _command_buffer_handle;
     };
 
     class PrimaryCommandBuffer :
@@ -306,9 +306,9 @@ namespace pbrlib
     {
     public:
         inline PrimaryCommandBuffer(
-            const shared_ptr<CommandPool>&      ptr_command_pool,
-            const shared_ptr<Framebuffer>&      ptr_framebuffer,
-            const shared_ptr<GraphicsPipeline>  ptr_pipeline
+            const PtrCommandPool&       ptr_command_pool,
+            const PtrFramebuffer&       ptr_framebuffer,
+            const PtrGraphicsPipeline&  ptr_pipeline
         );
 
         inline PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
@@ -324,19 +324,19 @@ namespace pbrlib
         inline void endRenderPass()                                             const noexcept;
         inline void nextSubpass()                                               const noexcept;
 
-        inline const shared_ptr<Framebuffer>&       getFramebuffer()    const noexcept;
-        inline const shared_ptr<GraphicsPipeline>&  getPipeline()       const noexcept;
+        inline const PtrFramebuffer&       getFramebuffer()    const noexcept;
+        inline const PtrGraphicsPipeline&  getPipeline()       const noexcept;
 
     private:
-        shared_ptr<Framebuffer>         _ptr_framebuffer;
-        shared_ptr<GraphicsPipeline>    _ptr_pipeline;
+        PtrFramebuffer         _ptr_framebuffer;
+        PtrGraphicsPipeline    _ptr_pipeline;
     };
 
     class SecondaryCommandBuffer :
         public CommandBuffer
     {
     public:
-        inline SecondaryCommandBuffer(const shared_ptr<CommandPool>& ptr_command_pool);
+        inline SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
 
         inline SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer);
         SecondaryCommandBuffer(const SecondaryCommandBuffer&) = delete;

@@ -10,7 +10,7 @@
 
 namespace pbrlib
 {
-    CommandPool::CommandPool(const shared_ptr<Device>& ptr_device, uint32_t queue_family_index) :
+    CommandPool::CommandPool(const PtrDevice& ptr_device, uint32_t queue_family_index) :
         _ptr_device         (ptr_device),
         _command_pool_handle(VK_NULL_HANDLE),
         _queue_family_index (queue_family_index)

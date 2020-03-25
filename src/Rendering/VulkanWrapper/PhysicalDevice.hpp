@@ -47,9 +47,9 @@ namespace pbrlib
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @return логическое устройство.
         */
-        inline shared_ptr<Device> makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const;
+        inline PtrDevice makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const;
         
-        inline shared_ptr<Device> makeDevice(
+        inline PtrDevice makeDevice(
             const vector<VkDeviceQueueCreateInfo>&  queue_info,
             const vector<const char*>&              layer_names,
             const vector<const char*>&              extension_names
@@ -94,12 +94,12 @@ namespace pbrlib
         return _search_layer_names.find(name) != _search_layer_names.end();
     }
 
-    inline shared_ptr<Device> PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const
+    inline PtrDevice PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const
     {
         return make_shared<Device>(*this, queue_info);
     }
 
-    inline shared_ptr<Device> PhysicalDevice::makeDevice(
+    inline PtrDevice PhysicalDevice::makeDevice(
         const vector<VkDeviceQueueCreateInfo>&  queue_info,
         const vector<const char*>&              layer_names,
         const vector<const char*>&              extension_names

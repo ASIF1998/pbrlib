@@ -23,7 +23,10 @@ using namespace std;
 
 namespace pbrlib
 {
-    struct PhysicalDevice;
+    struct  PhysicalDevice;
+    class   Instance;
+    
+    using PtrInstance = shared_ptr<Instance>;
 
     /**
      * @class VulkanInstanceExtensionSupported.
@@ -133,7 +136,7 @@ namespace pbrlib
          * @param app_name      название приложения.
          * @param app_version   номер приложения.
         */
-        inline static shared_ptr<Instance> make(const string_view app_name, uint32_t app_version);
+        inline static PtrInstance make(const string_view app_name, uint32_t app_version);
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
@@ -143,7 +146,7 @@ namespace pbrlib
          * @param layer_names       названия слоёв.
          * @param extension_names   названия расширений.
         */
-        inline static shared_ptr<Instance> make(
+        inline static PtrInstance make(
             const string_view           app_name,
             uint32_t                    app_version,
             const vector<const char*>&  layer_names,
@@ -234,12 +237,12 @@ namespace pbrlib
         return _supported_layers.check(name);
     }
 
-    inline shared_ptr<Instance> Instance::make(const string_view app_name, uint32_t app_version)
+    inline PtrInstance Instance::make(const string_view app_name, uint32_t app_version)
     {
         return make_shared<Instance>(app_name, app_version);
     }
 
-    inline shared_ptr<Instance> Instance::make(
+    inline PtrInstance Instance::make(
         const string_view           app_name,
         uint32_t                    app_version,
         const vector<const char*>&  layer_names,

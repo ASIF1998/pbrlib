@@ -9,7 +9,7 @@
 namespace pbrlib
 {
     inline DescriptorSetLayoutBindings::DescriptorSetLayoutBindings(
-        const shared_ptr<Device>&   ptr_device,
+        const PtrDevice&            ptr_device,
         size_t                      num_reserve_samplers
     ) :
         _ptr_device(ptr_device)
@@ -62,12 +62,12 @@ namespace pbrlib
         return _descriptor_set_layout_bindings;
     }
 
-    inline shared_ptr<Device>& DescriptorSetLayoutBindings::getDevice() noexcept
+    inline PtrDevice& DescriptorSetLayoutBindings::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& DescriptorSetLayoutBindings::getDevice() const noexcept
+    inline const PtrDevice& DescriptorSetLayoutBindings::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -123,12 +123,12 @@ namespace pbrlib
         assert(_descriptor_set_layout_handle != VK_NULL_HANDLE);
     }
 
-    inline shared_ptr<Device>& DescriptorSetLayout::getDevice() noexcept
+    inline PtrDevice& DescriptorSetLayout::getDevice() noexcept
     {
         return _descriptor_set_layout_bindings.getDevice();
     }
 
-    inline const shared_ptr<Device>& DescriptorSetLayout::getDevice() const noexcept
+    inline const PtrDevice& DescriptorSetLayout::getDevice() const noexcept
     {
         return _descriptor_set_layout_bindings.getDevice();
     }
@@ -150,7 +150,7 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                       ptr_device, 
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts
     ) :
         _ptr_device             (ptr_device),
@@ -162,7 +162,7 @@ namespace pbrlib
     }
         
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                   ptr_device, 
+        const PtrDevice&                            ptr_device,
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts
     ) :
         _ptr_device             (ptr_device),
@@ -174,7 +174,7 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                       ptr_device, 
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         const vector<VkPushConstantRange>&              push_constant_ranges
     ) :
@@ -187,7 +187,7 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                   ptr_device, 
+        const PtrDevice&                            ptr_device,
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         const vector<VkPushConstantRange>&          push_constant_ranges
     ) :
@@ -200,7 +200,7 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                       ptr_device, 
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         vector<VkPushConstantRange>&&                   push_constant_ranges
     ) :
@@ -213,7 +213,7 @@ namespace pbrlib
     }
     
     inline PipelineLayout::PipelineLayout(
-        const shared_ptr<Device>&                   ptr_device, 
+        const PtrDevice&                            ptr_device,
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         vector<VkPushConstantRange>&&               push_constant_ranges
     ) :
@@ -269,12 +269,12 @@ namespace pbrlib
         assert(_pipeline_layout_handle != VK_NULL_HANDLE);
     }
 
-    inline shared_ptr<Device>& PipelineLayout::getDevice() noexcept
+    inline PtrDevice& PipelineLayout::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const shared_ptr<Device>& PipelineLayout::getDevice() const noexcept
+    inline const PtrDevice& PipelineLayout::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -299,24 +299,24 @@ namespace pbrlib
         return _pipeline_layout_handle;
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                       ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts
     )
     {
         return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts);
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                   ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                            ptr_device,
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts
     )
     {
         return make_shared<PipelineLayout>(ptr_device, move(descriptor_set_layouts));
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                       ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         const vector<VkPushConstantRange>&              push_constant_ranges
     )
@@ -324,8 +324,8 @@ namespace pbrlib
         return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts, push_constant_ranges);
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                   ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                            ptr_device,
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         const vector<VkPushConstantRange>&          push_constant_ranges
     )
@@ -333,8 +333,8 @@ namespace pbrlib
         return make_shared<PipelineLayout>(ptr_device, move(descriptor_set_layouts), push_constant_ranges);
     }
 
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                       ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                                ptr_device,
         const vector<shared_ptr<DescriptorSetLayout>>&  descriptor_set_layouts,
         vector<VkPushConstantRange>&&                   push_constant_ranges
     )
@@ -342,8 +342,8 @@ namespace pbrlib
         return make_shared<PipelineLayout>(ptr_device, descriptor_set_layouts, move(push_constant_ranges));
     }
                             
-    inline shared_ptr<PipelineLayout> PipelineLayout::make(
-        const shared_ptr<Device>&                   ptr_device, 
+    inline PtrPipelineLayout PipelineLayout::make(
+        const PtrDevice&                            ptr_device, 
         vector<shared_ptr<DescriptorSetLayout>>&&   descriptor_set_layouts,
         vector<VkPushConstantRange>&&               push_constant_ranges
     )

@@ -39,10 +39,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device, 
-        uint32_t                   memory_type_index, 
-        const ImageInfo&           image_info, 
-        uint32_t                   queue_family_index
+        const PtrDevice&    ptr_device, 
+        uint32_t            memory_type_index, 
+        const ImageInfo&    image_info, 
+        uint32_t            queue_family_index
     ) :
         DeviceMemory(
             ptr_device, 
@@ -60,10 +60,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device,
-        uint32_t                   memory_type_index, 
-        const ImageInfo&           image_info, 
-        const vector<uint32_t>&    queue_family_indices
+        const PtrDevice&        ptr_device,
+        uint32_t                memory_type_index, 
+        const ImageInfo&        image_info, 
+        const vector<uint32_t>& queue_family_indices
     ) :
         DeviceMemory(
             ptr_device, 
@@ -81,10 +81,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device,
-        uint32_t                   memory_type_index, 
-        const ImageInfo&           image_info, 
-        vector<uint32_t>&&         queue_family_indices
+        const PtrDevice&    ptr_device,
+        uint32_t            memory_type_index, 
+        const ImageInfo&    image_info, 
+        vector<uint32_t>&&  queue_family_indices
     ) :
         DeviceMemory(
             ptr_device, 
@@ -102,10 +102,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device,
-        VkImage                    image,
-        ImageInfo                  image_info,
-        uint32_t                   queue_family_index
+        const PtrDevice&    ptr_device,
+        VkImage             image,
+        ImageInfo           image_info,
+        uint32_t            queue_family_index
     ) :
         DeviceMemory(
             ptr_device
@@ -118,10 +118,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device,
-        VkImage                    image,
-        ImageInfo                  image_info,
-        const vector<uint32_t>&    queue_family_indicies
+        const PtrDevice&        ptr_device,
+        VkImage                 image,
+        ImageInfo               image_info,
+        const vector<uint32_t>& queue_family_indicies
     ) :
         DeviceMemory(
             ptr_device
@@ -132,10 +132,10 @@ namespace pbrlib
     {}
 
     Image::Image(
-        const shared_ptr<Device>&  ptr_device,
-        VkImage                    image,
-        ImageInfo                  image_info,
-        vector<uint32_t>&&         queue_family_indicies
+        const PtrDevice&    ptr_device,
+        VkImage             image,
+        ImageInfo           image_info,
+        vector<uint32_t>&&  queue_family_indicies
     ) :
         DeviceMemory(
             ptr_device
@@ -176,7 +176,7 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ImageView::ImageView(
-        const shared_ptr<Image>&        ptr_image, 
+        const PtrImage&                 ptr_image, 
         VkFormat                        format, 
         const VkImageSubresourceRange&  subresource_range, 
         VkImageViewType                 type
