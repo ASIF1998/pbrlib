@@ -21,29 +21,30 @@ namespace pbrlib::math
     struct Vec4
     {
     public:
-        inline Vec4(Type xyzw = static_cast<Type>(0)) noexcept;
-        inline Vec4(Type x, Type y, Type z, Type w) noexcept;
+        inline constexpr Vec4();
+        inline constexpr Vec4(Type xyzw);
+        inline constexpr Vec4(Type x, Type y, Type z, Type w);
 
-        inline bool operator == (const Vec4& v) const noexcept;
-        inline bool operator != (const Vec4& v) const noexcept;
+        inline bool operator == (const Vec4& v) const;
+        inline bool operator != (const Vec4& v) const;
 
-        inline Vec4 operator + (const Vec4& v) const noexcept;
-        inline Vec4 operator - (const Vec4& v) const noexcept;
-        inline Vec4 operator * (Type s) const noexcept;
+        inline Vec4 operator + (const Vec4& v)  const;
+        inline Vec4 operator - (const Vec4& v)  const;
+        inline Vec4 operator * (Type s)         const;
 
-        inline Vec4& operator += (const Vec4& v) noexcept;
-        inline Vec4& operator -= (const Vec4& v) noexcept;
-        inline Vec4& operator *= (Type s) noexcept;
+        inline Vec4& operator += (const Vec4& v);
+        inline Vec4& operator -= (const Vec4& v);
+        inline Vec4& operator *= (Type s);
 
-        inline Type& operator [] (size_t i) noexcept;
-        inline Type operator [] (size_t i) const noexcept;
+        inline Type&    operator [] (size_t i) noexcept;
+        inline Type     operator [] (size_t i) const noexcept;
 
         /**
          * @brief Метод необходимый для вычисления квадрата длины вектора.
          * 
          * @return квадрат длины вектора.
         */
-        inline Type lengthSquared() const noexcept;
+        inline Type lengthSquared() const;
 
         /**
          * @brief Метод необходимый для вычисления длины вектора.
@@ -76,23 +77,24 @@ namespace pbrlib::math
     struct Vec4<float>
     {
     public:
-        inline Vec4(float xyzw = 0.0f) noexcept;
-        inline Vec4(__m128 xyzw) noexcept;
-        inline Vec4(float x, float y, float z, float w) noexcept;
+        inline constexpr    Vec4()                                      noexcept;
+        inline              Vec4(float xyzw)                            noexcept;
+        inline constexpr    Vec4(__m128 xyzw)                           noexcept;
+        inline constexpr    Vec4(float x, float y, float z, float w)    noexcept;
 
         inline bool operator == (const Vec4& v) const noexcept;
         inline bool operator != (const Vec4& v) const noexcept;
 
-        inline Vec4 operator + (const Vec4& v) const noexcept;
-        inline Vec4 operator - (const Vec4& v) const noexcept;
-        inline Vec4 operator * (float s) const noexcept;
+        inline Vec4 operator + (const Vec4& v)  const noexcept;
+        inline Vec4 operator - (const Vec4& v)  const noexcept;
+        inline Vec4 operator * (float s)        const noexcept;
 
-        inline Vec4& operator += (const Vec4& v) noexcept;
-        inline Vec4& operator -= (const Vec4& v) noexcept;
-        inline Vec4& operator *= (float s) noexcept;
+        inline Vec4& operator += (const Vec4& v)    noexcept;
+        inline Vec4& operator -= (const Vec4& v)    noexcept;
+        inline Vec4& operator *= (float s)          noexcept;
 
-        inline float& operator [] (size_t i) noexcept;
-        inline float operator [] (size_t i) const noexcept;
+        inline float&   operator [] (size_t i) noexcept;
+        inline float    operator [] (size_t i) const noexcept;
 
         /**
          * @brief Метод необходимый для вычисления квадрата длины вектора.
@@ -124,8 +126,8 @@ namespace pbrlib::math
                 float w;
             };
 
-            float xyzw[4];
-            __m128 xyzw_simd;
+            float   xyzw[4];
+            __m128  xyzw_simd;
         };
     };
 
@@ -152,7 +154,7 @@ namespace pbrlib::math
     Vec4<Type> normalize(const Vec4<Type>& v);
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Vec3<Type>& vec);
+    ostream& operator << (ostream& print, const Vec4<Type>& vec);
 }
 
 #include "vec4.inl"

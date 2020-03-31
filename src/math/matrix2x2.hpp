@@ -24,8 +24,13 @@ namespace pbrlib::math
     class Matrix2x2
     {
     public:
-        Matrix2x2(Type init_value = static_cast<Type>(0));
-        inline Matrix2x2(Type v11, Type v12, Type v21, Type v22);
+        /**
+         * @brief Конструктор по умолчанию создаёт единичную матрицу.
+        */
+        inline constexpr Matrix2x2();
+
+        inline constexpr Matrix2x2(Type init_value);
+        inline constexpr Matrix2x2(Type v11, Type v12, Type v21, Type v22);
 
         /**
          * @brief Констуктор.
@@ -41,22 +46,22 @@ namespace pbrlib::math
         inline bool operator == (const Matrix2x2& mat) const;
         inline bool operator != (const Matrix2x2& mat) const;
 
-        inline Matrix2x2 operator + (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator - (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator * (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator * (Type scal) const;
-        inline Vec2<Type> operator * (const Vec2<Type>& v) const;
+        inline Matrix2x2    operator + (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator - (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator * (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator * (Type scal)              const;
+        inline Vec2<Type>   operator * (const Vec2<Type>& v)    const;
 
-        Matrix2x2& operator += (const Matrix2x2& mat);
-        Matrix2x2& operator -= (const Matrix2x2& mat);
-        Matrix2x2& operator *= (const Matrix2x2& mat);
-        Matrix2x2& operator *= (Type scal);
+        inline Matrix2x2& operator += (const Matrix2x2& mat);
+        inline Matrix2x2& operator -= (const Matrix2x2& mat);
+        inline Matrix2x2& operator *= (const Matrix2x2& mat);
+        inline Matrix2x2& operator *= (Type scal);
 
-        inline Type* operator [] (size_t i);
-        inline const Type* operator [] (size_t i) const;
+        inline Type*        operator [] (size_t i);
+        inline const Type*  operator [] (size_t i) const;
 
-        Type& at(size_t i, size_t j);
-        Type at(size_t i, size_t j) const;
+        inline Type&    at(size_t i, size_t j);
+        inline Type     at(size_t i, size_t j) const;
 
         /**
          * @brief Метод необходимый для вычисления определителя.
@@ -68,12 +73,12 @@ namespace pbrlib::math
         /**
          * @brief Метод необходимый для транспонирования матрицы.
         */
-        void transpose();
+        inline void transpose();
 
         /**
          * @brief Метод находящий обратную матрицу.
         */
-        void inverse();
+        inline void inverse();
 
     private:
         union
@@ -87,9 +92,14 @@ namespace pbrlib::math
     class Matrix2x2<float>
     {
     public:
-        Matrix2x2(float init_value = 0.0f) noexcept;
-        inline Matrix2x2(float v11, float v12, float v21, float v22) noexcept;
-        inline Matrix2x2(const __m128& init_vec) noexcept;
+        /**
+         * @brief Конструктор по умолчанию создаёт единичную матрицу.
+        */
+        inline constexpr Matrix2x2();
+
+        inline constexpr Matrix2x2(float init_value)                            noexcept;
+        inline constexpr Matrix2x2(float v11, float v12, float v21, float v22)  noexcept;
+        inline constexpr Matrix2x2(const __m128& init_vec)                      noexcept;
 
         /**
          * @brief Констуктор.
@@ -105,22 +115,22 @@ namespace pbrlib::math
         inline bool operator == (const Matrix2x2& mat) const;
         inline bool operator != (const Matrix2x2& mat) const;
 
-        inline Matrix2x2 operator + (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator - (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator * (const Matrix2x2& mat) const;
-        inline Matrix2x2 operator * (float scal) const;
-        inline Vec2<float> operator * (const Vec2<float>& v) const;
+        inline Matrix2x2    operator + (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator - (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator * (const Matrix2x2& mat)   const;
+        inline Matrix2x2    operator * (float scal)             const;
+        inline Vec2<float>  operator * (const Vec2<float>& v)   const;
 
         inline Matrix2x2& operator += (const Matrix2x2& mat);
         inline Matrix2x2& operator -= (const Matrix2x2& mat);
         inline Matrix2x2& operator *= (const Matrix2x2& mat);
         inline Matrix2x2& operator *= (float scal);
 
-        inline float* operator [] (size_t i);
+        inline float*       operator [] (size_t i);
         inline const float* operator [] (size_t i) const;
 
-        inline float& at(size_t i, size_t j);
-        inline float at(size_t i, size_t j) const;
+        inline float&   at(size_t i, size_t j);
+        inline float    at(size_t i, size_t j) const;
 
         /**
          * @brief Метод необходимый для вычисления определителя.
@@ -132,19 +142,19 @@ namespace pbrlib::math
         /**
          * @brief Метод необходимый для транспонирования матрицы.
         */
-        void transpose();
+        inline void transpose();
 
         /**
          * @brief Метод находящий обратную матрицу.
         */
-        void inverse();
+        inline void inverse();
 
     private:
         union
         {
-            float _array2x2[2][2];
-            float _array4[4];
-            __m128 _m128_simd;
+            float   _array2x2[2][2];
+            float   _array4[4];
+            __m128  _m128_simd;
         };
     };
 
@@ -169,7 +179,7 @@ namespace pbrlib::math
     Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat);
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Matrix2x2<Type>& mat);
+    inline ostream& operator << (ostream& print, const Matrix2x2<Type>& mat);
 }
 
 #include "matrix2x2.inl"

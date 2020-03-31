@@ -8,52 +8,54 @@
 
 #include <memory>
 
+#include "vec4.hpp"
+
 namespace pbrlib::math
 {
     template<typename Type>
-    Matrix4x4<Type>::Matrix4x4(Type init_value) 
-    {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] = init_value;
+    inline constexpr Matrix4x4<Type>::Matrix4x4() :
+        _array16 {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
         }
-    }
+    {}
 
     template<typename Type>
-    Matrix4x4<Type>::Matrix4x4(const Type* ptr_data) 
+    inline constexpr Matrix4x4<Type>::Matrix4x4(Type init_value) :
+        _array16 {
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value
+        }
+    {}
+
+    template<typename Type>
+    inline constexpr Matrix4x4<Type>::Matrix4x4(
+        Type v11, Type v12, Type v13, Type v14,
+        Type v21, Type v22, Type v23, Type v24,
+        Type v31, Type v32, Type v33, Type v34, 
+        Type v41, Type v42, Type v43, Type v44
+    ) :
+        _array16 {
+            v11, v12, v13, v14,
+            v21, v22, v23, v24,
+            v31, v32, v33, v34,
+            v41, v42, v43, v44,
+        }
+    {}
+
+    template<typename Type>
+    inline Matrix4x4<Type>::Matrix4x4(const Type* ptr_data) 
     {
         assert(ptr_data);
         memcpy(_array16, ptr_data, sizeof(Type) * 16);
     }
 
     template<typename Type>
-    Matrix4x4<Type>::Matrix4x4(Type v11, Type v12, Type v13, Type v14,
-                               Type v21, Type v22, Type v23, Type v24,
-                               Type v31, Type v32, Type v33, Type v34,
-                               Type v41, Type v42, Type v43, Type v44) 
-    {
-        _array4x4[0][0] = v11;
-        _array4x4[0][1] = v12;
-        _array4x4[0][2] = v13;
-        _array4x4[0][3] = v14;
-
-        _array4x4[1][0] = v21;
-        _array4x4[1][1] = v22;
-        _array4x4[1][2] = v23;
-        _array4x4[1][3] = v24;
-
-        _array4x4[2][0] = v31;
-        _array4x4[2][1] = v32;
-        _array4x4[2][2] = v33;
-        _array4x4[2][3] = v34;
-
-        _array4x4[3][0] = v41;
-        _array4x4[3][1] = v42;
-        _array4x4[3][2] = v43;
-        _array4x4[3][3] = v44;
-    }
-
-    template<typename Type>
-    bool Matrix4x4<Type>::operator == (const Matrix4x4<Type>& mat) const
+    inline bool Matrix4x4<Type>::operator == (const Matrix4x4<Type>& mat) const
     {
         bool res = true;
 
@@ -65,7 +67,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    bool Matrix4x4<Type>::operator != (const Matrix4x4<Type>& mat) const
+    inline bool Matrix4x4<Type>::operator != (const Matrix4x4<Type>& mat) const
     {
         bool res = true;
 
@@ -77,7 +79,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type> Matrix4x4<Type>::operator + (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator + (const Matrix4x4<Type>& mat) const
     {
         Matrix4x4<Type> res;
 
@@ -89,7 +91,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type> Matrix4x4<Type>::operator - (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator - (const Matrix4x4<Type>& mat) const
     {
         Matrix4x4<Type> res;
 
@@ -101,9 +103,9 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type> Matrix4x4<Type>::operator * (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (const Matrix4x4<Type>& mat) const
     {
-        Matrix4x4<Type> res;
+        Matrix4x4<Type> res (static_cast<Type>(0));
 
         for (size_t i{0}; i < 4; i++) {
             for (size_t k{0}; k < 4; k++) {
@@ -118,7 +120,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type> Matrix4x4<Type>::operator * (Type scal) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (Type scal) const
     {
         Matrix4x4<Type> res;
 
@@ -130,7 +132,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const
+    inline Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const
     {
         Vec4<Type> res;
 
@@ -145,7 +147,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat)
     {
         for (size_t i{0}; i < 16; i++) {
             _array16[i] += mat._array16[i];
@@ -155,7 +157,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type>& Matrix4x4<Type>::operator -= (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator -= (const Matrix4x4<Type>& mat)
     {
         for (size_t i{0}; i < 16; i++) {
             _array16[i] -= mat._array16[i];
@@ -165,14 +167,14 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type>& Matrix4x4<Type>::operator *= (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (const Matrix4x4<Type>& mat)
     {
         *this = *this * mat;
         return *this;
     }
 
     template<typename Type>
-    Matrix4x4<Type>& Matrix4x4<Type>::operator *= (Type scal)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (Type scal)
     {
         for (size_t i{0}; i < 16; i++) {
             _array16[i] *= scal;
@@ -208,7 +210,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Type Matrix4x4<Type>::det() const
+    inline Type Matrix4x4<Type>::det() const
     {
         auto a33444334 = _array4x4[2][2] * _array4x4[3][3] - _array4x4[3][2] * _array4x4[2][3];
         auto a32443442 = _array4x4[2][1] * _array4x4[3][3] - _array4x4[2][3] * _array4x4[3][1];
@@ -217,27 +219,35 @@ namespace pbrlib::math
         auto a31433341 = _array4x4[2][0] * _array4x4[3][2] - _array4x4[2][2] * _array4x4[3][0];
         auto a31423241 = _array4x4[2][0] * _array4x4[3][1] - _array4x4[2][1] * _array4x4[3][0];
 
-        auto s1 = _array4x4[0][0] * (_array4x4[1][1] * a33444334 -
-                                     _array4x4[1][2] * a32443442 +
-                                     _array4x4[1][3] * a32433342);
+        auto s1 = _array4x4[0][0] * (
+            _array4x4[1][1] * a33444334 -
+            _array4x4[1][2] * a32443442 +
+            _array4x4[1][3] * a32433342
+        );
 
-        auto s2 = _array4x4[0][1] * (_array4x4[1][0] * a33444334 -
-                                     _array4x4[1][2] * a31443441 +
-                                     _array4x4[1][3] * a31433341);
+        auto s2 = _array4x4[0][1] * (
+            _array4x4[1][0] * a33444334 -
+            _array4x4[1][2] * a31443441 +
+            _array4x4[1][3] * a31433341
+        );
 
-        auto s3 = _array4x4[0][2] * (_array4x4[1][0] * a32443442 -
-                                     _array4x4[1][1] * a31443441 +
-                                     _array4x4[1][3] * a31423241);
+        auto s3 = _array4x4[0][2] * (
+            _array4x4[1][0] * a32443442 -
+            _array4x4[1][1] * a31443441 +
+            _array4x4[1][3] * a31423241
+        );
 
-        auto s4 = _array4x4[0][3] * (_array4x4[1][0] * a32433342 -
-                                     _array4x4[1][1] * a31433341 +
-                                     _array4x4[1][2] * a31423241);
+        auto s4 = _array4x4[0][3] * (
+            _array4x4[1][0] * a32433342 -
+            _array4x4[1][1] * a31433341 +
+            _array4x4[1][2] * a31423241
+        );
 
         return s1 - s2 + s3 - s4;
     }
 
     template<typename Type>
-    void Matrix4x4<Type>::transpose()
+    inline void Matrix4x4<Type>::transpose()
     {
         swap(_array4x4[0][1], _array4x4[1][0]);
         swap(_array4x4[0][2], _array4x4[2][0]);
@@ -248,7 +258,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    void Matrix4x4<Type>::inverse()
+    inline void Matrix4x4<Type>::inverse()
     {
         auto d = det();
 
@@ -274,78 +284,77 @@ namespace pbrlib::math
             auto a21332331 = tmat[1][0] * tmat[2][2] - tmat[1][2] * tmat[2][0];
             auto a21322231 = tmat[1][0] * tmat[2][1] - tmat[1][1] * tmat[2][0];
 
-            _array4x4[0][0] = tmat[1][1] * a33444334 - tmat[1][2] * a32443442 + tmat[1][3] * a32433342;
+            _array4x4[0][0] =   tmat[1][1] * a33444334 - tmat[1][2] * a32443442 + tmat[1][3] * a32433342;
             _array4x4[0][1] = -(tmat[1][0] * a33444334 - tmat[1][2] * a31443441 + tmat[1][3] * a31433341);
-            _array4x4[0][2] = tmat[1][0] * a32443442 - tmat[1][1] * a31443441 + tmat[1][3] * a31423241;
+            _array4x4[0][2] =   tmat[1][0] * a32443442 - tmat[1][1] * a31443441 + tmat[1][3] * a31423241;
             _array4x4[0][3] = -(tmat[1][0] * a32433342 - tmat[1][1] * a31433341 + tmat[1][2] * a31423241);
             
             _array4x4[1][0] = -(tmat[0][1] * a33444334 - tmat[0][2] * a32443442 + tmat[0][3] * a32433342);
-            _array4x4[1][1] =  tmat[0][0] * a33444334 - tmat[0][2] * a31443441 + tmat[0][3] * a31433341;
+            _array4x4[1][1] =   tmat[0][0] * a33444334 - tmat[0][2] * a31443441 + tmat[0][3] * a31433341;
             _array4x4[1][2] = -(tmat[0][0] * a32443442 - tmat[0][1] * a31443441 + tmat[0][3] * a31423241);
-            _array4x4[1][3] = tmat[0][0] * a32433342 - tmat[0][1] * a31433341 + tmat[0][2] * a31423241;
+            _array4x4[1][3] =   tmat[0][0] * a32433342 - tmat[0][1] * a31433341 + tmat[0][2] * a31423241;
             
-            _array4x4[2][0] = tmat[0][1] * a23442443 - tmat[0][2] * a22444224 + tmat[0][3] * a22432342;
+            _array4x4[2][0] =   tmat[0][1] * a23442443 - tmat[0][2] * a22444224 + tmat[0][3] * a22432342;
             _array4x4[2][1] = -(tmat[0][0] * a23442443 - tmat[0][2] * a21442441 + tmat[0][3] * a21432341);
-            _array4x4[2][2] = tmat[0][0] * a22444224 - tmat[0][1] * a21442441 + tmat[0][3] * a21422241;
+            _array4x4[2][2] =   tmat[0][0] * a22444224 - tmat[0][1] * a21442441 + tmat[0][3] * a21422241;
             _array4x4[2][3] = -(tmat[0][0] * a22432342 - tmat[0][1] * a21432341 + tmat[0][2] * a21422241);
             
             _array4x4[3][0] = -(tmat[0][1] * a23342433 - tmat[0][2] * a22342432 + tmat[0][3] * a22332332);
-            _array4x4[3][1] = tmat[0][0] * a23342433 - tmat[0][2] * a21342431 + tmat[0][3] * a21332331;
+            _array4x4[3][1] =   tmat[0][0] * a23342433 - tmat[0][2] * a21342431 + tmat[0][3] * a21332331;
             _array4x4[3][2] = -(tmat[0][0] * a22342432 - tmat[0][1] * a21342431 + tmat[0][3] * a21322231);
-            _array4x4[3][3] = tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
+            _array4x4[3][3] =   tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
             
             *this *= (static_cast<Type>(1) / d);
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Matrix4x4<float>::Matrix4x4(float init_value)
-    {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] = init_value;
+    inline constexpr Matrix4x4<float>::Matrix4x4() :
+        _array16 {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
         }
-    }
+    {}
 
-    Matrix4x4<float>::Matrix4x4(float v11, float v12, float v13, float v14,
-                                float v21, float v22, float v23, float v24,
-                                float v31, float v32, float v33, float v34,
-                                float v41, float v42, float v43, float v44)
-    {
-        _array4x4[0][0] = v11;
-        _array4x4[0][1] = v12;
-        _array4x4[0][2] = v13;
-        _array4x4[0][3] = v14;
+    inline constexpr Matrix4x4<float>::Matrix4x4(float init_value) :
+        _array16 {
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value,
+            init_value, init_value, init_value, init_value
+        }
+    {}
 
-        _array4x4[1][0] = v21;
-        _array4x4[1][1] = v22;
-        _array4x4[1][2] = v23;
-        _array4x4[1][3] = v24;
+    inline constexpr Matrix4x4<float>::Matrix4x4(
+        float v11, float v12, float v13, float v14,
+        float v21, float v22, float v23, float v24,
+        float v31, float v32, float v33, float v34,
+        float v41, float v42, float v43, float v44
+    ) :
+        _array16 {
+            v11, v12, v13, v14,
+            v21, v22, v23, v24,
+            v31, v32, v33, v34,
+            v41, v42, v43, v44,
+        }
+    {}
 
-        _array4x4[2][0] = v31;
-        _array4x4[2][1] = v32;
-        _array4x4[2][2] = v33;
-        _array4x4[2][3] = v34;
-
-        _array4x4[3][0] = v41;
-        _array4x4[3][1] = v42;
-        _array4x4[3][2] = v43;
-        _array4x4[3][3] = v44;
-    }
-
-    Matrix4x4<float>::Matrix4x4(const float* ptr_data)
+    inline Matrix4x4<float>::Matrix4x4(const float* ptr_data)
     {
         assert(ptr_data);
         _m256_simd[0] = _mm256_loadu_ps(ptr_data);
         _m256_simd[1] = _mm256_loadu_ps(ptr_data + 8);
     }
 
-    Matrix4x4<float>::Matrix4x4(const __m256& s1, const __m256& s2)
+    inline Matrix4x4<float>::Matrix4x4(const __m256& s1, const __m256& s2)
     {
         _m256_simd[0] = s1;
         _m256_simd[1] = s2;
     }
 
-    bool Matrix4x4<float>::operator == (const Matrix4x4<float>& mat) const
+    inline bool Matrix4x4<float>::operator == (const Matrix4x4<float>& mat) const
     {
         auto r1 = _mm_cmpeq_ps(_m128_simd[0], mat._m128_simd[0]);
         auto r2 = _mm_cmpeq_ps(_m128_simd[1], mat._m128_simd[1]);
@@ -354,12 +363,12 @@ namespace pbrlib::math
         return _mm_movemask_ps(_mm_and_ps(_mm_and_ps(r1, r2), _mm_and_ps(r3, r4))) == 15;
     }
 
-    bool Matrix4x4<float>::operator != (const Matrix4x4<float>& mat) const
+    inline bool Matrix4x4<float>::operator != (const Matrix4x4<float>& mat) const
     {
         return !(*this == mat);
     }
 
-    Matrix4x4<float> Matrix4x4<float>::operator + (const Matrix4x4<float>& mat) const
+    inline Matrix4x4<float> Matrix4x4<float>::operator + (const Matrix4x4<float>& mat) const
     {
         return {
             _mm256_add_ps(_m256_simd[0], mat._m256_simd[0]),
@@ -367,7 +376,7 @@ namespace pbrlib::math
         };
     }
 
-    Matrix4x4<float> Matrix4x4<float>::operator - (const Matrix4x4<float>& mat) const
+    inline Matrix4x4<float> Matrix4x4<float>::operator - (const Matrix4x4<float>& mat) const
     {
         return {
             _mm256_sub_ps(_m256_simd[0], mat._m256_simd[0]),
@@ -375,7 +384,7 @@ namespace pbrlib::math
         };
     }
 
-    Matrix4x4<float> Matrix4x4<float>::operator * (const Matrix4x4<float>& mat) const
+    inline Matrix4x4<float> Matrix4x4<float>::operator * (const Matrix4x4<float>& mat) const
     {
         auto a21 = _mm256_setr_m128(_m128_simd[1], _m128_simd[0]);
         auto a43 = _mm256_setr_m128(_m128_simd[3], _m128_simd[2]);
@@ -411,7 +420,7 @@ namespace pbrlib::math
         };
     }
 
-    Matrix4x4<float> Matrix4x4<float>::operator * (float scal) const
+    inline Matrix4x4<float> Matrix4x4<float>::operator * (float scal) const
     {
         auto vscal = _mm256_set1_ps(scal);
 
@@ -421,68 +430,79 @@ namespace pbrlib::math
         };
     }
 
-    Vec4<float> Matrix4x4<float>::operator * (const Vec4<float>& v) const
+    inline Vec4<float> Matrix4x4<float>::operator * (const Vec4<float>& v) const
     {
         Vec4<float> res;
 
         res.xyzw_simd = _mm_mul_ps(
-                            _mm_setr_ps(
-                                _array4x4[0][0], 
-                                _array4x4[1][0], 
-                                _array4x4[2][0], 
-                                _array4x4[3][0]), 
-                            _mm_set1_ps(v.xyzw_simd[0]));
+            _mm_setr_ps(
+                _array4x4[0][0], 
+                _array4x4[1][0], 
+                _array4x4[2][0], 
+                _array4x4[3][0]
+            ), 
+            _mm_set1_ps(v.xyzw_simd[0])
+        );
 
 
         res.xyzw_simd = _mm_add_ps(
-                            _mm_mul_ps(
-                                _mm_setr_ps(
-                                    _array4x4[0][1], 
-                                    _array4x4[1][1], 
-                                    _array4x4[2][1], 
-                                    _array4x4[3][1]), 
-                                _mm_set1_ps(v.xyzw_simd[1])), 
-                            res.xyzw_simd);
+            _mm_mul_ps(
+                _mm_setr_ps(
+                    _array4x4[0][1], 
+                    _array4x4[1][1], 
+                    _array4x4[2][1], 
+                    _array4x4[3][1]
+                ), 
+                _mm_set1_ps(v.xyzw_simd[1])
+            ), 
+            res.xyzw_simd
+        );
 
 
         res.xyzw_simd = _mm_add_ps(
-                            _mm_mul_ps(
-                                _mm_setr_ps(
-                                    _array4x4[0][2], 
-                                    _array4x4[1][2], 
-                                    _array4x4[2][2], 
-                                    _array4x4[3][2]), 
-                                _mm_set1_ps(v.xyzw_simd[2])), 
-                            res.xyzw_simd);
+            _mm_mul_ps(
+                _mm_setr_ps(
+                    _array4x4[0][2], 
+                    _array4x4[1][2], 
+                    _array4x4[2][2], 
+                    _array4x4[3][2]
+                ), 
+                _mm_set1_ps(v.xyzw_simd[2])
+            ), 
+            res.xyzw_simd
+        );
 
         res.xyzw_simd = _mm_add_ps(
-                            _mm_mul_ps(
-                                _mm_setr_ps(
-                                    _array4x4[0][3], 
-                                    _array4x4[1][3], 
-                                    _array4x4[2][3], 
-                                    _array4x4[3][3]), 
-                                _mm_set1_ps(v.xyzw_simd[3])), 
-                            res.xyzw_simd);
+            _mm_mul_ps(
+                _mm_setr_ps(
+                    _array4x4[0][3], 
+                    _array4x4[1][3], 
+                    _array4x4[2][3], 
+                    _array4x4[3][3]
+                ), 
+                _mm_set1_ps(v.xyzw_simd[3])
+            ), 
+            res.xyzw_simd
+        );
         
         return res; 
     }
 
-    Matrix4x4<float>& Matrix4x4<float>::operator += (const Matrix4x4<float>& mat) 
+    inline Matrix4x4<float>& Matrix4x4<float>::operator += (const Matrix4x4<float>& mat) 
     {
         _m256_simd[0] = _mm256_add_ps(_m256_simd[0], mat._m256_simd[0]);
         _m256_simd[1] = _mm256_add_ps(_m256_simd[1], mat._m256_simd[1]);
         return *this;
     }
 
-    Matrix4x4<float>& Matrix4x4<float>::operator -= (const Matrix4x4<float>& mat) 
+    inline Matrix4x4<float>& Matrix4x4<float>::operator -= (const Matrix4x4<float>& mat) 
     {
         _m256_simd[0] = _mm256_sub_ps(_m256_simd[0], mat._m256_simd[0]);
         _m256_simd[1] = _mm256_sub_ps(_m256_simd[1], mat._m256_simd[1]);
         return *this;
     }
 
-    Matrix4x4<float>& Matrix4x4<float>::operator *= (const Matrix4x4<float>& mat) 
+    inline Matrix4x4<float>& Matrix4x4<float>::operator *= (const Matrix4x4<float>& mat) 
     {
         auto a21 = _mm256_setr_m128(_m128_simd[1], _m128_simd[0]);
         auto a43 = _mm256_setr_m128(_m128_simd[3], _m128_simd[2]);
@@ -518,7 +538,7 @@ namespace pbrlib::math
         return *this;
     }
 
-    Matrix4x4<float>& Matrix4x4<float>::operator *= (float scal)
+    inline Matrix4x4<float>& Matrix4x4<float>::operator *= (float scal)
     {
         auto vscal = _mm256_set1_ps(scal);
 
@@ -549,7 +569,7 @@ namespace pbrlib::math
         return _array4x4[i][j];
     }
 
-    float Matrix4x4<float>::det() const
+    inline float Matrix4x4<float>::det() const
     {
         float a33444334 = _array4x4[2][2] * _array4x4[3][3] - _array4x4[3][2] * _array4x4[2][3];
         float a32443442 = _array4x4[2][1] * _array4x4[3][3] - _array4x4[2][3] * _array4x4[3][1];
@@ -558,26 +578,34 @@ namespace pbrlib::math
         float a31433341 = _array4x4[2][0] * _array4x4[3][2] - _array4x4[2][2] * _array4x4[3][0];
         float a31423241 = _array4x4[2][0] * _array4x4[3][1] - _array4x4[2][1] * _array4x4[3][0];
 
-        float s1 = _array4x4[0][0] * (_array4x4[1][1] * a33444334 -
-                                      _array4x4[1][2] * a32443442 +
-                                      _array4x4[1][3] * a32433342);
+        float s1 = _array4x4[0][0] * (
+            _array4x4[1][1] * a33444334 -
+            _array4x4[1][2] * a32443442 +
+            _array4x4[1][3] * a32433342
+        );
 
-        float s2 = _array4x4[0][1] * (_array4x4[1][0] * a33444334 -
-                                      _array4x4[1][2] * a31443441 +
-                                      _array4x4[1][3] * a31433341);
+        float s2 = _array4x4[0][1] * (
+            _array4x4[1][0] * a33444334 -
+            _array4x4[1][2] * a31443441 +
+            _array4x4[1][3] * a31433341
+        );
 
-        float s3 = _array4x4[0][2] * (_array4x4[1][0] * a32443442 -
-                                      _array4x4[1][1] * a31443441 +
-                                      _array4x4[1][3] * a31423241);
+        float s3 = _array4x4[0][2] * (
+            _array4x4[1][0] * a32443442 -
+            _array4x4[1][1] * a31443441 +
+            _array4x4[1][3] * a31423241
+        );
 
-        float s4 = _array4x4[0][3] * (_array4x4[1][0] * a32433342 -
-                                      _array4x4[1][1] * a31433341 +
-                                      _array4x4[1][2] * a31423241);
+        float s4 = _array4x4[0][3] * (
+            _array4x4[1][0] * a32433342 -
+            _array4x4[1][1] * a31433341 +
+            _array4x4[1][2] * a31423241
+        );
 
         return s1 - s2 + s3 - s4;
     }
 
-    void Matrix4x4<float>::transpose()
+    inline void Matrix4x4<float>::transpose()
     {
         auto xmm0 = _mm_unpacklo_ps(_m128_simd[0], _m128_simd[1]);
         auto xmm1 = _mm_unpacklo_ps(_m128_simd[2], _m128_simd[3]);
@@ -590,7 +618,7 @@ namespace pbrlib::math
         _m128_simd[3] = _mm_movehl_ps(xmm3, xmm2);
     }
 
-    void Matrix4x4<float>::inverse()
+    inline void Matrix4x4<float>::inverse()
     {
         auto d = det();
 
@@ -677,7 +705,7 @@ namespace pbrlib::math
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<typename Type>
-    Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat)
     {
         return {
             mat[0][0], mat[1][0], mat[2][0], mat[3][0],
@@ -688,7 +716,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat)
     {
         Matrix4x4<Type> res (mat);
         res.inverse();
@@ -696,7 +724,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Matrix4x4<Type>& mat)
+    inline ostream& operator << (ostream& print, const Matrix4x4<Type>& mat)
     {
         for (size_t i{0}; i < 4; i++) {
             print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << endl;

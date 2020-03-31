@@ -22,10 +22,18 @@ namespace pbrlib::math
     class Matrix3x3
     {
     public:
-        Matrix3x3(Type init_value = static_cast<Type>(0));
-        Matrix3x3(Type v11, Type v12, Type v13,
-                  Type v21, Type v22, Type v23,
-                  Type v31, Type v32, Type v33);
+        /**
+         * @brief Конструктор по умолчанию создаёт единичную матрицу.
+        */
+        inline constexpr Matrix3x3();
+
+        inline constexpr Matrix3x3(Type init_value);
+
+        inline constexpr Matrix3x3(
+            Type v11, Type v12, Type v13,
+            Type v21, Type v22, Type v23,
+            Type v31, Type v32, Type v33
+        );
 
         /**
          * @brief Констуктор.
@@ -38,42 +46,42 @@ namespace pbrlib::math
         */
         inline Matrix3x3(const Type* ptr_data);
 
-        bool operator == (const Matrix3x3& mat) const;
-        bool operator != (const Matrix3x3& mat) const;
+        inline bool operator == (const Matrix3x3& mat) const;
+        inline bool operator != (const Matrix3x3& mat) const;
 
-        Matrix3x3 operator + (const Matrix3x3& mat) const;
-        Matrix3x3 operator - (const Matrix3x3& mat) const;
-        Matrix3x3 operator * (const Matrix3x3& mat) const;
-        Matrix3x3 operator * (Type scal) const;
-        Vec3<Type> operator * (const Vec3<Type>& v) const;
+        inline Matrix3x3    operator + (const Matrix3x3& mat)   const;
+        inline Matrix3x3    operator - (const Matrix3x3& mat)   const;
+        inline Matrix3x3    operator * (const Matrix3x3& mat)   const;
+        inline Matrix3x3    operator * (Type scal)              const;
+        inline Vec3<Type>   operator * (const Vec3<Type>& v)    const;
 
-        Matrix3x3& operator += (const Matrix3x3& mat);
-        Matrix3x3& operator -= (const Matrix3x3& mat);
-        Matrix3x3& operator *= (const Matrix3x3& mat);
-        Matrix3x3& operator *= (Type scal);
+        inline Matrix3x3& operator += (const Matrix3x3& mat);
+        inline Matrix3x3& operator -= (const Matrix3x3& mat);
+        inline Matrix3x3& operator *= (const Matrix3x3& mat);
+        inline Matrix3x3& operator *= (Type scal);
 
-        inline Type* operator [] (size_t i);
-        inline const Type* operator [] (size_t i) const;
+        inline Type*        operator [] (size_t i);
+        inline const Type*  operator [] (size_t i) const;
 
-        inline Type& at(size_t i, size_t j);
-        inline Type at(size_t i, size_t j) const;
+        inline Type&    at(size_t i, size_t j);
+        inline Type     at(size_t i, size_t j) const;
 
         /**
          * @brief Метод необходимый для вычисления определителя.
          * 
          * @return определитель матрицы.
         */
-        Type det() const;
+        inline Type det() const;
 
         /**
          * @brief Метод необходимый для транспонирования матрицы.
         */
-        void transpose();
+        inline void transpose();
 
         /**
          * @brief Метод находящий обратную матрицу.
         */
-        void inverse();
+        inline void inverse();
 
     private:
         union
@@ -91,7 +99,7 @@ namespace pbrlib::math
      * @return транспонированная матрица mat.
     */
     template<typename Type>
-    Matrix3x3<Type> transpose(const Matrix3x3<Type>& mat);
+    inline Matrix3x3<Type> transpose(const Matrix3x3<Type>& mat);
 
     /**
      * @brief Функция необходимая для вычисления обратной матрицы.
@@ -101,10 +109,10 @@ namespace pbrlib::math
      * @return обратная матрица mat.
     */
     template<typename Type>
-    Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat);
+    inline Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat);
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Matrix3x3<Type>& mat);
+    inline ostream& operator << (ostream& print, const Matrix3x3<Type>& mat);
 }
 
 #include "matrix3x3.inl"
