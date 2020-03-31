@@ -7,7 +7,6 @@
 //
 
 #include "Buffer.hpp"
-#include "Device.hpp"
 
 namespace pbrlib
 {
@@ -89,5 +88,26 @@ namespace pbrlib
             _device_memory_handle, 
             0
         ) == VK_SUCCESS);
+    }
+
+    Buffer::Buffer(Buffer&& buffer) :
+        DeviceMemory            (move(buffer)),
+        _buffer_handle          (VK_NULL_HANDLE),
+        _usage                  (buffer._usage),
+        _queue_family_indicies  (move(buffer._queue_family_indicies))
+    {
+        swap(_buffer_handle, buffer._buffer_handle);
+    }
+
+    Buffer::~Buffer()
+    {
+        if (_buffer_handle != VK_NULL_HANDLE) {
+            vkDestroyBuffer(_ptr_device->getDeviceHandle(), _buffer_handle, nullptr);
+        }
+    }
+
+    const VkBuffer& Buffer::getBufferHandle() const noexcept
+    {
+        return _buffer_handle;
     }
 }

@@ -7,6 +7,7 @@
 //
 
 #include "Instance.hpp"
+#include "PhysicalDevice.hpp"
 
 #include "../../core.hpp"
 
@@ -30,6 +31,11 @@ namespace pbrlib
         }
     }
 
+    bool VulkanInstanceExtensionSupported::check(const string& name) const
+    {
+        return _extension_supported.find(name) != _extension_supported.end();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     VulkanInstanceLayerSupported::VulkanInstanceLayerSupported()
     {
@@ -46,7 +52,50 @@ namespace pbrlib
         }
     }
 
+    bool VulkanInstanceLayerSupported::check(const string& name) const
+    {
+        return _layer_supported.find(name) != _layer_supported.end();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Instance::Instance(const string_view app_name, uint32_t app_version) :
+        _instance_handle(VK_NULL_HANDLE)
+    {
+        _create(app_name, app_version, 0, nullptr, 0, nullptr);
+    }
+
+    Instance::Instance(
+        const string_view           app_name, 
+        uint32_t                    app_version, 
+        const vector<const char*>&  layer_names, 
+        const vector<const char*>&  extension_names
+    ) :
+        _instance_handle(VK_NULL_HANDLE)
+    {
+        _create(
+            app_name,
+            app_version,
+            static_cast<uint32_t>(layer_names.size()),
+            layer_names.data(),
+            static_cast<uint32_t>(extension_names.size()),
+            extension_names.data()
+        );
+    }
+
+    Instance::Instance(Instance&& instance) :
+        _instance_handle        (VK_NULL_HANDLE),
+        _physical_device_handles(move(instance._physical_device_handles))
+    {
+        swap(_instance_handle, instance._instance_handle);
+    }
+
+    Instance::~Instance()
+    {
+        if (_instance_handle != VK_NULL_HANDLE) {
+            vkDestroyInstance(_instance_handle, nullptr);
+        }
+    }
+
     void Instance::_create(
         const string_view   app_name,
         uint32_t            app_version, 
@@ -94,6 +143,36 @@ namespace pbrlib
         for (size_t i{0}; i < physical_device_handles.size(); i++) {
             _physical_device_handles.push_back(physical_device_handles[i]);
         }
+    }
+
+    const VkInstance& Instance::getHandle() const
+    {
+        return _instance_handle;
+    }
+
+    bool Instance::isExtensionSupported(const string& name)
+    {
+        return _supported_extensions.check(name);
+    }
+
+    bool Instance::isLayerSupported(const string& name)
+    {
+        return _supported_layers.check(name);
+    }
+
+    PtrInstance Instance::make(const string_view app_name, uint32_t app_version)
+    {
+        return make_shared<Instance>(app_name, app_version);
+    }
+
+    PtrInstance Instance::make(
+        const string_view           app_name,
+        uint32_t                    app_version,
+        const vector<const char*>&  layer_names,
+        const vector<const char*>&  extension_names
+    )
+    {
+        return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
     }
 
     PhysicalDevice& Instance::getPhysicalDevice(int type)

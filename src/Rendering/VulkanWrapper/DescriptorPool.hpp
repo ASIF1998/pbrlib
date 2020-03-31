@@ -25,34 +25,45 @@ namespace pbrlib
 
     using PtrDescriptorPool = shared_ptr<DescriptorPool>;
 
-
     class DescriptorPool
     {
     public:
-        inline DescriptorPool(
+        DescriptorPool(
             const PtrDevice&                    ptr_device,
             const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
             uint32_t                            max_sets
         );
 
-        inline DescriptorPool(DescriptorPool&& descriptor_pool); 
+        DescriptorPool(
+            const PtrDevice&            ptr_device,
+            const VkDescriptorPoolSize& descriptor_pool_size,
+            uint32_t                    max_sets
+        );
+
+        DescriptorPool(DescriptorPool&& descriptor_pool); 
         DescriptorPool(const DescriptorPool&) = delete;
 
-        inline ~DescriptorPool();
+        ~DescriptorPool();
 
         DescriptorPool& operator = (const DescriptorPool&)  = delete;
         DescriptorPool& operator = (DescriptorPool&&)       = delete;
 
-        inline void reset(VkDescriptorPoolResetFlags reset_flags) const noexcept;
+        void reset(VkDescriptorPoolResetFlags reset_flags) const noexcept;
 
-        inline PtrDevice&               getDevice()                 noexcept;
-        inline const PtrDevice&         getDevice()                 const noexcept;
-        inline const VkDescriptorPool&  getDescriptorPoolHandle()   const noexcept;
+        PtrDevice&               getDevice()                 noexcept;
+        const PtrDevice&         getDevice()                 const noexcept;
+        const VkDescriptorPool&  getDescriptorPoolHandle()   const noexcept;
 
-        inline static PtrDescriptorPool make(
+        static PtrDescriptorPool make(
             const PtrDevice&                    ptr_device,
             const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
             uint32_t                            max_sets
+        );
+
+        static PtrDescriptorPool make(
+            const PtrDevice&            ptr_device,
+            const VkDescriptorPoolSize& descriptor_pool_size,
+            uint32_t                    max_sets
         );
 
     private:
@@ -60,7 +71,5 @@ namespace pbrlib
         VkDescriptorPool                _descriptor_pool_handle;
     };
 }
-
-#include "DescriptorPool.inl"
 
 #endif /* DescriptorPool_hpp */

@@ -11,7 +11,6 @@
 
 #include "PipelineLayout.hpp"
 #include "RenderPass.hpp"
-#include "ShaderModule.hpp"
 
 #include <vector>
 #include <memory>
@@ -21,6 +20,7 @@ using namespace std;
 namespace pbrlib
 {
     class GraphicsPipeline;
+    class ShaderModule;
 
     using PtrGraphicsPipeline = shared_ptr<GraphicsPipeline>;
 
@@ -38,15 +38,15 @@ namespace pbrlib
          * @param num_vertex_biding_descriptions    число вершинных привязок используемых конвейером.
          * @param num_vertex_attribute_descriptions число атрибутов вершины.
         */
-        inline VertexInputState(
+        VertexInputState(
             size_t num_vertex_biding_descriptions       = 0,
             size_t num_vertex_attribute_descriptions    = 0
         );
 
-        inline VertexInputState(VertexInputState&& vertex_input_state);
-        inline VertexInputState(const VertexInputState& vertex_input_state);
+        VertexInputState(VertexInputState&& vertex_input_state);
+        VertexInputState(const VertexInputState& vertex_input_state);
 
-        inline ~VertexInputState();
+        ~VertexInputState();
 
         VertexInputState& operator = (VertexInputState&&)       = delete;
         VertexInputState& operator = (const VertexInputState&)  = delete;
@@ -60,7 +60,7 @@ namespace pbrlib
          * 
          * @throw В случае если количество привязок больше или равняется capacityVertexInputBindingDescription().
         */
-        inline void addVertexInputBindingDescription(uint32_t binding, uint32_t stride, VkVertexInputRate input_rate);
+        void addVertexInputBindingDescription(uint32_t binding, uint32_t stride, VkVertexInputRate input_rate);
 
         /**
          * @brief Метод необходимый для добавления атрибута.
@@ -72,14 +72,14 @@ namespace pbrlib
          * 
          * @throw В случае если количество атрибутов больше или равняется capacityVertexInputAttributeDescription().
         */
-        inline void addVertexInputAttributeDescription(uint32_t location, uint32_t binding, VkFormat format, uint32_t offset);
+        void addVertexInputAttributeDescription(uint32_t location, uint32_t binding, VkFormat format, uint32_t offset);
 
-        inline const VkVertexInputBindingDescription*   getVertexInputBindingDescriptions()         const noexcept;
-        inline const VkVertexInputAttributeDescription* getVertexInputAttributeDescriptions()       const noexcept;
-        inline size_t                                   numVertexInputBindingDescription()          const noexcept;
-        inline size_t                                   numVertexInputAttributeDescription()        const noexcept;
-        inline size_t                                   capacityVertexInputBindingDescription()     const noexcept;
-        inline size_t                                   capacityVertexInputAttributeDescription()   const noexcept;
+        const VkVertexInputBindingDescription*   getVertexInputBindingDescriptions()         const noexcept;
+        const VkVertexInputAttributeDescription* getVertexInputAttributeDescriptions()       const noexcept;
+        size_t                                   numVertexInputBindingDescription()          const noexcept;
+        size_t                                   numVertexInputAttributeDescription()        const noexcept;
+        size_t                                   capacityVertexInputBindingDescription()     const noexcept;
+        size_t                                   capacityVertexInputAttributeDescription()   const noexcept;
 
     private:
         VkVertexInputBindingDescription*    _ptr_vertex_biding_descriptions;
@@ -96,7 +96,7 @@ namespace pbrlib
         private VkPipelineMultisampleStateCreateInfo
     {
     public:
-        inline MultisampleState(
+        MultisampleState(
             VkSampleCountFlagBits   num_samples                 = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT,
             VkBool32                sample_shading_enable       = VK_FALSE,
             float                   min_sample_shading          = 1.0f,
@@ -104,12 +104,12 @@ namespace pbrlib
             VkBool32                alpha_to_one_enable         = VK_FALSE
         );
 
-        inline MultisampleState(const MultisampleState& multisample_state) noexcept;
+        MultisampleState(const MultisampleState& multisample_state) noexcept;
 
         MultisampleState& operator = (MultisampleState&&)       = delete;
         MultisampleState& operator = (const MultisampleState&)  = delete;
 
-        inline void setSampleMask(VkSampleMask sample_mask) noexcept;
+        void setSampleMask(VkSampleMask sample_mask) noexcept;
 
         /**
          * @brief 
@@ -118,7 +118,7 @@ namespace pbrlib
          * 
          * @param num_samples количество выборок.
         */
-        inline void setRasterizationSamples(VkSampleCountFlagBits num_samples) noexcept;
+        void setRasterizationSamples(VkSampleCountFlagBits num_samples) noexcept;
 
         /**
          * @brief Метод позволяющий установить минимальную долю затенеия образца.
@@ -137,16 +137,16 @@ namespace pbrlib
          * 
          * @throw В случае если min_sample_shading < 0 или min_sample_shading > 1.
         */
-        inline void setMinSampleShading(float min_sample_shading) noexcept;
+        void setMinSampleShading(float min_sample_shading) noexcept;
         
         /**
          * @brief Метод позволяющий включать или выключать закрашивание с частотой образцов.
          * 
          * @param is_enable флаг.
         */
-        inline void sampleShadingEnable(VkBool32 is_enable) noexcept;
+        void sampleShadingEnable(VkBool32 is_enable) noexcept;
 
-        inline void alphaToCoverageEnable(VkBool32 is_enable) noexcept;
+        void alphaToCoverageEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief 
@@ -157,14 +157,14 @@ namespace pbrlib
          * 
          * @param is_enable флаг.
         */
-        inline void alphaToOneEnable(VkBool32 is_enable) noexcept;
+        void alphaToOneEnable(VkBool32 is_enable) noexcept;
 
-        inline VkSampleMask             getSampleMask()             const noexcept;
-        inline VkSampleCountFlagBits    getRasterizationSamples()   const noexcept;
-        inline float                    getMinSampleShading()       const noexcept;
-        inline VkBool32                 sampleShadingEnable()       const noexcept;
-        inline VkBool32                 alphaToCoverageEnable()     const noexcept;
-        inline VkBool32                 alphaToOneEnable()          const noexcept;
+        VkSampleMask             getSampleMask()             const noexcept;
+        VkSampleCountFlagBits    getRasterizationSamples()   const noexcept;
+        float                    getMinSampleShading()       const noexcept;
+        VkBool32                 sampleShadingEnable()       const noexcept;
+        VkBool32                 alphaToCoverageEnable()     const noexcept;
+        VkBool32                 alphaToOneEnable()          const noexcept;
 
     private:
         VkSampleMask _sample_mask;
@@ -178,7 +178,7 @@ namespace pbrlib
         private VkPipelineRasterizationStateCreateInfo
     {
     public:
-        inline RasterizationState();
+        RasterizationState();
 
         RasterizationState(RasterizationState&&)        = default;
         RasterizationState(const RasterizationState&)   = default;
@@ -191,14 +191,14 @@ namespace pbrlib
          * 
          * @param polygon_mode режим отображения треугольника.
         */
-        inline void setPolygonMode(VkPolygonMode polygon_mode) noexcept;
+        void setPolygonMode(VkPolygonMode polygon_mode) noexcept;
 
         /**
          * @brief Метод позволяющий установить режим отбраковки треугольников.
          * 
          * @param cull_mode режим отбраковки треугольников.
         */
-        inline void setCullMode(VkCullModeFlags cull_mode) noexcept;
+        void setCullMode(VkCullModeFlags cull_mode) noexcept;
 
         /**
          * @brief 
@@ -207,7 +207,7 @@ namespace pbrlib
          * 
          * @param front_face определяет ориентацию треугольника.
         */
-        inline void setFrontFace(VkFrontFace front_face) noexcept;
+        void setFrontFace(VkFrontFace front_face) noexcept;
         
         /**
          * @brief 
@@ -216,14 +216,14 @@ namespace pbrlib
          * 
          * @param depth_bias_constant_factor постоянная глубина.
         */
-        inline void setDepthBiasConstantFactor(float depth_bias_constant_factor) noexcept;
+        void setDepthBiasConstantFactor(float depth_bias_constant_factor) noexcept;
 
         /**
          * @brief Метод позволяющий установить максимальную глубину.
          * 
          * @param depth_bias_clamp максимальная глубина.
         */
-        inline void setDepthBiasClamp(float depth_bias_clamp) noexcept;
+        void setDepthBiasClamp(float depth_bias_clamp) noexcept;
 
         /**
          * @brief 
@@ -232,28 +232,28 @@ namespace pbrlib
          * 
          * @param depts_bias_slope_factor коэффициент, применяемый к наклону.
         */
-        inline void setDepthBiasSlopeFactor(float depts_bias_slope_factor) noexcept;
+        void setDepthBiasSlopeFactor(float depts_bias_slope_factor) noexcept;
 
         /**
          * @brief Метод позволяющий установить толщину отрезка в пикселях.
          * 
          * @param line_width толщина отрезка в пикселях.
         */
-        inline void setLineWidth(float line_width) noexcept;
+        void setLineWidth(float line_width) noexcept;
 
         /**
          * @brief Метод позволяющий включать или отключать смещение глубины.
          * 
          * @param is_enable флаг.
         */
-        inline void depthClampEnable(VkBool32 is_enable) noexcept;
+        void depthClampEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод позволяющий отключить или включить растеризацию.
          * 
          * @param is_enable флаг. Если он равен  VK_TRUE, то растеризация отключается.
         */
-        inline void rasterizerDiscardEnable(VkBool32 is_enable) noexcept;
+        void rasterizerDiscardEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief 
@@ -275,18 +275,18 @@ namespace pbrlib
          * 
          * @param is_enable флаг.
         */
-        inline void depthBiasEnable(VkBool32 is_enable) noexcept;
+        void depthBiasEnable(VkBool32 is_enable) noexcept;
 
-        inline VkPolygonMode    getPolygonMode()                const noexcept;
-        inline VkCullModeFlags  getCullMode()                   const noexcept;
-        inline VkFrontFace      getFrontFace()                  const noexcept;
-        inline float            getDepthBiasConstantFactor()    const noexcept;
-        inline float            getDepthBiasClamp()             const noexcept;
-        inline float            getDepthBiasSlopeFactor()       const noexcept;
-        inline float            getLineWidth()                  const noexcept;
-        inline VkBool32         depthClampEnable()              const noexcept;
-        inline VkBool32         rasterizerDiscardEnable()       const noexcept;
-        inline VkBool32         depthBiasEnable()               const noexcept;
+        VkPolygonMode    getPolygonMode()                const noexcept;
+        VkCullModeFlags  getCullMode()                   const noexcept;
+        VkFrontFace      getFrontFace()                  const noexcept;
+        float            getDepthBiasConstantFactor()    const noexcept;
+        float            getDepthBiasClamp()             const noexcept;
+        float            getDepthBiasSlopeFactor()       const noexcept;
+        float            getLineWidth()                  const noexcept;
+        VkBool32         depthClampEnable()              const noexcept;
+        VkBool32         rasterizerDiscardEnable()       const noexcept;
+        VkBool32         depthBiasEnable()               const noexcept;
     };
 
     /**
@@ -303,7 +303,7 @@ namespace pbrlib
          * @param depth_test_enable VK_TRUE - включение теста глубины.
          * @param stencil_test_enable VK_TRUE - включение теста трафарета.
         */
-        inline DepthStencilState(
+        DepthStencilState(
             VkBool32 depth_test_enable      = VK_FALSE,
             VkBool32 stencil_test_enable    = VK_FALSE
         ) noexcept;
@@ -321,7 +321,7 @@ namespace pbrlib
          * 
          * @param depth_compare_op операция сравнения.
         */
-        inline void setDepthCompareOp(VkCompareOp depth_compare_op) noexcept;
+        void setDepthCompareOp(VkCompareOp depth_compare_op) noexcept;
 
         /**
          * @brief 
@@ -330,7 +330,7 @@ namespace pbrlib
          * 
          * @param front состояние теста трафарета для лицевых примитивов.
         */
-        inline void setFront(VkStencilOpState front) noexcept;
+        void setFront(VkStencilOpState front) noexcept;
 
         /**
          * @brief 
@@ -339,7 +339,7 @@ namespace pbrlib
          * 
          * @param back состояние теста трафарета для нелицевых примитивов.
         */
-        inline void setBack(VkStencilOpState back) noexcept;
+        void setBack(VkStencilOpState back) noexcept;
         
         /**
          * @brief 
@@ -349,7 +349,7 @@ namespace pbrlib
          * 
          * @param min_depth_bounds минимальная граница диапазона глубины.
         */
-        inline void setMinDepthBounds(float min_depth_bounds) noexcept;
+        void setMinDepthBounds(float min_depth_bounds) noexcept;
 
         /**
          * @brief 
@@ -359,45 +359,45 @@ namespace pbrlib
          * 
          * @param max_depth_bounds максимальная граница диапазона глубины.
         */
-        inline void setMaxDepthBounds(float max_depth_bounds) noexcept;
+        void setMaxDepthBounds(float max_depth_bounds) noexcept;
 
         /**
          * @brief Метод позволяющий включить или выключить тест глубины.
          * 
          * @param is_enable флаг.
         */
-        inline void depthTestEnable(VkBool32 is_enable) noexcept;
+        void depthTestEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод позволяющий включить или выключить запись в буффер глубины.
          * 
          * @param is_enable флаг.
         */
-        inline void depthWriteEnable(VkBool32 is_enable) noexcept;
+        void depthWriteEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод позволяющий включить или выключить тест диапазона глубины.
          * 
          * @param is_enable флаг.
         */
-        inline void depthBoundsTestEnable(VkBool32 is_enable) noexcept;
+        void depthBoundsTestEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод позволяющий включить или выключить тест трафарета.
          * 
          * @param is_enable флаг.
         */
-        inline void stencilTestEnable(VkBool32 is_enable) noexcept;
+        void stencilTestEnable(VkBool32 is_enable) noexcept;
 
-        inline VkCompareOp      getDepthCompareOp()     noexcept;
-        inline VkStencilOpState getFront()              noexcept;
-        inline VkStencilOpState getBack()               noexcept;
-        inline float            getMinDepthBounds()     noexcept;
-        inline float            getMaxDepthBounds()     noexcept;
-        inline VkBool32         depthTestEnable()       noexcept;
-        inline VkBool32         depthWriteEnable()      noexcept;
-        inline VkBool32         depthBoundsTestEnable() noexcept;
-        inline VkBool32         stencilTestEnable()     noexcept;
+        VkCompareOp      getDepthCompareOp()     noexcept;
+        VkStencilOpState getFront()              noexcept;
+        VkStencilOpState getBack()               noexcept;
+        float            getMinDepthBounds()     noexcept;
+        float            getMaxDepthBounds()     noexcept;
+        VkBool32         depthTestEnable()       noexcept;
+        VkBool32         depthWriteEnable()      noexcept;
+        VkBool32         depthBoundsTestEnable() noexcept;
+        VkBool32         stencilTestEnable()     noexcept;
     };
 
     /**
@@ -416,12 +416,12 @@ namespace pbrlib
          * 
          * @throw В случае если num_viewports = 0 или num_scissors = 0.
         */
-        inline ViewportState(size_t num_viewports, size_t num_scissors);
+        ViewportState(size_t num_viewports, size_t num_scissors);
 
-        inline ViewportState(ViewportState&& viewport_state);
-        inline ViewportState(const ViewportState& viewport_state);
+        ViewportState(ViewportState&& viewport_state);
+        ViewportState(const ViewportState& viewport_state);
 
-        inline ~ViewportState();
+        ~ViewportState();
 
         ViewportState& operator = (ViewportState&&)         = delete;
         ViewportState& operator = (const ViewportState&)    = delete;
@@ -439,7 +439,7 @@ namespace pbrlib
          * @throw В случае если количество областей вывода больше или равняется capacityViewports().
          * @throw В случае если min_depth < 0 или max_depth > 1.
         */
-        inline void addViewport(float x, float y, float width, float height, float min_depth, float max_depth);
+        void addViewport(float x, float y, float width, float height, float min_depth, float max_depth);
 
         /**
          * @brief 
@@ -453,14 +453,14 @@ namespace pbrlib
          * 
          * @throw В случае если количество прямоугольников для отсечения больше или равняется capacityScissors().
         */
-        inline void addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height);
+        void addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height);
 
-        inline const VkViewport*    getViewports()      const noexcept;
-        inline const VkRect2D*      getScissors()       const noexcept;
-        inline size_t               numViewports()      const noexcept;
-        inline size_t               numScissors()       const noexcept;
-        inline size_t               capacityViewports() const noexcept;
-        inline size_t               capacityScissors()  const noexcept;
+        const VkViewport*    getViewports()      const noexcept;
+        const VkRect2D*      getScissors()       const noexcept;
+        size_t               numViewports()      const noexcept;
+        size_t               numScissors()       const noexcept;
+        size_t               capacityViewports() const noexcept;
+        size_t               capacityScissors()  const noexcept;
 
     private:
         VkViewport* _ptr_viewports;
@@ -482,7 +482,7 @@ namespace pbrlib
          * 
          * @param topology тип примитива.
         */        
-        inline InputAssemblyState(VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+        InputAssemblyState(VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
         InputAssemblyState(InputAssemblyState&&)        = default;
         InputAssemblyState(const InputAssemblyState&)   = default;
@@ -495,7 +495,7 @@ namespace pbrlib
          * 
          * @param topology тип примитива.
         */
-        inline void setTopology(VkPrimitiveTopology topology) noexcept;
+        void setTopology(VkPrimitiveTopology topology) noexcept;
 
         /**
          * @brief 
@@ -511,10 +511,10 @@ namespace pbrlib
          * @param is_enable флаг.
          *      
         */
-        inline void primitiveRestartEnable(VkBool32 is_enable) noexcept;
+        void primitiveRestartEnable(VkBool32 is_enable) noexcept;
 
-        inline VkPrimitiveTopology  getTopology()               const noexcept;
-        inline VkBool32             primitiveRestartEnable()    const noexcept;
+        VkPrimitiveTopology  getTopology()               const noexcept;
+        VkBool32             primitiveRestartEnable()    const noexcept;
     };
 
     /**
@@ -530,12 +530,12 @@ namespace pbrlib
          * 
          * @param num_attachments число подключений.
         */
-        inline ColorBlendState(size_t num_attachments) noexcept;
+        ColorBlendState(size_t num_attachments) noexcept;
 
-        inline ColorBlendState(ColorBlendState&& color_blend_state);
-        inline ColorBlendState(const ColorBlendState& color_blend_state);
+        ColorBlendState(ColorBlendState&& color_blend_state);
+        ColorBlendState(const ColorBlendState& color_blend_state);
 
-        inline ~ColorBlendState();
+        ~ColorBlendState();
 
         ColorBlendState& operator = (ColorBlendState&&)         = delete;
         ColorBlendState& operator = (const ColorBlendState&)    = delete;
@@ -556,7 +556,7 @@ namespace pbrlib
          * @param alpha_blend_op            операция позволяющая объединять результаты умножений при вычислении альфа канала.
          * @param color_write_mask          определяет в какие каналы выходного изображения осуществляется запись.
         */
-        inline void addAttchament(
+        void addAttchament(
             VkBool32                blend_enable,
             VkBlendFactor           src_color_blend_factor,
             VkBlendFactor           dst_color_blend_factor,
@@ -567,15 +567,15 @@ namespace pbrlib
             VkColorComponentFlags   color_write_mask
         );
 
-        inline void logicOpEnable(VkBool32 is_enable) noexcept;
+        void logicOpEnable(VkBool32 is_enable) noexcept;
 
-        inline void setLogicOp(VkLogicOp logic_op) noexcept;
+        void setLogicOp(VkLogicOp logic_op) noexcept;
 
-        inline const VkPipelineColorBlendAttachmentState*   getAttachments()        const noexcept;
-        inline size_t                                       numAttachments()        const noexcept;
-        inline size_t                                       capacityAttachments()   const noexcept;
-        inline bool                                         logicOpEnable()         const noexcept;
-        inline VkLogicOp                                    getLogicOp()            const noexcept;
+        const VkPipelineColorBlendAttachmentState*   getAttachments()        const noexcept;
+        size_t                                       numAttachments()        const noexcept;
+        size_t                                       capacityAttachments()   const noexcept;
+        bool                                         logicOpEnable()         const noexcept;
+        VkLogicOp                                    getLogicOp()            const noexcept;
 
     private:
         VkPipelineColorBlendAttachmentState*    _ptr_attachments;
@@ -598,7 +598,7 @@ namespace pbrlib
          * @param num_scissors                      число прямоугольников для отсечения.
          * @param num_attachments                   число подключений.
         */
-        inline GraphicsPipelineState(
+        GraphicsPipelineState(
             size_t num_vertex_biding_descriptions,
             size_t num_vertex_attribute_descriptions,
             size_t num_viewports,
@@ -606,26 +606,26 @@ namespace pbrlib
             size_t num_attachments
         );
 
-        inline GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state);
-        inline GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state);
+        GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state);
+        GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state);
 
         GraphicsPipelineState& operator = (GraphicsPipelineState&&)         = delete;
         GraphicsPipelineState& operator = (const GraphicsPipelineState&)    = delete;
 
-        inline VertexInputState&            getVertexInputState()   noexcept;
-        inline const VertexInputState&      getVertexInputState()   const noexcept;
-        inline MultisampleState&            getMultisampleState()   noexcept;
-        inline const MultisampleState&      getMultisampleState()   const noexcept;
-        inline RasterizationState&          getRasterizationState() noexcept;
-        inline const RasterizationState&    getRasterizationState() const noexcept;
-        inline DepthStencilState&           getDepthStencilState()  noexcept;
-        inline const DepthStencilState&     getDepthStencilState()  const noexcept;
-        inline ViewportState&               getViewportState()      noexcept;
-        inline const ViewportState&         getViewportState()      const noexcept;
-        inline InputAssemblyState&          getInputAssemblyState() noexcept;
-        inline const InputAssemblyState&    getInputAssemblyState() const noexcept;
-        inline ColorBlendState&             getColorBlendState()    noexcept;
-        inline const ColorBlendState&       getColorBlendState()    const noexcept;
+        VertexInputState&            getVertexInputState()   noexcept;
+        const VertexInputState&      getVertexInputState()   const noexcept;
+        MultisampleState&            getMultisampleState()   noexcept;
+        const MultisampleState&      getMultisampleState()   const noexcept;
+        RasterizationState&          getRasterizationState() noexcept;
+        const RasterizationState&    getRasterizationState() const noexcept;
+        DepthStencilState&           getDepthStencilState()  noexcept;
+        const DepthStencilState&     getDepthStencilState()  const noexcept;
+        ViewportState&               getViewportState()      noexcept;
+        const ViewportState&         getViewportState()      const noexcept;
+        InputAssemblyState&          getInputAssemblyState() noexcept;
+        const InputAssemblyState&    getInputAssemblyState() const noexcept;
+        ColorBlendState&             getColorBlendState()    noexcept;
+        const ColorBlendState&       getColorBlendState()    const noexcept;
 
     private:
         VertexInputState    _vertex_input_state;
@@ -649,7 +649,7 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        inline GraphicsPipeline(
+        GraphicsPipeline(
             const GraphicsPipelineState&            graphics_pipeline_state,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
@@ -666,7 +666,7 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        inline GraphicsPipeline(
+        GraphicsPipeline(
             GraphicsPipelineState&&                 graphics_pipeline_state,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
@@ -674,21 +674,21 @@ namespace pbrlib
             uint32_t                                subpass_index
         );
 
-        inline  GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
+         GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
                 GraphicsPipeline(const GraphicsPipeline&&)  = delete;
 
-        inline ~GraphicsPipeline();
+        ~GraphicsPipeline();
 
         GraphicsPipeline& operator = (GraphicsPipeline&&)       = delete;
         GraphicsPipeline& operator = (const GraphicsPipeline&)  = delete;
 
-        inline uint32_t                                 getSubpassIndex()           const noexcept;
-        inline PtrPipelineLayout&                       getPipelineLayout()         noexcept;
-        inline const PtrPipelineLayout&                 getPipelineLayout()         const noexcept;
-        inline GraphicsPipelineState&                   getGraphicsPipelineState()  noexcept;
-        inline const GraphicsPipelineState&             getGraphicsPipelineState()  const noexcept;
-        inline VkPipeline                               getPipelineHandle()         const noexcept;
-        inline VkPipelineCache                          getPipelineCacheHandle()    const noexcept;
+        uint32_t                                 getSubpassIndex()           const noexcept;
+        PtrPipelineLayout&                       getPipelineLayout()         noexcept;
+        const PtrPipelineLayout&                 getPipelineLayout()         const noexcept;
+        GraphicsPipelineState&                   getGraphicsPipelineState()  noexcept;
+        const GraphicsPipelineState&             getGraphicsPipelineState()  const noexcept;
+        VkPipeline                               getPipelineHandle()         const noexcept;
+        VkPipelineCache                          getPipelineCacheHandle()    const noexcept;
 
         /**
          * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
@@ -699,7 +699,7 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        inline static PtrGraphicsPipeline make(
+        static PtrGraphicsPipeline make(
             const GraphicsPipelineState&            graphics_pipeline_state,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
@@ -716,7 +716,7 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        inline static PtrGraphicsPipeline make(
+        static PtrGraphicsPipeline make(
             GraphicsPipelineState&&     graphics_pipeline_state,
             const vector<ShaderModule>& shaders,
             const PtrPipelineLayout&    ptr_pipeline_layout,
@@ -725,7 +725,7 @@ namespace pbrlib
         );
 
     private:
-        inline void _create(const vector<ShaderModule>& shaders);
+        void _create(const vector<ShaderModule>& shaders);
 
     private:
         uint32_t                _subpass_index;
@@ -736,7 +736,5 @@ namespace pbrlib
         VkPipelineCache         _pipeline_cache_handle;
     };
 }
-
-#include "GraphicsPipeline.inl"
 
 #endif /* GraphicsPipeline_hpp */

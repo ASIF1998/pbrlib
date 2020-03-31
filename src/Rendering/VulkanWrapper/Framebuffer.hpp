@@ -9,13 +9,13 @@
 #ifndef Framebuffer_hpp
 #define Framebuffer_hpp
 
-#include "Image.hpp"
 #include "RenderPass.hpp"
 #include "Swapchain.hpp"
 
 namespace pbrlib
 {
     class Framebuffer;
+    class ImageView;
 
     using PtrAttachments = shared_ptr<vector<ImageView>>;
     using PtrFramebuffer = shared_ptr<Framebuffer>;
@@ -35,7 +35,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */
-        inline Framebuffer(
+        Framebuffer(
             const PtrSwapchain&     ptr_swapchain,
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -57,7 +57,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */
-        inline Framebuffer(
+        Framebuffer(
             const PtrSwapchain&     ptr_swapchain,
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -76,7 +76,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */  
-        inline Framebuffer(
+        Framebuffer(
             const PtrSwapchain&     ptr_swapchain, 
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -93,7 +93,7 @@ namespace pbrlib
          * @param height        высота фреймбуфера.
          * @param layers        количество слоёв фреймбуфера.
         */  
-        inline Framebuffer(
+        Framebuffer(
             PtrAttachments&&        attachments,
             const PtrRenderPass&    ptr_render_pass,
             uint32_t                width,
@@ -109,7 +109,7 @@ namespace pbrlib
          * @param height        высота фреймбуфера.
          * @param layers        количество слоёв фреймбуфера.
         */  
-        inline Framebuffer(
+        Framebuffer(
             const PtrAttachments&   attachments,
             const PtrRenderPass&    ptr_render_pass,
             uint32_t                width,
@@ -117,31 +117,31 @@ namespace pbrlib
             uint32_t                layers
         );
 
-        inline Framebuffer(Framebuffer&& framebuffer);
+        Framebuffer(Framebuffer&& framebuffer);
         Framebuffer(const Framebuffer& framebuffer) = delete;
 
-        inline ~Framebuffer();
+        ~Framebuffer();
 
         Framebuffer& operator = (Framebuffer&&)         = delete;
         Framebuffer& operator = (const Framebuffer&)    = delete;
 
-        inline bool isUsedSwapchain() const noexcept;
+        bool isUsedSwapchain() const noexcept;
 
-        inline PtrSwapchain&            getSwapchain()                  noexcept;
-        inline const PtrSwapchain&      getSwapchain()                  const noexcept;
-        inline PtrRenderPass&           getRenderPass()                 noexcept;
-        inline const PtrRenderPass&     getRenderPass()                 const noexcept;
-        inline PtrAttachments&          getAttachments()                noexcept;
-        inline const PtrAttachments&    getAttachments()                const noexcept;
-        inline ImageView&               getSwapchainAttachment()        noexcept;
-        inline const ImageView&         getSwapchainAttachment()        const noexcept;
-        inline uint32_t                 getSwapchainAttachmentIndex()   const noexcept;
-        inline const VkFramebuffer&     getFramebufferHandle()          const noexcept;
-        inline uint32_t                 getWidth()                      const noexcept;
-        inline uint32_t                 getHeight()                     const noexcept;
-        inline uint32_t                 getNumLayers()                  const noexcept;
-        inline PtrDevice&               getDevice()                     noexcept;
-        inline const PtrDevice&         getDevice()                     const noexcept;
+        PtrSwapchain&            getSwapchain()                  noexcept;
+        const PtrSwapchain&      getSwapchain()                  const noexcept;
+        PtrRenderPass&           getRenderPass()                 noexcept;
+        const PtrRenderPass&     getRenderPass()                 const noexcept;
+        PtrAttachments&          getAttachments()                noexcept;
+        const PtrAttachments&    getAttachments()                const noexcept;
+        ImageView&               getSwapchainAttachment()        noexcept;
+        const ImageView&         getSwapchainAttachment()        const noexcept;
+        uint32_t                 getSwapchainAttachmentIndex()   const noexcept;
+        const VkFramebuffer&     getFramebufferHandle()          const noexcept;
+        uint32_t                 getWidth()                      const noexcept;
+        uint32_t                 getHeight()                     const noexcept;
+        uint32_t                 getNumLayers()                  const noexcept;
+        PtrDevice&               getDevice()                     noexcept;
+        const PtrDevice&         getDevice()                     const noexcept;
 
         /**
          * @brief Статический метод для создания указателя на Framebuffer.
@@ -155,7 +155,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */
-        inline static PtrFramebuffer make(
+        static PtrFramebuffer make(
             const PtrSwapchain&     ptr_swapchain,
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -177,7 +177,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */
-        inline static PtrFramebuffer make(
+        static PtrFramebuffer make(
             const PtrSwapchain&     ptr_swapchain,
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -196,7 +196,7 @@ namespace pbrlib
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
         */  
-        inline static PtrFramebuffer make(
+        static PtrFramebuffer make(
             const PtrSwapchain&     ptr_swapchain, 
             uint32_t                swapchain_attachment_indx,
             const PtrRenderPass&    ptr_render_pass,
@@ -213,7 +213,7 @@ namespace pbrlib
          * @param height        высота фреймбуфера.
          * @param layers        количество слоёв фреймбуфера.
         */  
-        inline static PtrFramebuffer make(
+        static PtrFramebuffer make(
             PtrAttachments&&        attachments,
             const PtrRenderPass&    ptr_render_pass,
             uint32_t                width,
@@ -229,7 +229,7 @@ namespace pbrlib
          * @param height        высота фреймбуфера.
          * @param layers        количество слоёв фреймбуфера.
         */  
-        inline static PtrFramebuffer make(
+        static PtrFramebuffer make(
             const PtrAttachments&   attachments,
             const PtrRenderPass&    ptr_render_pass,
             uint32_t                width,
@@ -238,7 +238,7 @@ namespace pbrlib
         );
 
     private:
-        inline void _create();
+        void _create();
 
     private:  
         PtrSwapchain    _ptr_swapchain;
@@ -251,7 +251,5 @@ namespace pbrlib
         uint32_t        _layers;
     };
 }
-
-#include "Framebuffer.inl"
 
 #endif /* Framebuffer_hpp */

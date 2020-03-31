@@ -1,14 +1,16 @@
 //
-//  ShaderModule.inl
+//  ShaderModule.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 07/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "ShaderModule.hpp"
+
 namespace pbrlib
 {
-    inline SpecializationInfo::SpecializationInfo(
+    SpecializationInfo::SpecializationInfo(
         size_t size_data,
         size_t num_map_entires
     ) :
@@ -25,7 +27,7 @@ namespace pbrlib
         VkSpecializationInfo::pMapEntries   = _ptr_map_enties;
     }
 
-    inline SpecializationInfo::SpecializationInfo(SpecializationInfo&& specialization_info) :
+    SpecializationInfo::SpecializationInfo(SpecializationInfo&& specialization_info) :
         _ptr_data       (nullptr),
         _ptr_map_enties (nullptr)
     {
@@ -35,7 +37,7 @@ namespace pbrlib
         memcpy(this, &specialization_info, sizeof(VkSpecializationInfo));
     }
 
-    inline SpecializationInfo::SpecializationInfo(const SpecializationInfo& specialization_info) : 
+    SpecializationInfo::SpecializationInfo(const SpecializationInfo& specialization_info) : 
         VkSpecializationInfo {
             .mapEntryCount = static_cast<uint32_t>(specialization_info.mapEntryCount),
             .dataSize = specialization_info.dataSize
@@ -49,7 +51,7 @@ namespace pbrlib
         VkSpecializationInfo::pMapEntries   = _ptr_map_enties;
     }
 
-    inline SpecializationInfo::~SpecializationInfo()
+    SpecializationInfo::~SpecializationInfo()
     {
         if (_ptr_data) {
             delete[] _ptr_data;
@@ -60,7 +62,7 @@ namespace pbrlib
         }
     }
 
-    inline void SpecializationInfo::addMapEntry(const uint8_t* ptr_data, size_t data_size, uint32_t constant_id)
+    void SpecializationInfo::addMapEntry(const uint8_t* ptr_data, size_t data_size, uint32_t constant_id)
     {
         assert(VkSpecializationInfo::dataSize > _current_byte_in_data + data_size &&
                VkSpecializationInfo::mapEntryCount > _current_map_entry);
@@ -77,48 +79,48 @@ namespace pbrlib
         _current_map_entry++;
     }
 
-    inline uint8_t* SpecializationInfo::getData() noexcept
+    uint8_t* SpecializationInfo::getData() noexcept
     {
         return _ptr_data;
     }
 
-    inline const uint8_t* SpecializationInfo::getData() const noexcept
+    const uint8_t* SpecializationInfo::getData() const noexcept
     {
         return _ptr_data;
     }
 
-    inline VkSpecializationMapEntry* SpecializationInfo::getSpecializationMapEntries() noexcept
+    VkSpecializationMapEntry* SpecializationInfo::getSpecializationMapEntries() noexcept
     {
         return _ptr_map_enties;
     }
 
-    inline const VkSpecializationMapEntry* SpecializationInfo::getSpecializationMapEntries() const noexcept
+    const VkSpecializationMapEntry* SpecializationInfo::getSpecializationMapEntries() const noexcept
     {
         return _ptr_map_enties;
     }
 
-    inline size_t SpecializationInfo::getDataSize() const noexcept
+    size_t SpecializationInfo::getDataSize() const noexcept
     {
         return _current_byte_in_data;
     }
 
-    inline size_t SpecializationInfo::getSpecializationMapEntriesNum() const noexcept
+    size_t SpecializationInfo::getSpecializationMapEntriesNum() const noexcept
     {
         return _current_map_entry;
     }
 
-    inline size_t SpecializationInfo::capacityData() const noexcept
+    size_t SpecializationInfo::capacityData() const noexcept
     {
         return VkSpecializationInfo::dataSize;
     }
 
-    inline size_t SpecializationInfo::capacitySpecializationMapEntries() const noexcept
+    size_t SpecializationInfo::capacitySpecializationMapEntries() const noexcept
     {
         return VkSpecializationInfo::mapEntryCount;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline ShaderModule::ShaderModule(
+    ShaderModule::ShaderModule(
         const PtrDevice&            ptr_device,
         VkShaderStageFlagBits       shader_type,
         const uint32_t*             ptr_shader_code,
@@ -149,7 +151,7 @@ namespace pbrlib
         assert(_shader_handle != VK_NULL_HANDLE);
     }
 
-    inline ShaderModule::ShaderModule(ShaderModule&& shader_module) :
+    ShaderModule::ShaderModule(ShaderModule&& shader_module) :
         _ptr_device         (move(shader_module._ptr_device)),
         _shader_type        (shader_module._shader_type),
         _shader_handle      (VK_NULL_HANDLE),
@@ -158,44 +160,44 @@ namespace pbrlib
         swap(_shader_handle, shader_module._shader_handle);
     }
 
-    inline ShaderModule::~ShaderModule()
+    ShaderModule::~ShaderModule()
     {
         if (_shader_handle != VK_NULL_HANDLE) {
             vkDestroyShaderModule(_ptr_device->getDeviceHandle(), _shader_handle, nullptr);
         }
     }
 
-    inline PtrDevice& ShaderModule::getDevice() noexcept
+    PtrDevice& ShaderModule::getDevice() noexcept
     {
         return _ptr_device;
     }
 
-    inline const PtrDevice& ShaderModule::getDevice() const noexcept
+    const PtrDevice& ShaderModule::getDevice() const noexcept
     {
         return _ptr_device;
     }
 
-    inline VkShaderStageFlagBits ShaderModule::getShaderType() const noexcept
+    VkShaderStageFlagBits ShaderModule::getShaderType() const noexcept
     {
         return _shader_type;
     }
 
-    inline const VkShaderModule& ShaderModule::getShaderHandle() const noexcept
+    const VkShaderModule& ShaderModule::getShaderHandle() const noexcept
     {
         return _shader_handle;
     }
 
-    inline SpecializationInfo& ShaderModule::getSpecializationInfo() noexcept
+    SpecializationInfo& ShaderModule::getSpecializationInfo() noexcept
     {
         return _specialization_info;
     }
 
-    inline const SpecializationInfo& ShaderModule::getSpecializationInfo() const noexcept
+    const SpecializationInfo& ShaderModule::getSpecializationInfo() const noexcept
     {
         return _specialization_info;
     }
 
-    inline PtrShaderModule ShaderModule::make(
+    PtrShaderModule ShaderModule::make(
         const PtrDevice&            ptr_device,
         VkShaderStageFlagBits       shader_type,
         const uint32_t*             ptr_shader_code,

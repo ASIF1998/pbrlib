@@ -7,10 +7,56 @@
 //
 
 #include "Swapchain.hpp"
+
 #include "DeviceQueue.hpp"
 
 namespace pbrlib
 {
+    Swapchain::Swapchain(
+        const PtrDevice&            ptr_device,
+        const vector<uint32_t>&     queue_family_indices,
+        const PtrSurface&           surface
+    ) :
+        _swapchain_handle(VK_NULL_HANDLE),
+        _ptr_surface(surface)
+    {
+        _create(ptr_device, queue_family_indices, VK_SHARING_MODE_CONCURRENT);
+    }
+
+    Swapchain::Swapchain(
+        const PtrDevice&            ptr_device,
+        uint32_t                    queue_family_index,
+        const PtrSurface& surface
+    ) :
+        _swapchain_handle   (VK_NULL_HANDLE),
+        _ptr_surface        (surface)
+    {
+        vector<uint32_t> queue_family_indicies {queue_family_index};
+        _create(ptr_device, queue_family_indicies, VK_SHARING_MODE_EXCLUSIVE);
+    }
+
+    Swapchain::Swapchain(Swapchain&& swapchain) :
+        _swapchain_handle   (VK_NULL_HANDLE),
+        _ptr_surface        (move(swapchain._ptr_surface)),
+        _images_view        (move(swapchain._images_view))
+    {
+        swap(_swapchain_handle, swapchain._swapchain_handle);
+    }
+
+    Swapchain::~Swapchain()
+    {
+        if (_swapchain_handle != VK_NULL_HANDLE) {
+            for (size_t i{0}; i < _images_view.size(); i++) {
+                vkDestroyImageView(_images_view[i].getImage()->getDevice()->getDeviceHandle(), _images_view[i]._image_view_handle, nullptr);
+
+                _images_view[i]._image_view_handle          = VK_NULL_HANDLE;
+                _images_view[i]._ptr_image->_image_handle   = VK_NULL_HANDLE;
+            }
+            
+            vkDestroySwapchainKHR(_images_view[0]._ptr_image->getDevice()->getDeviceHandle(), _swapchain_handle, nullptr);
+        }
+    }
+
     void Swapchain::_create(
         const PtrDevice&            ptr_device,
         const vector<uint32_t>&     queue_family_indices,
@@ -90,5 +136,65 @@ namespace pbrlib
         for (size_t i{0}; i < ptr_images.size(); i++) {
             _images_view.push_back(ImageView(ptr_images[i], swapchain_info.imageFormat, image_subresource_range, VK_IMAGE_VIEW_TYPE_2D));
         }
+    }
+
+    vector<ImageView>& Swapchain::getImagesView() noexcept
+    {
+        return _images_view;
+    }
+
+
+    const vector<ImageView>& Swapchain::getImagesView() const noexcept
+    {
+        return _images_view;
+    }
+
+    void Swapchain::getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence)
+    {
+        VkDevice device_handle = _images_view[0].getImage()->getDevice()->getDeviceHandle();
+
+        vkAcquireNextImageKHR(device_handle, _swapchain_handle, numeric_limits<uint64_t>::max(), semaphore, fence, &image_index);
+    }
+
+    const VkSwapchainKHR& Swapchain::getSwapchainHandle() const noexcept
+    {
+        return _swapchain_handle;
+    }
+
+    PtrSurface& Swapchain::getSurface() noexcept
+    {
+        return _ptr_surface;
+    }
+
+    const PtrSurface& Swapchain::getSurface() const noexcept
+    {
+        return _ptr_surface;
+    }
+
+    PtrDevice& Swapchain::getDevice() noexcept
+    {
+        return _images_view[0].getImage()->getDevice();
+    }
+    const PtrDevice& Swapchain::getDevice() const noexcept
+    {
+        return _images_view[0].getImage()->getDevice();
+    }
+
+    PtrSwapchain Swapchain::make(
+        const PtrDevice&   ptr_device,
+        vector<uint32_t>            queue_family_indices,
+        const shared_ptr<Surface>&  surface
+    )
+    {
+        return make_shared<Swapchain>(ptr_device, queue_family_indices, surface);
+    }
+
+    PtrSwapchain Swapchain::make(
+        const PtrDevice&   ptr_device,
+        uint32_t                    queue_family_index,
+        const shared_ptr<Surface>&  surface
+    )
+    {
+        return make_shared<Swapchain>(ptr_device, queue_family_index, surface);
     }
 }

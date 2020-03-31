@@ -1,16 +1,20 @@
 //
-//  GraphicsPipeline.inl
+//  GraphicsPipeline.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 24/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "GraphicsPipeline.hpp"
+
+#include "ShaderModule.hpp"
+
 #include <numeric>
 
 namespace pbrlib
 {
-    inline VertexInputState::VertexInputState(
+    VertexInputState::VertexInputState(
         size_t num_vertex_biding_descriptions,
         size_t num_vertex_attribute_descriptions
     ) :
@@ -28,7 +32,7 @@ namespace pbrlib
         VkPipelineVertexInputStateCreateInfo::pVertexAttributeDescriptions  = _ptr_vertex_attribute_descriptions;
     }
 
-    inline VertexInputState::VertexInputState(VertexInputState&& vertex_input_state) :
+    VertexInputState::VertexInputState(VertexInputState&& vertex_input_state) :
         VkPipelineVertexInputStateCreateInfo {
             .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
             .vertexBindingDescriptionCount      = vertex_input_state.vertexBindingDescriptionCount,
@@ -48,7 +52,7 @@ namespace pbrlib
         vertex_input_state.vertexAttributeDescriptionCount  = 0;
     }
 
-    inline VertexInputState::VertexInputState(const VertexInputState& vertex_input_state) :
+    VertexInputState::VertexInputState(const VertexInputState& vertex_input_state) :
         VkPipelineVertexInputStateCreateInfo {
             .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
             .pNext                              = nullptr,
@@ -75,7 +79,7 @@ namespace pbrlib
         VkPipelineVertexInputStateCreateInfo::pVertexAttributeDescriptions  = _ptr_vertex_attribute_descriptions;
     }
 
-    inline void VertexInputState::addVertexInputBindingDescription(uint32_t binding, uint32_t stride, VkVertexInputRate input_rate)
+    void VertexInputState::addVertexInputBindingDescription(uint32_t binding, uint32_t stride, VkVertexInputRate input_rate)
     {
         assert(_curent_vertex_biding_description < VkPipelineVertexInputStateCreateInfo::vertexBindingDescriptionCount);
 
@@ -88,7 +92,7 @@ namespace pbrlib
         _curent_vertex_biding_description++;
     }
 
-    inline void VertexInputState::addVertexInputAttributeDescription(
+    void VertexInputState::addVertexInputAttributeDescription(
         uint32_t location,
         uint32_t binding,
         VkFormat format,
@@ -107,38 +111,38 @@ namespace pbrlib
         _curent_vertex_attribute_description++;
     }
 
-    inline const VkVertexInputBindingDescription* VertexInputState::getVertexInputBindingDescriptions() const noexcept
+    const VkVertexInputBindingDescription* VertexInputState::getVertexInputBindingDescriptions() const noexcept
     {
         return _ptr_vertex_biding_descriptions;
     }
 
 
-    inline const VkVertexInputAttributeDescription* VertexInputState::getVertexInputAttributeDescriptions() const noexcept
+    const VkVertexInputAttributeDescription* VertexInputState::getVertexInputAttributeDescriptions() const noexcept
     {
         return _ptr_vertex_attribute_descriptions;
     }
 
-    inline size_t VertexInputState::numVertexInputBindingDescription() const noexcept
+    size_t VertexInputState::numVertexInputBindingDescription() const noexcept
     {
         return _curent_vertex_biding_description;
     }
 
-    inline size_t VertexInputState::numVertexInputAttributeDescription() const noexcept
+    size_t VertexInputState::numVertexInputAttributeDescription() const noexcept
     {
         return _curent_vertex_attribute_description;
     }
 
-    inline size_t VertexInputState::capacityVertexInputBindingDescription() const noexcept
+    size_t VertexInputState::capacityVertexInputBindingDescription() const noexcept
     {
         return VkPipelineVertexInputStateCreateInfo::vertexBindingDescriptionCount;
     }
 
-    inline size_t VertexInputState::capacityVertexInputAttributeDescription() const noexcept
+    size_t VertexInputState::capacityVertexInputAttributeDescription() const noexcept
     {
         return VkPipelineVertexInputStateCreateInfo::vertexAttributeDescriptionCount;
     }
 
-    inline VertexInputState::~VertexInputState()
+    VertexInputState::~VertexInputState()
     {
         if (_ptr_vertex_biding_descriptions) {
             delete[] _ptr_vertex_biding_descriptions;
@@ -150,7 +154,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline MultisampleState::MultisampleState(
+    MultisampleState::MultisampleState(
         VkSampleCountFlagBits   num_samples,
         VkBool32                sample_shading_enable,
         float                   min_sample_shading,
@@ -171,75 +175,75 @@ namespace pbrlib
         _sample_mask(numeric_limits<decltype(_sample_mask)>::max())
     {}
 
-    inline MultisampleState::MultisampleState(const MultisampleState& multisample_state) noexcept
+    MultisampleState::MultisampleState(const MultisampleState& multisample_state) noexcept
     {
         memcpy(this, &multisample_state, sizeof(MultisampleState));
         VkPipelineMultisampleStateCreateInfo::pSampleMask = &_sample_mask;
     }
 
-    inline void MultisampleState::setSampleMask(VkSampleMask sample_mask) noexcept
+    void MultisampleState::setSampleMask(VkSampleMask sample_mask) noexcept
     {
         _sample_mask = sample_mask;
     }
 
-    inline void MultisampleState::setRasterizationSamples(VkSampleCountFlagBits num_samples) noexcept
+    void MultisampleState::setRasterizationSamples(VkSampleCountFlagBits num_samples) noexcept
     {
         VkPipelineMultisampleStateCreateInfo::rasterizationSamples = num_samples;
     }
 
-    inline void MultisampleState::setMinSampleShading(float min_sample_shading) noexcept
+    void MultisampleState::setMinSampleShading(float min_sample_shading) noexcept
     {
         assert(min_sample_shading >= 0.0f && min_sample_shading <= 1.0f);
         VkPipelineMultisampleStateCreateInfo::minSampleShading = min_sample_shading;
     }
     
-    inline void MultisampleState::sampleShadingEnable(VkBool32 is_enable) noexcept
+    void MultisampleState::sampleShadingEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineMultisampleStateCreateInfo::sampleShadingEnable = is_enable;
     }
 
-    inline void MultisampleState::alphaToCoverageEnable(VkBool32 is_enable) noexcept
+    void MultisampleState::alphaToCoverageEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineMultisampleStateCreateInfo::alphaToCoverageEnable = is_enable;
     }
 
-    inline void MultisampleState::alphaToOneEnable(VkBool32 is_enable) noexcept
+    void MultisampleState::alphaToOneEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineMultisampleStateCreateInfo::alphaToOneEnable = is_enable;
     }
 
-    inline VkSampleMask MultisampleState::getSampleMask() const noexcept
+    VkSampleMask MultisampleState::getSampleMask() const noexcept
     {
         return _sample_mask;
     }
 
-    inline VkSampleCountFlagBits MultisampleState::getRasterizationSamples() const noexcept
+    VkSampleCountFlagBits MultisampleState::getRasterizationSamples() const noexcept
     {
         return VkPipelineMultisampleStateCreateInfo::rasterizationSamples;
     }
 
-    inline float MultisampleState::getMinSampleShading() const noexcept
+    float MultisampleState::getMinSampleShading() const noexcept
     {
         return VkPipelineMultisampleStateCreateInfo::minSampleShading;
     }
 
-    inline VkBool32 MultisampleState::sampleShadingEnable() const noexcept
+    VkBool32 MultisampleState::sampleShadingEnable() const noexcept
     {
         return VkPipelineMultisampleStateCreateInfo::sampleShadingEnable;
     }
 
-    inline VkBool32 MultisampleState::alphaToCoverageEnable() const noexcept
+    VkBool32 MultisampleState::alphaToCoverageEnable() const noexcept
     {
         return VkPipelineMultisampleStateCreateInfo::alphaToCoverageEnable;
     }
 
-    inline VkBool32 MultisampleState::alphaToOneEnable() const noexcept
+    VkBool32 MultisampleState::alphaToOneEnable() const noexcept
     {
         return VkPipelineMultisampleStateCreateInfo::alphaToOneEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline RasterizationState::RasterizationState() :
+    RasterizationState::RasterizationState() :
         VkPipelineRasterizationStateCreateInfo {
             .sType      = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .pNext      = nullptr,
@@ -248,108 +252,108 @@ namespace pbrlib
         }
     {}
 
-    inline void RasterizationState::setPolygonMode(VkPolygonMode polygon_mode) noexcept
+    void RasterizationState::setPolygonMode(VkPolygonMode polygon_mode) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::polygonMode = polygon_mode;
     }
 
-    inline void RasterizationState::setCullMode(VkCullModeFlags cull_mode) noexcept
+    void RasterizationState::setCullMode(VkCullModeFlags cull_mode) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::cullMode = cull_mode;
     }
     
-    inline void RasterizationState::setFrontFace(VkFrontFace front_face) noexcept
+    void RasterizationState::setFrontFace(VkFrontFace front_face) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::frontFace = front_face;
     }
 
-    inline void RasterizationState::setDepthBiasConstantFactor(float depth_bias_constant_factor) noexcept
+    void RasterizationState::setDepthBiasConstantFactor(float depth_bias_constant_factor) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::depthBiasConstantFactor = depthBiasConstantFactor;
     }
 
-    inline void RasterizationState::setDepthBiasClamp(float depth_bias_clamp) noexcept
+    void RasterizationState::setDepthBiasClamp(float depth_bias_clamp) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::depthBiasClamp = depth_bias_clamp;
     }
 
-    inline void RasterizationState::setDepthBiasSlopeFactor(float depts_bias_slope_factor) noexcept
+    void RasterizationState::setDepthBiasSlopeFactor(float depts_bias_slope_factor) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::depthBiasSlopeFactor = depts_bias_slope_factor;
     }
 
-    inline void RasterizationState::setLineWidth(float line_width) noexcept
+    void RasterizationState::setLineWidth(float line_width) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::lineWidth = line_width;
     }
 
-    inline void RasterizationState::depthClampEnable(VkBool32 is_enable) noexcept
+    void RasterizationState::depthClampEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::depthClampEnable = is_enable;
     }
 
-    inline void RasterizationState::rasterizerDiscardEnable(VkBool32 is_enable) noexcept
+    void RasterizationState::rasterizerDiscardEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::rasterizerDiscardEnable = is_enable;
     }
 
-    inline void RasterizationState::depthBiasEnable(VkBool32 is_enable) noexcept
+    void RasterizationState::depthBiasEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineRasterizationStateCreateInfo::depthBiasEnable = is_enable;
     }
 
-    inline VkPolygonMode RasterizationState::getPolygonMode() const noexcept
+    VkPolygonMode RasterizationState::getPolygonMode() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::polygonMode;
     }
 
-    inline VkCullModeFlags RasterizationState::getCullMode() const noexcept
+    VkCullModeFlags RasterizationState::getCullMode() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::cullMode;
     }
 
-    inline VkFrontFace RasterizationState::getFrontFace() const noexcept
+    VkFrontFace RasterizationState::getFrontFace() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::frontFace;
     }
 
-    inline float RasterizationState::getDepthBiasConstantFactor() const noexcept
+    float RasterizationState::getDepthBiasConstantFactor() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::depthBiasConstantFactor;
     }
 
-    inline float RasterizationState::getDepthBiasClamp() const noexcept
+    float RasterizationState::getDepthBiasClamp() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::depthBiasClamp;
     }
 
-    inline float RasterizationState::getDepthBiasSlopeFactor() const noexcept
+    float RasterizationState::getDepthBiasSlopeFactor() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::depthBiasSlopeFactor;
     }
 
-    inline float RasterizationState::getLineWidth() const noexcept
+    float RasterizationState::getLineWidth() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::lineWidth;
     }
 
-    inline VkBool32 RasterizationState::depthClampEnable() const noexcept
+    VkBool32 RasterizationState::depthClampEnable() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::depthClampEnable;
     }
 
-    inline VkBool32 RasterizationState::rasterizerDiscardEnable() const noexcept
+    VkBool32 RasterizationState::rasterizerDiscardEnable() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::rasterizerDiscardEnable;
     }
 
-    inline VkBool32 RasterizationState::depthBiasEnable() const noexcept
+    VkBool32 RasterizationState::depthBiasEnable() const noexcept
     {
         return VkPipelineRasterizationStateCreateInfo::depthBiasEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline DepthStencilState::DepthStencilState(VkBool32 depth_test_enable, VkBool32 stencil_test_enable) noexcept :
+    DepthStencilState::DepthStencilState(VkBool32 depth_test_enable, VkBool32 stencil_test_enable) noexcept :
         VkPipelineDepthStencilStateCreateInfo{
             .sType              = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
             .pNext              = nullptr,
@@ -359,98 +363,98 @@ namespace pbrlib
         }
     {}
 
-    inline void DepthStencilState::setDepthCompareOp(VkCompareOp depth_compare_op) noexcept
+    void DepthStencilState::setDepthCompareOp(VkCompareOp depth_compare_op) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::depthCompareOp = depth_compare_op;
     }
 
-    inline void DepthStencilState::setFront(VkStencilOpState front) noexcept
+    void DepthStencilState::setFront(VkStencilOpState front) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::front = front;
     }
 
-    inline void DepthStencilState::setBack(VkStencilOpState back) noexcept
+    void DepthStencilState::setBack(VkStencilOpState back) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::back = back;
     }
 
-    inline void DepthStencilState::setMinDepthBounds(float min_depth_bounds) noexcept
+    void DepthStencilState::setMinDepthBounds(float min_depth_bounds) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::minDepthBounds = min_depth_bounds;
     }
 
-    inline void DepthStencilState::setMaxDepthBounds(float max_depth_bounds) noexcept
+    void DepthStencilState::setMaxDepthBounds(float max_depth_bounds) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::maxDepthBounds = max_depth_bounds;
     }
 
-    inline void DepthStencilState::depthTestEnable(VkBool32 is_enable) noexcept
+    void DepthStencilState::depthTestEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::depthTestEnable = is_enable;
     }
 
-    inline void DepthStencilState::depthWriteEnable(VkBool32 is_enable) noexcept
+    void DepthStencilState::depthWriteEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::depthWriteEnable = is_enable;
     }
 
-    inline void DepthStencilState::depthBoundsTestEnable(VkBool32 is_enable) noexcept
+    void DepthStencilState::depthBoundsTestEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::depthBoundsTestEnable = is_enable;
     }
 
-    inline void DepthStencilState::stencilTestEnable(VkBool32 is_enable) noexcept
+    void DepthStencilState::stencilTestEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineDepthStencilStateCreateInfo::stencilTestEnable = is_enable;
     }
 
-    inline VkCompareOp DepthStencilState::getDepthCompareOp() noexcept
+    VkCompareOp DepthStencilState::getDepthCompareOp() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::depthCompareOp;
     }
 
-    inline VkStencilOpState DepthStencilState::getFront() noexcept
+    VkStencilOpState DepthStencilState::getFront() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::front;
     }
 
-    inline VkStencilOpState DepthStencilState::getBack() noexcept
+    VkStencilOpState DepthStencilState::getBack() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::back;
     }
 
-    inline float DepthStencilState::getMinDepthBounds() noexcept
+    float DepthStencilState::getMinDepthBounds() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::minDepthBounds;
     }
 
-    inline float DepthStencilState::getMaxDepthBounds() noexcept
+    float DepthStencilState::getMaxDepthBounds() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::maxDepthBounds;
     }
 
-    inline VkBool32 DepthStencilState::depthTestEnable() noexcept
+    VkBool32 DepthStencilState::depthTestEnable() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::depthTestEnable;
     }
 
-    inline VkBool32 DepthStencilState::depthWriteEnable() noexcept
+    VkBool32 DepthStencilState::depthWriteEnable() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::depthWriteEnable;
     }
 
-    inline VkBool32 DepthStencilState::depthBoundsTestEnable() noexcept
+    VkBool32 DepthStencilState::depthBoundsTestEnable() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::depthBoundsTestEnable;
     }
 
-    inline VkBool32 DepthStencilState::stencilTestEnable() noexcept
+    VkBool32 DepthStencilState::stencilTestEnable() noexcept
     {
         return VkPipelineDepthStencilStateCreateInfo::stencilTestEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline ViewportState::ViewportState(size_t num_viewports, size_t num_scissors) :
+    ViewportState::ViewportState(size_t num_viewports, size_t num_scissors) :
         VkPipelineViewportStateCreateInfo {
             .sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
             .pNext          = nullptr,
@@ -466,7 +470,7 @@ namespace pbrlib
         VkPipelineViewportStateCreateInfo::pScissors    = _ptr_scissors     = new VkRect2D      [num_scissors];
     }
 
-    inline ViewportState::ViewportState(ViewportState&& viewport_state) :
+    ViewportState::ViewportState(ViewportState&& viewport_state) :
         _ptr_viewports  (nullptr),
         _ptr_scissors   (nullptr)
     {
@@ -479,7 +483,7 @@ namespace pbrlib
         memcpy(this, &viewport_state, sizeof(VkPipelineViewportStateCreateInfo));
     }
 
-    inline ViewportState::ViewportState(const ViewportState& viewport_state) :
+    ViewportState::ViewportState(const ViewportState& viewport_state) :
         VkPipelineViewportStateCreateInfo {
             .sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
             .pNext          = nullptr,
@@ -499,7 +503,7 @@ namespace pbrlib
         memcpy(_ptr_scissors,   viewport_state._ptr_scissors,   sizeof(VkRect2D) * _current_scissor);
     }
 
-    inline ViewportState::~ViewportState()
+    ViewportState::~ViewportState()
     {
         if (_ptr_viewports) {
             delete[] _ptr_viewports;
@@ -510,7 +514,7 @@ namespace pbrlib
         }
     }
 
-    inline void ViewportState::addViewport(float x, float y, float width, float height, float min_depth, float max_depth)
+    void ViewportState::addViewport(float x, float y, float width, float height, float min_depth, float max_depth)
     {
         assert(VkPipelineViewportStateCreateInfo::viewportCount > _current_viewport);
         assert(min_depth >= 0.0f && max_depth <= 1.0f);
@@ -527,7 +531,7 @@ namespace pbrlib
         _current_viewport++;
     }
 
-    inline void ViewportState::addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height)
+    void ViewportState::addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height)
     {
         assert(VkPipelineViewportStateCreateInfo::scissorCount > _current_scissor);
 
@@ -539,38 +543,38 @@ namespace pbrlib
         _current_scissor++;
     }
 
-    inline const VkViewport* ViewportState::getViewports() const noexcept
+    const VkViewport* ViewportState::getViewports() const noexcept
     {
         return _ptr_viewports;
     }
 
-    inline const VkRect2D* ViewportState::getScissors() const noexcept
+    const VkRect2D* ViewportState::getScissors() const noexcept
     {
         return _ptr_scissors;
     }
 
-    inline size_t ViewportState::numViewports() const noexcept
+    size_t ViewportState::numViewports() const noexcept
     {
         return _current_viewport;
     }
 
-    inline size_t ViewportState::numScissors() const noexcept
+    size_t ViewportState::numScissors() const noexcept
     {
         return _current_scissor;
     }
 
-    inline size_t ViewportState::capacityViewports() const noexcept
+    size_t ViewportState::capacityViewports() const noexcept
     {
         return VkPipelineViewportStateCreateInfo::viewportCount;
     }
 
-    inline size_t ViewportState::capacityScissors() const noexcept
+    size_t ViewportState::capacityScissors() const noexcept
     {
         return VkPipelineViewportStateCreateInfo::scissorCount;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline InputAssemblyState::InputAssemblyState(VkPrimitiveTopology topology) :
+    InputAssemblyState::InputAssemblyState(VkPrimitiveTopology topology) :
         VkPipelineInputAssemblyStateCreateInfo {
             .sType      = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
             .pNext      = nullptr,
@@ -579,28 +583,28 @@ namespace pbrlib
         }
     {}
 
-    inline void InputAssemblyState::setTopology(VkPrimitiveTopology topology) noexcept
+    void InputAssemblyState::setTopology(VkPrimitiveTopology topology) noexcept
     {
         VkPipelineInputAssemblyStateCreateInfo::topology = topology;
     }
 
-    inline void InputAssemblyState::primitiveRestartEnable(VkBool32 is_enable) noexcept
+    void InputAssemblyState::primitiveRestartEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineInputAssemblyStateCreateInfo::primitiveRestartEnable = is_enable;
     }
 
-    inline VkPrimitiveTopology InputAssemblyState::getTopology() const noexcept
+    VkPrimitiveTopology InputAssemblyState::getTopology() const noexcept
     {
         return VkPipelineInputAssemblyStateCreateInfo::topology;
     }
 
-    inline VkBool32 InputAssemblyState::primitiveRestartEnable() const noexcept
+    VkBool32 InputAssemblyState::primitiveRestartEnable() const noexcept
     {
         return VkPipelineInputAssemblyStateCreateInfo::primitiveRestartEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline ColorBlendState::ColorBlendState(size_t num_attachments) noexcept :
+    ColorBlendState::ColorBlendState(size_t num_attachments) noexcept :
         VkPipelineColorBlendStateCreateInfo {
             .sType              = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
             .pNext              = nullptr,
@@ -613,7 +617,7 @@ namespace pbrlib
         VkPipelineColorBlendStateCreateInfo::pAttachments = _ptr_attachments;
     }
 
-    inline ColorBlendState::ColorBlendState(ColorBlendState&& color_blend_state) :
+    ColorBlendState::ColorBlendState(ColorBlendState&& color_blend_state) :
         _ptr_attachments    (nullptr),
         _current_attachment (color_blend_state._current_attachment)
     {
@@ -622,7 +626,7 @@ namespace pbrlib
     }
 
 
-    inline ColorBlendState::ColorBlendState(const ColorBlendState& color_blend_state) :
+    ColorBlendState::ColorBlendState(const ColorBlendState& color_blend_state) :
         _ptr_attachments    (new VkPipelineColorBlendAttachmentState[color_blend_state.attachmentCount]),
         _current_attachment (color_blend_state._current_attachment)
     {
@@ -631,14 +635,14 @@ namespace pbrlib
         VkPipelineColorBlendStateCreateInfo::pAttachments = _ptr_attachments;
     }
 
-    inline ColorBlendState::~ColorBlendState()
+    ColorBlendState::~ColorBlendState()
     {
         if (_ptr_attachments) {
             delete[] _ptr_attachments;
         }
     }
 
-    inline void ColorBlendState::addAttchament(
+    void ColorBlendState::addAttchament(
         VkBool32                blend_enable,
         VkBlendFactor           src_color_blend_factor,
         VkBlendFactor           dst_color_blend_factor,
@@ -665,43 +669,43 @@ namespace pbrlib
         _current_attachment++;
     }
 
-    inline void ColorBlendState::logicOpEnable(VkBool32 is_enable) noexcept
+    void ColorBlendState::logicOpEnable(VkBool32 is_enable) noexcept
     {
         VkPipelineColorBlendStateCreateInfo::logicOpEnable = is_enable;
     }
 
-    inline void ColorBlendState::setLogicOp(VkLogicOp logic_op) noexcept
+    void ColorBlendState::setLogicOp(VkLogicOp logic_op) noexcept
     {
         VkPipelineColorBlendStateCreateInfo::logicOp= logic_op;
     }
 
-    inline const VkPipelineColorBlendAttachmentState* ColorBlendState::getAttachments() const noexcept
+    const VkPipelineColorBlendAttachmentState* ColorBlendState::getAttachments() const noexcept
     {
         return _ptr_attachments;
     }
 
-    inline size_t ColorBlendState::numAttachments() const noexcept
+    size_t ColorBlendState::numAttachments() const noexcept
     {
         return _current_attachment;
     }
 
-    inline size_t ColorBlendState::capacityAttachments() const noexcept
+    size_t ColorBlendState::capacityAttachments() const noexcept
     {
         return VkPipelineColorBlendStateCreateInfo::attachmentCount;
     }
 
-    inline bool ColorBlendState::logicOpEnable() const noexcept
+    bool ColorBlendState::logicOpEnable() const noexcept
     {
         return VkPipelineColorBlendStateCreateInfo::logicOpEnable;
     }
 
-    inline VkLogicOp ColorBlendState::getLogicOp() const noexcept
+    VkLogicOp ColorBlendState::getLogicOp() const noexcept
     {
         return VkPipelineColorBlendStateCreateInfo::logicOp;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline GraphicsPipelineState::GraphicsPipelineState(
+    GraphicsPipelineState::GraphicsPipelineState(
         size_t num_vertex_biding_descriptions,
         size_t num_vertex_attribute_descriptions,
         size_t num_viewports,
@@ -713,7 +717,7 @@ namespace pbrlib
         _color_blend_state  (num_attachments)
     {}
 
-    inline GraphicsPipelineState::GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state) :
+    GraphicsPipelineState::GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state) :
         _vertex_input_state     (move(graphics_pipeline_state._vertex_input_state)),
         _multisample_state      (move(graphics_pipeline_state._multisample_state)),
         _rasterization_state    (move(graphics_pipeline_state._rasterization_state)),
@@ -723,7 +727,7 @@ namespace pbrlib
         _color_blend_state      (move(graphics_pipeline_state._color_blend_state))
     {}
 
-    inline GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state) :
+    GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state) :
         _vertex_input_state     (graphics_pipeline_state._vertex_input_state),
         _multisample_state      (graphics_pipeline_state._multisample_state),
         _rasterization_state    (graphics_pipeline_state._rasterization_state),
@@ -733,78 +737,78 @@ namespace pbrlib
         _color_blend_state      (graphics_pipeline_state._color_blend_state)
     {}
 
-    inline VertexInputState& GraphicsPipelineState::getVertexInputState() noexcept
+    VertexInputState& GraphicsPipelineState::getVertexInputState() noexcept
     {
         return _vertex_input_state;
     }
     
-    inline const VertexInputState& GraphicsPipelineState::getVertexInputState() const noexcept
+    const VertexInputState& GraphicsPipelineState::getVertexInputState() const noexcept
     {
         return _vertex_input_state;
     }
 
-    inline MultisampleState& GraphicsPipelineState::getMultisampleState() noexcept
+    MultisampleState& GraphicsPipelineState::getMultisampleState() noexcept
     {
         return _multisample_state;
     }
 
-    inline const MultisampleState& GraphicsPipelineState::getMultisampleState() const noexcept
+    const MultisampleState& GraphicsPipelineState::getMultisampleState() const noexcept
     {
         return _multisample_state;
     }
 
-    inline RasterizationState& GraphicsPipelineState::getRasterizationState() noexcept
+    RasterizationState& GraphicsPipelineState::getRasterizationState() noexcept
     {
         return _rasterization_state;
     }
 
-    inline const RasterizationState& GraphicsPipelineState::getRasterizationState() const noexcept
+    const RasterizationState& GraphicsPipelineState::getRasterizationState() const noexcept
     {
         return _rasterization_state;
     }
 
-    inline DepthStencilState& GraphicsPipelineState::getDepthStencilState() noexcept
+    DepthStencilState& GraphicsPipelineState::getDepthStencilState() noexcept
     {
         return _depth_stencil_state;
     }
 
-    inline const DepthStencilState& GraphicsPipelineState::getDepthStencilState() const noexcept
+    const DepthStencilState& GraphicsPipelineState::getDepthStencilState() const noexcept
     {
         return _depth_stencil_state;
     }
 
-    inline ViewportState& GraphicsPipelineState::getViewportState() noexcept
+    ViewportState& GraphicsPipelineState::getViewportState() noexcept
     {
         return _viewport_state;
     }
 
-    inline const ViewportState& GraphicsPipelineState::getViewportState() const noexcept
+    const ViewportState& GraphicsPipelineState::getViewportState() const noexcept
     {
         return _viewport_state;
     }
 
-    inline InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() noexcept
+    InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() noexcept
     {
         return _input_assembly_state;
     }
 
-    inline const InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() const noexcept
+    const InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() const noexcept
     {
         return _input_assembly_state;
     }
 
-    inline ColorBlendState& GraphicsPipelineState::getColorBlendState() noexcept
+    ColorBlendState& GraphicsPipelineState::getColorBlendState() noexcept
     {
         return _color_blend_state;
     }
 
-    inline const ColorBlendState& GraphicsPipelineState::getColorBlendState() const noexcept
+    const ColorBlendState& GraphicsPipelineState::getColorBlendState() const noexcept
     {
         return _color_blend_state;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline GraphicsPipeline::GraphicsPipeline(
+    GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineState&            graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
@@ -821,7 +825,7 @@ namespace pbrlib
         _create(shaders);
     }
     
-    inline GraphicsPipeline::GraphicsPipeline(
+    GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineState&&                 graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
@@ -838,7 +842,7 @@ namespace pbrlib
         _create(shaders);
     }
 
-    inline GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& graphics_pipeline) :
+    GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& graphics_pipeline) :
         _subpass_index          (graphics_pipeline._subpass_index),
         _ptr_pipeline_layout    (move(graphics_pipeline._ptr_pipeline_layout)),
         _ptr_render_pass        (move(graphics_pipeline._ptr_render_pass)),
@@ -850,7 +854,7 @@ namespace pbrlib
         swap(_pipeline_cache_handle,    graphics_pipeline._pipeline_cache_handle);
     }
 
-    inline GraphicsPipeline::~GraphicsPipeline()
+    GraphicsPipeline::~GraphicsPipeline()
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -863,7 +867,7 @@ namespace pbrlib
         }
     }
 
-    inline void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
+    void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -926,42 +930,42 @@ namespace pbrlib
         assert(_pipeline_handle != VK_NULL_HANDLE);
     }
 
-    inline uint32_t GraphicsPipeline::getSubpassIndex() const noexcept
+    uint32_t GraphicsPipeline::getSubpassIndex() const noexcept
     {
         return _subpass_index;
     }
 
-    inline PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() noexcept
+    PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() noexcept
     {
         return _ptr_pipeline_layout;
     }
 
-    inline const PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() const noexcept
+    const PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() const noexcept
     {
         return _ptr_pipeline_layout;
     }
 
-    inline GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() noexcept
+    GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() noexcept
     {
         return _state;
     }
 
-    inline const GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() const noexcept
+    const GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() const noexcept
     {
         return _state;
     }
 
-    inline VkPipeline GraphicsPipeline::getPipelineHandle() const noexcept
+    VkPipeline GraphicsPipeline::getPipelineHandle() const noexcept
     {
         return _pipeline_handle;
     }
 
-    inline VkPipelineCache GraphicsPipeline::getPipelineCacheHandle() const noexcept
+    VkPipelineCache GraphicsPipeline::getPipelineCacheHandle() const noexcept
     {
         return _pipeline_cache_handle;
     }
 
-    inline PtrGraphicsPipeline GraphicsPipeline::make(
+    PtrGraphicsPipeline GraphicsPipeline::make(
         const GraphicsPipelineState&            graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&       ptr_pipeline_layout,
@@ -978,7 +982,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrGraphicsPipeline GraphicsPipeline::make(
+    PtrGraphicsPipeline GraphicsPipeline::make(
         GraphicsPipelineState&&                 graphics_pipeline_state,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&       ptr_pipeline_layout,

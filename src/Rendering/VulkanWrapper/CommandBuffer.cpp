@@ -1,14 +1,23 @@
 //
-//  CommandBuffer.inl
+//  CommandBuffer.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 07/03/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "CommandBuffer.hpp"
+
+
+#include "RenderPass.hpp"
+#include "DescriptorSet.hpp"
+
+#include "Buffer.hpp"
+#include "Image.hpp"
+
 namespace pbrlib
 {
-    inline CommandBuffer::CommandBuffer(
+    CommandBuffer::CommandBuffer(
         const PtrCommandPool&   ptr_command_pool, 
         VkCommandBufferLevel    level
     ) :
@@ -31,14 +40,14 @@ namespace pbrlib
         assert(_command_buffer_handle != VK_NULL_HANDLE);
     }
 
-    inline CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) :
+    CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) :
         _ptr_command_pool       (move(command_buffer._ptr_command_pool)),
         _command_buffer_handle  (VK_NULL_HANDLE)
     {
         swap(_command_buffer_handle, command_buffer._command_buffer_handle);
     }
 
-    inline CommandBuffer::~CommandBuffer() noexcept
+    CommandBuffer::~CommandBuffer() noexcept
     {
         if (_command_buffer_handle != VK_NULL_HANDLE) {
             vkFreeCommandBuffers(
@@ -50,7 +59,7 @@ namespace pbrlib
         }
     }
 
-    inline void CommandBuffer::bindVertexBuffers(
+    void CommandBuffer::bindVertexBuffers(
         uint32_t                    first_binding,
         const vector<Buffer>&       buffers,
         const vector<VkDeviceSize>& offsets
@@ -73,12 +82,12 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::bindVertexBuffer(const Buffer& buffer, VkDeviceSize offset) const noexcept
+    void CommandBuffer::bindVertexBuffer(const Buffer& buffer, VkDeviceSize offset) const noexcept
     {
         vkCmdBindVertexBuffers(_command_buffer_handle, 0, 1, &buffer.getBufferHandle(), &offset);
     }
 
-    inline void CommandBuffer::bindIndexBuffer(
+    void CommandBuffer::bindIndexBuffer(
         const Buffer&   index_buffer,  
         VkDeviceSize    offset, 
         VkIndexType     index_type
@@ -87,7 +96,21 @@ namespace pbrlib
         vkCmdBindIndexBuffer(_command_buffer_handle, index_buffer.getBufferHandle(), offset, index_type);
     }
 
-    inline void CommandBuffer::draw(
+    void CommandBuffer::bindDescriptorSet(
+        const PtrGraphicsPipeline&  ptr_graphics_pipeline,
+        const DescriptorSet&        descriptor_set
+    )
+    {
+        vkCmdBindDescriptorSets(
+            _command_buffer_handle,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            ptr_graphics_pipeline->getPipelineLayout()->getPipelineLayoutHandle(),
+            0, 1, &descriptor_set.getDescriptorSetHandle(),
+            0, nullptr
+        );
+    }
+
+    void CommandBuffer::draw(
         uint32_t vertex_count, 
         uint32_t instance_count, 
         uint32_t first_vertex, 
@@ -103,7 +126,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::drawIndexed(
+    void CommandBuffer::drawIndexed(
         uint32_t    index_count,
         uint32_t    instance_count,
         uint32_t    first_index,
@@ -121,7 +144,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::drawIndexedInderect(
+    void CommandBuffer::drawIndexedInderect(
         const Buffer&   buffer,
         VkDeviceSize    offset,
         uint32_t        draw_count,
@@ -138,7 +161,7 @@ namespace pbrlib
     }
 
     template<class Collection>
-    inline void CommandBuffer::updateBuffer(
+    void CommandBuffer::updateBuffer(
         const Buffer&       dst_buffer,
         const Collection&   data,
         VkDeviceSize        dst_offset
@@ -154,7 +177,7 @@ namespace pbrlib
     }
 
     template<class Pointer>
-    inline void CommandBuffer::updateBuffer(
+    void CommandBuffer::updateBuffer(
         const Buffer&       dst_buffer,
         const Pointer       ptr_data,
         const size_t        size_data,
@@ -170,7 +193,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::copyBuffer(
+    void CommandBuffer::copyBuffer(
         const Buffer&   src_buffer,
         const Buffer&   dst_buffer,
         VkDeviceSize    size
@@ -191,7 +214,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::copyBuffer(
+    void CommandBuffer::copyBuffer(
         const Buffer&                   src_buffer,
         const Buffer&                   dst_buffer,
         const vector<VkBufferCopy>&     regions
@@ -206,7 +229,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::copyImage(
+    void CommandBuffer::copyImage(
         const Image&                src_image,
         const Image&                dst_image,
         const VkImageCopy&          region
@@ -223,7 +246,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::copyImage(
+    void CommandBuffer::copyImage(
         const Image&                src_image,
         const Image&                dst_image,
         const vector<VkImageCopy>&  regions
@@ -240,7 +263,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::imageMemoryBarrier(
+    void CommandBuffer::imageMemoryBarrier(
         VkPipelineStageFlags            src_stage_mask,
         VkPipelineStageFlags            dst_stage_mask,
         VkAccessFlags                   src_access_mask,
@@ -276,7 +299,7 @@ namespace pbrlib
         );
     }
 
-    inline void CommandBuffer::bufferMemoryBarrier(
+    void CommandBuffer::bufferMemoryBarrier(
         VkPipelineStageFlags            src_stage_mask,
         VkPipelineStageFlags            dst_stage_mask,
         VkAccessFlags                   src_access_mask,
@@ -309,23 +332,23 @@ namespace pbrlib
             0, nullptr
         );
     }
-    inline PtrDevice& CommandBuffer::getDevice() noexcept
+    PtrDevice& CommandBuffer::getDevice() noexcept
     {
         return _ptr_command_pool->getDevice();
     }
 
-    inline const PtrDevice& CommandBuffer::getDevice() const noexcept
+    const PtrDevice& CommandBuffer::getDevice() const noexcept
     {
         return _ptr_command_pool->getDevice();
     }
 
-    inline const VkCommandBuffer& CommandBuffer::getCommandBufferHandle() const noexcept
+    const VkCommandBuffer& CommandBuffer::getCommandBufferHandle() const noexcept
     {
         return _command_buffer_handle;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline PrimaryCommandBuffer::PrimaryCommandBuffer(
+    PrimaryCommandBuffer::PrimaryCommandBuffer(
         const PtrCommandPool&       ptr_command_pool,
         const PtrFramebuffer&       ptr_framebuffer,
         const PtrGraphicsPipeline&  ptr_pipeline
@@ -335,13 +358,13 @@ namespace pbrlib
         _ptr_pipeline       (ptr_pipeline)
     {}
 
-    inline PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
+    PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer)),
         _ptr_framebuffer    (move(command_buffer._ptr_framebuffer)),
         _ptr_pipeline       (move(command_buffer._ptr_pipeline))
     {}
 
-    inline void PrimaryCommandBuffer::begin() const
+    void PrimaryCommandBuffer::begin() const
     {
         VkCommandBufferBeginInfo begin_info {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -351,17 +374,17 @@ namespace pbrlib
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
     }
 
-    inline void PrimaryCommandBuffer::end() const
+    void PrimaryCommandBuffer::end() const
     {
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }
 
-    inline void PrimaryCommandBuffer::bindToPipeline() const noexcept
+    void PrimaryCommandBuffer::bindToPipeline() const noexcept
     {
         vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _ptr_pipeline->getPipelineHandle());
     }
 
-    inline void PrimaryCommandBuffer::begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept
     {
         VkRenderPassBeginInfo begin_indo {
             .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -384,41 +407,64 @@ namespace pbrlib
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    inline void PrimaryCommandBuffer::endRenderPass() const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(const VkClearValue& clear_value) const noexcept
+    {
+        VkRenderPassBeginInfo begin_indo {
+            .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            .renderPass     = _ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
+            .framebuffer    = _ptr_framebuffer->getFramebufferHandle(),
+            .renderArea     = {
+                .offset = {
+                    .x = 0, 
+                    .y = 0
+                },
+                .extent = {
+                    .width  = _ptr_framebuffer->getWidth(),
+                    .height =  _ptr_framebuffer->getHeight()
+                }
+            },
+            .clearValueCount    = 1,
+            .pClearValues       = &clear_value
+        };
+
+        vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
+    }
+
+    void PrimaryCommandBuffer::endRenderPass() const noexcept
     {
         vkCmdEndRenderPass(_command_buffer_handle);
     }
 
-    inline void PrimaryCommandBuffer::nextSubpass() const noexcept
+    void PrimaryCommandBuffer::nextSubpass() const noexcept
     {
         vkCmdNextSubpass(_command_buffer_handle, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    inline const PtrFramebuffer& PrimaryCommandBuffer::getFramebuffer() const noexcept
+    const PtrFramebuffer& PrimaryCommandBuffer::getFramebuffer() const noexcept
     {
         return _ptr_framebuffer;
     }
 
-    inline const PtrGraphicsPipeline& PrimaryCommandBuffer::getPipeline() const noexcept
+    const PtrGraphicsPipeline& PrimaryCommandBuffer::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline SecondaryCommandBuffer::SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool) :
+    SecondaryCommandBuffer::SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool) :
         CommandBuffer(ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_SECONDARY)
     {}
 
-    inline SecondaryCommandBuffer::SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer) :
+    SecondaryCommandBuffer::SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer))
     {} 
 
-    inline void SecondaryCommandBuffer::bindToPipeline(const GraphicsPipeline& pipeline) const noexcept
+    void SecondaryCommandBuffer::bindToPipeline(const GraphicsPipeline& pipeline) const noexcept
     {
         vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineHandle());
     }
 
-    inline void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer) const
+    void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer) const
     {
         VkCommandBufferInheritanceInfo inheritance_info {
             .sType          = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
@@ -437,7 +483,7 @@ namespace pbrlib
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
     }     
 
-    inline void SecondaryCommandBuffer::end() const
+    void SecondaryCommandBuffer::end() const
     {
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }

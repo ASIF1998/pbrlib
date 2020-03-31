@@ -21,28 +21,28 @@ namespace pbrlib
         private VkSamplerCreateInfo
     {
     public:
-        inline SamplerInfo() noexcept;
+        SamplerInfo() noexcept;
 
         /**
          * @brief Метод необходимый для задания режима фильтрации при увеличении изображения.
          * 
          * @param filter режим фильтрации.
         */
-        inline void setMagFilter(VkFilter filter) noexcept;
+        void setMagFilter(VkFilter filter) noexcept;
 
         /**
          * @brief Метод необходимый для задания режима фильтрации при уменьшении изображения.
          * 
          * @param filter режим фильтрации.
         */
-        inline void setMinFilter(VkFilter filter) noexcept;
+        void setMinFilter(VkFilter filter) noexcept;
 
         /**
          * @brief Метод необходимый для задания режима пирамидальной фильтрации.
          * 
          * @param mipmap_mode режим пирамидальной фильтрации.
         */
-        inline void setMipmapMode(VkSamplerMipmapMode mipmap_mode) noexcept;
+        void setMipmapMode(VkSamplerMipmapMode mipmap_mode) noexcept;
 
         /**
          * @brief 
@@ -54,7 +54,7 @@ namespace pbrlib
          * @param v преобразование к текстурной координате. 
          * @param w преобразование к текстурной координате. 
         */
-        inline void setAdressMode(
+        void setAdressMode(
             VkSamplerAddressMode u = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
             VkSamplerAddressMode v = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, 
             VkSamplerAddressMode w = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
@@ -68,35 +68,35 @@ namespace pbrlib
          * 
          * @param mip_lod_bias смещение.
         */
-        inline void setMipLodBias(float mip_lod_bias) noexcept;
+        void setMipLodBias(float mip_lod_bias) noexcept;
 
         /**
          * @brief Метод позволяющий включать или отключать анизотропную фильтрацию.
          * 
          * @param is_enable флаг.
         */
-        inline void anisotropyEnable(VkBool32 is_enable) noexcept;
+        void anisotropyEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод устанавливающий максимальный уровень анизотропии.
          * 
          * @param max_anosotropy максимальный уровень анизотропии.
         */
-        inline void setMaxAnisotropy(float max_anosotropy) noexcept;
+        void setMaxAnisotropy(float max_anosotropy) noexcept;
 
         /**
          * @brief Метод включающий режим для выполнения операции сравнения.
          * 
          * @param is_enable флаг.
         */
-        inline void compareEnable(VkBool32 is_enable) noexcept;
+        void compareEnable(VkBool32 is_enable) noexcept;
 
         /**
          * @brief Метод задающий операции для теста глубины.
          * 
          * @param compare_op операция сравнения.
         */
-        inline void setCompareOp(VkCompareOp compare_op) noexcept;
+        void setCompareOp(VkCompareOp compare_op) noexcept;
 
         /**
          * @brief 
@@ -106,14 +106,14 @@ namespace pbrlib
          * @param min_lod наименьший слой в пирамиде.
          * @param max_lod наивысший слой в пирамиде.
         */
-        inline void setLodRange(float min_lod, float max_lod) noexcept;
+        void setLodRange(float min_lod, float max_lod) noexcept;
 
         /**
          * @brief Метод задающий цвет границы.
          * 
          * @param border_color цвет границы.
         */
-        inline void setBorderColor(VkBorderColor border_color) noexcept;
+        void setBorderColor(VkBorderColor border_color) noexcept;
 
         /**
          * @brief 
@@ -122,19 +122,19 @@ namespace pbrlib
          * 
          * @param unnormalized_coordinates флаг. Если VK_TRUE - то в координатах текселя, иначе в нормализованных.
         */
-        inline void unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept;
+        void unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept;
 
-        inline VkFilter             getMagFilter()              const noexcept;
-        inline VkFilter             getMinFilter()              const noexcept;
-        inline VkSamplerMipmapMode  getMipmapMode()             const noexcept;
-        inline VkBool32             anisotropyEnable()          const noexcept;
-        inline float                getMaxAnisotropy()          const noexcept;
-        inline VkBool32             compareEnable()             const noexcept;
-        inline VkCompareOp          getCompareOp()              const noexcept;
-        inline float                getMinLod()                 const noexcept;
-        inline float                getMaxLod()                 const noexcept;
-        inline VkBorderColor        getBorderColor()            const noexcept;
-        inline VkBool32             unnormalizedCoordinates()   const noexcept;
+        VkFilter             getMagFilter()              const noexcept;
+        VkFilter             getMinFilter()              const noexcept;
+        VkSamplerMipmapMode  getMipmapMode()             const noexcept;
+        VkBool32             anisotropyEnable()          const noexcept;
+        float                getMaxAnisotropy()          const noexcept;
+        VkBool32             compareEnable()             const noexcept;
+        VkCompareOp          getCompareOp()              const noexcept;
+        float                getMinLod()                 const noexcept;
+        float                getMaxLod()                 const noexcept;
+        VkBorderColor        getBorderColor()            const noexcept;
+        VkBool32             unnormalizedCoordinates()   const noexcept;
     };  
 
     class Sampler
@@ -146,24 +146,24 @@ namespace pbrlib
          * @param ptr_device    указатель на устройство.
          * @param sampler_info  информация о создаваемой выборке.
         */
-        inline Sampler(
+        Sampler(
             const PtrDevice&            ptr_device,
             const SamplerInfo&          sampler_info
         );
 
-        inline Sampler(Sampler&& sampler);
+        Sampler(Sampler&& sampler);
         Sampler(const Sampler&) = delete;
 
-        inline ~Sampler();
+        ~Sampler();
 
         Sampler& operator = (Sampler&&)         = delete;
         Sampler& operator = (const Sampler&)    = delete;
 
-        inline PtrDevice&           getDevice()         noexcept;
-        inline const PtrDevice&     getDevice()         const noexcept;
-        inline SamplerInfo&         getSamplerInfo()    noexcept;
-        inline const SamplerInfo&   getSamplerInfo()    const noexcept;
-        inline const VkSampler&     getSamplerHandle()  const noexcept;
+        PtrDevice&           getDevice()         noexcept;
+        const PtrDevice&     getDevice()         const noexcept;
+        SamplerInfo&         getSamplerInfo()    noexcept;
+        const SamplerInfo&   getSamplerInfo()    const noexcept;
+        const VkSampler&     getSamplerHandle()  const noexcept;
         
     private:
         PtrDevice   _ptr_device;
@@ -171,7 +171,5 @@ namespace pbrlib
         VkSampler   _sampler_handle;
     };
 }
-
-#include "Sampler.inl"
 
 #endif /* Sampler_hpp */

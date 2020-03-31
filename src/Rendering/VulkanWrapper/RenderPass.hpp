@@ -31,36 +31,36 @@ namespace pbrlib
          * @param num_color_attachment      количество цветовых подключить.
          * @param num_present_attachment    количество подключений, для которых вы хотите, что бы они пережили подпроход.
         */
-        inline SubpassDescription(
+        SubpassDescription(
             size_t num_input_attachment   = 1,
             size_t num_color_attachment   = 1,
             size_t num_present_attachment = 1
         );
 
-        inline SubpassDescription(SubpassDescription&& subpass_descriptoin);
-        inline SubpassDescription(const SubpassDescription& subpass_descriptoin);
+        SubpassDescription(SubpassDescription&& subpass_descriptoin);
+        SubpassDescription(const SubpassDescription& subpass_descriptoin);
 
-        inline void addInputAttachment(uint32_t attachment, VkImageLayout layout);
-        inline void addColorAttachment(uint32_t attachment, VkImageLayout layout);
-        inline void addPresentAttachment(uint32_t attachment);
-        inline void setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout);
-        inline void resetDepthStencilAttahment() noexcept;
+        void addInputAttachment(uint32_t attachment, VkImageLayout layout);
+        void addColorAttachment(uint32_t attachment, VkImageLayout layout);
+        void addPresentAttachment(uint32_t attachment);
+        void setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout);
+        void resetDepthStencilAttahment() noexcept;
 
-        inline vector<VkAttachmentReference>&       getInputAttachment()        noexcept;
-        inline const vector<VkAttachmentReference>& getInputAttachment()        const noexcept;
-        inline vector<VkAttachmentReference>&       getColorAttachment()        noexcept;
-        inline const vector<VkAttachmentReference>& getColorAttachment()        const noexcept;
-        inline vector<uint32_t>&                    getPresentAttachment()      noexcept;
-        inline const vector<uint32_t>&              getPresentAttachment()      const noexcept;
-        inline VkAttachmentReference&               getDepthStencilAttachment() noexcept;
-        inline const VkAttachmentReference&         getDepthStencilAttachment() const noexcept;
+        vector<VkAttachmentReference>&       getInputAttachment()        noexcept;
+        const vector<VkAttachmentReference>& getInputAttachment()        const noexcept;
+        vector<VkAttachmentReference>&       getColorAttachment()        noexcept;
+        const vector<VkAttachmentReference>& getColorAttachment()        const noexcept;
+        vector<uint32_t>&                    getPresentAttachment()      noexcept;
+        const vector<uint32_t>&              getPresentAttachment()      const noexcept;
+        VkAttachmentReference&               getDepthStencilAttachment() noexcept;
+        const VkAttachmentReference&         getDepthStencilAttachment() const noexcept;
 
         /**
          * @brief Метод сообщающий о том, использует ли подпроход подключение глубина-трафарет.
          *
          * @return true - в случае если испоьлзует, иначе false.
         */
-        inline bool useDepthStencilAttachment() const noexcept;
+        bool useDepthStencilAttachment() const noexcept;
 
     private:
         vector<VkAttachmentReference>   _input_attachment;
@@ -90,13 +90,13 @@ namespace pbrlib
          * @param num_subpass_descriptions      количество описателей подпрохода.
          * @param num_subpass_dependencies      количество определителей зависимостей подпроходов.
         */
-        inline RenderPassInfo(
+        RenderPassInfo(
             size_t num_attribute_descriptions,
             size_t num_subpass_descriptions,
             size_t num_subpass_dependencies
         );
 
-        inline RenderPassInfo(RenderPassInfo&& render_pass_info);
+        RenderPassInfo(RenderPassInfo&& render_pass_info);
         RenderPassInfo(const RenderPassInfo&) = default;
 
         /**
@@ -104,7 +104,7 @@ namespace pbrlib
          *
          * @param num_subpass_description количество описателей подпрохода.
         */
-        inline void setNumSubpassDescription(size_t num_subpass_description);
+        void setNumSubpassDescription(size_t num_subpass_description);
 
         /**
          * @brief Метод возвращающий i'ый описатель подпрохода.
@@ -112,7 +112,7 @@ namespace pbrlib
          * @param i индекс подпрохода.
          * @return i'ый описатель подпрохода.
         */
-        inline SubpassDescription& getSubpassDescription(size_t i) noexcept;
+        SubpassDescription& getSubpassDescription(size_t i) noexcept;
 
         /**
          * @brief Метод возвращающий i'ый описатель подпрохода.
@@ -120,7 +120,7 @@ namespace pbrlib
          * @param i индекс подпрохода.
          * @return i'ый описатель подпрохода.
         */
-        inline const SubpassDescription& getSubpassDescription(size_t i) const noexcept;
+        const SubpassDescription& getSubpassDescription(size_t i) const noexcept;
 
         /**
          * @brief Метод необходимый для добавления определения подключения.
@@ -136,7 +136,7 @@ namespace pbrlib
          * @param initial_layout    в каком размещении будет изображение в начале прохода рендеринга.
          * @param final_layout      в каком размещении изображение нужно оставить по завершению прохода рендеринга.
         */
-        inline void addAttachmentDescription(
+        void addAttachmentDescription(
             VkFormat                format,
             VkSampleCountFlagBits   samples,
             VkAttachmentLoadOp      load_op,
@@ -152,14 +152,14 @@ namespace pbrlib
          *
          * @param subpass_description ссылка на объект типа SubpassDescription.
         */
-        inline void addSubpassDescription(SubpassDescription&& subpass_description);
+        void addSubpassDescription(SubpassDescription&& subpass_description);
 
         /**
          * @brief Метод добавляющий описатель подпрохода.
          *
          * @param subpass_description константная ссылка на объект типа SubpassDescription.
         */
-        inline void addSubpassDescription(const SubpassDescription& subpass_description);
+        void addSubpassDescription(const SubpassDescription& subpass_description);
 
         /**
          * @brief Метод добавляющий определитель зависимостей подпроходов.
@@ -171,7 +171,7 @@ namespace pbrlib
          * @param src_access_mask   задаёт, как исходный подпроход обращался к данным.
          * @param dst_access_mask   задаёт, как целевой подпроход будет обращаться к данным.
         */
-        inline void addSubpassDependency(
+        void addSubpassDependency(
             uint32_t                src_subpass,
             uint32_t                dst_subpass,
             VkPipelineStageFlags    src_stage_mask,
@@ -180,12 +180,12 @@ namespace pbrlib
             VkAccessFlags           dst_access_mask
         );
 
-        inline vector<VkAttachmentDescription>&         getAttachmentDescriptions() noexcept;
-        inline const vector<VkAttachmentDescription>&   getAttachmentDescriptions() const noexcept;
-        inline vector<SubpassDescription>&              getSubpassDescriptions()    noexcept;
-        inline const vector<SubpassDescription>&        getSubpassDescriptions()    const noexcept;
-        inline vector<VkSubpassDependency>&             getSubpassDependencies()    noexcept;
-        inline const vector<VkSubpassDependency>&       getSubpassDependencies()    const noexcept;
+        vector<VkAttachmentDescription>&         getAttachmentDescriptions() noexcept;
+        const vector<VkAttachmentDescription>&   getAttachmentDescriptions() const noexcept;
+        vector<SubpassDescription>&              getSubpassDescriptions()    noexcept;
+        const vector<SubpassDescription>&        getSubpassDescriptions()    const noexcept;
+        vector<VkSubpassDependency>&             getSubpassDependencies()    noexcept;
+        const vector<VkSubpassDependency>&       getSubpassDependencies()    const noexcept;
 
     private:
         vector<VkAttachmentDescription> _attribute_descriptions;
@@ -215,15 +215,15 @@ namespace pbrlib
         RenderPass(RenderPass&& render_pass);
         RenderPass(const RenderPass&) = delete;
 
-        inline ~RenderPass() noexcept;
+        ~RenderPass() noexcept;
 
         RenderPass& operator = (RenderPass&&)       = delete;
         RenderPass& operator = (const RenderPass&)  = delete;
 
-        inline const RenderPassInfo&        getRenderPassInfo()         const noexcept;
-        inline const VkRenderPass&          getRenderPassHandle()       const noexcept;
-        inline PtrDevice&          getDevice()                 noexcept;
-        inline const PtrDevice&    getDevice()                 const noexcept;
+        const RenderPassInfo&        getRenderPassInfo()         const noexcept;
+        const VkRenderPass&          getRenderPassHandle()       const noexcept;
+        PtrDevice&          getDevice()                 noexcept;
+        const PtrDevice&    getDevice()                 const noexcept;
 
         /**
          * @brief Статический метод создающий объект типа PtrRenderPass.
@@ -231,7 +231,7 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        inline static PtrRenderPass make(
+        static PtrRenderPass make(
             const PtrDevice&   ptr_device, 
             const RenderPassInfo&       render_pass_info
         );
@@ -242,13 +242,13 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        inline static PtrRenderPass make(
+        static PtrRenderPass make(
             const PtrDevice&   ptr_device, 
             RenderPassInfo&&            render_pass_info
         );
 
     private:
-        inline void _create();
+        void _create();
 
     private:
         RenderPassInfo      _render_pass_info;
@@ -256,7 +256,5 @@ namespace pbrlib
         PtrDevice  _ptr_device;
     };
 }
-
-#include "RenderPass.inl"
 
 #endif /* RenderPass_hpp */

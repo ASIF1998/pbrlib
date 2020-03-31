@@ -22,15 +22,13 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Device;
-
     struct PhysicalDevice
     {
     public:
         PhysicalDevice(VkPhysicalDevice physical_device_handle);
 
-        inline bool isExtensionSupported(const string& name)    const;
-        inline bool isLayerSupported(const string& name)        const;
+        bool isExtensionSupported(const string& name)    const;
+        bool isLayerSupported(const string& name)        const;
 
         bool isFormatSupported(
             VkFormat            format, 
@@ -47,9 +45,9 @@ namespace pbrlib
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @return логическое устройство.
         */
-        inline PtrDevice makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const;
+        PtrDevice makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const;
         
-        inline PtrDevice makeDevice(
+        PtrDevice makeDevice(
             const vector<VkDeviceQueueCreateInfo>&  queue_info,
             const vector<const char*>&              layer_names,
             const vector<const char*>&              extension_names
@@ -82,31 +80,6 @@ namespace pbrlib
         set<string> _search_extension_names;
         set<string> _search_layer_names;
     };
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline bool PhysicalDevice::isExtensionSupported(const string& name) const
-    {
-        return _search_extension_names.find(name) != _search_extension_names.end();
-    }
-
-    inline bool PhysicalDevice::isLayerSupported(const string& name) const
-    {
-        return _search_layer_names.find(name) != _search_layer_names.end();
-    }
-
-    inline PtrDevice PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const
-    {
-        return make_shared<Device>(*this, queue_info);
-    }
-
-    inline PtrDevice PhysicalDevice::makeDevice(
-        const vector<VkDeviceQueueCreateInfo>&  queue_info,
-        const vector<const char*>&              layer_names,
-        const vector<const char*>&              extension_names
-    ) const
-    {
-        return make_shared<Device>(*this, queue_info, layer_names, extension_names);
-    }
 }
 
 #endif /* PhysicalDevice_hpp */

@@ -37,35 +37,35 @@ namespace pbrlib
          * @param ptr_instance      указатель на экземпляр Vulkan'а.
          * @param physical_device   физическое устройтсво.
         */
-        inline Surface(
+        Surface(
             const Window&               window, 
             const PtrInstance&          ptr_instance, 
             const PhysicalDevice&       physical_device
         );
 
-        inline Surface(Surface&& surface);
+        Surface(Surface&& surface);
         Surface(const Surface&) = delete;
         
-        inline ~Surface();
+        ~Surface();
 
         Surface& operator = (Surface&&)         = delete;
         Surface& operator = (const Surface&)    = delete;
 
-        inline const VkSurfaceKHR&              getSurfaceHandle()          const noexcept;
-        inline PtrInstance&                     getInstance()               noexcept;
-        inline const PtrInstance&               getInstance()               const noexcept;
-        inline const VkSurfaceCapabilitiesKHR&  getSurfaceCapabilities()    const noexcept;
-        inline const VkSurfaceFormatKHR&        getSurfaceFormat()          const noexcept;
+        const VkSurfaceKHR&              getSurfaceHandle()          const noexcept;
+        PtrInstance&                     getInstance()               noexcept;
+        const PtrInstance&               getInstance()               const noexcept;
+        const VkSurfaceCapabilitiesKHR&  getSurfaceCapabilities()    const noexcept;
+        const VkSurfaceFormatKHR&        getSurfaceFormat()          const noexcept;
 
-        inline void setFormat(const VkSurfaceFormatKHR& format) noexcept;
+        void setFormat(const VkSurfaceFormatKHR& format) noexcept;
         
-        inline static PtrSurface make(
+        static PtrSurface make(
             const Window&               window,
             const PtrInstance&          ptr_instance,
             const PhysicalDevice&       physical_device
         );
         
-        inline static vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
+        static vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
             const Surface&          surface, 
             const PhysicalDevice&   physical_device
         );
@@ -77,7 +77,5 @@ namespace pbrlib
         VkSurfaceFormatKHR          _surface_format;
     };
 }
-
-#include "Surface.inl"
 
 #endif /* Surface_hpp */

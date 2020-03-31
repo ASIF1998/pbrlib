@@ -14,6 +14,52 @@
 
 namespace pbrlib
 {
+    Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
+        _device_handle(VK_NULL_HANDLE)
+    {
+        _create(physical_device, queue_info, 0, nullptr, 0, nullptr);
+    }
+
+    Device::Device(
+        const PhysicalDevice&                   physical_device, 
+        const vector<VkDeviceQueueCreateInfo>&  queue_info, 
+        const vector<const char*>&              layer_names, 
+        const vector<const char*>&              extension_names
+    ) :
+        _device_handle(VK_NULL_HANDLE)
+    {
+        _create(
+            physical_device, queue_info,
+            static_cast<uint32_t>(layer_names.size()),
+            layer_names.data(),
+            static_cast<uint32_t>(extension_names.size()),
+            extension_names.data()
+        );
+    }
+
+    Device::Device(Device&& device) :
+        _device_handle(VK_NULL_HANDLE)
+    {
+        swap(_device_handle, device._device_handle);
+    }
+
+    Device::~Device()
+    {
+        if (_device_handle != VK_NULL_HANDLE) {
+            vkDestroyDevice(_device_handle, nullptr);
+        }
+    }
+
+    const VkDevice& Device::getDeviceHandle() const noexcept
+    {
+        return _device_handle;
+    }
+
+    void Device::waitIdle() const
+    {
+        vkDeviceWaitIdle(_device_handle);
+    }
+
     void Device::_create(
         const PhysicalDevice&                   physical_device,
         const vector<VkDeviceQueueCreateInfo>&  queue_info,

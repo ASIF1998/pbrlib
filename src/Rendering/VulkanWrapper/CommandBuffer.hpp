@@ -11,12 +11,8 @@
 
 #include "CommandPool.hpp"
 
-#include "RenderPass.hpp"
 #include "GraphicsPipeline.hpp"
 #include "Framebuffer.hpp"
-
-#include "Buffer.hpp"
-#include "Image.hpp"
 
 #include <memory>
 #include <vector>
@@ -25,6 +21,12 @@ using namespace std;
 
 namespace pbrlib
 {
+    class RenderPass;;
+    class DescriptorSet;
+    class Buffer;
+    class Image;
+    class CommandPool;
+
     class CommandBuffer
     {
     public:
@@ -34,15 +36,15 @@ namespace pbrlib
          * @param ptr_command_pool  указатель на пул команд.
          * @param level             уровень командного буфера.
         */
-        inline CommandBuffer(
+        CommandBuffer(
             const PtrCommandPool&   ptr_command_pool, 
             VkCommandBufferLevel    level
         );
 
-        inline CommandBuffer(CommandBuffer&& command_buffer);
+        CommandBuffer(CommandBuffer&& command_buffer);
         CommandBuffer(const CommandBuffer&&) = delete;
 
-        inline ~CommandBuffer() noexcept;
+        ~CommandBuffer() noexcept;
 
         CommandBuffer& operator = (CommandBuffer&&)         = delete;
         CommandBuffer& operator = (const CommandBuffer&&)   = delete;
@@ -58,7 +60,7 @@ namespace pbrlib
          * 
          * @throw в случае, если offsets.size() < buffer_handles.size().
         */
-        inline void bindVertexBuffers(
+        void bindVertexBuffers(
             uint32_t 		            first_binding, 
             const vector<Buffer>& 	    buffers, 
             const vector<VkDeviceSize>& offsets
@@ -72,7 +74,7 @@ namespace pbrlib
          * @param buffer    привязываемый буфер.
          * @param offset    смещениями в буфере (задаётся в байтах).
         */
-        inline void bindVertexBuffer(const Buffer& buffer, VkDeviceSize offset) const noexcept;
+        void bindVertexBuffer(const Buffer& buffer, VkDeviceSize offset) const noexcept;
 
         /**
          * @brief Метод позволяющий использовать буфер как индексный буфер.
@@ -87,7 +89,18 @@ namespace pbrlib
          * @param offset        смещение (с помощью него может быть привязана только часть буфера).
          * @param index_type    тип данных для индексов.
         */
-        inline void bindIndexBuffer(const Buffer& index_buffer, VkDeviceSize offset, VkIndexType index_type) const noexcept;
+        void bindIndexBuffer(const Buffer& index_buffer, VkDeviceSize offset, VkIndexType index_type) const noexcept;
+
+        /**
+         * @brief Метод позволяющий привязать набор дескрипторов к командному буферу.
+         * 
+         * @param ptr_graphics_pipeline указатель на графический конвейер.
+         * @param descriptor_set        множество дескрипторов.
+        */
+        void bindDescriptorSet(
+            const PtrGraphicsPipeline&  ptr_graphics_pipeline,
+            const DescriptorSet&        descriptor_set
+        );
 
         /**
          * @brief Метод позволяющий создать команду для отрисовки.
@@ -97,7 +110,7 @@ namespace pbrlib
          * @param first_vertex      индекс вершины после которой идут остальные вершины.
          * @param first_instance    индекс первого экземпляра.
         */
-        inline void draw(
+        void draw(
             uint32_t vertex_count, 
             uint32_t instance_count, 
             uint32_t first_vertex, 
@@ -113,7 +126,7 @@ namespace pbrlib
          * @param vertex_offset     значение, добавляемое к индексу вершины перед индексацией в буфер вершин.
          * @param first_instance    индекс первого экземпляра.
         */
-        inline void drawIndexed(
+        void drawIndexed(
             uint32_t    index_count,
             uint32_t    instance_count,
             uint32_t    first_index,
@@ -139,7 +152,7 @@ namespace pbrlib
          * @param draw_count    количество запусков отдельных операций рендеринга.
          * @param stride        количество байт, отделяющий одну структуру от другой в buffer (в байтах).
         */
-        inline void drawIndexedInderect(
+        void drawIndexedInderect(
             const Buffer&   buffer,
             VkDeviceSize    offset,
             uint32_t        draw_count,
@@ -154,7 +167,7 @@ namespace pbrlib
          * @param dst_offset    байтовое смещение в буфере.
         */
         template<class Collection>
-        inline void updateBuffer(
+        void updateBuffer(
             const Buffer&       dst_buffer,
             const Collection&   data,
             VkDeviceSize        dst_offset = 0
@@ -169,7 +182,7 @@ namespace pbrlib
          * @param dst_offset    байтовое смещение в буфере.
         */
         template<class Pointer>
-        inline void updateBuffer(
+        void updateBuffer(
             const Buffer&       dst_buffer,
             const Pointer       ptr_data,
             const size_t        size_data,
@@ -185,7 +198,7 @@ namespace pbrlib
          * @param dst_buffer    буфер в который будут помещены данные из src_buffer.
          * @param size          количество байтов, необходимых для копирования.
         */
-        inline void copyBuffer(
+        void copyBuffer(
             const Buffer&   src_buffer,
             const Buffer&   dst_buffer,
             VkDeviceSize    size
@@ -200,7 +213,7 @@ namespace pbrlib
          * @param dst_buffer    буфер в который будут помещены данные из src_buffer.
          * @param regions       регионы для копирования.
         */
-        inline void copyBuffer(
+        void copyBuffer(
             const Buffer&                   src_buffer,
             const Buffer&                   dst_buffer,
             const vector<VkBufferCopy>&     regions
@@ -215,7 +228,7 @@ namespace pbrlib
          * @param dst_image    изображение в которое будут помещены данные из src_image.
          * @param region       регион для копирования.
         */
-        inline void copyImage(
+        void copyImage(
             const Image&                src_image,
             const Image&                dst_image,
             const VkImageCopy&          region
@@ -230,7 +243,7 @@ namespace pbrlib
          * @param dst_image    изображение в которое будут помещены данные из src_image.
          * @param regions      регионы для копирования.
         */
-        inline void copyImage(
+        void copyImage(
             const Image&                src_image,
             const Image&                dst_image,
             const vector<VkImageCopy>&  regions
@@ -252,7 +265,7 @@ namespace pbrlib
          * @param image                     изображение, на которое влияет барьер.
          * @param subresource_range         указывает части изображения, на которое влияет барьер.
         */
-        inline void imageMemoryBarrier(
+        void imageMemoryBarrier(
             VkPipelineStageFlags            src_stage_mask,
             VkPipelineStageFlags            dst_stage_mask,
             VkAccessFlags                   src_access_mask,
@@ -280,7 +293,7 @@ namespace pbrlib
          * @param offset                    смещение в buffer   (используется для синхронизации к диапазону внутри буфера).
          * @param size                      размер в байтах     (используется для синхронизации к диапазону внутри буфера).
         */
-        inline void bufferMemoryBarrier(
+        void bufferMemoryBarrier(
             VkPipelineStageFlags            src_stage_mask,
             VkPipelineStageFlags            dst_stage_mask,
             VkAccessFlags                   src_access_mask,
@@ -292,9 +305,9 @@ namespace pbrlib
             VkDeviceSize                    size
         ) const noexcept;
 
-        inline PtrDevice&               getDevice()                 noexcept;
-        inline const PtrDevice&         getDevice()                 const noexcept;
-        inline const VkCommandBuffer&   getCommandBufferHandle()    const noexcept;
+        PtrDevice&               getDevice()                 noexcept;
+        const PtrDevice&         getDevice()                 const noexcept;
+        const VkCommandBuffer&   getCommandBufferHandle()    const noexcept;
 
     protected:
         PtrCommandPool  _ptr_command_pool;
@@ -305,27 +318,28 @@ namespace pbrlib
         public CommandBuffer
     {
     public:
-        inline PrimaryCommandBuffer(
+        PrimaryCommandBuffer(
             const PtrCommandPool&       ptr_command_pool,
             const PtrFramebuffer&       ptr_framebuffer,
             const PtrGraphicsPipeline&  ptr_pipeline
         );
 
-        inline PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
+        PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
         PrimaryCommandBuffer(const PrimaryCommandBuffer&) = delete;
 
         PrimaryCommandBuffer& operator = (PrimaryCommandBuffer&&)       = delete;
         PrimaryCommandBuffer& operator = (const PrimaryCommandBuffer&)  = delete;
 
-        inline void begin()                                                     const;
-        inline void end()                                                       const;
-        inline void bindToPipeline()                                            const noexcept;
-        inline void begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept;
-        inline void endRenderPass()                                             const noexcept;
-        inline void nextSubpass()                                               const noexcept;
+        void begin()                                                     const;
+        void end()                                                       const;
+        void bindToPipeline()                                            const noexcept;
+        void begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept;
+        void begineRenderPass(const VkClearValue& clear_value)           const noexcept;
+        void endRenderPass()                                             const noexcept;
+        void nextSubpass()                                               const noexcept;
 
-        inline const PtrFramebuffer&       getFramebuffer()    const noexcept;
-        inline const PtrGraphicsPipeline&  getPipeline()       const noexcept;
+        const PtrFramebuffer&       getFramebuffer()    const noexcept;
+        const PtrGraphicsPipeline&  getPipeline()       const noexcept;
 
     private:
         PtrFramebuffer         _ptr_framebuffer;
@@ -336,15 +350,15 @@ namespace pbrlib
         public CommandBuffer
     {
     public:
-        inline SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
+        SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
 
-        inline SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer);
+        SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer);
         SecondaryCommandBuffer(const SecondaryCommandBuffer&) = delete;
 
         SecondaryCommandBuffer& operator = (SecondaryCommandBuffer&&)       = delete;
         SecondaryCommandBuffer& operator = (const SecondaryCommandBuffer&)  = delete;
 
-        inline void bindToPipeline(const GraphicsPipeline& pipeline) const noexcept;
+        void bindToPipeline(const GraphicsPipeline& pipeline) const noexcept;
 
         /**
          * @brief Метод позволяющий начать запись в командный буфер.
@@ -355,12 +369,10 @@ namespace pbrlib
          * 
          * @param primary_command_buffer первичный командный буфер.
         */
-        inline void begin(const PrimaryCommandBuffer& primary_command_buffer)   const;
+        void begin(const PrimaryCommandBuffer& primary_command_buffer)   const;
         
-        inline void end()                                                       const;
+        void end()                                                       const;
     };
 }
-
-#include "CommandBuffer.inl"
 
 #endif /* CommandBuffer_hpp */

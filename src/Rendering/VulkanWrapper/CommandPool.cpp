@@ -31,4 +31,47 @@ namespace pbrlib
         
         assert(_command_pool_handle != VK_NULL_HANDLE);
     }
+
+    CommandPool::CommandPool(CommandPool&& command_pool) :
+        _ptr_device         (command_pool._ptr_device),
+        _command_pool_handle(VK_NULL_HANDLE),
+        _queue_family_index (command_pool._queue_family_index)
+    {
+        swap(_command_pool_handle, command_pool._command_pool_handle);
+    }
+
+    CommandPool::~CommandPool()
+    {
+        if (_command_pool_handle != VK_NULL_HANDLE) {
+            vkDestroyCommandPool(_ptr_device->getDeviceHandle(), _command_pool_handle, nullptr);
+        }
+    }
+
+    PtrDevice& CommandPool::getDevice() noexcept
+    {
+        return _ptr_device;
+    }
+
+    const PtrDevice& CommandPool::getDevice() const noexcept
+    {
+        return _ptr_device;
+    }
+
+    uint32_t CommandPool::getFamilyIndex() const noexcept
+    {
+        return _queue_family_index;
+    }
+
+    const VkCommandPool& CommandPool::getCommandPoolHandle() const noexcept
+    {
+        return _command_pool_handle;
+    }
+
+    PtrCommandPool CommandPool::make(
+        const PtrDevice&    ptr_device, 
+        uint32_t            queue_family_index
+    )
+    {
+        return make_shared<CommandPool>(ptr_device, queue_family_index);
+    }
 }

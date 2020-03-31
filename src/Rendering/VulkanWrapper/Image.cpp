@@ -145,6 +145,22 @@ namespace pbrlib
         _queue_family_indicies(move(queue_family_indicies))
     {}
 
+    Image::Image(Image&& image) :
+        DeviceMemory            (move(image)),
+        _image_handle           (VK_NULL_HANDLE),
+        _image_info             (image._image_info),
+        _queue_family_indicies  (move(image._queue_family_indicies))
+    {
+        swap(_image_handle, image._image_handle);
+    }
+
+    Image::~Image()
+    {
+        if (_image_handle != VK_NULL_HANDLE) {
+            vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
+        }
+    }
+
     void Image::_create()
     {
         uint32_t num_queue_indicies = static_cast<uint32_t>(_queue_family_indicies.size());
@@ -172,6 +188,61 @@ namespace pbrlib
         assert(vkCreateImage(_ptr_device->getDeviceHandle(), &image_create_info, nullptr, &_image_handle) == VK_SUCCESS);
         assert(_image_handle);
         assert(vkBindImageMemory(_ptr_device->getDeviceHandle(), _image_handle, _device_memory_handle, 0) == VK_SUCCESS);
+    }
+
+    ImageInfo& Image::getImageInfo()
+    {
+        return _image_info;
+    }
+
+    const ImageInfo& Image::getImageInfo() const
+    {
+        return _image_info;
+    }
+
+    const VkImage& Image::getImageHandle() const
+    {
+        return _image_handle;
+    }
+
+    PtrImage Image::make(
+        const PtrDevice&            ptr_device,
+        uint32_t                    memory_type_index,
+        const ImageInfo&            image_info,
+        uint32_t                    queue_family_index
+    )
+    {
+        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
+    }
+
+    PtrImage Image::make(
+        const PtrDevice&            ptr_device,
+        uint32_t                   memory_type_index,
+        const ImageInfo&           image_info,
+        const vector<uint32_t>&    queue_family_indices
+    )
+    {
+        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
+    }
+
+    PtrImage Image::make(
+        const PtrDevice&            ptr_device,
+        VkImage                    image,
+        const ImageInfo&           image_info,
+        uint32_t                   queue_family_index
+    )
+    {
+        return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
+    }
+
+    PtrImage Image::make(
+        const PtrDevice&           ptr_device,
+        VkImage                    image,
+        const ImageInfo&           image_info,
+        const vector<uint32_t>&    queue_family_indicies
+    )
+    {
+        return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,5 +282,57 @@ namespace pbrlib
         ) == VK_SUCCESS);
         
         assert(_image_view_handle != VK_NULL_HANDLE);
+    }
+
+    ImageView::ImageView(ImageView&& image_view) :
+        _image_view_handle  (VK_NULL_HANDLE),
+        _ptr_image          (move(image_view._ptr_image)),
+        _format             (image_view._format),
+        _subresource_range  (image_view._subresource_range),
+        _type               (image_view._type)
+    {
+        swap(image_view._image_view_handle, _image_view_handle);
+    }
+
+    ImageView::~ImageView()
+    {
+        if (_image_view_handle != VK_NULL_HANDLE) {
+            vkDestroyImageView(_ptr_image->getDevice()->getDeviceHandle(), _image_view_handle, nullptr);
+        }
+    }
+
+    PtrImage& ImageView::getImage() noexcept
+    {
+        return _ptr_image;
+    }
+
+    const PtrImage& ImageView::getImage() const noexcept 
+    {
+        return _ptr_image;
+    }
+
+    VkImageViewType ImageView::getImageViewType() const noexcept
+    {
+        return _type;
+    }
+
+    VkFormat ImageView::getFormat() const noexcept
+    {
+        return _format;
+    }
+
+    VkImageSubresourceRange& ImageView::getSubresourceRange() noexcept
+    {
+        return _subresource_range;
+    }
+
+    const VkImageSubresourceRange& ImageView::getSubresourceRange() const noexcept
+    {
+        return _subresource_range;
+    }
+
+    const VkImageView& ImageView::getImageViewHandle() const noexcept
+    {
+        return _image_view_handle;
     }
 }

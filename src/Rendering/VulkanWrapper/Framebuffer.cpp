@@ -1,14 +1,17 @@
 //
-//  Framebuffer.inl
+//  Framebuffer.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 18/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "Framebuffer.hpp"
+#include "Image.hpp"
+
 namespace pbrlib
 {
-    inline Framebuffer::Framebuffer(
+    Framebuffer::Framebuffer(
         const PtrSwapchain&     ptr_swapchain,
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -29,7 +32,7 @@ namespace pbrlib
         _create();
     }
 
-    inline Framebuffer::Framebuffer(
+    Framebuffer::Framebuffer(
         const PtrSwapchain&     ptr_swapchain,
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -50,7 +53,7 @@ namespace pbrlib
         _create();
     }
 
-    inline Framebuffer::Framebuffer(
+    Framebuffer::Framebuffer(
         const PtrSwapchain&     ptr_swapchain,
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -70,7 +73,7 @@ namespace pbrlib
         _create();
     }
 
-    inline Framebuffer::Framebuffer(
+    Framebuffer::Framebuffer(
         PtrAttachments&&        attachments,
         const PtrRenderPass&    ptr_render_pass,
         uint32_t                width,
@@ -89,7 +92,7 @@ namespace pbrlib
         _create();
     }
 
-    inline Framebuffer::Framebuffer(
+    Framebuffer::Framebuffer(
         const PtrAttachments&   attachments,
         const PtrRenderPass&    ptr_render_pass,
         uint32_t                width,
@@ -108,7 +111,7 @@ namespace pbrlib
         _create();
     }
 
-    inline Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
+    Framebuffer::Framebuffer(Framebuffer&& framebuffer) :
         _ptr_swapchain              (move(framebuffer._ptr_swapchain)),
         _ptr_render_pass            (move(framebuffer._ptr_render_pass)),
         _swapchain_attachment_indx  (framebuffer._swapchain_attachment_indx),
@@ -121,14 +124,14 @@ namespace pbrlib
         swap(_framebuffer_handle, framebuffer._framebuffer_handle);
     }
 
-    inline Framebuffer::~Framebuffer()
+    Framebuffer::~Framebuffer()
     {
         if (_framebuffer_handle != VK_NULL_HANDLE) {
             vkDestroyFramebuffer(_ptr_render_pass->getDevice()->getDeviceHandle(), _framebuffer_handle, nullptr);
         }
     }
 
-    inline void Framebuffer::_create()
+    void Framebuffer::_create()
     {
         assert(_width && _height && _layers && (_attachments != nullptr || isUsedSwapchain()));
 
@@ -166,89 +169,89 @@ namespace pbrlib
         assert(_framebuffer_handle != VK_NULL_HANDLE);
     }  
 
-    inline bool Framebuffer::isUsedSwapchain() const noexcept     
+    bool Framebuffer::isUsedSwapchain() const noexcept     
     {
         return _ptr_swapchain != nullptr;
     }
 
-    inline PtrSwapchain& Framebuffer::getSwapchain() noexcept
+    PtrSwapchain& Framebuffer::getSwapchain() noexcept
     {
         return _ptr_swapchain;
     }
 
-    inline const PtrSwapchain& Framebuffer::getSwapchain() const noexcept
+    const PtrSwapchain& Framebuffer::getSwapchain() const noexcept
     {
         return _ptr_swapchain;
     }
 
-    inline PtrRenderPass& Framebuffer::getRenderPass() noexcept
+    PtrRenderPass& Framebuffer::getRenderPass() noexcept
     {
         return _ptr_render_pass;
     }
 
-    inline const PtrRenderPass& Framebuffer::getRenderPass() const noexcept
+    const PtrRenderPass& Framebuffer::getRenderPass() const noexcept
     {
         return _ptr_render_pass;
     }
 
-    inline PtrAttachments& Framebuffer::getAttachments() noexcept
+    PtrAttachments& Framebuffer::getAttachments() noexcept
     {
         return _attachments;
     }
 
-    inline const PtrAttachments& Framebuffer::getAttachments() const noexcept
+    const PtrAttachments& Framebuffer::getAttachments() const noexcept
     {
         return _attachments;
     }
 
-    inline ImageView& Framebuffer::getSwapchainAttachment() noexcept
+    ImageView& Framebuffer::getSwapchainAttachment() noexcept
     {
         assert(_ptr_swapchain != nullptr);
         return _ptr_swapchain->getImagesView()[_swapchain_attachment_indx];
     }
 
-    inline const ImageView& Framebuffer::getSwapchainAttachment() const noexcept
+    const ImageView& Framebuffer::getSwapchainAttachment() const noexcept
     {
         assert(_ptr_swapchain != nullptr);
         return _ptr_swapchain->getImagesView()[_swapchain_attachment_indx];
     }
 
-    inline uint32_t Framebuffer::getSwapchainAttachmentIndex() const noexcept
+    uint32_t Framebuffer::getSwapchainAttachmentIndex() const noexcept
     {
         return _swapchain_attachment_indx;
     }
 
-    inline const VkFramebuffer& Framebuffer::getFramebufferHandle() const noexcept
+    const VkFramebuffer& Framebuffer::getFramebufferHandle() const noexcept
     {
         return _framebuffer_handle;
     }
 
-    inline uint32_t Framebuffer::getWidth() const noexcept
+    uint32_t Framebuffer::getWidth() const noexcept
     {
         return _width;
     }
 
-    inline uint32_t Framebuffer::getHeight() const noexcept
+    uint32_t Framebuffer::getHeight() const noexcept
     {
         return _height;
     }
 
-    inline uint32_t Framebuffer::getNumLayers() const noexcept
+    uint32_t Framebuffer::getNumLayers() const noexcept
     {
         return _layers;
     }
 
-    inline PtrDevice&  Framebuffer::getDevice() noexcept
+    PtrDevice&  Framebuffer::getDevice() noexcept
     {
         return _ptr_render_pass->getDevice();
     }
 
-    inline const PtrDevice& Framebuffer::getDevice() const noexcept
+    const PtrDevice& Framebuffer::getDevice() const noexcept
     {
         return _ptr_render_pass->getDevice();
     }
 
-    inline PtrFramebuffer Framebuffer::make(
+    PtrFramebuffer Framebuffer::make(
         const PtrSwapchain&     ptr_swapchain,
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -269,7 +272,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrFramebuffer Framebuffer::make(
+    PtrFramebuffer Framebuffer::make(
         const PtrSwapchain&     ptr_swapchain,
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -291,7 +294,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrFramebuffer Framebuffer::make(
+    PtrFramebuffer Framebuffer::make(
         const PtrSwapchain&     ptr_swapchain, 
         uint32_t                swapchain_attachment_indx,
         const PtrRenderPass&    ptr_render_pass,
@@ -310,7 +313,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrFramebuffer Framebuffer::make(
+    PtrFramebuffer Framebuffer::make(
         PtrAttachments&&        attachments,
         const PtrRenderPass&    ptr_render_pass,
         uint32_t                width,
@@ -327,7 +330,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrFramebuffer Framebuffer::make(
+    PtrFramebuffer Framebuffer::make(
         const PtrAttachments&   attachments,
         const PtrRenderPass&    ptr_render_pass,
         uint32_t                width,

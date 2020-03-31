@@ -10,7 +10,6 @@
 #define Image_hpp
 
 #include "DeviceMemory.hpp"
-#include "Device.hpp"
 
 #include <vector>
 #include <memory>
@@ -138,17 +137,17 @@ namespace pbrlib
             vector<uint32_t>&&          queue_family_indicies
         );
 
-        inline Image(Image&& image);
+        Image(Image&& image);
         Image(const Image&) = delete;
 
-        inline ~Image();
+        ~Image();
 
         Image& operator = (Image&&)         = delete;
         Image& operator = (const Image&)    = delete;
 
-        inline ImageInfo&       getImageInfo();
-        inline const ImageInfo& getImageInfo()      const;
-        inline const VkImage&   getImageHandle()    const;
+        ImageInfo&       getImageInfo();
+        const ImageInfo& getImageInfo()      const;
+        const VkImage&   getImageHandle()    const;
 
         /**
          * @brief Статический метод для создания Image.
@@ -159,7 +158,7 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static PtrImage make(
+        static PtrImage make(
             const PtrDevice&            ptr_device,
             uint32_t                    memory_type_index,
             const ImageInfo&            image_info,
@@ -175,7 +174,7 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
          * @return указатель на Image.
         */
-        inline static PtrImage make(
+        static PtrImage make(
             const PtrDevice&            ptr_device,
             uint32_t                    memory_type_index,
             const ImageInfo&            image_info,
@@ -191,7 +190,7 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        inline static PtrImage make(
+        static PtrImage make(
             const PtrDevice&            ptr_device,
             VkImage                     image,
             const ImageInfo&            image_info,
@@ -207,7 +206,7 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
          * @return указатель на Image.
         */
-        inline static PtrImage make(
+        static PtrImage make(
             const PtrDevice&            ptr_device,
             VkImage                     image,
             const ImageInfo&            image_info,
@@ -243,21 +242,21 @@ namespace pbrlib
             VkImageViewType                 type
         );
 
-        inline ImageView(ImageView&& image_view);
+        ImageView(ImageView&& image_view);
         ImageView(const ImageView&) = delete;
 
-        inline ~ImageView();
+        ~ImageView();
 
         ImageView& operator = (ImageView&&)         = delete;
         ImageView& operator = (const ImageView&)    = delete;
 
-        inline PtrImage&                        getImage()              noexcept;
-        inline const PtrImage&                  getImage()              const noexcept;
-        inline VkImageViewType                  getImageViewType()      const noexcept;
-        inline VkFormat                         getFormat()             const noexcept;
-        inline VkImageSubresourceRange&         getSubresourceRange()   noexcept;
-        inline const VkImageSubresourceRange&   getSubresourceRange()   const noexcept;
-        inline const VkImageView&               getImageViewHandle()    const noexcept;
+        PtrImage&                        getImage()              noexcept;
+        const PtrImage&                  getImage()              const noexcept;
+        VkImageViewType                  getImageViewType()      const noexcept;
+        VkFormat                         getFormat()             const noexcept;
+        VkImageSubresourceRange&         getSubresourceRange()   noexcept;
+        const VkImageSubresourceRange&   getSubresourceRange()   const noexcept;
+        const VkImageView&               getImageViewHandle()    const noexcept;
 
     private:
         PtrImage                _ptr_image;
@@ -266,131 +265,6 @@ namespace pbrlib
         VkImageSubresourceRange _subresource_range;
         VkImageViewType         _type;
     };
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline Image::Image(Image&& image) :
-        DeviceMemory            (move(image)),
-        _image_handle           (VK_NULL_HANDLE),
-        _image_info             (image._image_info),
-        _queue_family_indicies  (move(image._queue_family_indicies))
-    {
-        swap(_image_handle, image._image_handle);
-    }
-
-    inline Image::~Image()
-    {
-        if (_image_handle != VK_NULL_HANDLE) {
-            vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
-        }
-    }
-
-    inline ImageInfo& Image::getImageInfo()
-    {
-        return _image_info;
-    }
-
-    inline const ImageInfo& Image::getImageInfo() const
-    {
-        return _image_info;
-    }
-
-    inline const VkImage& Image::getImageHandle() const
-    {
-        return _image_handle;
-    }
-
-    inline PtrImage Image::make(
-        const PtrDevice&            ptr_device,
-        uint32_t                    memory_type_index,
-        const ImageInfo&            image_info,
-        uint32_t                    queue_family_index
-    )
-    {
-        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
-    }
-
-    inline PtrImage Image::make(
-        const PtrDevice&            ptr_device,
-        uint32_t                   memory_type_index,
-        const ImageInfo&           image_info,
-        const vector<uint32_t>&    queue_family_indices
-    )
-    {
-        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
-    }
-
-    inline PtrImage Image::make(
-        const PtrDevice&            ptr_device,
-        VkImage                    image,
-        const ImageInfo&           image_info,
-        uint32_t                   queue_family_index
-    )
-    {
-        return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
-    }
-
-    inline PtrImage Image::make(
-        const PtrDevice&           ptr_device,
-        VkImage                    image,
-        const ImageInfo&           image_info,
-        const vector<uint32_t>&    queue_family_indicies
-    )
-    {
-        return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline ImageView::ImageView(ImageView&& image_view) :
-        _image_view_handle  (VK_NULL_HANDLE),
-        _ptr_image          (move(image_view._ptr_image)),
-        _format             (image_view._format),
-        _subresource_range  (image_view._subresource_range),
-        _type               (image_view._type)
-    {
-        swap(image_view._image_view_handle, _image_view_handle);
-    }
-
-    inline ImageView::~ImageView()
-    {
-        if (_image_view_handle != VK_NULL_HANDLE) {
-            vkDestroyImageView(_ptr_image->getDevice()->getDeviceHandle(), _image_view_handle, nullptr);
-        }
-    }
-
-    inline PtrImage& ImageView::getImage() noexcept
-    {
-        return _ptr_image;
-    }
-
-    inline const PtrImage& ImageView::getImage() const noexcept 
-    {
-        return _ptr_image;
-    }
-
-    inline VkImageViewType ImageView::getImageViewType() const noexcept
-    {
-        return _type;
-    }
-
-    inline VkFormat ImageView::getFormat() const noexcept
-    {
-        return _format;
-    }
-
-    inline VkImageSubresourceRange& ImageView::getSubresourceRange() noexcept
-    {
-        return _subresource_range;
-    }
-
-    inline const VkImageSubresourceRange& ImageView::getSubresourceRange() const noexcept
-    {
-        return _subresource_range;
-    }
-
-    inline const VkImageView& ImageView::getImageViewHandle() const noexcept
-    {
-        return _image_view_handle;
-    }
 }
 
 #endif /* Image_hpp */

@@ -33,7 +33,7 @@ namespace pbrlib
          * 
          * @param ptr_device указатель на устройство.
         */
-        inline DeviceMemory(const PtrDevice& ptr_device) noexcept;
+        DeviceMemory(const PtrDevice& ptr_device) noexcept;
 
         /**
          * @brief Конструктор.
@@ -44,10 +44,10 @@ namespace pbrlib
         */
         DeviceMemory(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
 
-        inline DeviceMemory(DeviceMemory&& device_memory);
+        DeviceMemory(DeviceMemory&& device_memory);
         DeviceMemory(const DeviceMemory&) = delete;
 
-        inline ~DeviceMemory();
+        ~DeviceMemory();
 
         DeviceMemory& operator = (DeviceMemory&&)       = delete;
         DeviceMemory& operator = (const DeviceMemory&)  = delete;
@@ -73,13 +73,17 @@ namespace pbrlib
         template<typename Container>
         inline void setData(const Container& data);
 
-        inline MapStatus getMapStatus() const noexcept;
+        template<typename Pointer>
+        inline void setData(const Pointer& ptr, size_t size);
 
-        inline uint8_t*                 getData()               noexcept;
-        inline const uint8_t*           getData()               const noexcept;
-        inline const VkDeviceMemory&    getDeviceMemoryHandle() const noexcept;
-        inline PtrDevice&               getDevice()             noexcept;
-        inline const PtrDevice&         getDevice()             const noexcept;
+        MapStatus getMapStatus() const noexcept;
+
+        uint8_t*                 getData()               noexcept;
+        const uint8_t*           getData()               const noexcept;
+        const VkDeviceMemory&    getDeviceMemoryHandle() const noexcept;
+        PtrDevice&               getDevice()             noexcept;
+        const PtrDevice&         getDevice()             const noexcept;
+        VkDeviceSize             getSize()               const noexcept;
 
     protected:
         PtrDevice       _ptr_device;
@@ -89,57 +93,6 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline DeviceMemory::DeviceMemory(const PtrDevice& ptr_device) noexcept :
-        _ptr_device             (ptr_device),
-        _device_memory_handle   (VK_NULL_HANDLE),
-        _memory_size            (0),
-        _ptr_mapped_data        (nullptr)
-    {}
-
-    inline DeviceMemory::DeviceMemory(DeviceMemory&& device_memory) :
-        _ptr_device             (move(device_memory._ptr_device)),
-        _device_memory_handle   (VK_NULL_HANDLE),
-        _memory_size            (device_memory._memory_size),
-        _ptr_mapped_data        (device_memory._ptr_mapped_data)
-    {
-        swap(_device_memory_handle, device_memory._device_memory_handle);
-    }
-
-    inline DeviceMemory::~DeviceMemory()
-    {
-        vkFreeMemory(_ptr_device->getDeviceHandle(), _device_memory_handle, nullptr);
-    }
-
-    inline MapStatus DeviceMemory::getMapStatus() const noexcept
-    {
-        return (_ptr_mapped_data ? MapStatus::MAPPED : MapStatus::UNMAPPED);
-    }
-
-    inline uint8_t* DeviceMemory::getData() noexcept
-    {
-        return _ptr_mapped_data;
-    }
-
-    inline const uint8_t* DeviceMemory::getData() const noexcept
-    {
-        return _ptr_mapped_data;
-    }
-
-    inline const VkDeviceMemory& DeviceMemory::getDeviceMemoryHandle() const noexcept
-    {
-        return _device_memory_handle;
-    }
-
-    inline PtrDevice& DeviceMemory::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    inline const PtrDevice& DeviceMemory::getDevice() const noexcept
-    {
-        return _ptr_device;
-    }
-
     template<typename Container>
     inline void DeviceMemory::setData(const Container& data)
     {
@@ -153,6 +106,25 @@ namespace pbrlib
 
         if (is_memory_mapped == MapStatus::UNMAPPED) {
             unmap();
+        }
+    }
+
+    template<typename Pointer>
+    inline void DeviceMemory::setData(const Pointer& ptr, size_t size)
+    {
+        if (ptr) {
+            MapStatus is_memory_mapped = getMapStatus();
+
+            if (is_memory_mapped == MapStatus::UNMAPPED) {
+                map();
+            }
+
+            // memcpy(_ptr_mapped_data, &data[0], sizeof(data[0]) * size);
+            memcpy(_ptr_mapped_data, ptr, sizeof(ptr[0]) * size);
+
+            if (is_memory_mapped == MapStatus::UNMAPPED) {
+                unmap();
+            }
         }
     }
 }

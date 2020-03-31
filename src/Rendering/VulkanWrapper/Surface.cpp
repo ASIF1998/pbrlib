@@ -1,14 +1,16 @@
 //
-//  Surface.inl
+//  Surface.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 09/02/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "Surface.hpp"
+
 namespace pbrlib
 {
-    inline Surface::Surface(
+    Surface::Surface(
         const Window&               window, 
         const PtrInstance&          ptr_instance, 
         const PhysicalDevice&       physical_device
@@ -21,7 +23,7 @@ namespace pbrlib
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device.physical_device_handle, _surface_handle, &_surface_capabilities);
     }
 
-    inline Surface::Surface(Surface&& surface) :
+    Surface::Surface(Surface&& surface) :
         _ptr_instance           (move(surface._ptr_instance)),
         _surface_handle         (VK_NULL_HANDLE),
         _surface_capabilities   (surface._surface_capabilities),
@@ -30,14 +32,14 @@ namespace pbrlib
         swap(_surface_handle, surface._surface_handle);
     }
 
-    inline Surface::~Surface()
+    Surface::~Surface()
     {
         if (_surface_handle != VK_NULL_HANDLE) {
             vkDestroySurfaceKHR(_ptr_instance->getHandle(), _surface_handle, nullptr);
         }
     }
 
-    inline shared_ptr<Surface> Surface::make(
+    shared_ptr<Surface> Surface::make(
         const Window&               window,
         const PtrInstance&          ptr_instance,
         const PhysicalDevice&       physical_device
@@ -46,37 +48,37 @@ namespace pbrlib
         return make_shared<Surface>(window, ptr_instance, physical_device);
     }
 
-    inline const VkSurfaceKHR& Surface::getSurfaceHandle() const noexcept
+    const VkSurfaceKHR& Surface::getSurfaceHandle() const noexcept
     {
         return _surface_handle;
     }
 
-    inline PtrInstance& Surface::getInstance() noexcept
+    PtrInstance& Surface::getInstance() noexcept
     {
         return _ptr_instance;
     }
 
-    inline const PtrInstance& Surface::getInstance() const noexcept
+    const PtrInstance& Surface::getInstance() const noexcept
     {
         return _ptr_instance;
     }
 
-    inline const VkSurfaceCapabilitiesKHR& Surface::getSurfaceCapabilities() const noexcept
+    const VkSurfaceCapabilitiesKHR& Surface::getSurfaceCapabilities() const noexcept
     {
         return _surface_capabilities;
     }
         
-    inline const VkSurfaceFormatKHR& Surface::getSurfaceFormat() const noexcept
+    const VkSurfaceFormatKHR& Surface::getSurfaceFormat() const noexcept
     {
         return _surface_format;
     }
 
-    inline void Surface::setFormat(const VkSurfaceFormatKHR& format) noexcept
+    void Surface::setFormat(const VkSurfaceFormatKHR& format) noexcept
     {
         _surface_format = format;
     }
 
-    inline vector<VkSurfaceFormatKHR> Surface::getAllSurfaceFormats(
+    vector<VkSurfaceFormatKHR> Surface::getAllSurfaceFormats(
         const Surface&          surface, 
         const PhysicalDevice&   physical_device
     )
