@@ -11,7 +11,15 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    inline Vec4<Type>::Vec4(Type xyzw) noexcept :
+    inline constexpr Vec4<Type>::Vec4() :
+        x{static_cast<Type>(0)},
+        y{static_cast<Type>(0)},
+        z{static_cast<Type>(0)},
+        w{static_cast<Type>(0)}
+    {}
+
+    template<typename Type>
+    inline constexpr Vec4<Type>::Vec4(Type xyzw) :
         x{xyzw},
         y{xyzw},
         z{xyzw},
@@ -19,7 +27,7 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline Vec4<Type>::Vec4(Type x, Type y, Type z, Type w) noexcept :
+    inline constexpr Vec4<Type>::Vec4(Type x, Type y, Type z, Type w) :
         x{x},
         y{y},
         z{z},
@@ -27,37 +35,37 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline bool Vec4<Type>::operator == (const Vec4<Type>& v) const noexcept
+    inline bool Vec4<Type>::operator == (const Vec4<Type>& v) const
     {
         return x == v.x && y == v.y && z == v.z && w == v.w;
     }
 
     template<typename Type>
-    inline bool Vec4<Type>::operator != (const Vec4<Type>& v) const noexcept
+    inline bool Vec4<Type>::operator != (const Vec4<Type>& v) const
     {
         return x != v.x || y != v.y || z != v.z || w == v.w;
     }
 
     template<typename Type>
-    inline Vec4<Type> Vec4<Type>::operator + (const Vec4<Type>& v) const noexcept
+    inline Vec4<Type> Vec4<Type>::operator + (const Vec4<Type>& v) const
     {
         return {x + v.x, y + v.y, z + v.z, w + v.w};
     }
 
     template<typename Type>
-    inline Vec4<Type> Vec4<Type>::operator - (const Vec4<Type>& v) const noexcept
+    inline Vec4<Type> Vec4<Type>::operator - (const Vec4<Type>& v) const
     {
         return {x - v.x, y - v.y, z - v.z, w - v.w};
     }
 
     template<typename Type>
-    inline Vec4<Type> Vec4<Type>::operator * (Type s) const noexcept
+    inline Vec4<Type> Vec4<Type>::operator * (Type s) const
     {
         return {x * s, y * s, z * s, w * s};
     }
 
     template<typename Type>
-    inline Vec4<Type>& Vec4<Type>::operator += (const Vec4<Type>& v) noexcept
+    inline Vec4<Type>& Vec4<Type>::operator += (const Vec4<Type>& v)
     {
         x += v.x;
         y += v.y;
@@ -68,7 +76,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Vec4<Type>& Vec4<Type>::operator -= (const Vec4<Type>& v) noexcept
+    inline Vec4<Type>& Vec4<Type>::operator -= (const Vec4<Type>& v)
     {
         x -= v.x;
         y -= v.y;
@@ -79,7 +87,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Vec4<Type>& Vec4<Type>::operator *= (Type s) noexcept
+    inline Vec4<Type>& Vec4<Type>::operator *= (Type s)
     {
         x *= s;
         y *= s;
@@ -102,7 +110,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Type Vec4<Type>::lengthSquared() const noexcept
+    inline Type Vec4<Type>::lengthSquared() const
     {
         return x * x + y * y + z * z + w * w;
     }
@@ -127,15 +135,22 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline constexpr Vec4<float>::Vec4() noexcept :
+        x{0.0f},
+        y{0.0f},
+        z{0.0f},
+        w{0.0f}
+    {}
+
     inline Vec4<float>::Vec4(float xyzw) noexcept :
         xyzw_simd(_mm_set1_ps(xyzw))
     {}
 
-    inline Vec4<float>::Vec4(__m128 xyzw) noexcept :
+    inline constexpr Vec4<float>::Vec4(__m128 xyzw) noexcept :
         xyzw_simd(xyzw)
     {}
 
-    inline Vec4<float>::Vec4(float x, float y, float z, float w) noexcept :
+    inline constexpr Vec4<float>::Vec4(float x, float y, float z, float w) noexcept :
         x{x},
         y{y},
         z{z},

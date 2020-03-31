@@ -19,29 +19,30 @@ namespace pbrlib::math
     struct Vec2
     {
     public:
-        inline Vec2(Type xy = static_cast<Type>(0));
-        inline Vec2(Type x, Type y);
+        inline constexpr Vec2();
+        inline constexpr Vec2(Type xy);
+        inline constexpr Vec2(Type x, Type y);
 
-        inline bool operator == (const Vec2& v) const noexcept;
-        inline bool operator != (const Vec2& v) const noexcept;
+        inline bool operator == (const Vec2& v) const;
+        inline bool operator != (const Vec2& v) const;
         
-        inline Vec2 operator + (const Vec2& v) const noexcept;
-        inline Vec2 operator - (const Vec2& v) const noexcept;
-        inline Vec2 operator * (Type s) const noexcept;
+        inline Vec2 operator + (const Vec2& v)  const;
+        inline Vec2 operator - (const Vec2& v)  const;
+        inline Vec2 operator * (Type s)         const;
 
-        inline Vec2& operator += (const Vec2& v) noexcept;
-        inline Vec2& operator -= (const Vec2& v) noexcept;
-        inline Vec2& operator *= (Type s) noexcept;
+        inline Vec2& operator += (const Vec2& v);
+        inline Vec2& operator -= (const Vec2& v);
+        inline Vec2& operator *= (Type s);
 
         inline Type& operator [] (size_t i) noexcept;
-        inline Type operator [] (size_t i) const noexcept;
+        inline Type operator [] (size_t i)  const noexcept;
 
         /**
          * @brief Метод необходимый для вычисления квадрата длины вектора.
          * 
          * @return квадрат длины векора.
         */
-        inline Type lengthSquared() const noexcept;
+        inline Type lengthSquared() const;
 
         /**
          * @brief Метод необходимый для вычисления длины вектора.

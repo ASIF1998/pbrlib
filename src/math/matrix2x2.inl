@@ -8,25 +8,33 @@
 
 #include <memory>
 
+#include "vec2.hpp"
+
 namespace pbrlib::math
 {
     template<typename Type>
-    Matrix2x2<Type>::Matrix2x2(Type init_value)
-    {
-        for (size_t i{0}; i < 4; i++) {
-            _array4[i] = init_value;
+    inline constexpr Matrix2x2<Type>::Matrix2x2() :
+        _array4 {
+            1, 0,
+            0, 1
         }
-    }
+    {}
 
     template<typename Type>
-    inline Matrix2x2<Type>::Matrix2x2(Type v11, Type v12, Type v21, Type v22)
-    {
-        _array2x2[0][0] = v11;
-        _array2x2[0][1] = v12;
+    inline constexpr Matrix2x2<Type>::Matrix2x2(Type init_value) :
+        _array4 {
+            init_value, init_value,
+            init_value, init_value
+        }
+    {}
 
-        _array2x2[1][0] = v21;
-        _array2x2[1][1] = v22;
-    }
+    template<typename Type>
+    inline constexpr Matrix2x2<Type>::Matrix2x2(Type v11, Type v12, Type v21, Type v22) :
+        _array4 {
+            v11, v12,
+            v21, v22
+        }
+    {}
 
     template<typename Type>
     inline Matrix2x2<Type>::Matrix2x2(const Type* ptr_data)
@@ -107,7 +115,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix2x2<Type>& Matrix2x2<Type>::operator += (const Matrix2x2<Type>& mat)
+    inline Matrix2x2<Type>& Matrix2x2<Type>::operator += (const Matrix2x2<Type>& mat)
     {
         _array4[0] += mat._array4[0];
         _array4[1] += mat._array4[1];
@@ -118,7 +126,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix2x2<Type>& Matrix2x2<Type>::operator -= (const Matrix2x2<Type>& mat)
+    inline Matrix2x2<Type>& Matrix2x2<Type>::operator -= (const Matrix2x2<Type>& mat)
     {
         _array4[0] -= mat._array4[0];
         _array4[1] -= mat._array4[1];
@@ -129,7 +137,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix2x2<Type>& Matrix2x2<Type>::operator *= (const Matrix2x2<Type>& mat)
+    inline Matrix2x2<Type>& Matrix2x2<Type>::operator *= (const Matrix2x2<Type>& mat)
     {
         auto temp (*this);
 
@@ -142,7 +150,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Matrix2x2<Type>& Matrix2x2<Type>::operator *= (Type scal)
+    inline Matrix2x2<Type>& Matrix2x2<Type>::operator *= (Type scal)
     {
         _array4[0] *= scal;
         _array4[1] *= scal;
@@ -165,14 +173,14 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    Type& Matrix2x2<Type>::at(size_t i, size_t j)
+    inline Type& Matrix2x2<Type>::at(size_t i, size_t j)
     {
         assert(i < 2 && j < 2);
         return _array2x2[i][j];
     }
 
     template<typename Type>
-    Type Matrix2x2<Type>::at(size_t i, size_t j) const
+    inline Type Matrix2x2<Type>::at(size_t i, size_t j) const
     {
         assert(i < 2 && j < 2);
         return _array2x2[i][j];
@@ -185,7 +193,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    void Matrix2x2<Type>::transpose()
+    inline void Matrix2x2<Type>::transpose()
     {
         auto temp = _array2x2[1][0];
         _array2x2[1][0] = _array2x2[0][1];
@@ -193,7 +201,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    void Matrix2x2<Type>::inverse()
+    inline void Matrix2x2<Type>::inverse()
     {
         Type d = det();
 
@@ -210,23 +218,28 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Matrix2x2<float>::Matrix2x2(float init_value) noexcept
-    {
-        for (size_t i{0}; i < 4; i++) {
-            _array4[i] = init_value;
+    inline constexpr Matrix2x2<float>::Matrix2x2() :
+        _array4 {
+            1.0f, 0.0f,
+            0.0f, 1.0f
         }
-    }
+    {}
 
-    inline Matrix2x2<float>::Matrix2x2(float v11, float v12, float v21, float v22) noexcept
-    {
-        _array2x2[0][0] = v11;
-        _array2x2[0][1] = v12;
+    inline constexpr Matrix2x2<float>::Matrix2x2(float init_value) noexcept :
+        _array4 {
+            init_value, init_value, 
+            init_value, init_value
+        }
+    {}
 
-        _array2x2[1][0] = v21;
-        _array2x2[1][1] = v22;
-    }
+    inline constexpr Matrix2x2<float>::Matrix2x2(float v11, float v12, float v21, float v22) noexcept :
+        _array4 {
+            v11, v12,
+            v21, v22
+        }
+    {}
 
-    inline Matrix2x2<float>::Matrix2x2(const __m128& init_vec) noexcept :
+    inline constexpr Matrix2x2<float>::Matrix2x2(const __m128& init_vec) noexcept :
         _m128_simd(init_vec)
     {}
 
@@ -259,25 +272,31 @@ namespace pbrlib::math
     inline Matrix2x2<float> Matrix2x2<float>::operator * (const Matrix2x2<float>& mat) const
     {
         auto m1 = _mm_mul_ps(
-                        _mm_shuffle_ps(
-                            _m128_simd, 
-                            _m128_simd, 
-                            _MM_SHUFFLE(2, 2, 0, 0)), 
-                        _mm_shuffle_ps(
-                            mat._m128_simd, 
-                            mat._m128_simd, 
-                            _MM_SHUFFLE(1, 0, 1, 0)));
+            _mm_shuffle_ps(
+                _m128_simd, 
+                _m128_simd, 
+                _MM_SHUFFLE(2, 2, 0, 0)
+            ), 
+            _mm_shuffle_ps(
+                mat._m128_simd, 
+                mat._m128_simd, 
+                _MM_SHUFFLE(1, 0, 1, 0)
+            )
+        );
 
         
         auto m2 = _mm_mul_ps(
-                        _mm_shuffle_ps(
-                            _m128_simd, 
-                            _m128_simd, 
-                            _MM_SHUFFLE(3, 3, 1, 1)), 
-                        _mm_shuffle_ps(
-                            mat._m128_simd, 
-                            mat._m128_simd, 
-                            _MM_SHUFFLE(3, 2, 3, 2)));
+            _mm_shuffle_ps(
+                _m128_simd, 
+                _m128_simd, 
+                _MM_SHUFFLE(3, 3, 1, 1)
+            ), 
+            _mm_shuffle_ps(
+                mat._m128_simd, 
+                mat._m128_simd, 
+                _MM_SHUFFLE(3, 2, 3, 2)
+            )
+        );
 
         return (_mm_add_ps(m1, m2));
     }
@@ -310,25 +329,31 @@ namespace pbrlib::math
     inline Matrix2x2<float>& Matrix2x2<float>::operator *= (const Matrix2x2& mat)
     {
         auto m1 = _mm_mul_ps(
-                        _mm_shuffle_ps(
-                            _m128_simd, 
-                            _m128_simd, 
-                            _MM_SHUFFLE(2, 2, 0, 0)), 
-                        _mm_shuffle_ps(
-                            mat._m128_simd, 
-                            mat._m128_simd, 
-                            _MM_SHUFFLE(1, 0, 1, 0)));
+            _mm_shuffle_ps(
+                _m128_simd, 
+                _m128_simd, 
+                _MM_SHUFFLE(2, 2, 0, 0)
+            ), 
+            _mm_shuffle_ps(
+                mat._m128_simd, 
+                mat._m128_simd, 
+                _MM_SHUFFLE(1, 0, 1, 0)
+            )
+        );
 
         
         auto m2 = _mm_mul_ps(
-                        _mm_shuffle_ps(
-                            _m128_simd, 
-                            _m128_simd, 
-                            _MM_SHUFFLE(3, 3, 1, 1)), 
-                        _mm_shuffle_ps(
-                            mat._m128_simd, 
-                            mat._m128_simd, 
-                            _MM_SHUFFLE(3, 2, 3, 2)));
+            _mm_shuffle_ps(
+                _m128_simd, 
+                _m128_simd, 
+                _MM_SHUFFLE(3, 3, 1, 1)
+            ), 
+            _mm_shuffle_ps(
+                mat._m128_simd, 
+                mat._m128_simd, 
+                _MM_SHUFFLE(3, 2, 3, 2)
+            )
+        );
 
         _m128_simd = _mm_add_ps(m1, m2);
 
@@ -368,26 +393,29 @@ namespace pbrlib::math
         return _array2x2[0][0] * _array2x2[1][1] - _array2x2[1][0] * _array2x2[0][1];
     }
 
-    void Matrix2x2<float>::transpose()
+    inline void Matrix2x2<float>::transpose()
     {
         float temp = _array2x2[1][0];
         _array2x2[1][0] = _array2x2[0][1];
         _array2x2[0][1] = temp;
     }
 
-    void Matrix2x2<float>::inverse()
+    inline void Matrix2x2<float>::inverse()
     {
         float d = det();
 
         if (d != float(0u)) {
             _m128_simd = _mm_mul_ps(
-                                _mm_mul_ps(
-                                    _mm_shuffle_ps(
-                                        _m128_simd, 
-                                        _m128_simd, 
-                                        _MM_SHUFFLE(0, 2, 1, 3)), 
-                                    _mm_setr_ps(1.0f, -1.0f, -1.0f, 1.0f)), 
-                                    _mm_set1_ps(1.0f / d));
+                _mm_mul_ps(
+                    _mm_shuffle_ps(
+                        _m128_simd, 
+                        _m128_simd, 
+                        _MM_SHUFFLE(0, 2, 1, 3)
+                    ), 
+                    _mm_setr_ps(1.0f, -1.0f, -1.0f, 1.0f)
+                ), 
+                _mm_set1_ps(1.0f / d)
+            );
         }
     }
 
@@ -410,7 +438,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Matrix2x2<Type>& mat)
+    inline ostream& operator << (ostream& print, const Matrix2x2<Type>& mat)
     {
         for (size_t i{0}; i < 2; i++) {
             print << mat[i][0] << ' ' << mat[i][1] << endl;
