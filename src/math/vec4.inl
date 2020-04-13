@@ -122,7 +122,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    void Vec4<Type>::normalize()
+    inline void Vec4<Type>::normalize()
     {
         auto l = length();
     
@@ -221,7 +221,7 @@ namespace pbrlib::math
         return sqrt(lengthSquared());
     }
 
-    void Vec4<float>::normalize()
+    inline void Vec4<float>::normalize()
     {
         float l = length();
     
@@ -234,18 +234,18 @@ namespace pbrlib::math
     template<typename Type>
     inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2)
     {
-        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w + v2.w;
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
     }
 
     template<>
     inline float dot<float>(const Vec4<float> v1, const Vec4<float>& v2)
     {
         auto r = _mm_mul_ps(v1.xyzw_simd, v2.xyzw_simd);
-        return r[0] + r[1] + r[2] + r[4];
+        return r[0] + r[1] + r[2] + r[3];
     }
 
     template<typename Type>
-    Vec4<Type> normalize(const Vec4<Type>& v)
+    inline Vec4<Type> normalize(const Vec4<Type>& v)
     {
         Vec4<Type> res (v);
         res.normalize();

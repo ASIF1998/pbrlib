@@ -213,7 +213,11 @@ namespace pbrlib::math
                 _array2x2[0][0]
             };
 
-            *this = adj * (Type(1) / d);
+            *this = adj;
+
+            for (size_t i{0}; i < 4; i++) {
+                _array4[i] /= d;
+            }
         }
     }
 

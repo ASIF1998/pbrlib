@@ -13,13 +13,12 @@
 
 #include <immintrin.h>
 
+#include "vec4.hpp"
+
 using namespace std;
 
 namespace pbrlib::math
 {
-    template<typename Type>
-    struct Vec4;
-
     template<typename Type>
     class Matrix4x4
     {

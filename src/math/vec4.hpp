@@ -56,7 +56,7 @@ namespace pbrlib::math
         /**
          * @brief Метод необходимый для нормирования вектора.
         */
-        void normalize();
+        inline void normalize();
 
     public:
         union
@@ -113,7 +113,7 @@ namespace pbrlib::math
         /**
          * @brief Метод необходимый для нормирования вектора.
         */
-        void normalize();
+        inline void normalize();
 
     public:
         union
@@ -151,7 +151,7 @@ namespace pbrlib::math
      * @return нормированный вектор v.
     */
     template<typename Type>
-    Vec4<Type> normalize(const Vec4<Type>& v);
+    inline Vec4<Type> normalize(const Vec4<Type>& v);
 
     template<typename Type>
     ostream& operator << (ostream& print, const Vec4<Type>& vec);

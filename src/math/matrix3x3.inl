@@ -37,7 +37,7 @@ namespace pbrlib::math
         Type v31, Type v32, Type v33
     ) :
         _array9 {
-            v11, v12, v13.
+            v11, v12, v13,
             v21, v22, v23,
             v31, v32, v33
         }
@@ -245,7 +245,9 @@ namespace pbrlib::math
             _array3x3[2][1] = - (tmat._array3x3[0][0] * tmat._array3x3[1][2] - tmat._array3x3[0][2] * tmat._array3x3[1][0]);
             _array3x3[2][2] =   (tmat._array3x3[0][0] * tmat._array3x3[1][1] - tmat._array3x3[0][1] * tmat._array3x3[1][0]);
 
-            *this *= (static_cast<Type>(1) / d);
+            for (size_t i{0}; i < 9; i++) {
+                _array9[i] /= d;
+            }
         }
     }
 

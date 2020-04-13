@@ -8,8 +8,6 @@
 
 #include <memory>
 
-#include "vec4.hpp"
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -304,7 +302,9 @@ namespace pbrlib::math
             _array4x4[3][2] = -(tmat[0][0] * a22342432 - tmat[0][1] * a21342431 + tmat[0][3] * a21322231);
             _array4x4[3][3] =   tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
             
-            *this *= (static_cast<Type>(1) / d);
+            for (size_t i{0}; i < 16; i++) {
+                _array16[i] /= d;
+            }
         }
     }
 
