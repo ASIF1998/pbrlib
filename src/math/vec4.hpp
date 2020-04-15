@@ -125,6 +125,14 @@ namespace pbrlib::math
                 float z;
                 float w;
             };
+            
+            struct
+            {
+                float r;
+                float g;
+                float b;
+                float a;
+            };
 
             float   xyzw[4];
             __m128  xyzw_simd;

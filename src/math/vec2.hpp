@@ -64,6 +64,12 @@ namespace pbrlib::math
                 Type x;
                 Type y;
             };
+            
+            struct
+            {
+                Type r;
+                Type g;
+            };
 
             Type xy[2];
         };
