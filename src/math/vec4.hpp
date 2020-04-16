@@ -69,7 +69,16 @@ namespace pbrlib::math
                 Type w;
             };
 
+            struct
+            {
+                Type r;
+                Type g;
+                Type b;
+                Type a;
+            };
+
             Type xyzw[4];
+            Type rgba[4];
         };
     };
 
@@ -135,6 +144,7 @@ namespace pbrlib::math
             };
 
             float   xyzw[4];
+            float   rgba[4];
             __m128  xyzw_simd;
         };
     };

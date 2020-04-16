@@ -72,6 +72,7 @@ namespace pbrlib::math
             };
 
             Type xy[2];
+            Type rg[2];
         };
     };
 

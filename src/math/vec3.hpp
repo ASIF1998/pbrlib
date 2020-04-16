@@ -74,6 +74,7 @@ namespace pbrlib::math
             };
 
             Type xyz[3];
+            Type rgb[3];
         };
     };
 

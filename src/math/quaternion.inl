@@ -80,9 +80,10 @@ namespace pbrlib::math
     }
 
     inline Quaternion& Quaternion::operator *= (const Quaternion& q) noexcept
-    {  
-        v = q.v * w + v * q.w + cross(v, q.v);
-        w = w * q.w - dot(v, q.v);
+    {
+        Vec3<float> temp (v);
+        v = q.v * w + temp * q.w + cross(temp, q.v);
+        w = w * q.w - dot(temp, q.v);
         return *this;
     }
 
@@ -113,7 +114,7 @@ namespace pbrlib::math
 
     ostream& operator << (ostream& print, const Quaternion& q)
     {
-        print << q.v.x << ' ' << q.v.y << ' ' << q.v.z << ' ' << q.w;
+        print << q.v << ' ' << q.w;
         return print;
     }
 
@@ -195,21 +196,26 @@ namespace pbrlib::math
 
     inline Quaternion lerp(float t, const Quaternion& q1, const Quaternion& q2)
     {
-        return normalize(q1 * (1.0f - t) + q2 * t);
+        return q1 * (1.0f - t) + q2 * t;
     }
 
     inline Quaternion slerp(float t, const Quaternion& q1, const Quaternion& q2)
     {
         float cos_theta = dot(q1, q2);
 
-        if (cos_theta > 0.9995f) {
+        if (cos_theta > 0.995f) {
             return lerp(t, q1, q2);
         }
 
-        float       theta       = acos(clamp(cos_theta, -1.0f, 1.0f));
-        float       theta_ap    = theta * t;
-        Quaternion  qperp       = normalize(q2 - q1 * cos_theta);
+        Quaternion  q3 = q2;
 
-        return q1 * cos(theta_ap) + qperp * sin(theta);
+        if (cos_theta < static_cast<float>(0u)) {
+            q3          *=  -1.0f;
+            cos_theta   =   -cos_theta;
+        }
+        
+        float theta = acos(cos_theta);
+
+        return (q1 * sin((1.0f - t) * theta) + q3 * sin(t * theta)) / sin(theta);
     }
 }
