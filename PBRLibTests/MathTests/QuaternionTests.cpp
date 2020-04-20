@@ -211,3 +211,17 @@ TEST(MathQuaternion, Slerp)
 
     EXPECT_EQ(res, slerp(0.5f, q1, q2));
 }
+
+TEST(MathQuaternion, ToTransform)
+{
+    constexpr Matrix4x4<float> r (
+        1.0f, 0.0f,  0.0f,  0.0f,
+        0.0f, -1.0f, 0.0f,  0.0f,
+        0.0f, 0.0f,  -1.0f, 0.0f,
+        0.0f, 0.0f,  0.0f,  1.0f
+    );
+
+    Quaternion  q (1.0f, 0.0f, 0.0f, 0.0f);
+
+    EXPECT_EQ(r, q.toTransform().getMatrix());
+}

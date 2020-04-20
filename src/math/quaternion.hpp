@@ -15,6 +15,8 @@
 
 #include "vec3.hpp"
 
+#include "../Moving/Transform.hpp"
+
 using namespace std;
 
 namespace pbrlib::math
@@ -45,18 +47,14 @@ namespace pbrlib::math
         inline float&   operator [] (size_t i) noexcept;
 
         friend ostream& operator << (ostream& print, const Quaternion& q);
-
-        /**
-         * TODO: 
-         *      1) Добавить метод toTransform;
-         *      2) Добавить конструктор, инициализирующий кватернион от класса Transform.
-        */
-
+        
         inline float lengthSquared()    const noexcept;
         inline float length()           const noexcept;
 
         inline void normalize();
         inline void inverse();
+
+        inline Transform toTransform() const;
 
         /**
          * @brief Статический метод, который создаёт следющий кватернион:
