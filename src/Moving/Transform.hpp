@@ -20,6 +20,8 @@ namespace pbrlib
 {
     using namespace math;
 
+    class AABB;
+
     class Transform
     {
     public:
@@ -28,13 +30,9 @@ namespace pbrlib
 
         bool operator == (const Transform& t) const;
         bool operator != (const Transform& t) const;
-
-        /**
-         * TODO:
-         *  1) Добавить опператор () к AABB.
-        */
         
         Vec3<float> operator () (const Vec3<float>& v)      const;
+        AABB        operator () (const AABB& bbox)          const;
         Transform   operator *  (const Transform& t)        const;
 
         bool identity() const;

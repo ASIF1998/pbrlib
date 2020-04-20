@@ -10,6 +10,8 @@
 
 #include "../math/matrix4x4.hpp"
 
+#include "../RenderingResources/AABB.hpp"
+
 #include <cmath>
 
 namespace pbrlib
@@ -47,6 +49,20 @@ namespace pbrlib
             _m[1][0] * v.x + _m[1][1] * v.y + _m[1][2] * v.z,
             _m[2][0] * v.x + _m[2][1] * v.y + _m[2][2] * v.z
         };
+    }
+
+    AABB Transform::operator () (const AABB& bbox) const
+    {
+        AABB new_bbox ((*this)(bbox.corner(0)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(1)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(2)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(3)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(4)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(5)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(6)));
+        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(7)));
+
+        return new_bbox;
     }
 
     Transform Transform::operator * (const Transform& t) const
