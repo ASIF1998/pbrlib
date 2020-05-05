@@ -195,4 +195,30 @@ namespace pbrlib
     {
         return _sampler_handle;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Sampler::Builder::Builder() :
+        SamplerInfo()
+    {}
+
+    void Sampler::Builder::setDevice(const PtrDevice& ptr_device)
+    {
+        _ptr_device = ptr_device;
+    }
+
+    Sampler Sampler::Builder::build() const
+    {
+        return Sampler(
+            _ptr_device,
+            *this
+        );
+    }
+
+    PtrSampler Sampler::Builder::buildPtr() const
+    {
+        return make_shared<Sampler>(
+            _ptr_device,
+            *this
+        );
+    }
 }

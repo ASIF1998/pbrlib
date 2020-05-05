@@ -55,6 +55,30 @@ namespace pbrlib
     class ShaderModule
     {
     public:
+        class Builder
+        {
+        public:
+            Builder();
+
+            void setDevice(const PtrDevice& ptr_device);
+            void setShaderType(VkShaderStageFlagBits shader_type)                               noexcept;
+            void setShaderCode(const uint32_t* ptr_shader_code, size_t shader_code_size)        noexcept;
+            void setSpecializationInfoSizeData(size_t specialization_info_size_data)            noexcept;
+            void setSpecializationInfoNumMapEntries(size_t specialization_info_num_map_entires) noexcept;
+
+            ShaderModule    build()     const;
+            PtrShaderModule buildPtr()  const;
+
+        private:
+            PtrDevice               _ptr_device;
+            VkShaderStageFlagBits   _shader_type;
+            const uint32_t*         _ptr_shader_code;
+            size_t                  _shader_code_size;
+            size_t                  _specialization_info_size_data;
+            size_t                  _specialization_info_num_map_entires;
+        };
+
+    public:
         ShaderModule(
             const PtrDevice&            ptr_device,
             VkShaderStageFlagBits       shader_type,

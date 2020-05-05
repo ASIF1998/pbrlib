@@ -998,4 +998,69 @@ namespace pbrlib
             subpass_index
         );
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    GraphicsPipeline::Builder::Builder(
+        size_t num_vertex_biding_descriptions,
+        size_t num_vertex_attribute_descriptions,
+        size_t num_viewports,
+        size_t num_scissors,
+        size_t num_attachments
+    ) :
+        GraphicsPipelineState(
+            num_vertex_biding_descriptions, 
+            num_vertex_attribute_descriptions, 
+            num_viewports, 
+            num_scissors, 
+            num_attachments
+        ),
+        _subpass_index(0)
+    {}
+
+    void GraphicsPipeline::Builder::setPipleineLayout(const PtrPipelineLayout& ptr_pipeline_layout)
+    {
+        _ptr_pipeline_layout = ptr_pipeline_layout;
+    }
+
+    void GraphicsPipeline::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
+    {
+        _ptr_render_pass = ptr_render_pass;
+    }
+    
+    void GraphicsPipeline::Builder::setSubpassIndex(uint32_t subpass_index) noexcept
+    {
+        _subpass_index = subpass_index;
+    }
+
+    void GraphicsPipeline::Builder::setShadersModules(vector<ShaderModule>&& shaders)
+    {
+        swap(_shaders, shaders);
+    }
+
+    void GraphicsPipeline::Builder::addShader(ShaderModule&& shader_module)
+    {
+        _shaders.push_back(move(shader_module));
+    }
+
+    GraphicsPipeline GraphicsPipeline::Builder::build() const
+    {
+        return GraphicsPipeline(
+            *this,
+            _shaders,
+            _ptr_pipeline_layout,
+            _ptr_render_pass,
+            _subpass_index
+        );
+    }
+
+    PtrGraphicsPipeline GraphicsPipeline::Builder::buildPtr() const
+    {
+        return make_shared<GraphicsPipeline>(
+            *this,
+            _shaders,
+            _ptr_pipeline_layout,
+            _ptr_render_pass,
+            _subpass_index
+        );
+    }
 }

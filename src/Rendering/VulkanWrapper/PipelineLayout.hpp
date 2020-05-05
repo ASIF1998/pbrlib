@@ -21,7 +21,6 @@ namespace pbrlib
     class PipelineLayout;
     class DescriptorSetLayout;
     class SamplerInfo;
-//    class Sampler;
 
     using PtrPipelineLayout         = shared_ptr<PipelineLayout>;
     using PtrDescriptorSetLayout    = shared_ptr<DescriptorSetLayout>;

@@ -13,6 +13,10 @@
 
 namespace pbrlib
 {
+    class Sampler;
+
+    using PtrSampler = shared_ptr<Sampler>;
+
     /**
      * @class SamplerInfo.
      * @brief Класс предназначенный для хранения информации о выборке.
@@ -139,6 +143,22 @@ namespace pbrlib
 
     class Sampler
     {
+    public:
+        class Builder:
+            public SamplerInfo
+        {
+        public:
+            Builder();
+
+            void setDevice(const PtrDevice& ptr_device);
+
+            Sampler     build()     const;
+            PtrSampler  buildPtr()  const;
+
+        private:
+            PtrDevice _ptr_device;
+        };
+
     public:
         /**
          * @brief Конструктор.

@@ -118,8 +118,7 @@ namespace pbrlib
             if (is_memory_mapped == MapStatus::UNMAPPED) {
                 map();
             }
-
-            // memcpy(_ptr_mapped_data, &data[0], sizeof(data[0]) * size);
+            
             memcpy(_ptr_mapped_data, ptr, sizeof(ptr[0]) * size);
 
             if (is_memory_mapped == MapStatus::UNMAPPED) {

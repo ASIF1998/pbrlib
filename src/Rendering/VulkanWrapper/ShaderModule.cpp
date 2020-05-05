@@ -215,4 +215,67 @@ namespace pbrlib
             specialization_info_num_map_entires
         );
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ShaderModule::Builder::Builder() :
+        _specialization_info_size_data      (0),
+        _specialization_info_num_map_entires(0)
+    {}
+
+    void ShaderModule::Builder::setDevice(const PtrDevice& ptr_device)
+    {
+        _ptr_device = ptr_device;
+    }
+
+    void ShaderModule::Builder::setShaderType(VkShaderStageFlagBits shader_type) noexcept
+    {
+        _shader_type = shader_type;
+    }
+
+    void ShaderModule::Builder::setShaderCode(
+        const uint32_t* ptr_shader_code, 
+        size_t          shader_code_size
+    ) noexcept
+    {
+        _ptr_shader_code    = ptr_shader_code;
+        _shader_code_size   = shader_code_size;
+    }
+
+    void ShaderModule::Builder::setSpecializationInfoSizeData(
+        size_t specialization_info_size_data
+    ) noexcept
+    {
+        _specialization_info_size_data = specialization_info_size_data;
+    }
+
+    void ShaderModule::Builder::setSpecializationInfoNumMapEntries(
+        size_t specialization_info_num_map_entires
+    ) noexcept
+    {
+        _specialization_info_num_map_entires = specialization_info_num_map_entires;
+    }
+
+    ShaderModule ShaderModule::Builder::build() const
+    {
+        return ShaderModule(
+            _ptr_device,
+            _shader_type,
+            _ptr_shader_code,
+            _shader_code_size,
+            _specialization_info_size_data,
+            _specialization_info_num_map_entires
+        );
+    }
+
+    PtrShaderModule ShaderModule::Builder::buildPtr() const
+    {
+        return make_shared<ShaderModule>(
+            _ptr_device,
+            _shader_type,
+            _ptr_shader_code,
+            _shader_code_size,
+            _specialization_info_size_data,
+            _specialization_info_num_map_entires
+        );
+    }
 }

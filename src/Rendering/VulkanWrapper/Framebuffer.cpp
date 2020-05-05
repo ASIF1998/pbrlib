@@ -346,4 +346,118 @@ namespace pbrlib
             layers
         );
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Framebuffer::Builder::Builder() :
+        _ptr_swapchain              (nullptr),
+        _ptr_render_pass            (nullptr),
+        _ptr_attachments             (nullptr),
+        _swapchain_attachment_index (0),
+        _width                      (0),
+        _height                     (0),
+        _layers                     (0)
+    {}
+
+    void Framebuffer::Builder::setSwapchain(const PtrSwapchain& ptr_swapchain)
+    {
+        _ptr_swapchain = ptr_swapchain;
+    }
+
+    void Framebuffer::Builder::setSwapchainAttachmentIndex(uint32_t swapchain_attachment_index)
+    {
+        _swapchain_attachment_index = swapchain_attachment_index;
+    }
+
+    void Framebuffer::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
+    {
+        _ptr_render_pass = ptr_render_pass;
+    }
+
+    void Framebuffer::Builder::setAttachments(const PtrAttachments& ptr_attachments)
+    {
+        _ptr_attachments = ptr_attachments;
+    }
+
+    void Framebuffer::Builder::setWidth(uint32_t width) noexcept
+    {
+        _width = width;
+    }
+
+    void Framebuffer::Builder::setHeight(uint32_t height) noexcept
+    {
+        _height = height;
+    }
+
+    void Framebuffer::Builder::setNumLayers(uint32_t num_layers) noexcept
+    {
+        _layers = num_layers;
+    }
+
+    Framebuffer Framebuffer::Builder::build() const
+    {
+        if (!_ptr_swapchain) {
+            return Framebuffer(
+                _ptr_attachments,
+                _ptr_render_pass,
+                _width,
+                _height,
+                _layers
+            );
+        }
+
+        if (!_ptr_attachments) {
+            return Framebuffer(
+                _ptr_swapchain,
+                _swapchain_attachment_index,
+                _ptr_render_pass,
+                _width,
+                _height,
+                _layers
+            );
+        }
+
+        return Framebuffer(
+            _ptr_swapchain,
+            _swapchain_attachment_index,
+            _ptr_render_pass,
+            _ptr_attachments,
+            _width,
+            _height,
+            _layers
+        );
+    }
+
+    PtrFramebuffer Framebuffer::Builder::buildPtr() const
+    {
+        if (!_ptr_swapchain) {
+            return make_shared<Framebuffer>(
+                _ptr_attachments,
+                _ptr_render_pass,
+                _width,
+                _height,
+                _layers
+            );
+        }
+
+        if (!_ptr_attachments) {
+            return make_shared<Framebuffer>(
+                _ptr_swapchain,
+                _swapchain_attachment_index,
+                _ptr_render_pass,
+                _width,
+                _height,
+                _layers
+            );
+        }
+
+        return make_shared<Framebuffer>(
+            _ptr_swapchain,
+            _swapchain_attachment_index,
+            _ptr_render_pass,
+            _ptr_attachments,
+            _width,
+            _height,
+            _layers
+        );
+    }
 }

@@ -13,14 +13,22 @@
 
 #include <vector>
 #include <memory>
+#include "../../Memory/STLAlignedAllocator.hpp"
+
+#include "../../math/vec2.hpp"
+#include "../../math/vec3.hpp"
+#include "../../math/vec4.hpp"
 
 using namespace std;
+using namespace pbrlib::math;
 
 namespace pbrlib
 {
     class Image;
+    class ImageView;
 
-    using PtrImage = shared_ptr<Image>;
+    using PtrImage      = shared_ptr<Image>;
+    using PtrImageView  = shared_ptr<ImageView>;
 
     /**
      * @struct ImageInfo.
@@ -42,6 +50,95 @@ namespace pbrlib
         public DeviceMemory
     {
         friend class Swapchain;
+    
+    public:
+        enum class TexelType
+        {
+            R,
+            RG,
+            RGB,
+            RGBA
+        };
+
+        enum class NumBits
+        {
+            NB16,
+            NB32
+        };
+
+        template<TexelType TexType, typename Type, NumBits NBits>
+        class Builder
+        {
+        public:
+            inline          Builder();
+            inline virtual ~Builder();
+
+            inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
+            inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;
+            inline void         setNumSamples(VkSampleCountFlagBits num_samples)            noexcept;
+            inline void         setTiling(VkImageTiling tiling)                             noexcept;
+            inline void         setUsage(VkImageUsageFlags usage)                           noexcept;
+            inline void         setNumMipLevels(uint32_t mip_levels)                        noexcept;
+            inline void         setImageType(VkImageType image_type)                        noexcept;
+            inline void         setNumArrayLayers(uint32_t array_layers)                    noexcept;
+            inline void         setDevice(const PtrDevice& ptr_device)                      noexcept;
+            inline void         setMemoryTypeIndex(uint32_t memory_type_index)              noexcept;
+
+            inline void addQueueFamilyIndex(uint32_t queue_family_index) noexcept;
+
+            inline virtual Image       build()     const;
+            inline virtual PtrImage    buildPtr()  const;
+
+        protected:
+            PtrDevice           _ptr_device;
+            ImageInfo           _image_info;
+            uint32_t            _memory_type_index;
+            vector<uint32_t>    _queue_family_indicies;
+        };
+
+        template<
+            TexelType   TexType, 
+            typename    Type, 
+            NumBits     NBits, 
+            typename    AllocatorType = STLAlignedAllocator<Type>
+        >
+        class BuilderWithData :
+            public Builder<TexType, Type, NBits>
+        {
+        public:
+            inline BuilderWithData();
+            inline BuilderWithData(uint32_t width, uint32_t height, uint32_t depth);
+            inline BuilderWithData(const VkExtent3D& extend);
+
+            inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
+            inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;
+
+            template<typename Container>
+            void setData(const Container& data);
+
+            void setData(const Type* ptr, size_t size);
+
+            inline void pushBack(Type r);
+            inline void pushBack(const Vec2<Type>& c);
+            inline void pushBack(const Vec3<Type>& c);
+            inline void pushBack(const Vec4<Type>& c);
+
+            inline void set(size_t i, Type r);
+            inline void set(size_t i, const Vec2<Type>& c);
+            inline void set(size_t i, const Vec3<Type>& c);
+            inline void set(size_t i, const Vec4<Type>& c);
+
+            inline void set(size_t i, size_t j, Type r);
+            inline void set(size_t i, size_t j, const Vec2<Type>& c);
+            inline void set(size_t i, size_t j, const Vec3<Type>& c);
+            inline void set(size_t i, size_t j, const Vec4<Type>& c);
+
+            inline virtual Image       build()     const;
+            inline virtual PtrImage    buildPtr()  const;
+
+        private:
+            vector<Type, AllocatorType> _data;
+        };
 
     public:
         /**
@@ -225,6 +322,29 @@ namespace pbrlib
     class ImageView
     {
         friend class Swapchain;
+
+    public:
+        class Builder
+        {
+        public:
+            inline void setImage(const PtrImage& ptr_image);
+            inline void setFormat(VkFormat format)                     noexcept;
+            inline void setAspectMask(VkImageAspectFlags aspect_mask)  noexcept;
+            inline void setBaseMipLevel(uint32_t base_mip_level)       noexcept;
+            inline void setLevelCount(uint32_t level_count)            noexcept;
+            inline void setBaseArrayLayer(uint32_t base_array_layer)   noexcept;
+            inline void setLayerCount(uint32_t layer_count)            noexcept;
+            inline void setType(VkImageViewType type)                  noexcept;
+
+            inline ImageView       build()     const;
+            inline PtrImageView    buildPtr()  const;
+
+        private:
+            PtrImage                _ptr_image;
+            VkFormat                _format;
+            VkImageSubresourceRange _subresource_range;
+            VkImageViewType         _image_view_type;
+        };
         
     public:
         /**
@@ -266,5 +386,7 @@ namespace pbrlib
         VkImageViewType         _type;
     };
 }
+
+#include "Image.inl"
 
 #endif /* Image_hpp */

@@ -23,12 +23,65 @@ namespace pbrlib
     class Framebuffer
     {
     public:
+        class Builder
+        {
+        public:
+            Builder();
+
+            /**
+             * @brief Метод устанавливающий список отображения.
+             * 
+             * @param ptr_swapchain указатель на список отображения.
+            */
+            void setSwapchain(const PtrSwapchain& ptr_swapchain);
+
+            /**
+             * @brief Метод устанавливающий индекс вида изображения внутри списка отображения.
+             * 
+             * @param swapchain_attachment_index индекс вида изображения внутри списка отображения.
+            */
+            void setSwapchainAttachmentIndex(uint32_t swapchain_attachment_index);
+
+            /**
+             * @brief 
+             *      Метод устанавливающий проход рендеринга.
+             * 
+             * @param ptr_render_pass указатель на проход рендеринга.
+            */
+            void setRenderPass(const PtrRenderPass& ptr_render_pass);
+
+            /**
+             * @brief Метод устанавливающий виды изображений.
+             * 
+             * @param ptr_attachments  указатель на виды изображений (например глубина-трафарет).
+            */
+            void setAttachments(const PtrAttachments& ptr_attachments);
+
+            void setWidth(uint32_t width)           noexcept;
+            void setHeight(uint32_t height)         noexcept;
+            void setNumLayers(uint32_t num_layers)  noexcept;
+
+            Framebuffer     build()     const;
+            PtrFramebuffer  buildPtr()  const;
+
+        private:
+            PtrSwapchain    _ptr_swapchain;
+            PtrRenderPass   _ptr_render_pass;
+            PtrAttachments  _ptr_attachments;
+            uint32_t        _swapchain_attachment_index;
+            uint32_t        _width;
+            uint32_t        _height;
+            uint32_t        _layers;
+        };
+
+    public:
         /**
          * @brief Конструктор.
          * 
          * @param ptr_swapchain             указатель на список отображения.
          * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
-         * @param attachments               иные виды изображения (например глубина-трафарет), 
+         * @param ptr_render_pass           указатель на проход рендеринга.
+         * @param attachments               иные виды изображений (например глубина-трафарет), 
          *                                  которые, при создании фреймбуфера, будут идти после 
          *                                  видов изображения в списке отображения.
          * @param width                     ширина фреймбуфера.
@@ -50,7 +103,8 @@ namespace pbrlib
          * 
          * @param ptr_swapchain             указатель на список отображения.
          * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
-         * @param attachments               иные виды изображения (например глубина-трафарет), 
+         * @param ptr_render_pass           указатель на проход рендеринга.
+         * @param attachments               иные виды изображений (например глубина-трафарет), 
          *                                  которые, при создании фреймбуфера, будут идти после 
          *                                  видов изображения в списке отображения.
          * @param width                     ширина фреймбуфера.
@@ -72,6 +126,7 @@ namespace pbrlib
          * 
          * @param ptr_swapchain             указатель на список отображения.
          * @param swapchain_attachment_indx индекс вида изображения внутри списка отображения.
+         * @param ptr_render_pass           указатель на проход рендеринга.
          * @param width                     ширина фреймбуфера.
          * @param height                    высота фреймбуфера.
          * @param layers                    количество слоёв фреймбуфера.
@@ -88,10 +143,11 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param attachments   виды изображений.
-         * @param width         ширина фреймбуфера.
-         * @param height        высота фреймбуфера.
-         * @param layers        количество слоёв фреймбуфера.
+         * @param attachments       виды изображений.
+         * @param ptr_render_pass   указатель на проход рендеринга.
+         * @param width             ширина фреймбуфера.
+         * @param height            высота фреймбуфера.
+         * @param layers            количество слоёв фреймбуфера.
         */  
         Framebuffer(
             PtrAttachments&&        attachments,
@@ -104,10 +160,11 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param attachments   виды изображений.
-         * @param width         ширина фреймбуфера.
-         * @param height        высота фреймбуфера.
-         * @param layers        количество слоёв фреймбуфера.
+         * @param attachments       виды изображений.
+         * @param ptr_render_pass   указатель на проход рендеринга.
+         * @param width             ширина фреймбуфера.
+         * @param height            высота фреймбуфера.
+         * @param layers            количество слоёв фреймбуфера.
         */  
         Framebuffer(
             const PtrAttachments&   attachments,

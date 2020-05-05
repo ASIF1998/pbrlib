@@ -640,6 +640,45 @@ namespace pbrlib
     class GraphicsPipeline
     {
     public:
+        class Builder :
+            public GraphicsPipelineState
+        {
+        public:
+            /**
+             * @brief Конструктор.
+             * 
+             * @param num_vertex_biding_descriptions    число вершинных привязок используемых конвейером.
+             * @param num_vertex_attribute_descriptions число атрибутов вершины.
+             * @param num_viewports                     число областей вывода.
+             * @param num_scissors                      число прямоугольников для отсечения.
+             * @param num_attachments                   число подключений.
+            */
+            Builder(
+                size_t num_vertex_biding_descriptions,
+                size_t num_vertex_attribute_descriptions,
+                size_t num_viewports,
+                size_t num_scissors,
+                size_t num_attachments
+            );
+
+            void setPipleineLayout(const PtrPipelineLayout& ptr_pipeline_layout);
+            void setRenderPass(const PtrRenderPass& ptr_render_pass);
+            void setSubpassIndex(uint32_t subpass_index) noexcept;
+            void setShadersModules(vector<ShaderModule>&& shaders);
+
+            void addShader(ShaderModule&& shader_module);
+
+            GraphicsPipeline    build()     const;
+            PtrGraphicsPipeline buildPtr()  const;
+
+        private:
+            PtrPipelineLayout       _ptr_pipeline_layout;
+            PtrRenderPass           _ptr_render_pass;
+            uint32_t                _subpass_index;
+            vector<ShaderModule>    _shaders;
+        };
+
+    public:
         /**
          * @brief Конструктор.
          * 
@@ -674,8 +713,8 @@ namespace pbrlib
             uint32_t                                subpass_index
         );
 
-         GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
-                GraphicsPipeline(const GraphicsPipeline&&)  = delete;
+        GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
+        GraphicsPipeline(const GraphicsPipeline&&)  = delete;
 
         ~GraphicsPipeline();
 

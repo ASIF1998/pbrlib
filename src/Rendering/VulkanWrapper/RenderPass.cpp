@@ -347,4 +347,38 @@ namespace pbrlib
     {
         return make_shared<RenderPass>(ptr_device, move(render_pass_info));
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderPass::Builder::Builder(
+        size_t num_attribute_descriptions,
+        size_t num_subpass_descriptions,
+        size_t num_subpass_dependencies
+    ) :
+        RenderPassInfo(
+            num_attribute_descriptions,
+            num_subpass_descriptions,
+            num_subpass_dependencies
+        )
+    {}
+
+    void RenderPass::Builder::setDevice(const PtrDevice& ptr_device)
+    {
+        _ptr_device = ptr_device;
+    }
+
+    RenderPass RenderPass::Builder::build() const
+    {
+        return RenderPass(
+            _ptr_device,
+            *this
+        );
+    }
+    
+    PtrRenderPass RenderPass::Builder::buildPtr() const
+    {
+        return make_shared<RenderPass>(
+            _ptr_device,
+            *this
+        );
+    }
 }

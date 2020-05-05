@@ -56,6 +56,7 @@ namespace pbrlib
         _image_info             (image_info),
         _queue_family_indicies  (1)
     {
+        _queue_family_indicies[0] = queue_family_index;
         _create();
     }
 

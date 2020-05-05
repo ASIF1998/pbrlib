@@ -196,6 +196,39 @@ namespace pbrlib
     class RenderPass
     {
     public:
+        class Builder :
+            public RenderPassInfo
+        {
+        public:
+            Builder() = default;
+
+            /**
+             * @brief Конструктор.
+             * @details
+             *      При передачи в качестве аргумента num_subpass_descriptions отличное от нуля число,
+             *      то все num_subpass_descriptions объектов будут доступны сразу же. Это касается только
+             *      объектов типа SubpassDescription (описателей подпрохода).
+             *
+             * @param num_attribute_descriptions    количество определителей подключения.
+             * @param num_subpass_descriptions      количество описателей подпрохода.
+             * @param num_subpass_dependencies      количество определителей зависимостей подпроходов.
+            */
+            Builder(
+                size_t num_attribute_descriptions,
+                size_t num_subpass_descriptions,
+                size_t num_subpass_dependencies
+            );
+            
+            void setDevice(const PtrDevice& ptr_device);
+
+            RenderPass      build()     const;
+            PtrRenderPass   buildPtr()  const;
+
+        private:
+            PtrDevice _ptr_device;
+        };
+
+    public:
         /**
          * @brief Конструктор.
          * 
