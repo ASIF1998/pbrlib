@@ -351,7 +351,7 @@ namespace pbrlib
     Framebuffer::Builder::Builder() :
         _ptr_swapchain              (nullptr),
         _ptr_render_pass            (nullptr),
-        _ptr_attachments             (nullptr),
+        _ptr_attachments            (nullptr),
         _swapchain_attachment_index (0),
         _width                      (0),
         _height                     (0),
