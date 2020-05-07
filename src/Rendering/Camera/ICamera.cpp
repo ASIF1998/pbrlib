@@ -16,14 +16,16 @@ namespace pbrlib
         const Vec3<float>&  pos,
         const Vec3<float>&  eye,
         float               z_near,
-        float               z_far
+        float               z_far,
+        const Viewport&     viewport
     ) :
         _view       (view),
         _projection (projection),
         _pos        (pos),
         _dir        (eye),
         _z_near     (z_near),
-        _z_far      (z_far)
+        _z_far      (z_far),
+        _viewport   (viewport)
     {}
 
     Transform& ICamera::getView() noexcept
@@ -81,6 +83,16 @@ namespace pbrlib
         return _z_far;
     }
 
+    Viewport& ICamera::getViewport() noexcept
+    {
+        return _viewport;
+    }
+
+    const Viewport& ICamera::getViewport() const noexcept
+    {
+        return _viewport;
+    }
+
     void ICamera::setLookAt(
         const Vec3<float>& eye,
         const Vec3<float>& pos,
@@ -109,5 +121,27 @@ namespace pbrlib
         _z_near     = near;
         _z_far      = far;
         _projection = _calculateProjection();
+    }
+
+    void ICamera::setViewport(const Viewport& viewport) noexcept
+    {
+        _viewport = viewport;
+    }
+
+    void ICamera::setViewport(
+        float x,
+        float y,
+        float width,
+        float height,
+        float min_depth,
+        float max_depth
+    ) noexcept
+    {
+        _viewport.x         = x;
+        _viewport.y         = y;
+        _viewport.width     = width;
+        _viewport.height    = height;
+        _viewport.minDepth  = min_depth;
+        _viewport.maxDepth  = max_depth;
     }
 }

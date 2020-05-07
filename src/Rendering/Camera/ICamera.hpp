@@ -11,6 +11,12 @@
 
 #include "../../Moving/Transform.hpp"
 
+#include <vulkan/vulkan.h>
+
+struct VkViewport;
+
+using Viewport = VkViewport;
+
 namespace pbrlib
 {
     class ICamera
@@ -33,7 +39,8 @@ namespace pbrlib
             const Vec3<float>&  pos,
             const Vec3<float>&  eye,
             float               z_near,
-            float               z_far
+            float               z_far,
+            const Viewport&     viewport
         );
 
     public:
@@ -50,6 +57,9 @@ namespace pbrlib
         
         float getNearClipp()    const noexcept;
         float getFarClipp()     const noexcept;
+
+        Viewport&       getViewport() noexcept;
+        const Viewport& getViewport() const noexcept;
 
         void setLookAt(
             const Vec3<float>& eye,
@@ -85,6 +95,32 @@ namespace pbrlib
         */
         void setNearAndFarClipp(float near, float far);
 
+        /**
+         * @brief Метод позволяющий установить параметры области просмотра.
+         * 
+         * @param viewport параметры области просмотра.
+        */
+        void setViewport(const Viewport& viewport) noexcept;
+
+        /**
+         * @brief Метод позволяющий установить параметры области просмотра.
+         * 
+         * @param x         координата верхнего левого угла просмотра по оси X.
+         * @param y         координата верхнего левого угла просмотра по оси Y.
+         * @param width     ширина области просмотра.
+         * @param height    высота области просмотра. 
+         * @param min_depth минимальная глубина.
+         * @param max_depth максимальная глубина.
+        */
+        void setViewport(
+            float x,
+            float y,
+            float width,
+            float height,
+            float min_depth,
+            float max_depth
+        ) noexcept;
+
     protected:
         virtual Transform _calculateProjection() const = 0;
 
@@ -95,6 +131,7 @@ namespace pbrlib
         Vec3<float> _dir;
         float       _z_near;
         float       _z_far;
+        Viewport    _viewport;
     };
 }
 

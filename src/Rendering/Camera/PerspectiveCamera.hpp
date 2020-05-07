@@ -76,6 +76,32 @@ namespace pbrlib
             */
             void setFovy(float fovy) noexcept;
 
+            /**
+             * @brief Метод позволяющий установить параметры области просмотра.
+             * 
+             * @param viewport параметры области просмотра.
+            */
+            void setViewport(const Viewport& viewport) noexcept;
+
+            /**
+             * @brief Метод позволяющий установить параметры области просмотра.
+             * 
+             * @param x         координата верхнего левого угла просмотра по оси X.
+             * @param y         координата верхнего левого угла просмотра по оси Y.
+             * @param width     ширина области просмотра.
+             * @param height    высота области просмотра. 
+             * @param min_depth минимальная глубина.
+             * @param max_depth максимальная глубина.
+            */
+            void setViewport(
+                float x,
+                float y,
+                float width,
+                float height,
+                float min_depth,
+                float max_depth
+            ) noexcept;
+
             PerspectiveCamera       build()     const;
             PtrPerspectiveCamera    ptrBuild()  const;
 
@@ -87,6 +113,7 @@ namespace pbrlib
             float       _z_far;
             float       _aspect;
             float       _fovy;
+            Viewport    _viewport;
         };
 
     public:
@@ -100,6 +127,7 @@ namespace pbrlib
          * @param far_clipp     расстояние до дальней плоскости отсечения по оси Z.
          * @param aspect        соотношение сторон.
          * @param fovy          угол между верхней и нижней сторонами усечённого вида.
+         * @param viewport      параметры области просмотра.
         */
         PerspectiveCamera(
             const Vec3<float>&  pos,
@@ -108,7 +136,8 @@ namespace pbrlib
             float               near_clipp,
             float               far_clipp,
             float               aspect,
-            float               fovy
+            float               fovy,
+            const Viewport&     viewport
         );
 
         float getAspect()   const noexcept;

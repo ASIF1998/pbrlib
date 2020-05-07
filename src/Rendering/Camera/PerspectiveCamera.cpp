@@ -17,7 +17,8 @@ namespace pbrlib
         float               near_clipp,
         float               far_clipp,
         float               aspect,
-        float               fovy
+        float               fovy,
+        const Viewport&     viewport
     ) :
         ICamera(
             Transform::lookAt(pos, eye, up),
@@ -25,7 +26,8 @@ namespace pbrlib
             pos,
             eye,
             near_clipp,
-            far_clipp
+            far_clipp,
+            viewport
         ),
         _aspect (aspect),
         _fovy   (fovy)
@@ -122,6 +124,28 @@ namespace pbrlib
         _fovy = fovy;
     }
 
+    void PerspectiveCamera::Builder::setViewport(const Viewport& viewport) noexcept
+    {
+        _viewport = viewport;
+    }
+
+    void PerspectiveCamera::Builder::setViewport(
+        float x,
+        float y,
+        float width,
+        float height,
+        float min_depth,
+        float max_depth
+    ) noexcept
+    {
+        _viewport.x         = x;
+        _viewport.y         = y;
+        _viewport.width     = width;
+        _viewport.height    = height;
+        _viewport.minDepth  = min_depth;
+        _viewport.maxDepth  = max_depth;
+    }
+
     PerspectiveCamera PerspectiveCamera::Builder::build() const
     {
         return PerspectiveCamera(
@@ -131,7 +155,8 @@ namespace pbrlib
             _z_near,
             _z_far,
             _aspect,
-            _fovy
+            _fovy,
+            _viewport
         );
     }
 
@@ -144,7 +169,8 @@ namespace pbrlib
             _z_near,
             _z_far,
             _aspect,
-            _fovy
+            _fovy,
+            _viewport
         );
     }
 }

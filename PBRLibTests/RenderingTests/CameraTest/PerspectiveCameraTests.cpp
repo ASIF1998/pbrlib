@@ -25,6 +25,15 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
     constexpr Vec3<float> pos   (0.0f, 0.0f, 0.0f);
     constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
+    
+    constexpr Viewport viewport {
+        .x          = width / 2.0f,
+        .y          = height / 2.0f,
+        .width      = width,
+        .height     = height,
+        .minDepth   = 0.0f,
+        .maxDepth   = 1.0f
+    };
 
     Transform r1 = Transform::lookAt(pos, eye, up);
     Transform r2 = Transform::perspective(fovy, width / height, near, far);
@@ -38,6 +47,7 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     build_camera.setPosition(pos);
     build_camera.setUp(up);
     build_camera.setFovy(fovy);
+    build_camera.setViewport(viewport);
     
     PerspectiveCamera camera = build_camera.build();
 
@@ -50,6 +60,13 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     EXPECT_EQ(r1, camera.getView());
     EXPECT_EQ(r2, camera.getProjection());
     EXPECT_EQ(r2 * r1, camera.getViewProjection());
+    
+    EXPECT_EQ(viewport.x, camera.getViewport().x);
+    EXPECT_EQ(viewport.y, camera.getViewport().y);
+    EXPECT_EQ(viewport.width, camera.getViewport().width);
+    EXPECT_EQ(viewport.height, camera.getViewport().height);
+    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
+    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
 }
 
 TEST(RenderingCameraPerspectiveCamera, Setters)
@@ -65,6 +82,15 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     Vec3<float> pos   (0.0f, 0.0f, 0.0f);
     Vec3<float> up    (0.0f, 1.0f, 0.0f);
 
+    Viewport viewport {
+        .x          = width / 2.0f,
+        .y          = height / 2.0f,
+        .width      = width,
+        .height     = height,
+        .minDepth   = 0.0f,
+        .maxDepth   = 1.0f
+    };
+
     PerspectiveCamera::Builder build_camera;
 
     build_camera.setAspect(width, height);
@@ -74,9 +100,18 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     build_camera.setPosition(pos);
     build_camera.setUp(up);
     build_camera.setFovy(fovy);
+    build_camera.setViewport(viewport);
 
     PerspectiveCamera camera = build_camera.build();
 
+
+    EXPECT_EQ(viewport.x, camera.getViewport().x);
+    EXPECT_EQ(viewport.y, camera.getViewport().y);
+    EXPECT_EQ(viewport.width, camera.getViewport().width);
+    EXPECT_EQ(viewport.height, camera.getViewport().height);
+    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
+    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
+    
     EXPECT_EQ(Transform::lookAt(pos, eye, up), camera.getView());
     EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
     EXPECT_EQ(width / height, camera.getAspect());
@@ -92,10 +127,33 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     width   = 1000.0f;
     height  = 700.0f;
 
+    viewport.x          = 0.0f;
+    viewport.y          = 0.0f;
+    viewport.width      = 1000.0f;
+    viewport.height     = 500.0f;
+    viewport.minDepth   = 0.2f;
+    viewport.maxDepth   = 0.8f;
+
     camera.setLookAt(eye, pos, up);
     camera.setNearAndFarClipp(near, far);
     camera.setAspect(width / height);
     camera.setFovy(fovy);
+    camera.setViewport(
+        viewport.x,
+        viewport.y,
+        viewport.width,
+        viewport.height,
+        viewport.minDepth,
+        viewport.maxDepth
+    );
+    
+
+    EXPECT_EQ(viewport.x, camera.getViewport().x);
+    EXPECT_EQ(viewport.y, camera.getViewport().y);
+    EXPECT_EQ(viewport.width, camera.getViewport().width);
+    EXPECT_EQ(viewport.height, camera.getViewport().height);
+    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
+    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
     
     EXPECT_EQ(Transform::lookAt(pos, eye, up), camera.getView());
     EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
@@ -104,8 +162,24 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     fovy    -= 35.0f;
     width   = 800.0f;
     height  = 500.0f;
+
+    viewport.x          = 500.0f;
+    viewport.y          = 500.0f;
+    viewport.width      = 1500.0f;
+    viewport.height     = 1500.0f;
+    viewport.minDepth   = 0.3f;
+    viewport.maxDepth   = 0.7f;
     
     camera.setAspectAndFovy(width, height, fovy);
+    camera.setViewport(viewport);
+    
+
+    EXPECT_EQ(viewport.x, camera.getViewport().x);
+    EXPECT_EQ(viewport.y, camera.getViewport().y);
+    EXPECT_EQ(viewport.width, camera.getViewport().width);
+    EXPECT_EQ(viewport.height, camera.getViewport().height);
+    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
+    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
     
     EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
     EXPECT_EQ(width / height, camera.getAspect());
