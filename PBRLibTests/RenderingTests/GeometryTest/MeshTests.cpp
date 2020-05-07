@@ -10,16 +10,16 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/RenderingResources/Mesh.hpp"
+#include "../../../src/Rendering/Geometry/Mesh.hpp"
 
-#include "../../src/math/vec3.hpp"
-#include "../../src/math/vec2.hpp"
+#include "../../../src/math/vec3.hpp"
+#include "../../../src/math/vec2.hpp"
 
-#include "../../src/Rendering/VulkanWrapper/Instance.hpp"
-#include "../../src/Rendering/VulkanWrapper/PhysicalDevice.hpp"
-#include "../../src/Rendering/VulkanWrapper/Device.hpp"
+#include "../../../src/Rendering/VulkanWrapper/Instance.hpp"
+#include "../../../src/Rendering/VulkanWrapper/PhysicalDevice.hpp"
+#include "../../../src/Rendering/VulkanWrapper/Device.hpp"
 
-#include "../../src/Rendering/VulkanWrapper/Buffer.hpp"
+#include "../../../src/Rendering/VulkanWrapper/Buffer.hpp"
 
 using namespace testing;
 using namespace pbrlib;
@@ -34,7 +34,7 @@ struct Vertex
     Vec3<float> tangent;
 };
 
-TEST(RenderingResourceMesh, GettersAndSetters)
+TEST(RenderingGeometryMesh, GettersAndSetters)
 {
     PtrInstance ptr_instance = Instance::make(
         "RenderingResourceMesh::GettersAndSetters", 

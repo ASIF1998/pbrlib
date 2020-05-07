@@ -10,7 +10,7 @@
 
 #include "../math/matrix4x4.hpp"
 
-#include "../RenderingResources/AABB.hpp"
+#include "../Rendering/Geometry/AABB.hpp"
 
 #include <cmath>
 

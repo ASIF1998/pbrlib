@@ -9,9 +9,9 @@
 #ifndef Mesh_hpp
 #define Mesh_hpp
 
-#include "../Rendering/VulkanWrapper/Buffer.hpp"
+#include "../VulkanWrapper/Buffer.hpp"
 
-#include "../math/vec3.hpp"
+#include "../../math/vec3.hpp"
 
 #include "AABB.hpp"
 
@@ -44,16 +44,16 @@ namespace pbrlib
         inline void        setIndex(size_t i, uint32_t val);
 
     public:
-        shared_ptr<Buffer>      ptr_index_buffer;
-        shared_ptr<Buffer>      ptr_vertex_attrib_buffer;
-        uint32_t                num_vertices;
-        uint32_t                vertex_attrib_buffer_offset;    /// В sizeof(uint8_t).
-        uint32_t                num_indices;
-        uint32_t                index_buffer_offset;            /// В sizeof(uint8_t).
-        VkIndexType             index_type                      = VK_INDEX_TYPE_UINT32;
-        uint32_t                stride                          = sizeof(float) * 11;
-        VkPrimitiveTopology     topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        AABB                    aabb;
+        PtrBuffer           ptr_index_buffer;
+        PtrBuffer           ptr_vertex_attrib_buffer;
+        uint32_t            num_vertices;
+        uint32_t            vertex_attrib_buffer_offset;    /// В sizeof(uint8_t).
+        uint32_t            num_indices;
+        uint32_t            index_buffer_offset;            /// В sizeof(uint8_t).
+        VkIndexType         index_type                      = VK_INDEX_TYPE_UINT32;
+        uint32_t            stride                          = sizeof(float) * 11;
+        VkPrimitiveTopology topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        AABB                aabb;
 
         /**
          * TODO: 

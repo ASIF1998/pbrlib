@@ -10,15 +10,15 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/RenderingResources/AABB.hpp"
-#include "../../src/math/vec3.hpp"
+#include "../../../src/Rendering/Geometry/AABB.hpp"
+#include "../../../src/math/vec3.hpp"
 
 using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 using namespace std;
 
-TEST(RenderingResourceAABB, Constructor)
+TEST(RenderingGeometryAABB, Constructor)
 {
     constexpr Vec3<float> p (0.5f, 0.5f, 0.5f);
 
@@ -50,7 +50,7 @@ TEST(RenderingResourceAABB, Constructor)
     EXPECT_EQ(bbox3[1].z, 1.0f);
 }
 
-TEST(RenderingResourceAABB, EqualAndNotEqual)
+TEST(RenderingGeometryAABB, EqualAndNotEqual)
 {
     constexpr Vec3<float> p (0.5f, 0.5f, 0.5f);
 
@@ -64,7 +64,7 @@ TEST(RenderingResourceAABB, EqualAndNotEqual)
     EXPECT_TRUE(bbox1 != bbox2);
 }
 
-TEST(RenderingResourceAABB, Corner)
+TEST(RenderingGeometryAABB, Corner)
 {
     constexpr Vec3<float> r0 (-1.0f, -1.0f, -1.0f);
     constexpr Vec3<float> r1 (1.0f, -1.0f, -1.0f);
@@ -90,7 +90,7 @@ TEST(RenderingResourceAABB, Corner)
     EXPECT_TRUE(bbox.corner(7) == r7);
 }
 
-TEST(RenderingResourceAABB, Diagonal)
+TEST(RenderingGeometryAABB, Diagonal)
 {
     constexpr Vec3<float> r (2.0f, 2.0f, 2.0f);
     
@@ -102,7 +102,7 @@ TEST(RenderingResourceAABB, Diagonal)
     EXPECT_EQ(r, bbox.diagonal());
 }
 
-TEST(RenderingResourceAABB, SurfaceArea)
+TEST(RenderingGeometryAABB, SurfaceArea)
 {
     constexpr float r = 24.0f;
 
@@ -114,7 +114,7 @@ TEST(RenderingResourceAABB, SurfaceArea)
     EXPECT_EQ(r, bbox.surfaceArea());
 }
 
-TEST(RenderingResourceAABB, Volume)
+TEST(RenderingGeometryAABB, Volume)
 {
     constexpr float r = 8.0f;
 
@@ -126,7 +126,7 @@ TEST(RenderingResourceAABB, Volume)
     EXPECT_EQ(r, bbox.volume());
 }
 
-TEST(RenderingResourceAABB, MaximumExtend)
+TEST(RenderingGeometryAABB, MaximumExtend)
 {
     constexpr size_t r = 1;
 
@@ -138,7 +138,7 @@ TEST(RenderingResourceAABB, MaximumExtend)
     EXPECT_EQ(r, bbox.maximumExtent());
 }
 
-TEST(RenderingResourceAABB,  Lerp)
+TEST(RenderingGeometryAABB,  Lerp)
 {
     constexpr Vec3<float> r (0.5f);
 
@@ -152,7 +152,7 @@ TEST(RenderingResourceAABB,  Lerp)
     EXPECT_EQ(r, bbox.lerp(t));
 }
 
-TEST(RenderingResourceAABB, Union)
+TEST(RenderingGeometryAABB, Union)
 {
     constexpr Vec3<float> p1 (0.0f);
     constexpr Vec3<float> p2 (0.5f);
@@ -172,7 +172,7 @@ TEST(RenderingResourceAABB, Union)
     EXPECT_EQ(r2, res2);
 }
 
-TEST(RenderingResourceAABB, Intersect)
+TEST(RenderingGeometryAABB, Intersect)
 {
     constexpr Vec3<float> p1 (0.0f);
     constexpr Vec3<float> p2 (0.6f);
@@ -187,7 +187,7 @@ TEST(RenderingResourceAABB, Intersect)
     EXPECT_EQ(r, AABB::intersect(bbox1, bbox2));
 }
 
-TEST(RenderingResourceAABB, Overlaps)
+TEST(RenderingGeometryAABB, Overlaps)
 {
     constexpr Vec3<float> p1 (0.0f);
     constexpr Vec3<float> p2 (0.6f);
@@ -200,7 +200,7 @@ TEST(RenderingResourceAABB, Overlaps)
     EXPECT_EQ(true, AABB::overlaps(bbox1, bbox2));
 }
 
-TEST(RenderingResourceAABB, Inside)
+TEST(RenderingGeometryAABB, Inside)
 {
     constexpr Vec3<float> p1 (0.0f);
     constexpr Vec3<float> p2 (0.6f);
@@ -211,7 +211,7 @@ TEST(RenderingResourceAABB, Inside)
     EXPECT_EQ(true, AABB::inside(bbox, p3));
 }
 
-TEST(RenderingResourceAABB, Expand)
+TEST(RenderingGeometryAABB, Expand)
 {
     constexpr float         delta   (0.5f);
     constexpr Vec3<float>   rp1     (delta);

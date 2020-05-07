@@ -13,7 +13,7 @@ using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 
-TEST(RenderingCameraPerspectiveCamera, BuilderTest)
+TEST(RenderingCameraPerspectiveCamera, Builder)
 {
     constexpr float width   = 800.0f;
     constexpr float height  = 600.0f;
@@ -52,7 +52,7 @@ TEST(RenderingCameraPerspectiveCamera, BuilderTest)
     EXPECT_EQ(r2 * r1, camera.getViewProjection());
 }
 
-TEST(RenderingCameraPerspectiveCamera, SettersTest)
+TEST(RenderingCameraPerspectiveCamera, Setters)
 {
     float width   = 800.0f;
     float height  = 600.0f;
