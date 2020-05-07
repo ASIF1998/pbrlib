@@ -44,7 +44,7 @@ namespace pbrlib
         if (_queue_family_indicies.size() == 1) {
             return Buffer(
                 _ptr_device,
-                _size,
+                static_cast<VkDeviceSize>(_size * sizeof(Type)),
                 _usage,
                 _memory_type_index,
                 _queue_family_indicies[0]
@@ -53,7 +53,7 @@ namespace pbrlib
 
         return Buffer(
             _ptr_device,
-            _size,
+            static_cast<VkDeviceSize>(_size * sizeof(Type)),
             _usage,
             _memory_type_index,
             _queue_family_indicies
@@ -68,7 +68,7 @@ namespace pbrlib
         if (_queue_family_indicies.size() == 1) {
             return make_shared<Buffer>(
                 _ptr_device,
-                _size,
+                static_cast<VkDeviceSize>(_size * sizeof(Type)),
                 _usage,
                 _memory_type_index,
                 _queue_family_indicies[0]
@@ -76,7 +76,7 @@ namespace pbrlib
         } 
         return make_shared<Buffer>(
             _ptr_device,
-            _size,
+            static_cast<VkDeviceSize>(_size * sizeof(Type)),
             _usage,
             _memory_type_index,
             _queue_family_indicies
@@ -153,7 +153,7 @@ namespace pbrlib
             :
             Buffer(
                 Builder<Type>::_ptr_device,
-                static_cast<VkDeviceSize>(_data.size()),
+                static_cast<VkDeviceSize>(_data.size() * sizeof(Type)),
                 Builder<Type>::_usage,
                 Builder<Type>::_memory_type_index,
                 Builder<Type>::_queue_family_indicies
@@ -174,7 +174,7 @@ namespace pbrlib
         if (Builder<Type>::_queue_family_indicies.size() == 1) {
             ptr_buffer = make_shared<Buffer>(
                 Builder<Type>::_ptr_device,
-                static_cast<VkDeviceSize>(_data.size()),
+                static_cast<VkDeviceSize>(_data.size() * sizeof(Type)),
                 Builder<Type>::_usage,
                 Builder<Type>::_memory_type_index,
                 Builder<Type>::_queue_family_indicies[0]
@@ -182,7 +182,7 @@ namespace pbrlib
         } else {
             ptr_buffer = make_shared<Buffer>(
                 Builder<Type>::_ptr_device,
-                static_cast<VkDeviceSize>(_data.size()),
+                static_cast<VkDeviceSize>(_data.size() * sizeof(Type)),
                 Builder<Type>::_usage,
                 Builder<Type>::_memory_type_index,
                 Builder<Type>::_queue_family_indicies

@@ -106,29 +106,23 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
         indices.push_back(i * 2);
     }
 
-    shared_ptr<Buffer> ptr_vertex_buffer = make_shared<Buffer>(
-        ptr_device,
-        num_vertex * sizeof(Vertex),
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        1,
-        0
-    );
+    Buffer::BuilderWithData<Vertex>     build_vertex_buffer;
+    Buffer::BuilderWithData<uint32_t>   build_index_buffer;
 
-    shared_ptr<Buffer> ptr_index_buffer = make_shared<Buffer>(
-        ptr_device,
-        num_indices * sizeof(uint32_t),
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-        1,
-        0
-    );
+    build_vertex_buffer.setUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    build_vertex_buffer.setMemoryTypeIndex(1);
+    build_vertex_buffer.setDevice(ptr_device);
+    build_vertex_buffer.setData(vertices);
+    build_vertex_buffer.addQueueFamily(0);
 
-    ptr_vertex_buffer->map();
-    ptr_vertex_buffer->setData(vertices);
-    ptr_vertex_buffer->unmap();
+    build_index_buffer.setUsage(VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+    build_index_buffer.setMemoryTypeIndex(1);
+    build_index_buffer.setDevice(ptr_device);
+    build_index_buffer.setData(indices);
+    build_index_buffer.addQueueFamily(0);
 
-    ptr_index_buffer->map();
-    ptr_index_buffer->setData(indices);
-    ptr_index_buffer->unmap();
+    PtrBuffer ptr_vertex_buffer = build_vertex_buffer.buildPtr();
+    PtrBuffer ptr_index_buffer  = build_index_buffer.buildPtr();
 
     Mesh mesh1;
     Mesh mesh2;
