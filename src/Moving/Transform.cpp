@@ -25,7 +25,8 @@ namespace pbrlib
     /*  -------------------------   */
     constexpr Matrix4x4<float> Transform::IDENTITY_MATRIX;
 
-    Transform::Transform()
+    Transform::Transform() :
+        _m(IDENTITY_MATRIX)
     {}
 
     Transform::Transform(const Matrix4x4<float>& m) :
