@@ -198,7 +198,7 @@ namespace pbrlib
             Transform children_world_transform = _world_transform * _local_transform;
 
             _ptr_children[0]->update(delta_time, children_world_transform);
-            _world_transform = _ptr_children[0]->getWorldTransform();
+            _world_bbox = _ptr_children[0]->getWorldAABB();
 
             for (size_t i{1}; i < _ptr_children.size(); i++) {
                 _ptr_children[i]->update(delta_time, children_world_transform);
