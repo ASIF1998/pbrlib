@@ -103,10 +103,13 @@ namespace pbrlib::math
         inline constexpr Matrix4x4();
         
         inline constexpr Matrix4x4(float init_value);
-        inline constexpr Matrix4x4(float v11, float v12, float v13, float v14,
-                  float v21, float v22, float v23, float v24,
-                  float v31, float v32, float v33, float v34,
-                  float v41, float v42, float v43, float v44);
+
+        inline constexpr Matrix4x4(
+            float v11, float v12, float v13, float v14,
+            float v21, float v22, float v23, float v24,
+            float v31, float v32, float v33, float v34,
+            float v41, float v42, float v43, float v44
+        );
 
         /**
          * @brief Констуктор.

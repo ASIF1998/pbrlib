@@ -25,7 +25,7 @@ using namespace std;
 
 namespace pbrlib
 {
-    class NodeModifier;
+    class INodeModifier;
 
     class Scene
     {
@@ -37,19 +37,9 @@ namespace pbrlib
         class Node
         {
         public:
-            inline Node() = default;
-
             inline Node(
-                const string_view   name,
-                const Transform&    local_transform,
-                Node*               parent = nullptr
-            );
-
-            inline Node(
-                const string_view   name,
-                const Transform&    local_transform,
-                const Transform&    world_transform,
-                Node*               parent = nullptr
+                const string_view   name    = "No name",
+                Node*               parent  = nullptr
             );
 
             inline virtual ~Node();
@@ -81,37 +71,73 @@ namespace pbrlib
             inline void setLocalTransform(const Transform& transform);
             inline void setWorldTransform(const Transform& transform);
             inline void setWorldAABB(const AABB& bbox);
-            inline void setNodeModifier(NodeModifier* ptr_node_modifier);
+            inline void setNodeModifier(INodeModifier* ptr_node_modifier);
             inline void setName(const string_view name);
 
-            inline bool isWorldTransformCurrent()                   const noexcept;
-            inline void isWorldTransformCurrent(bool is_current)    noexcept;
+            inline bool worldTransformIsCurrent()               const noexcept;
+            inline void worldTransformIsCurrent(bool current)   noexcept;
+            inline bool worldAABBIsCurrent()                    const noexcept;
+            inline void worldAABBIsCurrent(bool current)        noexcept;
 
+            /**
+             * @brief Метод необходимый для добавления дочернего узла.
+             * @details 
+             *      При добавлении дочернего узла указатель на родителя 
+             *      устанавливается автоматически.
+             * 
+             * @param child ссылка на дочерний узел.
+            */
             inline void addChild(PtrNode&& child);
+
+            /**
+             * @brief Метод необходимый для добавления дочернего узла.
+             * @details 
+             *      При добавлении дочернего узла указатель на родителя 
+             *      устанавливается автоматически.
+             * 
+             * @param child ссылка на дочерний узел.
+            */
             inline void addChild(const PtrNode& child);
+
+            /**
+             * @brief Метод необходимый для добавления дочернего узла.
+             * @details 
+             *      При добавлении дочернего узла указатель на родителя 
+             *      устанавливается автоматически.
+             * 
+             * @param node_name название дочернего узла.
+             * @return Указатель на дочерний узел.
+            */
+            inline PtrNode& addChild(const string_view node_name);
 
             inline virtual void update(float delta_time, const Transform& world_transform);
 
+            inline static PtrNode make(
+                const string_view   name    = "No name",
+                Node*               parent  = nullptr
+            );
+
         private:
-            Node*                                               _ptr_parent; 
-            vector<PtrNode>                                     _ptr_children;
-            Transform                                           _local_transform;
-            Transform                                           _world_transform;
-            bool                                                _world_transform_is_current;
-            AABB                                                _world_bbox;
-            unordered_map<type_index, unique_ptr<NodeModifier>> _node_modifiers;
-            string                                              _name;
+            Node*                                                   _ptr_parent; 
+            vector<PtrNode>                                         _ptr_children;
+            Transform                                               _local_transform;
+            Transform                                               _world_transform;
+            bool                                                    _world_transform_is_current;
+            bool                                                    _world_aabb_is_current;
+            AABB                                                    _world_bbox;
+            unordered_map<type_index, unique_ptr<INodeModifier>>    _node_modifiers;
+            string                                                  _name;
         };
 
     public:
     private:
     };
 
-    class NodeModifier
+    class INodeModifier
     {
     public:
-        inline NodeModifier(const string_view name = "Node Modifier");
-        inline virtual ~NodeModifier();
+        inline INodeModifier(const string_view name = "Node Modifier");
+        inline virtual ~INodeModifier();
 
         virtual void update(Scene::Node* ptr_node, float delta_time) = 0;
 
@@ -120,6 +146,9 @@ namespace pbrlib
         inline string&          getName() noexcept;
         inline const string&    getName() const noexcept;
         virtual type_index      getType() const = 0;
+
+        template<typename NodeModifierType>
+        inline static type_index getTypeIndex();
 
     private:
         string _name;

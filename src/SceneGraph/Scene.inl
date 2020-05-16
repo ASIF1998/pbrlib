@@ -10,25 +10,11 @@ namespace pbrlib
 {
     inline Scene::Node::Node(
         const string_view   name,
-        const Transform&    local_transform,
         Node*               ptr_parent 
     ) :
         _ptr_parent                 (ptr_parent),
-        _local_transform            (local_transform),
         _world_transform_is_current (false),
-        _name                       (name)
-    {}
-
-    inline Scene::Node::Node(
-        const string_view   name,
-        const Transform&    local_transform,
-        const Transform&    world_transform,
-        Node*               ptr_parent 
-    ) :
-        _ptr_parent                 (ptr_parent),
-        _local_transform            (local_transform),
-        _world_transform            (world_transform),
-        _world_transform_is_current (true),
+        _world_aabb_is_current      (false),
         _name                       (name)
     {}
 
@@ -145,10 +131,11 @@ namespace pbrlib
 
     inline void Scene::Node::setWorldAABB(const AABB& bbox)
     {
+        _world_aabb_is_current = true;
         _world_bbox = bbox;
     }
 
-    inline void Scene::Node::setNodeModifier(NodeModifier* ptr_node_modifier)
+    inline void Scene::Node::setNodeModifier(INodeModifier* ptr_node_modifier)
     {
         auto it = _node_modifiers.find(ptr_node_modifier->getType());
 
@@ -164,24 +151,45 @@ namespace pbrlib
         _name = name;
     }
 
-    inline bool Scene::Node::isWorldTransformCurrent() const noexcept
+    inline bool Scene::Node::worldTransformIsCurrent() const noexcept
     {
         return _world_transform_is_current;
     }
 
-    inline void Scene::Node::isWorldTransformCurrent(bool is_current) noexcept
+    inline void Scene::Node::worldTransformIsCurrent(bool current) noexcept
     {
-        _world_transform_is_current = is_current;
+        _world_transform_is_current = current;
+    }
+
+    inline bool Scene::Node::worldAABBIsCurrent() const noexcept
+    {
+        return _world_aabb_is_current;
+    }
+
+    inline void Scene::Node::worldAABBIsCurrent(bool current) noexcept
+    {
+        _world_aabb_is_current = current;
     }
 
     inline void Scene::Node::addChild(PtrNode&& child)
     {
+        child->setParent(this);
         _ptr_children.push_back(move(child));
     }
 
     inline void Scene::Node::addChild(const PtrNode& child)
     {
+        child->setParent(this);
         _ptr_children.push_back(child);
+    }
+
+    inline Scene::PtrNode& Scene::Node::addChild(const string_view node_name)
+    {
+        PtrNode child = make_shared<Node>(node_name);
+
+        child->setParent(this);
+        _ptr_children.push_back(child);
+        return _ptr_children.back();
     }
 
     inline void Scene::Node::update(float delta_time, const Transform& transform)
@@ -194,40 +202,55 @@ namespace pbrlib
             _world_transform = transform;
         }
 
-        if (!_ptr_children.empty()) {
+        if (!_ptr_children.empty())  {
             Transform children_world_transform = _world_transform * _local_transform;
 
-            _ptr_children[0]->update(delta_time, children_world_transform);
-            _world_bbox = _ptr_children[0]->getWorldAABB();
-
-            for (size_t i{1}; i < _ptr_children.size(); i++) {
+            for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
                 _ptr_children[i]->update(delta_time, children_world_transform);
-                _world_bbox = AABB::aabbUnion(_world_bbox, _ptr_children[i]->getWorldAABB());
+            }
+
+            if (!_world_aabb_is_current) {
+                _world_bbox = _ptr_children[0]->getWorldAABB();
+
+                for (size_t i{1}, size{_ptr_children.size()}; i < size; i++) {
+                    _world_bbox = AABB::aabbUnion(_world_bbox, _ptr_children[i]->getWorldAABB());
+                }
             }
         }
     }
 
+    inline Scene::PtrNode Scene::Node::make(const string_view name, Node* parent)
+    {
+        return make_shared<Node>(name, parent);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline NodeModifier::NodeModifier(const string_view name) :
+    inline INodeModifier::INodeModifier(const string_view name) :
         _name(name)
     {}
 
-    inline void NodeModifier::setName(const string_view name)
+    inline void INodeModifier::setName(const string_view name)
     {
         _name = name;
     }
 
-    inline string& NodeModifier::getName() noexcept
+    inline string& INodeModifier::getName() noexcept
     {
         return _name;
     }
 
-    inline const string& NodeModifier::getName() const noexcept
+    inline const string& INodeModifier::getName() const noexcept
     {
         return _name;
     }
 
-    inline NodeModifier::~NodeModifier()
+    inline INodeModifier::~INodeModifier()
     {}
+
+    template<typename NodeModifierType>
+    inline type_index INodeModifier::getTypeIndex()
+    {
+        return typeid(NodeModifierType);
+    }
 }
 
