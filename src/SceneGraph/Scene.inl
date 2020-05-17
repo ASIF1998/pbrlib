@@ -20,6 +20,13 @@ namespace pbrlib
         return *dynamic_cast<NodeModifierType*>(_node_modifiers.at(typeid(NodeModifierType)).get());
     }
 
+    template<typename NodeModifierType>
+    inline bool Scene::Node::hasNodeModifier() const
+    {
+        auto it = _node_modifiers.find(typeid(NodeModifierType));
+        return it != end(_node_modifiers);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<typename NodeModifierType>
     inline type_index INodeModifier::getTypeIndex()

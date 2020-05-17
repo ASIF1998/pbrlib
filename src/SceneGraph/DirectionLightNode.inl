@@ -19,4 +19,11 @@ namespace pbrlib
     {
         return *dynamic_cast<DirLightNodeModifier*>(_dir_light_node_modifiers.at(typeid(DirLightNodeModifier)).get());
     }
+
+    template<typename DirLightNodeModifier>
+    inline bool DirectionLightNode::hasDirLightNodeModifier() const
+    {
+        auto it = _dir_light_node_modifiers.find(typeid(DirLightNodeModifier));
+        return it != end(_dir_light_node_modifiers);
+    }
 }

@@ -106,7 +106,7 @@ TEST(SceneGraphNode, GettersAndSetters)
     node2.setWorldTransform(world_transform);
     node2.setLocalTransform(local_transform);
     node2.setWorldAABB(world_aabb);
-    node2.setNodeModifier(new TestNodeModifier());
+    node2.addNodeModifier(new TestNodeModifier());
     node2.setName(node2_name);
 
     EXPECT_EQ(&node1, node2.getParent()) << "Не правильно работает метод setParent(...) в классе Scene::Node." << endl;
@@ -137,7 +137,8 @@ TEST(SceneGraphNode, GettersAndSetters)
     
     bool the_right_type = is_same<TestNodeModifier&, decltype(node2.getNodeModifier<TestNodeModifier>())>::value;
     
-    EXPECT_TRUE(the_right_type) << "Не правильный возвращаемый тип в методы getNodeModifier<...>()." << endl;
+    EXPECT_TRUE(the_right_type)                             << "Не правильный возвращаемый тип в методы getNodeModifier<...>()." << endl;
+    EXPECT_TRUE(node2.hasNodeModifier<TestNodeModifier>())  << "Ошибка в методы getNodeModifier<...>()." << endl;
     
     EXPECT_EQ("Test Node Modifier", node2.getNodeModifier<TestNodeModifier>().getName())
                             << "Не правильная инициализация имени в классе NodeModifier." << endl;

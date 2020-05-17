@@ -27,8 +27,12 @@ namespace pbrlib
 {
     class INodeModifier;
     class DirectionLightNode;
+    class SpotLightNode;
+    class PointLightNode;
 
     using PtrDirectionLightNode     = shared_ptr<DirectionLightNode>;
+    using PtrSpotLightNode          = shared_ptr<SpotLightNode>;
+    using PtrPointLightNode         = shared_ptr<PointLightNode>;
     using PtrINodeModifier          = unique_ptr<INodeModifier>;
 
     class Scene
@@ -69,19 +73,23 @@ namespace pbrlib
             template<typename NodeModifierType>
             inline const NodeModifierType& getNodeModifier() const;
 
+            template<typename NodeModifierType>
+            inline bool hasNodeModifier() const;
+
             void setParent(Node* ptr_parent) noexcept;
             void setChildren(vector<PtrNode>&& children);
             void setChildren(const vector<PtrNode>& children);
             void setLocalTransform(const Transform& transform);
             void setWorldTransform(const Transform& transform);
             void setWorldAABB(const AABB& bbox);
-            void setNodeModifier(INodeModifier* ptr_node_modifier);
             void setName(const string_view name);
 
             bool worldTransformIsCurrent()              const noexcept;
             void worldTransformIsCurrent(bool current)  noexcept;
             bool worldAABBIsCurrent()                   const noexcept;
             void worldAABBIsCurrent(bool current)       noexcept;
+
+            void addNodeModifier(INodeModifier* ptr_node_modifier);
 
             /**
              * @brief Метод необходимый для добавления дочернего узла.
@@ -135,7 +143,9 @@ namespace pbrlib
 
     public:
     private:
-        vector<PtrDirectionLightNode> _dir_light_nodes;
+        vector<PtrDirectionLightNode>   _dir_light_nodes;
+        vector<PtrSpotLightNode>        _spot_light_nodes;
+        vector<PtrPointLightNode>       _point_light_nodes;
     };
 
     class INodeModifier

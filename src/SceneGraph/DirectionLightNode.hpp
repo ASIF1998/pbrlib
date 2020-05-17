@@ -24,11 +24,30 @@ namespace pbrlib
         public Scene::Node
     {
     public:
-        DirectionLightNode();
+        DirectionLightNode(
+            const string_view   name    = "Direction Light Node",
+            Scene::Node*        parent  = nullptr
+        );
+
+        DirectionLightNode(
+            const string_view               name,
+            Scene::Node*                    parent,
+            const DirectionLight::Builder&  light_builder
+        );
+
+        DirectionLightNode(
+            const string_view           name,
+            Scene::Node*                parent,
+            const PtrDirectionLight&    ptr_light
+        );
+
+        DirectionLightNode(const DirectionLight::Builder& light_builder);
         DirectionLightNode(const PtrDirectionLight& ptr_light);
 
         void setLight(const DirectionLight::Builder& light_builder);
         void setLight(const PtrDirectionLight& ptr_light);
+
+        void addSpotLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire);
 
         PtrDirectionLight&          getLight() noexcept;
         const PtrDirectionLight&    getLight() const noexcept;
@@ -38,6 +57,9 @@ namespace pbrlib
 
         template<typename DirLightNodeModifier>
         inline const DirLightNodeModifier& getDirLightNodeModifier() const;
+
+        template<typename DirLightNodeModifier>
+        inline bool hasDirLightNodeModifier() const;
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
@@ -58,6 +80,7 @@ namespace pbrlib
 
         string&             getName() noexcept;
         const string&       getName() const noexcept;
+        
         virtual type_index  getType() const = 0;
 
     private:

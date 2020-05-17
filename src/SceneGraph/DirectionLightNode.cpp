@@ -10,12 +10,37 @@
 
 namespace pbrlib
 {
-    DirectionLightNode::DirectionLightNode() :
-        _ptr_light(nullptr)
+    DirectionLightNode::DirectionLightNode(const string_view name, Scene::Node* parent) :
+        Scene::Node (name, parent),
+        _ptr_light  (nullptr)
+    {}
+
+    DirectionLightNode::DirectionLightNode(
+        const string_view               name,
+        Scene::Node*                    parent,
+        const DirectionLight::Builder&  light_builder
+    ) :
+        Scene::Node (name, parent),
+        _ptr_light  (light_builder.buildPtr())
+    {}
+
+    DirectionLightNode::DirectionLightNode(
+        const string_view           name,
+        Scene::Node*                parent,
+        const PtrDirectionLight&    ptr_light
+    ) :
+        Scene::Node (name, parent),
+        _ptr_light  (ptr_light)
+    {}
+
+    DirectionLightNode::DirectionLightNode(const DirectionLight::Builder& light_builder) :
+        Scene::Node (),
+        _ptr_light  (light_builder.buildPtr())
     {}
 
     DirectionLightNode::DirectionLightNode(const PtrDirectionLight& ptr_light) :
-        _ptr_light(ptr_light)
+        Scene::Node (),
+        _ptr_light  (ptr_light)
     {}
 
     void DirectionLightNode::setLight(const DirectionLight::Builder& light_builder)
@@ -26,6 +51,17 @@ namespace pbrlib
     void DirectionLightNode::setLight(const PtrDirectionLight& ptr_light)
     {
         _ptr_light = ptr_light;
+    }
+
+    void DirectionLightNode::addSpotLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire)
+    {
+        auto it = _dir_light_node_modifiers.find(ptr_light_node_modifire->getType());
+
+        if (it != end(_dir_light_node_modifiers)) {
+            it->second.reset(ptr_light_node_modifire);
+        } else {
+            _dir_light_node_modifiers.insert(make_pair(ptr_light_node_modifire->getType(), ptr_light_node_modifire));
+        }
     }
 
     PtrDirectionLight& DirectionLightNode::getLight() noexcept

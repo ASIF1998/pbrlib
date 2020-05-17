@@ -125,17 +125,6 @@ namespace pbrlib
         _world_bbox = bbox;
     }
 
-    void Scene::Node::setNodeModifier(INodeModifier* ptr_node_modifier)
-    {
-        auto it = _node_modifiers.find(ptr_node_modifier->getType());
-
-        if (it != end(_node_modifiers)) {
-            it->second.reset(ptr_node_modifier);
-        } else {
-            _node_modifiers.insert(make_pair(ptr_node_modifier->getType(), ptr_node_modifier));
-        }
-    }
-
     void Scene::Node::setName(const string_view name)
     {
         _name = name;
@@ -159,6 +148,17 @@ namespace pbrlib
     void Scene::Node::worldAABBIsCurrent(bool current) noexcept
     {
         _world_aabb_is_current = current;
+    }
+
+    void Scene::Node::addNodeModifier(INodeModifier* ptr_node_modifier)
+    {
+        auto it = _node_modifiers.find(ptr_node_modifier->getType());
+
+        if (it != end(_node_modifiers)) {
+            it->second.reset(ptr_node_modifier);
+        } else {
+            _node_modifiers.insert(make_pair(ptr_node_modifier->getType(), ptr_node_modifier));
+        }
     }
 
     void Scene::Node::addChild(PtrNode&& child)
