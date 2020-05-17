@@ -1,0 +1,70 @@
+//
+//  DirectionLightNode.hpp
+//  PBRLib
+//
+//  Created by Асиф Мамедов on 17/05/2020.
+//  Copyright © 2020 Асиф Мамедов. All rights reserved.
+//
+
+#ifndef DirectionLightNode_hpp
+#define DirectionLightNode_hpp
+
+#include "../Rendering/Lights/DirectionLight.hpp"
+#include "Scene.hpp"
+
+namespace pbrlib
+{
+    class DirectionLightNode;
+    class IDirectionLightNodeModifier;
+
+    using PtrDirectionLightNode             = shared_ptr<DirectionLightNode>;
+    using PtrIDirectionLightNodeModifier    = unique_ptr<IDirectionLightNodeModifier>;
+
+    class DirectionLightNode :
+        public Scene::Node
+    {
+    public:
+        DirectionLightNode();
+        DirectionLightNode(const PtrDirectionLight& ptr_light);
+
+        void setLight(const DirectionLight::Builder& light_builder);
+        void setLight(const PtrDirectionLight& ptr_light);
+
+        PtrDirectionLight&          getLight() noexcept;
+        const PtrDirectionLight&    getLight() const noexcept;
+
+        template<typename DirLightNodeModifier>
+        inline DirLightNodeModifier& getDirLightNodeModifier();
+
+        template<typename DirLightNodeModifier>
+        inline const DirLightNodeModifier& getDirLightNodeModifier() const;
+
+        virtual void update(float delta_time, const Transform& world_transform) override;
+
+    private:
+        PtrDirectionLight                                           _ptr_light;    
+        unordered_map<type_index, PtrIDirectionLightNodeModifier>   _dir_light_node_modifiers;
+    };
+
+    class IDirectionLightNodeModifier
+    {
+    public:
+        IDirectionLightNodeModifier(const string_view name = "Direction Light Node Modifier");
+        virtual ~IDirectionLightNodeModifier();
+
+        virtual void update(DirectionLightNode* ptr_node, float delta_time) = 0;
+
+        void setName(const string_view name);
+
+        string&             getName() noexcept;
+        const string&       getName() const noexcept;
+        virtual type_index  getType() const = 0;
+
+    private:
+        string _name;
+    };
+}
+
+#include "DirectionLightNode.inl"
+
+#endif /* DirectionLightNode_hpp */

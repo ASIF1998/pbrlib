@@ -26,6 +26,10 @@ using namespace std;
 namespace pbrlib
 {
     class INodeModifier;
+    class DirectionLightNode;
+
+    using PtrDirectionLightNode     = shared_ptr<DirectionLightNode>;
+    using PtrINodeModifier          = unique_ptr<INodeModifier>;
 
     class Scene
     {
@@ -37,27 +41,27 @@ namespace pbrlib
         class Node
         {
         public:
-            inline Node(
+            Node(
                 const string_view   name    = "No name",
                 Node*               parent  = nullptr
             );
 
-            inline virtual ~Node();
+            virtual ~Node();
 
-            inline AABB&                   getWorldAABB()       noexcept;
-            inline const AABB&             getWorldAABB()       const noexcept;
-            inline Node*                   getParent()          noexcept;
-            inline const Node*             getParent()          const noexcept;
-            inline PtrNode&                getChild(size_t i);
-            inline const PtrNode&          getChild(size_t i)   const;
-            inline vector<PtrNode>&        getChildren()        noexcept;
-            inline const vector<PtrNode>&  getChildren()        const noexcept;
-            inline Transform&              getLocalTransform()  noexcept;
-            inline const Transform&        getLocalTransform()  const noexcept;
-            inline Transform&              getWorldTransform()  noexcept;
-            inline const Transform&        getWorldTransform()  const noexcept;
-            inline string&                 getName()            noexcept;
-            inline const string&           getName()            const noexcept;
+            AABB&                   getWorldAABB()      noexcept;
+            const AABB&             getWorldAABB()      const noexcept;
+            Node*                   getParent()         noexcept;
+            const Node*             getParent()         const noexcept;
+            PtrNode&                getChild(size_t i);
+            const PtrNode&          getChild(size_t i)  const;
+            vector<PtrNode>&        getChildren()       noexcept;
+            const vector<PtrNode>&  getChildren()       const noexcept;
+            Transform&              getLocalTransform() noexcept;
+            const Transform&        getLocalTransform() const noexcept;
+            Transform&              getWorldTransform() noexcept;
+            const Transform&        getWorldTransform() const noexcept;
+            string&                 getName()           noexcept;
+            const string&           getName()           const noexcept;
 
             template<typename NodeModifierType>
             inline NodeModifierType& getNodeModifier();
@@ -65,29 +69,19 @@ namespace pbrlib
             template<typename NodeModifierType>
             inline const NodeModifierType& getNodeModifier() const;
 
-            inline void setParent(Node* ptr_parent) noexcept;
-            inline void setChildren(vector<PtrNode>&& children);
-            inline void setChildren(const vector<PtrNode>& children);
-            inline void setLocalTransform(const Transform& transform);
-            inline void setWorldTransform(const Transform& transform);
-            inline void setWorldAABB(const AABB& bbox);
-            inline void setNodeModifier(INodeModifier* ptr_node_modifier);
-            inline void setName(const string_view name);
+            void setParent(Node* ptr_parent) noexcept;
+            void setChildren(vector<PtrNode>&& children);
+            void setChildren(const vector<PtrNode>& children);
+            void setLocalTransform(const Transform& transform);
+            void setWorldTransform(const Transform& transform);
+            void setWorldAABB(const AABB& bbox);
+            void setNodeModifier(INodeModifier* ptr_node_modifier);
+            void setName(const string_view name);
 
-            inline bool worldTransformIsCurrent()               const noexcept;
-            inline void worldTransformIsCurrent(bool current)   noexcept;
-            inline bool worldAABBIsCurrent()                    const noexcept;
-            inline void worldAABBIsCurrent(bool current)        noexcept;
-
-            /**
-             * @brief Метод необходимый для добавления дочернего узла.
-             * @details 
-             *      При добавлении дочернего узла указатель на родителя 
-             *      устанавливается автоматически.
-             * 
-             * @param child ссылка на дочерний узел.
-            */
-            inline void addChild(PtrNode&& child);
+            bool worldTransformIsCurrent()              const noexcept;
+            void worldTransformIsCurrent(bool current)  noexcept;
+            bool worldAABBIsCurrent()                   const noexcept;
+            void worldAABBIsCurrent(bool current)       noexcept;
 
             /**
              * @brief Метод необходимый для добавления дочернего узла.
@@ -97,7 +91,17 @@ namespace pbrlib
              * 
              * @param child ссылка на дочерний узел.
             */
-            inline void addChild(const PtrNode& child);
+            void addChild(PtrNode&& child);
+
+            /**
+             * @brief Метод необходимый для добавления дочернего узла.
+             * @details 
+             *      При добавлении дочернего узла указатель на родителя 
+             *      устанавливается автоматически.
+             * 
+             * @param child ссылка на дочерний узел.
+            */
+            void addChild(const PtrNode& child);
 
             /**
              * @brief Метод необходимый для добавления дочернего узла.
@@ -108,44 +112,45 @@ namespace pbrlib
              * @param node_name название дочернего узла.
              * @return Указатель на дочерний узел.
             */
-            inline PtrNode& addChild(const string_view node_name);
+            PtrNode& addChild(const string_view node_name);
 
-            inline virtual void update(float delta_time, const Transform& world_transform);
+            virtual void update(float delta_time, const Transform& world_transform);
 
-            inline static PtrNode make(
+            static PtrNode make(
                 const string_view   name    = "No name",
                 Node*               parent  = nullptr
             );
 
         private:
-            Node*                                                   _ptr_parent; 
-            vector<PtrNode>                                         _ptr_children;
-            Transform                                               _local_transform;
-            Transform                                               _world_transform;
-            bool                                                    _world_transform_is_current;
-            bool                                                    _world_aabb_is_current;
-            AABB                                                    _world_bbox;
-            unordered_map<type_index, unique_ptr<INodeModifier>>    _node_modifiers;
-            string                                                  _name;
+            Node*                                           _ptr_parent; 
+            vector<PtrNode>                                 _ptr_children;
+            Transform                                       _local_transform;
+            Transform                                       _world_transform;
+            bool                                            _world_transform_is_current;
+            bool                                            _world_aabb_is_current;
+            AABB                                            _world_bbox;
+            unordered_map<type_index, PtrINodeModifier>     _node_modifiers;
+            string                                          _name;
         };
 
     public:
     private:
+        vector<PtrDirectionLightNode> _dir_light_nodes;
     };
 
     class INodeModifier
     {
     public:
-        inline INodeModifier(const string_view name = "Node Modifier");
-        inline virtual ~INodeModifier();
+        INodeModifier(const string_view name = "Node Modifier");
+        virtual ~INodeModifier();
 
         virtual void update(Scene::Node* ptr_node, float delta_time) = 0;
 
-        inline void setName(const string_view name);
+        void setName(const string_view name);
 
-        inline string&          getName() noexcept;
-        inline const string&    getName() const noexcept;
-        virtual type_index      getType() const = 0;
+        string&             getName() noexcept;
+        const string&       getName() const noexcept;
+        virtual type_index  getType() const = 0;
 
         template<typename NodeModifierType>
         inline static type_index getTypeIndex();
