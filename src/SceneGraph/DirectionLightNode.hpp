@@ -63,6 +63,26 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
+        static PtrDirectionLightNode make(
+            const string_view   name    = "Direction Light Node",
+            Scene::Node*        parent  = nullptr
+        );
+
+        static PtrDirectionLightNode make(
+            const string_view               name,
+            Scene::Node*                    parent,
+            const DirectionLight::Builder&  light_builder
+        );
+
+        static PtrDirectionLightNode make(
+            const string_view           name,
+            Scene::Node*                parent,
+            const PtrDirectionLight&    ptr_light
+        );
+
+        static PtrDirectionLightNode make(const DirectionLight::Builder& light_builder);
+        static PtrDirectionLightNode make(const PtrDirectionLight& ptr_light);
+
     private:
         PtrDirectionLight                                           _ptr_light;    
         unordered_map<type_index, PtrIDirectionLightNodeModifier>   _dir_light_node_modifiers;
