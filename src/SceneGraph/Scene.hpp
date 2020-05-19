@@ -21,6 +21,12 @@
 #include "../Moving/Transform.hpp"
 #include "../Rendering/Geometry/AABB.hpp"
 
+#include "../Rendering/Lights/PointLight.hpp"
+#include "../Rendering/Lights/SpotLight.hpp"
+#include "../Rendering/Lights/DirectionLight.hpp"
+
+#include "../Rendering/Camera/PerspectiveCamera.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -29,10 +35,12 @@ namespace pbrlib
     class DirectionLightNode;
     class SpotLightNode;
     class PointLightNode;
+    class CameraNode;
 
     using PtrDirectionLightNode     = shared_ptr<DirectionLightNode>;
     using PtrSpotLightNode          = shared_ptr<SpotLightNode>;
     using PtrPointLightNode         = shared_ptr<PointLightNode>;
+    using PtrCameraNode             = shared_ptr<CameraNode>;
     using PtrINodeModifier          = unique_ptr<INodeModifier>;
 
     class Scene
@@ -122,6 +130,9 @@ namespace pbrlib
             */
             PtrNode& addChild(const string_view node_name);
 
+            void detachChild(const PtrNode& ptr_node);
+            void detachChild(const string_view name);
+
             virtual void update(float delta_time, const Transform& world_transform);
 
             static PtrNode make(
@@ -142,10 +153,88 @@ namespace pbrlib
         };
 
     public:
+        Scene(const string_view name = "Scene");
+        
+        void setRootNode(const PtrNode& node);
+        void setRootNode(PtrNode&& node);
+        void setName(const string_view name);
+
+        PtrNode&         getRootNode()   noexcept;
+        const PtrNode&   getRootNode()   const noexcept;
+        string&          getName()       noexcept;
+        const string&    getName()       const noexcept;
+
+        /**
+         * @brief Метод создающий узел для точечного источника света.
+         * @details 
+         *      Регистрирует источник света в сцене.
+         *      Созданный узел не имеет родителя и дочерних узлов.
+         * 
+         * @param light_builder объект создающий источник света.
+         * @param name          название узла.
+         * @return Указатель на узел.
+        */
+        PtrPointLightNode& makePointLight(
+            const PointLight::Builder&   light_builder,
+            const string_view            name = "Point Light"
+        );
+
+        /**
+         * @brief Метод создающий узел для прожекторного источника света.
+         * @details 
+         *      Регистрирует источник света в сцене.
+         *      Созданный узел не имеет родителя и дочерних узлов.
+         * 
+         * @param light_builder объект создающий источник света.
+         * @param name          название узла.
+         * @return Указатель на узел.
+        */
+        PtrSpotLightNode& makeSpotLight(
+            const SpotLight::Builder&   light_builder,
+            const string_view            name = "Spot Light"
+        );
+
+        /**
+         * @brief Метод создающий узел для направленного источника света.
+         * @details 
+         *      Регистрирует источник света в сцене.
+         *      Созданный узел не имеет родителя и дочерних узлов.
+         * 
+         * @param light_builder объект создающий источник света.
+         * @param name          название узла.
+         * @return Указатель на узел.
+        */
+        PtrDirectionLightNode& makeDirectionLight(
+            const DirectionLight::Builder&  light_builder,
+            const string_view               name = "Spot Light"
+        );
+
+        /**
+         * @brief Метод создающий узел для камеры.
+         *  @details 
+         *      Регистрирует камеру в сцене.
+         *      Созданный узел не имеет родителя и дочерних узлов.
+         *      Камера в сцене может быть только одно, поэтому при 
+         *      вызове данного метод, предыдущая камера, если она была,
+         *      будет заменена на новую.
+         * @param camera_builder    объект создающий камеру.
+         * @param name              название узла.
+         * @return Указатель на узел.
+        */
+        PtrCameraNode& makeCamera(
+            const PerspectiveCamera::Builder&   camera_builder,
+            const string_view                   name = "Camera"
+        );
+
+        void update(float delta_time);
+
     private:
+        PtrNode                         _ptr_root_node;
+        PtrCameraNode                   _ptr_camera_node;
         vector<PtrDirectionLightNode>   _dir_light_nodes;
         vector<PtrSpotLightNode>        _spot_light_nodes;
         vector<PtrPointLightNode>       _point_light_nodes;
+        string                          _name;
     };
 
     class INodeModifier

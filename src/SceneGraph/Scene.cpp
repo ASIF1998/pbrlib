@@ -8,6 +8,12 @@
 
 #include "Scene.hpp"
 
+#include "PointLightNode.hpp"
+#include "SpotLightNode.hpp"
+#include "DirectionLightNode.hpp"
+
+#include "CameraNode.hpp"
+
 namespace pbrlib
 {
     Scene::Node::Node(
@@ -164,22 +170,64 @@ namespace pbrlib
     void Scene::Node::addChild(PtrNode&& child)
     {
         child->setParent(this);
+
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
+            if (!_ptr_children[i]) {
+                // _ptr_children[i] = child;
+                swap(_ptr_children[i], child);
+                return ;
+            }
+        }
+
         _ptr_children.push_back(move(child));
     }
 
     void Scene::Node::addChild(const PtrNode& child)
     {
         child->setParent(this);
+
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
+            if (!_ptr_children[i]) {
+                _ptr_children[i] = child;
+                return ;
+            }
+        }
+
         _ptr_children.push_back(child);
     }
 
     Scene::PtrNode& Scene::Node::addChild(const string_view node_name)
     {
-        PtrNode child = make_shared<Node>(node_name);
+        PtrNode child = make_shared<Node>(node_name, this);
 
-        child->setParent(this);
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
+            if (!_ptr_children[i]) {
+                _ptr_children[i] = child;
+                return _ptr_children[i];
+            }
+        }
+
         _ptr_children.push_back(child);
         return _ptr_children.back();
+    }
+
+    void Scene::Node::detachChild(const PtrNode& ptr_node)
+    {
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
+            if (_ptr_children[i] == ptr_node) {
+                _ptr_children[i] = nullptr;
+            }
+        }
+    }
+
+
+    void Scene::Node::detachChild(const string_view name)
+    {
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
+            if (_ptr_children[i]->_name == name) {
+                _ptr_children[i] = nullptr;
+            }
+        }
     }
 
     void Scene::Node::update(float delta_time, const Transform& transform)
@@ -236,4 +284,90 @@ namespace pbrlib
 
     INodeModifier::~INodeModifier()
     {}
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Scene::Scene(const string_view name) :
+        _ptr_root_node      (nullptr),
+        _ptr_camera_node    (nullptr),
+        _name               (name)
+    {}
+
+    void Scene::setRootNode(const PtrNode& ptr_node)
+    {
+        _ptr_root_node = ptr_node;
+    }
+
+    void Scene::setRootNode(PtrNode&& ptr_node)
+    {
+        swap(_ptr_root_node, ptr_node);
+    }
+
+    void Scene::setName(const string_view name)
+    {
+        _name = name;
+    }
+
+    Scene::PtrNode& Scene::getRootNode() noexcept
+    {
+        return _ptr_root_node;
+    }
+
+    const Scene::PtrNode& Scene::getRootNode() const noexcept
+    {
+        return _ptr_root_node;
+    }
+
+    string& Scene::getName() noexcept
+    {
+        return _name;
+    }
+
+    const string& Scene::getName() const noexcept
+    {
+        return _name;
+    }
+
+    PtrPointLightNode& Scene::makePointLight(
+        const PointLight::Builder&   light_builder,
+        const string_view            name
+    )
+    {
+        _point_light_nodes.push_back(PointLightNode::make(name, nullptr, light_builder));
+        return _point_light_nodes.back();
+    }
+
+    PtrSpotLightNode& Scene::makeSpotLight(
+        const SpotLight::Builder&   light_builder,
+        const string_view           name
+    )
+    {
+        _spot_light_nodes.push_back(SpotLightNode::make(name, nullptr, light_builder));
+        return _spot_light_nodes.back();
+    }
+
+    PtrDirectionLightNode& Scene::makeDirectionLight(
+        const DirectionLight::Builder&  light_builder,
+        const string_view               name
+    )
+    {
+        _dir_light_nodes.push_back(DirectionLightNode::make(name, nullptr, light_builder));
+        return _dir_light_nodes.back();        
+    }
+
+    PtrCameraNode& Scene::makeCamera(
+        const PerspectiveCamera::Builder&   camera_builder,
+        const string_view                   name
+    )    
+    {
+        _ptr_camera_node = CameraNode::make(name, nullptr, camera_builder);
+        return _ptr_camera_node;
+    }
+
+    void Scene::update(float delta_time)
+    {
+        static const Transform t;
+        if (_ptr_root_node) {
+            _ptr_root_node->update(delta_time, t);
+        }
+    }
 }

@@ -65,6 +65,26 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
+        static PtrSpotLightNode make(
+            const string_view   name    = "Spot Light Node",
+            Scene::Node*        parent  = nullptr
+        );
+
+        static PtrSpotLightNode make(
+            const string_view           name,
+            Scene::Node*                parent,
+            const SpotLight::Builder&   light_builder
+        );
+
+        static PtrSpotLightNode make(
+            const string_view   name,
+            Scene::Node*        parent,
+            const PtrSpotLight& ptr_light
+        );
+
+        static PtrSpotLightNode make(const SpotLight::Builder& light_builder);
+        static PtrSpotLightNode make(const PtrSpotLight& ptr_light);
+        
     private:
         PtrSpotLight                                            _ptr_light;
         unordered_map<type_index, PtrISpotLightNodeModifier>    _spot_light_node_modifier;

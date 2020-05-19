@@ -19,6 +19,10 @@ using Viewport = VkViewport;
 
 namespace pbrlib
 {
+    class ICamera;
+
+    using PtrICamera = shared_ptr<ICamera>;
+
     class ICamera
     {
     protected:

@@ -17,6 +17,10 @@
 
 namespace pbrlib
 {
+    class Mesh;
+
+    using PtrMesh = shared_ptr<Mesh>;
+
     enum class MeshAttribute
     {
         Position,
@@ -42,6 +46,8 @@ namespace pbrlib
 
         inline uint32_t    getIndex(size_t i) const;
         inline void        setIndex(size_t i, uint32_t val);
+
+        inline static PtrMesh make();
 
     public:
         PtrBuffer           ptr_index_buffer;

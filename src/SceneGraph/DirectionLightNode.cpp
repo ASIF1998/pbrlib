@@ -83,6 +83,39 @@ namespace pbrlib
         Scene::Node::update(delta_time, world_transform);
     }
 
+    PtrDirectionLightNode DirectionLightNode::make(const string_view name, Scene::Node* parent)
+    {
+        return make_shared<DirectionLightNode>(name, parent);
+    }
+
+    PtrDirectionLightNode DirectionLightNode::make(
+        const string_view               name,
+        Scene::Node*                    parent,
+        const DirectionLight::Builder&  light_builder
+    )
+    {
+        return make_shared<DirectionLightNode>(name, parent, light_builder);
+    }
+
+    PtrDirectionLightNode DirectionLightNode::make(
+        const string_view           name,
+        Scene::Node*                parent,
+        const PtrDirectionLight&    ptr_light
+    )
+    {
+        return make_shared<DirectionLightNode>(name, parent, ptr_light);
+    }
+
+    PtrDirectionLightNode DirectionLightNode::make(const DirectionLight::Builder& light_builder)
+    {
+        return make_shared<DirectionLightNode>(light_builder);
+    }
+
+    PtrDirectionLightNode DirectionLightNode::make(const PtrDirectionLight& ptr_light)
+    {
+        return make_shared<DirectionLightNode>(ptr_light);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     IDirectionLightNodeModifier::IDirectionLightNodeModifier(const string_view name) :
         _name(name)

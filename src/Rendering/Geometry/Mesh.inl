@@ -107,4 +107,9 @@ namespace pbrlib
 
         *(reinterpret_cast<uint32_t*>(ptr_index_buffer->getData() + index_buffer_offset) + i) = val;
     }
+
+    inline PtrMesh Mesh::make()
+    {
+        return make_shared<Mesh>();
+    }
 }

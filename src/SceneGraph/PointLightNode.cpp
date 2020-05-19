@@ -86,6 +86,43 @@ namespace pbrlib
         Scene::Node::update(delta_time, world_transform);
     }
 
+    PtrPointLightNode PointLightNode::make(
+        const string_view   name,
+        Scene::Node*        parent
+    )
+    {
+        return make_shared<PointLightNode>(name, parent);
+    }
+
+    PtrPointLightNode PointLightNode::make(
+        const string_view           name,
+        Scene::Node*                parent,
+        const PointLight::Builder&  light_builder
+    )
+    {
+        return make_shared<PointLightNode>(name, parent, light_builder);
+    }
+
+    PtrPointLightNode PointLightNode::make(
+        const string_view       name,
+        Scene::Node*            parent,
+        const PtrPointLight&    ptr_light
+    )
+    {
+        return make_shared<PointLightNode>(name, parent, ptr_light);
+    }
+
+    PtrPointLightNode PointLightNode::make(const PointLight::Builder& light_builder)
+    {
+        return make_shared<PointLightNode>(light_builder);
+    }
+
+    PtrPointLightNode PointLightNode::make(const PtrPointLight& ptr_light)
+    {
+        return make_shared<PointLightNode>(ptr_light);
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     IPointLightNodeModifier::IPointLightNodeModifier(const string_view name) :
         _name(name)
