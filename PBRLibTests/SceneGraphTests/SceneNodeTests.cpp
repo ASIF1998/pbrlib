@@ -38,47 +38,37 @@ TEST(SceneGraphNode, Constructor)
 {
     constexpr string_view   name1   = "No name";
     const string            name2   = "Node 2";
-    constexpr char          name3[] = "Name 3";
 
     AABB raabb;
 
     Scene::Node node1;
     Scene::Node node2(name2);
-    Scene::Node node3(name3, &node2);
 
     constexpr Matrix4x4<float> rm;
 
     EXPECT_FALSE(node1.worldAABBIsCurrent()) << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldAABBIsCurrent()) << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
-    EXPECT_FALSE(node3.worldAABBIsCurrent()) << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
 
     EXPECT_FALSE(node1.worldTransformIsCurrent()) << "При инициализации мировое преобразование должно быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldTransformIsCurrent()) << "При инициализации мировое преобразование должно быть не актуальным." << endl;
-    EXPECT_FALSE(node3.worldTransformIsCurrent()) << "При инициализации мировое преобразование должно быть не актуальным." << endl;
 
     EXPECT_EQ(raabb, node1.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
-    EXPECT_EQ(raabb, node2.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
-    EXPECT_EQ(raabb, node3.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
+    EXPECT_EQ(raabb, node2.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl;
 
     EXPECT_EQ(nullptr, node1.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
     EXPECT_EQ(nullptr, node2.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
-    EXPECT_EQ(&node2, node3.getParent())    << "При инициализации появился не корректный указатель на родителя." << endl;
     
     EXPECT_TRUE(node1.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
     EXPECT_TRUE(node2.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
-    EXPECT_TRUE(node3.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
 
     EXPECT_EQ(rm, node1.getWorldTransform().getMatrix()) << "Не правильное инициализирование мирового преобразования." << endl;
     EXPECT_EQ(rm, node2.getWorldTransform().getMatrix()) << "Не правильное инициализирование мирового преобразования." << endl;
-    EXPECT_EQ(rm, node3.getWorldTransform().getMatrix()) << "Не правильное инициализирование мирового преобразования." << endl;
 
     EXPECT_EQ(rm, node1.getLocalTransform().getMatrix()) << "Не правильное инициализирование локального преобразования." << endl;
     EXPECT_EQ(rm, node2.getLocalTransform().getMatrix()) << "Не правильное инициализирование локального преобразования." << endl;
-    EXPECT_EQ(rm, node3.getLocalTransform().getMatrix()) << "Не правильное инициализирование локального преобразования." << endl;
 
     EXPECT_EQ(name1, node1.getName()) << "Не правильное инициализирование имени." << endl;
     EXPECT_EQ(name2, node2.getName()) << "Не правильное инициализирование имени." << endl;
-    EXPECT_EQ(name3, node3.getName()) << "Не правильное инициализирование имени." << endl;
 }
 
 TEST(SceneGraphNode, GettersAndSetters)
@@ -143,7 +133,7 @@ TEST(SceneGraphNode, GettersAndSetters)
     EXPECT_EQ(node2_name, node2.getName()) << "Не правильно работает метод setName(...)." << endl;
 }
 
-TEST(SceneGraphNode, UpdateTest)
+TEST(SceneGraphNode, UpdateAndDetachTest)
 {
     Transform t1 = Transform::translate(Vec3<float>(-5.0f, 0.0f, 0.0f));
     Transform t2 = Transform::rotateX(60.0f);
@@ -190,4 +180,17 @@ TEST(SceneGraphNode, UpdateTest)
     EXPECT_EQ(bbox2, node3->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
     EXPECT_EQ(bbox1, node4->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
     EXPECT_EQ(bbox2, node5->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
+
+    EXPECT_NE(nullptr, node1.getChild(0));
+    EXPECT_NE(nullptr, node1.getChild(1));
+
+    node1.detachChild("Node 2");
+
+    EXPECT_EQ(nullptr, node1.getChild(0));
+    EXPECT_NE(nullptr, node1.getChild(1));
+
+    node1.detachChild(node3);
+
+    EXPECT_EQ(nullptr, node1.getChild(0));
+    EXPECT_EQ(nullptr, node1.getChild(1));
 }

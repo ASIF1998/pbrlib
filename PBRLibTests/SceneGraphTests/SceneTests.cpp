@@ -98,11 +98,6 @@ TEST(SceneGraphScene, UpdateTest)
     node1->addChild(node3);
     node2->addChild(node4);
     node3->addChild(node5);
-    
-    node2->setParent(node1.get());
-    node3->setParent(node1.get());
-    node4->setParent(node2.get());
-    node5->setParent(node3.get());
 
     node1->setLocalTransform(t1);
     node2->setLocalTransform(t2);

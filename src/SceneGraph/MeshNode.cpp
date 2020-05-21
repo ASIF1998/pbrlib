@@ -10,17 +10,13 @@
 
 namespace pbrlib
 {
-    MeshNode::MeshNode(const string_view name, Scene::Node* parent) :
-        Scene::Node (name, parent),
+    MeshNode::MeshNode(const string_view name) :
+        Scene::Node (name),
         _ptr_mesh   (nullptr)
     {}
 
-    MeshNode::MeshNode(
-        const string_view   name,
-        Scene::Node*        parent,
-        const PtrMesh&      ptr_mesh
-    ) :
-        Scene::Node (name, parent),
+    MeshNode::MeshNode(const string_view name, const PtrMesh& ptr_mesh) :
+        Scene::Node (name),
         _ptr_mesh   (ptr_mesh)
     {}
 
@@ -84,18 +80,14 @@ namespace pbrlib
         }
     }
 
-    PtrMeshNode MeshNode::make(const string_view name, Scene::Node* parent)
+    PtrMeshNode MeshNode::make(const string_view name)
     {
-        return make_shared<MeshNode>(name, parent);
+        return make_shared<MeshNode>(name);
     }
 
-    PtrMeshNode MeshNode::make(
-        const string_view   name,
-        Scene::Node*        parent,
-        const PtrMesh&      ptr_mesh
-    )
+    PtrMeshNode MeshNode::make(const string_view name, const PtrMesh& ptr_mesh)
     {
-        return make_shared<MeshNode>(name, parent, ptr_mesh);
+        return make_shared<MeshNode>(name, ptr_mesh);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

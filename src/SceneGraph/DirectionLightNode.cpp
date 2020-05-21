@@ -10,26 +10,18 @@
 
 namespace pbrlib
 {
-    DirectionLightNode::DirectionLightNode(const string_view name, Scene::Node* parent) :
-        Scene::Node (name, parent),
+    DirectionLightNode::DirectionLightNode(const string_view name) :
+        Scene::Node (name),
         _ptr_light  (nullptr)
     {}
 
-    DirectionLightNode::DirectionLightNode(
-        const string_view               name,
-        Scene::Node*                    parent,
-        const DirectionLight::Builder&  light_builder
-    ) :
-        Scene::Node (name, parent),
+    DirectionLightNode::DirectionLightNode(const string_view name, const DirectionLight::Builder& light_builder) :
+        Scene::Node (name),
         _ptr_light  (light_builder.buildPtr())
     {}
 
-    DirectionLightNode::DirectionLightNode(
-        const string_view           name,
-        Scene::Node*                parent,
-        const PtrDirectionLight&    ptr_light
-    ) :
-        Scene::Node (name, parent),
+    DirectionLightNode::DirectionLightNode(const string_view name, const PtrDirectionLight& ptr_light) :
+        Scene::Node (name),
         _ptr_light  (ptr_light)
     {}
 
@@ -83,27 +75,19 @@ namespace pbrlib
         Scene::Node::update(delta_time, world_transform);
     }
 
-    PtrDirectionLightNode DirectionLightNode::make(const string_view name, Scene::Node* parent)
+    PtrDirectionLightNode DirectionLightNode::make(const string_view name)
     {
-        return make_shared<DirectionLightNode>(name, parent);
+        return make_shared<DirectionLightNode>(name);
     }
 
-    PtrDirectionLightNode DirectionLightNode::make(
-        const string_view               name,
-        Scene::Node*                    parent,
-        const DirectionLight::Builder&  light_builder
-    )
+    PtrDirectionLightNode DirectionLightNode::make(const string_view name, const DirectionLight::Builder& light_builder)
     {
-        return make_shared<DirectionLightNode>(name, parent, light_builder);
+        return make_shared<DirectionLightNode>(name, light_builder);
     }
 
-    PtrDirectionLightNode DirectionLightNode::make(
-        const string_view           name,
-        Scene::Node*                parent,
-        const PtrDirectionLight&    ptr_light
-    )
+    PtrDirectionLightNode DirectionLightNode::make(const string_view name, const PtrDirectionLight& ptr_light)
     {
-        return make_shared<DirectionLightNode>(name, parent, ptr_light);
+        return make_shared<DirectionLightNode>(name, ptr_light);
     }
 
     PtrDirectionLightNode DirectionLightNode::make(const DirectionLight::Builder& light_builder)

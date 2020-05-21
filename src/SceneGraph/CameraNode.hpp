@@ -24,23 +24,9 @@ namespace pbrlib
         public Scene::Node
     {
     public:
-        CameraNode(
-            const string_view   name    = "Camera Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        CameraNode(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrICamera&   ptr_camera
-        );
-
-        CameraNode(
-            const string_view                   name,
-            Scene::Node*                        parent,
-            const PerspectiveCamera::Builder&   camera_builder
-        );
-
+        CameraNode(const string_view name = "Camera Node");
+        CameraNode(const string_view name, const PtrICamera& ptr_camera);
+        CameraNode(const string_view name, const PerspectiveCamera::Builder& camera_builder);
         CameraNode(const PerspectiveCamera::Builder& camera_builder);
         CameraNode(const PtrICamera& ptr_camera);
 
@@ -63,23 +49,9 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
-        static PtrCameraNode make(
-            const string_view   name    = "Camera Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        static PtrCameraNode make(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrICamera&   ptr_camera
-        );
-
-        static PtrCameraNode make(
-            const string_view                   name,
-            Scene::Node*                        parent,
-            const PerspectiveCamera::Builder&   camera_builder
-        );
-
+        static PtrCameraNode make(const string_view name = "Camera Node");
+        static PtrCameraNode make(const string_view name, const PtrICamera& ptr_camera);
+        static PtrCameraNode make(const string_view name, const PerspectiveCamera::Builder& camera_builder);
         static PtrCameraNode make(const PerspectiveCamera::Builder& camera_builder);
         static PtrCameraNode make(const PtrICamera& ptr_camera);
 

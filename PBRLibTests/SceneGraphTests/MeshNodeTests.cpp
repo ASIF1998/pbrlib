@@ -39,53 +39,42 @@ TEST(SceneGraphMeshNode, Constructor)
 {
     constexpr string_view   name1   = "Mesh Node";
     const string            name2   = "Node 2";
-    constexpr char          name3[] = "Name 3";
 
     AABB raabb;
 
     PtrMesh ptr_mesh = Mesh::make();
 
-    MeshNode    node1;
-    MeshNode    node2(name2, nullptr, ptr_mesh);
-    PtrMeshNode node3 = MeshNode::make(name3, &node2, ptr_mesh);
+    MeshNode node1;
+    MeshNode node2(name2, ptr_mesh);
 
     constexpr Matrix4x4<float> rm;
 
     EXPECT_FALSE(node1.worldAABBIsCurrent())    << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldAABBIsCurrent())    << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
-    EXPECT_FALSE(node3->worldAABBIsCurrent())   << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
 
     EXPECT_FALSE(node1.worldTransformIsCurrent())   << "При инициализации мировое преобразование должно быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldTransformIsCurrent())   << "При инициализации мировое преобразование должно быть не актуальным." << endl;
-    EXPECT_FALSE(node3->worldTransformIsCurrent())  << "При инициализации мировое преобразование должно быть не актуальным." << endl;
 
     EXPECT_EQ(raabb, node1.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
-    EXPECT_EQ(raabb, node2.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
-    EXPECT_EQ(raabb, node3->getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
+    EXPECT_EQ(raabb, node2.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl;
 
     EXPECT_EQ(nullptr, node1.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
     EXPECT_EQ(nullptr, node2.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
-    EXPECT_EQ(&node2, node3->getParent())   << "При инициализации появился не корректный указатель на родителя." << endl;
 
     EXPECT_TRUE(node1.getChildren().empty())    << "При инициализирование появились дочерние узлы." << endl;
     EXPECT_TRUE(node2.getChildren().empty())    << "При инициализирование появились дочерние узлы." << endl;
-    EXPECT_TRUE(node3->getChildren().empty())   << "При инициализирование появились дочерние узлы." << endl;
 
     EXPECT_EQ(rm, node1.getWorldTransform().getMatrix())    << "Не правильное инициализирование мирового преобразования." << endl;
     EXPECT_EQ(rm, node2.getWorldTransform().getMatrix())    << "Не правильное инициализирование мирового преобразования." << endl;
-    EXPECT_EQ(rm, node3->getWorldTransform().getMatrix())   << "Не правильное инициализирование мирового преобразования." << endl;
 
     EXPECT_EQ(rm, node1.getLocalTransform().getMatrix())    << "Не правильное инициализирование локального преобразования." << endl;
     EXPECT_EQ(rm, node2.getLocalTransform().getMatrix())    << "Не правильное инициализирование локального преобразования." << endl;
-    EXPECT_EQ(rm, node3->getLocalTransform().getMatrix())   << "Не правильное инициализирование локального преобразования." << endl;
 
     EXPECT_EQ(name1, node1.getName())   << "Не правильное инициализирование имени." << endl;
     EXPECT_EQ(name2, node2.getName())   << "Не правильное инициализирование имени." << endl;
-    EXPECT_EQ(name3, node3->getName())  << "Не правильное инициализирование имени." << endl;
     
     EXPECT_EQ(nullptr, node1.getMesh())     << "Не правильное инициализирование указателя на меш." << endl;
     EXPECT_NE(nullptr, node2.getMesh())     << "Не правильное инициализирование указателя на меш." << endl;
-    EXPECT_EQ(ptr_mesh, node3->getMesh())   << "Не правильное инициализирование указателя на меш." << endl;
 }
 
 TEST(SceneGraphMeshNode, GettersAndSetters)
@@ -136,10 +125,10 @@ TEST(SceneGraphMeshNode, UpdateTest)
     );
     
     MeshNode     node1;
-    PtrMeshNode  node2 = MeshNode::make("Node 2", &node1);
-    PtrMeshNode  node3 = MeshNode::make("Node 3", &node1);
-    PtrMeshNode  node4 = MeshNode::make("Node 4", node2.get());
-    PtrMeshNode  node5 = MeshNode::make("Node 5", node3.get());
+    PtrMeshNode  node2 = MeshNode::make("Node 2");
+    PtrMeshNode  node3 = MeshNode::make("Node 3");
+    PtrMeshNode  node4 = MeshNode::make("Node 4");
+    PtrMeshNode  node5 = MeshNode::make("Node 5");
     
     node1.addChild(node2);
     node1.addChild(node3);

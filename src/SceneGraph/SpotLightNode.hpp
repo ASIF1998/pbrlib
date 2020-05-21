@@ -24,23 +24,9 @@ namespace pbrlib
         public Scene::Node
     {
     public:
-        SpotLightNode(
-            const string_view   name    = "Spot Light Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        SpotLightNode(
-            const string_view           name,
-            Scene::Node*                parent,
-            const SpotLight::Builder&   light_builder
-        );
-
-        SpotLightNode(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrSpotLight& ptr_light
-        );
-
+        SpotLightNode(const string_view name = "Spot Light Node");
+        SpotLightNode(const string_view name, const SpotLight::Builder& light_builder);
+        SpotLightNode(const string_view name, const PtrSpotLight& ptr_light);
         SpotLightNode(const SpotLight::Builder& light_builder);
         SpotLightNode(const PtrSpotLight& ptr_light);
 
@@ -65,23 +51,9 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
-        static PtrSpotLightNode make(
-            const string_view   name    = "Spot Light Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        static PtrSpotLightNode make(
-            const string_view           name,
-            Scene::Node*                parent,
-            const SpotLight::Builder&   light_builder
-        );
-
-        static PtrSpotLightNode make(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrSpotLight& ptr_light
-        );
-
+        static PtrSpotLightNode make(const string_view name = "Spot Light Node");
+        static PtrSpotLightNode make(const string_view name, const SpotLight::Builder& light_builder);
+        static PtrSpotLightNode make(const string_view name, const PtrSpotLight& ptr_light);
         static PtrSpotLightNode make(const SpotLight::Builder& light_builder);
         static PtrSpotLightNode make(const PtrSpotLight& ptr_light);
         

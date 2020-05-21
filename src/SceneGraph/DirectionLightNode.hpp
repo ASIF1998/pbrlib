@@ -24,23 +24,9 @@ namespace pbrlib
         public Scene::Node
     {
     public:
-        DirectionLightNode(
-            const string_view   name    = "Direction Light Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        DirectionLightNode(
-            const string_view               name,
-            Scene::Node*                    parent,
-            const DirectionLight::Builder&  light_builder
-        );
-
-        DirectionLightNode(
-            const string_view           name,
-            Scene::Node*                parent,
-            const PtrDirectionLight&    ptr_light
-        );
-
+        DirectionLightNode(const string_view name = "Direction Light Node");
+        DirectionLightNode(const string_view name, const DirectionLight::Builder& light_builder);
+        DirectionLightNode(const string_view name, const PtrDirectionLight& ptr_light);
         DirectionLightNode(const DirectionLight::Builder& light_builder);
         DirectionLightNode(const PtrDirectionLight& ptr_light);
 
@@ -63,23 +49,9 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
-        static PtrDirectionLightNode make(
-            const string_view   name    = "Direction Light Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        static PtrDirectionLightNode make(
-            const string_view               name,
-            Scene::Node*                    parent,
-            const DirectionLight::Builder&  light_builder
-        );
-
-        static PtrDirectionLightNode make(
-            const string_view           name,
-            Scene::Node*                parent,
-            const PtrDirectionLight&    ptr_light
-        );
-
+        static PtrDirectionLightNode make(const string_view name = "Direction Light Node");
+        static PtrDirectionLightNode make(const string_view name, const DirectionLight::Builder& light_builder);
+        static PtrDirectionLightNode make(const string_view name, const PtrDirectionLight& ptr_light);
         static PtrDirectionLightNode make(const DirectionLight::Builder& light_builder);
         static PtrDirectionLightNode make(const PtrDirectionLight& ptr_light);
 

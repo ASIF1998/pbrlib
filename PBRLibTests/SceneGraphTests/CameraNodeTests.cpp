@@ -39,7 +39,6 @@ TEST(SceneGraphCameraNode, Constructor)
 {
     constexpr string_view   name1   = "Camera Node";
     const string            name2   = "Node 2";
-    constexpr char          name3[] = "Name 3";
 
     constexpr float width   = 800.0f;
     constexpr float height  = 600.0f;
@@ -80,46 +79,36 @@ TEST(SceneGraphCameraNode, Constructor)
     AABB raabb;
 
     CameraNode      node1;
-    CameraNode      node2(name2, nullptr, camera_builder);
-    PtrCameraNode   node3 = CameraNode::make(name3, &node2, ptr_camera);
+    CameraNode      node2(name2, camera_builder);
 
     constexpr Matrix4x4<float> rm;
 
     EXPECT_FALSE(node1.worldAABBIsCurrent())    << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldAABBIsCurrent())    << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
-    EXPECT_FALSE(node3->worldAABBIsCurrent())   << "При инициализации мировой ограничивающий объём должен быть не актуальным." << endl;
 
     EXPECT_FALSE(node1.worldTransformIsCurrent())   << "При инициализации мировое преобразование должно быть не актуальным." << endl;
     EXPECT_FALSE(node2.worldTransformIsCurrent())   << "При инициализации мировое преобразование должно быть не актуальным." << endl;
-    EXPECT_FALSE(node3->worldTransformIsCurrent())  << "При инициализации мировое преобразование должно быть не актуальным." << endl;
 
     EXPECT_EQ(raabb, node1.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl;
-    EXPECT_EQ(raabb, node2.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
-    EXPECT_EQ(raabb, node3->getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
+    EXPECT_EQ(raabb, node2.getWorldAABB())  << "Не правильная инициализация мирового ограничивающего объёма." << endl;
 
     EXPECT_EQ(nullptr, node1.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
     EXPECT_EQ(nullptr, node2.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
-    EXPECT_EQ(&node2, node3->getParent())   << "При инициализации появился не корректный указатель на родителя." << endl;
 
     EXPECT_TRUE(node1.getChildren().empty())    << "При инициализирование появились дочерние узлы." << endl;
     EXPECT_TRUE(node2.getChildren().empty())    << "При инициализирование появились дочерние узлы." << endl;
-    EXPECT_TRUE(node3->getChildren().empty())   << "При инициализирование появились дочерние узлы." << endl;
 
     EXPECT_EQ(rm, node1.getWorldTransform().getMatrix())    << "Не правильное инициализирование мирового преобразования." << endl;
     EXPECT_EQ(rm, node2.getWorldTransform().getMatrix())    << "Не правильное инициализирование мирового преобразования." << endl;
-    EXPECT_EQ(rm, node3->getWorldTransform().getMatrix())   << "Не правильное инициализирование мирового преобразования." << endl;
 
     EXPECT_EQ(rm, node1.getLocalTransform().getMatrix())    << "Не правильное инициализирование локального преобразования." << endl;
     EXPECT_EQ(rm, node2.getLocalTransform().getMatrix())    << "Не правильное инициализирование локального преобразования." << endl;
-    EXPECT_EQ(rm, node3->getLocalTransform().getMatrix())   << "Не правильное инициализирование локального преобразования." << endl;
 
     EXPECT_EQ(name1, node1.getName())   << "Не правильное инициализирование имени." << endl;
     EXPECT_EQ(name2, node2.getName())   << "Не правильное инициализирование имени." << endl;
-    EXPECT_EQ(name3, node3->getName())  << "Не правильное инициализирование имени." << endl;
     
     EXPECT_EQ(nullptr, node1.getCamera())       << "Не правильное инициализирование указателя на источник света." << endl;
     EXPECT_NE(nullptr, node2.getCamera())       << "Не правильное инициализирование указателя на источник света." << endl;
-    EXPECT_EQ(ptr_camera, node3->getCamera())   << "Не правильное инициализирование указателя на источник света." << endl;
 
     EXPECT_EQ(near, node2.getCamera()->getNearClipp())          << "Не правильное инициализирование камеры." << endl;
     EXPECT_EQ(far, node2.getCamera()->getFarClipp())            << "Не правильное инициализирование камеры." << endl;
@@ -135,21 +124,6 @@ TEST(SceneGraphCameraNode, Constructor)
     EXPECT_EQ(viewport.height, node2.getCamera()->getViewport().height)     << "Не правильное инициализирование камеры." << endl;
     EXPECT_EQ(viewport.minDepth, node2.getCamera()->getViewport().minDepth) << "Не правильное инициализирование камеры." << endl;
     EXPECT_EQ(viewport.maxDepth, node2.getCamera()->getViewport().maxDepth) << "Не правильное инициализирование камеры." << endl;
-
-    EXPECT_EQ(near, node3->getCamera()->getNearClipp())          << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(far, node3->getCamera()->getFarClipp())            << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(eye, node3->getCamera()->getDirection())           << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(pos, node3->getCamera()->getPosition())            << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(r1, node3->getCamera()->getView())                 << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(r2, node3->getCamera()->getProjection())           << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(r2 * r1, node3->getCamera()->getViewProjection())  << "Не правильное инициализирование камеры." << endl;
-    
-    EXPECT_EQ(viewport.x, node3->getCamera()->getViewport().x)               << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(viewport.y, node3->getCamera()->getViewport().y)               << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(viewport.width, node3->getCamera()->getViewport().width)       << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(viewport.height, node3->getCamera()->getViewport().height)     << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(viewport.minDepth, node3->getCamera()->getViewport().minDepth) << "Не правильное инициализирование камеры." << endl;
-    EXPECT_EQ(viewport.maxDepth, node3->getCamera()->getViewport().maxDepth) << "Не правильное инициализирование камеры." << endl;
 }
 
 TEST(SceneGraphCameraNode, GettersAndSetters)
@@ -265,10 +239,10 @@ TEST(SceneGraphCameraNode, UpdateTest)
     );
 
     CameraNode      node1;
-    PtrCameraNode   node2 = CameraNode::make("Node 2", &node1);
-    PtrCameraNode   node3 = CameraNode::make("Node 3", &node1);
-    PtrCameraNode   node4 = CameraNode::make("Node 4", node2.get());
-    PtrCameraNode   node5 = CameraNode::make("Node 5", node3.get());
+    PtrCameraNode   node2 = CameraNode::make("Node 2");
+    PtrCameraNode   node3 = CameraNode::make("Node 3");
+    PtrCameraNode   node4 = CameraNode::make("Node 4");
+    PtrCameraNode   node5 = CameraNode::make("Node 5");
     
     node1.addChild(node2);
     node1.addChild(node3);

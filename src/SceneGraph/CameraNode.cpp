@@ -10,26 +10,18 @@
 
 namespace pbrlib
 {
-    CameraNode::CameraNode(const string_view name, Scene::Node* parent) :
-        Scene::Node (name, parent),
+    CameraNode::CameraNode(const string_view name) :
+        Scene::Node (name),
         _ptr_camera (nullptr)
     {}
 
-    CameraNode::CameraNode(
-        const string_view   name,
-        Scene::Node*        parent,
-        const PtrICamera&   ptr_camera
-    ) :
-        Scene::Node (name, parent),
+    CameraNode::CameraNode(const string_view name, const PtrICamera& ptr_camera) :
+        Scene::Node (name),
         _ptr_camera (ptr_camera)
     {}
 
-    CameraNode::CameraNode(
-        const string_view                   name,
-        Scene::Node*                        parent,
-        const PerspectiveCamera::Builder&   camera_builder
-    ) :
-        Scene::Node (name, parent),
+    CameraNode::CameraNode(const string_view name, const PerspectiveCamera::Builder& camera_builder) :
+        Scene::Node (name),
         _ptr_camera (camera_builder.ptrBuild())
     {}
 
@@ -74,27 +66,19 @@ namespace pbrlib
         return _ptr_camera;
     }
 
-    PtrCameraNode CameraNode::make(const string_view name, Scene::Node* parent)
+    PtrCameraNode CameraNode::make(const string_view name)
     {
-        return make_shared<CameraNode>(name, parent);
+        return make_shared<CameraNode>(name);
     }
 
-    PtrCameraNode CameraNode::make(
-        const string_view   name,
-        Scene::Node*        parent,
-        const PtrICamera&   ptr_camera
-    )
+    PtrCameraNode CameraNode::make(const string_view name, const PtrICamera& ptr_camera)
     {
-        return make_shared<CameraNode>(name, parent, ptr_camera);
+        return make_shared<CameraNode>(name, ptr_camera);
     }
 
-    PtrCameraNode CameraNode::make(
-        const string_view                   name,
-        Scene::Node*                        parent,
-        const PerspectiveCamera::Builder&   camera_builder
-    )
+    PtrCameraNode CameraNode::make(const string_view name, const PerspectiveCamera::Builder& camera_builder)
     {
-        return make_shared<CameraNode>(name, parent, camera_builder);
+        return make_shared<CameraNode>(name, camera_builder);
     }
 
     PtrCameraNode CameraNode::make(const PerspectiveCamera::Builder& camera_builder)

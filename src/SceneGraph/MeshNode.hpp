@@ -24,17 +24,8 @@ namespace pbrlib
         public Scene::Node
     {
     public:
-        MeshNode(
-            const string_view   name    = "Mesh Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        MeshNode(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrMesh&      ptr_mesh
-        );
-
+        MeshNode(const string_view name = "Mesh Node");
+        MeshNode(const string_view name, const PtrMesh& ptr_mesh);
         MeshNode(const PtrMesh& ptr_mesh);
 
         void setMesh(const PtrMesh& ptr_mesh);
@@ -55,17 +46,8 @@ namespace pbrlib
 
         virtual void update(float delta_time, const Transform& world_transform) override;
 
-        static PtrMeshNode make(
-            const string_view   name    = "Mesh Node",
-            Scene::Node*        parent  = nullptr
-        );
-
-        static PtrMeshNode make(
-            const string_view   name,
-            Scene::Node*        parent,
-            const PtrMesh&      ptr_mesh
-        );
-
+        static PtrMeshNode make(const string_view name = "Mesh Node");
+        static PtrMeshNode make(const string_view name, const PtrMesh& ptr_mesh);
         static PtrMeshNode make(const PtrMesh& ptr_mesh);
 
     private:

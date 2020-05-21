@@ -10,26 +10,18 @@
 
 namespace pbrlib
 {
-    PointLightNode::PointLightNode(const string_view name, Scene::Node* parent) :
-        Scene::Node (name, parent),
+    PointLightNode::PointLightNode(const string_view name) :
+        Scene::Node (name),
         _ptr_light  (nullptr)
     {}
 
-    PointLightNode::PointLightNode(
-        const string_view           name,
-        Scene::Node*                parent,
-        const PointLight::Builder&  light_builder
-    ) :
-        Scene::Node (name, parent),
+    PointLightNode::PointLightNode(const string_view name, const PointLight::Builder& light_builder) :
+        Scene::Node (name),
         _ptr_light  (light_builder.buildPtr())
     {}
 
-    PointLightNode::PointLightNode(
-        const string_view   name,
-        Scene::Node*        parent,
-        const PtrPointLight&   ptr_light
-    ) :
-        Scene::Node (name, parent),
+    PointLightNode::PointLightNode(const string_view name, const PtrPointLight& ptr_light) :
+        Scene::Node (name),
         _ptr_light  (ptr_light)
     {}
 
@@ -86,30 +78,19 @@ namespace pbrlib
         Scene::Node::update(delta_time, world_transform);
     }
 
-    PtrPointLightNode PointLightNode::make(
-        const string_view   name,
-        Scene::Node*        parent
-    )
+    PtrPointLightNode PointLightNode::make(const string_view name)
     {
-        return make_shared<PointLightNode>(name, parent);
+        return make_shared<PointLightNode>(name);
     }
 
-    PtrPointLightNode PointLightNode::make(
-        const string_view           name,
-        Scene::Node*                parent,
-        const PointLight::Builder&  light_builder
-    )
+    PtrPointLightNode PointLightNode::make(const string_view name, const PointLight::Builder& light_builder)
     {
-        return make_shared<PointLightNode>(name, parent, light_builder);
+        return make_shared<PointLightNode>(name, light_builder);
     }
 
-    PtrPointLightNode PointLightNode::make(
-        const string_view       name,
-        Scene::Node*            parent,
-        const PtrPointLight&    ptr_light
-    )
+    PtrPointLightNode PointLightNode::make(const string_view name, const PtrPointLight& ptr_light)
     {
-        return make_shared<PointLightNode>(name, parent, ptr_light);
+        return make_shared<PointLightNode>(name, ptr_light);
     }
 
     PtrPointLightNode PointLightNode::make(const PointLight::Builder& light_builder)

@@ -331,7 +331,7 @@ namespace pbrlib
         const string_view            name
     )
     {
-        _point_light_nodes.push_back(PointLightNode::make(name, nullptr, light_builder));
+        _point_light_nodes.push_back(PointLightNode::make(name, light_builder));
         return _point_light_nodes.back();
     }
 
@@ -340,7 +340,7 @@ namespace pbrlib
         const string_view           name
     )
     {
-        _spot_light_nodes.push_back(SpotLightNode::make(name, nullptr, light_builder));
+        _spot_light_nodes.push_back(SpotLightNode::make(name, light_builder));
         return _spot_light_nodes.back();
     }
 
@@ -349,7 +349,7 @@ namespace pbrlib
         const string_view               name
     )
     {
-        _dir_light_nodes.push_back(DirectionLightNode::make(name, nullptr, light_builder));
+        _dir_light_nodes.push_back(DirectionLightNode::make(name, light_builder));
         return _dir_light_nodes.back();        
     }
 
@@ -358,7 +358,7 @@ namespace pbrlib
         const string_view                   name
     )    
     {
-        _ptr_camera_node = CameraNode::make(name, nullptr, camera_builder);
+        _ptr_camera_node = CameraNode::make(name, camera_builder);
         return _ptr_camera_node;
     }
 
