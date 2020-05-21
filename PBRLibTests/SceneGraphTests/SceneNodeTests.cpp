@@ -60,13 +60,13 @@ TEST(SceneGraphNode, Constructor)
     EXPECT_EQ(raabb, node2.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
     EXPECT_EQ(raabb, node3.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl; 
 
-    EXPECT_EQ(nullptr, node1.getParent())   << "При инициализации у объекта появился указатель на объект (его не должно быть)." << endl;
-    EXPECT_EQ(nullptr, node2.getParent())   << "При инициализации у объекта появился указатель на объект (его не должно быть)." << endl;
+    EXPECT_EQ(nullptr, node1.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
+    EXPECT_EQ(nullptr, node2.getParent())   << "При инициализации у объекта появился указатель на родителя (его не должно быть)." << endl;
     EXPECT_EQ(&node2, node3.getParent())    << "При инициализации появился не корректный указатель на родителя." << endl;
     
-    EXPECT_TRUE(node1.getChildren().empty()) << "При инициализирование появились узлы." << endl;
-    EXPECT_TRUE(node2.getChildren().empty()) << "При инициализирование появились узлы." << endl;
-    EXPECT_TRUE(node3.getChildren().empty()) << "При инициализирование появились узлы." << endl;
+    EXPECT_TRUE(node1.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
+    EXPECT_TRUE(node2.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
+    EXPECT_TRUE(node3.getChildren().empty()) << "При инициализирование появились дочерние узлы." << endl;
 
     EXPECT_EQ(rm, node1.getWorldTransform().getMatrix()) << "Не правильное инициализирование мирового преобразования." << endl;
     EXPECT_EQ(rm, node2.getWorldTransform().getMatrix()) << "Не правильное инициализирование мирового преобразования." << endl;
@@ -128,9 +128,7 @@ TEST(SceneGraphNode, GettersAndSetters)
 
     EXPECT_EQ(node2.getWorldTransform().getMatrix(), world_transform.getMatrix())   << "Не правильно работает метод setWorldTransform(...)." << endl;
     EXPECT_TRUE(node2.worldTransformIsCurrent())                                    << "Не правильно работает метод setWorldTransform(...)." << endl;
-
-    EXPECT_EQ(node2.getLocalTransform().getMatrix(), local_transform.getMatrix())  
-                    << "Не правильно работает метод setLocalTransform(...)." << endl;
+    EXPECT_EQ(node2.getLocalTransform().getMatrix(), local_transform.getMatrix())   << "Не правильно работает метод setLocalTransform(...)." << endl;
 
     EXPECT_EQ(world_aabb, node2.getWorldAABB()) << "Не правильно работает метод setWorldAABB(...)." << endl;
     EXPECT_TRUE(node2.worldAABBIsCurrent())     << "Не правильно работает метод setWorldAABB(...)." << endl;
@@ -140,8 +138,7 @@ TEST(SceneGraphNode, GettersAndSetters)
     EXPECT_TRUE(the_right_type)                             << "Не правильный возвращаемый тип в методы getNodeModifier<...>()." << endl;
     EXPECT_TRUE(node2.hasNodeModifier<TestNodeModifier>())  << "Ошибка в методы addNodeModifier(...)." << endl;
     
-    EXPECT_EQ("Test Node Modifier", node2.getNodeModifier<TestNodeModifier>().getName())
-                            << "Не правильная инициализация имени в классе NodeModifier." << endl;
+    EXPECT_EQ("Test Node Modifier", node2.getNodeModifier<TestNodeModifier>().getName()) << "Не правильная инициализация имени в классе NodeModifier." << endl;
 
     EXPECT_EQ(node2_name, node2.getName()) << "Не правильно работает метод setName(...)." << endl;
 }

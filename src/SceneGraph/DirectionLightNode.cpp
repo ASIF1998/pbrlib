@@ -53,7 +53,7 @@ namespace pbrlib
         _ptr_light = ptr_light;
     }
 
-    void DirectionLightNode::addSpotLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire)
+    void DirectionLightNode::addDirLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire)
     {
         auto it = _dir_light_node_modifiers.find(ptr_light_node_modifire->getType());
 

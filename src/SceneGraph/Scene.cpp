@@ -173,7 +173,6 @@ namespace pbrlib
 
         for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
             if (!_ptr_children[i]) {
-                // _ptr_children[i] = child;
                 swap(_ptr_children[i], child);
                 return ;
             }

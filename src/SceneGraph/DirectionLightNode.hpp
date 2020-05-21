@@ -47,7 +47,7 @@ namespace pbrlib
         void setLight(const DirectionLight::Builder& light_builder);
         void setLight(const PtrDirectionLight& ptr_light);
 
-        void addSpotLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire);
+        void addDirLightNodeModifier(IDirectionLightNodeModifier* ptr_light_node_modifire);
 
         PtrDirectionLight&          getLight() noexcept;
         const PtrDirectionLight&    getLight() const noexcept;

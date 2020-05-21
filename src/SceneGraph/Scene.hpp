@@ -140,7 +140,7 @@ namespace pbrlib
                 Node*               parent  = nullptr
             );
 
-        private:
+        protected:
             Node*                                           _ptr_parent; 
             vector<PtrNode>                                 _ptr_children;
             Transform                                       _local_transform;
