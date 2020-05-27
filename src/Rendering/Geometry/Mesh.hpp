@@ -15,6 +15,8 @@
 
 #include "AABB.hpp"
 
+#include "../../SceneGraph/Component.hpp"
+
 namespace pbrlib
 {
     class Mesh;
@@ -28,10 +30,13 @@ namespace pbrlib
         Normal,
         Tangent,
     };
-
-    struct Mesh
+    
+    struct Mesh :
+        public Component
     {
     public:
+        inline Mesh(const string_view name = "Mesh");
+
         inline void mapVertexAttribBuffer()    const;
         inline void unmapVertexAttribBuffer()  const;
 
@@ -46,6 +51,8 @@ namespace pbrlib
 
         inline uint32_t    getIndex(size_t i) const;
         inline void        setIndex(size_t i, uint32_t val);
+
+        inline virtual type_index getType() const override;
 
         inline static PtrMesh make();
 

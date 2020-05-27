@@ -20,7 +20,33 @@ namespace pbrlib
         float               fovy,
         const Viewport&     viewport
     ) :
-        ICamera(
+        CameraBase(
+            "Perspective Camera",
+            Transform::lookAt(pos, eye, up),
+            Transform::perspective(fovy, aspect, near_clipp, far_clipp),
+            pos,
+            eye,
+            near_clipp,
+            far_clipp,
+            viewport
+        ),
+        _aspect (aspect),
+        _fovy   (fovy)
+    {}
+
+    PerspectiveCamera::PerspectiveCamera(
+        const string_view   name,
+        const Vec3<float>&  pos,
+        const Vec3<float>&  eye,
+        const Vec3<float>&  up,
+        float               near_clipp,
+        float               far_clipp,
+        float               aspect,
+        float               fovy,
+        const Viewport&     viewport
+    ) :
+        CameraBase(
+            name,
             Transform::lookAt(pos, eye, up),
             Transform::perspective(fovy, aspect, near_clipp, far_clipp),
             pos,
@@ -83,6 +109,10 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PerspectiveCamera::Builder::Builder(const string_view name) :
+        _name(name)
+    {}
+
     void PerspectiveCamera::Builder::setPosition(const Vec3<float>& pos)
     {
         _pos = pos;
@@ -146,9 +176,15 @@ namespace pbrlib
         _viewport.maxDepth  = max_depth;
     }
 
+    void PerspectiveCamera::Builder::setName(const string_view name)
+    {
+        _name = name;
+    }
+
     PerspectiveCamera PerspectiveCamera::Builder::build() const
     {
         return PerspectiveCamera(
+            _name,
             _pos,
             _eye,
             _up,
@@ -160,9 +196,10 @@ namespace pbrlib
         );
     }
 
-    PtrPerspectiveCamera PerspectiveCamera::Builder::ptrBuild() const
+    PtrPerspectiveCamera PerspectiveCamera::Builder::buildPtr() const
     {
         return make_shared<PerspectiveCamera>(
+            _name,
             _pos,
             _eye,
             _up,

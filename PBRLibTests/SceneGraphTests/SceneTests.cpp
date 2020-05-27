@@ -9,8 +9,6 @@
 #include <gtest/gtest.h>
 
 #include "../../src/SceneGraph/Scene.hpp"
-#include "../../src/SceneGraph/SpotLightNode.hpp"
-#include "../../src/SceneGraph/PointLightNode.hpp"
 
 using namespace testing;
 using namespace pbrlib;
@@ -44,7 +42,7 @@ TEST(SceneGraphScene, GettersAndSetters)
     EXPECT_EQ(ptr_node, scene.getRootNode())    << "Ошибка в методе setRootNode(...)." << endl;
 }
 
-TEST(SceneGraphScene, UpdateTest)
+TEST(SceneGraphScene, UpdateAndCompanentTest)
 {
     Transform t1 = Transform::translate(Vec3<float>(-5.0f, 0.0f, 0.0f));
     Transform t2 = Transform::rotateX(60.0f);
@@ -72,8 +70,39 @@ TEST(SceneGraphScene, UpdateTest)
     constexpr Vec3<float>   light_pos       (25.0f, -45.0f, -30.0f);
     constexpr Vec3<float>   dir_light       (1.0f, 0.0f, 0.0f);
     
-    SpotLight::Builder slight_builder;
-    PointLight::Builder plight_builder;
+    constexpr float width   = 800.0f;
+    constexpr float height  = 600.0f;
+
+    constexpr float near    = 0.01f;
+    constexpr float far     = 100.0f;
+    constexpr float fovy    = 45.0f;
+
+    constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
+    constexpr Vec3<float> pos   (0.0f, 0.0f, 0.0f);
+    constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
+    
+    constexpr Viewport viewport {
+        .x          = width / 2.0f,
+        .y          = height / 2.0f,
+        .width      = width,
+        .height     = height,
+        .minDepth   = 0.0f,
+        .maxDepth   = 1.0f
+    };
+
+    PerspectiveCamera::Builder  camera_builder;
+    SpotLight::Builder          slight_builder;
+    PointLight::Builder         plight_builder;
+
+    camera_builder.setAspect(width, height);
+    camera_builder.setEye(eye);
+    camera_builder.setNearClipp(near);
+    camera_builder.setFarClipp(far);
+    camera_builder.setPosition(pos);
+    camera_builder.setUp(up);
+    camera_builder.setFovy(fovy);
+    camera_builder.setViewport(viewport);
+    camera_builder.setName("Camera Buidler");
 
     slight_builder.setColor(light_color);
     slight_builder.setIntensity(intensity);
@@ -81,18 +110,21 @@ TEST(SceneGraphScene, UpdateTest)
     slight_builder.setOuterRadius(outer_radius);
     slight_builder.setInnerRadius(inner_radius);
     slight_builder.setDirection(dir_light);
+    slight_builder.setName("Spot Light Builder");
     
     plight_builder.setColor(light_color);
     plight_builder.setPosition(light_pos);
     plight_builder.setIntensity(intensity);
+    plight_builder.setName("Point Light Builder");
 
     Scene scene;
 
-    PtrSpotLightNode    node1 = scene.makeSpotLight(slight_builder, "Node 1");
-    PtrPointLightNode   node2 = scene.makePointLight(plight_builder, "Node 2");
-    PtrSpotLightNode    node3 = scene.makeSpotLight(slight_builder, "Node 3");
-    PtrSpotLightNode    node4 = scene.makeSpotLight(slight_builder, "Node 4");
-    PtrPointLightNode   node5 = scene.makePointLight(plight_builder, "Node 5");
+    Scene::PtrNode node1 = scene.makeSpotLight(slight_builder, "Node 1");
+    Scene::PtrNode node2 = scene.makePointLight(plight_builder, "Node 2");
+    Scene::PtrNode node3 = scene.makeSpotLight(slight_builder, "Node 3");
+    Scene::PtrNode node4 = scene.makeSpotLight(slight_builder, "Node 4");
+    Scene::PtrNode node5 = scene.makePointLight(plight_builder, "Node 5");
+    Scene::PtrNode node6 = scene.makeCamera(camera_builder);
     
     node1->addChild(node2);
     node1->addChild(node3);
@@ -108,6 +140,17 @@ TEST(SceneGraphScene, UpdateTest)
 
     scene.setRootNode(node1);
     scene.update(0.2);
+    
+    EXPECT_TRUE(node1->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
+    EXPECT_TRUE(node2->hasComponent<PointLight>())  << "Не правильно работает метод makePointLight(...)." << endl;
+    EXPECT_TRUE(node3->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
+    EXPECT_TRUE(node4->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
+    EXPECT_TRUE(node5->hasComponent<PointLight>())  << "Не правильно работает метод makePointLight(...)." << endl;
+    EXPECT_TRUE(node6->hasComponent<CameraBase>())  << "Не правильно работает метод makeCamera(...)." << endl;
+    
+    EXPECT_EQ("Spot Light Builder", node1->getComponent<SpotLight>().getName());
+    EXPECT_EQ("Point Light Builder", node2->getComponent<PointLight>().getName());
+    EXPECT_EQ("Camera Buidler", node6->getComponent<CameraBase>().getName());
 
     EXPECT_EQ(t1.getMatrix(), node1->getLocalTransform().getMatrix())           << "Не правильно работает метод update(...)." << endl;
     EXPECT_EQ(t1.getMatrix(), node2->getWorldTransform().getMatrix())           << "Не правильно работает метод update(...)." << endl;

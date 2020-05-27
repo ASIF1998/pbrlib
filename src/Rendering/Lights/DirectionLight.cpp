@@ -16,6 +16,21 @@ namespace pbrlib
         const Vec3<float>&  color,
         float               intensity
     ) :
+        Component   ("Direction Light"),
+        _pos        (position),
+        _dir        (direction),
+        _color      (color),
+        _intensity  (intensity)
+    {}
+
+    DirectionLight::DirectionLight(
+        const string_view   name,
+        const Vec3<float>&  position,
+        const Vec3<float>&  direction,
+        const Vec3<float>&  color,
+        float               intensity
+    ) :
+        Component   (name),
         _pos        (position),
         _dir        (direction),
         _color      (color),
@@ -77,7 +92,16 @@ namespace pbrlib
         return _dir;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    type_index DirectionLight::getType() const
+    {
+        return ComponentUtil::getTypeIndex<DirectionLight>();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    DirectionLight::Builder::Builder(const string_view name) :
+        _name(name)
+    {}
+
     void DirectionLight::Builder::setIntensity(float intensity) noexcept
     {
         _intensity = intensity;
@@ -98,13 +122,18 @@ namespace pbrlib
         _dir = direction;
     }
 
+    void DirectionLight::Builder::setName(const string_view name)
+    {
+        _name = name;
+    }
+
     DirectionLight DirectionLight::Builder::build() const
     {
-        return DirectionLight(_pos, _dir, _color, _intensity);
+        return DirectionLight(_name, _pos, _dir, _color, _intensity);
     }
 
     PtrDirectionLight DirectionLight::Builder::buildPtr() const
     {
-        return make_shared<DirectionLight>(_pos, _dir, _color, _intensity);
+        return make_shared<DirectionLight>(_name, _pos, _dir, _color, _intensity);
     }
 }

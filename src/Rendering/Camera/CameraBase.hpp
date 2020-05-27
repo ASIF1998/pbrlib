@@ -1,15 +1,17 @@
 //
-//  ICamera.hpp
+//  CameraBase.hpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 06/05/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#ifndef ICamera_hpp
-#define ICamera_hpp
+#ifndef CameraBase_hpp
+#define CameraBase_hpp
 
 #include "../../Moving/Transform.hpp"
+
+#include "../../SceneGraph/Component.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -19,25 +21,28 @@ using Viewport = VkViewport;
 
 namespace pbrlib
 {
-    class ICamera;
+    class CameraBase;
 
-    using PtrICamera = shared_ptr<ICamera>;
-
-    class ICamera
+    using PtrCameraBase = shared_ptr<CameraBase>;
+    
+    class CameraBase :
+        public Component
     {
     protected:
         /**
          * @brief Конструктор.
          * 
-         * @param view          преобразование, осуществляющая перевод из   
-         *                      мирового пространства в пространство вида.
-         * @param projection    преобразование осуществляющее проекцию.
-         * @param pos           позиция.
-         * @param eye           вектор направления взгляда.
-         * @param z_near        расстояние до ближайшей плоскости отсечения по оси Z.
-         * @param z_far         расстояние до дальней плоскости отсечения по оси Z.
+         * @param component_name    название компонента.
+         * @param view              преобразование, осуществляющая перевод из   
+         *                          мирового пространства в пространство вида.
+         * @param projection        преобразование осуществляющее проекцию.
+         * @param pos               позиция.
+         * @param eye               вектор направления взгляда.
+         * @param z_near            расстояние до ближайшей плоскости отсечения по оси Z.
+         * @param z_far             расстояние до дальней плоскости отсечения по оси Z.
         */
-        ICamera(
+        CameraBase(
+            const string_view   component_name,
             const Transform&    view,
             const Transform&    projection,
             const Vec3<float>&  pos,
@@ -125,6 +130,8 @@ namespace pbrlib
             float max_depth
         ) noexcept;
 
+        virtual type_index getType() const override;
+
     protected:
         virtual Transform _calculateProjection() const = 0;
 
@@ -139,4 +146,4 @@ namespace pbrlib
     };
 }
 
-#endif /* ICamera_hpp */
+#endif /* CameraBase_hpp */

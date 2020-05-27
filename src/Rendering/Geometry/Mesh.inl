@@ -13,6 +13,10 @@
 
 namespace pbrlib
 {
+    inline Mesh::Mesh(const string_view name) :
+        Component(name)
+    {}
+
     inline void Mesh::mapVertexAttribBuffer() const
     {
         ptr_vertex_attrib_buffer->map();
@@ -106,6 +110,11 @@ namespace pbrlib
         assert(i < num_indices);
 
         *(reinterpret_cast<uint32_t*>(ptr_index_buffer->getData() + index_buffer_offset) + i) = val;
+    }
+
+    inline type_index Mesh::getType() const
+    {
+        return ComponentUtil::getTypeIndex<Mesh>();
     }
 
     inline PtrMesh Mesh::make()

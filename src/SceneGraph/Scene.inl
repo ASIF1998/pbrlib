@@ -8,30 +8,42 @@
 
 namespace pbrlib
 {
-    template<typename NodeModifierType>
-    inline NodeModifierType& Scene::Node::getNodeModifier()
+    template<typename TComponent>
+    inline TComponent& Scene::Node::getComponent()
     {
-        return *dynamic_cast<NodeModifierType*>(_node_modifiers.at(typeid(NodeModifierType)).get());
+        return *dynamic_cast<TComponent*>(_components.at(typeid(TComponent)).get());
     }
 
-    template<typename NodeModifierType>
-    inline const NodeModifierType& Scene::Node::getNodeModifier() const
+    template<typename TComponent>
+    inline const TComponent& Scene::Node::getComponent() const
     {
-        return *dynamic_cast<NodeModifierType*>(_node_modifiers.at(typeid(NodeModifierType)).get());
+        return *dynamic_cast<TComponent*>(_components.at(typeid(TComponent)).get());
     }
 
-    template<typename NodeModifierType>
-    inline bool Scene::Node::hasNodeModifier() const
+    template<typename TScript>
+    inline TScript& Scene::Node::getScript()
     {
-        auto it = _node_modifiers.find(typeid(NodeModifierType));
-        return it != end(_node_modifiers);
+        return *dynamic_cast<TScript*>(_scripts.at(typeid(TScript)).get());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    template<typename NodeModifierType>
-    inline type_index INodeModifier::getTypeIndex()
+    template<typename TScript>
+    inline const TScript& Scene::Node::getScript() const
     {
-        return typeid(NodeModifierType);
+        return *dynamic_cast<TScript*>(_scripts.at(typeid(TScript)).get());
+    }
+
+    template<typename TComponent>
+    bool Scene::Node::hasComponent() const
+    {
+        auto it = _components.find(typeid(TComponent));
+        return it != end(_components);
+    }
+
+    template<typename TScript>
+    bool Scene::Node::hasScript() const
+    {
+        auto it = _scripts.find(typeid(TScript));
+        return it != end(_scripts);
     }
 }
 

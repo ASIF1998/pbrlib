@@ -1,16 +1,17 @@
 //
-//  ICamera.cpp
+//  CameraBase.cpp
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 06/05/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "ICamera.hpp"
+#include "CameraBase.hpp"
 
 namespace pbrlib
 {
-    ICamera::ICamera(
+    CameraBase::CameraBase(
+        const string_view   component_name,
         const Transform&    view,
         const Transform&    projection,
         const Vec3<float>&  pos,
@@ -19,6 +20,7 @@ namespace pbrlib
         float               z_far,
         const Viewport&     viewport
     ) :
+        Component   (component_name),
         _view       (view),
         _projection (projection),
         _pos        (pos),
@@ -28,72 +30,72 @@ namespace pbrlib
         _viewport   (viewport)
     {}
 
-    Transform& ICamera::getView() noexcept
+    Transform& CameraBase::getView() noexcept
     {
         return _view;
     }
 
-    const Transform& ICamera::getView() const noexcept
+    const Transform& CameraBase::getView() const noexcept
     {
         return _view;
     }
 
-    Transform& ICamera::getProjection() noexcept
+    Transform& CameraBase::getProjection() noexcept
     {
         return _projection;
     }
 
-    const Transform& ICamera::getProjection() const noexcept
+    const Transform& CameraBase::getProjection() const noexcept
     {
         return _projection;
     }
 
-    Transform ICamera::getViewProjection() const noexcept
+    Transform CameraBase::getViewProjection() const noexcept
     {
         return _projection * _view;
     }
 
-    Vec3<float>& ICamera::getPosition() noexcept
+    Vec3<float>& CameraBase::getPosition() noexcept
     {
         return _pos;
     }
 
-    const Vec3<float>& ICamera::getPosition() const noexcept
+    const Vec3<float>& CameraBase::getPosition() const noexcept
     {
         return _pos;
     }
 
-    Vec3<float>& ICamera::getDirection() noexcept
+    Vec3<float>& CameraBase::getDirection() noexcept
     {
         return _dir;
     }
 
-    const Vec3<float>& ICamera::getDirection() const noexcept
+    const Vec3<float>& CameraBase::getDirection() const noexcept
     {
         return _dir;
     }
 
-    float ICamera::getNearClipp() const noexcept
+    float CameraBase::getNearClipp() const noexcept
     {
         return _z_near;
     }
 
-    float ICamera::getFarClipp() const noexcept
+    float CameraBase::getFarClipp() const noexcept
     {
         return _z_far;
     }
 
-    Viewport& ICamera::getViewport() noexcept
+    Viewport& CameraBase::getViewport() noexcept
     {
         return _viewport;
     }
 
-    const Viewport& ICamera::getViewport() const noexcept
+    const Viewport& CameraBase::getViewport() const noexcept
     {
         return _viewport;
     }
 
-    void ICamera::setLookAt(
+    void CameraBase::setLookAt(
         const Vec3<float>& eye,
         const Vec3<float>& pos,
         const Vec3<float>& up
@@ -104,31 +106,31 @@ namespace pbrlib
         _view   = Transform::lookAt(pos, eye, up);
     }
 
-    void ICamera::setNearClipp(float near)
+    void CameraBase::setNearClipp(float near)
     {
         _z_near     = near;
         _projection = _calculateProjection();
     }
 
-    void ICamera::setFarClipp(float far)
+    void CameraBase::setFarClipp(float far)
     {
         _z_far      = far;
         _projection = _calculateProjection();
     }
 
-    void ICamera::setNearAndFarClipp(float near, float far)
+    void CameraBase::setNearAndFarClipp(float near, float far)
     {
         _z_near     = near;
         _z_far      = far;
         _projection = _calculateProjection();
     }
 
-    void ICamera::setViewport(const Viewport& viewport) noexcept
+    void CameraBase::setViewport(const Viewport& viewport) noexcept
     {
         _viewport = viewport;
     }
 
-    void ICamera::setViewport(
+    void CameraBase::setViewport(
         float x,
         float y,
         float width,
@@ -143,5 +145,11 @@ namespace pbrlib
         _viewport.height    = height;
         _viewport.minDepth  = min_depth;
         _viewport.maxDepth  = max_depth;
+    }
+
+    type_index CameraBase::getType() const
+    {
+        // return typeid(CameraBase);
+        return ComponentUtil::getTypeIndex<CameraBase>();
     }
 }

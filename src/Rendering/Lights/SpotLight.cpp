@@ -18,6 +18,25 @@ namespace pbrlib
         const Vec3<float>&  color,
         float               intensity
     ) :
+        Component       ("Spot Light"),
+        _color          (color),
+        _pos            (position),
+        _dir            (direction),
+        _intensity      (intensity),
+        _inner_radius   (inner_radius),
+        _outer_radius   (outer_radius)
+    {}
+
+    SpotLight::SpotLight(
+        const string_view   name,
+        const Vec3<float>&  position,
+        const Vec3<float>&  direction,
+        float               inner_radius,
+        float               outer_radius,
+        const Vec3<float>&  color,
+        float               intensity
+    ) :
+        Component       (name),
         _color          (color),
         _pos            (position),
         _dir            (direction),
@@ -101,7 +120,16 @@ namespace pbrlib
         return _outer_radius;
     }
 
+    type_index SpotLight::getType() const
+    {
+        return ComponentUtil::getTypeIndex<SpotLight>();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SpotLight::Builder::Builder(const string_view name) :
+        _name(name)
+    {}
+
     void SpotLight::Builder::setIntensity(float intensity) noexcept
     {
         _intensity = intensity;
@@ -132,9 +160,15 @@ namespace pbrlib
         _outer_radius = outer_radius;
     }
 
+    void SpotLight::Builder::setName(const string_view name)
+    {
+        _name = name;
+    }
+
     SpotLight SpotLight::Builder::build() const
     {
         return SpotLight(
+            _name,
             _pos,
             _dir,
             _inner_radius,
@@ -147,6 +181,7 @@ namespace pbrlib
     PtrSpotLight SpotLight::Builder::buildPtr() const
     {
         return make_shared<SpotLight>(
+            _name,
             _pos,
             _dir,
             _inner_radius,

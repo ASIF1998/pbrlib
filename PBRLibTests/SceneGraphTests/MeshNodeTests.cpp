@@ -16,25 +16,6 @@ using namespace testing;
 using namespace pbrlib;
 using namespace std;
 
-struct TestMeshNodeModifier :
-    public IMeshNodeModifier
-{
-    TestMeshNodeModifier() :
-        IMeshNodeModifier   (),
-        i                   (0)
-    {}
-
-    virtual void update(MeshNode* ptr_node, float delta_time) override
-    {}
-
-    virtual type_index  getType() const override
-    {
-        return INodeModifier::getTypeIndex<TestMeshNodeModifier>();
-    }
-
-    int i;
-};
-
 TEST(SceneGraphMeshNode, Constructor)
 {
     constexpr string_view   name1   = "Mesh Node";
@@ -75,13 +56,13 @@ TEST(SceneGraphMeshNode, Constructor)
     
     EXPECT_EQ(nullptr, node1.getMesh())     << "Не правильное инициализирование указателя на меш." << endl;
     EXPECT_NE(nullptr, node2.getMesh())     << "Не правильное инициализирование указателя на меш." << endl;
+    EXPECT_FALSE(node1.hasComponent<Mesh>());
+    EXPECT_TRUE(node2.hasComponent<Mesh>());
 }
 
 TEST(SceneGraphMeshNode, GettersAndSetters)
 {
     srand(static_cast<unsigned>(time(nullptr)));
-
-    const int init_value = rand();
 
     PtrMesh     ptr_mesh = Mesh::make();
     MeshNode    node;
@@ -89,18 +70,8 @@ TEST(SceneGraphMeshNode, GettersAndSetters)
     node.setMesh(ptr_mesh);
 
     EXPECT_EQ(ptr_mesh, node.getMesh());
-
-    EXPECT_FALSE(node.hasMeshNodeModifier<TestMeshNodeModifier>()) << "Не правильное инициализирование модификаторов." << endl;
-
-    {
-        TestMeshNodeModifier* test_mesh_node_modifier = new TestMeshNodeModifier;
-
-        test_mesh_node_modifier->i = init_value;
-        node.addMeshNodeModifier(test_mesh_node_modifier);
-    }
-
-    EXPECT_TRUE(node.hasMeshNodeModifier<TestMeshNodeModifier>())               << "Ошибка в методе addMeshNodeModifier(...)." << endl;
-    EXPECT_EQ(init_value, node.getMeshNodeModifier<TestMeshNodeModifier>().i)   << "Ошибка в методе addMeshNodeModifier(...)." << endl;
+    EXPECT_TRUE(node.hasComponent<Mesh>());
+    EXPECT_EQ(ptr_mesh.get(), &node.getComponent<Mesh>());
 }
 
 TEST(SceneGraphMeshNode, UpdateTest)

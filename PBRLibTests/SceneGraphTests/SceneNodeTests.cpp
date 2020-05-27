@@ -9,6 +9,8 @@
 #include <gtest/gtest.h>
 
 #include "../../src/SceneGraph/Scene.hpp"
+#include "../../src/SceneGraph/Component.hpp"
+#include "../../src/SceneGraph/Script.hpp"
 
 #include <string>
 #include <string_view>
@@ -17,21 +19,39 @@ using namespace testing;
 using namespace pbrlib;
 using namespace std;
 
-class TestNodeModifier :
-    public INodeModifier
+struct TestNodeComponent :
+    public Component
 {
-public:
-    TestNodeModifier() :
-        INodeModifier("Test Node Modifier")
+    TestNodeComponent() :
+        Component("Test Node Component")
     {}
-
-    virtual void update(Scene::Node* ptr_node, float delta_time) override
-    {}
-
+    
     virtual type_index getType() const override
     {
-        return INodeModifier::getTypeIndex<TestNodeModifier>();
+        return typeid(TestNodeComponent);
     }
+    
+    int i;
+};
+
+struct TestNodeScript :
+    public Script
+{
+    TestNodeScript() :
+        Script("Test Node Component")
+    {}
+    
+    virtual type_index getType() const override
+    {
+        return typeid(TestNodeScript);
+    }
+    
+    virtual void update(Scene::Node* ptr_node, float delta_time) override
+    {
+        i = static_cast<int>(delta_time);
+    }
+    
+    int i;
 };
 
 TEST(SceneGraphNode, Constructor)
@@ -73,6 +93,8 @@ TEST(SceneGraphNode, Constructor)
 
 TEST(SceneGraphNode, GettersAndSetters)
 {
+    srand((uint)time(nullptr));
+    
     Transform world_transform = Transform::translate(Vec3<float>(-5.0f, 25.0f, -13.5f));
     Transform local_transform = Transform::rotateX(60.0f);
 
@@ -80,6 +102,8 @@ TEST(SceneGraphNode, GettersAndSetters)
         Vec3<float> (-3.0f, 4.0f, -1.0f),
         Vec3<float> (34.0f, -32.0f, 1.0f)
     );
+    
+    int rval = rand() % 10000;
 
     constexpr string_view node1_name    = "Node 1";
     constexpr string_view node2_name    = "Node 2";
@@ -96,7 +120,6 @@ TEST(SceneGraphNode, GettersAndSetters)
     node2.setWorldTransform(world_transform);
     node2.setLocalTransform(local_transform);
     node2.setWorldAABB(world_aabb);
-    node2.addNodeModifier(new TestNodeModifier());
     node2.setName(node2_name);
 
     EXPECT_EQ(&node1, node2.getParent()) << "Не правильно работает метод setParent(...) в классе Scene::Node." << endl;
@@ -122,18 +145,23 @@ TEST(SceneGraphNode, GettersAndSetters)
 
     EXPECT_EQ(world_aabb, node2.getWorldAABB()) << "Не правильно работает метод setWorldAABB(...)." << endl;
     EXPECT_TRUE(node2.worldAABBIsCurrent())     << "Не правильно работает метод setWorldAABB(...)." << endl;
-    
-    bool the_right_type = is_same<TestNodeModifier&, decltype(node2.getNodeModifier<TestNodeModifier>())>::value;
-    
-    EXPECT_TRUE(the_right_type)                             << "Не правильный возвращаемый тип в методы getNodeModifier<...>()." << endl;
-    EXPECT_TRUE(node2.hasNodeModifier<TestNodeModifier>())  << "Ошибка в методы addNodeModifier(...)." << endl;
-    
-    EXPECT_EQ("Test Node Modifier", node2.getNodeModifier<TestNodeModifier>().getName()) << "Не правильная инициализация имени в классе NodeModifier." << endl;
 
     EXPECT_EQ(node2_name, node2.getName()) << "Не правильно работает метод setName(...)." << endl;
+    
+    node2.addComponent(make_shared<TestNodeComponent>());
+    node2.addScript(make_shared<TestNodeScript>());
+    
+    EXPECT_TRUE(node2.hasComponent<TestNodeComponent>())    << "Ошибка в addComponent(...) или в hasComponent()" << endl;
+    EXPECT_TRUE(node2.hasScript<TestNodeScript>())          << "Ошибка в addScript(...) или в hasScript()" << endl;
+    
+    node2.getComponent<TestNodeComponent>().i = rval;
+    node2.getScript<TestNodeScript>().update(&node2, rval);
+    
+    EXPECT_EQ(rval, node2.getComponent<TestNodeComponent>().i)  << "Ошибка в getComponent(...). Не правильно инициализирована переменная." << endl;
+    EXPECT_EQ(rval, node2.getScript<TestNodeScript>().i)        << "Ошибка в getScript(...). Не правильно инициализирована переменная." << endl;
 }
 
-TEST(SceneGraphNode, UpdateAndDetachTest)
+TEST(SceneGraphNode, UpdateDetachAndMakesTest)
 {
     Transform t1 = Transform::translate(Vec3<float>(-5.0f, 0.0f, 0.0f));
     Transform t2 = Transform::rotateX(60.0f);

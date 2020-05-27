@@ -9,7 +9,7 @@
 #ifndef PerspectiveCamera_hpp
 #define PerspectiveCamera_hpp
 
-#include "ICamera.hpp"
+#include "CameraBase.hpp"
 
 #include <memory>
 
@@ -21,13 +21,13 @@ namespace pbrlib
     using PtrPerspectiveCamera = shared_ptr<PerspectiveCamera>;
 
     class PerspectiveCamera :
-        public ICamera
+        public CameraBase
     {
     public:
         class Builder
         {
         public:
-            Builder() = default;
+            Builder(const string_view name = "Perspective Camera");
 
             void setPosition(const Vec3<float>& pos);
             void setEye(const Vec3<float>& eye);
@@ -102,8 +102,10 @@ namespace pbrlib
                 float max_depth
             ) noexcept;
 
+            void setName(const string_view name);
+
             PerspectiveCamera       build()     const;
-            PtrPerspectiveCamera    ptrBuild()  const;
+            PtrPerspectiveCamera    buildPtr()  const;
 
         private:
             Vec3<float> _pos;
@@ -114,6 +116,7 @@ namespace pbrlib
             float       _aspect;
             float       _fovy;
             Viewport    _viewport;
+            string      _name;
         };
 
     public:
@@ -130,6 +133,31 @@ namespace pbrlib
          * @param viewport      параметры области просмотра.
         */
         PerspectiveCamera(
+            const Vec3<float>&  pos,
+            const Vec3<float>&  eye,
+            const Vec3<float>&  up,
+            float               near_clipp,
+            float               far_clipp,
+            float               aspect,
+            float               fovy,
+            const Viewport&     viewport
+        );
+
+        /**
+         * @brief Конструктор.
+         * 
+         * @param component_name    название компонента.
+         * @param pos               позиция.
+         * @param eye               вектор направления взгляда.
+         * @param up                вектор, указывающий на вверх.
+         * @param near_clipp        расстояние до ближней плоскости отсечения по оси Z.
+         * @param far_clipp         расстояние до дальней плоскости отсечения по оси Z.
+         * @param aspect            соотношение сторон.
+         * @param fovy              угол между верхней и нижней сторонами усечённого вида.
+         * @param viewport          параметры области просмотра.
+        */
+        PerspectiveCamera(
+            const string_view   component_name,
             const Vec3<float>&  pos,
             const Vec3<float>&  eye,
             const Vec3<float>&  up,

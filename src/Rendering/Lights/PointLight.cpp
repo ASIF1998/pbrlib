@@ -15,6 +15,19 @@ namespace pbrlib
         const Vec3<float>&  color,
         float               intensity
     ) :
+        Component   ("Point Light"),
+        _intensity  (intensity),
+        _color      (color),
+        _pos        (position)
+    {}
+    
+    PointLight::PointLight(
+        const string_view   name,
+        const Vec3<float>&  position,
+        const Vec3<float>&  color,
+        float               intensity
+    ) :
+        Component   (name),
         _intensity  (intensity),
         _color      (color),
         _pos        (position)
@@ -60,7 +73,16 @@ namespace pbrlib
         return _pos;
     }
 
+    type_index PointLight::getType() const
+    {
+        return ComponentUtil::getTypeIndex<PointLight>();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PointLight::Builder::Builder(const string_view name) :
+        _name(name)
+    {}
+
     void PointLight::Builder::setIntensity(float intensity) noexcept
     {
         _intensity = intensity;
@@ -76,13 +98,18 @@ namespace pbrlib
         _pos = position;
     }
 
+    void PointLight::Builder::setName(const string_view name) 
+    {
+        _name = name;
+    }
+
     PointLight PointLight::Builder::build() const
     {
-        return PointLight(_pos, _color, _intensity);
+        return PointLight(_name, _pos, _color, _intensity);
     }
 
     PtrPointLight PointLight::Builder::buildPtr() const
     {
-        return make_shared<PointLight>(_pos, _color, _intensity);
+        return make_shared<PointLight>(_name, _pos, _color, _intensity);
     }
 }

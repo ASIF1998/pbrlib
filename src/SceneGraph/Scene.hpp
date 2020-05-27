@@ -31,17 +31,11 @@ using namespace std;
 
 namespace pbrlib
 {
-    class INodeModifier;
-    class DirectionLightNode;
-    class SpotLightNode;
-    class PointLightNode;
-    class CameraNode;
-
-    using PtrDirectionLightNode     = shared_ptr<DirectionLightNode>;
-    using PtrSpotLightNode          = shared_ptr<SpotLightNode>;
-    using PtrPointLightNode         = shared_ptr<PointLightNode>;
-    using PtrCameraNode             = shared_ptr<CameraNode>;
-    using PtrINodeModifier          = unique_ptr<INodeModifier>;
+    class Component;
+    class Script;
+    
+    using PtrComponent              = shared_ptr<Component>;
+    using PtrScript                 = shared_ptr<Script>;
 
     class Scene
     {
@@ -75,14 +69,23 @@ namespace pbrlib
             string&                 getName()           noexcept;
             const string&           getName()           const noexcept;
 
-            template<typename NodeModifierType>
-            inline NodeModifierType& getNodeModifier();
+            template<typename TComponent>
+            inline TComponent& getComponent();
 
-            template<typename NodeModifierType>
-            inline const NodeModifierType& getNodeModifier() const;
+            template<typename TComponent>
+            inline const TComponent& getComponent() const;
 
-            template<typename NodeModifierType>
-            inline bool hasNodeModifier() const;
+            template<typename TScript>
+            inline TScript& getScript();
+
+            template<typename TScript>
+            inline const TScript& getScript() const;
+
+            template<typename TComponent>
+            bool hasComponent() const;
+
+            template<typename TScript>
+            bool hasScript() const;
 
             void setParent(Node* ptr_parent) noexcept;
             void setChildren(vector<PtrNode>&& children);
@@ -97,7 +100,8 @@ namespace pbrlib
             bool worldAABBIsCurrent()                   const noexcept;
             void worldAABBIsCurrent(bool current)       noexcept;
 
-            void addNodeModifier(INodeModifier* ptr_node_modifier);
+            void addComponent(const PtrComponent& ptr_component);
+            void addScript(const PtrScript& ptr_script);
 
             /**
              * @brief Метод необходимый для добавления дочернего узла.
@@ -148,7 +152,8 @@ namespace pbrlib
             bool                                            _world_transform_is_current;
             bool                                            _world_aabb_is_current;
             AABB                                            _world_bbox;
-            unordered_map<type_index, PtrINodeModifier>     _node_modifiers;
+            unordered_map<type_index, PtrComponent>         _components;
+            unordered_map<type_index, PtrScript>            _scripts;
             string                                          _name;
         };
 
@@ -174,7 +179,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrPointLightNode& makePointLight(
+        PtrNode& makePointLight(
             const PointLight::Builder&   light_builder,
             const string_view            name = "Point Light"
         );
@@ -189,7 +194,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrSpotLightNode& makeSpotLight(
+        PtrNode& makeSpotLight(
             const SpotLight::Builder&   light_builder,
             const string_view            name = "Spot Light"
         );
@@ -204,7 +209,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrDirectionLightNode& makeDirectionLight(
+        PtrNode& makeDirectionLight(
             const DirectionLight::Builder&  light_builder,
             const string_view               name = "Spot Light"
         );
@@ -221,7 +226,7 @@ namespace pbrlib
          * @param name              название узла.
          * @return Указатель на узел.
         */
-        PtrCameraNode& makeCamera(
+        PtrNode& makeCamera(
             const PerspectiveCamera::Builder&   camera_builder,
             const string_view                   name = "Camera"
         );
@@ -229,33 +234,12 @@ namespace pbrlib
         void update(float delta_time);
 
     private:
-        PtrNode                         _ptr_root_node;
-        PtrCameraNode                   _ptr_camera_node;
-        vector<PtrDirectionLightNode>   _dir_light_nodes;
-        vector<PtrSpotLightNode>        _spot_light_nodes;
-        vector<PtrPointLightNode>       _point_light_nodes;
-        string                          _name;
-    };
-
-    class INodeModifier
-    {
-    public:
-        INodeModifier(const string_view name = "Node Modifier");
-        virtual ~INodeModifier();
-
-        virtual void update(Scene::Node* ptr_node, float delta_time) = 0;
-
-        void setName(const string_view name);
-
-        string&             getName() noexcept;
-        const string&       getName() const noexcept;
-        virtual type_index  getType() const = 0;
-
-        template<typename NodeModifierType>
-        inline static type_index getTypeIndex();
-
-    private:
-        string _name;
+        PtrNode         _ptr_root_node;
+        PtrNode         _ptr_camera_node;
+        vector<PtrNode> _dir_light_nodes;
+        vector<PtrNode> _spot_light_nodes;
+        vector<PtrNode> _point_light_nodes;
+        string          _name;
     };
 }
 

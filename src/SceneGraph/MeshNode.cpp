@@ -18,27 +18,21 @@ namespace pbrlib
     MeshNode::MeshNode(const string_view name, const PtrMesh& ptr_mesh) :
         Scene::Node (name),
         _ptr_mesh   (ptr_mesh)
-    {}
+    {
+        addComponent(ptr_mesh);
+    }
 
     MeshNode::MeshNode(const PtrMesh& ptr_mesh) :
         Scene::Node (),
         _ptr_mesh   (ptr_mesh)
-    {}
+    {
+        addComponent(ptr_mesh);
+    }
 
     void MeshNode::setMesh(const PtrMesh& ptr_mesh)
     {
         _ptr_mesh = ptr_mesh;
-    }
-
-    void MeshNode::addMeshNodeModifier(IMeshNodeModifier* ptr_mesh_modifire)
-    {
-        auto it = _mesh_node_modifiers.find(ptr_mesh_modifire->getType());
-
-        if (it != end(_mesh_node_modifiers)) {
-            it->second.reset(ptr_mesh_modifire);
-        } else {
-            _mesh_node_modifiers.insert(make_pair(ptr_mesh_modifire->getType(), ptr_mesh_modifire));
-        }
+        addComponent(ptr_mesh);
     }
     
     PtrMesh& MeshNode::getMesh() noexcept
@@ -53,10 +47,6 @@ namespace pbrlib
 
     void MeshNode::update(float delta_time, const Transform& world_transform)
     {
-        for (auto s{begin(_mesh_node_modifiers)}, e{end(_mesh_node_modifiers)}; s != e; s++) {  
-            s->second->update(this, delta_time);
-        }
-
         Scene::Node::update(delta_time, world_transform);
 
         /// Если мировой ограничивающий объём не является корректным и
@@ -88,28 +78,5 @@ namespace pbrlib
     PtrMeshNode MeshNode::make(const string_view name, const PtrMesh& ptr_mesh)
     {
         return make_shared<MeshNode>(name, ptr_mesh);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    IMeshNodeModifier::IMeshNodeModifier(const string_view name) :
-        _name(name)
-    {}
-
-    IMeshNodeModifier::~IMeshNodeModifier()
-    {}
-
-    void IMeshNodeModifier::setName(const string_view name)
-    {
-        _name = name;
-    }
-
-    string& IMeshNodeModifier::getName() noexcept
-    {
-        return _name;
-    }
-
-    const string& IMeshNodeModifier::getName() const noexcept
-    {
-        return _name;
     }
 }
