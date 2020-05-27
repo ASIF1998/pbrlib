@@ -28,7 +28,7 @@ struct TestNodeComponent :
     
     virtual type_index getType() const override
     {
-        return typeid(TestNodeComponent);
+        return ComponentUtil::getTypeIndex<TestNodeComponent>();
     }
     
     int i;
@@ -43,7 +43,7 @@ struct TestNodeScript :
     
     virtual type_index getType() const override
     {
-        return typeid(TestNodeScript);
+        return ComponentUtil::getTypeIndex<TestNodeScript>();
     }
     
     virtual void update(Scene::Node* ptr_node, float delta_time) override
