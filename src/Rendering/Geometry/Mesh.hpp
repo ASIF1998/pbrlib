@@ -17,6 +17,8 @@
 
 #include "../../SceneGraph/Component.hpp"
 
+#include "../Material/Material.hpp"
+
 namespace pbrlib
 {
     class Mesh;
@@ -29,6 +31,8 @@ namespace pbrlib
         UV,
         Normal,
         Tangent,
+
+        Count
     };
     
     struct Mesh :
@@ -67,11 +71,7 @@ namespace pbrlib
         uint32_t            stride                          = sizeof(float) * 11;
         VkPrimitiveTopology topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         AABB                aabb;
-
-        /**
-         * TODO: 
-         *      shared_ptr<ImageView> views [Material::Textures::NUM_TEXTURES];
-        */
+        PtrMaterial         ptr_material;
     };
 }
 
