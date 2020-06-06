@@ -25,6 +25,10 @@
 #include "../Rendering/Lights/SpotLight.hpp"
 #include "../Rendering/Lights/DirectionLight.hpp"
 
+#include "../Rendering/Material/MaterialManager.hpp"
+#include "../Rendering/VulkanWrapper/GPUTextureManager.hpp"
+#include "../Rendering/Geometry/MeshManager.hpp"
+
 #include "../Rendering/Camera/PerspectiveCamera.hpp"
 
 using namespace std;
@@ -34,8 +38,8 @@ namespace pbrlib
     class Component;
     class Script;
     
-    using PtrComponent              = shared_ptr<Component>;
-    using PtrScript                 = shared_ptr<Script>;
+    using PtrComponent  = shared_ptr<Component>;
+    using PtrScript     = shared_ptr<Script>;
 
     class Scene
     {
@@ -145,29 +149,48 @@ namespace pbrlib
             );
 
         protected:
-            Node*                                           _ptr_parent; 
-            vector<PtrNode>                                 _ptr_children;
-            Transform                                       _local_transform;
-            Transform                                       _world_transform;
-            bool                                            _world_transform_is_current;
-            bool                                            _world_aabb_is_current;
-            AABB                                            _world_bbox;
-            unordered_map<type_index, PtrComponent>         _components;
-            unordered_map<type_index, PtrScript>            _scripts;
-            string                                          _name;
+            Node*                                    _ptr_parent; 
+            vector<PtrNode>                          _ptr_children;
+            Transform                                _local_transform;
+            Transform                                _world_transform;
+            bool                                     _world_transform_is_current;
+            bool                                     _world_aabb_is_current;
+            AABB                                     _world_bbox;
+            unordered_map<type_index, PtrComponent>  _components;
+            unordered_map<type_index, PtrScript>     _scripts;
+            string                                   _name;
         };
 
     public:
-        Scene(const string_view name = "Scene");
+        /**
+         * @brief Конструктор.
+         * 
+         * @param name                  название сцены.
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type           используемый тип памяти на устройстве.
+         * @param queue_family_index    индекс семейства очередей.
+        */
+        Scene(
+            const string_view   name, 
+            const PtrDevice&    ptr_device,
+            uint32_t            memory_type,
+            uint32_t            queue_family_index
+        );
         
         void setRootNode(const PtrNode& node);
         void setRootNode(PtrNode&& node);
         void setName(const string_view name);
 
-        PtrNode&         getRootNode()   noexcept;
-        const PtrNode&   getRootNode()   const noexcept;
-        string&          getName()       noexcept;
-        const string&    getName()       const noexcept;
+        PtrNode&                    getRootNode()           noexcept;
+        const PtrNode&              getRootNode()           const noexcept;
+        string&                     getName()               noexcept;
+        const string&               getName()               const noexcept;
+        MaterialManager&            getMaterialManager()    noexcept;
+        const MaterialManager&      getMaterialManager()    const noexcept;
+        GPUTextureManager&          getTextureManager()     noexcept;
+        const GPUTextureManager&    getTextureManager()     const noexcept;
+        MeshManager&                getMeshManager()        noexcept;
+        const MeshManager&          getMeshManager()        const noexcept;
 
         /**
          * @brief Метод создающий узел для точечного источника света.
@@ -230,16 +253,19 @@ namespace pbrlib
             const PerspectiveCamera::Builder&   camera_builder,
             const string_view                   name = "Camera"
         );
-
+        
         void update(float delta_time);
 
     private:
-        PtrNode         _ptr_root_node;
-        PtrNode         _ptr_camera_node;
-        vector<PtrNode> _dir_light_nodes;
-        vector<PtrNode> _spot_light_nodes;
-        vector<PtrNode> _point_light_nodes;
-        string          _name;
+        PtrNode             _ptr_root_node;     //!< Корневой узел сцены.
+        PtrNode             _ptr_camera_node;   //!< Камера.
+        vector<PtrNode>     _dir_light_nodes;   //!< Направленные источники света.
+        vector<PtrNode>     _spot_light_nodes;  //!< Прожекторные источники света.
+        vector<PtrNode>     _point_light_nodes; //!< Точечные источники света.
+        MaterialManager     _material_manager;  //!< Менеджер материалов.
+        GPUTextureManager   _texture_manager;   //!< Менеджер текстур.
+        MeshManager         _mesh_manager;      //!< Менеджер сетки.
+        string              _name;              //!< Имя сцены.
     };
 }
 

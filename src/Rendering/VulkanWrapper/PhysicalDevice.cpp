@@ -13,7 +13,8 @@
 namespace pbrlib
 {
     PhysicalDevice::PhysicalDevice(VkPhysicalDevice physical_device_handle) :
-        physical_device_handle(physical_device_handle)
+        physical_device_handle  (physical_device_handle),
+        memory                  (physical_device_handle)
     {
         uint32_t num = 0;
 
@@ -137,5 +138,22 @@ namespace pbrlib
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device_handle, &num_queue_families, properties.data());
 
         return properties;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PhysicalDevice::Memory::Memory(VkPhysicalDevice physical_device_handle) 
+    {
+        vkGetPhysicalDeviceMemoryProperties(physical_device_handle, &_memory_properties);
+    }
+
+    uint32_t PhysicalDevice::Memory::getMemoryType(VkMemoryPropertyFlags property_flags)
+    {
+        for (uint32_t i{0}; i < _memory_properties.memoryTypeCount; i++) {
+            if (_memory_properties.memoryTypes[i].propertyFlags & property_flags) {
+                return i;
+            }
+        }
+
+        throw invalid_argument ("Типа памяти с таким флагом нет.");
     }
 }

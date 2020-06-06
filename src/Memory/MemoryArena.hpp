@@ -34,7 +34,7 @@ namespace pbrlib
      *      Реализация блока памяти должна наследоваться от 
      *      IMemoryBlock.
      * 
-     * @tparam Тип блока памяти.
+     * @tparam TMemoryBlock Тип блока памяти.
     */
     template<typename TMemoryBlock>
     class MemoryArena

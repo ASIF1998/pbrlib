@@ -26,7 +26,8 @@ namespace pbrlib
     struct  PhysicalDevice;
     class   Instance;
     
-    using PtrInstance = shared_ptr<Instance>;
+    using PtrInstance       = shared_ptr<Instance>;
+    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
 
     /**
      * @class VulkanInstanceExtensionSupported.
@@ -110,8 +111,8 @@ namespace pbrlib
 
         const VkInstance& getHandle() const;
 
-        PhysicalDevice& getPhysicalDevice(int type);
-        vector<PhysicalDevice> getAllPhysicalDevice(int type) const;
+        PtrPhysicalDevice           getPhysicalDevice(int type);
+        vector<PtrPhysicalDevice>   getAllPhysicalDevice(int type) const;
 
         /**
          * @brief Статический метод проверяющий поддержку расширения.

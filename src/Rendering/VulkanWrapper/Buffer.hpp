@@ -94,6 +94,7 @@ namespace pbrlib
              * @param size размер буфера.
             */
             inline virtual void setSize(size_t size);
+            inline void         reserve(size_t size);
             
             inline void pushBack(Type v);
 
@@ -101,6 +102,11 @@ namespace pbrlib
             inline void setData(const Container& data);
 
             inline void setData(const Type* ptr, size_t size);
+
+            inline size_t getSize() const;
+
+            inline void addData(const Type& data);
+            inline void addData(Type&& data);
 
             inline Type& operator [] (size_t i) noexcept;
 

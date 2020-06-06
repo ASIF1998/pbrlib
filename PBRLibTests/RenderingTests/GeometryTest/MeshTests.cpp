@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "../../../src/Rendering/Geometry/Mesh.hpp"
+#include "../../../src/Rendering/Geometry/MeshManager.hpp"
 
 #include "../../../src/math/vec3.hpp"
 #include "../../../src/math/vec2.hpp"
@@ -36,12 +37,14 @@ struct Vertex
 
 TEST(RenderingGeometryMesh, GettersAndSetters)
 {
+    srand(static_cast<unsigned>(time(nullptr)));
+    
     PtrInstance ptr_instance = Instance::make(
         "RenderingResourceMesh::GettersAndSetters", 
         VK_MAKE_VERSION(0, 0, 1)
     );
 
-    PhysicalDevice gpu = ptr_instance->getPhysicalDevice(
+    PtrPhysicalDevice gpu = ptr_instance->getPhysicalDevice(
         VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU    |
         VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU  |
         VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU
@@ -60,7 +63,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
         }
     );
 
-    PtrDevice ptr_device = gpu.makeDevice(device_queue_create_info);
+    PtrDevice ptr_device = gpu->makeDevice(device_queue_create_info);
 
     constexpr size_t num_vertex = 200;
     constexpr size_t num_indices = 152;
@@ -78,26 +81,26 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     for(size_t i{0}; i < num_vertex; i++) {
         vertices.push_back(Vertex{
             .pos = Vec3<float> (
-                static_cast<float>(i), 
-                static_cast<float>(i), 
-                static_cast<float>(i)
+                static_cast<float>(rand()),
+                static_cast<float>(rand()),
+                static_cast<float>(rand())
             ),
 
             .uv = Vec2<float> (
-                static_cast<float>(i), 
-                static_cast<float>(i)
+                static_cast<float>(rand()),
+                static_cast<float>(rand())
             ),
 
             .normal = Vec3<float> (
-                static_cast<float>(i), 
-                static_cast<float>(i), 
-                static_cast<float>(i)
+                static_cast<float>(rand()),
+                static_cast<float>(rand()),
+                static_cast<float>(rand())
             ),
 
             .tangent = Vec3<float> (
-                static_cast<float>(i), 
-                static_cast<float>(i), 
-                static_cast<float>(i)
+                static_cast<float>(rand()),
+                static_cast<float>(rand()),
+                static_cast<float>(rand())
             ),
         });
     }
@@ -110,13 +113,13 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     Buffer::BuilderWithData<uint32_t>   build_index_buffer;
 
     build_vertex_buffer.setUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    build_vertex_buffer.setMemoryTypeIndex(1);
+    build_vertex_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
     build_vertex_buffer.setDevice(ptr_device);
     build_vertex_buffer.setData(vertices);
     build_vertex_buffer.addQueueFamily(0);
 
     build_index_buffer.setUsage(VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
-    build_index_buffer.setMemoryTypeIndex(1);
+    build_index_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
     build_index_buffer.setDevice(ptr_device);
     build_index_buffer.setData(indices);
     build_index_buffer.addQueueFamily(0);

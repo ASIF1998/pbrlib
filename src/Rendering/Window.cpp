@@ -16,8 +16,8 @@
 
 namespace pbrlib
 {
-    bool Window::_is_init_SDL = false;
-    uint32_t Window::_num_window = 0;
+    bool        Window::_is_init_SDL    = false;
+    uint32_t    Window::_num_window     = 0;
 
     Window::Window(
         const string_view   title, 
@@ -52,7 +52,7 @@ namespace pbrlib
         assert(_ptr_window);
     }
 
-    inline Window::Window(Window&& window) 
+    Window::Window(Window&& window) 
     {
         swap(_ptr_window, window._ptr_window);
     }

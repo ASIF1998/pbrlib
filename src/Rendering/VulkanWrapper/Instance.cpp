@@ -175,29 +175,29 @@ namespace pbrlib
         return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
     }
 
-    PhysicalDevice& Instance::getPhysicalDevice(int type)
+    PtrPhysicalDevice Instance::getPhysicalDevice(int type)
     {
         VkPhysicalDeviceProperties physical_device_property;
 
         for (size_t i{0}; i < _physical_device_handles.size(); i++) {
             vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
             if (physical_device_property.deviceType & type) {
-                return _physical_device_handles[i];
+                return make_shared<PhysicalDevice>(_physical_device_handles[i]);
             }
         }
 
         throw invalid_argument ("Такого типа устройства нет.");
     }
 
-    vector<PhysicalDevice> Instance::getAllPhysicalDevice(int type) const
+    vector<PtrPhysicalDevice> Instance::getAllPhysicalDevice(int type) const
     {
-        vector<PhysicalDevice> handles;
+        vector<PtrPhysicalDevice> handles;
         VkPhysicalDeviceProperties physical_device_property;
 
         for (size_t i{0}; i < _physical_device_handles.size(); i++) {
             vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
             if (physical_device_property.deviceType & type) {
-                handles.push_back(_physical_device_handles[i]);
+                handles.push_back(make_shared<PhysicalDevice>(_physical_device_handles[i]));
             }
         }
 

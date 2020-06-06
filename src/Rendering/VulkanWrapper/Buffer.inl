@@ -96,6 +96,12 @@ namespace pbrlib
     }
 
     template<typename Type, typename AllocatorType>
+    inline void Buffer::BuilderWithData<Type, AllocatorType>::reserve(size_t size)
+    {
+        _data.reserve(size);
+    }
+
+    template<typename Type, typename AllocatorType>
     inline void Buffer::BuilderWithData<Type, AllocatorType>::pushBack(Type v)
     {
         _data.push_back(v);
@@ -131,6 +137,24 @@ namespace pbrlib
         if (size) {
             memcpy(_data.data(), ptr, sizeof(Type) * size);
         }
+    }
+
+    template<typename Type, typename AllocatorType>
+    inline size_t Buffer::BuilderWithData<Type, AllocatorType>::getSize() const
+    {
+        return _data.size();
+    }
+
+    template<typename Type, typename AllocatorType>
+    inline void Buffer::BuilderWithData<Type, AllocatorType>::addData(const Type& data)
+    {
+        _data.push_back(data);
+    }
+
+    template<typename Type, typename AllocatorType>
+    inline void Buffer::BuilderWithData<Type, AllocatorType>::addData(Type&& data)
+    {
+        _data.push_back(move(data));
     }
 
     template<typename Type, typename AllocatorType>

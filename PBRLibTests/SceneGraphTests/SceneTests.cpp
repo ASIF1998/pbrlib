@@ -8,18 +8,28 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/SceneGraph/Scene.hpp"
+#include "../../src/SceneGraph/Scene.hpp" 
+#include "../../src/SceneGraph/SceneView.hpp"
+
+#include "../../src/Rendering/Window.hpp"
 
 using namespace testing;
 using namespace pbrlib;
 
 TEST(SceneGraphScene, Constructor)
 {
+
+
     string_view name1 = "Scene";
     string_view name2 = "Scene 2";
-    
-    Scene scene1;
-    Scene scene2(name2);
+
+    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+
+    SceneView scene_view1 (name1, window);
+    SceneView scene_view2 (name2, window);
+
+    Scene& scene1 = scene_view1.getScene();
+    Scene& scene2 = scene_view2.getScene();
 
     EXPECT_EQ(nullptr, scene1.getRootNode()) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть)." << endl;
     EXPECT_EQ(nullptr, scene2.getRootNode()) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть)." << endl;
@@ -31,7 +41,12 @@ TEST(SceneGraphScene, Constructor)
 TEST(SceneGraphScene, GettersAndSetters)
 {
     string_view name = "Scene 1";
-    Scene scene;
+
+    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+    
+    SceneView scene_view (name, window);
+
+    Scene& scene = scene_view.getScene();
 
     Scene::PtrNode ptr_node = Scene::Node::make();
 
@@ -103,7 +118,6 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     camera_builder.setFovy(fovy);
     camera_builder.setViewport(viewport);
     camera_builder.setName("Camera Buidler");
-
     slight_builder.setColor(light_color);
     slight_builder.setIntensity(intensity);
     slight_builder.setPosition(light_pos);
@@ -117,7 +131,11 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     plight_builder.setIntensity(intensity);
     plight_builder.setName("Point Light Builder");
 
-    Scene scene;
+    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+    
+    SceneView scene_view ("Scene", window);
+
+    Scene& scene = scene_view.getScene();
 
     Scene::PtrNode node1 = scene.makeSpotLight(slight_builder, "Node 1");
     Scene::PtrNode node2 = scene.makePointLight(plight_builder, "Node 2");

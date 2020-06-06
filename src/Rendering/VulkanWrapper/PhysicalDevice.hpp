@@ -22,8 +22,24 @@ using namespace std;
 
 namespace pbrlib
 {
+    struct PhysicalDevice;
+
+    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
+
     struct PhysicalDevice
     {
+    public:
+        class Memory
+        {
+        public:
+            Memory(VkPhysicalDevice physical_device_handle);
+
+            uint32_t getMemoryType(VkMemoryPropertyFlags property_flags);
+
+        private:
+            VkPhysicalDeviceMemoryProperties _memory_properties;
+        };
+
     public:
         PhysicalDevice(VkPhysicalDevice physical_device_handle);
 
@@ -74,7 +90,8 @@ namespace pbrlib
         vector<VkQueueFamilyProperties> getQueueFamilyProperties() const;
 
     public:
-        VkPhysicalDevice physical_device_handle;
+        VkPhysicalDevice        physical_device_handle;
+        PhysicalDevice::Memory  memory;
 
     private:
         set<string> _search_extension_names;
