@@ -38,6 +38,8 @@ namespace pbrlib
     struct Mesh :
         public Component
     {
+        friend class MeshAssimp;
+        
     public:
         /**
          * @struct Vertex.
@@ -127,9 +129,9 @@ namespace pbrlib
         PtrBuffer           ptr_index_buffer;
         PtrBuffer           ptr_vertex_attrib_buffer;
         uint32_t            num_vertices;
-        uint32_t            vertex_attrib_buffer_offset;    /// В sizeof(uint8_t).
+        uint32_t            vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
         uint32_t            num_indices;
-        uint32_t            index_buffer_offset;            /// В sizeof(uint8_t).
+        uint32_t            index_buffer_offset;  	          
         VkIndexType         index_type                      = VK_INDEX_TYPE_UINT32;
         uint32_t            stride                          = sizeof(VertexAttrib);
         VkPrimitiveTopology topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;

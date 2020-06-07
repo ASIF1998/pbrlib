@@ -18,8 +18,6 @@ using namespace pbrlib;
 
 TEST(SceneGraphScene, Constructor)
 {
-
-
     string_view name1 = "Scene";
     string_view name2 = "Scene 2";
 

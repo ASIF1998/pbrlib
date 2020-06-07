@@ -40,7 +40,6 @@ namespace pbrlib
             uint32_t    num_ind;
             AABB        bbox;
             string      name;
-            string      material_name;
         };
 
         struct Asset

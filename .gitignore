@@ -2,5 +2,3 @@ PBRLib.xcodeproj/
 .vscode/*
 main.cpp
 gtest/
-thrid_party/stb
-thrid_party/assimp

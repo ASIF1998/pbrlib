@@ -42,7 +42,7 @@ namespace pbrlib
     }
 
     /**
-     * @brief Функция необходимая для подсчета ограничивающего объёма.
+     * @brief Функция необходимая для вычисления ограничивающего объёма.
      * 
      * @param ptr_pos   указатель на позиции.
      * @param num       количество позиций.
@@ -85,20 +85,17 @@ namespace pbrlib
         for (size_t i{0}; i < ptr_ai_node->mNumMeshes; i++) {
             aiMesh const* ptr_ai_mesh = ptr_ai_scene->mMeshes[ptr_ai_node->mMeshes[i]];
             aiFace const* ptr_ai_face = ptr_ai_mesh->mFaces;
-
-            aiMaterial* ptr_ai_material = ptr_ai_scene->mMaterials[ptr_ai_mesh->mMaterialIndex];
-
+            
             auto* ptr_texture_coords = ptr_ai_mesh->mTextureCoords[0] ? ptr_ai_mesh->mTextureCoords[0] : ptr_ai_mesh->mTextureCoords[1];
 
             asset->meshes.push_back(MeshAssimp::Mesh{});
             MeshAssimp::Mesh& mesh = asset->meshes.back();
 
             mesh.ind_offset     = static_cast<uint32_t>(asset->indices.getSize());
-            mesh.vert_offset    = static_cast<uint32_t>(asset->vert_attr.getSize());
+            mesh.vert_offset    = static_cast<uint32_t>(asset->vert_attr.getSize() * sizeof(Mesh::VertexAttrib));
             mesh.num_vert       = ptr_ai_mesh->mNumVertices;
             mesh.num_ind        = ptr_ai_mesh->mNumFaces * ptr_ai_face->mNumIndices;
             mesh.name           = ptr_ai_mesh->mName.C_Str();
-            mesh.material_name  = ptr_ai_material->GetName().C_Str();
             mesh.bbox           = computeAABB(ptr_ai_mesh->mVertices, ptr_ai_mesh->mNumVertices);
 
             for (size_t j{0}; j < ptr_ai_mesh->mNumVertices; j++) {
@@ -231,6 +228,7 @@ namespace pbrlib
             ptr_mesh->index_buffer_offset           = asset.meshes[i].ind_offset;
             ptr_mesh->index_type                    = VK_INDEX_TYPE_UINT32;
             ptr_mesh->aabb                          = asset.meshes[i].bbox;
+            ptr_mesh->_name                         = asset.meshes[i].name;
             ptr_mesh->ptr_material                  = nullptr;
 
             meshes.push_back(ptr_mesh);
