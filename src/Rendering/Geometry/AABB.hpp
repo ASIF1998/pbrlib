@@ -133,6 +133,29 @@ namespace pbrlib
         */
         static AABB expand(const AABB& bbox, float delta);
 
+        /**
+         * @brief Метод, вычисляющий ограничивающий объём по набору позиций.
+         * @details Тип TPos должен иметь только три поля типа float.
+         * 
+         * @tparam  TPos            тип, описывающий позицию.
+         * @param   ptr_positions   указатель на позиции.
+         * @param   num_positions   количество позиций.
+         * @return Ограничивающий объём.
+        */
+        template<typename TPos>
+        static AABB computeAABB(const TPos* ptr_positions, size_t num_positions);
+
+        /**
+         * @brief Метод, вычисляющий ограничивающий объём по набору позиций.
+         * @details Объекты находящие в контейнере типа TPositions должны иметь только три поля типа float.
+         * 
+         * @tparam  TPositions  тип, описывающий контейнер, который хранит позиции (например std::vector<Vec3<float>>).
+         * @param   positions   позиции.
+         * @return Ограничивающий объём.
+        */
+        template<typename TPositions>
+        static AABB computeAABB(const TPositions& positions);
+
     private:
         
         union
@@ -147,5 +170,7 @@ namespace pbrlib
         };
     };
 }
+
+#include "AABB.inl"
 
 #endif /* AABB_hpp */

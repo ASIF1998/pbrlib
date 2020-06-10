@@ -264,7 +264,7 @@ namespace pbrlib
         vector<PtrNode>     _point_light_nodes; //!< Точечные источники света.
         MaterialManager     _material_manager;  //!< Менеджер материалов.
         GPUTextureManager   _texture_manager;   //!< Менеджер текстур.
-        MeshManager         _mesh_manager;      //!< Менеджер сетки.
+        MeshManager         _mesh_manager;      //!< Менеджер сеток.
         string              _name;              //!< Имя сцены.
     };
 }

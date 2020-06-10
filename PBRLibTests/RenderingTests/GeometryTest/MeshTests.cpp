@@ -27,14 +27,6 @@ using namespace pbrlib;
 using namespace pbrlib::math;
 using namespace std;
 
-struct Vertex
-{
-    Vec3<float> pos;
-    Vec2<float> uv;
-    Vec3<float> normal;
-    Vec3<float> tangent;
-};
-
 TEST(RenderingGeometryMesh, GettersAndSetters)
 {
     srand(static_cast<unsigned>(time(nullptr)));
@@ -72,15 +64,15 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     constexpr Vec2<float>   uv_r    (0.6534f, 0.67003f);
     constexpr uint32_t      index_r (1332);
 
-    vector<Vertex>      vertices;
-    vector<uint32_t>    indices;
+    vector<Mesh::VertexAttrib>  vertices;
+    vector<uint32_t>            indices;
 
     vertices.reserve(num_vertex);
     indices.reserve(num_indices);
 
     for(size_t i{0}; i < num_vertex; i++) {
-        vertices.push_back(Vertex{
-            .pos = Vec3<float> (
+        vertices.push_back(Mesh::VertexAttrib{
+            .position = Vec3<float> (
                 static_cast<float>(rand()),
                 static_cast<float>(rand()),
                 static_cast<float>(rand())
@@ -109,8 +101,8 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
         indices.push_back(i * 2);
     }
 
-    Buffer::BuilderWithData<Vertex>     build_vertex_buffer;
-    Buffer::BuilderWithData<uint32_t>   build_index_buffer;
+    Buffer::BuilderWithData<Mesh::VertexAttrib> build_vertex_buffer;
+    Buffer::BuilderWithData<uint32_t>           build_index_buffer;
 
     build_vertex_buffer.setUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     build_vertex_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
@@ -129,25 +121,25 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     Mesh mesh1;
     Mesh mesh2;
-
-    mesh1.ptr_vertex_attrib_buffer       = ptr_vertex_buffer;
-    mesh1.ptr_index_buffer               = ptr_index_buffer;
-    mesh1.num_vertices                   = static_cast<uint32_t>(num_vertex) / 2;
-    mesh1.num_indices                    = static_cast<uint32_t>(num_indices) /2;
-    mesh1.index_buffer_offset            = 0;
-    mesh1.vertex_attrib_buffer_offset    = 0;
-
-    mesh2.ptr_vertex_attrib_buffer       = ptr_vertex_buffer;
-    mesh2.ptr_index_buffer               = ptr_index_buffer;
-    mesh2.num_vertices                   = static_cast<uint32_t>(num_vertex) / 2;
-    mesh2.num_indices                    = static_cast<uint32_t>(num_indices) /2;
-    mesh2.index_buffer_offset            = num_indices / 2 * sizeof(uint32_t);
-    mesh2.vertex_attrib_buffer_offset    = num_vertex / 2 * sizeof(Vertex);
+    
+    mesh1.setVertexBuffer(ptr_vertex_buffer);
+    mesh1.setIndexBuffer(ptr_index_buffer);
+    mesh1.setNumVertices(num_vertex / 2);
+    mesh1.setNumIndices(num_indices / 2);
+    mesh1.setIndexBufferOffset(0);
+    mesh1.setVertexBufferOffset(0);
+    
+    mesh2.setVertexBuffer(ptr_vertex_buffer);
+    mesh2.setIndexBuffer(ptr_index_buffer);
+    mesh2.setNumVertices(num_vertex / 2);
+    mesh2.setNumIndices(num_indices / 2);
+    mesh2.setIndexBufferOffset(num_indices / 2);
+    mesh2.setVertexBufferOffset(num_vertex / 2);
     
     mesh1.mapVertexAttribBuffer();
 
     for (size_t i{0}; i < num_vertex / 2; i++) {
-        EXPECT_EQ(vertices[i].pos, mesh1.getAttribute<MeshAttribute::Position>(i));
+        EXPECT_EQ(vertices[i].position, mesh1.getAttribute<MeshAttribute::Position>(i));
         EXPECT_EQ(vertices[i].uv, mesh1.getAttribute<MeshAttribute::UV>(i));
         EXPECT_EQ(vertices[i].normal, mesh1.getAttribute<MeshAttribute::Normal>(i));
         EXPECT_EQ(vertices[i].tangent, mesh1.getAttribute<MeshAttribute::Tangent>(i));
@@ -165,8 +157,8 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     mesh2.mapVertexAttribBuffer();
 
-    for (size_t i{num_vertex / 2}; i < num_vertex; i++) {
-        EXPECT_EQ(vertices[i].pos, mesh2.getAttribute<MeshAttribute::Position>(i - (num_vertex / 2)));
+    for (size_t i{mesh1.getVertexBufferOffset()}; i < mesh1.getNumVertices(); i++) {
+        EXPECT_EQ(vertices[i].position, mesh2.getAttribute<MeshAttribute::Position>(i - (num_vertex / 2)));
         EXPECT_EQ(vertices[i].uv, mesh2.getAttribute<MeshAttribute::UV>(i - (num_vertex / 2)));
         EXPECT_EQ(vertices[i].normal, mesh2.getAttribute<MeshAttribute::Normal>(i - (num_vertex / 2)));
         EXPECT_EQ(vertices[i].tangent, mesh2.getAttribute<MeshAttribute::Tangent>(i - (num_vertex / 2)));

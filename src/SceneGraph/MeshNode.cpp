@@ -54,7 +54,7 @@ namespace pbrlib
         /// меша в мировом пространстве.
         if (!Scene::Node::_world_aabb_is_current && _ptr_mesh) {
             Vec3<float> p;
-            const AABB& bbox    = _ptr_mesh->aabb;
+            const AABB& bbox    = _ptr_mesh->getAABB();
             Transform   t       = Scene::Node::_world_transform * Scene::Node::_local_transform;
             size_t      i       = 0;
 

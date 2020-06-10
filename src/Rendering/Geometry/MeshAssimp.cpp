@@ -42,29 +42,6 @@ namespace pbrlib
     }
 
     /**
-     * @brief Функция необходимая для вычисления ограничивающего объёма.
-     * 
-     * @param ptr_pos   указатель на позиции.
-     * @param num       количество позиций.
-     * @return Ограничивающий объём.
-    */
-    AABB computeAABB(const aiVector3D* ptr_pos, size_t num)
-    {
-        if (ptr_pos && num) {
-            const Vec3<float>*  ptr     (reinterpret_cast<const Vec3<float>*>(ptr_pos));
-            AABB                bbox    (ptr[0]);
-
-            for(size_t i{1}; i < num; i++) {
-                bbox = AABB::aabbUnion(bbox, ptr[i]);
-            }
-
-            return bbox;
-        }
-
-        return AABB();
-    }
-
-    /**
      * @brief Функция необходимая для обработки узла.
      * 
      * @param[out]  asset           хранит компоненты сеток представленных в сцене.
@@ -96,7 +73,7 @@ namespace pbrlib
             mesh.num_vert       = ptr_ai_mesh->mNumVertices;
             mesh.num_ind        = ptr_ai_mesh->mNumFaces * ptr_ai_face->mNumIndices;
             mesh.name           = ptr_ai_mesh->mName.C_Str();
-            mesh.bbox           = computeAABB(ptr_ai_mesh->mVertices, ptr_ai_mesh->mNumVertices);
+            mesh.bbox           = AABB::computeAABB(ptr_ai_mesh->mVertices, ptr_ai_mesh->mNumVertices);
 
             for (size_t j{0}; j < ptr_ai_mesh->mNumVertices; j++) {
                 position.x = ptr_ai_mesh->mVertices[j].x;
@@ -220,16 +197,16 @@ namespace pbrlib
         for (size_t i{0}; i < asset.meshes.size(); i++) {
             ptr_mesh = pbrlib::Mesh::make();
 
-            ptr_mesh->ptr_index_buffer              = ptr_index_buffer;
-            ptr_mesh->ptr_vertex_attrib_buffer      = ptr_vertex_buffer;
-            ptr_mesh->num_vertices                  = asset.meshes[i].num_vert;
-            ptr_mesh->vertex_attrib_buffer_offset   = asset.meshes[i].vert_offset;
-            ptr_mesh->num_indices                   = asset.meshes[i].num_ind;
-            ptr_mesh->index_buffer_offset           = asset.meshes[i].ind_offset;
-            ptr_mesh->index_type                    = VK_INDEX_TYPE_UINT32;
-            ptr_mesh->aabb                          = asset.meshes[i].bbox;
+            ptr_mesh->_ptr_index_buffer              = ptr_index_buffer;
+            ptr_mesh->_ptr_vertex_attrib_buffer      = ptr_vertex_buffer;
+            ptr_mesh->_num_vertices                  = asset.meshes[i].num_vert;
+            ptr_mesh->_vertex_attrib_buffer_offset   = asset.meshes[i].vert_offset;
+            ptr_mesh->_num_indices                   = asset.meshes[i].num_ind;
+            ptr_mesh->_index_buffer_offset           = asset.meshes[i].ind_offset;
+            ptr_mesh->_index_type                    = VK_INDEX_TYPE_UINT32;
+            ptr_mesh->_aabb                          = asset.meshes[i].bbox;
             ptr_mesh->_name                         = asset.meshes[i].name;
-            ptr_mesh->ptr_material                  = nullptr;
+            ptr_mesh->_ptr_material                  = nullptr;
 
             meshes.push_back(ptr_mesh);
         }

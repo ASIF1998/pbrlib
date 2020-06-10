@@ -6,6 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include <stdexcept>
+#include <algorithm>
+
 #include "Mesh.hpp"
 
 #include "../../math/vec3.hpp"
@@ -19,50 +22,50 @@ namespace pbrlib
 
     inline void Mesh::mapVertexAttribBuffer() const
     {
-        ptr_vertex_attrib_buffer->map();
+        _ptr_vertex_attrib_buffer->map();
     }
 
     inline void Mesh::unmapVertexAttribBuffer() const
     {
-        ptr_vertex_attrib_buffer->unmap();
+        _ptr_vertex_attrib_buffer->unmap();
     }
 
     inline void Mesh::mapIndexBuffer() const
     {
-        ptr_index_buffer->map();
+        _ptr_index_buffer->map();
     }
 
     inline void Mesh::unmapIndexBuffer() const
     {
-        ptr_index_buffer->unmap();
+        _ptr_index_buffer->unmap();
     }
 
     template<MeshAttribute Attrib>
     inline auto& Mesh::getAttribute(size_t i)
     {
-        assert(ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
 
         if constexpr (Attrib == MeshAttribute::Position) {
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::UV) {
             size_t offset_to_uv = offsetof(VertexAttrib, uv);
 
             return *reinterpret_cast<Vec2<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_uv + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Normal) {
             size_t offset_to_normal = offsetof(VertexAttrib, normal);
 
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_normal + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Tangent) {
             size_t offset_to_tangent = offsetof(VertexAttrib, tangent);
 
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_tangent + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
             );
         }
     }
@@ -70,51 +73,247 @@ namespace pbrlib
     template<MeshAttribute Attrib>
     inline const auto& Mesh::getAttribute(size_t i) const
     {
-        assert(ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
 
         if constexpr (Attrib == MeshAttribute::Position) {
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::UV) {
             size_t offset_to_uv = offsetof(VertexAttrib, uv);
 
             return *reinterpret_cast<Vec2<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_uv + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Normal) {
             size_t offset_to_normal = offsetof(VertexAttrib, normal);
 
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_normal + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Tangent) {
             size_t offset_to_tangent = offsetof(VertexAttrib, tangent);
 
             return *reinterpret_cast<Vec3<float>*>(
-                ptr_vertex_attrib_buffer->getData() + vertex_attrib_buffer_offset + offset_to_tangent + stride * i
+                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
             );
         }
     }
 
     inline uint32_t Mesh::getIndex(size_t i) const
     {
-        assert(ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
-        assert(i < num_indices);
-        return *(reinterpret_cast<uint32_t*>(ptr_index_buffer->getData() + index_buffer_offset) + i);
+        assert(_ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(i < _num_indices);
+        return *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getData() + _index_buffer_offset) + i);
     }
 
-    inline void Mesh::setIndex(size_t i, uint32_t val)
+    inline PtrBuffer& Mesh::getIndexBuffer() noexcept
     {
-        assert(ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
-        assert(i < num_indices);
+        return _ptr_index_buffer;
+    }
 
-        *(reinterpret_cast<uint32_t*>(ptr_index_buffer->getData() + index_buffer_offset) + i) = val;
+    inline const PtrBuffer& Mesh::getIndexBuffer() const noexcept
+    {
+        return _ptr_index_buffer;
+    }
+
+    inline PtrBuffer& Mesh::getVertexBuffer() noexcept
+    {
+        return _ptr_vertex_attrib_buffer;
+    }
+
+    inline const PtrBuffer& Mesh::getVertexBuffer() const noexcept
+    {
+        return _ptr_vertex_attrib_buffer;
+    }
+
+    inline uint32_t Mesh::getNumIndices() const noexcept
+    {
+        return _num_indices;
+    }
+
+    inline uint32_t Mesh::getNumVertices() const noexcept
+    {
+        return _num_vertices;
+    }
+
+    inline uint32_t Mesh::getIndexBufferOffset() const noexcept
+    {
+        return _index_buffer_offset;
+    }
+
+    inline uint32_t Mesh::getVertexBufferOffset() const noexcept
+    {
+        return _vertex_attrib_buffer_offset;
+    }
+
+    inline VkIndexType Mesh::getIndexType() const noexcept
+    {
+        return _index_type;
+    }
+
+    inline AABB& Mesh::getAABB() noexcept
+    {
+        return _aabb;
+    }
+
+    inline const AABB& Mesh::getAABB() const noexcept
+    {
+        return _aabb;
+    }
+
+    inline PtrMaterial& Mesh::getMaterial() noexcept
+    {
+        return _ptr_material;
+    }
+
+    inline const PtrMaterial& Mesh::getMaterial() const noexcept
+    {
+        return _ptr_material;
     }
 
     inline type_index Mesh::getType() const
     {
         return ComponentUtil::getTypeIndex<Mesh>();
+    }
+
+    inline void Mesh::setIndex(size_t i, uint32_t val)
+    {
+        assert(_ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(i < _num_indices);
+
+        *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getData() + _index_buffer_offset) + i) = val;
+    }
+    
+    inline void Mesh::setIndexBuffer(const PtrBuffer& ptr_buffer)
+    {
+        if (ptr_buffer->getSize() % sizeof(uint32_t)) {
+            throw invalid_argument("Размер буфера не кратен sizeof(uint32_t)");
+        }
+
+        _ptr_index_buffer = ptr_buffer;
+    }
+
+    inline void Mesh::setVertexBuffer(const PtrBuffer& ptr_buffer)
+    {
+        if (ptr_buffer->getSize() % sizeof(VertexAttrib)) {
+            throw invalid_argument("Размер буфера не кратен sizeof(Mesh::VertexAttrib)");
+        }
+
+        _ptr_vertex_attrib_buffer = ptr_buffer;
+    }
+
+    inline void Mesh::setAABB(const AABB& bbox)
+    {
+        _aabb = bbox;
+    }
+
+    inline void Mesh::setData(const vector<uint32_t>& ib)
+    {
+        if ((_index_buffer_offset + ib.size()) * sizeof(uint32_t) >= _ptr_index_buffer->getSize()) {
+            throw invalid_argument("Выход за границу памяти.");
+        }
+
+        bool is_maped = _ptr_index_buffer->getMapStatus() == MapStatus::MAPPED;
+
+        if (!is_maped) {
+            _ptr_index_buffer->map();
+        }
+
+        uint8_t*    ptr     = _ptr_index_buffer->getData();
+        size_t      size    = std::min(static_cast<size_t>(_ptr_index_buffer->getSize()), sizeof(uint32_t) * ib.size());
+
+        memcpy(ptr, ib.data(), size);
+
+        if (!is_maped) {
+            _ptr_index_buffer->unmap();
+        }
+    }
+
+    inline void Mesh::setData(const vector<Mesh::VertexAttrib>& vb)
+    {
+        if ((_vertex_attrib_buffer_offset + vb.size()) * sizeof(VertexAttrib) >= _ptr_vertex_attrib_buffer->getSize()) {
+            throw invalid_argument("Выход за границу памяти.");
+        }
+
+        bool is_maped = _ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED;
+
+        if (!is_maped) {
+            _ptr_vertex_attrib_buffer->map();
+        }
+
+        uint8_t*    ptr     = _ptr_vertex_attrib_buffer->getData();
+        size_t      size    = std::min(static_cast<size_t>(_ptr_vertex_attrib_buffer->getSize()), sizeof(uint32_t) * vb.size());
+
+        memcpy(ptr, vb.data(), size);
+
+        if (!is_maped) {
+            _ptr_vertex_attrib_buffer->unmap();
+        }
+    }
+
+    inline void Mesh::setNumVertices(size_t num)
+    {
+        _num_vertices = static_cast<uint32_t>(num);
+    }
+
+    inline void Mesh::setNumIndices(size_t num)
+    {
+        _num_indices = static_cast<uint32_t>(num);
+    }
+
+    inline void Mesh::setVertexBufferOffset(size_t offset)
+    {
+        _vertex_attrib_buffer_offset = static_cast<uint32_t>(offset * sizeof(VertexAttrib));
+    }
+
+    inline void Mesh::setIndexBufferOffset(size_t offset)
+    {
+        _index_buffer_offset = static_cast<uint32_t>(offset * sizeof(uint32_t));
+    }
+
+    inline void Mesh::copyIndexBuffer(vector<uint32_t>& ib)
+    {
+        bool is_maped = _ptr_index_buffer->getMapStatus() == MapStatus::MAPPED;
+
+        if (!is_maped) {
+            _ptr_index_buffer->map();
+        }
+
+        uint8_t*    ptr_data    = _ptr_index_buffer->getData();
+        size_t      size        = _ptr_index_buffer->getSize();
+
+        if (size_t num_ind = size / sizeof(uint32_t); num_ind != ib.size()) {
+            ib.resize(num_ind);
+        }
+
+        memcpy(ib.data(), ptr_data, size);
+
+        if (!is_maped) {
+            _ptr_index_buffer->unmap();
+        }
+    }
+
+    inline void Mesh::copyVertexBuffer(vector<Mesh::VertexAttrib>& vb)
+    {
+        bool is_maped = _ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED;
+
+        if (!is_maped) {
+            _ptr_vertex_attrib_buffer->map();
+        }
+
+        uint8_t*    ptr_data    = _ptr_vertex_attrib_buffer->getData();
+        size_t      size        = _ptr_vertex_attrib_buffer->getSize();
+
+        if (size_t num_vert = size / sizeof(VertexAttrib); num_vert != vb.size()) {
+            vb.resize(num_vert);
+        }
+
+        memcpy(vb.data(), ptr_data, size);
+
+        if (!is_maped) {
+            _ptr_vertex_attrib_buffer->unmap();
+        }
     }
 
     inline PtrMesh Mesh::make(const string_view name)
@@ -157,13 +356,13 @@ namespace pbrlib
     {
         Mesh mesh (_name);
 
-        mesh.aabb                       = _bbox;
-        mesh.index_buffer_offset        = 0;
-        mesh.ptr_index_buffer           = _index_buffer_builder.buildPtr();
-        mesh.ptr_material               = nullptr;
-        mesh.ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
-        mesh.num_vertices               = static_cast<uint32_t>(mesh.ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
-        mesh.num_indices                = static_cast<uint32_t>(mesh.ptr_index_buffer->getSize() / sizeof(uint32_t));
+        mesh._aabb                       = _bbox;
+        mesh._index_buffer_offset        = 0;
+        mesh._ptr_index_buffer           = _index_buffer_builder.buildPtr();
+        mesh._ptr_material               = nullptr;
+        mesh._ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
+        mesh._num_vertices               = static_cast<uint32_t>(mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
+        mesh._num_indices                = static_cast<uint32_t>(mesh._ptr_index_buffer->getSize() / sizeof(uint32_t));
 
         return mesh;
     }
@@ -172,13 +371,13 @@ namespace pbrlib
     {
         PtrMesh ptr_mesh = Mesh::make(_name);
 
-        ptr_mesh->aabb                      = _bbox;
-        ptr_mesh->index_buffer_offset       = 0;
-        ptr_mesh->ptr_index_buffer          = _index_buffer_builder.buildPtr();
-        ptr_mesh->ptr_material              = nullptr;
-        ptr_mesh->ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
-        ptr_mesh->num_vertices              = static_cast<uint32_t>(ptr_mesh->ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
-        ptr_mesh->num_indices               = static_cast<uint32_t>(ptr_mesh->ptr_index_buffer->getSize() / sizeof(uint32_t));
+        ptr_mesh->_aabb                      = _bbox;
+        ptr_mesh->_index_buffer_offset       = 0;
+        ptr_mesh->_ptr_index_buffer          = _index_buffer_builder.buildPtr();
+        ptr_mesh->_ptr_material              = nullptr;
+        ptr_mesh->_ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
+        ptr_mesh->_num_vertices              = static_cast<uint32_t>(ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
+        ptr_mesh->_num_indices               = static_cast<uint32_t>(ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t));
 
         return ptr_mesh;
     }
@@ -229,13 +428,13 @@ namespace pbrlib
     {
         Mesh mesh (_name);
 
-        mesh.aabb                       = _bbox;
-        mesh.index_buffer_offset        = 0;
-        mesh.ptr_index_buffer           = _index_buffer_builder.buildPtr();
-        mesh.ptr_material               = nullptr;
-        mesh.ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
-        mesh.num_vertices               = mesh.ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
-        mesh.num_indices                = mesh.ptr_index_buffer->getSize() / sizeof(uint32_t);
+        mesh._aabb                       = _bbox;
+        mesh._index_buffer_offset        = 0;
+        mesh._ptr_index_buffer           = _index_buffer_builder.buildPtr();
+        mesh._ptr_material               = nullptr;
+        mesh._ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
+        mesh._num_vertices               = mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
+        mesh._num_indices                = mesh._ptr_index_buffer->getSize() / sizeof(uint32_t);
 
         return mesh;
     }
@@ -245,13 +444,13 @@ namespace pbrlib
     {
         PtrMesh ptr_mesh = Mesh::make(_name);
 
-        ptr_mesh->aabb                      = _bbox;
-        ptr_mesh->index_buffer_offset       = 0;
-        ptr_mesh->ptr_index_buffer          = _index_buffer_builder.buildPtr();
-        ptr_mesh->ptr_material              = nullptr;
-        ptr_mesh->ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
-        ptr_mesh->num_vertices              = ptr_mesh->ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
-        ptr_mesh->num_indices               = ptr_mesh->ptr_index_buffer->getSize() / sizeof(uint32_t);
+        ptr_mesh->_aabb                      = _bbox;
+        ptr_mesh->_index_buffer_offset       = 0;
+        ptr_mesh->_ptr_index_buffer          = _index_buffer_builder.buildPtr();
+        ptr_mesh->_ptr_material              = nullptr;
+        ptr_mesh->_ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
+        ptr_mesh->_num_vertices              = ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
+        ptr_mesh->_num_indices               = ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t);
         
         return ptr_mesh;
     }

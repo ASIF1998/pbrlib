@@ -118,25 +118,66 @@ namespace pbrlib
         template<MeshAttribute Attrib>
         inline const auto& getAttribute(size_t i) const;
 
-        inline uint32_t    getIndex(size_t i) const;
-        inline void        setIndex(size_t i, uint32_t val);
+        inline uint32_t             getIndex(size_t i)          const;
+        inline PtrBuffer&           getIndexBuffer()            noexcept;
+        inline const PtrBuffer&     getIndexBuffer()            const noexcept;
+        inline PtrBuffer&           getVertexBuffer()           noexcept;
+        inline const PtrBuffer&     getVertexBuffer()           const noexcept;
+        inline uint32_t             getNumIndices()             const noexcept;
+        inline uint32_t             getNumVertices()            const noexcept;
+        inline uint32_t             getIndexBufferOffset()      const noexcept;
+        inline uint32_t             getVertexBufferOffset()     const noexcept;
+        inline VkIndexType          getIndexType()              const noexcept;
+        inline AABB&                getAABB()                   noexcept;
+        inline const AABB&          getAABB()                   const noexcept; 
+        inline PtrMaterial&         getMaterial()               noexcept;
+        inline const PtrMaterial&   getMaterial()               const noexcept;
+        inline virtual type_index   getType()                   const override;
 
-        inline virtual type_index getType() const override;
+        inline void setIndex(size_t i, uint32_t val);
+        inline void setIndexBuffer(const PtrBuffer& ptr_buffer);
+        inline void setVertexBuffer(const PtrBuffer& ptr_buffer);
+        inline void setAABB(const AABB& bbox);
+        inline void setNumVertices(size_t num);
+        inline void setNumIndices(size_t num);
+        inline void setVertexBufferOffset(size_t offset);
+        inline void setIndexBufferOffset(size_t offset);
+
+        /**
+         * При использовании этих методов ограничивающий объём остаётся прежним.
+         * Для установки огрничивающего объёма воспользуйтесь методом setAABB.
+        */
+        inline void setData(const vector<uint32_t>& ib);
+        inline void setData(const vector<VertexAttrib>& vb);
+
+        /**
+         * @brief Метод копирует содержимое индексного буффера в ib.
+         * 
+         * @param[out] ib буффер, в который будет осуществлятся копирование.
+        */
+        inline void copyIndexBuffer(vector<uint32_t>& ib);
+
+        /**
+         * @brief Метод копирует содержимое вершинного буффера в vb.
+         * 
+         * @param[out] vb буффер, в который будет осуществлятся копирование.
+        */
+        inline void copyVertexBuffer(vector<VertexAttrib>& vb);
 
         inline static PtrMesh make(const string_view name = "Mesh");
 
-    public:
-        PtrBuffer           ptr_index_buffer;
-        PtrBuffer           ptr_vertex_attrib_buffer;
-        uint32_t            num_vertices;
-        uint32_t            vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
-        uint32_t            num_indices;
-        uint32_t            index_buffer_offset;  	          
-        VkIndexType         index_type                      = VK_INDEX_TYPE_UINT32;
-        uint32_t            stride                          = sizeof(VertexAttrib);
-        VkPrimitiveTopology topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        AABB                aabb;
-        PtrMaterial         ptr_material;
+    private:
+        PtrBuffer           _ptr_index_buffer;
+        PtrBuffer           _ptr_vertex_attrib_buffer;
+        uint32_t            _num_vertices;
+        uint32_t            _vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
+        uint32_t            _num_indices;
+        uint32_t            _index_buffer_offset;  	          
+        VkIndexType         _index_type                      = VK_INDEX_TYPE_UINT32;
+        uint32_t            _stride                          = sizeof(VertexAttrib);
+        VkPrimitiveTopology _topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        AABB                _aabb;
+        PtrMaterial         _ptr_material;
     };
 }
 
