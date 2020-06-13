@@ -8,19 +8,22 @@
 
 #include "Surface.hpp"
 
+#include "Instance.hpp"
+#include "PhysicalDevice.hpp"
+
 namespace pbrlib
 {
     Surface::Surface(
         const Window&               window, 
         const PtrInstance&          ptr_instance, 
-        const PhysicalDevice&       physical_device
+        const PtrPhysicalDevice&    ptr_physical_device
     ) :
         _ptr_instance   (ptr_instance),
         _surface_handle (VK_NULL_HANDLE)
     {
         assert(SDL_Vulkan_CreateSurface(window._ptr_window, _ptr_instance->getHandle(), &_surface_handle) == SDL_TRUE);
         assert(_surface_handle);
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device.physical_device_handle, _surface_handle, &_surface_capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(ptr_physical_device->physical_device_handle, _surface_handle, &_surface_capabilities);
     }
 
     Surface::Surface(Surface&& surface) :
@@ -42,10 +45,10 @@ namespace pbrlib
     shared_ptr<Surface> Surface::make(
         const Window&               window,
         const PtrInstance&          ptr_instance,
-        const PhysicalDevice&       physical_device
+        const PtrPhysicalDevice&    ptr_physical_device
     )
     {
-        return make_shared<Surface>(window, ptr_instance, physical_device);
+        return make_shared<Surface>(window, ptr_instance, ptr_physical_device);
     }
 
     const VkSurfaceKHR& Surface::getSurfaceHandle() const noexcept
@@ -79,14 +82,14 @@ namespace pbrlib
     }
 
     vector<VkSurfaceFormatKHR> Surface::getAllSurfaceFormats(
-        const Surface&          surface, 
-        const PhysicalDevice&   physical_device
+        const Surface&              surface, 
+        const PtrPhysicalDevice&    ptr_physical_device
     )
     {
         uint32_t num_formats = 0;
 
         vkGetPhysicalDeviceSurfaceFormatsKHR(
-            physical_device.physical_device_handle, 
+            ptr_physical_device->physical_device_handle, 
             surface._surface_handle, 
             &num_formats, 
             nullptr
@@ -95,7 +98,7 @@ namespace pbrlib
         vector<VkSurfaceFormatKHR> formats (num_formats);
 
         vkGetPhysicalDeviceSurfaceFormatsKHR(
-            physical_device.physical_device_handle, 
+            ptr_physical_device->physical_device_handle, 
             surface._surface_handle, 
             &num_formats, 
             formats.data()

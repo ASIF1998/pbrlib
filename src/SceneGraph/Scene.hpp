@@ -46,10 +46,13 @@ namespace pbrlib
     public:
         class Node;
 
-        using PtrNode = shared_ptr<Node>;
+        using PtrNode       = shared_ptr<Node>;
+        using VisibleList   = vector<PtrNode>;
 
         class Node
         {
+            friend class Scene;
+
         public:
             Node(
                 const string_view   name    = "No name",
@@ -148,6 +151,9 @@ namespace pbrlib
                 Node*               parent  = nullptr
             );
 
+        private:
+            void _getVisibleList(VisibleList& out_visible_list);
+
         protected:
             Node*                                    _ptr_parent; 
             vector<PtrNode>                          _ptr_children;
@@ -191,6 +197,8 @@ namespace pbrlib
         const GPUTextureManager&    getTextureManager()     const noexcept;
         MeshManager&                getMeshManager()        noexcept;
         const MeshManager&          getMeshManager()        const noexcept;
+        VisibleList                 getVisibleList();
+        const VisibleList           getVisibleList()        const;
 
         /**
          * @brief Метод создающий узел для точечного источника света.

@@ -9,8 +9,7 @@
 #ifndef Surface_hpp
 #define Surface_hpp
 
-#include "Instance.hpp"
-#include "PhysicalDevice.hpp"
+#include <vulkan/vulkan.h>
 
 #include "../Window.hpp"
 
@@ -24,8 +23,12 @@ namespace pbrlib
 {
     class Swapchain;
     class Surface;
+    class PhysicalDevice;
+    class Instance;
 
-    using PtrSurface = shared_ptr<Surface>;
+    using PtrSurface        = shared_ptr<Surface>;
+    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
+    using PtrInstance       = shared_ptr<Instance>;
 
     class Surface
     {
@@ -33,14 +36,14 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param window            окно.
-         * @param ptr_instance      указатель на экземпляр Vulkan'а.
-         * @param physical_device   физическое устройтсво.
+         * @param window                окно.
+         * @param ptr_instance          указатель на экземпляр Vulkan'а.
+         * @param ptr_physical_device   физическое устройство.
         */
         Surface(
             const Window&               window, 
             const PtrInstance&          ptr_instance, 
-            const PhysicalDevice&       physical_device
+            const PtrPhysicalDevice&    ptr_physical_device
         );
 
         Surface(Surface&& surface);
@@ -62,12 +65,12 @@ namespace pbrlib
         static PtrSurface make(
             const Window&               window,
             const PtrInstance&          ptr_instance,
-            const PhysicalDevice&       physical_device
+            const PtrPhysicalDevice&    ptr_physical_device
         );
         
         static vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
-            const Surface&          surface, 
-            const PhysicalDevice&   physical_device
+            const Surface&              surface, 
+            const PtrPhysicalDevice&    ptr_physical_device
         );
 
     private:

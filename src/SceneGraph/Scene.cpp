@@ -266,6 +266,18 @@ namespace pbrlib
         }
     }
 
+    void Scene::Node::_getVisibleList(Scene::VisibleList& out_visible_list)
+    {
+        /**
+         * TODO: Добавить отсечение по усечённому конусу.
+        */
+
+       for (size_t i{0}, num_child{_ptr_children.size()}; i < num_child; i++) {
+           out_visible_list.push_back(_ptr_children[i]);
+           _ptr_children[i]->_getVisibleList(out_visible_list);
+       }
+    }
+
     Scene::PtrNode Scene::Node::make(const string_view name, Node* parent)
     {
         return make_shared<Node>(name, parent);
@@ -348,6 +360,30 @@ namespace pbrlib
     const MeshManager& Scene::getMeshManager() const noexcept
     {
         return _mesh_manager;
+    }
+
+    Scene::VisibleList Scene::getVisibleList()
+    {
+        VisibleList visible_list;
+        
+        if (_ptr_root_node) {
+            visible_list.push_back(_ptr_root_node);
+            _ptr_root_node->_getVisibleList(visible_list);
+        }
+
+        return visible_list;
+    }
+
+    const Scene::VisibleList Scene::getVisibleList() const
+    {
+        VisibleList visible_list;
+        
+        if (_ptr_root_node) {
+            visible_list.push_back(_ptr_root_node);
+            _ptr_root_node->_getVisibleList(visible_list);
+        }
+
+        return visible_list;
     }
 
     Scene::PtrNode& Scene::makePointLight(

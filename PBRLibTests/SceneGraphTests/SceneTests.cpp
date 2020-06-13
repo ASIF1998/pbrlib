@@ -20,11 +20,17 @@ TEST(SceneGraphScene, Constructor)
 {
     string_view name1 = "Scene";
     string_view name2 = "Scene 2";
+    
+    Window::Builder window_builder;
+    
+    window_builder.setTitle("Testing");
+    window_builder.setExtend(800, 600);
+    window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
-
-    SceneView scene_view1 (name1, window);
-    SceneView scene_view2 (name2, window);
+    PtrWindow ptr_window = window_builder.buildPtr();
+    
+    SceneView scene_view1 (name1, ptr_window);
+    SceneView scene_view2 (name2, ptr_window);
 
     Scene& scene1 = scene_view1.getScene();
     Scene& scene2 = scene_view2.getScene();
@@ -40,9 +46,15 @@ TEST(SceneGraphScene, GettersAndSetters)
 {
     string_view name = "Scene 1";
 
-    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+    Window::Builder window_builder;
     
-    SceneView scene_view (name, window);
+    window_builder.setTitle("Testing");
+    window_builder.setExtend(800, 600);
+    window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+
+    PtrWindow ptr_window = window_builder.buildPtr();
+    
+    SceneView scene_view (name, ptr_window);
 
     Scene& scene = scene_view.getScene();
 
@@ -129,9 +141,15 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     plight_builder.setIntensity(intensity);
     plight_builder.setName("Point Light Builder");
 
-    Window window ("Testing", 800, 600, Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+    Window::Builder window_builder;
     
-    SceneView scene_view ("Scene", window);
+    window_builder.setTitle("Testing");
+    window_builder.setExtend(800, 600);
+    window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
+
+    PtrWindow ptr_window = window_builder.buildPtr();
+    
+    SceneView scene_view ("Scene", ptr_window);
 
     Scene& scene = scene_view.getScene();
 

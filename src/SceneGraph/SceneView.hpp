@@ -22,11 +22,12 @@ namespace pbrlib
 
     using PtrIRenderer      = shared_ptr<IRenderer>;
     using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
+    using PtrWindow         = shared_ptr<Window>;
 
     class SceneView
     {
     public:
-        SceneView(const string_view scene_name, const Window& window);
+        SceneView(const string_view scene_name, const PtrWindow& ptr_window);
 
         void setRenderer(const PtrIRenderer& ptr_renderer);
 
@@ -39,16 +40,15 @@ namespace pbrlib
         Scene&              getScene()      noexcept;
         const Scene&        getScene()      const noexcept;
 
-        void drawScene(Window& window, float delta_time);
+        void drawScene(float delta_time);
 
     private:
         PtrInstance         _ptr_instance;          //!< Указатель на экземпляр Vulkan'а.
         PtrDevice           _ptr_device;            //!< Указатель на логическое устройство (GPU).
         PtrPhysicalDevice   _ptr_physical_device;   //!< Указатель на физичестое устройство (GPU).
 
-        vector<VkDeviceQueueCreateInfo> _queues_infos; //!< Информация об используемый очередях устройства.
-
         PtrIRenderer    _ptr_renderer;  //!< Указатель на визуализатор.
+        PtrWindow       _ptr_window;    //!< Указатель на окно.
         Scene           _scene;         //!< Сцена.
     };
 }

@@ -10,9 +10,16 @@
 
 #include <stdexcept>
 
+#include <SDL2/SDL_vulkan.h>
+
 #include "Window.hpp"
 
-#include <SDL2/SDL_vulkan.h>
+#include "VulkanWrapper/Instance.hpp"
+#include "VulkanWrapper/PhysicalDevice.hpp"
+
+#include "VulkanWrapper/Swapchain.hpp"
+
+#include "../Util/enumCast.hpp"
 
 namespace pbrlib
 {
@@ -27,8 +34,9 @@ namespace pbrlib
         int                 pos_y, 
         ResizableWindow     resizable
     ) :
-        _ptr_window (nullptr),
-        _title      (title)
+        _ptr_window     (nullptr),
+        _title          (title),
+        _ptr_swapchain  (nullptr)
     {
         if (!_is_init_SDL) {
             if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -46,7 +54,7 @@ namespace pbrlib
             pos_y, 
             width, 
             height, 
-            SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | static_cast<decltype(SDL_WINDOW_SHOWN)>(resizable)
+            SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | util::enumCast(resizable)
         );
 
         assert(_ptr_window);
@@ -104,6 +112,37 @@ namespace pbrlib
         SDL_SetWindowTitle(_ptr_window, _title.data());
     }
 
+    void Window::_initVulkanResources(
+        const PtrInstance&          ptr_instance, 
+        const PtrPhysicalDevice&    ptr_physical_device,
+        const PtrDevice&            ptr_device,
+        uint32_t                    queue_family_index
+    )
+    {
+        if (!_ptr_swapchain) {
+            _ptr_swapchain = Swapchain::make(
+                ptr_device, 
+                queue_family_index, 
+                Surface::make(*this, ptr_instance, ptr_physical_device)
+            );
+        }
+    }
+
+    bool Window::_hasVulkanResources() const noexcept
+    {
+        return _ptr_swapchain != nullptr;
+    }
+
+    PtrSurface& Window::_getVulkanSurface() noexcept
+    {
+        return _ptr_swapchain->getSurface();
+    }
+
+    PtrSwapchain& Window::_getVulkanSwapchain() noexcept
+    {
+        return _ptr_swapchain;
+    }
+
     bool Window::showCursor(bool e) noexcept
     {
         return SDL_ShowCursor(e);
@@ -123,5 +162,79 @@ namespace pbrlib
         uint32_t offset = static_cast<uint32_t>(out_extensions.size());
         out_extensions.resize(offset + num_extensions_names);
         assert(SDL_Vulkan_GetInstanceExtensions(window._ptr_window, &num_extensions_names, out_extensions.data() + offset) == SDL_TRUE);
+    }
+
+    PtrWindow Window::make(
+        const string_view   title, 
+        int                 width, 
+        int                 height, 
+        int                 pos_x, 
+        int                 pos_y, 
+        ResizableWindow     resizable
+    )
+    {
+        return make_shared<Window>(title, width, height, pos_x, pos_y, resizable);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Window::Builder::Builder() :
+        _title      ("Window"),
+        _width      (0),
+        _height     (0),
+        _pos_x      (0),
+        _pos_y      (0),
+        _resizable  (ResizableWindow::STATIC)
+    {}
+
+    void Window::Builder::setTitle(const string_view title)
+    {
+        _title = title;
+    }
+
+    void Window::Builder::setWidth(int width) noexcept
+    {
+        _width = width;
+    }
+
+    void Window::Builder::setHeight(int height) noexcept
+    {
+        _height = height;
+    }
+
+    void Window::Builder::setExtend(int width, int height) noexcept
+    {
+        _width  = width; 
+        _height = height;
+    }
+
+    void Window::Builder::setPositionX(int pos_x) noexcept
+    {
+        _pos_x = pos_x;
+    }
+
+    void Window::Builder::setPositionY(int pos_y) noexcept
+    {
+        _pos_y = pos_y;
+    }
+
+    void Window::Builder::setPosition(int pos_x, int pos_y) noexcept
+    {
+        _pos_x = pos_x;
+        _pos_y = pos_y;
+    }
+
+    void Window::Builder::setResizableWindow(ResizableWindow resizable) noexcept
+    {
+        _resizable = resizable;
+    }
+
+    Window Window::Builder::build() const
+    {
+        return Window(_title, _width, _height, _pos_x, _pos_y, _resizable);
+    }
+
+    PtrWindow Window::Builder::buildPtr() const
+    {
+        return Window::make(_title, _width, _height, _pos_x, _pos_y, _resizable);
     }
 }

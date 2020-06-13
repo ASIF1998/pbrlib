@@ -14,22 +14,22 @@
 
 namespace pbrlib
 {
-    Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_info) :
+    Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_infos) :
         _device_handle(VK_NULL_HANDLE)
     {
-        _create(physical_device, queue_info, 0, nullptr, 0, nullptr);
+        _create(physical_device, queue_infos, 0, nullptr, 0, nullptr);
     }
 
     Device::Device(
         const PhysicalDevice&                   physical_device, 
-        const vector<VkDeviceQueueCreateInfo>&  queue_info, 
+        const vector<VkDeviceQueueCreateInfo>&  queue_infos, 
         const vector<const char*>&              layer_names, 
         const vector<const char*>&              extension_names
     ) :
         _device_handle(VK_NULL_HANDLE)
     {
         _create(
-            physical_device, queue_info,
+            physical_device, queue_infos,
             static_cast<uint32_t>(layer_names.size()),
             layer_names.data(),
             static_cast<uint32_t>(extension_names.size()),
@@ -55,6 +55,11 @@ namespace pbrlib
         return _device_handle;
     }
 
+    const vector<VkDeviceQueueCreateInfo>& Device::getDeviceQueueInfo() const noexcept
+    {
+        return _queues_infos;
+    }
+
     void Device::waitIdle() const
     {
         vkDeviceWaitIdle(_device_handle);
@@ -62,14 +67,16 @@ namespace pbrlib
 
     void Device::_create(
         const PhysicalDevice&                   physical_device,
-        const vector<VkDeviceQueueCreateInfo>&  queue_info,
+        const vector<VkDeviceQueueCreateInfo>&  queue_infos,
         uint32_t                                enabled_layer_count,
         const char* const*                      ptr_enabled_layers,
         uint32_t                                enabled_extension_count,
         const char* const*                      ptr_extensions
     )
     {
-        vector<VkQueueFamilyProperties> queue_properties (queue_info.size());
+        _queues_infos = queue_infos;
+
+        vector<VkQueueFamilyProperties> queue_properties (queue_infos.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
 
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device.physical_device_handle, &queue_num, queue_properties.data());
@@ -84,13 +91,13 @@ namespace pbrlib
             .sType                      = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext                      = nullptr,
             .flags                      = 0,
-            .queueCreateInfoCount       = static_cast<uint32_t>(queue_info.size()),
-            .pQueueCreateInfos          = queue_info.data(),
+            .queueCreateInfoCount       = static_cast<uint32_t>(queue_infos.size()),
+            .pQueueCreateInfos          = queue_infos.data(),
             .enabledLayerCount          = enabled_layer_count,
             .ppEnabledLayerNames        = ptr_enabled_layers,
             .enabledExtensionCount      = enabled_extension_count,
             .ppEnabledExtensionNames    = ptr_extensions,
-            .pEnabledFeatures = nullptr
+            .pEnabledFeatures           = nullptr
         };
 
         assert(vkCreateDevice(

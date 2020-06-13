@@ -9,6 +9,8 @@
 #include "DeviceQueue.hpp"
 #include "Device.hpp"
 
+#include "PhysicalDevice.hpp"
+
 #include "CommandBuffer.hpp"
 
 namespace pbrlib
@@ -121,14 +123,14 @@ namespace pbrlib
 
     bool DeviceQueue::isPresentSuppoerted(
         uint32_t                queue_family_index, 
-        const PhysicalDevice&   physocal_device, 
+        const PhysicalDevice&   physical_device,
         const Surface&          surface
     )
     {
         VkBool32 res;
 
         vkGetPhysicalDeviceSurfaceSupportKHR(
-            physocal_device.physical_device_handle, 
+            physical_device.physical_device_handle,
             queue_family_index, 
             surface.getSurfaceHandle(), 
             &res
