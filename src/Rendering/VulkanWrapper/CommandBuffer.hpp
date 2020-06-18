@@ -26,6 +26,13 @@ namespace pbrlib
     class Buffer;
     class Image;
     class CommandPool;
+    class CommandBuffer;
+    class PrimaryCommandBuffer;
+    class SecondaryCommandBuffer;
+
+    using PtrCommandBuffer          = shared_ptr<CommandBuffer>;
+    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
+    using PtrSecondaryCommandBuffer = shared_ptr<SecondaryCommandBuffer>;
 
     class CommandBuffer
     {
@@ -305,6 +312,11 @@ namespace pbrlib
             VkDeviceSize                    size
         ) const noexcept;
 
+        /**
+         * @brief Метод, сбрасывающий буфер команд в исходное состояние.
+        */
+        void reset() const noexcept;
+
         PtrDevice&               getDevice()                 noexcept;
         const PtrDevice&         getDevice()                 const noexcept;
         const VkCommandBuffer&   getCommandBufferHandle()    const noexcept;
@@ -341,6 +353,12 @@ namespace pbrlib
         const PtrFramebuffer&       getFramebuffer()    const noexcept;
         const PtrGraphicsPipeline&  getPipeline()       const noexcept;
 
+        static PtrPrimaryCommandBuffer make(
+            const PtrCommandPool&       ptr_command_pool,
+            const PtrFramebuffer&       ptr_framebuffer,
+            const PtrGraphicsPipeline&  ptr_pipeline
+        );
+
     private:
         PtrFramebuffer         _ptr_framebuffer;
         PtrGraphicsPipeline    _ptr_pipeline;
@@ -369,9 +387,11 @@ namespace pbrlib
          * 
          * @param primary_command_buffer первичный командный буфер.
         */
-        void begin(const PrimaryCommandBuffer& primary_command_buffer)   const;
+        void begin(const PrimaryCommandBuffer& primary_command_buffer) const;
         
-        void end()                                                       const;
+        void end() const;
+
+        static PtrSecondaryCommandBuffer make(const PtrCommandPool& ptr_command_pool);
     };
 }
 
