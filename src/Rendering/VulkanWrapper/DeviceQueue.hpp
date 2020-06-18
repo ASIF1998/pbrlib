@@ -20,6 +20,9 @@ namespace pbrlib
 {
     class Device;
     class CommandBuffer;
+    class DeviceQueue;
+
+    using PtrDeviceQueue = shared_ptr<DeviceQueue>;
     
     class DeviceQueue
     {
@@ -78,9 +81,18 @@ namespace pbrlib
 
         static bool isPresentSuppoerted(
             uint32_t                queue_family_index, 
-            const PhysicalDevice&   physocal_device, 
+            const PhysicalDevice&   physical_device, 
             const Surface&          surface
         );
+
+        /**
+         * @brief Статический метод, необходимый для создания указателя на очередь устройства.
+         * 
+         * @param ptr_device    указатель на устройство.
+         * @param family_index  индекс семейства очередей.
+         * @param index         индекс очереди в семействе очередей.
+        */
+        static PtrDeviceQueue make(const PtrDevice& ptr_device, uint32_t family_index, uint32_t index);
 
     private:
         PtrDevice   _ptr_device;

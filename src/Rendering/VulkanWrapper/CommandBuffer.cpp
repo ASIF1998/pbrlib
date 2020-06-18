@@ -332,6 +332,12 @@ namespace pbrlib
             0, nullptr
         );
     }
+
+    void CommandBuffer::reset() const noexcept
+    {
+        vkResetCommandBuffer(_command_buffer_handle, 0);
+    }
+
     PtrDevice& CommandBuffer::getDevice() noexcept
     {
         return _ptr_command_pool->getDevice();
@@ -450,6 +456,15 @@ namespace pbrlib
         return _ptr_pipeline;
     }
 
+    PtrPrimaryCommandBuffer PrimaryCommandBuffer::make(
+        const PtrCommandPool&       ptr_command_pool,
+        const PtrFramebuffer&       ptr_framebuffer,
+        const PtrGraphicsPipeline&  ptr_pipeline
+    )
+    {
+        return make_shared<PrimaryCommandBuffer>(ptr_command_pool, ptr_framebuffer, ptr_pipeline);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SecondaryCommandBuffer::SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool) :
         CommandBuffer(ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_SECONDARY)
@@ -486,5 +501,10 @@ namespace pbrlib
     void SecondaryCommandBuffer::end() const
     {
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
+    }
+
+    PtrSecondaryCommandBuffer SecondaryCommandBuffer::make(const PtrCommandPool& ptr_command_pool)
+    {
+        return make_shared<SecondaryCommandBuffer>(ptr_command_pool);
     }
 }

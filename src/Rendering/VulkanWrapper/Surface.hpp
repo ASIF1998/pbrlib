@@ -21,7 +21,6 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Swapchain;
     class Surface;
     class PhysicalDevice;
     class Instance;

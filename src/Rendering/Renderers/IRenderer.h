@@ -30,18 +30,19 @@ namespace pbrlib
          * @brief Чисто виртуальный метод, предназначенный для инициализации визуализатора.
          * @details Этот метод вызывается из метода SceneView::setRenderer(...)
          * 
-         * @param ptr_window указатель на окно.
-         * @param ptr_device указатель на логическое устройство.
+         * @param ptr_window            указатель на окно.
+         * @param ptr_device            указатель на логическое устройство.
+         * @param ptr_physical_device   указатель на физическое устройство.
         */
-        virtual void init(const PtrWindow& ptr_window, const PtrDevice& ptr_device) = 0;
+        virtual void init(const PtrWindow& ptr_window, const PtrDevice& ptr_device, const PtrPhysicalDevice& ptr_physical_device) = 0;
 
         /**
          * @brief Метод, отвечающий за отрисовку узла.
          * 
-         * @param ptr_node      указатель на узел.
+         * @param visible_list  узлы.
          * @param delta_time    количество пройденного времени с момента завершения последнего кадра,
         */
-        virtual void draw(const Scene::PtrNode& ptr_node, float delta_time) = 0;
+        virtual void draw(const Scene::VisibleList& visible_list, float delta_time) = 0;
     };
 }
 

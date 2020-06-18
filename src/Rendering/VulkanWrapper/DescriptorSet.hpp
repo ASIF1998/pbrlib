@@ -21,6 +21,9 @@ namespace pbrlib
     class Sampler;
     class ImageView;
     class Buffer;
+    class DescriptorSet;
+
+    using PtrDescriptorSet = shared_ptr<DescriptorSet>;
 
     class DescriptorSet
     {
@@ -89,6 +92,17 @@ namespace pbrlib
             uint32_t            binding, 
             VkDescriptorType    descriptor_type
         );
+        
+        /**
+         * @brief Статический метод, создающий указатель на DescriptorSet.
+         *
+         * @param ptr_descriptor_pool       указатель на пул дескрипторов.
+         * @param ptr_descriptor_set_layout указатель на объект размещения множества дескрипторов.
+        */
+        static PtrDescriptorSet make(
+             const PtrDescriptorPool&        ptr_descriptor_pool,
+             const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+         );
 
     private:
         PtrDescriptorPool       _ptr_descriptor_pool;

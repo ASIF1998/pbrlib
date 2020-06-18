@@ -15,25 +15,34 @@
 
 #include "../Rendering/VulkanWrapper/Swapchain.hpp"
 
+#define PBRLIB_DEBUG_VULKAN 1
+
 namespace pbrlib
 {
-    PtrInstance& getVulkanInstance(const PtrWindow& ptr_window)
+    PtrInstance getVulkanInstance()
     {
-        static PtrInstance ptr_instance = nullptr;
+        PtrInstance ptr_instance = nullptr;
 
         if (!ptr_instance) {
             vector<string>      extensions = Instance::getExtensionNames();
             vector<const char*> pointers_on_extension_name (extensions.size());
 
-            vector<const char*> layers (0);
+            vector<const char*> pointers_on_layer_name;
 
-            for (size_t i{0}; i < extensions.size(); i++) {
+            for (size_t i{0}, num_ext{extensions.size()}; i < num_ext; i++) {
                 pointers_on_extension_name[i] = extensions[i].data();
             }
 
-            Window::getVulkanInstanceExtensions(*ptr_window, pointers_on_extension_name);
+#if PBRLIB_DEBUG_VULKAN
+            vector<string> layers = Instance::getLayerNames();
 
-            ptr_instance = Instance::make(ptr_window->getTitle(), VK_MAKE_VERSION(0, 0, 1), layers, pointers_on_extension_name);
+            pointers_on_layer_name.resize(layers.size());
+
+            for (size_t i{0}, num_layers{layers.size()}; i < num_layers; i++) {
+                pointers_on_layer_name[i] = layers[i].data();
+            }
+#endif
+            ptr_instance = Instance::make("PBRLib", VK_MAKE_VERSION(0, 0, 1), pointers_on_layer_name, pointers_on_extension_name);
         }
 
         return ptr_instance;
@@ -98,6 +107,7 @@ namespace pbrlib
 
             pointers_extencions_names[0]    = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
             ptr_device                      = ptr_physical_device->makeDevice(
+                instance,
                 queues_infos, 
                 pointers_layers_names, 
                 pointers_extencions_names
@@ -107,62 +117,35 @@ namespace pbrlib
         return ptr_device;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SceneView::VulkanResources::VulkanResources()
+    {
+        ptr_instance = getVulkanInstance();
+        ptr_physical_device = getVulkanPhysicalDevice(ptr_instance);
+        ptr_device = getVulkanDevice(ptr_instance, getVulkanDeviceQueuesCreateInfo(ptr_physical_device), ptr_physical_device);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    SceneView::VulkanResources SceneView::_vulkan_resources = SceneView::VulkanResources();
+
     SceneView::SceneView(const string_view scene_name, const PtrWindow& ptr_window) :
-        _ptr_instance       (getVulkanInstance(ptr_window)),
-        _ptr_physical_device(getVulkanPhysicalDevice(_ptr_instance)),
-        _ptr_device         (
-            getVulkanDevice(
-                getVulkanInstance(ptr_window), 
-                getVulkanDeviceQueuesCreateInfo(
-                    getVulkanPhysicalDevice(getVulkanInstance(ptr_window))
-                ), 
-                getVulkanPhysicalDevice(getVulkanInstance(ptr_window))
-            )
-        ),
         _ptr_renderer   (nullptr),
         _ptr_window     (ptr_window),
         _scene          (
             scene_name, 
-            _ptr_device, 
-            _ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT),
-            _ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
+            _vulkan_resources.ptr_device, 
+            _vulkan_resources.ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT),
+            _vulkan_resources.ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
         )
-    {}
-
-    void SceneView::setRenderer(const PtrIRenderer& ptr_renderer)
     {
-        _ptr_renderer = ptr_renderer;
-        _ptr_renderer->init(_ptr_window, _ptr_device);
-    }
-
-    PtrInstance& SceneView::getInstance() noexcept
-    {
-        return _ptr_instance;
-    }
-
-    const PtrInstance& SceneView::getInstance() const noexcept
-    {
-        return _ptr_instance;
-    }
-
-    PtrDevice& SceneView::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& SceneView::getDevice() const noexcept
-    {
-        return _ptr_device;
-    }
-
-    PtrIRenderer& SceneView::getRenderer() noexcept
-    {
-        return _ptr_renderer;
-    }
-
-    const PtrIRenderer& SceneView::getRenderer() const noexcept
-    {
-        return _ptr_renderer;
+        if (!_ptr_window->_hasVulkanResources()) {
+            _ptr_window->_initVulkanResources(
+                _vulkan_resources.ptr_instance, 
+                _vulkan_resources.ptr_physical_device, 
+                _vulkan_resources.ptr_device, 
+                _vulkan_resources.ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
+            );
+        }
     }
 
     Scene& SceneView::getScene() noexcept
@@ -175,16 +158,27 @@ namespace pbrlib
         return _scene;
     }
 
+    PtrWindow& SceneView::getWindow() noexcept
+    {
+        return _ptr_window;
+    }
+
+    const PtrWindow& SceneView::getWindow() const noexcept
+    {
+        return _ptr_window;
+    }
+
+    void SceneView::setRenderer(const PtrIRenderer& ptr_renderer)
+    {
+        _ptr_renderer = ptr_renderer;
+        _ptr_renderer->init(_ptr_window, _vulkan_resources.ptr_device, _vulkan_resources.ptr_physical_device);
+    }
+
     void SceneView::drawScene(float delta_time)
     {
        assert(_ptr_renderer);
 
        _scene.update(delta_time);
-       
-       Scene::VisibleList visible_list = _scene.getVisibleList();
-
-       for (size_t i{0}, num_node{visible_list.size()}; i < num_node; i++) {
-           _ptr_renderer->draw(visible_list[i], delta_time);
-       }
+       _ptr_renderer->draw(_scene.getVisibleList(), delta_time);
     }
 }

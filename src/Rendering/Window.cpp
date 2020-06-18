@@ -19,6 +19,8 @@
 
 #include "VulkanWrapper/Swapchain.hpp"
 
+#include "VulkanWrapper/DeviceQueue.hpp"
+
 #include "../Util/enumCast.hpp"
 
 namespace pbrlib
@@ -106,6 +108,16 @@ namespace pbrlib
         return _title;
     }
 
+    PtrSwapchain& Window::getSwapchain() noexcept
+    {
+        return _ptr_swapchain;
+    }
+
+    const PtrSwapchain& Window::getSwapchain() const noexcept
+    {
+        return _ptr_swapchain;
+    }
+
     void Window::setTitle(const string_view title) 
     {
         _title = title;
@@ -120,11 +132,28 @@ namespace pbrlib
     )
     {
         if (!_ptr_swapchain) {
-            _ptr_swapchain = Swapchain::make(
-                ptr_device, 
-                queue_family_index, 
-                Surface::make(*this, ptr_instance, ptr_physical_device)
-            );
+            PtrSurface                  ptr_surface                 = Surface::make(*this, ptr_instance, ptr_physical_device);
+            vector<VkSurfaceFormatKHR>  surface_supported_formats   = Surface::getAllSurfaceFormats(*ptr_surface, ptr_physical_device);
+            
+            VkSurfaceFormatKHR current_surface_format;
+
+            for (size_t i{0}, num_surface_formats{surface_supported_formats.size()}; i < num_surface_formats; i++) {
+                if (surface_supported_formats[i].colorSpace ==  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && surface_supported_formats[i].format == VK_FORMAT_B8G8R8A8_SRGB) {
+                    current_surface_format = surface_supported_formats[i];
+                } else if (i == num_surface_formats) {
+                    current_surface_format = surface_supported_formats[0];
+                }
+            }
+
+            ptr_surface->setFormat(current_surface_format);
+
+            if (DeviceQueue::isPresentSuppoerted(queue_family_index, *ptr_physical_device, *ptr_surface)) {
+                _ptr_swapchain = Swapchain::make(
+                    ptr_device, 
+                    queue_family_index, 
+                    ptr_surface
+                );
+            }
         }
     }
 

@@ -59,11 +59,12 @@ namespace pbrlib
          * @brief Метод создающий логическое устройство.
          * 
          * @param queue_info информация о создаваемых очередях логического устройства.
-         * @return логическое устройство.
+         * @return Логическое устройство.
         */
-        PtrDevice makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const;
+        PtrDevice makeDevice(const PtrInstance& ptr_instance, const vector<VkDeviceQueueCreateInfo>& queue_info) const;
         
         PtrDevice makeDevice(
+            const PtrInstance&                      ptr_instance,
             const vector<VkDeviceQueueCreateInfo>&  queue_info,
             const vector<const char*>&              layer_names,
             const vector<const char*>&              extension_names
@@ -74,7 +75,7 @@ namespace pbrlib
          * @details Типом памяти является набор флагов VkMemoryPropertyFlags и индекс кучи.
          * 
          * @param type набор флагов VkMemoryPropertyFlags.
-         * @return индекс типа памяти.
+         * @return Индекс типа памяти.
         */
         uint32_t getMemoryTypeIndex(uint32_t type) const;
 

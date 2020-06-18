@@ -23,7 +23,7 @@ namespace pbrlib
     }
 
     MeshNode::MeshNode(const PtrMesh& ptr_mesh) :
-        Scene::Node (),
+        Scene::Node (ptr_mesh->getName()),
         _ptr_mesh   (ptr_mesh)
     {
         addComponent(ptr_mesh);
@@ -78,5 +78,10 @@ namespace pbrlib
     PtrMeshNode MeshNode::make(const string_view name, const PtrMesh& ptr_mesh)
     {
         return make_shared<MeshNode>(name, ptr_mesh);
+    }
+
+    PtrMeshNode MeshNode::make(const PtrMesh& ptr_mesh)
+    {
+        return make_shared<MeshNode>(ptr_mesh);
     }
 }

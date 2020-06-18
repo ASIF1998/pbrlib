@@ -155,4 +155,12 @@ namespace pbrlib
             0, nullptr
         );
     }
+
+    PtrDescriptorSet DescriptorSet::make(
+        const PtrDescriptorPool&        ptr_descriptor_pool,
+        const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+    )
+    {
+        return make_shared<DescriptorSet>(ptr_descriptor_pool, ptr_descriptor_set_layout);
+    }
 }

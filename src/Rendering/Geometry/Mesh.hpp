@@ -125,8 +125,8 @@ namespace pbrlib
         inline const PtrBuffer&     getVertexBuffer()           const noexcept;
         inline uint32_t             getNumIndices()             const noexcept;
         inline uint32_t             getNumVertices()            const noexcept;
-        inline uint32_t             getIndexBufferOffset()      const noexcept;
-        inline uint32_t             getVertexBufferOffset()     const noexcept;
+        inline uint32_t             getIndexBufferOffset()      const noexcept; //!< Возвращает смещение в байтах.
+        inline uint32_t             getVertexBufferOffset()     const noexcept; //!< Возвращает смещение в байтах.
         inline VkIndexType          getIndexType()              const noexcept;
         inline AABB&                getAABB()                   noexcept;
         inline const AABB&          getAABB()                   const noexcept; 
@@ -172,7 +172,7 @@ namespace pbrlib
         uint32_t            _num_vertices;
         uint32_t            _vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
         uint32_t            _num_indices;
-        uint32_t            _index_buffer_offset;  	          
+        uint32_t            _index_buffer_offset;  	         //!< В sizeof(uint8_t).
         VkIndexType         _index_type                      = VK_INDEX_TYPE_UINT32;
         uint32_t            _stride                          = sizeof(VertexAttrib);
         VkPrimitiveTopology _topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;

@@ -14,13 +14,18 @@
 
 namespace pbrlib
 {
-    Device::Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_infos) :
+    Device::Device(
+        const PtrInstance&                      ptr_instance,
+        const PhysicalDevice&                   physical_device, 
+        const vector<VkDeviceQueueCreateInfo>&  queue_infos
+    ) :
         _device_handle(VK_NULL_HANDLE)
     {
-        _create(physical_device, queue_infos, 0, nullptr, 0, nullptr);
+        _create(ptr_instance, physical_device, queue_infos, 0, nullptr, 0, nullptr);
     }
 
     Device::Device(
+        const PtrInstance&                      ptr_instance,
         const PhysicalDevice&                   physical_device, 
         const vector<VkDeviceQueueCreateInfo>&  queue_infos, 
         const vector<const char*>&              layer_names, 
@@ -29,6 +34,7 @@ namespace pbrlib
         _device_handle(VK_NULL_HANDLE)
     {
         _create(
+            ptr_instance,
             physical_device, queue_infos,
             static_cast<uint32_t>(layer_names.size()),
             layer_names.data(),
@@ -60,12 +66,23 @@ namespace pbrlib
         return _queues_infos;
     }
 
+    PtrInstance& Device::getInstance() noexcept
+    {
+        return _ptr_instance;
+    }
+
+    const PtrInstance& Device::getInstance() const noexcept
+    {
+        return _ptr_instance;
+    }
+
     void Device::waitIdle() const
     {
         vkDeviceWaitIdle(_device_handle);
     }
 
     void Device::_create(
+        const PtrInstance&                      ptr_instance,
         const PhysicalDevice&                   physical_device,
         const vector<VkDeviceQueueCreateInfo>&  queue_infos,
         uint32_t                                enabled_layer_count,
@@ -74,6 +91,7 @@ namespace pbrlib
         const char* const*                      ptr_extensions
     )
     {
+        _ptr_instance = ptr_instance;  
         _queues_infos = queue_infos;
 
         vector<VkQueueFamilyProperties> queue_properties (queue_infos.size());

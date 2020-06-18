@@ -55,7 +55,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
         }
     );
 
-    PtrDevice ptr_device = gpu->makeDevice(device_queue_create_info);
+    PtrDevice ptr_device = gpu->makeDevice(ptr_instance, device_queue_create_info);
 
     constexpr size_t num_vertex = 200;
     constexpr size_t num_indices = 152;

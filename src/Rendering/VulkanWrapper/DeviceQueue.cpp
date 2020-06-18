@@ -138,4 +138,9 @@ namespace pbrlib
         
         return res == VK_TRUE;
     }
+
+    PtrDeviceQueue DeviceQueue::make(const PtrDevice& ptr_device, uint32_t family_index, uint32_t index)
+    {
+        return make_shared<DeviceQueue>(ptr_device, family_index, index);
+    }
 }

@@ -68,7 +68,7 @@ namespace pbrlib
             asset->meshes.push_back(MeshAssimp::Mesh{});
             MeshAssimp::Mesh& mesh = asset->meshes.back();
 
-            mesh.ind_offset     = static_cast<uint32_t>(asset->indices.getSize());
+            mesh.ind_offset     = static_cast<uint32_t>(asset->indices.getSize() * sizeof(uint32_t));
             mesh.vert_offset    = static_cast<uint32_t>(asset->vert_attr.getSize() * sizeof(Mesh::VertexAttrib));
             mesh.num_vert       = ptr_ai_mesh->mNumVertices;
             mesh.num_ind        = ptr_ai_mesh->mNumFaces * ptr_ai_face->mNumIndices;
@@ -76,27 +76,35 @@ namespace pbrlib
             mesh.bbox           = AABB::computeAABB(ptr_ai_mesh->mVertices, ptr_ai_mesh->mNumVertices);
 
             for (size_t j{0}; j < ptr_ai_mesh->mNumVertices; j++) {
-                position.x = ptr_ai_mesh->mVertices[j].x;
-                position.y = ptr_ai_mesh->mVertices[j].y;
-                position.z = ptr_ai_mesh->mVertices[j].z;
-
-                uv.x = ptr_texture_coords[j].x;
-                uv.y = ptr_texture_coords[j].y;
-
-                normal.x = ptr_ai_mesh->mNormals[j].x;
-                normal.y = ptr_ai_mesh->mNormals[j].y;
-                normal.z = ptr_ai_mesh->mNormals[j].z;
-
-                tangent.x = ptr_ai_mesh->mTangents[j].x;
-                tangent.y = ptr_ai_mesh->mTangents[j].y;
-                tangent.z = ptr_ai_mesh->mTangents[j].z;
-
-                 asset->vert_attr.addData({
-                     position,
-                     uv,
-                     normal,
-                     tangent
-                 });
+                if (ptr_ai_mesh->mVertices) {
+                    position.x = ptr_ai_mesh->mVertices[j].x;
+                    position.y = ptr_ai_mesh->mVertices[j].y;
+                    position.z = ptr_ai_mesh->mVertices[j].z;
+                }
+                
+                if (ptr_texture_coords) {
+                    uv.x = ptr_texture_coords[j].x;
+                    uv.y = ptr_texture_coords[j].y;
+                }
+                
+                if (ptr_ai_mesh->mNormals) {
+                    normal.x = ptr_ai_mesh->mNormals[j].x;
+                    normal.y = ptr_ai_mesh->mNormals[j].y;
+                    normal.z = ptr_ai_mesh->mNormals[j].z;
+                }
+                
+                if (ptr_ai_mesh->mTangents) {
+                    tangent.x = ptr_ai_mesh->mTangents[j].x;
+                    tangent.y = ptr_ai_mesh->mTangents[j].y;
+                    tangent.z = ptr_ai_mesh->mTangents[j].z;
+                }
+                
+                asset->vert_attr.addData({
+                    position,
+                    uv,
+                    normal,
+                    tangent
+                });
             }
 
             for (size_t j{0}; j < ptr_ai_mesh->mNumFaces; j++) {

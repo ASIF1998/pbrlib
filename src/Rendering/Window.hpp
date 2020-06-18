@@ -132,6 +132,9 @@ namespace pbrlib
         string&         getTitle();
         const string&   getTitle() const;
 
+        PtrSwapchain&       getSwapchain() noexcept;
+        const PtrSwapchain& getSwapchain() const noexcept;
+
         void setTitle(const string_view title);
 
         static bool showCursor(bool e)      noexcept;    

@@ -79,18 +79,19 @@ namespace pbrlib
         return format_properties;
     }
 
-    PtrDevice PhysicalDevice::makeDevice(const vector<VkDeviceQueueCreateInfo>& queue_info) const
+    PtrDevice PhysicalDevice::makeDevice(const PtrInstance& ptr_instance, const vector<VkDeviceQueueCreateInfo>& queue_info) const
     {
-        return make_shared<Device>(*this, queue_info);
+        return make_shared<Device>(ptr_instance, *this, queue_info);
     }
 
     PtrDevice PhysicalDevice::makeDevice(
+        const PtrInstance&                      ptr_instance,
         const vector<VkDeviceQueueCreateInfo>&  queue_info,
         const vector<const char*>&              layer_names,
         const vector<const char*>&              extension_names
     ) const
     {
-        return make_shared<Device>(*this, queue_info, layer_names, extension_names);
+        return make_shared<Device>(ptr_instance, *this, queue_info, layer_names, extension_names);
     }
 
     uint32_t PhysicalDevice::getMemoryTypeIndex(uint32_t type) const

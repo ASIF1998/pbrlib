@@ -22,29 +22,38 @@ namespace pbrlib
 {
     struct  PhysicalDevice;
     class   Device;
+    class   Instance;
 
-    using PtrDevice = shared_ptr<Device>;
+    using PtrDevice     = shared_ptr<Device>;
+    using PtrInstance   = shared_ptr<Instance>;
 
     class Device
     {
     public:
         /**
-         * Конструктор.
+         * @brief Конструктор.
          * 
+         * @param ptr_instance      указатель на экземпляр Vulkan'а.
          * @param physical_device   физическое устройство.
          * @param queue_infos       информация о создаваемых очередях логического устройства.
         */
-        Device(const PhysicalDevice& physical_device, const vector<VkDeviceQueueCreateInfo>& queue_infos);
+        Device(
+            const PtrInstance&                      ptr_instance,
+            const PhysicalDevice&                   physical_device, 
+            const vector<VkDeviceQueueCreateInfo>&  queue_infos
+        );
 
         /**
-         * Конструктор.
+         * @brief Конструктор.
          * 
+         * @param ptr_instance      указатель на экземпляр Vulkan'а
          * @param physical_device   физическое устройство.
          * @param queue_infos       информация о создаваемых очередях логического устройства.
          * @param layer_names       названия слоёв.
          * @param extension_names   названия расширений.
         */
         Device(
+            const PtrInstance&                      ptr_instance,
             const PhysicalDevice&                   physical_device, 
             const vector<VkDeviceQueueCreateInfo>&  queue_infos, 
             const vector<const char*>&              layer_names, 
@@ -61,6 +70,8 @@ namespace pbrlib
 
         const VkDevice&                         getDeviceHandle()       const noexcept;
         const vector<VkDeviceQueueCreateInfo>&  getDeviceQueueInfo()    const noexcept;
+        PtrInstance&                            getInstance()           noexcept;
+        const PtrInstance&                      getInstance()           const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
@@ -69,6 +80,7 @@ namespace pbrlib
 
     private:
         void _create(
+            const PtrInstance&                      ptr_instance,
             const PhysicalDevice&                   physical_device,
             const vector<VkDeviceQueueCreateInfo>&  queue_infos,
             uint32_t                                enabled_layer_count,
@@ -78,6 +90,7 @@ namespace pbrlib
         );
 
     private:
+        PtrInstance                     _ptr_instance;
         VkDevice                        _device_handle; //!< Дескриптор логического устройства.
         vector<VkDeviceQueueCreateInfo> _queues_infos;  //!< Информация об используемых очередях устройства.
     };
