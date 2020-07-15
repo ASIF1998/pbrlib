@@ -32,9 +32,9 @@ TEST(MathMatrix3x3, Constructor)
     };
 
     constexpr int r2[9] {
-        23, 23, 23,
-        23, 23, 23,
-        23, 23, 23
+        23, 0, 0,
+        0, 23, 0,
+        0, 0, 23
     };
 
     constexpr int r3[9] {
@@ -91,8 +91,12 @@ TEST(MathMatrix3x3, AdditionAndSubtraction)
     Matrix3x3<short> res = m1 + m2;
 
     for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(60, res[i][j]);
+        for (size_t j{0}; j < 3; j++) {     
+            if (i == j) {
+                EXPECT_EQ(60, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -100,7 +104,11 @@ TEST(MathMatrix3x3, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(-14, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(-14, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -110,7 +118,11 @@ TEST(MathMatrix3x3, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(60, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(60, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -118,7 +130,11 @@ TEST(MathMatrix3x3, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(23, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(23, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 }
@@ -132,7 +148,11 @@ TEST(MathMatrix3x3, ScalarMultiplication)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(32, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(32, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -140,7 +160,11 @@ TEST(MathMatrix3x3, ScalarMultiplication)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(64, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(64, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 }

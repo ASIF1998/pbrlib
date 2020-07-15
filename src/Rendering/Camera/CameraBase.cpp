@@ -149,7 +149,6 @@ namespace pbrlib
 
     type_index CameraBase::getType() const
     {
-        // return typeid(CameraBase);
         return ComponentUtil::getTypeIndex<CameraBase>();
     }
 }

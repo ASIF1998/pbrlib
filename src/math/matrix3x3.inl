@@ -15,18 +15,18 @@ namespace pbrlib::math
     template<typename Type>
     inline constexpr Matrix3x3<Type>::Matrix3x3() :
         _array9 {
-            1, 0, 0,
-            0, 1, 0,
-            0, 0, 1
+            static_cast<Type>(1), static_cast<Type>(0), static_cast<Type>(0),
+            static_cast<Type>(0), static_cast<Type>(1), static_cast<Type>(0),
+            static_cast<Type>(0), static_cast<Type>(0), static_cast<Type>(1)
         }
     {}
 
     template<typename Type>
     inline constexpr Matrix3x3<Type>::Matrix3x3(Type init_value) :
         _array9 {
-            init_value, init_value, init_value,
-            init_value, init_value, init_value,
-            init_value, init_value, init_value
+            init_value, static_cast<Type>(0), static_cast<Type>(0),
+            static_cast<Type>(0), init_value, static_cast<Type>(0),
+            static_cast<Type>(0), static_cast<Type>(0), init_value
         }
     {}
 

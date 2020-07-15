@@ -294,6 +294,11 @@ namespace pbrlib
         }
     }
 
+    inline void Mesh::setMaterial(const PtrMaterial& ptr_material)
+    {
+        _ptr_material = ptr_material;
+    }
+
     inline void Mesh::copyVertexBuffer(vector<Mesh::VertexAttrib>& vb)
     {
         bool is_maped = _ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED;

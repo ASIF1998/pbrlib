@@ -19,6 +19,8 @@
 #include "../../math/vec3.hpp"
 #include "../../math/vec4.hpp"
 
+#include "DeviceQueue.hpp"
+
 using namespace std;
 using namespace pbrlib::math;
 
@@ -26,9 +28,13 @@ namespace pbrlib
 {
     class Image;
     class ImageView;
+    class PrimaryCommandBuffer;
+    class DeviceQueue;
 
-    using PtrImage      = shared_ptr<Image>;
-    using PtrImageView  = shared_ptr<ImageView>;
+    using PtrImage                  = shared_ptr<Image>;
+    using PtrImageView              = shared_ptr<ImageView>;
+    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
+    using PtrDeviceQueue            = shared_ptr<DeviceQueue>;
 
     /**
      * @struct ImageInfo.
@@ -54,14 +60,17 @@ namespace pbrlib
     public:
         enum class TexelType
         {
-            R,
+            R = 1,
             RG,
             RGB,
-            RGBA
+            RGBA,
+            Depth,
+            DepthStencil
         };
 
         enum class NumBits
         {
+            NB8,
             NB16,
             NB32
         };
@@ -118,6 +127,11 @@ namespace pbrlib
 
             void setData(const Type* ptr, size_t size);
 
+            void setDeviceLocalMemoryTypeIndex(uint32_t memory_type_index)      noexcept;
+            void setHostLocalMemoryTypeIndex(uint32_t memory_type_index)        noexcept;
+            void setCommandBuffer(const PtrPrimaryCommandBuffer& ptr_command_buffer);
+            void setDeviceQueue(const PtrDeviceQueue& ptr_device_queue);
+
             inline void pushBack(Type r);
             inline void pushBack(const Vec2<Type>& c);
             inline void pushBack(const Vec3<Type>& c);
@@ -138,6 +152,9 @@ namespace pbrlib
 
         private:
             vector<Type, AllocatorType> _data;
+            uint32_t                    _device_local_memory_type_index;
+            PtrPrimaryCommandBuffer     _ptr_command_buffer;
+            PtrDeviceQueue              _ptr_queue;
         };
 
     public:

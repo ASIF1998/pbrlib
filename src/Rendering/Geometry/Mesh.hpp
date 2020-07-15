@@ -142,6 +142,7 @@ namespace pbrlib
         inline void setNumIndices(size_t num);
         inline void setVertexBufferOffset(size_t offset);
         inline void setIndexBufferOffset(size_t offset);
+        inline void setMaterial(const PtrMaterial& ptr_material);
 
         /**
          * При использовании этих методов ограничивающий объём остаётся прежним.

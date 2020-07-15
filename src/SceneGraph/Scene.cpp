@@ -285,16 +285,26 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Scene::Scene(
-        const string_view   name, 
-        const PtrDevice&    ptr_device, 
-        uint32_t            memory_type,
-        uint32_t            queue_family_index
+        const string_view       name, 
+        const PtrDevice&        ptr_device,
+        const PtrDeviceQueue&   ptr_device_queue,
+        const PtrCommandPool&   ptr_command_pool,    
+        uint32_t                device_local_memory_type_index,
+        uint32_t                host_local_memory_type_index
     ) :
         _ptr_root_node      (nullptr),
         _ptr_camera_node    (nullptr),
         _name               (name),
-        _texture_manager    (ptr_device, memory_type, VK_IMAGE_TILING_OPTIMAL, VK_SAMPLE_COUNT_1_BIT),
-        _mesh_manager       (ptr_device, queue_family_index, memory_type)
+        _texture_manager    (
+            ptr_device, 
+            ptr_command_pool,
+            device_local_memory_type_index, 
+            host_local_memory_type_index, 
+            ptr_device_queue,
+            VK_IMAGE_TILING_OPTIMAL, 
+            VK_SAMPLE_COUNT_1_BIT
+        ),
+        _mesh_manager       (ptr_device, ptr_device_queue->getFamilyIndex(), host_local_memory_type_index)
     {}
 
     void Scene::setRootNode(const PtrNode& ptr_node)

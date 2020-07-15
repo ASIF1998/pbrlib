@@ -8,6 +8,12 @@
 
 #include <type_traits>
 
+#include "../../Util/enumCast.hpp"
+
+#include "CommandBuffer.hpp"
+
+#include "Buffer.hpp"
+
 namespace pbrlib
 {
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
@@ -122,6 +128,90 @@ namespace pbrlib
         inline static uint32_t getNumComponents() noexcept
         {
             return 4;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::R, uint8_t, Image::NumBits::NB8>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_R8_UINT;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 1;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::RG, uint8_t, Image::NumBits::NB8>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_R8G8_SRGB;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 2;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::RGB, uint8_t, Image::NumBits::NB8>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_R8G8B8_SRGB;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 3;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::RGBA, uint8_t, Image::NumBits::NB8>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_R8G8B8A8_SRGB;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 4;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::Depth, float, Image::NumBits::NB32>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_D32_SFLOAT;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 1;
+        }
+    };
+
+    template<>
+    struct FormatDefinition<Image::TexelType::DepthStencil, float, Image::NumBits::NB32>
+    {
+        inline static VkFormat getFormat() noexcept
+        {
+            return VK_FORMAT_D32_SFLOAT_S8_UINT;
+        }
+
+        inline static uint32_t getNumComponents() noexcept
+        {
+            return 1;
         }
     };
     
@@ -337,8 +427,32 @@ namespace pbrlib
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
     void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setData(const Type* ptr, size_t size)
     {
-        assert(_data.size() == size);
-        memcpy(_data.data(), ptr, size * sizeof(Type));
+        _data.resize(size);
+        memcpy(_data.data(), ptr, size * sizeof(_data[0]));
+    }
+
+    template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setDeviceLocalMemoryTypeIndex(uint32_t memory_type_index) noexcept
+    {
+        _device_local_memory_type_index = memory_type_index;
+    }
+
+    template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setHostLocalMemoryTypeIndex(uint32_t memory_type_index) noexcept
+    {
+        Image::Builder<TexType, Type, NBits>::_memory_type_index = memory_type_index;
+    }
+
+    template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setCommandBuffer(const PtrPrimaryCommandBuffer& ptr_command_buffer)
+    {
+        _ptr_command_buffer = ptr_command_buffer;
+    }
+
+    template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setDeviceQueue(const PtrDeviceQueue& ptr_device_queue)
+    {
+        _ptr_queue = ptr_device_queue;
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
@@ -624,25 +738,96 @@ namespace pbrlib
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
     inline Image Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::build() const
-    {           
-       Image image = Builder<TexType, Type, NBits>::_queue_family_indicies.size() == 1 ?
+    {
+        Image image = Builder<TexType, Type, NBits>::_queue_family_indicies.size() == 1 ?
             Image(
                 Builder<TexType, Type, NBits>::_ptr_device,
-                Builder<TexType, Type, NBits>::_memory_type_index,
+                _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
-                Builder<TexType, Type, NBits>::_queue_family_indicies[0]
+                _ptr_queue->getFamilyIndex()
             )
             :
             Image(
                 Builder<TexType, Type, NBits>::_ptr_device,
-                Builder<TexType, Type, NBits>::_memory_type_index,
+                _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
-                Builder<TexType, Type, NBits>::_queue_family_indicies
+                _ptr_queue->getFamilyIndex()
             );
 
-        image.map();
-        image.setData(_data);
-        image.unmap();
+       	 if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
+            Buffer::BuilderWithData<Type> builder_buffer;
+            
+            builder_buffer.setData(_data.data(), _data.size());
+            builder_buffer.setUsage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+            builder_buffer.addQueueFamily(_ptr_queue->getFamilyIndex());
+            builder_buffer.setDevice(Builder<TexType, Type, NBits>::_ptr_device);
+            builder_buffer.setMemoryTypeIndex(Builder<TexType, Type, NBits>::_memory_type_index);
+
+            Buffer temp_buffer = builder_buffer.build();
+
+            VkImageSubresourceLayers image_subresource_layers {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel       = 0,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            VkImageSubresourceRange image_subresource_range {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel   = 0,
+                .levelCount     = 1,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+             _ptr_command_buffer->reset();
+             _ptr_command_buffer->begin();
+
+            _ptr_command_buffer->imageMemoryBarrier(
+                VK_PIPELINE_STAGE_HOST_BIT, 
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+                0, 
+                0, 
+                VK_IMAGE_LAYOUT_UNDEFINED, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                _ptr_queue->getFamilyIndex(), 
+                _ptr_queue->getFamilyIndex(), 
+                image, 
+                image_subresource_range
+            );
+
+            _ptr_command_buffer->copyBufferToImage(
+                temp_buffer, 
+                0, 
+                image, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                image_subresource_layers, 
+                {0, 0, 0}, 
+                Builder<TexType, Type, NBits>::_image_info.image_extend
+            );
+
+            _ptr_command_buffer->imageMemoryBarrier(
+                VK_PIPELINE_STAGE_HOST_BIT, 
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+                0, 
+                0, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                _ptr_queue->getFamilyIndex(), 
+                _ptr_queue->getFamilyIndex(), 
+                image, 
+                image_subresource_range
+            );
+
+            _ptr_command_buffer->end();
+
+            _ptr_queue->submit(*_ptr_command_buffer);
+            _ptr_queue->waitIdle();
+        } else {
+            image.map();
+            image.setData(_data);
+            image.unmap();
+        }
 
         return image;
     }
@@ -655,22 +840,93 @@ namespace pbrlib
         if (Builder<TexType, Type, NBits>::_queue_family_indicies.size() == 1) {
             ptr_image = make_shared<Image>(
                 Builder<TexType, Type, NBits>::_ptr_device,
-                Builder<TexType, Type, NBits>::_memory_type_index,
+                _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
-                Builder<TexType, Type, NBits>::_queue_family_indicies[0]
+                _ptr_queue->getFamilyIndex()
             );
         } else {
             ptr_image = make_shared<Image>(
                 Builder<TexType, Type, NBits>::_ptr_device,
-                Builder<TexType, Type, NBits>::_memory_type_index,
+                _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
-                Builder<TexType, Type, NBits>::_queue_family_indicies
+                _ptr_queue->getFamilyIndex()
             );
         }
 
-        ptr_image->map();
-        ptr_image->setData(_data);
-        ptr_image->unmap();
+        if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
+            Buffer::BuilderWithData<Type> builder_buffer;
+            
+            builder_buffer.setData(_data.data(), _data.size());
+            builder_buffer.setUsage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+            builder_buffer.addQueueFamily(_ptr_queue->getFamilyIndex());
+            builder_buffer.setDevice(Builder<TexType, Type, NBits>::_ptr_device);
+            builder_buffer.setMemoryTypeIndex(Builder<TexType, Type, NBits>::_memory_type_index);
+
+            Buffer temp_buffer = builder_buffer.build();
+
+            VkImageSubresourceLayers image_subresource_layers {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel       = 0,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            VkImageSubresourceRange image_subresource_range {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel   = 0,
+                .levelCount     = 1,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            _ptr_command_buffer->reset();
+            _ptr_command_buffer->begin();
+
+            _ptr_command_buffer->imageMemoryBarrier(
+                VK_PIPELINE_STAGE_HOST_BIT, 
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+                0, 
+                0, 
+                VK_IMAGE_LAYOUT_UNDEFINED, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                _ptr_queue->getFamilyIndex(), 
+                _ptr_queue->getFamilyIndex(), 
+                *ptr_image, 
+                image_subresource_range
+            );
+
+            _ptr_command_buffer->copyBufferToImage(
+                temp_buffer, 
+                0, 
+                *ptr_image, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                image_subresource_layers, 
+                {0, 0, 0}, 
+                Builder<TexType, Type, NBits>::_image_info.image_extend
+            );
+
+            _ptr_command_buffer->imageMemoryBarrier(
+                VK_PIPELINE_STAGE_HOST_BIT, 
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+                0, 
+                0, 
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                _ptr_queue->getFamilyIndex(), 
+                _ptr_queue->getFamilyIndex(), 
+                *ptr_image, 
+                image_subresource_range
+            );
+
+            _ptr_command_buffer->end();
+
+            _ptr_queue->submit(*_ptr_command_buffer);
+            _ptr_queue->waitIdle();
+        } else {
+            ptr_image->map();
+            ptr_image->setData(_data);
+            ptr_image->unmap();
+        }
 
         return ptr_image;
     }
@@ -686,9 +942,7 @@ namespace pbrlib
         _format = format;
     }
 
-    inline void ImageView::Builder::setAspectMask(
-        VkImageAspectFlags aspect_mask
-    ) noexcept
+    inline void ImageView::Builder::setAspectMask(VkImageAspectFlags aspect_mask) noexcept
     {
         _subresource_range.aspectMask = aspect_mask;
     }

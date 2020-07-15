@@ -205,16 +205,16 @@ namespace pbrlib
         for (size_t i{0}; i < asset.meshes.size(); i++) {
             ptr_mesh = pbrlib::Mesh::make();
 
-            ptr_mesh->_ptr_index_buffer              = ptr_index_buffer;
-            ptr_mesh->_ptr_vertex_attrib_buffer      = ptr_vertex_buffer;
-            ptr_mesh->_num_vertices                  = asset.meshes[i].num_vert;
-            ptr_mesh->_vertex_attrib_buffer_offset   = asset.meshes[i].vert_offset;
-            ptr_mesh->_num_indices                   = asset.meshes[i].num_ind;
-            ptr_mesh->_index_buffer_offset           = asset.meshes[i].ind_offset;
-            ptr_mesh->_index_type                    = VK_INDEX_TYPE_UINT32;
-            ptr_mesh->_aabb                          = asset.meshes[i].bbox;
+            ptr_mesh->_ptr_index_buffer             = ptr_index_buffer;
+            ptr_mesh->_ptr_vertex_attrib_buffer     = ptr_vertex_buffer;
+            ptr_mesh->_num_vertices                 = asset.meshes[i].num_vert;
+            ptr_mesh->_vertex_attrib_buffer_offset  = asset.meshes[i].vert_offset;
+            ptr_mesh->_num_indices                  = asset.meshes[i].num_ind;
+            ptr_mesh->_index_buffer_offset          = asset.meshes[i].ind_offset;
+            ptr_mesh->_index_type                   = VK_INDEX_TYPE_UINT32;
+            ptr_mesh->_aabb                         = asset.meshes[i].bbox;
             ptr_mesh->_name                         = asset.meshes[i].name;
-            ptr_mesh->_ptr_material                  = nullptr;
+            ptr_mesh->_ptr_material                 = nullptr;
 
             meshes.push_back(ptr_mesh);
         }

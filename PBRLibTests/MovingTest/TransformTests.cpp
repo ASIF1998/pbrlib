@@ -78,9 +78,9 @@ TEST(MovingTransform, Translate)
     Transform transform = Transform::translate(t);
 
     constexpr Matrix4x4<float> r (
-        0.0f, 0.0f, 0.0f, 0.5f,
-        0.0f, 0.0f, 0.0f, 0.5f,
-        0.0f, 0.0f, 0.0f, 0.5f, 
+        1.0f, 0.0f, 0.0f, 0.5f,
+        0.0f, 1.0f, 0.0f, 0.5f,
+        0.0f, 0.0f, 1.0f, 0.5f, 
         0.0f, 0.0f, 0.0f, 1.0f
     );
 
@@ -141,10 +141,10 @@ TEST(MovingTransform, Rotates)
 TEST(MovingTransform, LookAt)
 {
     constexpr Matrix4x4<float> res (
-        0.0995037183f,  -0.663813591f,  0.741249323f,   0.0f,
-        0.0f,           0.744946361f,   0.667124391f,   0.0f,
-        -0.995037198f,  -0.0663813576f, 0.0741249323f,  0.0f,
-        -0.497518539f,  -3.38544893f,   -63.673317f,    1.0f
+        -0.0995037183f,     -0.663813591f,  -0.741249323f,      0.0f,
+        0.0f,               0.744946361f,   -0.667124391f,      0.0f,
+        0.995037198f,       -0.0663813576f, -0.0741249323f,     0.0f,
+        0.497518599,        -3.38544941,    -3.78037167,        1.0f
     );
 
     constexpr Vec3<float> pos   (45.0f, 45.0f, 4.0f);
@@ -161,8 +161,8 @@ TEST(MovingTransform, PrespectiveProjection)
     constexpr Matrix4x4<float> res (
         -0.117089964f,  0.0f,           0.0f,           0.0f,
         0.0f,           -0.156119958f,  0.0f,           0.0f,
-        0.0f,           0.0f,           -1.0000999f,    -1.0f,
-        0.0f,           0.0f,           -0.0200009998f, 0.0f
+        0.0f,           0.0f,           -1.00004995,    -1.0f,
+        0.0f,           0.0f,           -0.0100004999, 0.0f
     );
 
     constexpr float fov       = 60.0f;

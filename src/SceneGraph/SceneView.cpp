@@ -15,7 +15,9 @@
 
 #include "../Rendering/VulkanWrapper/Swapchain.hpp"
 
-#define PBRLIB_DEBUG_VULKAN 1
+#include "../Rendering/VulkanWrapper/DeviceQueue.hpp"
+
+#define PBRLIB_DEBUG_VULKAN 0
 
 namespace pbrlib
 {
@@ -120,9 +122,14 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SceneView::VulkanResources::VulkanResources()
     {
-        ptr_instance = getVulkanInstance();
+        ptr_instance        = getVulkanInstance();
         ptr_physical_device = getVulkanPhysicalDevice(ptr_instance);
-        ptr_device = getVulkanDevice(ptr_instance, getVulkanDeviceQueuesCreateInfo(ptr_physical_device), ptr_physical_device);
+
+        auto device_queues_create_info = getVulkanDeviceQueuesCreateInfo(ptr_physical_device);
+
+        ptr_device          = getVulkanDevice(ptr_instance, device_queues_create_info, ptr_physical_device);
+        ptr_device_queue    = DeviceQueue::make(ptr_device, device_queues_create_info[0].queueFamilyIndex, 0); //!< На данный момент используется только одна очередь.
+        ptr_command_pool    = CommandPool::make(ptr_device, ptr_device_queue->getFamilyIndex());
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -134,8 +141,10 @@ namespace pbrlib
         _scene          (
             scene_name, 
             _vulkan_resources.ptr_device, 
-            _vulkan_resources.ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT),
-            _vulkan_resources.ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
+            _vulkan_resources.ptr_device_queue,
+            _vulkan_resources.ptr_command_pool,
+            _vulkan_resources.ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
+            _vulkan_resources.ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
         )
     {
         if (!_ptr_window->_hasVulkanResources()) {
@@ -176,9 +185,21 @@ namespace pbrlib
 
     void SceneView::drawScene(float delta_time)
     {
-       assert(_ptr_renderer);
+        assert(_ptr_renderer);
+        
+        if (_scene._ptr_camera_node) {
+            _scene.update(delta_time);
+            
+            CameraBase& camera = _scene._ptr_camera_node->getComponent<CameraBase>();
 
-       _scene.update(delta_time);
-       _ptr_renderer->draw(_scene.getVisibleList(), delta_time);
+            _ptr_renderer->draw(
+                camera, 
+                _scene.getVisibleList(), 
+                _scene._point_light_nodes, 
+                _scene._spot_light_nodes, 
+                _scene._dir_light_nodes, 
+                delta_time
+            );
+        }
     }
 }

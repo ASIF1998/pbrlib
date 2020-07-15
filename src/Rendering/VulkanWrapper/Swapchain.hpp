@@ -10,7 +10,6 @@
 #define Swapchain_hpp
 
 #include "Surface.hpp"
-#include "Image.hpp"
 
 #include <numeric>
 
@@ -18,6 +17,7 @@ namespace pbrlib
 {
     class Swapchain;
     class DeviceQueue;
+    class ImageView;
 
     using PtrSwapchain = shared_ptr<Swapchain>;
 

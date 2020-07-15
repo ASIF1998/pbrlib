@@ -12,7 +12,6 @@
 #include "CommandPool.hpp"
 
 #include "GraphicsPipeline.hpp"
-#include "Framebuffer.hpp"
 
 #include <memory>
 #include <vector>
@@ -29,10 +28,12 @@ namespace pbrlib
     class CommandBuffer;
     class PrimaryCommandBuffer;
     class SecondaryCommandBuffer;
+    class Framebuffer;
 
     using PtrCommandBuffer          = shared_ptr<CommandBuffer>;
     using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
     using PtrSecondaryCommandBuffer = shared_ptr<SecondaryCommandBuffer>;
+    using PtrFramebuffer            = shared_ptr<Framebuffer>;
 
     class CommandBuffer
     {
@@ -108,6 +109,17 @@ namespace pbrlib
             const PtrGraphicsPipeline&  ptr_graphics_pipeline,
             const DescriptorSet&        descriptor_set
         );
+
+        /**
+         * @brief Метод, привязывающий буфер команд к конвейеру.
+         * 
+         * @param ptr_pipeline указатель на графический конвейер.
+        */
+        void bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const noexcept;
+
+        /**
+         * TODO: Добавить метод bindToPipeline для вычислительного конвейера.
+        */
 
         /**
          * @brief Метод позволяющий создать команду для отрисовки.
@@ -257,6 +269,26 @@ namespace pbrlib
         );
 
         /**
+         * @brief Метод, позволяющий копировать данные из буфера в изображение.
+         * 
+         * @param src_buffer                    буфер источник.
+         * @param src_buffer_offset             смещение в буфере.
+         * @param dst_image                     изображение, в которое будет осуществляться копирование.
+         * @param dst_image_subresource_layers  указывает подресурс, в который копируются данные.
+         * @param dst_image_offset              смещение в изображение.
+         * @param dst_image_extent              размер.
+        */
+        void copyBufferToImage(
+            const Buffer&               src_buffer,
+            uint32_t                    src_buffer_offset,
+            const Image&                dst_image,
+            VkImageLayout               dst_image_layout,
+            VkImageSubresourceLayers    dst_image_subresource_layers,
+            VkOffset3D                  dst_image_offset,
+            VkExtent3D                  dst_image_extent
+        );
+
+        /**
          * @brief 
          *      Метод позволяющий создавать команду для перевода
          *      изображения из одного состояния в другое.
@@ -332,8 +364,7 @@ namespace pbrlib
     public:
         PrimaryCommandBuffer(
             const PtrCommandPool&       ptr_command_pool,
-            const PtrFramebuffer&       ptr_framebuffer,
-            const PtrGraphicsPipeline&  ptr_pipeline
+            const PtrFramebuffer&       ptr_framebuffer
         );
 
         PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
@@ -344,7 +375,6 @@ namespace pbrlib
 
         void begin()                                                     const;
         void end()                                                       const;
-        void bindToPipeline()                                            const noexcept;
         void begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept;
         void begineRenderPass(const VkClearValue& clear_value)           const noexcept;
         void endRenderPass()                                             const noexcept;
@@ -355,8 +385,7 @@ namespace pbrlib
 
         static PtrPrimaryCommandBuffer make(
             const PtrCommandPool&       ptr_command_pool,
-            const PtrFramebuffer&       ptr_framebuffer,
-            const PtrGraphicsPipeline&  ptr_pipeline
+            const PtrFramebuffer&       ptr_framebuffer
         );
 
     private:
@@ -375,8 +404,6 @@ namespace pbrlib
 
         SecondaryCommandBuffer& operator = (SecondaryCommandBuffer&&)       = delete;
         SecondaryCommandBuffer& operator = (const SecondaryCommandBuffer&)  = delete;
-
-        void bindToPipeline(const GraphicsPipeline& pipeline) const noexcept;
 
         /**
          * @brief Метод позволяющий начать запись в командный буфер.

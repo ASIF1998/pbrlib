@@ -15,16 +15,16 @@ namespace pbrlib::math
     template<typename Type>
     inline constexpr Matrix2x2<Type>::Matrix2x2() :
         _array4 {
-            1, 0,
-            0, 1
+            static_cast<Type>(1), static_cast<Type>(0),
+            static_cast<Type>(0), static_cast<Type>(1)
         }
     {}
 
     template<typename Type>
     inline constexpr Matrix2x2<Type>::Matrix2x2(Type init_value) :
         _array4 {
-            init_value, init_value,
-            init_value, init_value
+            init_value, static_cast<Type>(0),
+            static_cast<Type>(0), init_value
         }
     {}
 
@@ -231,8 +231,8 @@ namespace pbrlib::math
 
     inline constexpr Matrix2x2<float>::Matrix2x2(float init_value) noexcept :
         _array4 {
-            init_value, init_value, 
-            init_value, init_value
+            init_value, 0.0f, 
+            0.0f, init_value
         }
     {}
 

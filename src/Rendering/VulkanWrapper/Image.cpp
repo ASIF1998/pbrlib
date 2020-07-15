@@ -15,7 +15,7 @@ namespace pbrlib
      * @details На данный момент поддерживаются только типы float.
      * 
      * @param format формат.
-     * @return размер в байтах.
+     * @return Размер в байтах.
     */
     uint32_t getFormatSize(VkFormat format)
     {
@@ -23,16 +23,23 @@ namespace pbrlib
             return 16;
         } else if (format == VK_FORMAT_R32G32B32_SFLOAT) {
             return 12;
-        } else if (format == VK_FORMAT_R32G32_SFLOAT ||
-                   format == VK_FORMAT_R16G16B16A16_SFLOAT) {
+        } else if (format == VK_FORMAT_R32G32_SFLOAT || format == VK_FORMAT_R16G16B16A16_SFLOAT) {
             return 8;
         } else if (format == VK_FORMAT_R16G16B16_SFLOAT) {
             return 6;
-        } else if (format == VK_FORMAT_R32_SFLOAT ||
-                   format == VK_FORMAT_R16G16_SFLOAT) {
+        } else if (
+            format == VK_FORMAT_R32_SFLOAT      ||
+            format == VK_FORMAT_R16G16_SFLOAT   ||
+            format == VK_FORMAT_R8G8B8A8_SRGB   ||
+            format == VK_FORMAT_D32_SFLOAT
+        ) {
             return 4;
-        } else if (format == VK_FORMAT_R16_SFLOAT) {
+        } else if (format == VK_FORMAT_R8G8B8_SRGB) {
+            return 3;
+        } else if (format == VK_FORMAT_R16_SFLOAT || format == VK_FORMAT_R8G8_SRGB) {
             return 2;
+        } else if (format == VK_FORMAT_R8_SRGB || format == VK_FORMAT_R8_UINT) {
+            return 1;
         }
         
         return 0;
@@ -217,7 +224,7 @@ namespace pbrlib
     }
 
     PtrImage Image::make(
-        const PtrDevice&            ptr_device,
+        const PtrDevice&           ptr_device,
         uint32_t                   memory_type_index,
         const ImageInfo&           image_info,
         const vector<uint32_t>&    queue_family_indices
@@ -227,7 +234,7 @@ namespace pbrlib
     }
 
     PtrImage Image::make(
-        const PtrDevice&            ptr_device,
+        const PtrDevice&           ptr_device,
         VkImage                    image,
         const ImageInfo&           image_info,
         uint32_t                   queue_family_index

@@ -10,6 +10,8 @@
 
 #include "DeviceQueue.hpp"
 
+#include "Image.hpp"
+
 namespace pbrlib
 {
     Swapchain::Swapchain(
@@ -26,7 +28,7 @@ namespace pbrlib
     Swapchain::Swapchain(
         const PtrDevice&            ptr_device,
         uint32_t                    queue_family_index,
-        const PtrSurface& surface
+        const PtrSurface&           surface
     ) :
         _swapchain_handle   (VK_NULL_HANDLE),
         _ptr_surface        (surface)

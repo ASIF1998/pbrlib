@@ -55,6 +55,7 @@ namespace pbrlib
     AABB Transform::operator () (const AABB& bbox) const
     {
         AABB new_bbox ((*this)(bbox.corner(0)));
+        
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(1)));
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(2)));
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(3)));
@@ -109,9 +110,9 @@ namespace pbrlib
     Transform Transform::translate(const Vec3<float>& t)
     {
         return Transform(Matrix4x4<float>(
-            0.0f, 0.0f, 0.0f, t.x,
-            0.0f, 0.0f, 0.0f, t.y,
-            0.0f, 0.0f, 0.0f, t.z,
+            1.0f, 0.0f, 0.0f, t.x,
+            0.0f, 1.0f, 0.0f, t.y,
+            0.0f, 0.0f, 1.0f, t.z,
             0.0f, 0.0f, 0.0f, 1.0f
         ));
     }
@@ -206,15 +207,15 @@ namespace pbrlib
     )
     {
         Vec3<float> d = normalize(pos - eye);
-        Vec3<float> r = normalize(cross(up, d));
-        Vec3<float> u = cross(d, r);
+		Vec3<float> r = normalize(cross(d, up));
+		Vec3<float> u = cross(r, d);
 
         return Transform(Matrix4x4<float>(
-            r.x,            u.x,            d.x,            0.0f,
-            r.y,            u.y,            d.y,            0.0f,
-            r.z,            u.z,            d.z,            0.0f,
-            -dot(r, pos),   -dot(u, pos),   -dot(d, pos),   1.0f
-        ));
+           r.x,            u.x,            -d.x,            0.0f,
+           r.y,            u.y,            -d.y,            0.0f,
+           r.z,            u.z,            -d.z,            0.0f,
+           -dot(r, eye),   -dot(u, eye),   dot(d, eye),     1.0f
+       ));
     }
 
     Transform Transform::perspective(
@@ -227,11 +228,11 @@ namespace pbrlib
         float a = tan(fovy / 2.0f);
 
         return Transform(Matrix4x4<float>(
-            1.0f / (aspect * a),    0.0f,       0.0f,                                           0.0f,
-            0.0f,                   1.0f / a,   0.0f,                                           0.0f, 
-            0.0f,                   0.0f,       -(z_far + z_near) / (z_far - z_near),           -1.0f,
-            0.0f,                   0.0f,       -(2.0f * z_far * z_near) / (z_far - z_near),    0.0f
-        ));
+           1.0f / (aspect * a),    0.0f,       0.0f,                                            0.0f,
+           0.0f,                   1.0f / a,   0.0f,                                            0.0f,
+           0.0f,                   0.0f,       z_far / (z_near - z_far),                        -1.0f,
+           0.0f,                   0.0f,       -(z_far * z_near) / (z_far - z_near),            0.0f
+       ));
     }
 
     ostream& operator << (ostream& print, const Transform& t)

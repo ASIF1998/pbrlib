@@ -15,6 +15,8 @@
 #include "Buffer.hpp"
 #include "Image.hpp"
 
+#include "Framebuffer.hpp"
+
 namespace pbrlib
 {
     CommandBuffer::CommandBuffer(
@@ -108,6 +110,11 @@ namespace pbrlib
             0, 1, &descriptor_set.getDescriptorSetHandle(),
             0, nullptr
         );
+    }
+
+    void CommandBuffer::bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const noexcept
+    {
+        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, ptr_pipeline->getPipelineHandle());
     }
 
     void CommandBuffer::draw(
@@ -263,6 +270,28 @@ namespace pbrlib
         );
     }
 
+    void CommandBuffer::copyBufferToImage(
+        const Buffer&               src_buffer,
+        uint32_t                    src_buffer_offset,
+        const Image&                dst_image,
+        VkImageLayout               dst_image_layout,
+        VkImageSubresourceLayers    dst_image_subresource_layers,
+        VkOffset3D                  dst_image_offset,
+        VkExtent3D                  dst_image_extent
+    )
+    {
+        VkBufferImageCopy region {
+            .bufferOffset       = src_buffer_offset,
+            .bufferRowLength    = 0,
+            .bufferImageHeight  = 0,
+            .imageSubresource   = dst_image_subresource_layers,
+            .imageOffset        = dst_image_offset,
+            .imageExtent        = dst_image_extent
+        };
+
+        vkCmdCopyBufferToImage(_command_buffer_handle, src_buffer.getBufferHandle(), dst_image.getImageHandle(), dst_image_layout, 1, &region);
+    }
+
     void CommandBuffer::imageMemoryBarrier(
         VkPipelineStageFlags            src_stage_mask,
         VkPipelineStageFlags            dst_stage_mask,
@@ -356,12 +385,10 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PrimaryCommandBuffer::PrimaryCommandBuffer(
         const PtrCommandPool&       ptr_command_pool,
-        const PtrFramebuffer&       ptr_framebuffer,
-        const PtrGraphicsPipeline&  ptr_pipeline
+        const PtrFramebuffer&       ptr_framebuffer
     ) :
         CommandBuffer       (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY),
-        _ptr_framebuffer    (ptr_framebuffer),
-        _ptr_pipeline       (ptr_pipeline)
+        _ptr_framebuffer    (ptr_framebuffer)
     {}
 
     PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
@@ -373,8 +400,7 @@ namespace pbrlib
     void PrimaryCommandBuffer::begin() const
     {
         VkCommandBufferBeginInfo begin_info {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
         };
 
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
@@ -383,11 +409,6 @@ namespace pbrlib
     void PrimaryCommandBuffer::end() const
     {
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
-    }
-
-    void PrimaryCommandBuffer::bindToPipeline() const noexcept
-    {
-        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _ptr_pipeline->getPipelineHandle());
     }
 
     void PrimaryCommandBuffer::begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept
@@ -458,11 +479,10 @@ namespace pbrlib
 
     PtrPrimaryCommandBuffer PrimaryCommandBuffer::make(
         const PtrCommandPool&       ptr_command_pool,
-        const PtrFramebuffer&       ptr_framebuffer,
-        const PtrGraphicsPipeline&  ptr_pipeline
+        const PtrFramebuffer&       ptr_framebuffer
     )
     {
-        return make_shared<PrimaryCommandBuffer>(ptr_command_pool, ptr_framebuffer, ptr_pipeline);
+        return make_shared<PrimaryCommandBuffer>(ptr_command_pool, ptr_framebuffer);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -473,11 +493,6 @@ namespace pbrlib
     SecondaryCommandBuffer::SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer))
     {} 
-
-    void SecondaryCommandBuffer::bindToPipeline(const GraphicsPipeline& pipeline) const noexcept
-    {
-        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineHandle());
-    }
 
     void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer) const
     {

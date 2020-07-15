@@ -34,10 +34,10 @@ TEST(MathMatrix4x4, Constructor)
     };
 
     constexpr int r2[16] {
-        23, 23, 23, 23,
-        23, 23, 23, 23,
-        23, 23, 23, 23,
-        23, 23, 23, 23
+        23, 0, 0, 0,
+        0, 23, 0, 0,
+        0, 0, 23, 0,
+        0, 0, 0, 23
     };
 
     constexpr int r3[16] {
@@ -86,10 +86,10 @@ TEST(MathMatrix4x4, ConstructorTypeFloat)
     };
 
     constexpr float r2[16] {
-        2.3f, 2.3f, 2.3f, 2.3f,
-        2.3f, 2.3f, 2.3f, 2.3f,
-        2.3f, 2.3f, 2.3f, 2.3f,
-        2.3f, 2.3f, 2.3f, 2.3f
+        2.3f, 0.0f, 0.0f, 0.0f,
+        0.0f, 2.3f, 0.0f, 0.0f,
+        0.0f, 0.0f, 2.3f, 0.0f,
+        0.0f, 0.0f, 0.0f, 2.3f
     };
 
     constexpr float r3[16] {
@@ -173,7 +173,11 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(60, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(60, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -181,7 +185,11 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(-14, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(-14, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -191,7 +199,11 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(60, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(60, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -199,7 +211,11 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(23, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(23, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 }
@@ -213,7 +229,11 @@ TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(60.0f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(60.0f, res[i][j]);
+            } else {
+                EXPECT_EQ(0.0f, res[i][j]);
+            }
         }
     }
 
@@ -221,7 +241,11 @@ TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(-14, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(-14, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -231,7 +255,11 @@ TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(60, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(60, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -239,7 +267,11 @@ TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(23, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(23, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }   
 }
@@ -253,7 +285,11 @@ TEST(MathMatrix4x4, ScalarMultiplication)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(32, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(32, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -261,7 +297,11 @@ TEST(MathMatrix4x4, ScalarMultiplication)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(64, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(64, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 }
@@ -275,7 +315,11 @@ TEST(MathMatrix4x4, ScalarMultiplicationTypeFloat)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(33.0f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(33.0f, res[i][j]);
+            } else {
+                EXPECT_EQ(0.0f, res[i][j]);
+            }
         }
     }
 
@@ -283,7 +327,11 @@ TEST(MathMatrix4x4, ScalarMultiplicationTypeFloat)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            EXPECT_EQ(66.0f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(66.0f, res[i][j]);
+            } else {
+                EXPECT_EQ(0.0f, res[i][j]);
+            }
         }
     }
 }
@@ -340,10 +388,10 @@ TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
     Matrix4x4<float> r1 = m1 * m2;
 
     constexpr Matrix4x4<float> r2 {
-        49.6f,  39.1f, 26.0f, 23.3f,
-        102.2f, 65.2f, 57.0f, 51.5f,
-        99.2f,  60.2f, 55.0f, 50.5f,
-        107.8f, 58.3f, 63.0f, 63.1f
+        74.0999985f, 67.8000030f, 85.1999969f, 52.5999985f,
+        50.5499992f, 48.7999992f, 48.2000008f, 35.3499985f,
+        61.0000000f, 58.0000000f, 77.0000000f, 53.0000000f,
+        45.0000000f, 40.0000000f, 55.0000000f, 33.0000000f
     };
 
     EXPECT_EQ(r1, r2);

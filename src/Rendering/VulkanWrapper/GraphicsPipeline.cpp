@@ -655,7 +655,7 @@ namespace pbrlib
     {
         assert(VkPipelineColorBlendStateCreateInfo::attachmentCount > _current_attachment);
 
-        _ptr_attachments[-_current_attachment] = {
+        _ptr_attachments[_current_attachment] = {
             .blendEnable            = blend_enable,
             .srcColorBlendFactor    = src_color_blend_factor,
             .dstColorBlendFactor    = dst_color_blend_factor,

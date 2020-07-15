@@ -8,26 +8,31 @@
 
 #include "Material.hpp"
 
+#include "../VulkanWrapper/GPUTextureManager.hpp"
+
 namespace pbrlib
 {
     Material::Material() :
-       _albedo             (nullptr),
-       _normal_map         (nullptr),
-       _metallic_roughness (nullptr),
-       _baked_AO           (nullptr)
+        _albedo             (nullptr),
+        _normal_map         (nullptr),
+        _metallic           (nullptr),
+        _roughness          (nullptr),
+       _baked_AO            (nullptr)
     {}
 
     Material::Material(const Material& material) :
         _albedo             (material._albedo),
         _normal_map         (material._normal_map),
-        _metallic_roughness (material._metallic_roughness),
+        _metallic           (material._metallic),
+        _roughness          (material._roughness),
         _baked_AO           (material._baked_AO)
     {}
 
     Material::Material(Material&& material) :
         _albedo             (move(material._albedo)),
         _normal_map         (move(material._normal_map)),
-        _metallic_roughness (move(material._metallic_roughness)),
+        _metallic           (move(material._metallic)),
+        _roughness          (move(material._roughness)),
         _baked_AO           (move(material._baked_AO))
     {}
 
@@ -58,15 +63,13 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Material::Builder::Builder() :
+    Material::Builder::Builder(GPUTextureManager& texture_manager) :
         _albedo                     (nullptr),
         _normal_map                 (nullptr),
-        _metallic_roughness         (nullptr),
+        _metallic                   (nullptr),
+        _roughness                  (nullptr),
         _baked_AO                   (nullptr),
-        _path_to_albedo             (""),
-        _path_to_normal_map         (""),
-        _path_to_metallic_roughness (""),
-        _path_to_baked_AO           ("")
+        _texture_manager            (texture_manager)
     {}
 
     void Material::Builder::setAlbedo(const PtrImageView& albedo)
@@ -74,14 +77,107 @@ namespace pbrlib
         _albedo = albedo;
     }
 
+    bool Material::Builder::setAlbedo(const string_view texture_name)
+    {
+        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
+            _albedo = texture.value();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool Material::Builder::setAlbedo(const string_view path_to_albedo, const string_view texture_name)
+    {
+        if (!_texture_manager.loadRGBA(path_to_albedo, texture_name)) {
+            /// Не удалось загрузить тектуру.
+            return false;
+        }
+
+        _albedo = _texture_manager.get(texture_name).value();
+
+        return true;
+    }
+
     void Material::Builder::setNormalMap(const PtrImageView& normal_map)
     {
         _normal_map = normal_map;
     }
 
-    void Material::Builder::setMetallicRoughness(const PtrImageView& metallic_roughness)
+    bool Material::Builder::setNormalMap(const string_view texture_name)
     {
-        _metallic_roughness = metallic_roughness;
+        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
+            _normal_map = texture.value();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool Material::Builder::setNormalMap(const string_view path_to_normal_map, const string_view texture_name)
+    {
+        if (!_texture_manager.loadRGBA(path_to_normal_map, texture_name)) {
+            /// Не удалось загрузить тектуру.
+            return false;
+        }
+
+        _normal_map = _texture_manager.get(texture_name).value();
+
+        return true;
+    }
+
+    void Material::Builder::setMetallic(const PtrImageView& metallic)
+    {
+        _metallic = metallic;
+    }
+
+    bool Material::Builder::setMetallic(const string_view texture_name)
+    {
+        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
+            _metallic = texture.value();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool Material::Builder::setMetallic(const string_view path_to_metallic, const string_view texture_name)
+    {
+        if (!_texture_manager.loadR(path_to_metallic, texture_name)) {
+            /// Не удалось загрузить тектуру.
+            return false;
+        }
+
+        _metallic = _texture_manager.get(texture_name).value();
+
+        return true;
+    }
+
+    void Material::Builder::setRoughness(const PtrImageView& roughness)
+    {
+        _roughness = roughness;
+    }
+
+    bool Material::Builder::setRoughness(const string_view texture_name)
+    {
+        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
+            _roughness = texture.value();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool Material::Builder::setRoughness(const string_view path_to_roughness, const string_view texture_name)
+    {
+        if (!_texture_manager.loadR(path_to_roughness, texture_name)) {
+            /// Не удалось загрузить тектуру.
+            return false;
+        }
+
+        _roughness = _texture_manager.get(texture_name).value();
+
+        return true;
     }
 
     void Material::Builder::setBakedAO(const PtrImageView& baked_AO)
@@ -89,63 +185,38 @@ namespace pbrlib
         _baked_AO = baked_AO;
     }
 
-    void Material::Builder::setPathToAlbedo(const string_view path_to_albedo)
+    bool Material::Builder::setBakedAO(const string_view texture_name)
     {
-        _path_to_albedo = path_to_albedo;
-    }
-
-    void Material::Builder::setPathToNormalMap(const string_view path_to_normal_map)
-    {
-        _path_to_normal_map = path_to_normal_map;
-    }
-
-    void Material::Builder::setPathToMetallicRoughness(const string_view path_to_metallic_roughness)
-    {
-        _path_to_metallic_roughness = path_to_metallic_roughness;
-    }
-
-    void Material::Builder::setPathToBakedAO(const string_view path_to_baked_AO)
-    {
-        _path_to_baked_AO = path_to_baked_AO;
-    }
-
-    void Material::Builder::_loading_missing_texture()
-    {
-        if (!_albedo) {
-            /**
-             * TODO: Загрузить текстуру с albedo.
-            */
+        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
+            _baked_AO = texture.value();
+            return true;
         }
 
-        if (!_normal_map) {
-            /**
-             * TODO: Загрузить текстуру с normal map.
-            */
+        return false;
+    }
+
+    bool Material::Builder::setBakedAO(const string_view path_to_baked_AO, const string_view texture_name)
+    {
+        if (!_texture_manager.loadR(path_to_baked_AO, texture_name)) {
+            /// Не удалось загрузить тектуру.
+            return false;
         }
 
-        if (!_metallic_roughness) {
-            /**
-             * TODO: Загрузить текстуру с metallic и roughness.
-            */
-        }
+        _baked_AO = _texture_manager.get(texture_name).value();
 
-        if (!_baked_AO) {
-            /**
-             * TODO: Загрузить текстуру с запечённым ambient occlusion.
-            */
-        }
+        return true;
     }
 
    Material Material::Builder::build()
    {
+        assert(_albedo && _normal_map && _metallic && _roughness && _baked_AO);
 
         Material material;
 
-        _loading_missing_texture();
-
         material._albedo                = _albedo;
         material._normal_map            = _normal_map;
-        material._metallic_roughness    = _metallic_roughness;
+        material._metallic              = _metallic;
+        material._roughness             = _roughness;
         material._baked_AO              = _baked_AO;
 
         return material;
@@ -153,13 +224,14 @@ namespace pbrlib
 
     PtrMaterial Material::Builder::buildPtr()
     {
-        PtrMaterial ptr_material = Material::make();
+        assert(_albedo && _normal_map && _metallic && _roughness && _baked_AO);
 
-        _loading_missing_texture();
+        PtrMaterial ptr_material = Material::make();
 
         ptr_material->_albedo               = _albedo;
         ptr_material->_normal_map           = _normal_map;
-        ptr_material->_metallic_roughness   = _metallic_roughness;
+        ptr_material->_metallic             = _metallic;
+        ptr_material->_roughness            = _roughness;
         ptr_material->_baked_AO             = _baked_AO;
 
         return ptr_material;;

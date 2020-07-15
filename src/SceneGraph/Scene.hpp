@@ -43,6 +43,8 @@ namespace pbrlib
 
     class Scene
     {
+        friend class SceneView;
+        
     public:
         class Node;
 
@@ -171,16 +173,20 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param name                  название сцены.
-         * @param ptr_device            указатель на устройство.
-         * @param memory_type           используемый тип памяти на устройстве.
-         * @param queue_family_index    индекс семейства очередей.
+         * @param name                              название сцены.
+         * @param ptr_device                        указатель на устройство. 
+         * @param ptr_device_queue                  указатель на очередь устройства.
+         * @param ptr_command_pool                  указатель на команлный пул.
+         * @param device_local_memory_type_index    тип памяти, являющаяся локальной для устройства (GPU).
+         * @param host_local_memory_type_index      тип памяти, которая может быть отображена и читаться или записываться CPU.
         */
         Scene(
-            const string_view   name, 
-            const PtrDevice&    ptr_device,
-            uint32_t            memory_type,
-            uint32_t            queue_family_index
+            const string_view       name, 
+            const PtrDevice&        ptr_device,
+            const PtrDeviceQueue&   ptr_device_queue,
+            const PtrCommandPool&   ptr_command_pool,    
+            uint32_t                device_local_memory_type_index,
+            uint32_t                host_local_memory_type_index
         );
         
         void setRootNode(const PtrNode& node);

@@ -23,8 +23,8 @@ TEST(MathMatrix2x2, Constructor)
     };
 
     constexpr float r2[4] = {
-        2.3f, 2.3f,
-        2.3f, 2.3f
+        2.3f, 0.0f,
+        0.0f, 2.3f
     };
 
     constexpr float r3[4] = {
@@ -77,8 +77,8 @@ TEST(MathMatrix2x2, ConstructorTypeFloat)
     };
 
     constexpr int r2[4] {
-        23, 23, 
-        23, 23
+        23, 0,
+        0, 23
     };
 
     constexpr int r3[4] {
@@ -149,7 +149,11 @@ TEST(MathMatrix2x2, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(5, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(5, res[i][j]);
+            } else {
+                EXPECT_EQ(0, res[i][j]);
+            }
         }
     }
 
@@ -157,7 +161,11 @@ TEST(MathMatrix2x2, AdditionAndSubtraction)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(-1, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(-1, res[i][j]);
+            } else {
+                EXPECT_NE(-1, res[i][j]);
+            }
         }
     }
 
@@ -180,7 +188,11 @@ TEST(MathMatrix2x2, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(5.5f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(5.5f, res[i][j]);
+            } else {
+                EXPECT_NE(5.5f, res[i][j]);
+            }
         }
     }
 
@@ -188,7 +200,11 @@ TEST(MathMatrix2x2, AdditionAndSubtractionTypeFloat)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(-0.5f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(-0.5f, res[i][j]);
+            } else {
+                EXPECT_NE(-0.5f, res[i][j]);
+            }
         }
     }
 
@@ -211,7 +227,11 @@ TEST(MathMatrix2x2, ScalarMultiplication)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(128, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(128, res[i][j]);
+            } else {
+                EXPECT_NE(128, res[i][j]);
+            }
         }
     }
     
@@ -219,7 +239,12 @@ TEST(MathMatrix2x2, ScalarMultiplication)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(512, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(512, res[i][j]);
+            } else {
+                EXPECT_NE(512, res[i][j]);
+            }
+            
         }
     }
 }
@@ -233,7 +258,11 @@ TEST(MathMatrix2x2, ScalarMultiplicationTypeFloat)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(74.25f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(74.25f, res[i][j]);
+            } else {
+                EXPECT_NE(74.25f, res[i][j]);
+            }
         }
     }
 
@@ -241,7 +270,11 @@ TEST(MathMatrix2x2, ScalarMultiplicationTypeFloat)
 
     for (size_t i{0}; i < 2; i++) {
         for (size_t j{0}; j < 2; j++) {
-            EXPECT_EQ(16.5f, res[i][j]);
+            if (i == j) {
+                EXPECT_EQ(16.5f, res[i][j]);
+            } else {
+                EXPECT_NE(16.5f, res[i][j]);
+            }
         }
     }
 }

@@ -124,7 +124,7 @@ namespace pbrlib
          *      Метод необходимый для того, что бы указывать в каких координатах
          *      читать из текстуры - заданных в текселях или в нормализованных ([0..1]).
          * 
-         * @param unnormalized_coordinates флаг. Если VK_TRUE - то в координатах текселя, иначе в нормализованных.
+         * @param unnormalized_coordinates флаг. Если VK_TRUE - то в [0, tex_width] и [0, tex_height], иначе в нормализованных.
         */
         void unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept;
 

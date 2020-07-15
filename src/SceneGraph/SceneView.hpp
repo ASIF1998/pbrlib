@@ -11,6 +11,7 @@
 
 #include "../Rendering/VulkanWrapper/Instance.hpp"
 #include "../Rendering/VulkanWrapper/Device.hpp"
+#include "../Rendering/VulkanWrapper/CommandPool.hpp"
 
 #include "Scene.hpp"
 
@@ -19,10 +20,12 @@ namespace pbrlib
     class IRenderer;
     class Window;
     class PhysicalDevice;
+    class DeviceQueue;
 
     using PtrIRenderer      = shared_ptr<IRenderer>;
     using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
     using PtrWindow         = shared_ptr<Window>;
+    using PtrDeviceQueue    = shared_ptr<DeviceQueue>;
 
     class SceneView
     {
@@ -36,6 +39,8 @@ namespace pbrlib
             PtrInstance         ptr_instance;           //!< Указатель на экземпляр Vulkan'а.
             PtrDevice           ptr_device;             //!< Указатель на логическое устройство (GPU).
             PtrPhysicalDevice   ptr_physical_device;    //!< Указатель на физическое устройство (GPU).
+            PtrDeviceQueue      ptr_device_queue;       //!< Указатель на очередь устройства.
+            PtrCommandPool      ptr_command_pool;       //!< Указатель на командный пул.
         };
 
     public:

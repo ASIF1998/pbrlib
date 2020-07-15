@@ -15,13 +15,14 @@ namespace pbrlib
 {
     class IRenderer;
     class Device;
+    class CameraBase;
 
     using PtrIRenderer  = shared_ptr<IRenderer>;
     using PtrDevice     = shared_ptr<Device>;
 
     /**
      * @class IRenderer.
-     * @brief Основной интерфейс для реализации рендера.
+     * @brief Интерфейс для реализации рендера.
     */
     class IRenderer
     {
@@ -34,15 +35,30 @@ namespace pbrlib
          * @param ptr_device            указатель на логическое устройство.
          * @param ptr_physical_device   указатель на физическое устройство.
         */
-        virtual void init(const PtrWindow& ptr_window, const PtrDevice& ptr_device, const PtrPhysicalDevice& ptr_physical_device) = 0;
+        virtual void init(
+            const PtrWindow&            ptr_window, 
+            const PtrDevice&            ptr_device, 
+            const PtrPhysicalDevice&    ptr_physical_device
+        ) = 0;
 
         /**
-         * @brief Метод, отвечающий за отрисовку узла.
+         * @brief Метод, отвечающий за отрисовку.
          * 
-         * @param visible_list  узлы.
-         * @param delta_time    количество пройденного времени с момента завершения последнего кадра,
+         * @param camera            камера.
+         * @param visible_list      видимые узлы.
+         * @param point_lights      точечные источники света.
+         * @param spot_lights       прожекторные источники света.
+         * @param direction_lights  направленные источники света.
+         * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
-        virtual void draw(const Scene::VisibleList& visible_list, float delta_time) = 0;
+        virtual void draw(
+            const CameraBase&               camera,
+            const Scene::VisibleList&       visible_list, 
+            const vector<Scene::PtrNode>    point_lights,
+            const vector<Scene::PtrNode>    spot_lights,
+            const vector<Scene::PtrNode>    direction_lights,
+            float                           delta_time
+        ) = 0;
     };
 }
 
