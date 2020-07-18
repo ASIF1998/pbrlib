@@ -754,7 +754,7 @@ namespace pbrlib
                 _ptr_queue->getFamilyIndex()
             );
 
-       	 if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
+       	if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
             Buffer::BuilderWithData<Type> builder_buffer;
             
             builder_buffer.setData(_data.data(), _data.size());

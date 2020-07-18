@@ -17,6 +17,8 @@
 
 #include "Framebuffer.hpp"
 
+#include "ComputePipeline.hpp"
+
 namespace pbrlib
 {
     CommandBuffer::CommandBuffer(
@@ -112,9 +114,14 @@ namespace pbrlib
         );
     }
 
-    void CommandBuffer::bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const noexcept
+    void CommandBuffer::bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const
     {
         vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, ptr_pipeline->getPipelineHandle());
+    }
+
+    void CommandBuffer::bindToPipeline(const PtrComputePipeline& ptr_pipeline) const
+    {
+        vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, ptr_pipeline->getPipelineHandle());
     }
 
     void CommandBuffer::draw(
@@ -156,7 +163,7 @@ namespace pbrlib
         VkDeviceSize    offset,
         uint32_t        draw_count,
         uint32_t        stride
-    ) const noexcept
+    ) const
     {
         vkCmdDrawIndexedIndirect(
             _command_buffer_handle,
@@ -165,6 +172,11 @@ namespace pbrlib
             draw_count,
             stride
         );
+    }
+
+    void CommandBuffer::dispatch(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z) const noexcept
+    {
+        vkCmdDispatch(_command_buffer_handle, group_count_x, group_count_y, group_count_z);
     }
 
     template<class Collection>

@@ -29,11 +29,13 @@ namespace pbrlib
     class PrimaryCommandBuffer;
     class SecondaryCommandBuffer;
     class Framebuffer;
+    class ComputePipeline;
 
     using PtrCommandBuffer          = shared_ptr<CommandBuffer>;
     using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
     using PtrSecondaryCommandBuffer = shared_ptr<SecondaryCommandBuffer>;
     using PtrFramebuffer            = shared_ptr<Framebuffer>;
+    using PtrComputePipeline        = shared_ptr<ComputePipeline>;
 
     class CommandBuffer
     {
@@ -59,7 +61,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий использовать буферы как источник 
+         *      Метод, позволяющий использовать буферы как источник 
          *      вершинных данных (их ещё называют вершинными буферами).
          * 
          * @param first_binding индекс первой привязки.
@@ -76,7 +78,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий использовать буфер как источник 
+         *      Метод, позволяющий использовать буфер как источник
          *      вершинных данных (его ещё называют вершинным буфером).
          * 
          * @param buffer    привязываемый буфер.
@@ -85,7 +87,7 @@ namespace pbrlib
         void bindVertexBuffer(const Buffer& buffer, VkDeviceSize offset) const noexcept;
 
         /**
-         * @brief Метод позволяющий использовать буфер как индексный буфер.
+         * @brief Метод, позволяющий использовать буфер как индексный буфер.
          * @details 
          *      Когда вы вызываете команду для индексированной отрисовки, Vulkan
          *      начинает читать данные следующим способом:
@@ -100,7 +102,7 @@ namespace pbrlib
         void bindIndexBuffer(const Buffer& index_buffer, VkDeviceSize offset, VkIndexType index_type) const noexcept;
 
         /**
-         * @brief Метод позволяющий привязать набор дескрипторов к командному буферу.
+         * @brief Метод, позволяющий привязать набор дескрипторов к командному буферу.
          * 
          * @param ptr_graphics_pipeline указатель на графический конвейер.
          * @param descriptor_set        множество дескрипторов.
@@ -115,14 +117,17 @@ namespace pbrlib
          * 
          * @param ptr_pipeline указатель на графический конвейер.
         */
-        void bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const noexcept;
+        void bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const;
 
         /**
-         * TODO: Добавить метод bindToPipeline для вычислительного конвейера.
+         * @brief Метод, привязывающий буфер команд к конвейеру.
+         * 
+         * @param ptr_pipeline указатель на вычислительный конвейер.
         */
+        void bindToPipeline(const PtrComputePipeline& ptr_pipeline) const;
 
         /**
-         * @brief Метод позволяющий создать команду для отрисовки.
+         * @brief Метод, позволяющий создать команду для отрисовки.
          * 
          * @param vertex_count      число вершин.
          * @param instance_count    количество экземпляров для отрисовки.
@@ -137,7 +142,7 @@ namespace pbrlib
         ) const noexcept;
         
         /**
-         * @brief Метод позволяющий создать команду для индексированной отрисовки.
+         * @brief Метод, позволяющий создать команду для индексированной отрисовки.
          * 
          * @param index_count       количество индексов.
          * @param instance_count    количество экземпляров для отрисовки.
@@ -154,7 +159,7 @@ namespace pbrlib
         ) const noexcept;
 
         /**
-         * @brief Метод позволяющий осуществлять косвенную индексную отрисовку.
+         * @brief Метод, позволяющий осуществлять косвенную индексную отрисовку.
          * @details 
          *      Экземпляр структуры, которая описывает параметры отрисовки:
          *          struct IndirectIndexRenderingOptions
@@ -176,10 +181,19 @@ namespace pbrlib
             VkDeviceSize    offset,
             uint32_t        draw_count,
             uint32_t        stride
-        ) const noexcept;
+        ) const;
 
         /**
-         * @brief Метод позволяющий создать команду для обновления содержимого буфера.
+         * @brief Метод, позволяющий запускать глобальную рабочую группу с использованеим вычислитлельного конвейера.
+         * 
+         * @param group_count_x число локальных рабочих групп по оси X.
+         * @param group_count_y число локальных рабочих групп по оси Y.
+         * @param group_count_z число локальных рабочих групп по оси Z.
+        */
+        void dispatch(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z) const noexcept;
+
+        /**
+         * @brief Метод, позволяющий создать команду для обновления содержимого буфера.
          * 
          * @param dst_buffer    обновляемый буфер.
          * @param data          данные, которые будут записаны в буфер.
@@ -193,7 +207,7 @@ namespace pbrlib
         ) const;
 
         /**
-         * @brief Метод позволяющий создать команду для обновления содержимого буфера.
+         * @brief Метод, позволяющий создать команду для обновления содержимого буфера.
          * 
          * @param dst_buffer    обновляемый буфер.
          * @param ptr_data      указатель на данные, которые будут записаны в буфер.
@@ -210,7 +224,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создать команду для осуществления 
+         *      Метод, позволяющий создать команду для осуществления
          *      копирования из одного буфера в другой.
          * 
          * @param src_buffer    источник данных.
@@ -225,7 +239,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создать команду для осуществления 
+         *      Метод, позволяющий создать команду для осуществления
          *      копирования из одного буфера в другой.
          * 
          * @param src_buffer    источник данных.
@@ -240,7 +254,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создать команду для осуществления 
+         *      Метод, позволяющий создать команду для осуществления
          *      копирования из одного изображения в другое.
          * 
          * @param src_image    источник данных.
@@ -255,7 +269,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создать команду для осуществления 
+         *      Метод, позволяющий создать команду для осуществления
          *      копирования из одного изображения в другое.
          * 
          * @param src_image    источник данных.
@@ -290,7 +304,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создавать команду для перевода
+         *      Метод, позволяющий создавать команду для перевода
          *      изображения из одного состояния в другое.
          * 
          * @param src_stage_mask            определяет когда исходная стадия осуществила чтение или запись ресурса.
@@ -319,7 +333,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод позволяющий создавать команду для перевода
+         *      Метод ,позволяющий создавать команду для перевода
          *      буфера из одного состояния в другое.
          * 
          * @param src_stage_mask            определяет когда исходная стадия хавершила чтение или запись ресурса.

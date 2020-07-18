@@ -444,7 +444,8 @@ namespace pbrlib
 
     void Scene::update(float delta_time)
     {
-        static const Transform t;
+        const Transform t;
+        
         if (_ptr_root_node) {
             _ptr_root_node->update(delta_time, t);
         }

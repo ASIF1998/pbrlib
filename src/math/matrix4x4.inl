@@ -386,12 +386,7 @@ namespace pbrlib::math
 
     inline Matrix4x4<float> Matrix4x4<float>::operator * (const Matrix4x4<float>& mat) const
     {
-		Matrix4x4<float> res;
-
-        __m128 a0 = _m128_simd[0];
-        __m128 a1 = _m128_simd[1];
-        __m128 a2 = _m128_simd[2];
-        __m128 a3 = _m128_simd[3];
+        Matrix4x4<float> res;
 
         __m128 b00_vec = _mm_set1_ps(mat._m128_simd[0][0]);
         __m128 b01_vec = _mm_set1_ps(mat._m128_simd[0][1]);
@@ -413,10 +408,10 @@ namespace pbrlib::math
         __m128 b32_vec = _mm_set1_ps(mat._m128_simd[3][2]);
         __m128 b33_vec = _mm_set1_ps(mat._m128_simd[3][3]);
 
-        res._m128_simd[0] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(a0, b00_vec), _mm_mul_ps(a1, b01_vec)), _mm_add_ps(_mm_mul_ps(a2, b02_vec), _mm_mul_ps(a3, b03_vec)));
-        res._m128_simd[1] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(a0, b10_vec), _mm_mul_ps(a1, b11_vec)), _mm_add_ps(_mm_mul_ps(a2, b12_vec), _mm_mul_ps(a3, b13_vec)));
-        res._m128_simd[2] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(a0, b20_vec), _mm_mul_ps(a1, b21_vec)), _mm_add_ps(_mm_mul_ps(a2, b22_vec), _mm_mul_ps(a3, b23_vec)));
-        res._m128_simd[3] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(a0, b30_vec), _mm_mul_ps(a1, b31_vec)), _mm_add_ps(_mm_mul_ps(a2, b32_vec), _mm_mul_ps(a3, b33_vec)));
+        res._m128_simd[0] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b00_vec), _mm_mul_ps(_m128_simd[1], b01_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b02_vec), _mm_mul_ps(_m128_simd[3], b03_vec)));
+        res._m128_simd[1] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b10_vec), _mm_mul_ps(_m128_simd[1], b11_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b12_vec), _mm_mul_ps(_m128_simd[3], b13_vec)));
+        res._m128_simd[2] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b20_vec), _mm_mul_ps(_m128_simd[1], b21_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b22_vec), _mm_mul_ps(_m128_simd[3], b23_vec)));
+        res._m128_simd[3] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b30_vec), _mm_mul_ps(_m128_simd[1], b31_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b32_vec), _mm_mul_ps(_m128_simd[3], b33_vec)));
 
 		return res;
     }

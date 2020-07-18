@@ -207,8 +207,8 @@ namespace pbrlib
     )
     {
         Vec3<float> d = normalize(pos - eye);
-		Vec3<float> r = normalize(cross(d, up));
-		Vec3<float> u = cross(r, d);
+        Vec3<float> r = normalize(cross(d, up));
+        Vec3<float> u = cross(r, d);
 
         return Transform(Matrix4x4<float>(
            r.x,            u.x,            -d.x,            0.0f,
