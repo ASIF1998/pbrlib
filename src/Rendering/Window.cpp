@@ -138,7 +138,7 @@ namespace pbrlib
             VkSurfaceFormatKHR current_surface_format;
 
             for (size_t i{0}, num_surface_formats{surface_supported_formats.size()}; i < num_surface_formats; i++) {
-                if (surface_supported_formats[i].colorSpace ==  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && surface_supported_formats[i].format == VK_FORMAT_B8G8R8A8_SRGB) {
+                if (surface_supported_formats[i].colorSpace ==  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && surface_supported_formats[i].format == VK_FORMAT_B8G8R8A8_UNORM) {
                     current_surface_format = surface_supported_formats[i];
                 } else if (i == num_surface_formats) {
                     current_surface_format = surface_supported_formats[0];

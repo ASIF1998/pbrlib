@@ -51,7 +51,7 @@ namespace pbrlib
         swap(_command_buffer_handle, command_buffer._command_buffer_handle);
     }
 
-    CommandBuffer::~CommandBuffer() noexcept
+    CommandBuffer::~CommandBuffer()
     {
         if (_command_buffer_handle != VK_NULL_HANDLE) {
             vkFreeCommandBuffers(
@@ -109,6 +109,20 @@ namespace pbrlib
             _command_buffer_handle,
             VK_PIPELINE_BIND_POINT_GRAPHICS,
             ptr_graphics_pipeline->getPipelineLayout()->getPipelineLayoutHandle(),
+            0, 1, &descriptor_set.getDescriptorSetHandle(),
+            0, nullptr
+        );
+    }
+
+    void CommandBuffer::bindDescriptorSet(
+        const PtrComputePipeline&   ptr_compute_pipeline,
+        const DescriptorSet&        descriptor_set
+    )
+    {
+        vkCmdBindDescriptorSets(
+            _command_buffer_handle,
+            VK_PIPELINE_BIND_POINT_COMPUTE,
+            ptr_compute_pipeline->getPipelineLayout()->getPipelineLayoutHandle(),
             0, 1, &descriptor_set.getDescriptorSetHandle(),
             0, nullptr
         );
@@ -396,16 +410,16 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PrimaryCommandBuffer::PrimaryCommandBuffer(
-        const PtrCommandPool&       ptr_command_pool,
-        const PtrFramebuffer&       ptr_framebuffer
+        const PtrCommandPool&       ptr_command_pool
+        // const PtrFramebuffer&       ptr_framebuffer
     ) :
-        CommandBuffer       (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY),
-        _ptr_framebuffer    (ptr_framebuffer)
+        CommandBuffer       (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY)
+        // _ptr_framebuffer    (ptr_framebuffer)
     {}
 
     PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer)),
-        _ptr_framebuffer    (move(command_buffer._ptr_framebuffer)),
+        // _ptr_framebuffer    (move(command_buffer._ptr_framebuffer)),
         _ptr_pipeline       (move(command_buffer._ptr_pipeline))
     {}
 
@@ -423,20 +437,20 @@ namespace pbrlib
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept
     {
         VkRenderPassBeginInfo begin_indo {
             .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass     = _ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
-            .framebuffer    = _ptr_framebuffer->getFramebufferHandle(),
+            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
+            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
             .renderArea     = {
                 .offset = {
                     .x = 0, 
                     .y = 0
                 },
                 .extent = {
-                    .width  = _ptr_framebuffer->getWidth(),
-                    .height =  _ptr_framebuffer->getHeight()
+                    .width  = ptr_framebuffer->getWidth(),
+                    .height = ptr_framebuffer->getHeight()
                 }
             },
             .clearValueCount    = static_cast<uint32_t>(clear_values.size()),
@@ -446,20 +460,20 @@ namespace pbrlib
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const VkClearValue& clear_value) const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value) const noexcept
     {
         VkRenderPassBeginInfo begin_indo {
             .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass     = _ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
-            .framebuffer    = _ptr_framebuffer->getFramebufferHandle(),
+            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
+            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
             .renderArea     = {
                 .offset = {
                     .x = 0, 
                     .y = 0
                 },
                 .extent = {
-                    .width  = _ptr_framebuffer->getWidth(),
-                    .height =  _ptr_framebuffer->getHeight()
+                    .width  = ptr_framebuffer->getWidth(),
+                    .height = ptr_framebuffer->getHeight()
                 }
             },
             .clearValueCount    = 1,
@@ -479,22 +493,14 @@ namespace pbrlib
         vkCmdNextSubpass(_command_buffer_handle, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    const PtrFramebuffer& PrimaryCommandBuffer::getFramebuffer() const noexcept
-    {
-        return _ptr_framebuffer;
-    }
-
     const PtrGraphicsPipeline& PrimaryCommandBuffer::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
 
-    PtrPrimaryCommandBuffer PrimaryCommandBuffer::make(
-        const PtrCommandPool&       ptr_command_pool,
-        const PtrFramebuffer&       ptr_framebuffer
-    )
+    PtrPrimaryCommandBuffer PrimaryCommandBuffer::make(const PtrCommandPool& ptr_command_pool)
     {
-        return make_shared<PrimaryCommandBuffer>(ptr_command_pool, ptr_framebuffer);
+        return make_shared<PrimaryCommandBuffer>(ptr_command_pool);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -506,13 +512,13 @@ namespace pbrlib
         CommandBuffer       (move(command_buffer))
     {} 
 
-    void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer) const
+    void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer, const PtrFramebuffer& ptr_framebuffer) const
     {
         VkCommandBufferInheritanceInfo inheritance_info {
             .sType          = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
-            .renderPass     = primary_command_buffer.getFramebuffer()->getRenderPass()->getRenderPassHandle(),
+            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(),
             .subpass        = primary_command_buffer.getPipeline()->getSubpassIndex(),
-            .framebuffer    = primary_command_buffer.getFramebuffer()->getFramebufferHandle()
+            .framebuffer    = ptr_framebuffer->getFramebufferHandle()
         };
 
 

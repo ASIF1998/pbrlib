@@ -32,6 +32,14 @@ namespace pbrlib
         class Builder
         {
         public:
+            Builder() = default;
+            
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)        = delete;
+            Builder& operator = (const Builder&)   = delete;
+
             /**
              * @brief   Метод устанавливающий размер буфера.
              * @details Окончательный размер буфера равняется sizeof(Type) * size.
@@ -86,6 +94,12 @@ namespace pbrlib
         public:
             inline BuilderWithData() = default;
             inline BuilderWithData(size_t n);
+
+            BuilderWithData(BuilderWithData&&)      = delete;
+            BuilderWithData(const BuilderWithData&) = delete;
+
+            BuilderWithData& operator = (BuilderWithData&&)      = delete;
+            BuilderWithData& operator = (const BuilderWithData&) = delete;
 
             /**
              * @brief   Метод устанавливающий размер буфера.

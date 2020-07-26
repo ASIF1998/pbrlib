@@ -20,7 +20,7 @@ using namespace std;
 
 namespace pbrlib
 {
-    class RenderPass;;
+    class RenderPass;
     class DescriptorSet;
     class Buffer;
     class Image;
@@ -54,7 +54,7 @@ namespace pbrlib
         CommandBuffer(CommandBuffer&& command_buffer);
         CommandBuffer(const CommandBuffer&&) = delete;
 
-        ~CommandBuffer() noexcept;
+        ~CommandBuffer();
 
         CommandBuffer& operator = (CommandBuffer&&)         = delete;
         CommandBuffer& operator = (const CommandBuffer&&)   = delete;
@@ -109,6 +109,17 @@ namespace pbrlib
         */
         void bindDescriptorSet(
             const PtrGraphicsPipeline&  ptr_graphics_pipeline,
+            const DescriptorSet&        descriptor_set
+        );
+
+        /**
+         * @brief Метод, позволяющий привязать набор дескрипторов к командному буферу.
+         * 
+         * @param ptr_compute_pipeline  указатель на вычислительный конвейер.
+         * @param descriptor_set        множество дескрипторов.
+        */
+        void bindDescriptorSet(
+            const PtrComputePipeline&   ptr_compute_pipeline,
             const DescriptorSet&        descriptor_set
         );
 
@@ -376,10 +387,7 @@ namespace pbrlib
         public CommandBuffer
     {
     public:
-        PrimaryCommandBuffer(
-            const PtrCommandPool&       ptr_command_pool,
-            const PtrFramebuffer&       ptr_framebuffer
-        );
+        PrimaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
 
         PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
         PrimaryCommandBuffer(const PrimaryCommandBuffer&) = delete;
@@ -387,23 +395,18 @@ namespace pbrlib
         PrimaryCommandBuffer& operator = (PrimaryCommandBuffer&&)       = delete;
         PrimaryCommandBuffer& operator = (const PrimaryCommandBuffer&)  = delete;
 
-        void begin()                                                     const;
-        void end()                                                       const;
-        void begineRenderPass(const vector<VkClearValue>& clear_values)  const noexcept;
-        void begineRenderPass(const VkClearValue& clear_value)           const noexcept;
-        void endRenderPass()                                             const noexcept;
-        void nextSubpass()                                               const noexcept;
+        void begin()                                                                                            const;
+        void end()                                                                                              const;
+        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept;
+        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value)           const noexcept;
+        void endRenderPass()                                                                                    const noexcept;
+        void nextSubpass()                                                                                      const noexcept;
 
-        const PtrFramebuffer&       getFramebuffer()    const noexcept;
-        const PtrGraphicsPipeline&  getPipeline()       const noexcept;
+        const PtrGraphicsPipeline& getPipeline() const noexcept;
 
-        static PtrPrimaryCommandBuffer make(
-            const PtrCommandPool&       ptr_command_pool,
-            const PtrFramebuffer&       ptr_framebuffer
-        );
+        static PtrPrimaryCommandBuffer make(const PtrCommandPool&       ptr_command_pool);
 
     private:
-        PtrFramebuffer         _ptr_framebuffer;
         PtrGraphicsPipeline    _ptr_pipeline;
     };
 
@@ -426,9 +429,10 @@ namespace pbrlib
          *      его состояния (это должен быть тот командный буфер, который
          *      вызовет этот).
          * 
-         * @param primary_command_buffer первичный командный буфер.
+         * @param primary_command_buffer    первичный командный буфер.
+         * @param ptr_framebuffer           указатель на кадровый буфер.
         */
-        void begin(const PrimaryCommandBuffer& primary_command_buffer) const;
+        void begin(const PrimaryCommandBuffer& primary_command_buffer, const PtrFramebuffer& ptr_framebuffer) const;
         
         void end() const;
 

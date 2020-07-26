@@ -60,6 +60,12 @@ namespace pbrlib
         public:
             Builder();
 
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)      = delete;
+            Builder& operator = (const Builder&) = delete;
+
             void setDevice(const PtrDevice& ptr_device);
             void setShaderType(VkShaderStageFlagBits shader_type)                               noexcept;
             void setShaderCode(const uint32_t* ptr_shader_code, size_t shader_code_size)        noexcept;

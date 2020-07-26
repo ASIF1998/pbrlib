@@ -100,10 +100,40 @@ namespace pbrlib
         const Sampler&      sampler,
         uint32_t            binding, 
         VkDescriptorType    descriptor_type
-    )
+    ) const
     {
         VkDescriptorImageInfo descriptor_image_info {
             .sampler        = sampler.getSamplerHandle(),
+            .imageView      = image_view.getImageViewHandle(),
+            .imageLayout    = image_layout
+        };
+
+        VkWriteDescriptorSet write_descriptor_set {
+            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet             = _descriptor_set_handle,
+            .dstBinding         = binding,     
+            .dstArrayElement    = 0,
+            .descriptorCount    = 1,
+            .descriptorType     = descriptor_type,
+            .pImageInfo         = &descriptor_image_info
+        };
+
+        vkUpdateDescriptorSets(
+            getDevice()->getDeviceHandle(),
+            1, &write_descriptor_set,
+            0, nullptr
+        );
+    }
+
+    void DescriptorSet::writeImageView(
+        const ImageView&    image_view,
+        VkImageLayout       image_layout,
+        uint32_t            binding, 
+        VkDescriptorType    descriptor_type
+    ) const
+    {
+        VkDescriptorImageInfo descriptor_image_info {
+            .sampler        = VK_NULL_HANDLE,
             .imageView      = image_view.getImageViewHandle(),
             .imageLayout    = image_layout
         };
@@ -131,7 +161,7 @@ namespace pbrlib
         VkDeviceSize        range,
         uint32_t            binding, 
         VkDescriptorType    descriptor_type
-    )
+    ) const
     {
         VkDescriptorBufferInfo descriptor_buffer_info {
             .buffer = buffer.getBufferHandle(),

@@ -25,7 +25,7 @@ namespace pbrlib
          * TODO: const VkSpecializationInfo*.
         */
 
-        assert(shader_module.getShaderType() != VK_SHADER_STAGE_COMPUTE_BIT);
+        assert(shader_module.getShaderType() == VK_SHADER_STAGE_COMPUTE_BIT);
 
         VkComputePipelineCreateInfo compute_pipeline_info {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
@@ -86,9 +86,18 @@ namespace pbrlib
         assert(_pipeline_handle != VK_NULL_HANDLE);
     }
 
+    ComputePipeline::ComputePipeline(ComputePipeline&& pipeline) :
+        _pipeline_handle(VK_NULL_HANDLE)
+    {
+        swap(_pipeline_handle, pipeline._pipeline_handle);
+        swap(_ptr_pipeline_layout, pipeline._ptr_pipeline_layout);
+    }
+
     ComputePipeline::~ComputePipeline()
     {
-        vkDestroyPipeline(_ptr_pipeline_layout->getDevice()->getDeviceHandle(), _pipeline_handle, nullptr);
+        if (_pipeline_handle != VK_NULL_HANDLE) {
+            vkDestroyPipeline(_ptr_pipeline_layout->getDevice()->getDeviceHandle(), _pipeline_handle, nullptr);
+        }
     }
 
     VkPipeline ComputePipeline::getPipelineHandle() const noexcept
@@ -104,5 +113,13 @@ namespace pbrlib
     const PtrPipelineLayout& ComputePipeline::getPipelineLayout() const noexcept
     {
         return _ptr_pipeline_layout;
+    }
+
+    PtrComputePipeline ComputePipeline::make(
+        const ShaderModule&         shader_module,
+        const PtrPipelineLayout&    ptr_pipeline_layout
+    )
+    {
+        return make_shared<ComputePipeline>(shader_module, ptr_pipeline_layout);
     }
 }

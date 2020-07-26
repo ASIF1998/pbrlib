@@ -72,7 +72,24 @@ namespace pbrlib
             const Sampler&      sampler,
             uint32_t            binding, 
             VkDescriptorType    descriptor_type
-        );
+        ) const;
+
+        /**
+         * @brief 
+         *      Метод, позволяющий привязать вид изображения к множеству 
+         *      дескрипторов путём записи во множество дескрипторов.
+         * 
+         * @param image_view        вид изображения.
+         * @param image_layout      размещение.
+         * @param binding           индекс привязки.
+         * @param descriptor_type   тип обновляемого ресурса.
+        */
+        void writeImageView(
+            const ImageView&    image_view,
+            VkImageLayout       image_layout,
+            uint32_t            binding, 
+            VkDescriptorType    descriptor_type
+        ) const;
 
         /**
          * @brief 
@@ -91,7 +108,7 @@ namespace pbrlib
             VkDeviceSize        range,
             uint32_t            binding, 
             VkDescriptorType    descriptor_type
-        );
+        ) const;
         
         /**
          * @brief Статический метод, создающий указатель на DescriptorSet.

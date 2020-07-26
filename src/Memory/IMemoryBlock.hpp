@@ -20,6 +20,9 @@ namespace pbrlib
 {
     struct IMemoryBlock
     {
+        inline virtual ~IMemoryBlock()
+        {}
+
         virtual void*       getPtrMemory()          = 0;
         virtual const void* getPtrMemory()  const   = 0;
         virtual size_t      getSize()       const   = 0;

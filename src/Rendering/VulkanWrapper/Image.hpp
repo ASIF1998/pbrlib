@@ -80,7 +80,14 @@ namespace pbrlib
         {
         public:
             inline          Builder();
+
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
             inline virtual ~Builder();
+
+            Builder& operator = (Builder&&)      = delete;
+            Builder& operator = (const Builder&) = delete;
 
             inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
             inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;
@@ -118,6 +125,12 @@ namespace pbrlib
             inline BuilderWithData();
             inline BuilderWithData(uint32_t width, uint32_t height, uint32_t depth);
             inline BuilderWithData(const VkExtent3D& extend);
+
+            BuilderWithData(BuilderWithData&&)      = delete;
+            BuilderWithData(const BuilderWithData&) = delete;
+
+            BuilderWithData& operator = (BuilderWithData&&)      = delete;
+            BuilderWithData& operator = (const BuilderWithData&) = delete;
 
             inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
             inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;

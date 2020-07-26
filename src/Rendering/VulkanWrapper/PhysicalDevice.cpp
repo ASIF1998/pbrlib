@@ -147,7 +147,7 @@ namespace pbrlib
         vkGetPhysicalDeviceMemoryProperties(physical_device_handle, &_memory_properties);
     }
 
-    uint32_t PhysicalDevice::Memory::getMemoryType(VkMemoryPropertyFlags property_flags)
+    uint32_t PhysicalDevice::Memory::getMemoryType(VkMemoryPropertyFlags property_flags) const
     {
         for (uint32_t i{0}; i < _memory_properties.memoryTypeCount; i++) {
             if (_memory_properties.memoryTypes[i].propertyFlags & property_flags) {

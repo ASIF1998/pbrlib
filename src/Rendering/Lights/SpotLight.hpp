@@ -52,7 +52,7 @@ namespace pbrlib
             float       _intensity;
             float       _inner_radius;
             float       _outer_radius;
-            string     _name;
+            string      _name;
         };
 
     public:

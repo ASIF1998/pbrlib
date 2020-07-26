@@ -34,7 +34,7 @@ namespace pbrlib
         public:
             Memory(VkPhysicalDevice physical_device_handle);
 
-            uint32_t getMemoryType(VkMemoryPropertyFlags property_flags);
+            uint32_t getMemoryType(VkMemoryPropertyFlags property_flags) const;
 
         private:
             VkPhysicalDeviceMemoryProperties _memory_properties;

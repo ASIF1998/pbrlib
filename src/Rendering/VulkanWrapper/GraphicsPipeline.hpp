@@ -661,6 +661,12 @@ namespace pbrlib
                 size_t num_attachments
             );
 
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)      = delete;
+            Builder& operator = (const Builder&) = delete;
+
             void setPipleineLayout(const PtrPipelineLayout& ptr_pipeline_layout);
             void setRenderPass(const PtrRenderPass& ptr_render_pass);
             void setSubpassIndex(uint32_t subpass_index) noexcept;

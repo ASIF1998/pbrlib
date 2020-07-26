@@ -27,6 +27,11 @@ namespace pbrlib
     public:
         SamplerInfo() noexcept;
 
+        SamplerInfo(const SamplerInfo&) = default;
+
+        SamplerInfo& operator = (SamplerInfo&&)         = delete;
+        SamplerInfo& operator = (const SamplerInfo&)    = delete;
+
         /**
          * @brief Метод необходимый для задания режима фильтрации при увеличении изображения.
          * 
@@ -149,6 +154,12 @@ namespace pbrlib
         {
         public:
             Builder();
+
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)      = delete;
+            Builder& operator = (const Builder&) = delete;
 
             void setDevice(const PtrDevice& ptr_device);
 

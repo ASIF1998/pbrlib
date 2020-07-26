@@ -83,12 +83,14 @@ namespace pbrlib
          * @param view                  преобразование в пространство вида (камеры).
          * @param drawable_objects      отображаемые объекты.
          * @param ptr_command_buffer    указатель на командный буфер.
+         * @param ptr_sampler           указатель на сэмплер.
         */
         void draw(
             const Transform&            projection,
             const Transform&            view,
             const Scene::VisibleList&   drawable_objects, 
-            const PtrCommandBuffer&     ptr_command_buffer
+            const PtrCommandBuffer&     ptr_command_buffer,
+            const PtrSampler&           ptr_sampler
         );
 
         PtrGraphicsPipeline&         getPipeline()       noexcept;
@@ -124,7 +126,6 @@ namespace pbrlib
         PtrGraphicsPipeline _ptr_pipeline;
         PtrDescriptorSet    _ptr_descriptor_set;
         PtrBuffer           _ptr_uniform_matrices_data_buffer;
-        PtrSampler          _ptr_sampler;
     };
 }
 

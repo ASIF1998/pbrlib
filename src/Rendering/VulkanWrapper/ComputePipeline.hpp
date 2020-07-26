@@ -32,7 +32,7 @@ namespace pbrlib
          * @brief Конструктор.
          * 
          * @param shader_module         шейдерный модуль.
-         * @param ptr_pipeline_layout   указатель на PipelineLayout
+         * @param ptr_pipeline_layout   указатель на PipelineLayout.
         */
         ComputePipeline(
             const ShaderModule&         shader_module,
@@ -50,11 +50,29 @@ namespace pbrlib
             const PtrPipelineLayout&    ptr_pipeline_layout
         );
 
+        ComputePipeline(ComputePipeline&& pipeline);
+        ComputePipeline(const ComputePipeline&) = delete;
+
         ~ComputePipeline();
+
+        ComputePipeline& operator = (ComputePipeline&&)         = delete;
+        ComputePipeline& operator = (const ComputePipeline&)    = delete;
 
         VkPipeline                  getPipelineHandle()     const noexcept;
         PtrPipelineLayout&          getPipelineLayout()     noexcept;
         const PtrPipelineLayout&    getPipelineLayout()     const noexcept;
+
+        /**
+         * @brief Статический метод, создающий объект типа ComputePipeline.
+         * 
+         * @param shader_module         шейдерный модуль.
+         * @param ptr_pipeline_layout   указатель на PipelineLayout.
+         * @return Указатель на ComputePipeline.
+        */
+        static PtrComputePipeline make(
+            const ShaderModule&         shader_module,
+            const PtrPipelineLayout&    ptr_pipeline_layout
+        );
 
     private:
         VkPipeline          _pipeline_handle;

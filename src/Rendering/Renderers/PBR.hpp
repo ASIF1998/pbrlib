@@ -1,38 +1,40 @@
 //
-//  IRenderer.h
+//  PBR.hpp
 //  PBRLib
 //
-//  Created by Асиф Мамедов on 02/06/2020.
+//  Created by Асиф Мамедов on 19/07/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#ifndef IRenderer_h
-#define IRenderer_h
+#ifndef PBR_hpp
+#define PBR_hpp
 
-#include "../../SceneGraph/Scene.hpp"
+#include "IRenderer.h"
+
+#include "SubPasses/GBufferPass.hpp"
+#include "SubPasses/PBRPass.hpp"
+
+#include <vector>
+#include <memory>
+
+using namespace std;
 
 namespace pbrlib
 {
-    class IRenderer;
-    class Device;
-    class CameraBase;
+    class ImageView;
+    class Framebuffer;
+    class PrimaryCommandBuffer;
 
-    using PtrIRenderer  = shared_ptr<IRenderer>;
-    using PtrDevice     = shared_ptr<Device>;
+    using PtrAttachments            = shared_ptr<vector<ImageView>>;
+    using PtrFramebuffer            = shared_ptr<Framebuffer>; 
+    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
 
-    /**
-     * @class IRenderer.
-     * @brief Интерфейс для реализации рендера.
-    */
-    class IRenderer
+    class PBR :
+        public IRenderer
     {
     public:
-        inline virtual ~IRenderer()  noexcept
-        {}
-
         /**
-         * @brief Чисто виртуальный метод, предназначенный для инициализации визуализатора.
-         * @details Этот метод вызывается из метода SceneView::setRenderer(...)
+         * @brief Метод, предназначенный для инициализации.
          * 
          * @param ptr_window            указатель на окно.
          * @param ptr_device            указатель на логическое устройство.
@@ -42,7 +44,7 @@ namespace pbrlib
             const PtrWindow&            ptr_window, 
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_device
-        ) = 0;
+        ) override;
 
         /**
          * @brief Метод, отвечающий за отрисовку.
@@ -61,8 +63,31 @@ namespace pbrlib
             const vector<Scene::PtrNode>    spot_lights,
             const vector<Scene::PtrNode>    direction_lights,
             float                           delta_time
-        ) = 0;
+        ) override;
+
+        PtrGBufferPass&          getGBUfferPass()    noexcept;
+        const PtrGBufferPass&    getGBUfferPass()    const noexcept;
+        PtrPBRPass&              getPBRPass()        noexcept;
+        const PtrPBRPass&        getPBRPass()        const noexcept;
+
+    private:
+        PtrGBufferPass  _ptr_gbuffer_pass;
+        PtrPBRPass      _ptr_pbr_pass;
+
+        PtrDevice _ptr_device;
+
+        PtrDescriptorPool _ptr_descriptor_pool;
+
+        PtrRenderPass           _ptr_render_pass;
+        PtrAttachments          _ptr_framebuffer_attachments;
+        vector<PtrFramebuffer>  _ptr_framebuffers;
+        PtrSwapchain            _ptr_swapchain;
+        PtrSampler              _ptr_sampler_linear;
+        PtrSampler              _ptr_sampler_nearest;
+
+        PtrPrimaryCommandBuffer _ptr_command_buffer;
+        PtrDeviceQueue          _ptr_device_queue;
     };
 }
 
-#endif /* IRenderer_h */
+#endif /* PBR_hpp */

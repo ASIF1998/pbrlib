@@ -34,7 +34,7 @@ namespace pbrlib
         VkSampleCountFlags      num_samples
     ) :
         _ptr_device                     (ptr_device),
-        _ptr_command_buffer             (PrimaryCommandBuffer::make(ptr_command_pool, nullptr)),
+        _ptr_command_buffer             (PrimaryCommandBuffer::make(ptr_command_pool)),
         _device_local_memory_type_index (device_local_memory_type_index),
         _host_local_memory_type_index   (host_local_memory_type_index),
         _ptr_device_queue               (ptr_device_queue),

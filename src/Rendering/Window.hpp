@@ -69,6 +69,12 @@ namespace pbrlib
         public:
             Builder();
 
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)      = delete;
+            Builder& operator = (const Builder&) = delete;
+
             void setTitle(const string_view title);
 
             void setWidth(int width)                noexcept;
@@ -172,6 +178,7 @@ namespace pbrlib
             const PtrDevice&            ptr_device,
             uint32_t                    queue_family_index
         );
+        
         bool _hasVulkanResources() const noexcept;
 
         PtrSurface&     _getVulkanSurface()     noexcept;

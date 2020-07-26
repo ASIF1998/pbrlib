@@ -28,6 +28,12 @@ namespace pbrlib
         public:
             Builder();
 
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)         = delete;
+            Builder& operator = (const Builder&)    = delete;
+
             /**
              * @brief Метод устанавливающий список отображения.
              * 
