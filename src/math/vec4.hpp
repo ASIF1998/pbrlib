@@ -13,6 +13,9 @@
 
 #include <xmmintrin.h>
 
+#include "vec3.hpp"
+#include "vec2.hpp"
+
 using namespace std;
 
 namespace pbrlib::math
@@ -21,9 +24,11 @@ namespace pbrlib::math
     struct Vec4
     {
     public:
-        inline constexpr Vec4();
-        inline constexpr Vec4(Type xyzw);
-        inline constexpr Vec4(Type x, Type y, Type z, Type w);
+        inline constexpr Vec4(Type xyzw = static_cast<Type>(0));
+        inline constexpr Vec4(Type x, Type y, Type z = static_cast<Type>(0), Type w = static_cast<Type>(0));
+        inline constexpr Vec4(const Vec3<Type>& vec3, Type w = static_cast<Type>(0));
+        inline constexpr Vec4(const Vec2<Type>& v1, const Vec2<Type>& v2);
+        inline constexpr Vec4(const Vec2<Type>& vec2);
 
         inline bool operator == (const Vec4& v) const;
         inline bool operator != (const Vec4& v) const;
@@ -86,10 +91,12 @@ namespace pbrlib::math
     struct Vec4<float>
     {
     public:
-        inline constexpr    Vec4()                                      noexcept;
-        inline              Vec4(float xyzw)                            noexcept;
-        inline constexpr    Vec4(__m128 xyzw)                           noexcept;
-        inline constexpr    Vec4(float x, float y, float z, float w)    noexcept;
+        inline              Vec4(float xyzw = 0.0f)                                 noexcept;
+        inline constexpr    Vec4(__m128 xyzw)                                       noexcept;
+        inline constexpr    Vec4(float x, float y, float z = 0.0f, float w = 0.0f)  noexcept;
+        inline constexpr    Vec4(const Vec3<float>& vec3, float w = 0.0f)           noexcept; 
+        inline constexpr    Vec4(const Vec2<float>& v1, const Vec2<float>& v2)      noexcept;
+        inline constexpr    Vec4(const Vec2<float>& vec2)                           noexcept;
 
         inline bool operator == (const Vec4& v) const noexcept;
         inline bool operator != (const Vec4& v) const noexcept;

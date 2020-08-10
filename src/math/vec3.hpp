@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+#include "vec2.hpp"
+
 using namespace std;
 
 namespace pbrlib::math
@@ -19,9 +21,9 @@ namespace pbrlib::math
     struct Vec3
     {
     public:
-        inline constexpr Vec3();
-        inline constexpr Vec3(Type xyz);
-        inline constexpr Vec3(Type x, Type y, Type z);
+        inline constexpr Vec3(Type xyz = static_cast<Type>(0));
+        inline constexpr Vec3(Type x, Type y, Type z = static_cast<Type>(0));
+        inline constexpr Vec3(const Vec2<Type>& vec2, Type z = static_cast<Type>(0));
 
         inline bool operator == (const Vec3& v) const;
         inline bool operator != (const Vec3& v) const;

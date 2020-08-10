@@ -18,23 +18,31 @@
 
 namespace pbrlib
 {
+    enum class NumDescriptors :
+        uint32_t
+    {
+        UniformBuffer           = 7,
+        CombinedImageSampler    = 9,
+        StorageImage            = 1
+    };
+
     PtrDescriptorPool descriptorPoolCreate(const PtrDevice& ptr_device)
     {
         vector<VkDescriptorPoolSize> descriptor_pool_size;
         
         descriptor_pool_size.push_back({
             .type               = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptorCount    = 1
+            .descriptorCount    = util::enumCast(NumDescriptors::UniformBuffer)
         });
         
         descriptor_pool_size.push_back({
             .type               = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount    = 8
+            .descriptorCount    = util::enumCast(NumDescriptors::CombinedImageSampler)
         });
         
         descriptor_pool_size.push_back({
             .type               = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .descriptorCount    = 1
+            .descriptorCount    = util::enumCast(NumDescriptors::StorageImage)
         });
         
         uint32_t max_allocate_sets_count = 2;
@@ -43,15 +51,16 @@ namespace pbrlib
     }
 
     PtrRenderPass createRenderPass(const PtrSwapchain& ptr_swapchain, const PtrAttachments& image_view)
-    {   
-        RenderPass::Builder build_render_pass       (5, 2, 1);
-        SubpassDescription  subpass_description1    (0, 3, 0);
+    {
+        RenderPass::Builder build_render_pass       (6, 2, 1);
+        SubpassDescription  subpass_description1    (0, 4, 0);
 
         auto& image_view_reference = ptr_swapchain->getImagesView()[0];
 
         subpass_description1.addColorAttachment(1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.addColorAttachment(2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.addColorAttachment(3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(5, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.setDepthStencilAttachment(4, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
         build_render_pass.setDevice(ptr_swapchain->getDevice());
@@ -100,9 +109,8 @@ namespace pbrlib
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
         );
 
-        //!< Глубина.
         build_render_pass.addAttachmentDescription(
-            VK_FORMAT_D32_SFLOAT,
+           image_view->at(3).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
             VK_ATTACHMENT_LOAD_OP_CLEAR,
             VK_ATTACHMENT_STORE_OP_STORE,
@@ -110,6 +118,17 @@ namespace pbrlib
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
             VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL
+        );
+        
+        build_render_pass.addAttachmentDescription(
+            image_view->at(4).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
         );
     
         build_render_pass.addSubpassDescription(move(subpass_description1));
@@ -121,61 +140,77 @@ namespace pbrlib
         const PtrDevice&            ptr_device,
         const PtrPhysicalDevice&    ptr_physical_device,
         uint32_t                    gpu_queue_family_index,
-        uint32_t                    width, 
+        uint32_t                    width,
         uint32_t                    height
     )
     {
         PtrAttachments ptr_framebuffer_attachments (new vector<ImageView>());
 
-        Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     builder_image;
-        ImageView::Builder                                                      builder_image_view;
-        Image::Builder<Image::TexelType::Depth, float, Image::NumBits::NB32>    builder_depth_image;
+        Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     image_rgba_builder;
+        ImageView::Builder                                                      image_view_builder;
+        Image::Builder<Image::TexelType::Depth, float, Image::NumBits::NB32>    depth_image_builder;
+        Image::Builder<Image::TexelType::R, float, Image::NumBits::NB32>        image_r_builder;
 
-        builder_image.setDevice(ptr_device);
-        builder_image.setExtend(width, height, 1);
-        builder_image.setImageType(VK_IMAGE_TYPE_2D);
-        builder_image.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+
+        image_rgba_builder.setDevice(ptr_device);
+        image_rgba_builder.setExtend(width, height, 1);
+        image_rgba_builder.setImageType(VK_IMAGE_TYPE_2D);
+        image_rgba_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+        image_rgba_builder.setNumArrayLayers(1);
+        image_rgba_builder.setNumMipLevels(1);
+        image_rgba_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+        image_rgba_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
+        image_rgba_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        image_rgba_builder.addQueueFamilyIndex(gpu_queue_family_index);
+
+        image_r_builder.setDevice(ptr_device);
+        image_r_builder.setExtend(width, height, 1);
+        image_r_builder.setImageType(VK_IMAGE_TYPE_2D);
+        image_r_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+        image_r_builder.setNumArrayLayers(1);
+        image_r_builder.setNumMipLevels(1);
+        image_r_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+        image_r_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
+        image_r_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        image_r_builder.addQueueFamilyIndex(gpu_queue_family_index);
+
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
+        image_view_builder.setBaseArrayLayer(0);
+        image_view_builder.setBaseMipLevel(0);
+        image_view_builder.setFormat(VK_FORMAT_R32G32B32A32_SFLOAT);
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        image_view_builder.setLayerCount(1);
+        image_view_builder.setLevelCount(1);
+        image_view_builder.setType(VK_IMAGE_VIEW_TYPE_2D);
+
+        depth_image_builder.setDevice(ptr_device);
+        depth_image_builder.setExtend(width, height, 1);
+        depth_image_builder.setImageType(VK_IMAGE_TYPE_2D);
+        depth_image_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+        depth_image_builder.setNumArrayLayers(1);
+        depth_image_builder.setNumMipLevels(1);
+        depth_image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+        depth_image_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
+        depth_image_builder.setUsage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        depth_image_builder.addQueueFamilyIndex(gpu_queue_family_index);
+
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
         
-        builder_image.setNumArrayLayers(1);
-        builder_image.setNumMipLevels(1);
-        builder_image.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
-        builder_image.setTiling(VK_IMAGE_TILING_OPTIMAL);
-        builder_image.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT); /// TODO: Убрать всё ненужное
-        builder_image.addQueueFamilyIndex(gpu_queue_family_index);
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
 
-        builder_image_view.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
-        builder_image_view.setBaseArrayLayer(0);
-        builder_image_view.setBaseMipLevel(0);
-        builder_image_view.setFormat(VK_FORMAT_R32G32B32A32_SFLOAT);
-        builder_image_view.setImage(builder_image.buildPtr());
-        builder_image_view.setLayerCount(1);
-        builder_image_view.setLevelCount(1);
-        builder_image_view.setType(VK_IMAGE_VIEW_TYPE_2D);
-
-        builder_depth_image.setDevice(ptr_device);
-        builder_depth_image.setExtend(width, height, 1);
-        builder_depth_image.setImageType(VK_IMAGE_TYPE_2D);
-        builder_depth_image.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
-        builder_depth_image.setNumArrayLayers(1);
-        builder_depth_image.setNumMipLevels(1);
-        builder_depth_image.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
-        builder_depth_image.setTiling(VK_IMAGE_TILING_OPTIMAL);
-        builder_depth_image.setUsage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
-        builder_depth_image.addQueueFamilyIndex(gpu_queue_family_index);
-
-        ptr_framebuffer_attachments->push_back(builder_image_view.build());
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
         
-        builder_image_view.setImage(builder_image.buildPtr());
-        ptr_framebuffer_attachments->push_back(builder_image_view.build());
+        image_view_builder.setImage(depth_image_builder.buildPtr());
+        image_view_builder.setFormat(VK_FORMAT_D32_SFLOAT);
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_DEPTH_BIT);
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
 
-        builder_image_view.setImage(builder_image.buildPtr());
-        ptr_framebuffer_attachments->push_back(builder_image_view.build());
-        
-        builder_image_view.setImage(builder_depth_image.buildPtr());
-        builder_image_view.setFormat(VK_FORMAT_D32_SFLOAT);
-        builder_image_view.setAspectMask(VK_IMAGE_ASPECT_DEPTH_BIT);
-
-        ptr_framebuffer_attachments->push_back(builder_image_view.build());
+        image_view_builder.setImage(image_r_builder.buildPtr());
+        image_view_builder.setFormat(VK_FORMAT_R32_SFLOAT);
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
         
         return ptr_framebuffer_attachments;
     }
@@ -227,8 +262,8 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void PBR::init(
-        const PtrWindow&            ptr_window, 
-        const PtrDevice&            ptr_device, 
+        const PtrWindow&            ptr_window,
+        const PtrDevice&            ptr_device,
         const PtrPhysicalDevice&    ptr_physical_device
     )
     {
@@ -253,7 +288,7 @@ namespace pbrlib
         auto        [width, height]         = ptr_window->getExtent();
 
         _ptr_swapchain                  = ptr_window->getSwapchain();
-        _ptr_device_queue               = DeviceQueue::make(_ptr_device, gpu_queue_family_index, 0); 
+        _ptr_device_queue               = DeviceQueue::make(_ptr_device, gpu_queue_family_index, 0);
         _ptr_descriptor_pool            = descriptorPoolCreate(_ptr_device);
         _ptr_framebuffer_attachments    = createFramebufferAttachments(_ptr_device, ptr_physical_device, gpu_queue_family_index, width, height);
         _ptr_render_pass                = createRenderPass(_ptr_swapchain, _ptr_framebuffer_attachments);
@@ -262,9 +297,9 @@ namespace pbrlib
         _ptr_sampler_linear             = build_sampler.buildPtr();
 
         build_sampler.setMagFilter(VK_FILTER_NEAREST);
-        build_sampler.setMinFilter(VK_FILTER_NEAREST);      
+        build_sampler.setMinFilter(VK_FILTER_NEAREST);
 
-        _ptr_sampler_nearest = build_sampler.buildPtr();  
+        _ptr_sampler_nearest = build_sampler.buildPtr();
 
         _ptr_gbuffer_pass = GBufferPass::make(
             _ptr_device,
@@ -276,12 +311,22 @@ namespace pbrlib
             gpu_queue_family_index
         );
 
-        _ptr_pbr_pass = PBRPass::make(_ptr_device, _ptr_descriptor_pool);
+        _ptr_pbr_pass = PBRPass::make(
+            _ptr_device,
+            ptr_physical_device,
+            gpu_queue_family_index,
+            _ptr_descriptor_pool, 
+            _ptr_framebuffers[0]->getAttachments()->at(0),
+            _ptr_framebuffers[0]->getAttachments()->at(1),
+            _ptr_framebuffers[0]->getAttachments()->at(2),
+            _ptr_framebuffers[0]->getAttachments()->at(4),
+            _ptr_sampler_nearest
+        );
     }
 
     void PBR::draw(
         const CameraBase&               camera,
-        const Scene::VisibleList&       visible_list, 
+        const Scene::VisibleList&       visible_list,
         const vector<Scene::PtrNode>    point_lights,
         const vector<Scene::PtrNode>    spot_lights,
         const vector<Scene::PtrNode>    direction_lights,
@@ -299,16 +344,18 @@ namespace pbrlib
         
         vkDestroySemaphore(_ptr_device->getDeviceHandle(), semaphore_handle, nullptr);
 
-        vector<VkClearValue> clear_values (5);
+        vector<VkClearValue> clear_values (6);
         
         VkClearValue color_attachment_clear_value   {1.0f, 1.0f, 1.0f, 1.0f};
         VkClearValue depth_clear_value              {1.0f, 1.0f, 1.0f, 1.0f};
+        VkClearValue anisotropy_clear_value              {0.0f, 0.0f, 0.0f, 0.0f};
         
         clear_values[0] = color_attachment_clear_value;
         clear_values[1] = color_attachment_clear_value;
         clear_values[2] = color_attachment_clear_value;
         clear_values[3] = color_attachment_clear_value;
         clear_values[4] = depth_clear_value;
+        clear_values[5] = anisotropy_clear_value;
 
         _ptr_command_buffer->reset();
         _ptr_command_buffer->begin();
@@ -321,12 +368,12 @@ namespace pbrlib
         _ptr_command_buffer->bindToPipeline(_ptr_pbr_pass->getPipeline());
 
         _ptr_pbr_pass->draw(
-            _ptr_command_buffer, 
-            _ptr_framebuffers[image_index]->getAttachments()->at(0),
-            _ptr_framebuffers[image_index]->getAttachments()->at(1),
-            _ptr_framebuffers[image_index]->getAttachments()->at(2),
+            camera,
+            _ptr_command_buffer,
             _ptr_swapchain->getImagesView()[image_index],
-            _ptr_sampler_nearest
+            point_lights,
+            spot_lights,
+            direction_lights
         );
 
         static VkImageSubresourceRange image_subresource_range {

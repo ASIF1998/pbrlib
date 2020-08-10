@@ -174,6 +174,14 @@ namespace pbrlib
             */
             bool setBakedAO(const string_view path_to_baked_AO, const string_view texture_name);
 
+            /**
+             * @brief Метод, позволяющий установить значение анизотропности материала.
+             * @details anisotropy >= -1.0f && anisotropy <= 1.0f.
+             * 
+             * @param anisotropy анизотропность.
+            */
+            void setAnisotropy(float anisotropy);
+
             Material    build();
             PtrMaterial buildPtr();
 
@@ -183,6 +191,8 @@ namespace pbrlib
             PtrImageView    _metallic;
             PtrImageView    _roughness;
             PtrImageView    _baked_AO;
+
+            float _anisotropy;
 
             GPUTextureManager& _texture_manager;
         };
@@ -197,6 +207,7 @@ namespace pbrlib
         void setTexture(const PtrImageView& ptr_image_view);
 
         void setTexture(size_t i, const PtrImageView& ptr_image_view);
+        void setAnisotropy(float anisotropy);
 
         template<Textures TextureType>
         PtrImageView& getTexture();
@@ -205,7 +216,8 @@ namespace pbrlib
         const PtrImageView& getTexture() const;
 
         PtrImageView&       getTexture(size_t i);
-        const PtrImageView& getTexture(size_t i) const;
+        const PtrImageView& getTexture(size_t i)    const;
+        float               getAnisotropy()         const noexcept;
 
         static PtrMaterial make();
 
@@ -223,6 +235,8 @@ namespace pbrlib
 
             PtrImageView _textures[util::enumCast(Textures::Count)];
         };
+
+        float _anisotropy;
     };
 }
 

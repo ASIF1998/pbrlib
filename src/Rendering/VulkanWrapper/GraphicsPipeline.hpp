@@ -558,13 +558,13 @@ namespace pbrlib
         */
         void addAttchament(
             VkBool32                blend_enable,
-            VkBlendFactor           src_color_blend_factor,
-            VkBlendFactor           dst_color_blend_factor,
-            VkBlendOp               color_blend_op,
-            VkBlendFactor           src_alpha_blend_factor,
-            VkBlendFactor           dst_alpha_blend_factor,
-            VkBlendOp               alpha_blend_op,
-            VkColorComponentFlags   color_write_mask
+            VkBlendFactor           src_color_blend_factor  = VK_BLEND_FACTOR_ZERO,
+            VkBlendFactor           dst_color_blend_factor  = VK_BLEND_FACTOR_ZERO,
+            VkBlendOp               color_blend_op          = VK_BLEND_OP_ADD,
+            VkBlendFactor           src_alpha_blend_factor  = VK_BLEND_FACTOR_ZERO,
+            VkBlendFactor           dst_alpha_blend_factor  = VK_BLEND_FACTOR_ZERO,
+            VkBlendOp               alpha_blend_op          = VK_BLEND_OP_ADD,
+            VkColorComponentFlags   color_write_mask        = VK_COLOR_COMPONENT_A_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_R_BIT
         );
 
         void logicOpEnable(VkBool32 is_enable) noexcept;
@@ -583,10 +583,10 @@ namespace pbrlib
     };
 
     /**
-     * @class GraphicsPipelineState.
+     * @class GraphicsPipelineStates.
      * @brief Класс, хранящий в себе все состояния графического конвейера.
     */
-    class GraphicsPipelineState
+    class GraphicsPipelineStates
     {
     public:
         /**
@@ -598,7 +598,7 @@ namespace pbrlib
          * @param num_scissors                      число прямоугольников для отсечения.
          * @param num_attachments                   число подключений.
         */
-        GraphicsPipelineState(
+        GraphicsPipelineStates(
             size_t num_vertex_biding_descriptions,
             size_t num_vertex_attribute_descriptions,
             size_t num_viewports,
@@ -606,11 +606,11 @@ namespace pbrlib
             size_t num_attachments
         );
 
-        GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state);
-        GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state);
+        GraphicsPipelineStates(GraphicsPipelineStates&& graphics_pipeline_states);
+        GraphicsPipelineStates(const GraphicsPipelineStates& graphics_pipeline_states);
 
-        GraphicsPipelineState& operator = (GraphicsPipelineState&&)         = delete;
-        GraphicsPipelineState& operator = (const GraphicsPipelineState&)    = delete;
+        GraphicsPipelineStates& operator = (GraphicsPipelineStates&&)         = delete;
+        GraphicsPipelineStates& operator = (const GraphicsPipelineStates&)    = delete;
 
         VertexInputState&            getVertexInputState()   noexcept;
         const VertexInputState&      getVertexInputState()   const noexcept;
@@ -641,7 +641,7 @@ namespace pbrlib
     {
     public:
         class Builder :
-            public GraphicsPipelineState
+            public GraphicsPipelineStates
         {
         public:
             /**
@@ -688,14 +688,14 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param graphics_pipeline_states  состояния графического конвейера.
          * @param shaders                   шейдеры.
          * @param ptr_pipeline_layout       указатель на PipelineLayout.
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
         GraphicsPipeline(
-            const GraphicsPipelineState&            graphics_pipeline_state,
+            const GraphicsPipelineStates&           graphics_pipeline_states,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
             const PtrRenderPass&                    ptr_render_pass,
@@ -705,14 +705,14 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param graphics_pipeline_states  состояния графического конвейера.
          * @param shaders                   шейдеры.
          * @param ptr_pipeline_layout       указатель на PipelineLayout.
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
         GraphicsPipeline(
-            GraphicsPipelineState&&                 graphics_pipeline_state,
+            GraphicsPipelineStates&&                graphics_pipeline_states,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
             const PtrRenderPass&                    ptr_render_pass,
@@ -727,25 +727,25 @@ namespace pbrlib
         GraphicsPipeline& operator = (GraphicsPipeline&&)       = delete;
         GraphicsPipeline& operator = (const GraphicsPipeline&)  = delete;
 
-        uint32_t                                 getSubpassIndex()           const noexcept;
-        PtrPipelineLayout&                       getPipelineLayout()         noexcept;
-        const PtrPipelineLayout&                 getPipelineLayout()         const noexcept;
-        GraphicsPipelineState&                   getGraphicsPipelineState()  noexcept;
-        const GraphicsPipelineState&             getGraphicsPipelineState()  const noexcept;
-        VkPipeline                               getPipelineHandle()         const noexcept;
-        VkPipelineCache                          getPipelineCacheHandle()    const noexcept;
+        uint32_t                                getSubpassIndex()           const noexcept;
+        PtrPipelineLayout&                      getPipelineLayout()         noexcept;
+        const PtrPipelineLayout&                getPipelineLayout()         const noexcept;
+        GraphicsPipelineStates&                 getGraphicsPipelineStates() noexcept;
+        const GraphicsPipelineStates&           getGraphicsPipelineStates() const noexcept;
+        VkPipeline                              getPipelineHandle()         const noexcept;
+        VkPipelineCache                         getPipelineCacheHandle()    const noexcept;
 
         /**
          * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
          * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param graphics_pipeline_states  состояния графического конвейера.
          * @param shaders                   шейдеры.
          * @param ptr_pipeline_layout       указатель на PipelineLayout.
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
         static PtrGraphicsPipeline make(
-            const GraphicsPipelineState&            graphics_pipeline_state,
+            const GraphicsPipelineStates&           graphics_pipeline_states,
             const vector<ShaderModule>&             shaders,
             const PtrPipelineLayout&                ptr_pipeline_layout,
             const PtrRenderPass&                    ptr_render_pass,
@@ -755,14 +755,14 @@ namespace pbrlib
         /**
          * @brief Статический метод, позволяющий создать указатель на объект типа GraphicsPipeline.
          * 
-         * @param graphics_pipeline_state   состояния графического конвейера.
+         * @param graphics_pipeline_states  состояния графического конвейера.
          * @param shaders                   шейдеры.
          * @param ptr_pipeline_layout       указатель на PipelineLayout.
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
         static PtrGraphicsPipeline make(
-            GraphicsPipelineState&&     graphics_pipeline_state,
+            GraphicsPipelineStates&&    graphics_pipeline_states,
             const vector<ShaderModule>& shaders,
             const PtrPipelineLayout&    ptr_pipeline_layout,
             const PtrRenderPass&        ptr_render_pass,
@@ -776,7 +776,7 @@ namespace pbrlib
         uint32_t                _subpass_index;
         PtrPipelineLayout       _ptr_pipeline_layout;
         PtrRenderPass           _ptr_render_pass;
-        GraphicsPipelineState   _state;
+        GraphicsPipelineStates  _states;
         VkPipeline              _pipeline_handle;
         VkPipelineCache         _pipeline_cache_handle;
     };

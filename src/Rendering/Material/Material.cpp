@@ -17,7 +17,8 @@ namespace pbrlib
         _normal_map         (nullptr),
         _metallic           (nullptr),
         _roughness          (nullptr),
-       _baked_AO            (nullptr)
+        _baked_AO           (nullptr),
+        _anisotropy         (0.0f)
     {}
 
     Material::Material(const Material& material) :
@@ -25,7 +26,8 @@ namespace pbrlib
         _normal_map         (material._normal_map),
         _metallic           (material._metallic),
         _roughness          (material._roughness),
-        _baked_AO           (material._baked_AO)
+        _baked_AO           (material._baked_AO),
+        _anisotropy         (material._anisotropy)
     {}
 
     Material::Material(Material&& material) :
@@ -33,7 +35,8 @@ namespace pbrlib
         _normal_map         (move(material._normal_map)),
         _metallic           (move(material._metallic)),
         _roughness          (move(material._roughness)),
-        _baked_AO           (move(material._baked_AO))
+        _baked_AO           (move(material._baked_AO)),
+        _anisotropy         (material._anisotropy)
     {}
 
     Material::~Material()
@@ -43,6 +46,12 @@ namespace pbrlib
     {
         assert(i < util::enumCast(Textures::Count));
         _textures[i] = ptr_image_view;
+    }
+
+    void Material::setAnisotropy(float anisotropy)
+    {
+        assert(anisotropy >= -1.0f && anisotropy <= 1.0f);
+        _anisotropy = anisotropy;
     }
 
     PtrImageView& Material::getTexture(size_t i)
@@ -57,6 +66,11 @@ namespace pbrlib
         return _textures[i];
     }
 
+    float Material::getAnisotropy() const noexcept
+    {
+        return _anisotropy;
+    }
+
     PtrMaterial Material::make()
     {
         return make_shared<Material>();
@@ -69,6 +83,7 @@ namespace pbrlib
         _metallic                   (nullptr),
         _roughness                  (nullptr),
         _baked_AO                   (nullptr),
+        _anisotropy                 (0.0f),
         _texture_manager            (texture_manager)
     {}
 
@@ -207,6 +222,12 @@ namespace pbrlib
         return true;
     }
 
+    void Material::Builder::setAnisotropy(float anisotropy)
+    {
+        assert(anisotropy >= -1.0f && anisotropy <= 1.0f);
+        _anisotropy = anisotropy;
+    }
+
    Material Material::Builder::build()
    {
         assert(_albedo && _normal_map && _metallic && _roughness && _baked_AO);
@@ -218,6 +239,7 @@ namespace pbrlib
         material._metallic              = _metallic;
         material._roughness             = _roughness;
         material._baked_AO              = _baked_AO;
+        material._anisotropy            = _anisotropy;
 
         return material;
    }
@@ -233,6 +255,7 @@ namespace pbrlib
         ptr_material->_metallic             = _metallic;
         ptr_material->_roughness            = _roughness;
         ptr_material->_baked_AO             = _baked_AO;
+        ptr_material->_anisotropy           = _anisotropy;
 
         return ptr_material;;
     }

@@ -13,13 +13,6 @@ using namespace std;
 namespace pbrlib::math
 {
     template<typename Type>
-    inline constexpr Vec3<Type>::Vec3() :
-        x{static_cast<Type>(0)},
-        y{static_cast<Type>(0)},
-        z{static_cast<Type>(0)}
-    {}
-
-    template<typename Type>
     inline constexpr Vec3<Type>::Vec3(Type xyz) :
         x{xyz},
         y{xyz},
@@ -30,6 +23,13 @@ namespace pbrlib::math
     inline constexpr Vec3<Type>::Vec3(Type x, Type y, Type z) :
         x{x},
         y{y},
+        z{z}
+    {}
+
+    template<typename Type>
+    inline constexpr Vec3<Type>::Vec3(const Vec2<Type>& vec2, Type z) :
+        x{vec2.x},
+        y{vec2.y},
         z{z}
     {}
 

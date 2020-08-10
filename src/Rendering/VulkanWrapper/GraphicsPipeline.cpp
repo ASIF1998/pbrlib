@@ -705,7 +705,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    GraphicsPipelineState::GraphicsPipelineState(
+    GraphicsPipelineStates::GraphicsPipelineStates(
         size_t num_vertex_biding_descriptions,
         size_t num_vertex_attribute_descriptions,
         size_t num_viewports,
@@ -717,99 +717,99 @@ namespace pbrlib
         _color_blend_state  (num_attachments)
     {}
 
-    GraphicsPipelineState::GraphicsPipelineState(GraphicsPipelineState&& graphics_pipeline_state) :
-        _vertex_input_state     (move(graphics_pipeline_state._vertex_input_state)),
-        _multisample_state      (move(graphics_pipeline_state._multisample_state)),
-        _rasterization_state    (move(graphics_pipeline_state._rasterization_state)),
-        _depth_stencil_state    (move(graphics_pipeline_state._depth_stencil_state)),
-        _viewport_state         (move(graphics_pipeline_state._viewport_state)),
-        _input_assembly_state   (move(graphics_pipeline_state._input_assembly_state)),
-        _color_blend_state      (move(graphics_pipeline_state._color_blend_state))
+    GraphicsPipelineStates::GraphicsPipelineStates(GraphicsPipelineStates&& graphics_pipeline_states) :
+        _vertex_input_state     (move(graphics_pipeline_states._vertex_input_state)),
+        _multisample_state      (move(graphics_pipeline_states._multisample_state)),
+        _rasterization_state    (move(graphics_pipeline_states._rasterization_state)),
+        _depth_stencil_state    (move(graphics_pipeline_states._depth_stencil_state)),
+        _viewport_state         (move(graphics_pipeline_states._viewport_state)),
+        _input_assembly_state   (move(graphics_pipeline_states._input_assembly_state)),
+        _color_blend_state      (move(graphics_pipeline_states._color_blend_state))
     {}
 
-    GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineState& graphics_pipeline_state) :
-        _vertex_input_state     (graphics_pipeline_state._vertex_input_state),
-        _multisample_state      (graphics_pipeline_state._multisample_state),
-        _rasterization_state    (graphics_pipeline_state._rasterization_state),
-        _depth_stencil_state    (graphics_pipeline_state._depth_stencil_state),
-        _viewport_state         (graphics_pipeline_state._viewport_state),
-        _input_assembly_state   (graphics_pipeline_state._input_assembly_state),
-        _color_blend_state      (graphics_pipeline_state._color_blend_state)
+    GraphicsPipelineStates::GraphicsPipelineStates(const GraphicsPipelineStates& graphics_pipeline_states) :
+        _vertex_input_state     (graphics_pipeline_states._vertex_input_state),
+        _multisample_state      (graphics_pipeline_states._multisample_state),
+        _rasterization_state    (graphics_pipeline_states._rasterization_state),
+        _depth_stencil_state    (graphics_pipeline_states._depth_stencil_state),
+        _viewport_state         (graphics_pipeline_states._viewport_state),
+        _input_assembly_state   (graphics_pipeline_states._input_assembly_state),
+        _color_blend_state      (graphics_pipeline_states._color_blend_state)
     {}
 
-    VertexInputState& GraphicsPipelineState::getVertexInputState() noexcept
+    VertexInputState& GraphicsPipelineStates::getVertexInputState() noexcept
     {
         return _vertex_input_state;
     }
     
-    const VertexInputState& GraphicsPipelineState::getVertexInputState() const noexcept
+    const VertexInputState& GraphicsPipelineStates::getVertexInputState() const noexcept
     {
         return _vertex_input_state;
     }
 
-    MultisampleState& GraphicsPipelineState::getMultisampleState() noexcept
+    MultisampleState& GraphicsPipelineStates::getMultisampleState() noexcept
     {
         return _multisample_state;
     }
 
-    const MultisampleState& GraphicsPipelineState::getMultisampleState() const noexcept
+    const MultisampleState& GraphicsPipelineStates::getMultisampleState() const noexcept
     {
         return _multisample_state;
     }
 
-    RasterizationState& GraphicsPipelineState::getRasterizationState() noexcept
+    RasterizationState& GraphicsPipelineStates::getRasterizationState() noexcept
     {
         return _rasterization_state;
     }
 
-    const RasterizationState& GraphicsPipelineState::getRasterizationState() const noexcept
+    const RasterizationState& GraphicsPipelineStates::getRasterizationState() const noexcept
     {
         return _rasterization_state;
     }
 
-    DepthStencilState& GraphicsPipelineState::getDepthStencilState() noexcept
+    DepthStencilState& GraphicsPipelineStates::getDepthStencilState() noexcept
     {
         return _depth_stencil_state;
     }
 
-    const DepthStencilState& GraphicsPipelineState::getDepthStencilState() const noexcept
+    const DepthStencilState& GraphicsPipelineStates::getDepthStencilState() const noexcept
     {
         return _depth_stencil_state;
     }
 
-    ViewportState& GraphicsPipelineState::getViewportState() noexcept
+    ViewportState& GraphicsPipelineStates::getViewportState() noexcept
     {
         return _viewport_state;
     }
 
-    const ViewportState& GraphicsPipelineState::getViewportState() const noexcept
+    const ViewportState& GraphicsPipelineStates::getViewportState() const noexcept
     {
         return _viewport_state;
     }
 
-    InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() noexcept
+    InputAssemblyState& GraphicsPipelineStates::getInputAssemblyState() noexcept
     {
         return _input_assembly_state;
     }
 
-    const InputAssemblyState& GraphicsPipelineState::getInputAssemblyState() const noexcept
+    const InputAssemblyState& GraphicsPipelineStates::getInputAssemblyState() const noexcept
     {
         return _input_assembly_state;
     }
 
-    ColorBlendState& GraphicsPipelineState::getColorBlendState() noexcept
+    ColorBlendState& GraphicsPipelineStates::getColorBlendState() noexcept
     {
         return _color_blend_state;
     }
 
-    const ColorBlendState& GraphicsPipelineState::getColorBlendState() const noexcept
+    const ColorBlendState& GraphicsPipelineStates::getColorBlendState() const noexcept
     {
         return _color_blend_state;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GraphicsPipeline::GraphicsPipeline(
-        const GraphicsPipelineState&            graphics_pipeline_state,
+        const GraphicsPipelineStates&           graphics_pipeline_states,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
         const PtrRenderPass&                    ptr_render_pass,
@@ -818,7 +818,7 @@ namespace pbrlib
         _subpass_index          (subpass_index),
         _ptr_pipeline_layout    (ptr_pipeline_layout),
         _ptr_render_pass        (ptr_render_pass),
-        _state                  (graphics_pipeline_state),
+        _states                 (graphics_pipeline_states),
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
@@ -826,7 +826,7 @@ namespace pbrlib
     }
     
     GraphicsPipeline::GraphicsPipeline(
-        GraphicsPipelineState&&                 graphics_pipeline_state,
+        GraphicsPipelineStates&&                graphics_pipeline_states,
         const vector<ShaderModule>&             shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
         const PtrRenderPass&                    ptr_render_pass,
@@ -835,7 +835,7 @@ namespace pbrlib
         _subpass_index          (subpass_index),
         _ptr_pipeline_layout    (ptr_pipeline_layout),
         _ptr_render_pass        (ptr_render_pass),
-        _state                  (move(graphics_pipeline_state)),
+        _states                 (move(graphics_pipeline_states)),
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
@@ -846,7 +846,7 @@ namespace pbrlib
         _subpass_index          (graphics_pipeline._subpass_index),
         _ptr_pipeline_layout    (move(graphics_pipeline._ptr_pipeline_layout)),
         _ptr_render_pass        (move(graphics_pipeline._ptr_render_pass)),
-        _state                  (move(graphics_pipeline._state)),
+        _states                 (move(graphics_pipeline._states)),
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
@@ -904,14 +904,14 @@ namespace pbrlib
             .flags                  = 0,
             .stageCount             = static_cast<uint32_t>(pipeline_shader_stages_info.size()),
             .pStages                = pipeline_shader_stages_info.data(),
-            .pVertexInputState      = reinterpret_cast<VkPipelineVertexInputStateCreateInfo*>   (&_state.getVertexInputState()),
-            .pInputAssemblyState    = reinterpret_cast<VkPipelineInputAssemblyStateCreateInfo*> (&_state.getInputAssemblyState()),
+            .pVertexInputState      = reinterpret_cast<VkPipelineVertexInputStateCreateInfo*>   (&_states.getVertexInputState()),
+            .pInputAssemblyState    = reinterpret_cast<VkPipelineInputAssemblyStateCreateInfo*> (&_states.getInputAssemblyState()),
             .pTessellationState     = nullptr,
-            .pViewportState         = reinterpret_cast<VkPipelineViewportStateCreateInfo*>      (&_state.getViewportState()),
-            .pRasterizationState    = reinterpret_cast<VkPipelineRasterizationStateCreateInfo*> (&_state.getRasterizationState()),
-            .pMultisampleState      = reinterpret_cast<VkPipelineMultisampleStateCreateInfo*>   (&_state.getMultisampleState()),
-            .pDepthStencilState     = reinterpret_cast<VkPipelineDepthStencilStateCreateInfo*>  (&_state.getDepthStencilState()),
-            .pColorBlendState       = reinterpret_cast<VkPipelineColorBlendStateCreateInfo*>    (&_state.getColorBlendState()),
+            .pViewportState         = reinterpret_cast<VkPipelineViewportStateCreateInfo*>      (&_states.getViewportState()),
+            .pRasterizationState    = reinterpret_cast<VkPipelineRasterizationStateCreateInfo*> (&_states.getRasterizationState()),
+            .pMultisampleState      = reinterpret_cast<VkPipelineMultisampleStateCreateInfo*>   (&_states.getMultisampleState()),
+            .pDepthStencilState     = reinterpret_cast<VkPipelineDepthStencilStateCreateInfo*>  (&_states.getDepthStencilState()),
+            .pColorBlendState       = reinterpret_cast<VkPipelineColorBlendStateCreateInfo*>    (&_states.getColorBlendState()),
             .pDynamicState          = nullptr,
             .layout                 = _ptr_pipeline_layout->getPipelineLayoutHandle(),
             .renderPass             = _ptr_render_pass->getRenderPassHandle(),
@@ -945,14 +945,14 @@ namespace pbrlib
         return _ptr_pipeline_layout;
     }
 
-    GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() noexcept
+    GraphicsPipelineStates& GraphicsPipeline::getGraphicsPipelineStates() noexcept
     {
-        return _state;
+        return _states;
     }
 
-    const GraphicsPipelineState& GraphicsPipeline::getGraphicsPipelineState() const noexcept
+    const GraphicsPipelineStates& GraphicsPipeline::getGraphicsPipelineStates() const noexcept
     {
-        return _state;
+        return _states;
     }
 
     VkPipeline GraphicsPipeline::getPipelineHandle() const noexcept
@@ -966,15 +966,15 @@ namespace pbrlib
     }
 
     PtrGraphicsPipeline GraphicsPipeline::make(
-        const GraphicsPipelineState&            graphics_pipeline_state,
+        const GraphicsPipelineStates&           graphics_pipeline_states,
         const vector<ShaderModule>&             shaders,
-        const PtrPipelineLayout&       ptr_pipeline_layout,
-        const PtrRenderPass&           ptr_render_pass,
+        const PtrPipelineLayout&                ptr_pipeline_layout,
+        const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
     )
     {
         return make_shared<GraphicsPipeline>(
-            graphics_pipeline_state,
+            graphics_pipeline_states,
             shaders,
             ptr_pipeline_layout,
             ptr_render_pass,
@@ -983,15 +983,15 @@ namespace pbrlib
     }
 
     PtrGraphicsPipeline GraphicsPipeline::make(
-        GraphicsPipelineState&&                 graphics_pipeline_state,
+        GraphicsPipelineStates&&                graphics_pipeline_states,
         const vector<ShaderModule>&             shaders,
-        const PtrPipelineLayout&       ptr_pipeline_layout,
-        const PtrRenderPass&           ptr_render_pass,
+        const PtrPipelineLayout&                ptr_pipeline_layout,
+        const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
     )
     {
         return make_shared<GraphicsPipeline>(
-            move(graphics_pipeline_state),
+            move(graphics_pipeline_states),
             shaders,
             ptr_pipeline_layout,
             ptr_render_pass,
@@ -1007,7 +1007,7 @@ namespace pbrlib
         size_t num_scissors,
         size_t num_attachments
     ) :
-        GraphicsPipelineState(
+        GraphicsPipelineStates(
             num_vertex_biding_descriptions, 
             num_vertex_attribute_descriptions, 
             num_viewports, 

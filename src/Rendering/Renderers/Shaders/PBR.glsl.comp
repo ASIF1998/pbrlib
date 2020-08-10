@@ -1,17 +1,53 @@
 #version 450
 
+#extension GL_GOOGLE_include_directive : enable
+
+#include "PointLightData.h"
+#include "SpotLightData.h"
+#include "DirectionLightData.h"
+
+#include "NumLights.h"
+
+#include "CameraData.h"
+
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-layout(set = 0, binding = 0, rgba8) uniform writeonly image2D out_image;
+layout(set = 0, binding = 0, rgba8) uniform writeonly image2D OutImage;
 
-layout(set = 0, binding = 1) uniform sampler2D position_and_metallic;
-layout(set = 0, binding = 2) uniform sampler2D normal_and_roughness;
-layout(set = 0, binding = 3) uniform sampler2D albedo_and_baked_AO;
+layout(set = 0, binding = 1) uniform sampler2D PositionAndMetallic;
+layout(set = 0, binding = 2) uniform sampler2D NormalAndRoughness;
+layout(set = 0, binding = 3) uniform sampler2D AlbedoAndBakedAO;
+layout(set = 0, binding = 4) uniform sampler2D Anisotropy;
+
+layout(set = 0, binding = 5) uniform u_num_lights
+{
+    NumLights lights;
+} num_lights;
+
+layout(set = 0, binding = 6, std140) uniform u_point_lights_data
+{
+    PointLightData data[];
+} point_lights_data;
+
+layout(set = 0, binding = 7, std140) uniform u_spot_lights_data
+{
+    SpotLightData data[];
+} spot_lights_data;
+
+layout(set = 0, binding = 8, std140) uniform u_direction_lights_data
+{
+    DirectionLightData data[];
+} direction_lights_dates;
+
+layout(set = 0, binding = 9, std140) uniform u_camera_data
+{
+    CameraData data;
+} camera_data;
 
 void main()
 {
     ivec2   uv      = ivec2(gl_GlobalInvocationID.xy);
-    vec4    color   = texelFetch(albedo_and_baked_AO, uv, 0).aaaa;
+    vec4    color   = texelFetch(Anisotropy, uv, 0).rrrr;
 
-    imageStore(out_image, uv, color);
+    imageStore(OutImage, uv, color);
 }

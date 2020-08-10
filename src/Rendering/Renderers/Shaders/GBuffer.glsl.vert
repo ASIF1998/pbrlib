@@ -8,7 +8,8 @@ layout(location = 3) in vec2 VertUV;
 layout(std140, binding = 0) uniform u_matrices
 {
     mat4 MVP;
-    mat3 model_matrix;
+    mat4 model_matrix;
+    mat3 normal_matrix;
 } matrices;
 
 layout(location = 0) out vec3 FPosition;
@@ -19,11 +20,11 @@ void main()
 {
     gl_Position = matrices.MVP * vec4(VertPosition, 1.0f);
 
-    vec3 norm   = normalize(matrices.model_matrix * VertNormal);
-    vec3 tang   = normalize(matrices.model_matrix * VertTangent);
+    vec3 norm   = normalize(matrices.normal_matrix * VertNormal);
+    vec3 tang   = normalize(matrices.normal_matrix * VertTangent);
     vec3 binorm = cross(norm, tang);
 
     FTBN            = mat3(tang, binorm, norm);
-    FPosition       = matrices.model_matrix * VertPosition;    
+    FPosition       = vec3(matrices.model_matrix * vec4(VertPosition, 1.0));    
     FTextureCoord   = VertUV;
 }

@@ -11,14 +11,6 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    inline constexpr Vec4<Type>::Vec4() :
-        x{static_cast<Type>(0)},
-        y{static_cast<Type>(0)},
-        z{static_cast<Type>(0)},
-        w{static_cast<Type>(0)}
-    {}
-
-    template<typename Type>
     inline constexpr Vec4<Type>::Vec4(Type xyzw) :
         x{xyzw},
         y{xyzw},
@@ -32,6 +24,30 @@ namespace pbrlib::math
         y{y},
         z{z},
         w{w}
+    {}
+
+    template<typename Type>
+    inline constexpr Vec4<Type>::Vec4(const Vec3<Type>& vec3, Type w) :
+        x{vec3.x},
+        y{vec3.y},
+        z{vec3.y},
+        w{w}
+    {}
+
+    template<typename Type>
+    inline constexpr Vec4<Type>::Vec4(const Vec2<Type>& v1, const Vec2<Type>& v2) :
+        x{v1.x},
+        y{v1.y},
+        z{v2.x},
+        w{v2.y}
+    {}
+
+    template<typename Type>
+    inline constexpr Vec4<Type>::Vec4(const Vec2<Type>& vec2) :
+        x{vec2.x},
+        y{vec2.y},
+        z{static_cast<Type>(0)},
+        w{static_cast<Type>(0)}
     {}
 
     template<typename Type>
@@ -135,13 +151,6 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline constexpr Vec4<float>::Vec4() noexcept :
-        x{0.0f},
-        y{0.0f},
-        z{0.0f},
-        w{0.0f}
-    {}
-
     inline Vec4<float>::Vec4(float xyzw) noexcept :
         xyzw_simd(_mm_set1_ps(xyzw))
     {}
@@ -155,6 +164,27 @@ namespace pbrlib::math
         y{y},
         z{z},
         w{w}
+    {}
+
+    inline constexpr Vec4<float>::Vec4(const Vec3<float>& vec3, float w) noexcept :
+        x{vec3.x},
+        y{vec3.y},
+        z{vec3.z},
+        w{w}
+    {}
+
+    inline constexpr Vec4<float>::Vec4(const Vec2<float>& v1, const Vec2<float>& v2) noexcept :
+        x{v1.x},
+        y{v1.y},
+        z{v2.x},
+        w{v2.y}
+    {}
+
+    inline constexpr Vec4<float>::Vec4(const Vec2<float>& vec2) noexcept :
+        x{vec2.x},
+        y{vec2.y},
+        z{0.0f},
+        w{0.0f}
     {}
 
     inline bool Vec4<float>::operator == (const Vec4& v) const noexcept

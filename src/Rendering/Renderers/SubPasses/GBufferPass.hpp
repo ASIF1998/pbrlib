@@ -45,7 +45,8 @@ namespace pbrlib
      *      содержать следующие подключения:
      *          1) для позиции (vec3) и металичности (float);
      *          2) для нормали (vec3) и шероховатости (float);
-     *          3) для альбедо (vec3) и запечённого AO (float).
+     *          3) для альбедо (vec3) и запечённого AO (float);
+     *          4) для параметра анизотропности (float).
     */
     class GBufferPass
     {
@@ -126,6 +127,7 @@ namespace pbrlib
         PtrGraphicsPipeline _ptr_pipeline;
         PtrDescriptorSet    _ptr_descriptor_set;
         PtrBuffer           _ptr_uniform_matrices_data_buffer;
+        PtrBuffer           _ptr_uniform_material_data_buffer;
     };
 }
 
