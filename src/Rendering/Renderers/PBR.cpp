@@ -149,8 +149,6 @@ namespace pbrlib
         Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     image_rgba_builder;
         ImageView::Builder                                                      image_view_builder;
         Image::Builder<Image::TexelType::Depth, float, Image::NumBits::NB32>    depth_image_builder;
-        Image::Builder<Image::TexelType::R, float, Image::NumBits::NB32>        image_r_builder;
-
 
         image_rgba_builder.setDevice(ptr_device);
         image_rgba_builder.setExtend(width, height, 1);
@@ -162,18 +160,7 @@ namespace pbrlib
         image_rgba_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
         image_rgba_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
         image_rgba_builder.addQueueFamilyIndex(gpu_queue_family_index);
-
-        image_r_builder.setDevice(ptr_device);
-        image_r_builder.setExtend(width, height, 1);
-        image_r_builder.setImageType(VK_IMAGE_TYPE_2D);
-        image_r_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
-        image_r_builder.setNumArrayLayers(1);
-        image_r_builder.setNumMipLevels(1);
-        image_r_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
-        image_r_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
-        image_r_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
-        image_r_builder.addQueueFamilyIndex(gpu_queue_family_index);
-
+        
         image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
         image_view_builder.setBaseArrayLayer(0);
         image_view_builder.setBaseMipLevel(0);
@@ -207,8 +194,8 @@ namespace pbrlib
         image_view_builder.setAspectMask(VK_IMAGE_ASPECT_DEPTH_BIT);
         ptr_framebuffer_attachments->push_back(image_view_builder.build());
 
-        image_view_builder.setImage(image_r_builder.buildPtr());
-        image_view_builder.setFormat(VK_FORMAT_R32_SFLOAT);
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        image_view_builder.setFormat(VK_FORMAT_R32G32B32A32_SFLOAT);
         image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
         ptr_framebuffer_attachments->push_back(image_view_builder.build());
         

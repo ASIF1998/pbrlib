@@ -28,6 +28,7 @@ namespace pbrlib
     class Buffer;
     class PhysicalDevice;
     class CameraBase;
+    class Scene;
 
     using PtrComputePipeline    = shared_ptr<ComputePipeline>;
     using PtrDevice             = shared_ptr<Device>;

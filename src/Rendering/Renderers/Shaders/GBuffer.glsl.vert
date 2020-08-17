@@ -1,9 +1,9 @@
 #version 450
 
-layout(location = 0) in vec3 VertPosition;
-layout(location = 1) in vec3 VertNormal;
-layout(location = 2) in vec3 VertTangent;
-layout(location = 3) in vec2 VertUV;
+layout(location = 0) in highp   vec3 VertPosition;
+layout(location = 1) in highp   vec3 VertNormal;
+layout(location = 2) in highp   vec3 VertTangent;
+layout(location = 3) in mediump vec2 VertUV;
 
 layout(std140, binding = 0) uniform u_matrices
 {
@@ -12,17 +12,17 @@ layout(std140, binding = 0) uniform u_matrices
     mat3 normal_matrix;
 } matrices;
 
-layout(location = 0) out vec3 FPosition;
-layout(location = 1) out vec2 FTextureCoord;
-layout(location = 2) out mat3 FTBN;
+layout(location = 0) out highp      vec3 FPosition;
+layout(location = 1) out mediump    vec2 FTextureCoord;
+layout(location = 2) out highp      mat3 FTBN;
 
 void main()
 {
     gl_Position = matrices.MVP * vec4(VertPosition, 1.0f);
 
-    vec3 norm   = normalize(matrices.normal_matrix * VertNormal);
-    vec3 tang   = normalize(matrices.normal_matrix * VertTangent);
-    vec3 binorm = cross(norm, tang);
+    highp vec3 norm   = normalize(matrices.normal_matrix * VertNormal);
+    highp vec3 tang   = normalize(matrices.normal_matrix * VertTangent);
+    highp vec3 binorm = cross(norm, tang);
 
     FTBN            = mat3(tang, binorm, norm);
     FPosition       = vec3(matrices.model_matrix * vec4(VertPosition, 1.0));    

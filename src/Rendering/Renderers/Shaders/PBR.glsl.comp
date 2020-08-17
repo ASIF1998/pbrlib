@@ -10,6 +10,8 @@
 
 #include "CameraData.h"
 
+#include "brdf.h"
+
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout(set = 0, binding = 0, rgba8) uniform writeonly image2D OutImage;
@@ -17,7 +19,7 @@ layout(set = 0, binding = 0, rgba8) uniform writeonly image2D OutImage;
 layout(set = 0, binding = 1) uniform sampler2D PositionAndMetallic;
 layout(set = 0, binding = 2) uniform sampler2D NormalAndRoughness;
 layout(set = 0, binding = 3) uniform sampler2D AlbedoAndBakedAO;
-layout(set = 0, binding = 4) uniform sampler2D Anisotropy;
+layout(set = 0, binding = 4) uniform sampler2D TangentAndAnisotropy;
 
 layout(set = 0, binding = 5) uniform u_num_lights
 {
@@ -44,10 +46,15 @@ layout(set = 0, binding = 9, std140) uniform u_camera_data
     CameraData data;
 } camera_data;
 
+vec3 getF0(in const vec3 base_color, float metallic)
+{
+    return mix(vec3(0.04), base_color, metallic);
+}
+
 void main()
 {
     ivec2   uv      = ivec2(gl_GlobalInvocationID.xy);
-    vec4    color   = texelFetch(Anisotropy, uv, 0).rrrr;
+    vec4    color   = texelFetch(AlbedoAndBakedAO, uv, 0);
 
-    imageStore(OutImage, uv, color);
+    imageStore(OutImage, uv, color); 
 }

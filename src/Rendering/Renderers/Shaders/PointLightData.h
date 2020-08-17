@@ -6,8 +6,8 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#ifndef PointLight_h
-#define PointLight_h
+#ifndef PointLightData_h
+#define PointLightData_h
 
 struct PointLightData
 {
@@ -15,4 +15,4 @@ struct PointLightData
     vec4 color_and_intensity;
 };
 
-#endif /* PointLight_h */
+#endif /* PointLightData_h */
