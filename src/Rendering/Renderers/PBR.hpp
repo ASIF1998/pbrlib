@@ -33,6 +33,8 @@ namespace pbrlib
         public IRenderer
     {
     public:
+        PBR(const PBRPass::Optionals& optionals = PBRPass::Optionals());
+
         /**
          * @brief Метод, предназначенный для инициализации.
          * 
@@ -87,6 +89,8 @@ namespace pbrlib
 
         PtrPrimaryCommandBuffer _ptr_command_buffer;
         PtrDeviceQueue          _ptr_device_queue;
+
+        PBRPass::Optionals  _optionals;
     };
 }
 

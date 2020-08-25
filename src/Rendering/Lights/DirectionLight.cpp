@@ -43,6 +43,11 @@ namespace pbrlib
         _color = color;
     }
 
+    void DirectionLight::setDirectionOnLight(const Vec3<float>& direction)
+    {
+        _dir_on_lihght = direction;
+    }
+
     float DirectionLight::getIntensity() const noexcept
     {
         return _intensity;

@@ -9,9 +9,15 @@
 #ifndef brdf_h
 #define brdf_h
 
-#define PI 3.14159265359
+#define PI 		3.14159265359
+#define M_1_PI 	0.31830988618
 
-#define BIT32(x) 1 << x
+// #define x) 1 << x
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define D_BECKAMNN_ID 			0
+#define D_GGX_ID 				1
+#define D_GGX_ANISOTROPY_ID 	2
 
 float D_Beckmann(mediump float n_dot_m, mediump float alpha)
 {
@@ -63,12 +69,22 @@ float D_GGX_Anisotropy(
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define G1_GGX              BIT32(1)
-#define G1_BECKMANN         BIT32(2)
-#define G1_SCHLICK_BECKMANN BIT32(3)
-#define G1_SCHLICK_GGX      BIT32(3)
+#define G1_GGX              0
+#define G1_BECKMANN         1
+#define G1_SCHLICK_BECKMANN 2
+#define G1_SCHLICK_GGX      3
 
 #define G_SMITH_USE G1_GGX
+
+#define G_BECKAMNN_ID 				0
+#define G_GGX_ID 					1
+#define G_SCHILCK_BECKAMNN_ID 		2
+#define G_SCHILCK_GGX_ID 			3
+#define G_IMPLICIT_ID				4
+#define G_NEUMANN_ID				5
+#define G_COOK_TARRANCE_ID			6
+#define G_KELEMEN_ID				7
+#define G_SMITH_ID					8
 
 float G_GGX(mediump float n_dot_m, mediump float alpha)
 {
@@ -151,19 +167,18 @@ float G_Smith(float n_dot_l, float n_dot_v, float alpha)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define F_NONE_ID 			0
+#define F_SCHLICK_ID		1
+#define F_COOK_TORRANCE_ID 	2
+
 vec3 F_None(lowp const vec3 f0)
 {
 	return f0;
 }
 
-vec3 F_Schlick(in const lowp vec3 f0, mediump float v_dot_h)
+vec3 F_Schlick(lowp const vec3 f0, mediump float v_dot_h)
 {
-	float v_dot_h_pow5 = v_dot_h * v_dot_h;
-
-	v_dot_h_pow5 *= v_dot_h_pow5;
-	v_dot_h_pow5 *= v_dot_h;
-
-	return f0 + (1.0f - f0) * (1.0f - v_dot_h_pow5);
+	return f0 + (1.0 - f0) * pow(1.0 - v_dot_h, 5.0);
 }
 
 vec3 F_CookTorrance(lowp const vec3 f0, mediump float v_dot_h)
@@ -183,6 +198,15 @@ vec3 F_CookTorrance(lowp const vec3 f0, mediump float v_dot_h)
 	d *= d;
 
 	return 0.5 * c * (1.0f + d);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float getSpotAngleAttenuation(in mediump const vec3 l, in mediump const vec3 light_dir, float inner_angle, float outer_angle) 
+{
+	float l_dot_ld 		= max(dot(normalize(-light_dir), l), 0.000001f);
+	float cos_outter	= cos(outer_angle);
+	
+	return (l_dot_ld - cos_outter) / (cos(inner_angle) - cos_outter);
 }
 
 #endif /* brdf_h */

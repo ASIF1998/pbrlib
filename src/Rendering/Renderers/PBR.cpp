@@ -248,6 +248,10 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PBR::PBR(const PBRPass::Optionals& optionals) :
+        _optionals(optionals)
+    {}
+
     void PBR::init(
         const PtrWindow&            ptr_window,
         const PtrDevice&            ptr_device,
@@ -307,7 +311,8 @@ namespace pbrlib
             _ptr_framebuffers[0]->getAttachments()->at(1),
             _ptr_framebuffers[0]->getAttachments()->at(2),
             _ptr_framebuffers[0]->getAttachments()->at(4),
-            _ptr_sampler_nearest
+            _ptr_sampler_nearest,
+            _optionals
         );
     }
 

@@ -62,9 +62,9 @@ namespace pbrlib
         }
     }
 
-    void SpecializationInfo::addMapEntry(const uint8_t* ptr_data, size_t data_size, uint32_t constant_id)
+    void SpecializationInfo::addMapEntry(const void* ptr_data, size_t data_size, uint32_t constant_id)
     {
-        assert(VkSpecializationInfo::dataSize > _current_byte_in_data + data_size &&
+        assert(VkSpecializationInfo::dataSize >= _current_byte_in_data + data_size &&
                VkSpecializationInfo::mapEntryCount > _current_map_entry);
 
         _ptr_map_enties[_current_map_entry] = {

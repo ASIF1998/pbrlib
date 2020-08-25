@@ -34,7 +34,7 @@ namespace pbrlib
         SpecializationInfo& operator = (SpecializationInfo&&)       = delete;
         SpecializationInfo& operator = (const SpecializationInfo&)  = delete;
         
-        void addMapEntry(const uint8_t* ptr_data, size_t data_size, uint32_t constant_id);
+        void addMapEntry(const void* ptr_data, size_t data_size, uint32_t constant_id);
 
         uint8_t*                         getData()                           noexcept;
         const uint8_t*                   getData()                           const noexcept;

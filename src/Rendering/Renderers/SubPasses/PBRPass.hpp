@@ -44,6 +44,76 @@ namespace pbrlib
     class PBRPass
     {
     public:
+        enum class DistributionFunction :
+            uint32_t
+        {
+            Beckmann = 0,
+            GGX,
+            GGX_Anisotropy
+        };
+
+        enum class GeometryFunction :
+            uint32_t 
+        {
+            Beckmann = 0,
+            GGX,
+            SchlickBeckmann,
+            SchlickGGX,
+            Implicit,
+            Neumann,
+            CookTorrance,
+            Kelemen,
+            Smith
+        };
+
+        enum class FresnelApproximation
+        {
+            None,
+            Schlick,
+            CookTorrance
+        };
+
+        class Optionals
+        {
+            friend class PBRPass;
+            
+        public:
+            inline Optionals(
+                DistributionFunction    distrib_func    = DistributionFunction::GGX,
+                GeometryFunction        geom_func       = GeometryFunction::Smith,
+                FresnelApproximation    fresnel_approx  = FresnelApproximation::Schlick,
+                bool                    use_bent_normal = false
+            );
+
+            inline void setDistributionFunction(DistributionFunction dist_func)        noexcept;
+            inline void setGeometryFunction(GeometryFunction geom_func)                noexcept;
+            inline void setFresnelApproximation(FresnelApproximation fresnel_approx)   noexcept;
+            inline void useBentNormal(bool to_use)                                     noexcept;
+
+            inline DistributionFunction     getDistributionFunction()   const noexcept;
+            inline GeometryFunction         getGeometryFunction()       const noexcept;
+            inline FresnelApproximation     getFresnelApproximation()   const noexcept;
+            inline bool                     useBentNormal()             const noexcept;
+
+        private:
+            DistributionFunction    _distrib_func;
+            GeometryFunction        _geom_func;
+            FresnelApproximation    _fresnel_approx;
+
+            union
+            {
+                struct
+                {
+                    bool        use_bent_normal :  1;
+                    uint32_t    other           :  31;
+                };
+
+                uint32_t mask;
+
+            } _other_options;
+        };
+
+    public:
         /**
          * @brief Конструктор.
          * 
@@ -56,6 +126,7 @@ namespace pbrlib
          * @param albedo_and_baked_AO_image_view    указатель на вид изображения с альбедо и запечённым AO.
          * @param anisotropy_image_view             указатель на вид изображения с анизотропностью.
          * @param ptr_sampler                       указатель на сэмплер.
+         * @param optionals                         опции рендера.
         */
         PBRPass(
             const PtrDevice&            ptr_device, 
@@ -66,7 +137,8 @@ namespace pbrlib
             const ImageView&            normal_and_roughness_image_view,
             const ImageView&            albedo_and_baked_AO_image_view,
             const ImageView&            anisotropy_image_view,
-            const PtrSampler&           ptr_sampler
+            const PtrSampler&           ptr_sampler,
+            const Optionals&            optionals = Optionals()
         );
 
         /**
@@ -88,10 +160,10 @@ namespace pbrlib
             const vector<Scene::PtrNode>    direction_lights
         );
 
-        PtrComputePipeline&         getPipeline() noexcept;
-        const PtrComputePipeline&   getPipeline() const noexcept;
+        inline PtrComputePipeline&         getPipeline() noexcept;
+        inline const PtrComputePipeline&   getPipeline() const noexcept;
 
-        static PtrPBRPass make(
+        inline static PtrPBRPass make(
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_deviec,
             uint32_t                    queue_family_index,
@@ -100,7 +172,8 @@ namespace pbrlib
             const ImageView&            normal_and_roughness_image_view,
             const ImageView&            albedo_and_baked_AO_image_view,
             const ImageView&            anisotropy_image_view,
-            const PtrSampler&           ptr_sampler
+            const PtrSampler&           ptr_sampler,
+            const Optionals&            optionals = Optionals()
         );
 
     private:
@@ -129,5 +202,7 @@ namespace pbrlib
         };
     };
 }
+
+#include "PBRPass.inl"
 
 #endif /* PBRPass_hpp */
