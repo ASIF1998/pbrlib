@@ -9,7 +9,7 @@
 #ifndef NumLights_h
 #define NumLights_h
 
-#define MAX_POINT_LIGHT     2048
+#define MAX_POINT_LIGHT     1024
 #define MAX_SPOT_LIGHT      1024
 #define MAX_DIRECTION_LIGHT 1024
 

@@ -1,13 +1,13 @@
 //
-//  GBuffer.glsl.frag.h
+//  GBuffer.glsl.frag.spv.h
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 27/08/2020.
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#ifndef GBuffer_glsl_frag_h
-#define GBuffer_glsl_frag_h
+#ifndef GBuffer_glsl_frag_spv_h
+#define GBuffer_glsl_frag_spv_h
 
 namespace pbrlib
 {
@@ -219,4 +219,4 @@ namespace pbrlib
     };
 }
 
-#endif /* GBuffer_glsl_frag_h */
+#endif /* GBuffer_glsl_frag_spv_h */

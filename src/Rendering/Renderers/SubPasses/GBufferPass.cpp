@@ -25,8 +25,8 @@
 
 #include "../Shaders/MaterialData.h"
 
-#include "spv/GBuffer.glsl.vert.h"
-#include "spv/GBuffer.glsl.frag.h"
+#include "spv/GBuffer.glsl.vert.spv.h"
+#include "spv/GBuffer.glsl.frag.spv.h"
 
 namespace pbrlib
 {
