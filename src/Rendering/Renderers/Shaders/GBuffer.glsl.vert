@@ -29,8 +29,8 @@ void main()
     // highp vec3 tang   = normalize(matrices.normal_matrix * VertTangent);
     // highp vec3 binorm = cross(norm, tang);
 
-    FNorm   = normalize(matrices.normal_matrix * VertNormal);
-    FTang   = normalize(matrices.normal_matrix * VertTangent);
+    FNorm   = matrices.normal_matrix * VertNormal;
+    FTang   = matrices.normal_matrix * VertTangent;
     FBtang  = cross(FNorm, FTang);
 
     // FTBN            = mat3(tang, binorm, norm);
