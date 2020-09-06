@@ -204,7 +204,7 @@ namespace pbrlib
     }
 
     void PBRPass::draw(
-        const CameraBase&               camera,
+        const Scene::PtrNode&           ptr_camera,
         const PtrCommandBuffer&         ptr_command_buffer,
         const ImageView&                out_image_view,
         const vector<Scene::PtrNode>    point_lights,
@@ -225,21 +225,23 @@ namespace pbrlib
         vector<DirectionLightData>  direction_lights_data   (num_lights.direct);
 
         CameraData camera_data = {
-            .position = camera.getPosition()
+            .position = (ptr_camera->getWorldTransform() * ptr_camera->getLocalTransform())(ptr_camera->getComponent<CameraBase>().getPosition())
         };
 
         for (size_t i{0}; i < num_lights.point; i++) {
-            const PointLight& point_light = point_lights[i]->getComponent<PointLight>();
+            const PointLight&   point_light     = point_lights[i]->getComponent<PointLight>();
+            Transform           light_transform = point_lights[i]->getWorldTransform() * point_lights[i]->getLocalTransform();
 
             point_lights_data[i].color_and_intensity    = Vec4<float>(point_light.getColor(), point_light.getIntensity());
-            point_lights_data[i].position               = point_light.getPosition();
+            point_lights_data[i].position               = light_transform(point_light.getPosition());
         }
 
         for (size_t i{0}; i < num_lights.spot; i++) {
-            const SpotLight& spot_light = spot_lights[i]->getComponent<SpotLight>();
+            const SpotLight&    spot_light      = spot_lights[i]->getComponent<SpotLight>();
+            Transform           light_transform = spot_lights[i]->getWorldTransform() * spot_lights[i]->getLocalTransform();
 
             spot_lights_data[i].color_and_intensity         = Vec4<float>(spot_light.getColor(), spot_light.getIntensity());
-            spot_lights_data[i].position_and_inner_radius   = Vec4<float>(spot_light.getPosition(), spot_light.getInnerRadius());
+            spot_lights_data[i].position_and_inner_radius   = Vec4<float>(light_transform(spot_light.getPosition()), spot_light.getInnerRadius());
             spot_lights_data[i].direction_and_outer_radius  = Vec4<float>(spot_light.getDirection(), spot_light.getOuterRadius());
         }
 
@@ -247,7 +249,7 @@ namespace pbrlib
             const DirectionLight& direction_light = direction_lights[i]->getComponent<DirectionLight>();
 
             direction_lights_data[i].color_and_intensity    = Vec4<float>(direction_light.getColor(), direction_light.getIntensity());
-            direction_lights_data[i].direction_on_light     = direction_light.getDirectionOnLight();
+            direction_lights_data[i].direction_to_light     = direction_light.getDirectionToLight();
         }
 
         _ptr_uniform_num_lights_buffer->setData(&num_lights, 1);

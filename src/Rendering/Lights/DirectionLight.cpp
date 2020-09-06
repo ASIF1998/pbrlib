@@ -11,24 +11,24 @@
 namespace pbrlib
 {
     DirectionLight::DirectionLight(
-        const Vec3<float>&  direction_on_light,
+        const Vec3<float>&  direction_to_light,
         const Vec3<float>&  color,
         float               intensity
     ) :
         Component       ("Direction Light"),
-        _dir_on_lihght  (direction_on_light),
+        _dir_to_lihght  (direction_to_light),
         _color          (color),
         _intensity      (intensity)
     {}
 
     DirectionLight::DirectionLight(
         const string_view   name,
-        const Vec3<float>&  direction_on_light,
+        const Vec3<float>&  direction_to_light,
         const Vec3<float>&  color,
         float               intensity
     ) :
         Component       (name),
-        _dir_on_lihght  (direction_on_light),
+        _dir_to_lihght  (direction_to_light),
         _color          (color),
         _intensity      (intensity)
     {}
@@ -43,9 +43,9 @@ namespace pbrlib
         _color = color;
     }
 
-    void DirectionLight::setDirectionOnLight(const Vec3<float>& direction)
+    void DirectionLight::setDirectionToLight(const Vec3<float>& direction)
     {
-        _dir_on_lihght = direction;
+        _dir_to_lihght = direction;
     }
 
     float DirectionLight::getIntensity() const noexcept
@@ -63,14 +63,14 @@ namespace pbrlib
         return _color;
     }
 
-    Vec3<float>& DirectionLight::getDirectionOnLight() noexcept
+    Vec3<float>& DirectionLight::getDirectionToLight() noexcept
     {
-        return _dir_on_lihght;
+        return _dir_to_lihght;
     }
 
-    const Vec3<float>& DirectionLight::getDirectionOnLight() const noexcept
+    const Vec3<float>& DirectionLight::getDirectionToLight() const noexcept
     {
-        return _dir_on_lihght;
+        return _dir_to_lihght;
     }
 
     type_index DirectionLight::getType() const
@@ -93,9 +93,9 @@ namespace pbrlib
         _color = color;
     }
 
-    void DirectionLight::Builder::setDirectionOnLight(const Vec3<float>& direction)
+    void DirectionLight::Builder::setDirectionToLight(const Vec3<float>& direction)
     {
-        _dir_on_light = direction;
+        _dir_to_light = direction;
     }
 
     void DirectionLight::Builder::setName(const string_view name)
@@ -105,11 +105,11 @@ namespace pbrlib
 
     DirectionLight DirectionLight::Builder::build() const
     {
-        return DirectionLight(_name, _dir_on_light, _color, _intensity);
+        return DirectionLight(_name, _dir_to_light, _color, _intensity);
     }
 
     PtrDirectionLight DirectionLight::Builder::buildPtr() const
     {
-        return make_shared<DirectionLight>(_name, _dir_on_light, _color, _intensity);
+        return make_shared<DirectionLight>(_name, _dir_to_light, _color, _intensity);
     }
 }

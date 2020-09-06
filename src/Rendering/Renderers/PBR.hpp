@@ -24,16 +24,24 @@ namespace pbrlib
     class ImageView;
     class Framebuffer;
     class PrimaryCommandBuffer;
+    class PBR;
 
     using PtrAttachments            = shared_ptr<vector<ImageView>>;
     using PtrFramebuffer            = shared_ptr<Framebuffer>; 
     using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
+    using PtrPBR                    = shared_ptr<PBR>;                  // ?
 
     class PBR :
         public IRenderer
     {
     public:
         PBR(const PBRPass::Optionals& optionals = PBRPass::Optionals());
+
+        PBR(PBR&&)      = delete;
+        PBR(const PBR&) = delete;
+
+        PBR& operator = (PBR&&)         = delete;
+        PBR& operator = (const PBR&)    = delete;
 
         /**
          * @brief Метод, предназначенный для инициализации.
@@ -51,7 +59,7 @@ namespace pbrlib
         /**
          * @brief Метод, отвечающий за отрисовку.
          * 
-         * @param camera            камера.
+         * @param ptr_camera        указатель на камеру.
          * @param visible_list      видимые узлы.
          * @param point_lights      точечные источники света.
          * @param spot_lights       прожекторные источники света.
@@ -59,7 +67,7 @@ namespace pbrlib
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
         virtual void draw(
-            const CameraBase&               camera,
+            const Scene::PtrNode&           ptr_camera,
             const Scene::VisibleList&       visible_list, 
             const vector<Scene::PtrNode>    point_lights,
             const vector<Scene::PtrNode>    spot_lights,
@@ -71,6 +79,8 @@ namespace pbrlib
         const PtrGBufferPass&    getGBUfferPass()    const noexcept;
         PtrPBRPass&              getPBRPass()        noexcept;
         const PtrPBRPass&        getPBRPass()        const noexcept;
+
+        static PtrPBR make(const PBRPass::Optionals& optionals = PBRPass::Optionals());
 
     private:
         PtrGBufferPass  _ptr_gbuffer_pass;

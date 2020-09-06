@@ -51,6 +51,40 @@ namespace pbrlib
     class GBufferPass
     {
     public:
+        class Builder
+        {
+        public:
+            Builder() = default;
+
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)         = delete;
+            Builder& operator = (const Builder&)    = delete;
+
+            void setDevice(const PtrDevice& ptr_device);
+            void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
+            void setRenderPass(const PtrRenderPass& ptr_render_pass);
+            void setSubpassIndex(uint32_t subpass_index);
+            void setDeviceMemoryIndex(uint32_t memory_index);
+            void setDeviceQueueFamilyIndex(uint32_t queue_family_index);
+            void windowSize(uint32_t width, uint32_t height);
+
+            GBufferPass     build();
+            PtrGBufferPass  buildPtr();
+
+        private:
+            PtrDevice           _ptr_device;
+            PtrDescriptorPool   _ptr_descriptor_pool;
+            PtrRenderPass       _ptr_render_pass;
+            uint32_t            _subpass_index;
+            uint32_t            _window_width;
+            uint32_t            _window_height;
+            uint32_t            _gpu_memory_index;
+            uint32_t            _gpu_queue_family_index;
+        };
+        
+    public:
         /**
          * @brief Конструктор.
          * 
@@ -58,20 +92,20 @@ namespace pbrlib
          * @param ptr_descriptor_pool       указатель на пул дескрипторов.
          * @param ptr_render_pass           указатель на проход рендеринга.
          * @param subpass_index             индекс подпрохода.
-         * @param window_width              ширина окна.
-         * @param window_height             высота окна.
          * @param gpu_memory_index          индекс памяти устройства (должен поддерживать отображение).
          * @param gpu_queue_family_index    индекс семейства очередей (семейство должно поддерживать графические операции).
+         * @param window_width              ширина окна.
+         * @param window_height             высота окна.
         */
         GBufferPass(
             const PtrDevice&            ptr_device, 
             const PtrDescriptorPool&    ptr_descriptor_pool,  
             const PtrRenderPass&        ptr_render_pass,
             uint32_t                    subpass_index,
-            uint32_t                    window_width,
-            uint32_t                    window_height,
             uint32_t                    gpu_memory_index,
-            uint32_t                    gpu_queue_family_index
+            uint32_t                    gpu_queue_family_index,
+            uint32_t                    window_width,
+            uint32_t                    window_height
         );
 
         /**
@@ -106,10 +140,10 @@ namespace pbrlib
          * @param ptr_descriptor_pool       указатель на пул дескрипторов.
          * @param ptr_render_pass           указатель на проход рендеринга.
          * @param subpass_index             индекс подпрохода.
-         * @param window_width              ширина окна.
-         * @param window_height             высота окна.
          * @param gpu_memory_index          индекс памяти устройства (должен поддерживать отображение).
          * @param gpu_queue_family_index    индекс семейства очередей (семейство должно поддерживать графические операции).
+         * @param window_width              ширина окна.
+         * @param window_height             высота окна.s
          * @return Указатель на GBufferPass.
         */
         static PtrGBufferPass make(
@@ -117,10 +151,10 @@ namespace pbrlib
             const PtrDescriptorPool&    ptr_descriptor_pool,  
             const PtrRenderPass&        ptr_render_pass,
             uint32_t                    subpass_index,
-            uint32_t                    window_width,
-            uint32_t                    window_height,
             uint32_t                    gpu_memory_index,
-            uint32_t                    gpu_queue_family_index
+            uint32_t                    gpu_queue_family_index,
+            uint32_t                    window_width,
+            uint32_t                    window_height
         );
 
     private:

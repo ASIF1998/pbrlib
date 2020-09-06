@@ -61,15 +61,80 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void GBufferPass::Builder::setDevice(const PtrDevice& ptr_device)
+    {
+        _ptr_device = ptr_device;
+        
+    }
+
+    void GBufferPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
+    {
+       _ptr_descriptor_pool = ptr_descriptor_pool;
+    }
+
+    void GBufferPass::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
+    {
+       _ptr_render_pass = ptr_render_pass;
+    }
+
+    void GBufferPass::Builder::setSubpassIndex(uint32_t subpass_index)
+    {
+        _subpass_index = subpass_index;
+    }
+
+    void GBufferPass::Builder::setDeviceMemoryIndex(uint32_t memory_index)
+    {
+        _gpu_memory_index = memory_index;
+    }
+
+    void GBufferPass::Builder::setDeviceQueueFamilyIndex(uint32_t queue_family_index)
+    {
+        _gpu_queue_family_index = queue_family_index;
+    }
+
+    void GBufferPass::Builder::windowSize(uint32_t width, uint32_t height)
+    {
+        _window_width   = width;
+        _window_height  = height;
+    }
+
+    GBufferPass GBufferPass::Builder::build()
+    {
+        return GBufferPass(
+            _ptr_device, 
+            _ptr_descriptor_pool, 
+            _ptr_render_pass, 
+            _subpass_index, 
+            _gpu_memory_index, 
+            _gpu_queue_family_index,
+            _window_width, _window_height
+        );
+    }
+    
+    PtrGBufferPass GBufferPass::Builder::buildPtr()
+    {
+        return GBufferPass::make(
+            _ptr_device, 
+            _ptr_descriptor_pool, 
+            _ptr_render_pass, 
+            _subpass_index, 
+            _gpu_memory_index, 
+            _gpu_queue_family_index,
+            _window_width, _window_height
+        );
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GBufferPass::GBufferPass(
         const PtrDevice&            ptr_device, 
         const PtrDescriptorPool&    ptr_descriptor_pool,  
         const PtrRenderPass&        ptr_render_pass,
         uint32_t                    subpass_index,
-        uint32_t                    window_width,
-        uint32_t                    window_height,
         uint32_t                    gpu_memory_index,
-        uint32_t                    gpu_queue_family_index
+        uint32_t                    gpu_queue_family_index,
+        uint32_t                    window_width,
+        uint32_t                    window_height
     )
     {
         ShaderModule::Builder build_vert_shader;
@@ -226,15 +291,9 @@ namespace pbrlib
                     const PtrMaterial&  ptr_material        = mesh.getMaterial();
                     Transform           current_transform   = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
                     
-                    uniform_matrices_buffer_data.model_matrix = current_transform.getMatrix();
-                    uniform_matrices_buffer_data.MVP          = (projection * view * current_transform).getMatrix();
-
-                    uniform_matrices_buffer_data.normal_matrix = inverse(Matrix4x4<float> (
-                        uniform_matrices_buffer_data.model_matrix[0][0],    uniform_matrices_buffer_data.model_matrix[0][1],    uniform_matrices_buffer_data.model_matrix[0][2],    0.0f,
-                        uniform_matrices_buffer_data.model_matrix[1][0],    uniform_matrices_buffer_data.model_matrix[1][1],    uniform_matrices_buffer_data.model_matrix[1][2],    0.0f,
-                        uniform_matrices_buffer_data.model_matrix[2][0],    uniform_matrices_buffer_data.model_matrix[2][1],    uniform_matrices_buffer_data.model_matrix[2][2],    0.0f,
-                        0.0f,                                               0.0f,                                               0.0f,                                               1.0f
-                    ));
+                    uniform_matrices_buffer_data.model_matrix   = current_transform.getMatrix();
+                    uniform_matrices_buffer_data.MVP            = (projection * view * current_transform).getMatrix();
+                    uniform_matrices_buffer_data.normal_matrix  = transpose(inverse(uniform_matrices_buffer_data.model_matrix));
 
                     uniform_material_buffer_data.anisotropy = ptr_material->getAnisotropy();
 
@@ -313,10 +372,10 @@ namespace pbrlib
         const PtrDescriptorPool&    ptr_descriptor_pool,  
         const PtrRenderPass&        ptr_render_pass,
         uint32_t                    subpass_index,
-        uint32_t                    window_width,
-        uint32_t                    window_height,
         uint32_t                    gpu_memory_index,
-        uint32_t                    gpu_queue_family_index
+        uint32_t                    gpu_queue_family_index,
+        uint32_t                    window_width,
+        uint32_t                    window_height
     )
     {
         return make_unique<GBufferPass>(
@@ -324,10 +383,9 @@ namespace pbrlib
             ptr_descriptor_pool, 
             ptr_render_pass, 
             subpass_index, 
-            window_width, 
-            window_height, 
             gpu_memory_index, 
-            gpu_queue_family_index
+            gpu_queue_family_index,
+            window_width, window_height
         );
     }
 }

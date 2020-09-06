@@ -47,7 +47,7 @@ namespace pbrlib
         /**
          * @brief Метод, отвечающий за отрисовку.
          * 
-         * @param camera            камера.
+         * @param ptr_camera        указатель на камеру.
          * @param visible_list      видимые узлы.
          * @param point_lights      точечные источники света.
          * @param spot_lights       прожекторные источники света.
@@ -55,7 +55,7 @@ namespace pbrlib
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
         virtual void draw(
-            const CameraBase&               camera,
+            const Scene::PtrNode&           ptr_camera,
             const Scene::VisibleList&       visible_list, 
             const vector<Scene::PtrNode>    point_lights,
             const vector<Scene::PtrNode>    spot_lights,

@@ -63,6 +63,93 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    inline void PBRPass::Builder::setDevice(const PtrDevice& ptr_device)
+    {
+        _ptr_device = ptr_device;
+    }
+
+    inline void PBRPass::Builder::setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device)
+    {
+        _ptr_physical_deviec = ptr_physical_device;
+    }
+
+    inline void PBRPass::Builder::setQueueFamilyIndex(uint32_t queue_family_index)
+    {
+        _queue_family_index = queue_family_index;
+    }
+
+    inline void PBRPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
+    {
+        _ptr_descriptor_pool = ptr_descriptor_pool;
+    }
+
+    inline void PBRPass::Builder::setPositionAndMetallicImageView(const ImageView* position_and_metallic_image_view)
+    {
+        assert(position_and_metallic_image_view);
+        _position_and_metallic_image_view = position_and_metallic_image_view;
+    }
+
+    inline void PBRPass::Builder::setNormalAndRoughnessImageView(const ImageView* normal_and_roughness_image_view)
+    {
+        assert(normal_and_roughness_image_view);
+        _normal_and_roughness_image_view = normal_and_roughness_image_view;
+    }
+
+    inline void PBRPass::Builder::setAlbedoAndBakedAOImageView(const ImageView* albedo_and_baked_AO_image_view)
+    {
+        assert(albedo_and_baked_AO_image_view);
+        _albedo_and_baked_AO_image_view = albedo_and_baked_AO_image_view;
+    }
+
+    inline void PBRPass::Builder::setAnisotropyImageView(const ImageView* anisotropy_image_view)
+    {
+        assert(anisotropy_image_view);
+        _anisotropy_image_view = anisotropy_image_view;
+    }
+
+    inline void PBRPass::Builder::setSampler(const PtrSampler& ptr_sampler)
+    {
+        _ptr_sampler = ptr_sampler;
+    }
+
+    inline void PBRPass::Builder::setOptionals(const Optionals& optionals)
+    {
+        _optionals = optionals;
+    }
+
+    inline PBRPass PBRPass::Builder::build()
+    {
+        return PBRPass(
+            _ptr_device,
+            _ptr_physical_deviec,
+            _queue_family_index,
+            _ptr_descriptor_pool,
+            *_position_and_metallic_image_view,
+            *_normal_and_roughness_image_view,
+            *_albedo_and_baked_AO_image_view,
+            *_anisotropy_image_view,
+            _ptr_sampler,
+            _optionals
+        );
+    }
+
+    inline PtrPBRPass PBRPass::Builder::buildPtr()
+    {
+        return make_unique<PBRPass>(
+            _ptr_device,
+            _ptr_physical_deviec,
+            _queue_family_index,
+            _ptr_descriptor_pool,
+            *_position_and_metallic_image_view,
+            *_normal_and_roughness_image_view,
+            *_albedo_and_baked_AO_image_view,
+            *_anisotropy_image_view,
+            _ptr_sampler,
+            _optionals
+        );
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline PtrComputePipeline& PBRPass::getPipeline() noexcept
     {
         return _ptr_pipeline;
@@ -87,7 +174,7 @@ namespace pbrlib
     )
     {
         return make_unique<PBRPass>(
-            ptr_device, 
+            ptr_device,
             ptr_physical_deviec,
             queue_family_index,
             ptr_descriptor_pool,

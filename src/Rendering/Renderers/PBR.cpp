@@ -262,6 +262,9 @@ namespace pbrlib
 
         Sampler::Builder build_sampler;
 
+        GBufferPass::Builder    gbuffer_builder;
+        PBRPass::Builder        pbr_pass_builder;
+
         build_sampler.setDevice(ptr_device);
         build_sampler.anisotropyEnable(VK_FALSE);
         build_sampler.compareEnable(VK_FALSE);
@@ -292,32 +295,31 @@ namespace pbrlib
 
         _ptr_sampler_nearest = build_sampler.buildPtr();
 
-        _ptr_gbuffer_pass = GBufferPass::make(
-            _ptr_device,
-            _ptr_descriptor_pool,
-            _ptr_render_pass,
-            0,
-            width, height,
-            gpu_memory_index,
-            gpu_queue_family_index
-        );
+        gbuffer_builder.setDevice(_ptr_device);
+        gbuffer_builder.setDescriptorPool(_ptr_descriptor_pool);
+        gbuffer_builder.setRenderPass(_ptr_render_pass);
+        gbuffer_builder.setSubpassIndex(0);
+        gbuffer_builder.setDeviceMemoryIndex(gpu_memory_index);
+        gbuffer_builder.setDeviceQueueFamilyIndex(gpu_queue_family_index);
+        gbuffer_builder.windowSize(width, height);
 
-        _ptr_pbr_pass = PBRPass::make(
-            _ptr_device,
-            ptr_physical_device,
-            gpu_queue_family_index,
-            _ptr_descriptor_pool, 
-            _ptr_framebuffers[0]->getAttachments()->at(0),
-            _ptr_framebuffers[0]->getAttachments()->at(1),
-            _ptr_framebuffers[0]->getAttachments()->at(2),
-            _ptr_framebuffers[0]->getAttachments()->at(4),
-            _ptr_sampler_nearest,
-            _optionals
-        );
+        pbr_pass_builder.setDevice(_ptr_device);
+        pbr_pass_builder.setPhysicalDevice(ptr_physical_device);
+        pbr_pass_builder.setQueueFamilyIndex(gpu_queue_family_index);
+        pbr_pass_builder.setDescriptorPool(_ptr_descriptor_pool);
+        pbr_pass_builder.setPositionAndMetallicImageView(&_ptr_framebuffers[0]->getAttachments()->at(0));
+        pbr_pass_builder.setNormalAndRoughnessImageView(&_ptr_framebuffers[0]->getAttachments()->at(1));
+        pbr_pass_builder.setAlbedoAndBakedAOImageView(&_ptr_framebuffers[0]->getAttachments()->at(2));
+        pbr_pass_builder.setAnisotropyImageView(&_ptr_framebuffers[0]->getAttachments()->at(4));
+        pbr_pass_builder.setSampler(_ptr_sampler_nearest);
+        pbr_pass_builder.setOptionals(_optionals);
+
+        _ptr_gbuffer_pass   = gbuffer_builder.buildPtr();
+        _ptr_pbr_pass       = pbr_pass_builder.buildPtr();
     }
 
     void PBR::draw(
-        const CameraBase&               camera,
+        const Scene::PtrNode&           ptr_camera,
         const Scene::VisibleList&       visible_list,
         const vector<Scene::PtrNode>    point_lights,
         const vector<Scene::PtrNode>    spot_lights,
@@ -329,6 +331,8 @@ namespace pbrlib
         
         VkSemaphore             semaphore_handle    = VK_NULL_HANDLE;
         VkSemaphoreCreateInfo   semaphore_info      = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+        
+        const CameraBase& camera = ptr_camera->getComponent<CameraBase>();
         
         assert(vkCreateSemaphore(_ptr_device->getDeviceHandle(), &semaphore_info, nullptr, &semaphore_handle) == VK_SUCCESS);
         
@@ -360,7 +364,7 @@ namespace pbrlib
         _ptr_command_buffer->bindToPipeline(_ptr_pbr_pass->getPipeline());
 
         _ptr_pbr_pass->draw(
-            camera,
+            ptr_camera,
             _ptr_command_buffer,
             _ptr_swapchain->getImagesView()[image_index],
             point_lights,
@@ -415,5 +419,10 @@ namespace pbrlib
     const PtrPBRPass& PBR::getPBRPass() const noexcept
     {
         return _ptr_pbr_pass;
+    }
+
+    PtrPBR PBR::make(const PBRPass::Optionals& optionals)
+    {
+        return make_shared<PBR>(optionals);
     }
 }

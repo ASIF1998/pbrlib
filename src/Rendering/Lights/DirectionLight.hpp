@@ -36,14 +36,14 @@ namespace pbrlib
 
             void setIntensity(float intensity) noexcept;
             void setColor(const Vec3<float>& color);
-            void setDirectionOnLight(const Vec3<float>& direction);
+            void setDirectionToLight(const Vec3<float>& direction);
             void setName(const string_view name);
 
             DirectionLight      build()     const;
             PtrDirectionLight   buildPtr()  const;
 
         private:
-            Vec3<float> _dir_on_light;
+            Vec3<float> _dir_to_light;
             Vec3<float> _color;
             float       _intensity;
             string      _name;
@@ -51,32 +51,32 @@ namespace pbrlib
 
     public:
         DirectionLight(
-            const Vec3<float>&  direction_on_light,
+            const Vec3<float>&  direction_to_light,
             const Vec3<float>&  color,
             float               intensity
         );
 
         DirectionLight(
             const string_view   name,
-            const Vec3<float>&  direction_on_light,
+            const Vec3<float>&  direction_to_light,
             const Vec3<float>&  color,
             float               intensity
         );
 
         void setIntensity(float intensity) noexcept;
         void setColor(const Vec3<float>& color);
-        void setDirectionOnLight(const Vec3<float>& direction);
+        void setDirectionToLight(const Vec3<float>& direction);
 
         float               getIntensity()          const noexcept;
         Vec3<float>&        getColor()              noexcept;
         const Vec3<float>&  getColor()              const noexcept;
-        Vec3<float>&        getDirectionOnLight()   noexcept;
-        const Vec3<float>&  getDirectionOnLight()   const noexcept;
+        Vec3<float>&        getDirectionToLight()   noexcept;
+        const Vec3<float>&  getDirectionToLight()   const noexcept;
 
         virtual type_index getType() const override;
 
     private:
-        Vec3<float> _dir_on_lihght;
+        Vec3<float> _dir_to_lihght;
         Vec3<float> _color;
         float       _intensity;
     };

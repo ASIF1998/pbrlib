@@ -34,13 +34,16 @@ namespace pbrlib
     using PtrDevice             = shared_ptr<Device>;
     using PtrDescriptorSet      = shared_ptr<DescriptorSet>;
     using PtrCommandBuffer      = shared_ptr<CommandBuffer>;
-    using PtrImageView          = shared_ptr<ImageView>;
     using PtrPBRPass            = unique_ptr<PBRPass>;
     using PtrSampler            = shared_ptr<Sampler>;
     using PtrDescriptorPool     = shared_ptr<DescriptorPool>;
     using PtrBuffer             = shared_ptr<Buffer>;
     using PtrPhysicalDevice     = shared_ptr<PhysicalDevice>;
 
+    /**
+     * @class PBRPass.
+     * @brief Данный класс необходим для прохода физически-корректного рендеринга.
+    */
     class PBRPass
     {
     public:
@@ -66,7 +69,8 @@ namespace pbrlib
             Smith
         };
 
-        enum class FresnelApproximation
+        enum class FresnelApproximation :
+            uint32_t
         {
             None,
             Schlick,
@@ -113,6 +117,44 @@ namespace pbrlib
             } _other_options;
         };
 
+        class Builder
+        {
+        public:
+            Builder() = default;
+
+            Builder(Builder&&)      = delete;
+            Builder(const Builder&) = delete;
+
+            Builder& operator = (Builder&&)         = delete;
+            Builder& operator = (const Builder&)    = delete;
+
+            inline void setDevice(const PtrDevice& ptr_device);
+            inline void setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device);
+            inline void setQueueFamilyIndex(uint32_t queue_family_index);
+            inline void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
+            inline void setPositionAndMetallicImageView(const ImageView* position_and_metallic_image_view);
+            inline void setNormalAndRoughnessImageView(const ImageView* normal_and_roughness_image_view);
+            inline void setAlbedoAndBakedAOImageView(const ImageView* albedo_and_baked_AO_image_view);
+            inline void setAnisotropyImageView(const ImageView* anisotropy_image_view);
+            inline void setSampler(const PtrSampler& ptr_sampler);
+            inline void setOptionals(const Optionals& optionals);
+
+            inline PBRPass      build();
+            inline PtrPBRPass   buildPtr();
+
+        private:
+            PtrDevice           _ptr_device;
+            PtrPhysicalDevice   _ptr_physical_deviec;
+            uint32_t            _queue_family_index;
+            PtrDescriptorPool   _ptr_descriptor_pool;
+            const ImageView*    _position_and_metallic_image_view;
+            const ImageView*    _normal_and_roughness_image_view;
+            const ImageView*    _albedo_and_baked_AO_image_view;
+            const ImageView*    _anisotropy_image_view;
+            PtrSampler          _ptr_sampler;
+            Optionals           _optionals;
+        };
+
     public:
         /**
          * @brief Конструктор.
@@ -144,15 +186,15 @@ namespace pbrlib
         /**
          * @brief Метод, позволяющий запустить проход физически-корректного рендеринга.
          * 
-         * @param camera                 камера.
-         * @param ptr_command_buffer     указатель на командный буфер.
-         * @param out_image_view         указатель на вид изображения в который будет записан резкльтат прохода.
-         * @param point_lights           точечные источники света.
-         * @param spot_lights            прожекторные источники света.
-         * @param direction_lights       направденные источники света.
+         * @param ptr_camera            указатель на камеру.
+         * @param ptr_command_buffer    указатель на командный буфер.
+         * @param out_image_view        указатель на вид изображения в который будет записан резкльтат прохода.
+         * @param point_lights          точечные источники света.
+         * @param spot_lights           прожекторные источники света.
+         * @param direction_lights      направденные источники света.
         */
         void draw(
-            const CameraBase&               camera,
+            const Scene::PtrNode&           ptr_camera,
             const PtrCommandBuffer&         ptr_command_buffer,
             const ImageView&                out_image_view,
             const vector<Scene::PtrNode>    point_lights,

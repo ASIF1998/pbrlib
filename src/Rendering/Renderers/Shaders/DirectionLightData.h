@@ -11,7 +11,7 @@
 
 struct DirectionLightData
 {
-    vec4 direction_on_light;
+    vec4 direction_to_light;
     vec4 color_and_intensity;
 };
 

@@ -293,6 +293,32 @@ void main()
         Lout += (diff_component + spec_component) * I * E(dist, n_dot_l) * getSpotAngleAttenuation(dir_to_light, light_dir, light_inner_angle, light_outer_angle);
     }
 
+    /// Directions
+    for (uint current_light_index = 0; current_light_index < num_lights.lights.direct; current_light_index++) {
+        light_color         = direction_lights_dates.data[current_light_index].color_and_intensity.rgb;
+        light_intensity     = direction_lights_dates.data[current_light_index].color_and_intensity.a;
+        dir_to_light        = normalize(direction_lights_dates.data[current_light_index].direction_to_light.xyz);
+
+        h = normalize(dir_to_light + position);
+
+        n_dot_h = max(dot(normal, h), 0.000001f);
+        n_dot_l = max(dot(normal, dir_to_light), 0.000001f);
+        v_dot_h = max(dot(dir_to_camera, h), 0.000001f);
+
+        DISTRIBUTION_FUNCTION(n_dot_h, t_dot_h, b_dot_h, roughness, D);
+        GEOMETRY_FUNCTION(n_dot_h, n_dot_l, n_dot_v, v_dot_h, roughness, G);
+        FRESNEL_APPROXIMATION_FUNCTION(base_color, metallic, v_dot_h, F);
+
+        kd = (1.0f - F) * n_dot_l * M_1_PI;
+
+        spec_component  = (F * D * G) / (4.0f * n_dot_l * n_dot_v); 
+        diff_component  = kd * (light_color * light_intensity) * base_color;
+
+        I = (light_color * light_intensity) / (4.0f * PI);
+
+        Lout += (diff_component + spec_component) * I;
+    }
+
     vec3 ambient    = base_color * ao;
     vec3 color      = ambient + Lout;
 
