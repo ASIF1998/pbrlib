@@ -189,13 +189,13 @@ namespace pbrlib
         return *_out_image_view;
     }
 
-    inline void PBRPass::outputImple(ImageView& image_view, size_t id)
+    inline void PBRPass::outputImpl(ImageView& image_view, size_t id)
     {
         assert(id < OutputImagesViewsIDs::Count);
         _out_image_view = &image_view;
     }
 
-    inline void PBRPass::outputImple(PtrImageView& ptr_image_view, size_t id)
+    inline void PBRPass::outputImpl(PtrImageView& ptr_image_view, size_t id)
     {
         assert(ptr_image_view && id < OutputImagesViewsIDs::Count);
         _out_image_view = ptr_image_view.get();
@@ -210,7 +210,7 @@ namespace pbrlib
             *_ptr_images_views[id],
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             *_ptr_sampler,
-            id,
+            static_cast<uint32_t>(id),
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
         );
     }

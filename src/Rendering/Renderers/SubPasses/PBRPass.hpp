@@ -277,8 +277,8 @@ namespace pbrlib
         friend class IPassOutput<PBRPass>;
         
         inline const ImageView&    outputImpl(size_t id) const;
-        inline void                outputImple(ImageView& image_view, size_t id);
-        inline void                outputImple(PtrImageView& ptr_image_view, size_t id);
+        inline void                outputImpl(ImageView& image_view, size_t id);
+        inline void                outputImpl(PtrImageView& ptr_image_view, size_t id);
 
         inline void inputImpl(const PtrImageView& ptr_image_view, size_t id);
 
