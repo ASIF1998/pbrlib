@@ -242,7 +242,7 @@ void main()
         light_intensity = point_lights_data.data[current_light_index].color_and_intensity.a;
 
         dir_to_light    = normalize(point_lights_data.data[current_light_index].position.xyz - position);
-        h               = normalize(dir_to_light + position);
+        h               = normalize(dir_to_light + dir_to_camera);
         dist            = length(point_lights_data.data[current_light_index].position.xyz - position);
 
         n_dot_h = max(dot(normal, h), 0.000001f);
@@ -272,7 +272,7 @@ void main()
         light_outer_angle   = spot_lights_data.data[current_light_index].direction_and_outer_radius.w;
 
         dir_to_light    = normalize(spot_lights_data.data[current_light_index].position_and_inner_radius.xyz - position);
-        h               = normalize(dir_to_light + position);
+        h               = normalize(dir_to_light + dir_to_camera);
         dist            = length(spot_lights_data.data[current_light_index].position_and_inner_radius.xyz - position);
 
         n_dot_h = max(dot(normal, h), 0.000001f);
@@ -299,7 +299,7 @@ void main()
         light_intensity     = direction_lights_dates.data[current_light_index].color_and_intensity.a;
         dir_to_light        = normalize(direction_lights_dates.data[current_light_index].direction_to_light.xyz);
 
-        h = normalize(dir_to_light + position);
+        h = normalize(dir_to_light + dir_to_camera);
 
         n_dot_h = max(dot(normal, h), 0.000001f);
         n_dot_l = max(dot(normal, dir_to_light), 0.000001f);

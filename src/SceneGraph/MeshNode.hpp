@@ -16,7 +16,7 @@ namespace pbrlib
 {
     class MeshNode;
 
-    using PtrMeshNode           = shared_ptr<MeshNode>;
+    using PtrMeshNode = shared_ptr<MeshNode>;
 
     class MeshNode :
         public Scene::Node

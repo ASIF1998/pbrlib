@@ -6,6 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#include "../../VulkanWrapper/DescriptorSet.hpp"
 
 namespace pbrlib
 {
@@ -119,15 +120,26 @@ namespace pbrlib
 
     inline PBRPass PBRPass::Builder::build()
     {
+        if (_position_and_metallic_image_view && _normal_and_roughness_image_view && _albedo_and_baked_AO_image_view && _anisotropy_image_view) {
+            return PBRPass(
+                _ptr_device,
+                _ptr_physical_deviec,
+                _queue_family_index,
+                _ptr_descriptor_pool,
+                *_position_and_metallic_image_view,
+                *_normal_and_roughness_image_view,
+                *_albedo_and_baked_AO_image_view,
+                *_anisotropy_image_view,
+                _ptr_sampler,
+                _optionals
+            );
+        }
+
         return PBRPass(
             _ptr_device,
             _ptr_physical_deviec,
             _queue_family_index,
             _ptr_descriptor_pool,
-            *_position_and_metallic_image_view,
-            *_normal_and_roughness_image_view,
-            *_albedo_and_baked_AO_image_view,
-            *_anisotropy_image_view,
             _ptr_sampler,
             _optionals
         );
@@ -135,15 +147,26 @@ namespace pbrlib
 
     inline PtrPBRPass PBRPass::Builder::buildPtr()
     {
+        if (_position_and_metallic_image_view && _normal_and_roughness_image_view && _albedo_and_baked_AO_image_view && _anisotropy_image_view) {
+            return make_unique<PBRPass>(
+                _ptr_device,
+                _ptr_physical_deviec,
+                _queue_family_index,
+                _ptr_descriptor_pool,
+                *_position_and_metallic_image_view,
+                *_normal_and_roughness_image_view,
+                *_albedo_and_baked_AO_image_view,
+                *_anisotropy_image_view,
+                _ptr_sampler,
+                _optionals
+            );
+        }
+
         return make_unique<PBRPass>(
             _ptr_device,
             _ptr_physical_deviec,
             _queue_family_index,
             _ptr_descriptor_pool,
-            *_position_and_metallic_image_view,
-            *_normal_and_roughness_image_view,
-            *_albedo_and_baked_AO_image_view,
-            *_anisotropy_image_view,
             _ptr_sampler,
             _optionals
         );
@@ -158,6 +181,57 @@ namespace pbrlib
     inline const PtrComputePipeline& PBRPass::getPipeline() const noexcept
     {
         return _ptr_pipeline;
+    }
+
+    inline const ImageView& PBRPass::outputImpl(size_t id) const
+    {
+        assert(_out_image_view && id < OutputImagesViewsIDs::Count);
+        return *_out_image_view;
+    }
+
+    inline void PBRPass::outputImple(ImageView& image_view, size_t id)
+    {
+        assert(id < OutputImagesViewsIDs::Count);
+        _out_image_view = &image_view;
+    }
+
+    inline void PBRPass::outputImple(PtrImageView& ptr_image_view, size_t id)
+    {
+        assert(ptr_image_view && id < OutputImagesViewsIDs::Count);
+        _out_image_view = ptr_image_view.get();
+    }
+
+    inline void PBRPass::inputImpl(const PtrImageView& ptr_image_view, size_t id)
+    {
+        assert(id < InputImagesViewsIDs::Count);
+        _ptr_images_views[id] = ptr_image_view.get();
+
+        _ptr_descriptor_set->writeImageView(
+            *_ptr_images_views[id],
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            *_ptr_sampler,
+            id,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+        );
+    }
+
+    inline PtrPBRPass PBRPass::make(
+        const PtrDevice&            ptr_device, 
+        const PtrPhysicalDevice&    ptr_physical_deviec,
+        uint32_t                    queue_family_index,
+        const PtrDescriptorPool&    ptr_descriptor_pool,
+        const PtrSampler&           ptr_sampler,
+        const Optionals&            optionals
+    )
+    {
+        return make_unique<PBRPass>(
+            ptr_device,
+            ptr_physical_deviec,
+            queue_family_index,
+            ptr_descriptor_pool,
+            ptr_sampler,
+            optionals
+        );
     }
 
     inline PtrPBRPass PBRPass::make(

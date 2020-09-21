@@ -9,12 +9,14 @@
 #include "GBufferPass.hpp"
 
 #include "../../VulkanWrapper/Device.hpp"
+#include "../../VulkanWrapper/PhysicalDevice.hpp"
 
 #include "../../VulkanWrapper/ShaderModule.hpp"
 
 #include "../../VulkanWrapper/DescriptorSet.hpp"
 #include "../../VulkanWrapper/GraphicsPipeline.hpp"
 #include "../../VulkanWrapper/RenderPass.hpp"
+#include "../../VulkanWrapper/Framebuffer.hpp"
 
 #include "../../Geometry/Mesh.hpp"
 
@@ -61,26 +63,19 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     void GBufferPass::Builder::setDevice(const PtrDevice& ptr_device)
     {
         _ptr_device = ptr_device;
-        
+    }
+
+    void GBufferPass::Builder::setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device)
+    {
+        _ptr_physical_device = ptr_physical_device;
     }
 
     void GBufferPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
     {
        _ptr_descriptor_pool = ptr_descriptor_pool;
-    }
-
-    void GBufferPass::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
-    {
-       _ptr_render_pass = ptr_render_pass;
-    }
-
-    void GBufferPass::Builder::setSubpassIndex(uint32_t subpass_index)
-    {
-        _subpass_index = subpass_index;
     }
 
     void GBufferPass::Builder::setDeviceMemoryIndex(uint32_t memory_index)
@@ -102,10 +97,8 @@ namespace pbrlib
     GBufferPass GBufferPass::Builder::build()
     {
         return GBufferPass(
-            _ptr_device, 
-            _ptr_descriptor_pool, 
-            _ptr_render_pass, 
-            _subpass_index, 
+            _ptr_device, _ptr_physical_device,
+            _ptr_descriptor_pool,
             _gpu_memory_index, 
             _gpu_queue_family_index,
             _window_width, _window_height
@@ -115,10 +108,8 @@ namespace pbrlib
     PtrGBufferPass GBufferPass::Builder::buildPtr()
     {
         return GBufferPass::make(
-            _ptr_device, 
+            _ptr_device, _ptr_physical_device,
             _ptr_descriptor_pool, 
-            _ptr_render_pass, 
-            _subpass_index, 
             _gpu_memory_index, 
             _gpu_queue_family_index,
             _window_width, _window_height
@@ -126,19 +117,192 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PtrRenderPass makeRenderPass(const PtrDevice& ptr_device, const PtrAttachments& image_view)
+    {
+        RenderPass::Builder build_render_pass       (GBufferPass::OutputImagesViewsIDs::Count, 1, 0);
+        SubpassDescription  subpass_description1    (0, 4, 0);
+
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::Anisotropy, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.setDepthStencilAttachment(GBufferPass::OutputImagesViewsIDs::Depth, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+
+        build_render_pass.setDevice(ptr_device);
+        
+        build_render_pass.addAttachmentDescription(
+            image_view->at(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        );
+
+        build_render_pass.addAttachmentDescription(
+            image_view->at(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        );
+
+        build_render_pass.addAttachmentDescription(
+            image_view->at(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        );
+
+        build_render_pass.addAttachmentDescription(
+           image_view->at(GBufferPass::OutputImagesViewsIDs::Depth).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL
+        );
+        
+        build_render_pass.addAttachmentDescription(
+            image_view->at(GBufferPass::OutputImagesViewsIDs::Anisotropy).getFormat(),
+            VK_SAMPLE_COUNT_1_BIT,
+            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_STORE_OP_STORE,
+            VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        );
+    
+        build_render_pass.addSubpassDescription(move(subpass_description1));
+
+        return build_render_pass.buildPtr();
+    }
+
+    PtrAttachments makeFramebufferAttachments(
+        const PtrDevice&            ptr_device,
+        const PtrPhysicalDevice&    ptr_physical_device,
+        uint32_t                    gpu_queue_family_index,
+        uint32_t                    width,
+        uint32_t                    height
+    )
+    {
+        PtrAttachments ptr_framebuffer_attachments (new vector<ImageView>());
+
+        Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     image_rgba_builder;
+        ImageView::Builder                                                      image_view_builder;
+        Image::Builder<Image::TexelType::Depth, float, Image::NumBits::NB32>    depth_image_builder;
+
+        image_rgba_builder.setDevice(ptr_device);
+        image_rgba_builder.setExtend(width, height, 1);
+        image_rgba_builder.setImageType(VK_IMAGE_TYPE_2D);
+        image_rgba_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+        image_rgba_builder.setNumArrayLayers(1);
+        image_rgba_builder.setNumMipLevels(1);
+        image_rgba_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+        image_rgba_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
+        image_rgba_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        image_rgba_builder.addQueueFamilyIndex(gpu_queue_family_index);
+        
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
+        image_view_builder.setBaseArrayLayer(0);
+        image_view_builder.setBaseMipLevel(0);
+        image_view_builder.setFormat(VK_FORMAT_R32G32B32A32_SFLOAT);
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        image_view_builder.setLayerCount(1);
+        image_view_builder.setLevelCount(1);
+        image_view_builder.setType(VK_IMAGE_VIEW_TYPE_2D);
+
+        depth_image_builder.setDevice(ptr_device);
+        depth_image_builder.setExtend(width, height, 1);
+        depth_image_builder.setImageType(VK_IMAGE_TYPE_2D);
+        depth_image_builder.setMemoryTypeIndex(ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT));
+        depth_image_builder.setNumArrayLayers(1);
+        depth_image_builder.setNumMipLevels(1);
+        depth_image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+        depth_image_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
+        depth_image_builder.setUsage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        depth_image_builder.addQueueFamilyIndex(gpu_queue_family_index);
+
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
+        
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
+
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
+        
+        image_view_builder.setImage(depth_image_builder.buildPtr());
+        image_view_builder.setFormat(VK_FORMAT_D32_SFLOAT);
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_DEPTH_BIT);
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
+
+        image_view_builder.setImage(image_rgba_builder.buildPtr());
+        image_view_builder.setFormat(VK_FORMAT_R32G32B32A32_SFLOAT);
+        image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
+        ptr_framebuffer_attachments->push_back(image_view_builder.build());
+        
+        return ptr_framebuffer_attachments;
+    }
+
+    PtrFramebuffer makeFramebuffer(
+        const PtrAttachments&   ptr_framebuffer_attachments,
+        const PtrRenderPass&    ptr_render_pass,
+        uint32_t                width,
+        uint32_t                height
+    )
+    {
+        Framebuffer::Builder    build_framebuffer;
+        PtrFramebuffer  framebuffer;
+
+        build_framebuffer.setAttachments(ptr_framebuffer_attachments);
+        build_framebuffer.setRenderPass(ptr_render_pass);
+        build_framebuffer.setWidth(width);
+        build_framebuffer.setHeight(height);
+        build_framebuffer.setNumLayers(1);
+
+        return build_framebuffer.buildPtr();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GBufferPass::GBufferPass(
         const PtrDevice&            ptr_device, 
+        const PtrPhysicalDevice&    ptr_physical_device,
         const PtrDescriptorPool&    ptr_descriptor_pool,  
-        const PtrRenderPass&        ptr_render_pass,
-        uint32_t                    subpass_index,
         uint32_t                    gpu_memory_index,
         uint32_t                    gpu_queue_family_index,
         uint32_t                    window_width,
         uint32_t                    window_height
-    )
+    ) :
+        _clear_values (OutputImagesViewsIDs::Count)
     {
+        {
+            VkClearValue color_attachment_clear_value   {1.0f, 1.0f, 1.0f, 1.0f};
+            VkClearValue depth_clear_value              {1.0f, 1.0f, 1.0f, 1.0f};
+            VkClearValue anisotropy_clear_value         {0.0f, 0.0f, 0.0f, 0.0f};
+
+            _clear_values[OutputImagesViewsIDs::PositionAndMetallic]    = color_attachment_clear_value;
+            _clear_values[OutputImagesViewsIDs::NormalAndRoughness]     = color_attachment_clear_value;
+            _clear_values[OutputImagesViewsIDs::AlbedoAndBaked]         = color_attachment_clear_value;
+            _clear_values[OutputImagesViewsIDs::Depth]                  = depth_clear_value;
+            _clear_values[OutputImagesViewsIDs::Anisotropy]             = anisotropy_clear_value;
+        }
+
         ShaderModule::Builder build_vert_shader;
         ShaderModule::Builder build_frag_shader;
+        
+        constexpr uint32_t subpass_index = 0;
 
         GraphicsPipeline::Builder   build_graphics_pipline  (1, 4, 1, 1, 4);
 
@@ -146,6 +310,10 @@ namespace pbrlib
         Buffer::Builder<MaterialData>           build_uniform_material_data_buffer;
         
         DescriptorSetLayoutBindings descriptor_set_layout_bindings (ptr_device, 0);
+
+        _ptr_framebuffer_attachments    = makeFramebufferAttachments(ptr_device, ptr_physical_device, gpu_queue_family_index, window_width, window_height);
+        _ptr_render_pass                = makeRenderPass(ptr_device, _ptr_framebuffer_attachments);
+        _ptr_framebuffer                = makeFramebuffer(_ptr_framebuffer_attachments, _ptr_render_pass, window_width, window_height);
 
         descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::MatricesData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
         descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::Albedo), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -253,7 +421,7 @@ namespace pbrlib
         
         build_graphics_pipline.addShader(build_vert_shader.build());
         build_graphics_pipline.addShader(build_frag_shader.build());
-        build_graphics_pipline.setRenderPass(ptr_render_pass);
+        build_graphics_pipline.setRenderPass(_ptr_render_pass);
         build_graphics_pipline.setPipleineLayout(PipelineLayout::make(ptr_device, ptr_descriptor_set_layout));
         build_graphics_pipline.setSubpassIndex(subpass_index);
 
@@ -367,11 +535,28 @@ namespace pbrlib
         return _ptr_descriptor_set;
     }
 
+    const PtrFramebuffer& GBufferPass::getFramebuffer() const noexcept
+    {
+        return _ptr_framebuffer;
+    }
+
+    const vector<VkClearValue>& GBufferPass::getClearValue() const noexcept
+    {
+       return _clear_values;
+    }
+
+    const ImageView& GBufferPass::outputImpl(size_t id) const
+    {
+        return _ptr_framebuffer_attachments->at(id);
+    }
+
+    void GBufferPass::outputImpl(PtrImageView& ptr_image_view, size_t id)
+    {}
+
     PtrGBufferPass GBufferPass::make(
         const PtrDevice&            ptr_device, 
+        const PtrPhysicalDevice&    ptr_physical_device,
         const PtrDescriptorPool&    ptr_descriptor_pool,  
-        const PtrRenderPass&        ptr_render_pass,
-        uint32_t                    subpass_index,
         uint32_t                    gpu_memory_index,
         uint32_t                    gpu_queue_family_index,
         uint32_t                    window_width,
@@ -380,9 +565,8 @@ namespace pbrlib
     {
         return make_unique<GBufferPass>(
             ptr_device, 
+            ptr_physical_device,
             ptr_descriptor_pool, 
-            ptr_render_pass, 
-            subpass_index, 
             gpu_memory_index, 
             gpu_queue_family_index,
             window_width, window_height

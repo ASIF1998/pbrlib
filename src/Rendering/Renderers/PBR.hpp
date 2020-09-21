@@ -29,7 +29,7 @@ namespace pbrlib
     using PtrAttachments            = shared_ptr<vector<ImageView>>;
     using PtrFramebuffer            = shared_ptr<Framebuffer>; 
     using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
-    using PtrPBR                    = shared_ptr<PBR>;                  // ?
+    using PtrPBR                    = shared_ptr<PBR>;
 
     class PBR :
         public IRenderer
@@ -90,9 +90,6 @@ namespace pbrlib
 
         PtrDescriptorPool _ptr_descriptor_pool;
 
-        PtrRenderPass           _ptr_render_pass;
-        PtrAttachments          _ptr_framebuffer_attachments;
-        vector<PtrFramebuffer>  _ptr_framebuffers;
         PtrSwapchain            _ptr_swapchain;
         PtrSampler              _ptr_sampler_linear;
         PtrSampler              _ptr_sampler_nearest;

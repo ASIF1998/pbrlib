@@ -13,6 +13,8 @@
 
 #include "../../../SceneGraph/Scene.hpp"
 
+#include "Pass.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -44,7 +46,8 @@ namespace pbrlib
      * @class PBRPass.
      * @brief Данный класс необходим для прохода физически-корректного рендеринга.
     */
-    class PBRPass
+    class PBRPass : 
+        public IPassInputOutput<PBRPass>
     {
     public:
         enum class DistributionFunction :
@@ -75,6 +78,31 @@ namespace pbrlib
             None,
             Schlick,
             CookTorrance
+        };
+
+        struct InputImagesViewsIDs
+        {
+            enum :
+                size_t
+            {
+                PositionAndMetallic = 0,
+                NormalAndRoughness,
+                AlbedoAndBaked,
+                Anisotropy,
+
+                Count
+            };
+        };
+
+        struct OutputImagesViewsIDs
+        {
+            enum :
+                size_t
+            {
+                Result = 0,
+
+                Count
+            };
         };
 
         class Optionals
@@ -158,17 +186,36 @@ namespace pbrlib
     public:
         /**
          * @brief Конструктор.
-         * 
-         * @param ptr_device                        указатель на логическое устройтсво.
-         * @param ptr_physical_deviec               укаазетль на физическое устройство.
-         * @param queue_family_index                индекс семейства очередей.
-         * @param ptr_descriptor_pool               указатель на пул дескрипторов.
-         * @param position_and_metallic_image_view  указатель на вид изображения с позициями и металичностью.
-         * @param normal_and_roughness_image_view   указатель на вид изображения с нормалями и шероховатостью.
-         * @param albedo_and_baked_AO_image_view    указатель на вид изображения с альбедо и запечённым AO.
-         * @param anisotropy_image_view             указатель на вид изображения с анизотропностью.
-         * @param ptr_sampler                       указатель на сэмплер.
-         * @param optionals                         опции рендера.
+         *
+         * @param ptr_device            указатель на логическое устройство.
+         * @param ptr_physical_deviec   указатель на физическое устройство.
+         * @param queue_family_index    индекс семейства очередей.
+         * @param ptr_descriptor_pool   указатель на пул дескрипторов.
+         * @param ptr_sampler           указатель на сэмплер.
+         * @param optionals             опции рендера.
+        */
+        PBRPass(
+            const PtrDevice&            ptr_device, 
+            const PtrPhysicalDevice&    ptr_physical_deviec,
+            uint32_t                    queue_family_index,
+            const PtrDescriptorPool&    ptr_descriptor_pool,
+            const PtrSampler&           ptr_sampler,
+            const Optionals&            optionals = Optionals()
+        );
+
+        /**
+         * @brief Конструктор.
+         *
+         * @param ptr_device указатель на логическое устройство.
+         * @param ptr_physical_deviec указатель на физическое устройство.
+         * @param queue_family_index индекс семейства очередей.
+         * @param ptr_descriptor_pool указатель на пул дескрипторов.
+         * @param position_and_metallic_image_view указатель на вид изображения с позициями и металличностью.
+         * @param normal_and_roughness_image_view указатель на вид изображения с нормалями и шероховатостью.
+         * @param albedo_and_baked_AO_image_view указатель на вид изображения с альбедо и запечённым AO.
+         * @param anisotropy_image_view указатель на вид изображения с анизотропностью.
+         * @param ptr_sampler указатель на сэмплер.
+         * @param optionals опции рендера.
         */
         PBRPass(
             const PtrDevice&            ptr_device, 
@@ -188,15 +235,13 @@ namespace pbrlib
          * 
          * @param ptr_camera            указатель на камеру.
          * @param ptr_command_buffer    указатель на командный буфер.
-         * @param out_image_view        указатель на вид изображения в который будет записан резкльтат прохода.
          * @param point_lights          точечные источники света.
          * @param spot_lights           прожекторные источники света.
-         * @param direction_lights      направденные источники света.
+         * @param direction_lights      направленные источники света.
         */
         void draw(
             const Scene::PtrNode&           ptr_camera,
             const PtrCommandBuffer&         ptr_command_buffer,
-            const ImageView&                out_image_view,
             const vector<Scene::PtrNode>    point_lights,
             const vector<Scene::PtrNode>    spot_lights,
             const vector<Scene::PtrNode>    direction_lights
@@ -210,6 +255,15 @@ namespace pbrlib
             const PtrPhysicalDevice&    ptr_physical_deviec,
             uint32_t                    queue_family_index,
             const PtrDescriptorPool&    ptr_descriptor_pool,
+            const PtrSampler&           ptr_sampler,
+            const Optionals&            optionals = Optionals()
+        );
+
+        inline static PtrPBRPass make(
+            const PtrDevice&            ptr_device, 
+            const PtrPhysicalDevice&    ptr_physical_deviec,
+            uint32_t                    queue_family_index,
+            const PtrDescriptorPool&    ptr_descriptor_pool,
             const ImageView&            position_and_metallic_image_view,
             const ImageView&            normal_and_roughness_image_view,
             const ImageView&            albedo_and_baked_AO_image_view,
@@ -217,6 +271,16 @@ namespace pbrlib
             const PtrSampler&           ptr_sampler,
             const Optionals&            optionals = Optionals()
         );
+
+    private:
+        friend class IPassInputOutput<PBRPass>;
+        friend class IPassOutput<PBRPass>;
+        
+        inline const ImageView&    outputImpl(size_t id) const;
+        inline void                outputImple(ImageView& image_view, size_t id);
+        inline void                outputImple(PtrImageView& ptr_image_view, size_t id);
+
+        inline void inputImpl(const PtrImageView& ptr_image_view, size_t id);
 
     private:
         PtrComputePipeline  _ptr_pipeline;
@@ -240,8 +304,10 @@ namespace pbrlib
                 const ImageView* _ptr_anisotropy_image_view;
             };
 
-            const ImageView* _ptr_images_views[4];
+            const ImageView* _ptr_images_views[InputImagesViewsIDs::Count];
         };
+
+        const ImageView* _out_image_view;
     };
 }
 

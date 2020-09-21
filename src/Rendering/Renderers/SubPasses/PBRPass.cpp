@@ -70,22 +70,13 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PBRPass::PBRPass(
         const PtrDevice&            ptr_device, 
-        const PtrPhysicalDevice&    ptr_physical_deviec,
+        const PtrPhysicalDevice&    ptr_physical_device,
         uint32_t                    queue_family_index,
         const PtrDescriptorPool&    ptr_descriptor_pool,
-        const ImageView&            position_and_metallic_image_view,
-        const ImageView&            normal_and_roughness_image_view,
-        const ImageView&            albedo_and_baked_AO_image_view,
-        const ImageView&            anisotropy_image_view,
         const PtrSampler&           ptr_sampler,
         const Optionals&            optionals
     )
     {
-        _ptr_position_and_metallic_image_view   = &position_and_metallic_image_view;
-        _ptr_normal_and_roughness_image_view    = &normal_and_roughness_image_view;
-        _ptr_albedo_and_baked_AO_image_view     = &albedo_and_baked_AO_image_view;
-        _ptr_anisotropy_image_view              = &anisotropy_image_view;
-        
         _ptr_sampler = ptr_sampler;
 
         ShaderModule::Builder               build_shader;
@@ -104,31 +95,31 @@ namespace pbrlib
         build_shader.setSpecializationInfoNumMapEntries(util::enumCast(ConstantID::Num));
 
         build_point_lights_data_buffer.setDevice(ptr_device);
-        build_point_lights_data_buffer.setMemoryTypeIndex(ptr_physical_deviec->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+        build_point_lights_data_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
         build_point_lights_data_buffer.setSize(MAX_POINT_LIGHT);
         build_point_lights_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_point_lights_data_buffer.addQueueFamily(queue_family_index);
 
         build_spot_lights_data_buffer.setDevice(ptr_device);
-        build_spot_lights_data_buffer.setMemoryTypeIndex(ptr_physical_deviec->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+        build_spot_lights_data_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
         build_spot_lights_data_buffer.setSize(MAX_SPOT_LIGHT);
         build_spot_lights_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_spot_lights_data_buffer.addQueueFamily(queue_family_index);
 
         build_direction_lights_data_buffer.setDevice(ptr_device);
-        build_direction_lights_data_buffer.setMemoryTypeIndex(ptr_physical_deviec->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+        build_direction_lights_data_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
         build_direction_lights_data_buffer.setSize(MAX_DIRECTION_LIGHT);
         build_direction_lights_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_direction_lights_data_buffer.addQueueFamily(queue_family_index);
 
         build_num_lights_buffer.setDevice(ptr_device);
-        build_num_lights_buffer.setMemoryTypeIndex(ptr_physical_deviec->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+        build_num_lights_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
         build_num_lights_buffer.setSize(1);
         build_num_lights_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_num_lights_buffer.addQueueFamily(queue_family_index);
 
         build_camera_data_buffer.setDevice(ptr_device);
-        build_camera_data_buffer.setMemoryTypeIndex(ptr_physical_deviec->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+        build_camera_data_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
         build_camera_data_buffer.setSize(1);
         build_camera_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_camera_data_buffer.addQueueFamily(queue_family_index);
@@ -159,18 +150,8 @@ namespace pbrlib
         _ptr_uniform_spot_lights_data_buffer        = build_spot_lights_data_buffer.buildPtr();
         _ptr_uniform_direction_lights_data_buffer   = build_direction_lights_data_buffer.buildPtr();
         _ptr_uniform_num_lights_buffer              = build_num_lights_buffer.buildPtr();
-        
-        _ptr_uniform_camera_data_buffer = build_camera_data_buffer.buildPtr();
 
-        for (uint32_t binding {1} ; binding < 5; binding++) {
-            _ptr_descriptor_set->writeImageView(
-                *_ptr_images_views[binding - 1],
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                *_ptr_sampler,
-                binding,
-                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-            );
-        }
+        _ptr_uniform_camera_data_buffer = build_camera_data_buffer.buildPtr();
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_num_lights_buffer, 
@@ -203,17 +184,46 @@ namespace pbrlib
         );
     }
 
+    PBRPass::PBRPass(
+        const PtrDevice&            ptr_device, 
+        const PtrPhysicalDevice&    ptr_physical_device,
+        uint32_t                    queue_family_index,
+        const PtrDescriptorPool&    ptr_descriptor_pool,
+        const ImageView&            position_and_metallic_image_view,
+        const ImageView&            normal_and_roughness_image_view,
+        const ImageView&            albedo_and_baked_AO_image_view,
+        const ImageView&            anisotropy_image_view,
+        const PtrSampler&           ptr_sampler,
+        const Optionals&            optionals
+    ) :
+        PBRPass(ptr_device, ptr_physical_device, queue_family_index, ptr_descriptor_pool, ptr_sampler, optionals)
+    {
+        _ptr_position_and_metallic_image_view   = &position_and_metallic_image_view;
+        _ptr_normal_and_roughness_image_view    = &normal_and_roughness_image_view;
+        _ptr_albedo_and_baked_AO_image_view     = &albedo_and_baked_AO_image_view;
+        _ptr_anisotropy_image_view              = &anisotropy_image_view;
+
+        for (uint32_t binding {1} ; binding < 5; binding++) {
+            _ptr_descriptor_set->writeImageView(
+                *_ptr_images_views[binding - 1],
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                *_ptr_sampler,
+                binding,
+                VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+            );
+        }
+    }
+
     void PBRPass::draw(
         const Scene::PtrNode&           ptr_camera,
         const PtrCommandBuffer&         ptr_command_buffer,
-        const ImageView&                out_image_view,
         const vector<Scene::PtrNode>    point_lights,
         const vector<Scene::PtrNode>    spot_lights,
         const vector<Scene::PtrNode>    direction_lights
     )
     {
 
-        VkExtent3D  out_image_size  = out_image_view.getImage()->getImageInfo().image_extend;
+        VkExtent3D  out_image_size  = _out_image_view->getImage()->getImageInfo().image_extend;
         NumLights   num_lights;
 
         num_lights.point    = static_cast<uint>(min<size_t>(MAX_POINT_LIGHT, point_lights.size()));
@@ -268,7 +278,7 @@ namespace pbrlib
         }
 
         _ptr_descriptor_set->writeImageView(
-            out_image_view,
+            *_out_image_view,
             VK_IMAGE_LAYOUT_GENERAL,
             util::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
         );

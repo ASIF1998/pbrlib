@@ -190,8 +190,6 @@ namespace pbrlib
         if (_scene._ptr_camera_node) {
             _scene.update(delta_time);
             
-//            CameraBase& camera = _scene._ptr_camera_node->getComponent<CameraBase>();
-
             _ptr_renderer->draw(
                 _scene._ptr_camera_node,
                 _scene.getVisibleList(), 
