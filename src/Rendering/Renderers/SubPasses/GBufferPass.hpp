@@ -89,7 +89,7 @@ namespace pbrlib
             void setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device);
             void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
             void setDeviceMemoryIndex(uint32_t memory_index);
-            void setDeviceQueueFamilyIndex(uint32_t queue_family_index);
+            void setQueue(const PtrDeviceQueue& ptr_queue);
             void windowSize(uint32_t width, uint32_t height);
 
             GBufferPass     build();
@@ -102,7 +102,7 @@ namespace pbrlib
             uint32_t            _window_width;
             uint32_t            _window_height;
             uint32_t            _gpu_memory_index;
-            uint32_t            _gpu_queue_family_index;
+            PtrDeviceQueue _ptr_device_queue;
         };
         
     public:
@@ -110,19 +110,19 @@ namespace pbrlib
          * @brief Конструктор.
          * 
          * @param ptr_device                указатель на логическое устройство.
+         * @param ptr_queue                 укзатель на очередь устройства.
          * @param ptr_physical_device       указатель на физическое устройство.
          * @param ptr_descriptor_pool       указатель на пул дескрипторов.
          * @param gpu_memory_index          индекс памяти устройства (должен поддерживать отображение).
-         * @param gpu_queue_family_index    индекс семейства очередей (семейство должно поддерживать графические операции).
          * @param window_width              ширина окна.
          * @param window_height             высота окна.
         */
         GBufferPass(
             const PtrDevice&            ptr_device, 
+            const PtrDeviceQueue&       ptr_queue,
             const PtrPhysicalDevice&    ptr_physical_device,
             const PtrDescriptorPool&    ptr_descriptor_pool,  
             uint32_t                    gpu_memory_index,
-            uint32_t                    gpu_queue_family_index,
             uint32_t                    window_width,
             uint32_t                    window_height
         );
@@ -140,11 +140,11 @@ namespace pbrlib
          * @param ptr_sampler           указатель на сэмплер.
         */
         void draw(
-            const Transform&            projection,
-            const Transform&            view,
-            const Scene::VisibleList&   drawable_objects, 
-            const PtrCommandBuffer&     ptr_command_buffer,
-            const PtrSampler&           ptr_sampler
+            const Transform&                projection,
+            const Transform&                view,
+            const Scene::VisibleList&       drawable_objects, 
+            const PtrPrimaryCommandBuffer&  ptr_command_buffer,
+            const PtrSampler&               ptr_sampler
         );
 
         PtrGraphicsPipeline&         getPipeline()       noexcept;
@@ -156,23 +156,23 @@ namespace pbrlib
         const vector<VkClearValue>& getClearValue()     const noexcept;
 
         /**
-         * @brief Метод, позволяющий указатель на объект типа GBufferPass.
+         * @brief Метод, позволяющий создавать указатель на объект типа GBufferPass.
          * 
          * @param ptr_device                указатель на логическое устройство.
+         * @param ptr_queue                 укзатель на очередь устройства.
          * @param ptr_physical_device       указатель на физическое устройство.
          * @param ptr_descriptor_pool       указатель на пул дескрипторов.
          * @param gpu_memory_index          индекс памяти устройства (должен поддерживать отображение).
-         * @param gpu_queue_family_index    индекс семейства очередей (семейство должно поддерживать графические операции).
          * @param window_width              ширина окна.
          * @param window_height             высота окна.
          * @return Указатель на GBufferPass.
         */
         static PtrGBufferPass make(
             const PtrDevice&            ptr_device, 
+            const PtrDeviceQueue&       ptr_queue,
             const PtrPhysicalDevice&    ptr_physical_device,
             const PtrDescriptorPool&    ptr_descriptor_pool,  
             uint32_t                    gpu_memory_index,
-            uint32_t                    gpu_queue_family_index,
             uint32_t                    window_width,
             uint32_t                    window_height
         );
@@ -185,6 +185,7 @@ namespace pbrlib
 
     private:
         PtrGraphicsPipeline     _ptr_pipeline;
+        PtrDeviceQueue          _ptr_device_queue;
         PtrDescriptorSet        _ptr_descriptor_set;
         PtrBuffer               _ptr_uniform_matrices_data_buffer;
         PtrBuffer               _ptr_uniform_material_data_buffer;

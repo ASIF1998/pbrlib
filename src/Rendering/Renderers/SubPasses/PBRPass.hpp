@@ -158,7 +158,6 @@ namespace pbrlib
 
             inline void setDevice(const PtrDevice& ptr_device);
             inline void setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device);
-            inline void setQueueFamilyIndex(uint32_t queue_family_index);
             inline void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
             inline void setPositionAndMetallicImageView(const ImageView* position_and_metallic_image_view);
             inline void setNormalAndRoughnessImageView(const ImageView* normal_and_roughness_image_view);
@@ -166,6 +165,7 @@ namespace pbrlib
             inline void setAnisotropyImageView(const ImageView* anisotropy_image_view);
             inline void setSampler(const PtrSampler& ptr_sampler);
             inline void setOptionals(const Optionals& optionals);
+            inline void setQueue(const PtrDeviceQueue& ptr_queue);
 
             inline PBRPass      build();
             inline PtrPBRPass   buildPtr();
@@ -173,7 +173,6 @@ namespace pbrlib
         private:
             PtrDevice           _ptr_device;
             PtrPhysicalDevice   _ptr_physical_deviec;
-            uint32_t            _queue_family_index;
             PtrDescriptorPool   _ptr_descriptor_pool;
             const ImageView*    _position_and_metallic_image_view;
             const ImageView*    _normal_and_roughness_image_view;
@@ -181,6 +180,7 @@ namespace pbrlib
             const ImageView*    _anisotropy_image_view;
             PtrSampler          _ptr_sampler;
             Optionals           _optionals;
+            PtrDeviceQueue      _ptr_device_queue;
         };
 
     public:
@@ -189,7 +189,7 @@ namespace pbrlib
          *
          * @param ptr_device            указатель на логическое устройство.
          * @param ptr_physical_deviec   указатель на физическое устройство.
-         * @param queue_family_index    индекс семейства очередей.
+         * @param ptr_queue             указатель на очередь.
          * @param ptr_descriptor_pool   указатель на пул дескрипторов.
          * @param ptr_sampler           указатель на сэмплер.
          * @param optionals             опции рендера.
@@ -197,7 +197,7 @@ namespace pbrlib
         PBRPass(
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_deviec,
-            uint32_t                    queue_family_index,
+            const PtrDeviceQueue&       ptr_queue,
             const PtrDescriptorPool&    ptr_descriptor_pool,
             const PtrSampler&           ptr_sampler,
             const Optionals&            optionals = Optionals()
@@ -206,21 +206,21 @@ namespace pbrlib
         /**
          * @brief Конструктор.
          *
-         * @param ptr_device указатель на логическое устройство.
-         * @param ptr_physical_deviec указатель на физическое устройство.
-         * @param queue_family_index индекс семейства очередей.
-         * @param ptr_descriptor_pool указатель на пул дескрипторов.
-         * @param position_and_metallic_image_view указатель на вид изображения с позициями и металличностью.
-         * @param normal_and_roughness_image_view указатель на вид изображения с нормалями и шероховатостью.
-         * @param albedo_and_baked_AO_image_view указатель на вид изображения с альбедо и запечённым AO.
-         * @param anisotropy_image_view указатель на вид изображения с анизотропностью.
-         * @param ptr_sampler указатель на сэмплер.
-         * @param optionals опции рендера.
+         * @param ptr_device                        указатель на логическое устройство.
+         * @param ptr_physical_deviec               указатель на физическое устройство.
+         * @param ptr_queue                         указатель на очередь.
+         * @param ptr_descriptor_pool               указатель на пул дескрипторов.
+         * @param position_and_metallic_image_view  указатель на вид изображения с позициями и металличностью.
+         * @param normal_and_roughness_image_view   указатель на вид изображения с нормалями и шероховатостью.
+         * @param albedo_and_baked_AO_image_view    указатель на вид изображения с альбедо и запечённым AO.
+         * @param anisotropy_image_view             указатель на вид изображения с анизотропностью.
+         * @param ptr_sampler                       указатель на сэмплер.
+         * @param optionals                         опции рендера.
         */
         PBRPass(
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_deviec,
-            uint32_t                    queue_family_index,
+            const PtrDeviceQueue&       ptr_queue,
             const PtrDescriptorPool&    ptr_descriptor_pool,
             const ImageView&            position_and_metallic_image_view,
             const ImageView&            normal_and_roughness_image_view,
@@ -241,7 +241,7 @@ namespace pbrlib
         */
         void draw(
             const Scene::PtrNode&           ptr_camera,
-            const PtrCommandBuffer&         ptr_command_buffer,
+            const PtrPrimaryCommandBuffer&  ptr_command_buffer,
             const vector<Scene::PtrNode>    point_lights,
             const vector<Scene::PtrNode>    spot_lights,
             const vector<Scene::PtrNode>    direction_lights
@@ -250,19 +250,43 @@ namespace pbrlib
         inline PtrComputePipeline&         getPipeline() noexcept;
         inline const PtrComputePipeline&   getPipeline() const noexcept;
 
+        /**
+         * @brief Метод, позволяющий создавать указатель на объект типа PBRPass.
+         * 
+         * @param ptr_device            указатель на логическое устройство.
+         * @param ptr_physical_deviec   указатель на физическое устройство.
+         * @param ptr_queue             указатель на очередь.
+         * @param ptr_descriptor_pool   указатель на пул дескрипторов.
+         * @param ptr_sampler           указатель на сэмплер.
+         * @param optionals             опции рендера.
+        */
         inline static PtrPBRPass make(
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_deviec,
-            uint32_t                    queue_family_index,
+            const PtrDeviceQueue&       ptr_queue,
             const PtrDescriptorPool&    ptr_descriptor_pool,
             const PtrSampler&           ptr_sampler,
             const Optionals&            optionals = Optionals()
         );
 
+        /**
+         * @brief Метод, позволяющий создавать указатель на объект типа PBRPass.
+         * 
+         * @param ptr_device                        указатель на логическое устройство.
+         * @param ptr_physical_deviec               указатель на физическое устройство.
+         * @param ptr_queue                         указатель на очередь.
+         * @param ptr_descriptor_pool               указатель на пул дескрипторов.
+         * @param position_and_metallic_image_view  указатель на вид изображения с позициями и металличностью.
+         * @param normal_and_roughness_image_view   указатель на вид изображения с нормалями и шероховатостью.
+         * @param albedo_and_baked_AO_image_view    указатель на вид изображения с альбедо и запечённым AO.
+         * @param anisotropy_image_view             указатель на вид изображения с анизотропностью.
+         * @param ptr_sampler                       указатель на сэмплер.
+         * @param optionals                         опции рендера.
+        */
         inline static PtrPBRPass make(
             const PtrDevice&            ptr_device, 
             const PtrPhysicalDevice&    ptr_physical_deviec,
-            uint32_t                    queue_family_index,
+            const PtrDeviceQueue&       ptr_queue,
             const PtrDescriptorPool&    ptr_descriptor_pool,
             const ImageView&            position_and_metallic_image_view,
             const ImageView&            normal_and_roughness_image_view,
@@ -286,6 +310,8 @@ namespace pbrlib
         PtrComputePipeline  _ptr_pipeline;
         PtrDescriptorSet    _ptr_descriptor_set;
         PtrSampler          _ptr_sampler;
+
+        PtrDeviceQueue _ptr_device_queue;
 
         PtrBuffer _ptr_uniform_point_lights_data_buffer;
         PtrBuffer _ptr_uniform_spot_lights_data_buffer;

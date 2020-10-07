@@ -109,12 +109,12 @@ namespace pbrlib
 
     Transform Transform::translate(const Vec3<float>& t)
     {
-        return Transform(Matrix4x4<float>(
-            1.0f, 0.0f, 0.0f, t.x,
-            0.0f, 1.0f, 0.0f, t.y,
-            0.0f, 0.0f, 1.0f, t.z,
-            0.0f, 0.0f, 0.0f, 1.0f
-        ));
+       return Transform(Matrix4x4<float>(
+           1.0f, 0.0f, 0.0f, 0.0f,
+           0.0f, 1.0f, 0.0f, 0.0f,
+           0.0f, 0.0f, 1.0f, 0.0f,
+           t.x,  t.y,  t.z,  1.0f
+       ));
     }
 
     Transform Transform::scale(const Vec3<float>& s)

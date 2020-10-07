@@ -74,11 +74,6 @@ namespace pbrlib
         _ptr_physical_deviec = ptr_physical_device;
     }
 
-    inline void PBRPass::Builder::setQueueFamilyIndex(uint32_t queue_family_index)
-    {
-        _queue_family_index = queue_family_index;
-    }
-
     inline void PBRPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
     {
         _ptr_descriptor_pool = ptr_descriptor_pool;
@@ -118,13 +113,18 @@ namespace pbrlib
         _optionals = optionals;
     }
 
+    inline void PBRPass::Builder::setQueue(const PtrDeviceQueue& ptr_queue)
+    {
+        _ptr_device_queue = ptr_queue;
+    }
+
     inline PBRPass PBRPass::Builder::build()
     {
         if (_position_and_metallic_image_view && _normal_and_roughness_image_view && _albedo_and_baked_AO_image_view && _anisotropy_image_view) {
             return PBRPass(
                 _ptr_device,
                 _ptr_physical_deviec,
-                _queue_family_index,
+                _ptr_device_queue,
                 _ptr_descriptor_pool,
                 *_position_and_metallic_image_view,
                 *_normal_and_roughness_image_view,
@@ -138,7 +138,7 @@ namespace pbrlib
         return PBRPass(
             _ptr_device,
             _ptr_physical_deviec,
-            _queue_family_index,
+            _ptr_device_queue,
             _ptr_descriptor_pool,
             _ptr_sampler,
             _optionals
@@ -151,7 +151,7 @@ namespace pbrlib
             return make_unique<PBRPass>(
                 _ptr_device,
                 _ptr_physical_deviec,
-                _queue_family_index,
+                _ptr_device_queue,
                 _ptr_descriptor_pool,
                 *_position_and_metallic_image_view,
                 *_normal_and_roughness_image_view,
@@ -165,7 +165,7 @@ namespace pbrlib
         return make_unique<PBRPass>(
             _ptr_device,
             _ptr_physical_deviec,
-            _queue_family_index,
+            _ptr_device_queue,
             _ptr_descriptor_pool,
             _ptr_sampler,
             _optionals
@@ -218,7 +218,7 @@ namespace pbrlib
     inline PtrPBRPass PBRPass::make(
         const PtrDevice&            ptr_device, 
         const PtrPhysicalDevice&    ptr_physical_deviec,
-        uint32_t                    queue_family_index,
+        const PtrDeviceQueue&       ptr_queue,
         const PtrDescriptorPool&    ptr_descriptor_pool,
         const PtrSampler&           ptr_sampler,
         const Optionals&            optionals
@@ -227,7 +227,7 @@ namespace pbrlib
         return make_unique<PBRPass>(
             ptr_device,
             ptr_physical_deviec,
-            queue_family_index,
+            ptr_queue,
             ptr_descriptor_pool,
             ptr_sampler,
             optionals
@@ -237,7 +237,7 @@ namespace pbrlib
     inline PtrPBRPass PBRPass::make(
         const PtrDevice&            ptr_device, 
         const PtrPhysicalDevice&    ptr_physical_deviec,
-        uint32_t                    queue_family_index,
+        const PtrDeviceQueue&       ptr_queue,
         const PtrDescriptorPool&    ptr_descriptor_pool,
         const ImageView&            position_and_metallic_image_view,
         const ImageView&            normal_and_roughness_image_view,
@@ -250,7 +250,7 @@ namespace pbrlib
         return make_unique<PBRPass>(
             ptr_device,
             ptr_physical_deviec,
-            queue_family_index,
+            ptr_queue,
             ptr_descriptor_pool,
             position_and_metallic_image_view,
             normal_and_roughness_image_view,

@@ -83,24 +83,23 @@ namespace pbrlib
         _gpu_memory_index = memory_index;
     }
 
-    void GBufferPass::Builder::setDeviceQueueFamilyIndex(uint32_t queue_family_index)
-    {
-        _gpu_queue_family_index = queue_family_index;
-    }
-
     void GBufferPass::Builder::windowSize(uint32_t width, uint32_t height)
     {
         _window_width   = width;
         _window_height  = height;
     }
 
+    void GBufferPass::Builder::setQueue(const PtrDeviceQueue& ptr_queue) 
+    {
+        _ptr_device_queue = ptr_queue;
+    }
+
     GBufferPass GBufferPass::Builder::build()
     {
         return GBufferPass(
-            _ptr_device, _ptr_physical_device,
+            _ptr_device, _ptr_device_queue, _ptr_physical_device,
             _ptr_descriptor_pool,
-            _gpu_memory_index, 
-            _gpu_queue_family_index,
+            _gpu_memory_index,
             _window_width, _window_height
         );
     }
@@ -108,10 +107,9 @@ namespace pbrlib
     PtrGBufferPass GBufferPass::Builder::buildPtr()
     {
         return GBufferPass::make(
-            _ptr_device, _ptr_physical_device,
+            _ptr_device, _ptr_device_queue, _ptr_physical_device,
             _ptr_descriptor_pool, 
-            _gpu_memory_index, 
-            _gpu_queue_family_index,
+            _gpu_memory_index,
             _window_width, _window_height
         );
     }
@@ -126,7 +124,7 @@ namespace pbrlib
         subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::Anisotropy, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        subpass_description1.setDepthStencilAttachment(GBufferPass::OutputImagesViewsIDs::Depth, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+        subpass_description1.setDepthStencilAttachment(GBufferPass::OutputImagesViewsIDs::Depth, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
         build_render_pass.setDevice(ptr_device);
         
@@ -171,7 +169,7 @@ namespace pbrlib
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
             VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
         );
         
         build_render_pass.addAttachmentDescription(
@@ -202,7 +200,7 @@ namespace pbrlib
 
         Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     image_rgba_builder;
         ImageView::Builder                                                      image_view_builder;
-        Image::Builder<Image::TexelType::Depth, float, Image::NumBits::NB32>    depth_image_builder;
+        Image::Builder<Image::TexelType::DepthStencil, float, Image::NumBits::NB32>    depth_image_builder;
 
         image_rgba_builder.setDevice(ptr_device);
         image_rgba_builder.setExtend(width, height, 1);
@@ -244,7 +242,7 @@ namespace pbrlib
         ptr_framebuffer_attachments->push_back(image_view_builder.build());
         
         image_view_builder.setImage(depth_image_builder.buildPtr());
-        image_view_builder.setFormat(VK_FORMAT_D32_SFLOAT);
+        image_view_builder.setFormat(VK_FORMAT_D32_SFLOAT_S8_UINT);
         image_view_builder.setAspectMask(VK_IMAGE_ASPECT_DEPTH_BIT);
         ptr_framebuffer_attachments->push_back(image_view_builder.build());
 
@@ -278,15 +276,20 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GBufferPass::GBufferPass(
         const PtrDevice&            ptr_device, 
+        const PtrDeviceQueue&       ptr_queue,
         const PtrPhysicalDevice&    ptr_physical_device,
         const PtrDescriptorPool&    ptr_descriptor_pool,  
         uint32_t                    gpu_memory_index,
-        uint32_t                    gpu_queue_family_index,
         uint32_t                    window_width,
         uint32_t                    window_height
     ) :
-        _clear_values (OutputImagesViewsIDs::Count)
+        _clear_values (OutputImagesViewsIDs::Count),
+        _ptr_device_queue (ptr_queue)
     {
+        assert(ptr_queue);
+
+        uint32_t queue_family_index = _ptr_device_queue->getFamilyIndex();
+
         {
             VkClearValue color_attachment_clear_value   {1.0f, 1.0f, 1.0f, 1.0f};
             VkClearValue depth_clear_value              {1.0f, 1.0f, 1.0f, 1.0f};
@@ -311,7 +314,7 @@ namespace pbrlib
         
         DescriptorSetLayoutBindings descriptor_set_layout_bindings (ptr_device, 0);
 
-        _ptr_framebuffer_attachments    = makeFramebufferAttachments(ptr_device, ptr_physical_device, gpu_queue_family_index, window_width, window_height);
+        _ptr_framebuffer_attachments    = makeFramebufferAttachments(ptr_device, ptr_physical_device, queue_family_index, window_width, window_height);
         _ptr_render_pass                = makeRenderPass(ptr_device, _ptr_framebuffer_attachments);
         _ptr_framebuffer                = makeFramebuffer(_ptr_framebuffer_attachments, _ptr_render_pass, window_width, window_height);
 
@@ -339,13 +342,13 @@ namespace pbrlib
         build_uniform_matrices_data_buffer.setMemoryTypeIndex(gpu_memory_index);
         build_uniform_matrices_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_uniform_matrices_data_buffer.setSize(1);
-        build_uniform_matrices_data_buffer.addQueueFamily(gpu_queue_family_index);
+        build_uniform_matrices_data_buffer.addQueueFamily(queue_family_index);
 
         build_uniform_material_data_buffer.setDevice(ptr_device);
         build_uniform_material_data_buffer.setMemoryTypeIndex(gpu_memory_index);
         build_uniform_material_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_uniform_material_data_buffer.setSize(1);
-        build_uniform_material_data_buffer.addQueueFamily(gpu_queue_family_index);
+        build_uniform_material_data_buffer.addQueueFamily(queue_family_index);
 
         _ptr_uniform_matrices_data_buffer   = build_uniform_matrices_data_buffer.buildPtr();
         _ptr_uniform_material_data_buffer   = build_uniform_material_data_buffer.buildPtr();
@@ -441,11 +444,11 @@ namespace pbrlib
     }
 
     void GBufferPass::draw(
-        const Transform&            projection,
-        const Transform&            view,
-        const Scene::VisibleList&   drawable_objects, 
-        const PtrCommandBuffer&     ptr_command_buffer,
-        const PtrSampler&           ptr_sampler
+        const Transform&                projection,
+        const Transform&                view,
+        const Scene::VisibleList&       drawable_objects, 
+        const PtrPrimaryCommandBuffer&  ptr_command_buffer,
+        const PtrSampler&               ptr_sampler
     )
     {
         UniformBufferMatrices   uniform_matrices_buffer_data;
@@ -456,14 +459,14 @@ namespace pbrlib
                 Mesh& mesh = drawable_objects[i]->getComponent<Mesh>();
 
                 if(mesh.getMaterial()) {
+                    /*  ----------------------------------------------------------------------  */
                     const PtrMaterial&  ptr_material        = mesh.getMaterial();
                     Transform           current_transform   = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
                     
                     uniform_matrices_buffer_data.model_matrix   = current_transform.getMatrix();
                     uniform_matrices_buffer_data.MVP            = (projection * view * current_transform).getMatrix();
                     uniform_matrices_buffer_data.normal_matrix  = transpose(inverse(uniform_matrices_buffer_data.model_matrix));
-
-                    uniform_material_buffer_data.anisotropy = ptr_material->getAnisotropy();
+                    uniform_material_buffer_data.anisotropy     = ptr_material->getAnisotropy();
 
                     _ptr_uniform_matrices_data_buffer->setData(&uniform_matrices_buffer_data, 1);
                     _ptr_uniform_material_data_buffer->setData(&uniform_material_buffer_data, 1);
@@ -505,11 +508,23 @@ namespace pbrlib
                         *ptr_sampler, 
                         util::enumCast(GBufferPassBindings::AO), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
-                    
+
+                    ptr_command_buffer->reset();
+                    ptr_command_buffer->begin();
+
+                    ptr_command_buffer->begineRenderPass(getFramebuffer(), getClearValue());
+                    ptr_command_buffer->bindToPipeline(getPipeline());
+
                     ptr_command_buffer->bindVertexBuffer(*ptr_vertex_buffer, mesh.getVertexBufferOffset());
                     ptr_command_buffer->bindIndexBuffer(*ptr_index_buffer, mesh.getIndexBufferOffset(), VK_INDEX_TYPE_UINT32);
                     ptr_command_buffer->bindDescriptorSet(_ptr_pipeline, *_ptr_descriptor_set);
                     ptr_command_buffer->drawIndexed(mesh.getNumIndices(), 1, 0, 0, 0);
+
+                    ptr_command_buffer->endRenderPass();
+                    ptr_command_buffer->end();
+
+                    _ptr_device_queue->submit(*ptr_command_buffer);
+                    _ptr_device_queue->waitIdle();
                 }
             }
         }
@@ -555,20 +570,20 @@ namespace pbrlib
 
     PtrGBufferPass GBufferPass::make(
         const PtrDevice&            ptr_device, 
+        const PtrDeviceQueue&       ptr_queue,
         const PtrPhysicalDevice&    ptr_physical_device,
         const PtrDescriptorPool&    ptr_descriptor_pool,  
         uint32_t                    gpu_memory_index,
-        uint32_t                    gpu_queue_family_index,
         uint32_t                    window_width,
         uint32_t                    window_height
     )
     {
         return make_unique<GBufferPass>(
             ptr_device, 
+            ptr_queue,
             ptr_physical_device,
             ptr_descriptor_pool, 
             gpu_memory_index, 
-            gpu_queue_family_index,
             window_width, window_height
         );
     }

@@ -71,12 +71,17 @@ namespace pbrlib
     PBRPass::PBRPass(
         const PtrDevice&            ptr_device, 
         const PtrPhysicalDevice&    ptr_physical_device,
-        uint32_t                    queue_family_index,
+        const PtrDeviceQueue&       ptr_queue,
         const PtrDescriptorPool&    ptr_descriptor_pool,
         const PtrSampler&           ptr_sampler,
         const Optionals&            optionals
-    )
+    ) :
+        _ptr_device_queue (ptr_queue)
     {
+        assert(ptr_queue);
+
+        uint32_t queue_family_index = _ptr_device_queue->getFamilyIndex();
+        
         _ptr_sampler = ptr_sampler;
 
         ShaderModule::Builder               build_shader;
@@ -187,7 +192,7 @@ namespace pbrlib
     PBRPass::PBRPass(
         const PtrDevice&            ptr_device, 
         const PtrPhysicalDevice&    ptr_physical_device,
-        uint32_t                    queue_family_index,
+        const PtrDeviceQueue&       ptr_queue,
         const PtrDescriptorPool&    ptr_descriptor_pool,
         const ImageView&            position_and_metallic_image_view,
         const ImageView&            normal_and_roughness_image_view,
@@ -196,7 +201,7 @@ namespace pbrlib
         const PtrSampler&           ptr_sampler,
         const Optionals&            optionals
     ) :
-        PBRPass(ptr_device, ptr_physical_device, queue_family_index, ptr_descriptor_pool, ptr_sampler, optionals)
+        PBRPass(ptr_device, ptr_physical_device, ptr_queue, ptr_descriptor_pool, ptr_sampler, optionals)
     {
         _ptr_position_and_metallic_image_view   = &position_and_metallic_image_view;
         _ptr_normal_and_roughness_image_view    = &normal_and_roughness_image_view;
@@ -216,13 +221,12 @@ namespace pbrlib
 
     void PBRPass::draw(
         const Scene::PtrNode&           ptr_camera,
-        const PtrCommandBuffer&         ptr_command_buffer,
+        const PtrPrimaryCommandBuffer&         ptr_command_buffer,
         const vector<Scene::PtrNode>    point_lights,
         const vector<Scene::PtrNode>    spot_lights,
         const vector<Scene::PtrNode>    direction_lights
     )
     {
-
         VkExtent3D  out_image_size  = _out_image_view->getImage()->getImageInfo().image_extend;
         NumLights   num_lights;
 
@@ -283,7 +287,17 @@ namespace pbrlib
             util::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
         );
 
+        ptr_command_buffer->reset();
+        ptr_command_buffer->begin();
+
+        ptr_command_buffer->bindToPipeline(getPipeline());
+
         ptr_command_buffer->bindDescriptorSet(_ptr_pipeline, *_ptr_descriptor_set);
         ptr_command_buffer->dispatch(out_image_size.width, out_image_size.height, 1);
+        
+        ptr_command_buffer->end();
+
+        _ptr_device_queue->submit(*ptr_command_buffer);
+        _ptr_device_queue->waitIdle();
     }
 }

@@ -118,21 +118,20 @@ namespace pbrlib
         gbuffer_builder.setPhysicalDevice(ptr_physical_device);
         gbuffer_builder.setDescriptorPool(_ptr_descriptor_pool);
         gbuffer_builder.setDeviceMemoryIndex(gpu_memory_index);
-        gbuffer_builder.setDeviceQueueFamilyIndex(gpu_queue_family_index);
         gbuffer_builder.windowSize(width, height);
-
-        pbr_pass_builder.setDevice(_ptr_device);
-        pbr_pass_builder.setPhysicalDevice(ptr_physical_device);
-        pbr_pass_builder.setQueueFamilyIndex(gpu_queue_family_index);
-        pbr_pass_builder.setDescriptorPool(_ptr_descriptor_pool);
+        gbuffer_builder.setQueue(_ptr_device_queue);
         
         _ptr_gbuffer_pass = gbuffer_builder.buildPtr();
 
+        pbr_pass_builder.setDevice(_ptr_device);
+        pbr_pass_builder.setPhysicalDevice(ptr_physical_device);
+        pbr_pass_builder.setDescriptorPool(_ptr_descriptor_pool);
+        pbr_pass_builder.setQueue(_ptr_device_queue);
         pbr_pass_builder.setPositionAndMetallicImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic));
         pbr_pass_builder.setNormalAndRoughnessImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness));
         pbr_pass_builder.setAlbedoAndBakedAOImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked));
         pbr_pass_builder.setAnisotropyImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::Anisotropy));
-        
+        pbr_pass_builder.setQueue(_ptr_device_queue);
         pbr_pass_builder.setSampler(_ptr_sampler_nearest);
         pbr_pass_builder.setOptionals(_optionals);
 
@@ -148,12 +147,18 @@ namespace pbrlib
         float                           delta_time
     )
     {
+        if (!ptr_camera->hasComponent<CameraBase>()) {
+            throw runtime_error("Нет камеры.");
+        }
+
+        const auto& camera = ptr_camera->getComponent<CameraBase>();
+
         uint32_t image_index = 0;
         
         VkSemaphore             semaphore_handle    = VK_NULL_HANDLE;
-        VkSemaphoreCreateInfo   semaphore_info      = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-        
-        const CameraBase& camera = ptr_camera->getComponent<CameraBase>();
+        VkSemaphoreCreateInfo   semaphore_info      = { 
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO 
+        };
         
         assert(vkCreateSemaphore(_ptr_device->getDeviceHandle(), &semaphore_info, nullptr, &semaphore_handle) == VK_SUCCESS);
         
@@ -161,16 +166,10 @@ namespace pbrlib
         
         vkDestroySemaphore(_ptr_device->getDeviceHandle(), semaphore_handle, nullptr);
 
+        _ptr_gbuffer_pass->draw(camera.getProjection(), camera.getView(), visible_list, _ptr_command_buffer, _ptr_sampler_linear);
+
         _ptr_command_buffer->reset();
         _ptr_command_buffer->begin();
-
-        _ptr_command_buffer->begineRenderPass(_ptr_gbuffer_pass->getFramebuffer(), _ptr_gbuffer_pass->getClearValue());
-        
-        _ptr_command_buffer->bindToPipeline(_ptr_gbuffer_pass->getPipeline());
-        _ptr_gbuffer_pass->draw(camera.getProjection(), camera.getView(), visible_list, _ptr_command_buffer, _ptr_sampler_linear);
-        _ptr_command_buffer->endRenderPass();
-
-        _ptr_command_buffer->bindToPipeline(_ptr_pbr_pass->getPipeline());
 
         static VkImageSubresourceRange image_subresource_range {
             .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -193,6 +192,11 @@ namespace pbrlib
             image_subresource_range
         );
         
+        _ptr_command_buffer->end();
+        
+        _ptr_device_queue->submit(*_ptr_command_buffer);
+        _ptr_device_queue->waitIdle();
+        
         _ptr_pbr_pass->output(_ptr_swapchain->getImagesView()[image_index], PBRPass::OutputImagesViewsIDs::Result);
 
         _ptr_pbr_pass->draw(
@@ -202,6 +206,9 @@ namespace pbrlib
             spot_lights,
             direction_lights
         );
+
+        _ptr_command_buffer->reset();
+        _ptr_command_buffer->begin();
 
         _ptr_command_buffer->imageMemoryBarrier(
             VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,

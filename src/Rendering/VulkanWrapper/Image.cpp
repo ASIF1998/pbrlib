@@ -25,12 +25,12 @@ namespace pbrlib
             return 12;
         } else if (format == VK_FORMAT_R32G32_SFLOAT || format == VK_FORMAT_R16G16B16A16_SFLOAT) {
             return 8;
-        } else if (format == VK_FORMAT_R16G16B16_SFLOAT) {
+        } else if (format == VK_FORMAT_R16G16B16_SFLOAT ||  format == VK_FORMAT_D32_SFLOAT_S8_UINT) {
             return 6;
         } else if (
-            format == VK_FORMAT_R32_SFLOAT      ||
-            format == VK_FORMAT_R16G16_SFLOAT   ||
-            format == VK_FORMAT_R8G8B8A8_SRGB   ||
+            format == VK_FORMAT_R32_SFLOAT          ||
+            format == VK_FORMAT_R16G16_SFLOAT       ||
+            format == VK_FORMAT_R8G8B8A8_SRGB       ||
             format == VK_FORMAT_D32_SFLOAT
         ) {
             return 4;

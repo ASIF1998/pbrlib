@@ -12,12 +12,10 @@
 #define PI 		3.14159265359
 #define M_1_PI 	0.31830988618
 
-// #define x) 1 << x
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define D_BECKAMNN_ID 			0
 #define D_GGX_ID 				1
-#define D_GGX_ANISOTROPY_ID 	2
+#define D_GGX_ANISOTROPY_ID	2
 
 float D_Beckmann(mediump float n_dot_m, mediump float alpha)
 {
@@ -42,7 +40,7 @@ float D_GGX(mediump float n_dot_m, mediump float alpha)
 
 float D_GGX_Anisotropy(
 	mediump float n_dot_h,
-	mediump float tnag_dot_h,
+	mediump float tang_dot_h,
 	mediump float btang_dot_h,
 	mediump float alpha,
 	mediump float anisotropy
@@ -61,7 +59,7 @@ float D_GGX_Anisotropy(
 
     float a = alpha_b * alpha_t;
 
-    vec3 	v 	= vec3(alpha_b * tnag_dot_h, alpha_t * btang_dot_h, a * n_dot_h);
+    vec3 	v 	= vec3(alpha_b * tang_dot_h, alpha_t * btang_dot_h, a * n_dot_h);
     float 	v2 	= dot(v, v);
     float	w 	= a / v2;
 

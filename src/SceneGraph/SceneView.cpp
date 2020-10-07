@@ -23,7 +23,7 @@ namespace pbrlib
 {
     PtrInstance getVulkanInstance()
     {
-        PtrInstance ptr_instance = nullptr;
+        static PtrInstance ptr_instance = nullptr;
 
         if (!ptr_instance) {
             vector<string>      extensions = Instance::getExtensionNames();
