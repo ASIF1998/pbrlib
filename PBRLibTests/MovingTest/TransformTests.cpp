@@ -78,10 +78,10 @@ TEST(MovingTransform, Translate)
     Transform transform = Transform::translate(t);
 
     constexpr Matrix4x4<float> r (
-        1.0f, 0.0f, 0.0f, 0.5f,
-        0.0f, 1.0f, 0.0f, 0.5f,
-        0.0f, 0.0f, 1.0f, 0.5f, 
-        0.0f, 0.0f, 0.0f, 1.0f
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f
     );
 
     EXPECT_EQ(r, transform.getMatrix());
