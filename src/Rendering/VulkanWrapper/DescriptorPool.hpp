@@ -67,8 +67,8 @@ namespace pbrlib
         );
 
     private:
-        PtrDevice                       _ptr_device;
-        VkDescriptorPool                _descriptor_pool_handle;
+        PtrDevice        _ptr_device;
+        VkDescriptorPool _descriptor_pool_handle;
     };
 }
 

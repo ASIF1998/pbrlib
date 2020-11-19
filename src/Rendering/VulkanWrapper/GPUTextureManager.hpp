@@ -112,8 +112,8 @@ namespace pbrlib
         unordered_map<string, PtrImageView> _textures;                          //!< Текстуры.
         PtrDevice                           _ptr_device;                        //!< Указатель на устройство.
         PtrPrimaryCommandBuffer             _ptr_command_buffer;                //!< Указатель на командный буфер.
-        uint32_t                            _device_local_memory_type_index;    //!< Тип памяти, являющаяся локальной для устройства (GPU).
-        uint32_t                            _host_local_memory_type_index;      //!< Тип памяти, которая может быть отображена и читаться или записываться CPU.
+        uint32_t                            _device_local_memory_type_index;    //!< Тип памяти, являющийся локальной для устройства (GPU).
+        uint32_t                            _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
         PtrDeviceQueue                      _ptr_device_queue;                  //!< Указатель на очередь устройства.
         VkImageTiling                       _image_tiling;                      //!< Способ размещения текстуры на устройстве.
         VkSampleCountFlags                  _num_samples;                       //!< Количество выборок в текстуре на устройстве.

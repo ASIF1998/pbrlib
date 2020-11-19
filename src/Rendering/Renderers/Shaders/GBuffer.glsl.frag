@@ -6,7 +6,6 @@
 
 layout(location = 0) in highp       vec3 FPosition;
 layout(location = 1) in mediump     vec2 FTextureCoord;
-
 layout(location = 2) in highp       mat3 FTBN;
 
 layout(set = 0, binding = 1) uniform sampler2D Albedo;

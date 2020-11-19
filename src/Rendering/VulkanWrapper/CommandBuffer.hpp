@@ -404,10 +404,10 @@ namespace pbrlib
 
         const PtrGraphicsPipeline& getPipeline() const noexcept;
 
-        static PtrPrimaryCommandBuffer make(const PtrCommandPool&       ptr_command_pool);
+        static PtrPrimaryCommandBuffer make(const PtrCommandPool& ptr_command_pool);
 
     private:
-        PtrGraphicsPipeline    _ptr_pipeline;
+        PtrGraphicsPipeline _ptr_pipeline;
     };
 
     class SecondaryCommandBuffer :
