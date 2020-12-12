@@ -99,8 +99,8 @@ TEST(SceneGraphNode, GettersAndSetters)
     Transform local_transform = Transform::rotateX(60.0f);
 
     AABB world_aabb(
-        Vec3<float> (-3.0f, 4.0f, -1.0f),
-        Vec3<float> (34.0f, -32.0f, 1.0f)
+        Vec3<float> (-3.0f, 4.000f, -1.0f),
+        Vec3<float> (34.0f, -32.0f, 1.00f)
     );
     
     int rval = rand() % 10000;

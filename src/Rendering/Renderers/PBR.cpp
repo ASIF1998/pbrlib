@@ -129,8 +129,8 @@ namespace pbrlib
         pbr_pass_builder.setQueue(_ptr_device_queue);
         pbr_pass_builder.setPositionAndMetallicImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic));
         pbr_pass_builder.setNormalAndRoughnessImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness));
-        pbr_pass_builder.setAlbedoAndBakedAOImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked));
-        pbr_pass_builder.setAnisotropyImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::Anisotropy));
+        pbr_pass_builder.setAlbedoAndBakedAOImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::AlbedoAndBakedAO));
+        pbr_pass_builder.setAnisotropyImageView(&_ptr_gbuffer_pass->output(GBufferPass::OutputImagesViewsIDs::TangentAndAnisotropy));
         pbr_pass_builder.setQueue(_ptr_device_queue);
         pbr_pass_builder.setSampler(_ptr_sampler_nearest);
         pbr_pass_builder.setOptionals(_optionals);

@@ -42,24 +42,29 @@ namespace pbrlib
         Matrix4x4<float> model_matrix;
         Matrix4x4<float> normal_matrix;
     };
-
-    enum class GBufferPassBindings
+    struct GBufferPassBindings
     {
-        MatricesData = 0,
-        Albedo,
-        NormalMap,
-        Metallic,
-        Roughness,
-        AO,
-        MaterailData
+        enum
+        {
+            MatricesData = 0,
+            Albedo,
+            NormalMap,
+            Metallic,
+            Roughness,
+            AO,
+            MaterailData
+        };
     };
 
-    enum class GBufferPassLocations
+    struct GBufferPassLocations
     {
-        Position = 0,
-        Normal,
-        Tangent,
-        UV
+        enum
+        {
+            Position = 0,
+            Normal,
+            Tangent,
+            UV
+        };
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,8 +127,8 @@ namespace pbrlib
 
         subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::Anisotropy, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::AlbedoAndBakedAO, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        subpass_description1.addColorAttachment(GBufferPass::OutputImagesViewsIDs::TangentAndAnisotropy, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         subpass_description1.setDepthStencilAttachment(GBufferPass::OutputImagesViewsIDs::Depth, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
         build_render_pass.setDevice(ptr_device);
@@ -131,7 +136,7 @@ namespace pbrlib
         build_render_pass.addAttachmentDescription(
             image_view->at(GBufferPass::OutputImagesViewsIDs::PositionAndMetallic).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
-            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_LOAD_OP_LOAD,
             VK_ATTACHMENT_STORE_OP_STORE,
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -142,7 +147,7 @@ namespace pbrlib
         build_render_pass.addAttachmentDescription(
             image_view->at(GBufferPass::OutputImagesViewsIDs::NormalAndRoughness).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
-            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_LOAD_OP_LOAD,
             VK_ATTACHMENT_STORE_OP_STORE,
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -151,9 +156,9 @@ namespace pbrlib
         );
 
         build_render_pass.addAttachmentDescription(
-            image_view->at(GBufferPass::OutputImagesViewsIDs::AlbedoAndBaked).getFormat(),
+            image_view->at(GBufferPass::OutputImagesViewsIDs::AlbedoAndBakedAO).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
-            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_LOAD_OP_LOAD,
             VK_ATTACHMENT_STORE_OP_STORE,
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -164,7 +169,7 @@ namespace pbrlib
         build_render_pass.addAttachmentDescription(
            image_view->at(GBufferPass::OutputImagesViewsIDs::Depth).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
-            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_LOAD_OP_LOAD,
             VK_ATTACHMENT_STORE_OP_STORE,
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -173,9 +178,9 @@ namespace pbrlib
         );
         
         build_render_pass.addAttachmentDescription(
-            image_view->at(GBufferPass::OutputImagesViewsIDs::Anisotropy).getFormat(),
+            image_view->at(GBufferPass::OutputImagesViewsIDs::TangentAndAnisotropy).getFormat(),
             VK_SAMPLE_COUNT_1_BIT,
-            VK_ATTACHMENT_LOAD_OP_CLEAR,
+            VK_ATTACHMENT_LOAD_OP_LOAD,
             VK_ATTACHMENT_STORE_OP_STORE,
             VK_ATTACHMENT_LOAD_OP_DONT_CARE,
             VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -198,9 +203,9 @@ namespace pbrlib
     {
         PtrAttachments ptr_framebuffer_attachments (new vector<ImageView>());
 
-        Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>     image_rgba_builder;
-        ImageView::Builder                                                      image_view_builder;
-        Image::Builder<Image::TexelType::DepthStencil, float, Image::NumBits::NB32>    depth_image_builder;
+        Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>         image_rgba_builder;
+        ImageView::Builder                                                          image_view_builder;
+        Image::Builder<Image::TexelType::DepthStencil, float, Image::NumBits::NB32> depth_image_builder;
 
         image_rgba_builder.setDevice(ptr_device);
         image_rgba_builder.setExtend(width, height, 1);
@@ -210,7 +215,7 @@ namespace pbrlib
         image_rgba_builder.setNumMipLevels(1);
         image_rgba_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
         image_rgba_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
-        image_rgba_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        image_rgba_builder.setUsage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
         image_rgba_builder.addQueueFamilyIndex(gpu_queue_family_index);
         
         image_view_builder.setAspectMask(VK_IMAGE_ASPECT_COLOR_BIT);
@@ -230,7 +235,7 @@ namespace pbrlib
         depth_image_builder.setNumMipLevels(1);
         depth_image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
         depth_image_builder.setTiling(VK_IMAGE_TILING_OPTIMAL);
-        depth_image_builder.setUsage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        depth_image_builder.setUsage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
         depth_image_builder.addQueueFamilyIndex(gpu_queue_family_index);
 
         ptr_framebuffer_attachments->push_back(image_view_builder.build());
@@ -283,24 +288,11 @@ namespace pbrlib
         uint32_t                    window_width,
         uint32_t                    window_height
     ) :
-        _clear_values (OutputImagesViewsIDs::Count),
         _ptr_device_queue (ptr_queue)
     {
         assert(ptr_queue);
 
         uint32_t queue_family_index = _ptr_device_queue->getFamilyIndex();
-
-        {
-            VkClearValue color_attachment_clear_value   {1.0f, 1.0f, 1.0f, 1.0f};
-            VkClearValue depth_clear_value              {1.0f, 1.0f, 1.0f, 1.0f};
-            VkClearValue anisotropy_clear_value         {0.0f, 0.0f, 0.0f, 0.0f};
-
-            _clear_values[OutputImagesViewsIDs::PositionAndMetallic]    = color_attachment_clear_value;
-            _clear_values[OutputImagesViewsIDs::NormalAndRoughness]     = color_attachment_clear_value;
-            _clear_values[OutputImagesViewsIDs::AlbedoAndBaked]         = color_attachment_clear_value;
-            _clear_values[OutputImagesViewsIDs::Depth]                  = depth_clear_value;
-            _clear_values[OutputImagesViewsIDs::Anisotropy]             = anisotropy_clear_value;
-        }
 
         ShaderModule::Builder build_vert_shader;
         ShaderModule::Builder build_frag_shader;
@@ -318,13 +310,13 @@ namespace pbrlib
         _ptr_render_pass                = makeRenderPass(ptr_device, _ptr_framebuffer_attachments);
         _ptr_framebuffer                = makeFramebuffer(_ptr_framebuffer_attachments, _ptr_render_pass, window_width, window_height);
 
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::MatricesData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::Albedo), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::NormalMap), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::Metallic), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::Roughness), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::AO), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-        descriptor_set_layout_bindings.addBinding(util::enumCast(GBufferPassBindings::MaterailData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::MatricesData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::Albedo, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::NormalMap, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::Metallic, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::Roughness, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::AO, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        descriptor_set_layout_bindings.addBinding(GBufferPassBindings::MaterailData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
 
         PtrDescriptorSetLayout ptr_descriptor_set_layout = DescriptorSetLayout::make(move(descriptor_set_layout_bindings));
 
@@ -360,26 +352,26 @@ namespace pbrlib
         );
 
         build_graphics_pipline.getVertexInputState().addVertexInputAttributeDescription(
-            util::enumCast(GBufferPassLocations::Position),
+            GBufferPassLocations::Position,
             0,
             VK_FORMAT_R32G32B32_SFLOAT,
             offsetof(Mesh::VertexAttrib, position)
         );
 
         build_graphics_pipline.getVertexInputState().addVertexInputAttributeDescription(
-            util::enumCast(GBufferPassLocations::Normal),
+            GBufferPassLocations::Normal,
             0,
             VK_FORMAT_R32G32B32_SFLOAT, offsetof(Mesh::VertexAttrib, normal)
         );
 
          build_graphics_pipline.getVertexInputState().addVertexInputAttributeDescription(
-            util::enumCast(GBufferPassLocations::Tangent),
+            GBufferPassLocations::Tangent,
             0,
             VK_FORMAT_R32G32B32_SFLOAT, offsetof(Mesh::VertexAttrib, tangent)
         );
 
          build_graphics_pipline.getVertexInputState().addVertexInputAttributeDescription(
-            util::enumCast(GBufferPassLocations::UV),
+            GBufferPassLocations::UV,
             0,
             VK_FORMAT_R32G32B32_SFLOAT, offsetof(Mesh::VertexAttrib, uv)
         );
@@ -433,13 +425,13 @@ namespace pbrlib
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_matrices_data_buffer, 
             0, sizeof(UniformBufferMatrices), 
-            util::enumCast(GBufferPassBindings::MatricesData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            GBufferPassBindings::MatricesData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_material_data_buffer, 
             0, sizeof(MaterialData), 
-            util::enumCast(GBufferPassBindings::MaterailData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            GBufferPassBindings::MaterailData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
     }
 
@@ -454,17 +446,149 @@ namespace pbrlib
         UniformBufferMatrices   uniform_matrices_buffer_data;
         MaterialData            uniform_material_buffer_data;
 
+        ptr_command_buffer->reset();
+        ptr_command_buffer->begin();
+        
+        Vec4<float> color_image_clear_val                   (1.0, 1.0, 1.0, 0.0);
+        Vec4<float> tangent_and_aniso_image_clear_val       (0.0, 0.0, 0.0, 0.0);
+        Vec4<float> pos_and_metallic_image_clear_val        (0.0, 0.0, 0.0, 0.0);
+        Vec4<float> normal_and_roughness_image_clear_val    (0.0, 0.0, 0.0, 0.0);
+
+        float       depth_clear_val     = 1.0;
+        uint32_t    stencil_clear_val   = 0;
+
+        VkImageSubresourceRange color_image_subresource_range {
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel   = 0,
+            .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1
+        };
+
+        VkImageSubresourceRange depth_stencil_image_subresource_range {
+            .aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+            .baseMipLevel   = 0,
+            .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1
+        };
+
+        ptr_command_buffer->imageMemoryBarrier(
+            VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            0,
+            0,
+            *outputImpl(OutputImagesViewsIDs::AlbedoAndBakedAO).getImage(),
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->imageMemoryBarrier(
+            VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            0,
+            0,
+            *outputImpl(OutputImagesViewsIDs::TangentAndAnisotropy).getImage(),
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->imageMemoryBarrier(
+            VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            0,
+            0,
+            *outputImpl(OutputImagesViewsIDs::PositionAndMetallic).getImage(),
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->imageMemoryBarrier(
+            VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            0,
+            0,
+            *outputImpl(OutputImagesViewsIDs::NormalAndRoughness).getImage(),
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->imageMemoryBarrier(
+            VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0,
+            0,
+            VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            0,
+            0,
+            *outputImpl(OutputImagesViewsIDs::Depth).getImage(),
+            depth_stencil_image_subresource_range
+        );
+
+        ptr_command_buffer->clearColorImage(
+            *outputImpl(OutputImagesViewsIDs::AlbedoAndBakedAO).getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            color_image_clear_val,
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->clearColorImage(
+            *outputImpl(OutputImagesViewsIDs::TangentAndAnisotropy).getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            tangent_and_aniso_image_clear_val,
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->clearColorImage(
+            *outputImpl(OutputImagesViewsIDs::PositionAndMetallic).getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            pos_and_metallic_image_clear_val,
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->clearColorImage(
+            *outputImpl(OutputImagesViewsIDs::NormalAndRoughness).getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            normal_and_roughness_image_clear_val,
+            color_image_subresource_range
+        );
+
+        ptr_command_buffer->clearDepthStencilImage(
+            *outputImpl(OutputImagesViewsIDs::Depth).getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            depth_clear_val, stencil_clear_val,
+            depth_stencil_image_subresource_range
+        );
+
+        ptr_command_buffer->end();
+
+        _ptr_device_queue->submit(*ptr_command_buffer);
+        _ptr_device_queue->waitIdle();
+
         for (size_t i{0}, size{drawable_objects.size()}; i < size; i++) {
             if (drawable_objects[i]->hasComponent<Mesh>()) {
                 Mesh& mesh = drawable_objects[i]->getComponent<Mesh>();
 
                 if(mesh.getMaterial()) {
                     /*  ----------------------------------------------------------------------  */
-                    const PtrMaterial&  ptr_material        = mesh.getMaterial();
-                    Transform           current_transform   = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
-                    
-                    uniform_matrices_buffer_data.model_matrix   = current_transform.getMatrix();
-                    uniform_matrices_buffer_data.MVP            = (projection * view * current_transform).getMatrix();
+                    const PtrMaterial&  ptr_material    = mesh.getMaterial();
+                    Transform           model           = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
+
+                    uniform_matrices_buffer_data.model_matrix   = model.getMatrix();
+                    uniform_matrices_buffer_data.MVP            = (projection * view * model).getMatrix();
                     uniform_matrices_buffer_data.normal_matrix  = transpose(inverse(uniform_matrices_buffer_data.model_matrix));
                     uniform_material_buffer_data.anisotropy     = ptr_material->getAnisotropy();
 
@@ -478,41 +602,41 @@ namespace pbrlib
                         *ptr_material->getTexture<Material::Textures::Albedo>(), 
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                         *ptr_sampler, 
-                        util::enumCast(GBufferPassBindings::Albedo), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+                        GBufferPassBindings::Albedo, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
 
                     _ptr_descriptor_set->writeImageView(
                         *ptr_material->getTexture<Material::Textures::NormalMap>(), 
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                         *ptr_sampler, 
-                        util::enumCast(GBufferPassBindings::NormalMap), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+                        GBufferPassBindings::NormalMap, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
 
                     _ptr_descriptor_set->writeImageView(
                         *mesh.getMaterial()->getTexture<Material::Textures::Metallic>(), 
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                         *ptr_sampler, 
-                        util::enumCast(GBufferPassBindings::Metallic), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+                        GBufferPassBindings::Metallic, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
 
                     _ptr_descriptor_set->writeImageView(
                         *ptr_material->getTexture<Material::Textures::Roughness>(), 
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                         *ptr_sampler, 
-                        util::enumCast(GBufferPassBindings::Roughness), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+                        GBufferPassBindings::Roughness, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
 
                     _ptr_descriptor_set->writeImageView(
                         *ptr_material->getTexture<Material::Textures::BakedAO>(), 
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                         *ptr_sampler, 
-                        util::enumCast(GBufferPassBindings::AO), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+                        GBufferPassBindings::AO, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
                     );
 
                     ptr_command_buffer->reset();
                     ptr_command_buffer->begin();
 
-                    ptr_command_buffer->begineRenderPass(getFramebuffer(), getClearValue());
+                    ptr_command_buffer->begineRenderPass(getFramebuffer());
                     ptr_command_buffer->bindToPipeline(getPipeline());
 
                     ptr_command_buffer->bindVertexBuffer(*ptr_vertex_buffer, mesh.getVertexBufferOffset());
@@ -553,11 +677,6 @@ namespace pbrlib
     const PtrFramebuffer& GBufferPass::getFramebuffer() const noexcept
     {
         return _ptr_framebuffer;
-    }
-
-    const vector<VkClearValue>& GBufferPass::getClearValue() const noexcept
-    {
-       return _clear_values;
     }
 
     const ImageView& GBufferPass::outputImpl(size_t id) const

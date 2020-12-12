@@ -172,23 +172,23 @@ TEST(MathMatrix3x3, ScalarMultiplication)
 TEST(MathMatrix3x3, MatrixMultiplication)
 {
     constexpr Matrix3x3<float> m1 {
-        1.2f,   3.4f,   0.05f,
-        4.3f,   34.0f,  4.45f,
+        1.200f, 3.400f, 0.0500f,
+        4.300f, 34.00f, 4.4500f,
         23.54f, 82.59f, 323.43f
     };
 
     constexpr Matrix3x3<float> m2 {
-        10.125f,    23.3f,  0.25f,
-        4.35f,      3.2f,   0.45f,
-        2.534f,     8.59f,  33.43f
+        10.125f, 23.3f, 0.250f,
+        4.3500f, 3.20f, 0.450f,
+        2.5340f, 8.59f, 33.43f
     };
 
     Matrix3x3<float> r = m1 * m2;
 
     constexpr Matrix3x3<float> res {
-        27.0667f,       39.2695f,   3.50150013f,
-        202.7138f,      247.2155f,  165.138489f,
-        1417.18062f,    3591.0337f, 10855.3154f  
+        27.0667000f, 39.269500f, 3.50150013f,
+        202.713800f, 247.21550f, 165.138489f,
+        1417.18062f, 3591.0337f, 10855.3154f  
     };
 
     EXPECT_EQ(r, res);
@@ -244,8 +244,8 @@ TEST(MathMatrix3x3, AccessToElement)
 TEST(MathMatrix3x3, Determinant)
 {
     constexpr Matrix3x3<float> m {
-        1.0f, 2.0f, 3.5f,
-        2.2f, 3.0f, 1.2f,
+        1.0f, 2.0f, 3.50f,
+        2.2f, 3.0f, 1.20f,
         8.5f, 2.6f, 12.3f
     };
     
@@ -263,8 +263,8 @@ TEST(MathMatrix3x3, Transpose)
     };
 
     Matrix3x3<float> m2 {
-        1.0f, 2.2f, 8.5f,
-        2.0f, 3.0f, 2.6f,
+        1.0f, 2.2f, 8.50f,
+        2.0f, 3.0f, 2.60f,
         3.5f, 1.2f, 12.3f
     };
 
@@ -282,9 +282,9 @@ TEST(MathMatrix3x3, Inverse)
     };
 
     Matrix3x3<float> m2 {
-        -0.488362006f,  0.224085586236808f, 0.117102790226977f,
-        0.243747279f,   0.252276998698858f, -0.0939713642,
-        0.285962105f,   -0.208182722f,      0.0202399883f
+        -0.488362006f, 0.224085586236808f, 0.117102790226977f,
+        0.2437472790f, 0.252276998698858f, -0.09397136420000f,
+        0.2859621050f, -0.20818272200000f, 0.020239988300000f
     };
     
     EXPECT_EQ(m2, inverse(m1));

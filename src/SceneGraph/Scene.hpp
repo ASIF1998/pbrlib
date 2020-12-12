@@ -233,7 +233,7 @@ namespace pbrlib
         */
         PtrNode& makeSpotLight(
             const SpotLight::Builder&   light_builder,
-            const string_view            name = "Spot Light"
+            const string_view           name = "Spot Light"
         );
 
         /**

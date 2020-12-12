@@ -16,9 +16,9 @@ using namespace pbrlib::math;
 
 TEST(RenderingLightsSpotLight, BuilderAndSetters)
 {
-    constexpr Vec3<float>   color           (1.0f, 0.0f, 0.0f);
-    constexpr Vec3<float>   pos             (0.5f, 0.5f, 0.5f);
-    constexpr Vec3<float>   dir             (0.0, 0.0f, -1.0f);
+    constexpr Vec3<float>   color           (1.00f, 0.0f, 0.00f);
+    constexpr Vec3<float>   pos             (0.50f, 0.5f, 0.50f);
+    constexpr Vec3<float>   dir             (0.00f, 0.0f, -1.0f);
     constexpr float         intensity       (50.0f);
     constexpr float         outer_radius    (20.0f);
     constexpr float         inner_radius    (10.0f);

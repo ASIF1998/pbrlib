@@ -17,8 +17,8 @@ using namespace pbrlib::math;
 
 TEST(RenderingLightsDirectionLight, BuilderAndSetters)
 {
-    constexpr Vec3<float>   color           (1.0f, 0.0f, 0.0f);
-    constexpr Vec3<float>   dir_on_light    (0.0f, 0.0f, 1.0f);
+    constexpr Vec3<float>   color           (1.00f, 0.0f, 0.0f);
+    constexpr Vec3<float>   dir_on_light    (0.00f, 0.0f, 1.0f);
     constexpr float         intensity       (50.0f);
 
     DirectionLight::Builder build_direction_light;

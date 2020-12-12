@@ -234,12 +234,12 @@ namespace pbrlib
 
         Material material;
 
-        material._albedo                = _albedo;
-        material._normal_map            = _normal_map;
-        material._metallic              = _metallic;
-        material._roughness             = _roughness;
-        material._baked_AO              = _baked_AO;
-        material._anisotropy            = _anisotropy;
+        material._albedo        = _albedo;
+        material._normal_map    = _normal_map;
+        material._metallic      = _metallic;
+        material._roughness     = _roughness;
+        material._baked_AO      = _baked_AO;
+        material._anisotropy    = _anisotropy;
 
         return material;
    }
@@ -250,12 +250,12 @@ namespace pbrlib
 
         PtrMaterial ptr_material = Material::make();
 
-        ptr_material->_albedo               = _albedo;
-        ptr_material->_normal_map           = _normal_map;
-        ptr_material->_metallic             = _metallic;
-        ptr_material->_roughness            = _roughness;
-        ptr_material->_baked_AO             = _baked_AO;
-        ptr_material->_anisotropy           = _anisotropy;
+        ptr_material->_albedo       = _albedo;
+        ptr_material->_normal_map   = _normal_map;
+        ptr_material->_metallic     = _metallic;
+        ptr_material->_roughness    = _roughness;
+        ptr_material->_baked_AO     = _baked_AO;
+        ptr_material->_anisotropy   = _anisotropy;
 
         return ptr_material;;
     }

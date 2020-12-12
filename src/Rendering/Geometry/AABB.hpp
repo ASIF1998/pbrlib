@@ -157,7 +157,6 @@ namespace pbrlib
         static AABB computeAABB(const TPositions& positions);
 
     private:
-        
         union
         {
             struct

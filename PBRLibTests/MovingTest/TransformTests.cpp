@@ -105,14 +105,14 @@ TEST(MovingTransform, Scale)
 
 TEST(MovingTransform, Rotates)
 {
-    constexpr Vec3<float> r1 (0.4767313f, -0.291967213f, 0.82914561f);
-    constexpr Vec3<float> r2 (0.816371619f, 0.572077572f, -0.079149574f);
-    constexpr Vec3<float> r3 (-0.257068098f, 0.698900223f, 0.667423784f);
+    constexpr Vec3<float> r1 (0.4767313000f, -0.291967213f, 0.8291456100f);
+    constexpr Vec3<float> r2 (0.8163716190f, 0.5720775720f, -0.079149574f);
+    constexpr Vec3<float> r3 (-0.257068098f, 0.6989002230f, 0.6674237840f);
     
-    constexpr float         theta   (60.0f);
-    constexpr Vec3<float>   axis1   (1.0f, 0.0f, 0.0f);
-    constexpr Vec3<float>   axis2   (0.0f, 1.0f, 0.0f);
-    constexpr Vec3<float>   axis3   (0.0f, 0.0f, 1.0f);
+    constexpr float         theta   (60.000000f);
+    constexpr Vec3<float>   axis1   (1.0000000f, 0.000000000f, 0.000000000f);
+    constexpr Vec3<float>   axis2   (0.0000000f, 1.000000000f, 0.000000000f);
+    constexpr Vec3<float>   axis3   (0.0000000f, 0.000000000f, 1.000000000f);
     constexpr Vec3<float>   v       (0.4767313f, 0.572077572f, 0.667423784f);
 
     Transform rx    = Transform::rotateX(theta);
@@ -141,15 +141,15 @@ TEST(MovingTransform, Rotates)
 TEST(MovingTransform, LookAt)
 {
     constexpr Matrix4x4<float> res (
-        -0.0995037183f,     -0.663813591f,  -0.741249323f,      0.0f,
-        0.0f,               0.744946361f,   -0.667124391f,      0.0f,
-        0.995037198f,       -0.0663813576f, -0.0741249323f,     0.0f,
-        0.497518599,        -3.38544941,    -3.78037167,        1.0f
+        -0.0995037183f, -0.6638135910f, -0.7412493230f, 0.0f,
+        0.00000000000f, 0.74494636100f, -0.6671243910f, 0.0f,
+        0.99503719800f, -0.0663813576f, -0.0741249323f, 0.0f,
+        0.49751859900f, -3.3854494100f, -3.7803716700f, 1.0f
     );
 
-    constexpr Vec3<float> pos   (45.0f, 45.0f, 4.0f);
-    constexpr Vec3<float> eye   (-5.0f, 0.0f, -1.0f);
-    constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
+    constexpr Vec3<float> pos   (45.0f, 45.0f, 4.00f);
+    constexpr Vec3<float> eye   (-5.0f, 0.00f, -1.0f);
+    constexpr Vec3<float> up    (0.00f, 1.00f, 0.00f);
 
     Transform look_at = Transform::lookAt(pos, eye, up);
     
@@ -159,15 +159,15 @@ TEST(MovingTransform, LookAt)
 TEST(MovingTransform, PrespectiveProjection)
 {
     constexpr Matrix4x4<float> res (
-        -0.117089964f,  0.0f,           0.0f,           0.0f,
-        0.0f,           -0.156119958f,  0.0f,           0.0f,
-        0.0f,           0.0f,           -1.00004995,    -1.0f,
-        0.0f,           0.0f,           -0.0100004999, 0.0f
+        -0.117089964f, 0.0000000000f, 0.00000000000f, 0.00f,
+        0.0000000000f, -0.156119958f, 0.00000000000f, 0.00f,
+        0.0000000000f, 0.0000000000f, -1.0000499500f, -1.0f,
+        0.0000000000f, 0.0000000000f, -0.0100004999f, 0.00f
     );
 
     constexpr float fov       = 60.0f;
     constexpr float aspect    = 4.0f / 3.0f;
-    constexpr float z_near    = 0.01f;
+    constexpr float z_near    = 0.010f;
     constexpr float z_far     = 200.0f;
 
     Transform perspective_projection = Transform::perspective(fov, aspect, z_near, z_far);

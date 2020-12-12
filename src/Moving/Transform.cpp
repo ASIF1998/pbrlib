@@ -229,7 +229,7 @@ namespace pbrlib
 
         return Transform(Matrix4x4<float>(
            1.0f / (aspect * a),    0.0f,       0.0f,                                            0.0f,
-           0.0f,                   1.0f / a,   0.0f,                                            0.0f,
+           0.0f,                   -1.0f / a,  0.0f,                                            0.0f,
            0.0f,                   0.0f,       z_far / (z_near - z_far),                        -1.0f,
            0.0f,                   0.0f,       -(z_far * z_near) / (z_far - z_near),            0.0f
        ));

@@ -388,6 +388,49 @@ namespace pbrlib
         );
     }
 
+    void CommandBuffer::clearColorImage(
+        const Image&                    image,
+        VkImageLayout                   image_layout,
+        const Vec4<float>&              clear_color,
+        const VkImageSubresourceRange&  image_subresource_range
+    ) const noexcept
+    {
+        VkClearColorValue vk_clear_color {
+            clear_color.r, 
+            clear_color.g, 
+            clear_color.b, 
+            clear_color.a
+        };
+
+        vkCmdClearColorImage(
+            _command_buffer_handle, 
+            image.getImageHandle(), image_layout, 
+            &vk_clear_color, 
+            1, &image_subresource_range
+        );
+    }
+
+    void CommandBuffer::clearDepthStencilImage(
+        const Image&                    image,
+        VkImageLayout                   image_layout,
+        float                           depth_val,
+        uint32_t                        stencil_val,
+        const VkImageSubresourceRange&  image_subresource_range
+    ) const noexcept
+    {
+        VkClearDepthStencilValue vk_clear_depth_stencil_val {
+            .depth      = depth_val,
+            .stencil    = stencil_val
+        };
+
+        vkCmdClearDepthStencilImage(
+            _command_buffer_handle,
+            image.getImageHandle(), image_layout,
+            &vk_clear_depth_stencil_val, 
+            1, &image_subresource_range
+        );
+    }
+
     void CommandBuffer::reset() const noexcept
     {
         vkResetCommandBuffer(_command_buffer_handle, 0);
@@ -409,17 +452,12 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimaryCommandBuffer::PrimaryCommandBuffer(
-        const PtrCommandPool&       ptr_command_pool
-        // const PtrFramebuffer&       ptr_framebuffer
-    ) :
-        CommandBuffer       (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY)
-        // _ptr_framebuffer    (ptr_framebuffer)
+    PrimaryCommandBuffer::PrimaryCommandBuffer(const PtrCommandPool&       ptr_command_pool) :
+        CommandBuffer (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY)
     {}
 
     PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
         CommandBuffer       (move(command_buffer)),
-        // _ptr_framebuffer    (move(command_buffer._ptr_framebuffer)),
         _ptr_pipeline       (move(command_buffer._ptr_pipeline))
     {}
 
@@ -478,6 +516,29 @@ namespace pbrlib
             },
             .clearValueCount    = 1,
             .pClearValues       = &clear_value
+        };
+
+        vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
+    }
+
+    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer) const noexcept
+    {
+        VkRenderPassBeginInfo begin_indo {
+            .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
+            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
+            .renderArea     = {
+                .offset = {
+                    .x = 0, 
+                    .y = 0
+                },
+                .extent = {
+                    .width  = ptr_framebuffer->getWidth(),
+                    .height = ptr_framebuffer->getHeight()
+                }
+            },
+            .clearValueCount    = 0,
+            .pClearValues       = nullptr
         };
 
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);

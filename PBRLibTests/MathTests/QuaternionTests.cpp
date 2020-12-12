@@ -28,9 +28,9 @@ TEST(MathQuaternion, Constructor)
     EXPECT_EQ(0.0f, q1.v.z);
     EXPECT_EQ(1.0f, q1.w);
 
-    EXPECT_EQ(1.0f,     q2.v.x);
-    EXPECT_EQ(2.2f,     q2.v.y);
-    EXPECT_EQ(4.255f,   q2.v.z);
+    EXPECT_EQ(1.00000f, q2.v.x);
+    EXPECT_EQ(2.20000f, q2.v.y);
+    EXPECT_EQ(4.25500f, q2.v.z);
     EXPECT_EQ(123.321f, q2.w);
 
     EXPECT_EQ(v.x,  q3.v.x);
@@ -73,7 +73,7 @@ TEST(MathQuaternion, AdditionAndSubtraction)
 TEST(MathQuaternion, ScalarMultiplicationAndDivision)
 {
     constexpr Quaternion res1 (3.0f, 9.0f, 12.0f, 15.0f);
-    constexpr Quaternion res2 (1.0f, 3.0f, 4.0f, 5.0f);
+    constexpr Quaternion res2 (1.0f, 3.0f, 4.00f, 5.00f);
 
     Quaternion  q (1.0f, 3.0f, 4.0f, 5.0f);
     float       s (3.0f);
@@ -108,14 +108,14 @@ TEST(MathQuaternion, AccessToElement)
 {
     constexpr Quaternion q (1.0f, 2.2f, 4.255f, 123.321f);
 
-    EXPECT_EQ(1.0f,     q.v.x);
-    EXPECT_EQ(2.2f,     q.v.y);
-    EXPECT_EQ(4.255f,   q.v.z);
+    EXPECT_EQ(1.00000f, q.v.x);
+    EXPECT_EQ(2.20000f, q.v.y);
+    EXPECT_EQ(4.25500f, q.v.z);
     EXPECT_EQ(123.321f, q.w);
 
-    EXPECT_EQ(1.0f,     q[0]);
-    EXPECT_EQ(2.2f,     q[1]);
-    EXPECT_EQ(4.255f,   q[2]);
+    EXPECT_EQ(1.00000f, q[0]);
+    EXPECT_EQ(2.20000f, q[1]);
+    EXPECT_EQ(4.25500f, q[2]);
     EXPECT_EQ(123.321f, q[3]);
 }
 
@@ -146,7 +146,7 @@ TEST(MathQuaternion, Inverse)
         -0.0588235334f, 
         -0.0784313753f, 
         -0.0980392172f, 
-        0.0196078438f
+        0.01960784380f
     );
 
     Quaternion q (3.0f, 4.0f, 5.0f, 1.0f);
@@ -206,8 +206,8 @@ TEST(MathQuaternion, Slerp)
 {
     constexpr Quaternion res (0.381873041f, 0.27716592f, 0.381873041f, 0.461943209f);
 
-    constexpr Quaternion q1 (0.12, 0.3, 0.4, 0.5);
-    constexpr Quaternion q2 (-0.5, -0.15, -0.220, -0.25);
+    constexpr Quaternion q1 (0.12f, 0.300f, 0.4000f, 0.500f);
+    constexpr Quaternion q2 (-0.5f, -0.15f, -0.220f, -0.25f);
 
     EXPECT_EQ(res, slerp(0.5f, q1, q2));
 }
@@ -215,10 +215,10 @@ TEST(MathQuaternion, Slerp)
 TEST(MathQuaternion, ToTransform)
 {
     constexpr Matrix4x4<float> r (
-        1.0f, 0.0f,  0.0f,  0.0f,
-        0.0f, -1.0f, 0.0f,  0.0f,
-        0.0f, 0.0f,  -1.0f, 0.0f,
-        0.0f, 0.0f,  0.0f,  1.0f
+        1.0f, 0.00f, 0.00f, 0.0f,
+        0.0f, -1.0f, 0.00f, 0.0f,
+        0.0f, 0.00f, -1.0f, 0.0f,
+        0.0f, 0.00f, 0.00f, 1.0f
     );
 
     Quaternion  q (1.0f, 0.0f, 0.0f, 0.0f);

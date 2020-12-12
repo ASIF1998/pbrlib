@@ -22,8 +22,8 @@ TEST(RenderingGeometryAABB, Constructor)
 {
     constexpr Vec3<float> p (0.5f, 0.5f, 0.5f);
 
-    constexpr Vec3<float> p1 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> p2 (1.0f, -1.0f, 1.0f);
+    constexpr Vec3<float> p1 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> p2 (1.00f, -1.0f, 1.00f);
 
     constexpr float min_value = numeric_limits<float>::lowest();
     constexpr float max_value = numeric_limits<float>::max();
@@ -45,9 +45,9 @@ TEST(RenderingGeometryAABB, Constructor)
     EXPECT_EQ(bbox3[0].x, -1.0f);
     EXPECT_EQ(bbox3[0].y, -1.0f);
     EXPECT_EQ(bbox3[0].z, -1.0f);
-    EXPECT_EQ(bbox3[1].x, 1.0f);
-    EXPECT_EQ(bbox3[1].y, 1.0f);
-    EXPECT_EQ(bbox3[1].z, 1.0f);
+    EXPECT_EQ(bbox3[1].x, 1.00f);
+    EXPECT_EQ(bbox3[1].y, 1.00f);
+    EXPECT_EQ(bbox3[1].z, 1.00f);
 }
 
 TEST(RenderingGeometryAABB, EqualAndNotEqual)
@@ -67,16 +67,16 @@ TEST(RenderingGeometryAABB, EqualAndNotEqual)
 TEST(RenderingGeometryAABB, Corner)
 {
     constexpr Vec3<float> r0 (-1.0f, -1.0f, -1.0f);
-    constexpr Vec3<float> r1 (1.0f, -1.0f, -1.0f);
-    constexpr Vec3<float> r2 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> r3 (1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> r4 (-1.0f, -1.0f, 1.0f);
-    constexpr Vec3<float> r5 (1.0f, -1.0f, 1.0f);
-    constexpr Vec3<float> r6 (-1.0f, 1.0f, 1.0f);
-    constexpr Vec3<float> r7 (1.0f, 1.0f, 1.0f);
+    constexpr Vec3<float> r1 (1.00f, -1.0f, -1.0f);
+    constexpr Vec3<float> r2 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> r3 (1.00f, 1.00f, -1.0f);
+    constexpr Vec3<float> r4 (-1.0f, -1.0f, 1.00f);
+    constexpr Vec3<float> r5 (1.00f, -1.0f, 1.00f);
+    constexpr Vec3<float> r6 (-1.0f, 1.00f, 1.00f);
+    constexpr Vec3<float> r7 (1.00f, 1.00f, 1.00f);
 
-    constexpr Vec3<float> p1 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> p2 (1.0f, -1.0f, 1.0f);
+    constexpr Vec3<float> p1 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> p2 (1.00f, -1.0f, 1.00f);
 
     AABB bbox (p1, p2);
 
@@ -94,8 +94,8 @@ TEST(RenderingGeometryAABB, Diagonal)
 {
     constexpr Vec3<float> r (2.0f, 2.0f, 2.0f);
     
-    constexpr Vec3<float> p1 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> p2 (1.0f, -1.0f, 1.0f);
+    constexpr Vec3<float> p1 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> p2 (1.00f, -1.0f, 1.00f);
 
     AABB bbox (p1, p2);
 
@@ -106,8 +106,8 @@ TEST(RenderingGeometryAABB, SurfaceArea)
 {
     constexpr float r = 24.0f;
 
-    constexpr Vec3<float> p1 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> p2 (1.0f, -1.0f, 1.0f);
+    constexpr Vec3<float> p1 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> p2 (1.00f, -1.0f, 1.00f);
 
     AABB bbox (p1, p2);
 
@@ -118,8 +118,8 @@ TEST(RenderingGeometryAABB, Volume)
 {
     constexpr float r = 8.0f;
 
-    constexpr Vec3<float> p1 (-1.0f, 1.0f, -1.0f);
-    constexpr Vec3<float> p2 (1.0f, -1.0f, 1.0f);
+    constexpr Vec3<float> p1 (-1.0f, 1.00f, -1.0f);
+    constexpr Vec3<float> p2 (1.00f, -1.0f, 1.00f);
 
     AABB bbox (p1, p2);
 

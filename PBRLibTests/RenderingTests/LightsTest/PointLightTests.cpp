@@ -16,8 +16,8 @@ using namespace pbrlib::math;
 
 TEST(RenderingLightsPointLight, BuilderAndSetters)
 {
-    constexpr Vec3<float>   color       (1.0f, 0.0f, 0.0f);
-    constexpr Vec3<float>   pos         (0.5f, 0.5f, 0.5f);
+    constexpr Vec3<float>   color       (1.00f, 0.0f, 0.0f);
+    constexpr Vec3<float>   pos         (0.05f, 0.5f, 0.5f);
     constexpr float         intensity   (50.0f);
 
     PointLight::Builder build_point_light;

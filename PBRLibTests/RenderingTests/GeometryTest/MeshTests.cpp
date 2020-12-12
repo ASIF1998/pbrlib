@@ -60,8 +60,8 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     constexpr size_t num_vertex = 200;
     constexpr size_t num_indices = 152;
 
-    constexpr Vec3<float>   pnt_r   (0.00334f, 0.5454f, 0.4567f);
-    constexpr Vec2<float>   uv_r    (0.6534f, 0.67003f);
+    constexpr Vec3<float>   pnt_r   (0.00334f, 0.54540f, 0.4567f);
+    constexpr Vec2<float>   uv_r    (0.65340f, 0.67003f);
     constexpr uint32_t      index_r (1332);
 
     vector<Mesh::VertexAttrib>  vertices;

@@ -14,7 +14,6 @@ layout(std140, binding = 0) uniform u_matrices
 
 layout(location = 0) out highp      vec3 FPosition;
 layout(location = 1) out mediump    vec2 FTextureCoord;
-
 layout(location = 2) out highp      mat3 FTBN;
 
 void main()

@@ -97,14 +97,14 @@ TEST(MathVec4, AccessToElement)
     constexpr Vec4<float>   v1 (2.2f, 4.3f, 54.4f, 0.0005f);
     constexpr Vec4<int>     v2 (1, 2, 3, 7);
 
-    EXPECT_EQ(2.2f, v1[0]);
-    EXPECT_EQ(4.3f, v1[1]);
-    EXPECT_EQ(54.4f, v1[2]);
+    EXPECT_EQ(2.2000f, v1[0]);
+    EXPECT_EQ(4.3000f, v1[1]);
+    EXPECT_EQ(54.400f, v1[2]);
     EXPECT_EQ(0.0005f, v1[3]);
 
-    EXPECT_EQ(2.2f, v1.x);
-    EXPECT_EQ(4.3f, v1.y);
-    EXPECT_EQ(54.4f, v1.z);
+    EXPECT_EQ(2.2000f, v1.x);
+    EXPECT_EQ(4.3000f, v1.y);
+    EXPECT_EQ(54.400f, v1.z);
     EXPECT_EQ(0.0005f, v1.w);
 
     EXPECT_EQ(1, v2[0]);

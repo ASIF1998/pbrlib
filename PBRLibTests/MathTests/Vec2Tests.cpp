@@ -39,10 +39,10 @@ TEST(MathVec2, EqualAndNotEqual)
 
 TEST(MathVec2, AdditionAndSubtraction)
 {
-    Vec2<float>             v1  (2.0f, 3.0f);
-    constexpr Vec2<float>   v2  (3.5f, 4.56f);
-    constexpr Vec2<float>   res1(5.5f, 7.56f);
-    Vec2<float>             res2(2.0f, 3.0f);
+    Vec2<float>             v1      (2.0f, 3.00f);
+    constexpr Vec2<float>   v2      (3.5f, 4.56f);
+    constexpr Vec2<float>   res1    (5.5f, 7.56f);
+    Vec2<float>             res2    (2.0f, 3.00f);
 
     EXPECT_EQ(res1, v1 + v2);
 
@@ -86,7 +86,7 @@ TEST(MathVec2, AccessToElement)
 TEST(MathVec2, Length)
 {
     constexpr Vec2<float> v1 (3434.323f, 121.5454f);
-    constexpr Vec2<float> v2 (0.132323f, 76.434f);
+    constexpr Vec2<float> v2 (0.132323f, 76.43400f);
 
     EXPECT_EQ(3436.473156098f, v1.length());
     EXPECT_EQ(76.43411453f, v2.length());
@@ -95,9 +95,9 @@ TEST(MathVec2, Length)
 TEST(MathVec2, Normalize)
 {
     constexpr Vec2<float> v1 (7643.8738f, 768.434f);
-    constexpr Vec2<float> v2 (0.132323f, 76.434f);
+    constexpr Vec2<float> v2 (0.1323230f, 76.4340f);
 
-    constexpr Vec2<float> r1 (0.994984865f, 0.100025222f);
+    constexpr Vec2<float> r1 (0.9949848650f, 0.100025222f);
     constexpr Vec2<float> r2 (0.0017312034f, 0.999998509f);
     
     EXPECT_TRUE(r1 == normalize(v1));

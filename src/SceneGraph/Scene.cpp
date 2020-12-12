@@ -251,7 +251,7 @@ namespace pbrlib
 
         if (!_ptr_children.empty())  {
             Transform children_world_transform = _world_transform * _local_transform;
-
+            
             for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
                 _ptr_children[i]->update(delta_time, children_world_transform);
             }

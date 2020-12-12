@@ -379,10 +379,10 @@ TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
     };
 
     constexpr Matrix4x4<float> m2 {
-        6.0f, 4.0f,  5.0f, 3.3f, 
+        6.0f, 4.00f, 5.0f, 3.3f, 
         5.3f, 0.05f, 2.0f, 5.0f,
-        7.0f, 5.0f,  3.0f, 2.0f,
-        3.0f, 5.0f,  2.0f, 1.0f
+        7.0f, 5.00f, 3.0f, 2.0f,
+        3.0f, 5.00f, 2.0f, 1.0f
     };
 
     Matrix4x4<float> r1 = m1 * m2;
@@ -511,10 +511,10 @@ TEST(MathMatrix4x4, Determinant)
 TEST(MathMatrix4x4, DeterminantTypeFloat)
 {
     constexpr Matrix4x4<float> m {
-        1.0f, 2.0f,  3.3f, 4.0f,
-        5.0f, 4.0f,  6.0f, 3.0f,
+        1.0f, 2.00f, 3.3f, 4.0f,
+        5.0f, 4.00f, 6.0f, 3.0f,
         5.0f, 34.4f, 6.6f, 2.0f,
-        7.0f, 6.0f,  4.0f, 2.0f
+        7.0f, 6.00f, 4.0f, 2.0f
     };
 
     constexpr float r = 1614.28f;
@@ -597,10 +597,10 @@ TEST(MathMatrix4x4, InverseTypeFloat)
     };
 
     constexpr Matrix4x4<float> r {
-        -2.0f,          1.69230771f,    -1.30769229f,   1.0f,
-        1.0f,           -0.692307711f,  0.307692289f,   0.0f,
-        3.99999428f,    -4.07691765f,   3.92307162f,    -2.99999619f,
-        -2.99999619f,   3.15384197f,    -2.84615016f,   1.99999738f
+        -2.00000000f, 1.6923077100f, -1.30769229f, 1.000000000f,
+        1.000000000f, -0.692307711f, 0.307692289f, 0.000000000f,
+        3.999994280f, -4.076917650f, 3.923071620f, -2.99999619f,
+        -2.99999619f, 3.1538419700f, -2.84615016f, 1.999997380f
     };
     
 

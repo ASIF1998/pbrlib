@@ -39,10 +39,10 @@ TEST(MathVec3, EqualAndNotEqual)
 
 TEST(MathVec3, AdditionAndSubtraction)
 {
-    Vec3<float>             v1  (2.0f, 3.0f, 3.5f);
+    Vec3<float>             v1  (2.0f, 3.00f, 3.5f);
     constexpr Vec3<float>   v2  (3.5f, 4.56f, 3.5f);
     constexpr Vec3<float>   res1(5.5f, 7.56f, 7.0f);
-    Vec3<float>             res2(2.0f, 3.0f, 3.5f);
+    Vec3<float>             res2(2.0f, 3.00f, 3.5f);
 
     EXPECT_EQ(res1, v1 + v2);
 
@@ -61,12 +61,12 @@ TEST(MathVec3, AdditionAndSubtraction)
 
 TEST(MathVec3, Multiplication)
 {
-    constexpr Vec3<float>   sres    (2.4f, 64.8f, 24.8f);
+    constexpr Vec3<float>   sres    (2.400000000f, 64.8000000f, 24.80000000f);
     constexpr Vec3<float>   cres    (0.718162537f, 40.9439163f, -107.052002f);
-    constexpr float         dres    (130.686172f);
+    constexpr float         dres    (130.6861720f);
 
-    Vec3<float> v1 (1.2f, 32.4f, 12.4f);
-    Vec3<float> v2 (3.43f, 3.4f, 1.3234f);
+    Vec3<float> v1 (1.20f, 32.4f, 12.400f);
+    Vec3<float> v2 (3.43f, 3.40f, 1.3234f);
     
     EXPECT_TRUE(sres == (v1 * 2.0f));
     EXPECT_TRUE(cres == cross(v1, v2));
@@ -89,7 +89,7 @@ TEST(MathVec3, AccessToElement)
 
 TEST(MathVec3, Length)
 {
-    constexpr Vec3<float>   v   (1.2f, 32.4f, 12.4f);
+    constexpr Vec3<float>   v   (1.20000000f, 32.4f, 12.4f);
     constexpr float         lr  (34.7125359f);
 
     EXPECT_EQ(lr, v.length());
@@ -97,11 +97,11 @@ TEST(MathVec3, Length)
 
 TEST(MathVec3, Normalize)
 {
-    constexpr Vec3<float> r1 (0.994975984f, 0.100024336737f, 0.00422390176269f);
-    constexpr Vec3<float> r2 (0.00131073419f, 0.757122039f, 0.653272092f);
+    constexpr Vec3<float> r1 (0.99497598400f, 0.100024336737f, 0.00422390176269f);
+    constexpr Vec3<float> r2 (0.00131073419f, 0.757122039000f, 0.65327209200000f);
 
     constexpr Vec3<float> v1 (7643.8738f, 768.434f, 32.45f);
-    constexpr Vec3<float> v2 (0.132323f, 76.434f, 65.95f);
+    constexpr Vec3<float> v2 (0.1323230f, 76.4340f, 65.95f);
 
     EXPECT_TRUE(r1 == normalize(v1));
     EXPECT_TRUE(r2 == normalize(v2));

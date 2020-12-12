@@ -66,9 +66,9 @@ namespace pbrlib
             {
                 PositionAndMetallic = 0,
                 NormalAndRoughness,
-                AlbedoAndBaked,
+                AlbedoAndBakedAO,
                 Depth,
-                Anisotropy,
+                TangentAndAnisotropy,
 
                 Count
             };
@@ -102,7 +102,7 @@ namespace pbrlib
             uint32_t            _window_width;
             uint32_t            _window_height;
             uint32_t            _gpu_memory_index;
-            PtrDeviceQueue _ptr_device_queue;
+            PtrDeviceQueue      _ptr_device_queue;
         };
         
     public:
@@ -153,7 +153,6 @@ namespace pbrlib
         const PtrDescriptorSet&      getDescriptorSet()  const noexcept;
 
         const PtrFramebuffer&       getFramebuffer()    const noexcept;
-        const vector<VkClearValue>& getClearValue()     const noexcept;
 
         /**
          * @brief Метод, позволяющий создавать указатель на объект типа GBufferPass.
@@ -192,7 +191,6 @@ namespace pbrlib
         PtrRenderPass           _ptr_render_pass;
         PtrAttachments          _ptr_framebuffer_attachments;
         PtrFramebuffer          _ptr_framebuffer;
-        vector<VkClearValue>    _clear_values;
     };
 }
 

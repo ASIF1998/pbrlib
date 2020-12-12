@@ -33,7 +33,7 @@ using vec4 = pbrlib::math::Vec4<float>;
 
 #include "../../../Util/enumCast.hpp"
 
-#include "spv/PBRPass.comp.spv.h"
+#include "spv/PBRPass.glsl.comp.spv.h"
 
 #include <algorithm>
 
@@ -221,7 +221,7 @@ namespace pbrlib
 
     void PBRPass::draw(
         const Scene::PtrNode&           ptr_camera,
-        const PtrPrimaryCommandBuffer&         ptr_command_buffer,
+        const PtrPrimaryCommandBuffer&  ptr_command_buffer,
         const vector<Scene::PtrNode>    point_lights,
         const vector<Scene::PtrNode>    spot_lights,
         const vector<Scene::PtrNode>    direction_lights
@@ -230,9 +230,9 @@ namespace pbrlib
         VkExtent3D  out_image_size  = _out_image_view->getImage()->getImageInfo().image_extend;
         NumLights   num_lights;
 
-        num_lights.point    = static_cast<uint>(min<size_t>(MAX_POINT_LIGHT, point_lights.size()));
-        num_lights.spot     = static_cast<uint>(min<size_t>(MAX_SPOT_LIGHT, spot_lights.size()));
-        num_lights.direct   = static_cast<uint>(min<size_t>(MAX_DIRECTION_LIGHT, direction_lights.size()));
+        num_lights.point    = static_cast<uint>(std::min<size_t>(MAX_POINT_LIGHT, point_lights.size()));
+        num_lights.spot     = static_cast<uint>(std::min<size_t>(MAX_SPOT_LIGHT, spot_lights.size()));
+        num_lights.direct   = static_cast<uint>(std::min<size_t>(MAX_DIRECTION_LIGHT, direction_lights.size()));
 
         vector<PointLightData>      point_lights_data       (num_lights.point);
         vector<SpotLightData>       spot_lights_data        (num_lights.spot);

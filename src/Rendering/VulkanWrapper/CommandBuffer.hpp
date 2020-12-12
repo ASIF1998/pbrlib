@@ -16,6 +16,8 @@
 #include <memory>
 #include <vector>
 
+#include "../../math/vec4.hpp"
+
 using namespace std;
 
 namespace pbrlib
@@ -36,6 +38,8 @@ namespace pbrlib
     using PtrSecondaryCommandBuffer = shared_ptr<SecondaryCommandBuffer>;
     using PtrFramebuffer            = shared_ptr<Framebuffer>;
     using PtrComputePipeline        = shared_ptr<ComputePipeline>;
+
+    using namespace math;
 
     class CommandBuffer
     {
@@ -344,7 +348,7 @@ namespace pbrlib
 
         /**
          * @brief 
-         *      Метод ,позволяющий создавать команду для перевода
+         *      Метод, позволяющий создавать команду для перевода
          *      буфера из одного состояния в другое.
          * 
          * @param src_stage_mask            определяет когда исходная стадия хавершила чтение или запись ресурса.
@@ -367,6 +371,38 @@ namespace pbrlib
             const Buffer&                   buffer,
             VkDeviceSize                    offset,
             VkDeviceSize                    size
+        ) const noexcept;
+
+        /**
+         * @brief Метод, позволяющий очистить изображение.
+         * 
+         * @param image                     изображение.
+         * @param image_layout              размещение изображения.
+         * @param clear_color               цвет, которым будет очищаться изображение.
+         * @param image_subresource_range   указывает части изображения, которые будут очищаться.
+        */
+        void clearColorImage(
+            const Image&                    image,
+            VkImageLayout                   image_layout,
+            const Vec4<float>&              clear_color,
+            const VkImageSubresourceRange&  image_subresource_range
+        ) const noexcept;
+
+        /**
+         * @brief Метод, позволяющий очистить изображение.
+         * 
+         * @param image                     изображение.
+         * @param image_layout              размещение изображения.
+         * @param depth_val                 значение глубины, которым будет осуществляться очистка изображения.
+         * @param stencil_val               значение трафарета, которым будет осуществляться очистка изображения.
+         * @param image_subresource_range   указывает части изображения, которые будут очищаться.
+        */
+        void clearDepthStencilImage(
+            const Image&                    image,
+            VkImageLayout                   image_layout,
+            float                           depth_val,
+            uint32_t                        stencil_val,
+            const VkImageSubresourceRange&  image_subresource_range
         ) const noexcept;
 
         /**
@@ -399,6 +435,7 @@ namespace pbrlib
         void end()                                                                                              const;
         void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept;
         void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value)           const noexcept;
+        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer)                                            const noexcept;
         void endRenderPass()                                                                                    const noexcept;
         void nextSubpass()                                                                                      const noexcept;
 

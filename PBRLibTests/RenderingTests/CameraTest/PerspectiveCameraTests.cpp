@@ -18,13 +18,13 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     constexpr float width   = 800.0f;
     constexpr float height  = 600.0f;
 
-    constexpr float near    = 0.01f;
+    constexpr float near    = 0.010f;
     constexpr float far     = 100.0f;
-    constexpr float fovy    = 45.0f;
+    constexpr float fovy    = 45.00f;
 
     constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
-    constexpr Vec3<float> pos   (0.0f, 0.0f, 0.0f);
-    constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
+    constexpr Vec3<float> pos   (0.0f, 0.0f, 0.00f);
+    constexpr Vec3<float> up    (0.0f, 1.0f, 0.00f);
     
     constexpr Viewport viewport {
         .x          = width / 2.0f,
@@ -74,13 +74,13 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     float width   = 800.0f;
     float height  = 600.0f;
 
-    float near    = 0.01f;
+    float near    = 0.010f;
     float far     = 100.0f;
-    float fovy    = 45.0f;
+    float fovy    = 45.00f;
 
     Vec3<float> eye   (0.0f, 0.0f, -1.0f);
-    Vec3<float> pos   (0.0f, 0.0f, 0.0f);
-    Vec3<float> up    (0.0f, 1.0f, 0.0f);
+    Vec3<float> pos   (0.0f, 0.0f, 0.00f);
+    Vec3<float> up    (0.0f, 1.0f, 0.00f);
 
     Viewport viewport {
         .x          = width / 2.0f,
@@ -125,14 +125,14 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     fovy    = 60.0f;
 
     width   = 1000.0f;
-    height  = 700.0f;
+    height  = 700.00f;
 
-    viewport.x          = 0.0f;
-    viewport.y          = 0.0f;
+    viewport.x          = 0.0000f;
+    viewport.y          = 0.0000f;
     viewport.width      = 1000.0f;
-    viewport.height     = 500.0f;
-    viewport.minDepth   = 0.2f;
-    viewport.maxDepth   = 0.8f;
+    viewport.height     = 500.00f;
+    viewport.minDepth   = 0.2000f;
+    viewport.maxDepth   = 0.8000f;
 
     camera.setLookAt(eye, pos, up);
     camera.setNearAndFarClipp(near, far);
@@ -159,16 +159,16 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
     EXPECT_EQ(width / height, camera.getAspect());
     
-    fovy    -= 35.0f;
-    width   = 800.0f;
-    height  = 500.0f;
+    fovy    -=  35.00f;
+    width   =   800.0f;
+    height  =   500.0f;
 
-    viewport.x          = 500.0f;
-    viewport.y          = 500.0f;
+    viewport.x          = 500.00f;
+    viewport.y          = 500.00f;
     viewport.width      = 1500.0f;
     viewport.height     = 1500.0f;
-    viewport.minDepth   = 0.3f;
-    viewport.maxDepth   = 0.7f;
+    viewport.minDepth   = 0.3000f;
+    viewport.maxDepth   = 0.7000f;
     
     camera.setAspectAndFovy(width, height, fovy);
     camera.setViewport(viewport);
