@@ -29,7 +29,7 @@
 #include "../Rendering/VulkanWrapper/GPUTextureManager.hpp"
 #include "../Rendering/Geometry/MeshManager.hpp"
 
-#include "../Rendering/Camera/PerspectiveCamera.hpp"
+#include "../Rendering/Cameras/PerspectiveCamera.hpp"
 
 using namespace std;
 

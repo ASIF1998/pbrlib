@@ -28,7 +28,7 @@ TEST(MathMatrix2x2, Constructor)
     };
 
     constexpr float r3[4] = {
-        1.2f, 2.1f, 
+        1.20f, 2.100f, 
         5.34f, 323.4f
     };
     

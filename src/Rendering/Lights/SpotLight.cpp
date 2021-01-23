@@ -19,9 +19,9 @@ namespace pbrlib
         float               intensity
     ) :
         Component       ("Spot Light"),
-        _color          (color),
         _pos            (position),
         _dir            (direction),
+        _color          (color),
         _intensity      (intensity),
         _inner_radius   (inner_radius),
         _outer_radius   (outer_radius)
@@ -37,9 +37,9 @@ namespace pbrlib
         float               intensity
     ) :
         Component       (name),
-        _color          (color),
         _pos            (position),
         _dir            (direction),
+        _color          (color),
         _intensity      (intensity),
         _inner_radius   (inner_radius),
         _outer_radius   (outer_radius)

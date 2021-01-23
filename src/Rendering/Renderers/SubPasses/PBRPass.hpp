@@ -19,18 +19,18 @@ using namespace std;
 
 namespace pbrlib
 {
-    class ComputePipeline;
-    class Device;
-    class DescriptorSet;
-    class CommandBuffer;
-    class ImageView;
-    class PBRPass;
-    class Sampler;
-    class DescriptorPool;
-    class Buffer;
-    class PhysicalDevice;
-    class CameraBase;
-    class Scene;
+    class   ComputePipeline;
+    class   Device;
+    class   DescriptorSet;
+    class   CommandBuffer;
+    class   ImageView;
+    class   PBRPass;
+    class   Sampler;
+    class   DescriptorPool;
+    class   Buffer;
+    struct  PhysicalDevice;
+    class   CameraBase;
+    class   Scene;
 
     using PtrComputePipeline    = shared_ptr<ComputePipeline>;
     using PtrDevice             = shared_ptr<Device>;

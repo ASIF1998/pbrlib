@@ -7,7 +7,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../../../src/Rendering/Camera/PerspectiveCamera.hpp"
+#include "../../../src/Rendering/Cameras/PerspectiveCamera.hpp"
 
 using namespace testing;
 using namespace pbrlib;

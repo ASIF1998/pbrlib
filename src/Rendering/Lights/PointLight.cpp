@@ -16,9 +16,9 @@ namespace pbrlib
         float               intensity
     ) :
         Component   ("Point Light"),
-        _intensity  (intensity),
         _color      (color),
-        _pos        (position)
+        _pos        (position),
+        _intensity  (intensity)
     {}
     
     PointLight::PointLight(
@@ -28,9 +28,9 @@ namespace pbrlib
         float               intensity
     ) :
         Component   (name),
-        _intensity  (intensity),
         _color      (color),
-        _pos        (position)
+        _pos        (position),
+        _intensity  (intensity)
     {}
 
     void PointLight::setIntensity(float intensity) noexcept

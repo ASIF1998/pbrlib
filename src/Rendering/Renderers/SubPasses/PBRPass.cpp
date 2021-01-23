@@ -19,7 +19,7 @@
 
 #include "../../VulkanWrapper/Image.hpp"
 
-#include "../../Camera/CameraBase.hpp"
+#include "../../Cameras/CameraBase.hpp"
 
 using vec3 = pbrlib::math::Vec3<float>;
 using vec4 = pbrlib::math::Vec4<float>;

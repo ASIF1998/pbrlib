@@ -176,7 +176,6 @@ namespace pbrlib
         uint32_t            _index_buffer_offset;  	         //!< В sizeof(uint8_t).
         VkIndexType         _index_type                      = VK_INDEX_TYPE_UINT32;
         uint32_t            _stride                          = sizeof(VertexAttrib);
-        VkPrimitiveTopology _topology                        = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         AABB                _aabb;
         PtrMaterial         _ptr_material;
     };

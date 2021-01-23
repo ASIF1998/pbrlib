@@ -17,10 +17,10 @@
 
 namespace pbrlib
 {
-    class IRenderer;
-    class Window;
-    class PhysicalDevice;
-    class DeviceQueue;
+    class 	IRenderer;
+    class   Window;
+    struct  PhysicalDevice;
+    class   DeviceQueue;
 
     using PtrIRenderer      = shared_ptr<IRenderer>;
     using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;

@@ -128,10 +128,10 @@ namespace pbrlib
         size_t                      specialization_info_size_data,
         size_t                      specialization_info_num_map_entires
     ) :
-        _ptr_device         (ptr_device),
-        _shader_type        (shader_type),
-        _shader_handle      (VK_NULL_HANDLE),
-        _specialization_info(specialization_info_size_data, specialization_info_num_map_entires)
+        _ptr_device             (ptr_device),
+        _shader_type            (shader_type),
+        _specialization_info    (specialization_info_size_data, specialization_info_num_map_entires),
+        _shader_handle          (VK_NULL_HANDLE)
     {
         VkShaderModuleCreateInfo shader_info {
             .sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -152,10 +152,10 @@ namespace pbrlib
     }
 
     ShaderModule::ShaderModule(ShaderModule&& shader_module) :
-        _ptr_device         (move(shader_module._ptr_device)),
-        _shader_type        (shader_module._shader_type),
-        _shader_handle      (VK_NULL_HANDLE),
-        _specialization_info(shader_module._specialization_info)
+        _ptr_device             (move(shader_module._ptr_device)),
+        _shader_type            (shader_module._shader_type),
+        _specialization_info    (shader_module._specialization_info),
+        _shader_handle          (VK_NULL_HANDLE)
     {
         swap(_shader_handle, shader_module._shader_handle);
     }

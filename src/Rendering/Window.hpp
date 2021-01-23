@@ -22,12 +22,12 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Surface;
-    class Swapchain;
-    class Instance;
-    class PhysicalDevice;
-    class Device;
-    class Window;
+    class   Surface;
+    class   Swapchain;
+    class   Instance;
+    struct  PhysicalDevice;
+    class 	Device;
+    class 	Window;
 
     using PtrSurface        = shared_ptr<Surface>;
     using PtrSwapchain      = shared_ptr<Swapchain>;
@@ -35,16 +35,6 @@ namespace pbrlib
     using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
     using PtrDevice         = shared_ptr<Device>;
     using PtrWindow         = shared_ptr<Window>;
-
-    /**
-     * @enum ResizableWindow.
-     * @brief Перечисление указывающее возможность изменения размера окна.
-    */
-    enum class ResizableWindow
-    {
-        DYNAMIC = SDL_WINDOW_RESIZABLE,
-        STATIC  = 0
-    };
 
     /**
      * @class Window.
@@ -62,6 +52,16 @@ namespace pbrlib
         {
             WINDOW_WIDTH    = 0,
             WINDOW_HEIGHT   = 1
+        };
+
+        /**
+         * @enum Resizable.
+         * @brief Перечисление указывающее возможность изменения размера окна.
+        */
+        enum class Resizable
+        {
+            DYNAMIC = SDL_WINDOW_RESIZABLE,
+            STATIC  = 0
         };
 
         class Builder
@@ -90,7 +90,7 @@ namespace pbrlib
              * 
              * @param resizable параметр, указывающий возможность изменения размера окна.
             */
-            void setResizableWindow(ResizableWindow resizable) noexcept;
+            void setResizableWindow(Resizable resizable) noexcept;
 
             Window      build()     const;
             PtrWindow   buildPtr()  const;
@@ -101,7 +101,7 @@ namespace pbrlib
             int             _height;
             int             _pos_x;
             int             _pos_y;
-            ResizableWindow _resizable;
+            Resizable       _resizable;
         };
 
     public:
@@ -121,7 +121,7 @@ namespace pbrlib
             int                 height, 
             int                 pos_x, 
             int                 pos_y, 
-            ResizableWindow     resizable = ResizableWindow::STATIC
+            Resizable           resizable = Resizable::STATIC
         );
 
         Window(Window&& window);
@@ -165,7 +165,7 @@ namespace pbrlib
             int                 height, 
             int                 pos_x, 
             int                 pos_y, 
-            ResizableWindow     resizable = ResizableWindow::STATIC
+            Resizable           resizable = Resizable::STATIC
         );
 
     public:

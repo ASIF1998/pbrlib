@@ -42,6 +42,7 @@ namespace pbrlib
         Matrix4x4<float> model_matrix;
         Matrix4x4<float> normal_matrix;
     };
+    
     struct GBufferPassBindings
     {
         enum

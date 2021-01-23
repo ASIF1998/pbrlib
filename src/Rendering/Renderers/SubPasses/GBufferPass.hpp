@@ -19,17 +19,17 @@ using namespace std;
 
 namespace pbrlib
 {
-    class GraphicsPipeline;
-    class Buffer;
-    class DescriptorPool;
-    class DescriptorSet;
-    class Device;
-    class RenderPass;
-    class CommandBuffer;
-    class Sampler;
-    class GBufferPass;
-    class Framebuffer;
-    class PhysicalDevice;
+    class   GraphicsPipeline;
+    class   Buffer;
+    class   DescriptorPool;
+    class   DescriptorSet;
+    class   Device;
+    class   RenderPass;
+    class   CommandBuffer;
+    class   Sampler;
+    class   GBufferPass;
+    class   Framebuffer;
+    struct  PhysicalDevice;
 
     using PtrGraphicsPipeline   = shared_ptr<GraphicsPipeline>;
     using PtrBuffer             = shared_ptr<Buffer>;

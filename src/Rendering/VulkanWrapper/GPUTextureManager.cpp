@@ -20,7 +20,7 @@
 
 #include "CommandBuffer.hpp"
 
-#include <stb/stb_image.h>
+#include <stb_image.h>
 
 namespace pbrlib
 {
@@ -31,7 +31,7 @@ namespace pbrlib
         uint32_t                host_local_memory_type_index,
         PtrDeviceQueue          ptr_device_queue,
         VkImageTiling           image_tiling,
-        VkSampleCountFlags      num_samples
+        VkSampleCountFlagBits   num_samples
     ) :
         _ptr_device                     (ptr_device),
         _ptr_command_buffer             (PrimaryCommandBuffer::make(ptr_command_pool)),
@@ -71,7 +71,7 @@ namespace pbrlib
             image_builder.setDeviceQueue(_ptr_device_queue);
             image_builder.setNumArrayLayers(1);
             image_builder.setNumMipLevels(1);
-            image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+            image_builder.setNumSamples(_num_samples);
             image_builder.setTiling(_image_tiling);
             image_builder.setUsage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
@@ -125,7 +125,7 @@ namespace pbrlib
             image_builder.setDeviceQueue(_ptr_device_queue);
             image_builder.setNumArrayLayers(1);
             image_builder.setNumMipLevels(1);
-            image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+            image_builder.setNumSamples(_num_samples);
             image_builder.setTiling(_image_tiling);
             image_builder.setUsage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
@@ -179,7 +179,7 @@ namespace pbrlib
             image_builder.setDeviceQueue(_ptr_device_queue);
             image_builder.setNumArrayLayers(1);
             image_builder.setNumMipLevels(1);
-            image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+            image_builder.setNumSamples(_num_samples);
             image_builder.setTiling(_image_tiling);
             image_builder.setUsage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
@@ -233,7 +233,7 @@ namespace pbrlib
             image_builder.setDeviceQueue(_ptr_device_queue);
             image_builder.setNumArrayLayers(1);
             image_builder.setNumMipLevels(1);
-            image_builder.setNumSamples(VK_SAMPLE_COUNT_1_BIT);
+            image_builder.setNumSamples(_num_samples);
             image_builder.setTiling(_image_tiling);
             image_builder.setUsage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 

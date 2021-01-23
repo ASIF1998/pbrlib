@@ -396,10 +396,10 @@ namespace pbrlib
     ) const noexcept
     {
         VkClearColorValue vk_clear_color {
-            clear_color.r, 
-            clear_color.g, 
-            clear_color.b, 
-            clear_color.a
+            .float32[0] = clear_color.r,
+            .float32[1] = clear_color.g,
+            .float32[2] = clear_color.b,
+            .float32[3] = clear_color.a
         };
 
         vkCmdClearColorImage(

@@ -34,11 +34,11 @@ namespace pbrlib
         int                 height, 
         int                 pos_x, 
         int                 pos_y, 
-        ResizableWindow     resizable
+        Window::Resizable   resizable
     ) :
         _ptr_window     (nullptr),
-        _title          (title),
-        _ptr_swapchain  (nullptr)
+        _ptr_swapchain  (nullptr),
+        _title          (title)
     {
         if (!_is_init_SDL) {
             if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -199,7 +199,7 @@ namespace pbrlib
         int                 height, 
         int                 pos_x, 
         int                 pos_y, 
-        ResizableWindow     resizable
+        Window::Resizable   resizable
     )
     {
         return make_shared<Window>(title, width, height, pos_x, pos_y, resizable);
@@ -212,7 +212,7 @@ namespace pbrlib
         _height     (0),
         _pos_x      (0),
         _pos_y      (0),
-        _resizable  (ResizableWindow::STATIC)
+        _resizable  (Resizable::STATIC)
     {}
 
     void Window::Builder::setTitle(const string_view title)
@@ -252,7 +252,7 @@ namespace pbrlib
         _pos_y = pos_y;
     }
 
-    void Window::Builder::setResizableWindow(ResizableWindow resizable) noexcept
+    void Window::Builder::setResizableWindow(Window::Resizable resizable) noexcept
     {
         _resizable = resizable;
     }

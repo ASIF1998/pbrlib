@@ -21,9 +21,9 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Surface;
-    class PhysicalDevice;
-    class Instance;
+    class   Surface;
+    struct  PhysicalDevice;
+    class   Instance;
 
     using PtrSurface        = shared_ptr<Surface>;
     using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;

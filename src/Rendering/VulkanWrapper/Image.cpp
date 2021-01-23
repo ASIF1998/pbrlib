@@ -261,8 +261,8 @@ namespace pbrlib
         VkImageViewType                 type
     ) :
         _ptr_image          (ptr_image),
-        _format             (format),
         _image_view_handle  (VK_NULL_HANDLE),
+        _format             (format),
         _subresource_range  (subresource_range),
         _type               (type)
     {
@@ -293,8 +293,8 @@ namespace pbrlib
     }
 
     ImageView::ImageView(ImageView&& image_view) :
-        _image_view_handle  (VK_NULL_HANDLE),
         _ptr_image          (move(image_view._ptr_image)),
+        _image_view_handle  (VK_NULL_HANDLE),
         _format             (image_view._format),
         _subresource_range  (image_view._subresource_range),
         _type               (image_view._type)

@@ -105,9 +105,10 @@ namespace pbrlib
 
         if (!ptr_device) {
             vector<const char*> pointers_layers_names       (0);
-            vector<const char*> pointers_extencions_names   (1);
+            vector<const char*> pointers_extencions_names   (2);
 
             pointers_extencions_names[0]    = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+            pointers_extencions_names[1]    = "VK_KHR_portability_subset";
             ptr_device                      = ptr_physical_device->makeDevice(
                 instance,
                 queues_infos, 

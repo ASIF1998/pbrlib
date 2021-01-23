@@ -55,7 +55,7 @@ namespace pbrlib
             uint32_t                host_local_memory_type_index,
             PtrDeviceQueue          ptr_device_queue,
             VkImageTiling           image_tiling,
-            VkSampleCountFlags      num_samples
+            VkSampleCountFlagBits   num_samples
         );
 
         /**
@@ -116,7 +116,7 @@ namespace pbrlib
         uint32_t                            _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
         PtrDeviceQueue                      _ptr_device_queue;                  //!< Указатель на очередь устройства.
         VkImageTiling                       _image_tiling;                      //!< Способ размещения текстуры на устройстве.
-        VkSampleCountFlags                  _num_samples;                       //!< Количество выборок в текстуре на устройстве.
+        VkSampleCountFlagBits               _num_samples;                       //!< Количество выборок в текстуре на устройстве.
     };
 }
 

@@ -63,8 +63,8 @@ namespace pbrlib
     ) :
         _ptr_swapchain              (ptr_swapchain),
         _ptr_render_pass            (ptr_render_pass),
-        _attachments                (nullptr),
         _swapchain_attachment_indx  (swapchain_attachment_indx),
+        _attachments                (nullptr),
         _framebuffer_handle         (VK_NULL_HANDLE),
         _width                      (width),
         _height                     (height),

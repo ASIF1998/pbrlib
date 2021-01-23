@@ -112,7 +112,7 @@ namespace pbrlib
             .applicationVersion = app_version,
             .pEngineName        = "PBRLib",
             .engineVersion      = EngineVersion,
-            .apiVersion         = VK_MAKE_VERSION(1, 2, 0)
+            .apiVersion         = VulkanVersion
         };
 
         VkInstanceCreateInfo instance_info {

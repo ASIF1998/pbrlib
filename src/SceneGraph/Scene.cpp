@@ -294,7 +294,6 @@ namespace pbrlib
     ) :
         _ptr_root_node      (nullptr),
         _ptr_camera_node    (nullptr),
-        _name               (name),
         _texture_manager    (
             ptr_device, 
             ptr_command_pool,
@@ -304,7 +303,8 @@ namespace pbrlib
             VK_IMAGE_TILING_OPTIMAL, 
             VK_SAMPLE_COUNT_1_BIT
         ),
-        _mesh_manager       (ptr_device, ptr_device_queue->getFamilyIndex(), host_local_memory_type_index)
+        _mesh_manager       (ptr_device, ptr_device_queue->getFamilyIndex(), host_local_memory_type_index),
+        _name               (name)
     {}
 
     void Scene::setRootNode(const PtrNode& ptr_node)
