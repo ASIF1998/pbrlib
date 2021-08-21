@@ -39,7 +39,7 @@ namespace pbrlib
     struct UniformBufferMatrices
     {
         Matrix4x4<float> MVP;
-        Matrix4x4<float> model_matrix;
+        Matrix4x4<float> model_view_matrix;
         Matrix4x4<float> normal_matrix;
     };
     
@@ -450,10 +450,11 @@ namespace pbrlib
         ptr_command_buffer->reset();
         ptr_command_buffer->begin();
         
-        Vec4<float> color_image_clear_val                   (1.0, 1.0, 1.0, 0.0);
-        Vec4<float> tangent_and_aniso_image_clear_val       (0.0, 0.0, 0.0, 0.0);
-        Vec4<float> pos_and_metallic_image_clear_val        (0.0, 0.0, 0.0, 0.0);
-        Vec4<float> normal_and_roughness_image_clear_val    (0.0, 0.0, 0.0, 0.0);
+        Vec4<float> color_image_clear_val                   (0.0);
+        Vec4<float> alebdo_and_ao                           (1.0, 1.0, 1.0, 0.0);
+        Vec4<float> tangent_and_aniso_image_clear_val       (0.0);
+        Vec4<float> pos_and_metallic_image_clear_val        (0.0);
+        Vec4<float> normal_and_roughness_image_clear_val    (0.0);
 
         float       depth_clear_val     = 1.0;
         uint32_t    stencil_clear_val   = 0;
@@ -542,7 +543,7 @@ namespace pbrlib
         ptr_command_buffer->clearColorImage(
             *outputImpl(OutputImagesViewsIDs::AlbedoAndBakedAO).getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            color_image_clear_val,
+            alebdo_and_ao,
             color_image_subresource_range
         );
 
@@ -588,10 +589,11 @@ namespace pbrlib
                     const PtrMaterial&  ptr_material    = mesh.getMaterial();
                     Transform           model           = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
 
-                    uniform_matrices_buffer_data.model_matrix   = model.getMatrix();
-                    uniform_matrices_buffer_data.MVP            = (projection * view * model).getMatrix();
-                    uniform_matrices_buffer_data.normal_matrix  = transpose(inverse(uniform_matrices_buffer_data.model_matrix));
-                    uniform_material_buffer_data.anisotropy     = ptr_material->getAnisotropy();
+                    uniform_matrices_buffer_data.model_view_matrix  = (view * model).getMatrix();
+                    uniform_matrices_buffer_data.MVP                = projection.getMatrix() * uniform_matrices_buffer_data.model_view_matrix;
+                    uniform_matrices_buffer_data.normal_matrix      = transpose(inverse(uniform_matrices_buffer_data.model_view_matrix));
+
+                    uniform_material_buffer_data.anisotropy = ptr_material->getAnisotropy();
 
                     _ptr_uniform_matrices_data_buffer->setData(&uniform_matrices_buffer_data, 1);
                     _ptr_uniform_material_data_buffer->setData(&uniform_material_buffer_data, 1);

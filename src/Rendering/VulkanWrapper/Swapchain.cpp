@@ -73,7 +73,7 @@ namespace pbrlib
             .minImageCount          = _ptr_surface->getSurfaceCapabilities().maxImageCount,
             .imageFormat            = _ptr_surface->getSurfaceFormat().format,
             .imageColorSpace        = _ptr_surface->getSurfaceFormat().colorSpace,
-            .imageExtent            = _ptr_surface->getSurfaceCapabilities().minImageExtent,
+            .imageExtent            = _ptr_surface->getSurfaceCapabilities().currentExtent,
             .imageArrayLayers       = 1,
             .imageUsage             = _ptr_surface->getSurfaceCapabilities().supportedUsageFlags,
             .imageSharingMode       = sharing_mode,

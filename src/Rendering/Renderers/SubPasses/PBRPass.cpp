@@ -227,6 +227,8 @@ namespace pbrlib
         const vector<Scene::PtrNode>    direction_lights
     )
     {
+        const CameraBase& camera = ptr_camera->getComponent<CameraBase>();
+
         VkExtent3D  out_image_size  = _out_image_view->getImage()->getImageInfo().image_extend;
         NumLights   num_lights;
 
@@ -242,23 +244,26 @@ namespace pbrlib
             .position = (ptr_camera->getWorldTransform() * ptr_camera->getLocalTransform())(ptr_camera->getComponent<CameraBase>().getPosition())
         };
 
+        /// Point Lights.
         for (size_t i{0}; i < num_lights.point; i++) {
             const PointLight&   point_light     = point_lights[i]->getComponent<PointLight>();
-            Transform           light_transform = point_lights[i]->getWorldTransform() * point_lights[i]->getLocalTransform();
+            Transform           light_transform = camera.getView() * point_lights[i]->getWorldTransform() * point_lights[i]->getLocalTransform();
 
             point_lights_data[i].color_and_intensity    = Vec4<float>(point_light.getColor(), point_light.getIntensity());
             point_lights_data[i].position               = light_transform(point_light.getPosition());
         }
 
+        /// Spot Lights.
         for (size_t i{0}; i < num_lights.spot; i++) {
             const SpotLight&    spot_light      = spot_lights[i]->getComponent<SpotLight>();
-            Transform           light_transform = spot_lights[i]->getWorldTransform() * spot_lights[i]->getLocalTransform();
+            Transform           light_transform = camera.getView() * spot_lights[i]->getWorldTransform() * spot_lights[i]->getLocalTransform();
 
             spot_lights_data[i].color_and_intensity         = Vec4<float>(spot_light.getColor(), spot_light.getIntensity());
             spot_lights_data[i].position_and_inner_radius   = Vec4<float>(light_transform(spot_light.getPosition()), spot_light.getInnerRadius());
             spot_lights_data[i].direction_and_outer_radius  = Vec4<float>(spot_light.getDirection(), spot_light.getOuterRadius());
         }
 
+        /// Direction Lights.
         for (size_t i{0}; i < num_lights.direct; i++) {
             const DirectionLight& direction_light = direction_lights[i]->getComponent<DirectionLight>();
 

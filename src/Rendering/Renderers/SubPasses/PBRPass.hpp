@@ -120,12 +120,12 @@ namespace pbrlib
             inline void setDistributionFunction(DistributionFunction dist_func)        noexcept;
             inline void setGeometryFunction(GeometryFunction geom_func)                noexcept;
             inline void setFresnelApproximation(FresnelApproximation fresnel_approx)   noexcept;
-            inline void useBentNormal(bool to_use)                                     noexcept;
+            inline void useBentNormalTangentBtangent(bool to_use)                      noexcept;
 
-            inline DistributionFunction     getDistributionFunction()   const noexcept;
-            inline GeometryFunction         getGeometryFunction()       const noexcept;
-            inline FresnelApproximation     getFresnelApproximation()   const noexcept;
-            inline bool                     useBentNormal()             const noexcept;
+            inline DistributionFunction     getDistributionFunction()       const noexcept;
+            inline GeometryFunction         getGeometryFunction()           const noexcept;
+            inline FresnelApproximation     getFresnelApproximation()       const noexcept;
+            inline bool                     useBentNormalTangentBtangent()  const noexcept;
 
         private:
             DistributionFunction    _distrib_func;
@@ -136,8 +136,8 @@ namespace pbrlib
             {
                 struct
                 {
-                    bool        use_bent_normal :  1;
-                    uint32_t    other           :  31;
+                    bool        use_bent_normal_tangent_btangent    :  1;
+                    uint32_t    other                               :  31;
                 };
 
                 uint32_t mask;

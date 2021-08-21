@@ -10,7 +10,7 @@
 
 #include <stdexcept>
 
-#include <SDL2/SDL_vulkan.h>
+#include <SDL_vulkan.h>
 
 #include "Window.hpp"
 
@@ -140,7 +140,8 @@ namespace pbrlib
             for (size_t i{0}, num_surface_formats{surface_supported_formats.size()}; i < num_surface_formats; i++) {
                 if (surface_supported_formats[i].colorSpace ==  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && surface_supported_formats[i].format == VK_FORMAT_B8G8R8A8_UNORM) {
                     current_surface_format = surface_supported_formats[i];
-                } else if (i == num_surface_formats) {
+                    i = num_surface_formats;
+                } else if (i == num_surface_formats - 1) {
                     current_surface_format = surface_supported_formats[0];
                 }
             }

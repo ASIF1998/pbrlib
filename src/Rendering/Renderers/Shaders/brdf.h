@@ -15,17 +15,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define D_BECKAMNN_ID 			0
 #define D_GGX_ID 				1
-#define D_GGX_ANISOTROPY_ID	2
+#define D_GGX_ANISOTROPY_ID		2
 
 float D_Beckmann(mediump float n_dot_m, mediump float alpha)
 {
-	float a = n_dot_m * n_dot_m - 1.0f;
-	float b = n_dot_m * n_dot_m * alpha * alpha;
-	float c = PI * alpha * alpha * n_dot_m * n_dot_m * n_dot_m * n_dot_m;
-
-	float exp_res = exp(a / max(b, 0.00001));
-
-	return c * exp_res;
+    float n_dot_m_2 = n_dot_m * n_dot_m;
+    float alpha_2 	= alpha * alpha;
+    
+    return exp(((n_dot_m_2 - 1.0) / n_dot_m_2) / alpha_2) / (PI * alpha_2 * n_dot_m_2 * n_dot_m_2);
 }
 
 float D_GGX(mediump float n_dot_m, mediump float alpha)
@@ -190,12 +187,9 @@ vec3 F_CookTorrance(lowp const vec3 f0, mediump float v_dot_h)
 	vec3 b = g + v_dot_h;
 
 	vec3 c = a / b;
-	vec3 d = (a * v_dot_h - 1) / (b * v_dot_h + 1.0f);
+	vec3 d = (b * v_dot_h - 1) / (a * v_dot_h + 1.0f);
 
-	c *= c;
-	d *= d;
-
-	return 0.5 * c * (1.0f + d);
+	return 0.5 * c * c * (1.0f + d * d);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

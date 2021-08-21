@@ -12,8 +12,8 @@
 
 #include "brdf.h"
 
-#define USE_BENT_NORMAL(Options)    Options == 1
-#define E(d, n_dot_l)               n_dot_l / max(d * d, 0.000001f)
+#define USE_BENT_NORMAL_TANGENT_BTANGENT(Options)   Options == 1
+#define E(d, n_dot_l)                               n_dot_l / max(d * d, 0.000001f)
 
 /**
  * @brief   Функция нормального распределения микрограней.
@@ -38,9 +38,6 @@
         }                                                                               \
                                                                                         \
         case D_GGX_ANISOTROPY_ID : {                                                    \
-            t_dot_h = max(dot(tangent, h), 0.000001f);                                  \
-            b_dot_h = max(dot(btangent, h), 0.000001f);                                 \
-                                                                                        \
             D = D_GGX_Anisotropy(n_dot_h, t_dot_h, b_dot_h, roughness, anisotropy);     \
             break;                                                                      \
         }                                                                               \
@@ -109,8 +106,8 @@
  * @brief   Функция приближения Френеля.
  * @details За выбор функции приближения отвечает константа специализации FresnelApproximationFunctionID.
  *
- * @param [in] base_color   цвет поверхности.
- * @param [in] metallic     металичность.
+ * @param [in]  base_color  цвет поверхности.
+ * @param [in]  metallic    металичность.
  * @param [in]  v_dot_h     косинус угла между вектором направления на камеру и медианным вектором.
  * @param [out] F           результат.
 */
@@ -176,19 +173,21 @@ vec3 getF0(in lowp const vec3 base_color, float metallic)
     return mix(vec3(0.04), base_color, metallic);
 }
 
-vec3 calculateBentNormal(
-    in mediump const vec3   v,
-    in highp const vec3     normal, 
-    in highp const vec3     tang, 
-    in highp const vec3     btang, 
-    float                   aniso
+void calculateBentNormalTangentBtangent(
+    in      mediump const vec3  v,
+    inout   highp vec3          normal,
+    inout   highp vec3          tang, 
+    inout   highp vec3          btang, 
+    in      float               aniso
 )
 {
-    vec3 aniso_dir      = aniso > 0.0 ? btang : tang;
+    vec3 aniso_dir      = aniso >= 0.0 ? btang : tang;
     vec3 aniso_tang     = cross(aniso_dir, v);
     vec3 aniso_normal   = cross(aniso_tang, aniso_dir);
 
-    return reflect(-v, normalize(mix(normal, aniso_normal, aniso)));
+    normal  = normalize(mix(normal, aniso_normal, abs(aniso)));
+    btang   = cross(normal, tang);
+    tang    = cross(btang, normal);
 }
 
 void main()
@@ -206,23 +205,28 @@ void main()
     vec3    tangent    = tangent_and_anisotropy.xyz;
     vec3    btangent   = cross(normal, tangent);
     float   dist;
-    
+
     vec3    base_color  = albedo_and_ao.rgb;
     float   roughness   = normal_and_roughness.a * normal_and_roughness.a;
     float   metallic    = position_and_metallic.a;
     float   anisotropy  = tangent_and_anisotropy.a;
     float   ao          = albedo_and_ao.a;
 
+    vec3 dir_to_camera   = normalize(camera_data.data.position - position);
+    vec3 dir_to_light;
+
+    if (USE_BENT_NORMAL_TANGENT_BTANGENT(PBR_OtherOptions)) {
+        calculateBentNormalTangentBtangent(dir_to_camera, normal, tangent, btangent, anisotropy);
+    }
+
+    float n_dot_v = max(dot(normal, dir_to_camera), 0.000001f);
+    float n_dot_h, n_dot_l, t_dot_h, b_dot_h, v_dot_h;
+
     float   D;
     float   G;
     vec3    F;
 
     vec3 kd, I;
-
-    vec3    dir_to_camera   = normalize(camera_data.data.position - position);
-    vec3    dir_to_light;
-    float   n_dot_v         = max(dot(normal, dir_to_camera), 0.000001f);
-    float   n_dot_h, n_dot_l, t_dot_h, b_dot_h, v_dot_h;
 
     vec3 h;
 
@@ -231,10 +235,6 @@ void main()
     vec3    light_dir, light_color;
     float   light_intensity;
     float   light_inner_angle, light_outer_angle;
-
-    if (USE_BENT_NORMAL(PBR_OtherOptions)) {
-        normal = calculateBentNormal(dir_to_camera, normal, tangent, btangent, anisotropy);
-    }
 
     /// Points
     for (uint current_light_index = 0; current_light_index < num_lights.lights.point; current_light_index++) {
@@ -248,6 +248,13 @@ void main()
         n_dot_h = max(dot(normal, h), 0.000001f);
         n_dot_l = max(dot(normal, dir_to_light), 0.000001f);
         v_dot_h = max(dot(dir_to_camera, h), 0.000001f);
+
+        if (DistributionFunctionID == D_GGX_ANISOTROPY_ID) {
+            /// На данный момент эти переменные используются только в 
+            /// анизотропной функции распределения.
+            t_dot_h = max(dot(tangent, h), 0.000001f);
+            b_dot_h = max(dot(btangent, h), 0.000001f); 
+        }
 
         DISTRIBUTION_FUNCTION(n_dot_h, t_dot_h, b_dot_h, roughness, D);
         GEOMETRY_FUNCTION(n_dot_h, n_dot_l, n_dot_v, v_dot_h, roughness, G);
@@ -279,6 +286,13 @@ void main()
         n_dot_l = max(dot(normal, dir_to_light), 0.000001f);
         v_dot_h = max(dot(dir_to_camera, h), 0.000001f);
 
+        if (DistributionFunctionID == D_GGX_ANISOTROPY_ID) {
+            /// На данный момент эти переменные используются только в 
+            /// анизотропной функции распределения.
+            t_dot_h = max(dot(tangent, h), 0.000001f);
+            b_dot_h = max(dot(btangent, h), 0.000001f); 
+        }
+
         DISTRIBUTION_FUNCTION(n_dot_h, t_dot_h, b_dot_h, roughness, D);
         GEOMETRY_FUNCTION(n_dot_h, n_dot_l, n_dot_v, v_dot_h, roughness, G);
         FRESNEL_APPROXIMATION_FUNCTION(base_color, metallic, v_dot_h, F);
@@ -305,6 +319,13 @@ void main()
         n_dot_l = max(dot(normal, dir_to_light), 0.000001f);
         v_dot_h = max(dot(dir_to_camera, h), 0.000001f);
 
+        if (DistributionFunctionID == D_GGX_ANISOTROPY_ID) {
+            /// На данный момент эти переменные используются только в 
+            /// анизотропной функции распределения.
+            t_dot_h = max(dot(tangent, h), 0.000001f);
+            b_dot_h = max(dot(btangent, h), 0.000001f); 
+        }
+
         DISTRIBUTION_FUNCTION(n_dot_h, t_dot_h, b_dot_h, roughness, D);
         GEOMETRY_FUNCTION(n_dot_h, n_dot_l, n_dot_v, v_dot_h, roughness, G);
         FRESNEL_APPROXIMATION_FUNCTION(base_color, metallic, v_dot_h, F);
@@ -323,7 +344,7 @@ void main()
     vec3 color      = ambient + Lout;
 
     color   /= color + 1.0f;
-    color   = pow(color, vec3(1.0 / 2.2));
+    color   = pow(color, vec3(0.4545));
 
-    imageStore(OutImage, uv, vec4(color, 1.0)); 
+    imageStore(OutImage, uv, vec4(color, 1.0));
 }

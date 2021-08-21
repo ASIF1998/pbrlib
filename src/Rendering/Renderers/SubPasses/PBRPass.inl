@@ -20,7 +20,7 @@ namespace pbrlib
         _geom_func      (geom_func),
         _fresnel_approx (fresnel_approx)
     {
-        _other_options.use_bent_normal = use_bent_normal;
+        _other_options.use_bent_normal_tangent_btangent = use_bent_normal;
     }
 
     inline void PBRPass::Optionals::setDistributionFunction(DistributionFunction dist_func) noexcept
@@ -38,9 +38,9 @@ namespace pbrlib
         _fresnel_approx = fresnel_approx;
     }
 
-    inline void PBRPass::Optionals::useBentNormal(bool to_use) noexcept
+    inline void PBRPass::Optionals::useBentNormalTangentBtangent(bool to_use) noexcept
     {
-        _other_options.use_bent_normal = to_use;
+        _other_options.use_bent_normal_tangent_btangent = to_use;
     }
 
     inline PBRPass::DistributionFunction PBRPass::Optionals::getDistributionFunction() const noexcept
@@ -58,9 +58,9 @@ namespace pbrlib
         return _fresnel_approx;
     }
 
-    inline bool PBRPass::Optionals::useBentNormal() const noexcept
+    inline bool PBRPass::Optionals::useBentNormalTangentBtangent() const noexcept
     {
-        return _other_options.use_bent_normal;
+        return _other_options.use_bent_normal_tangent_btangent;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
