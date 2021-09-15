@@ -7,6 +7,7 @@
 //
 
 #include <memory>
+#include <cassert>
 
 namespace pbrlib::math
 {
@@ -286,22 +287,22 @@ namespace pbrlib::math
             _array4x4[0][1] = -(tmat[1][0] * a33444334 - tmat[1][2] * a31443441 + tmat[1][3] * a31433341);
             _array4x4[0][2] =   tmat[1][0] * a32443442 - tmat[1][1] * a31443441 + tmat[1][3] * a31423241;
             _array4x4[0][3] = -(tmat[1][0] * a32433342 - tmat[1][1] * a31433341 + tmat[1][2] * a31423241);
-            
+
             _array4x4[1][0] = -(tmat[0][1] * a33444334 - tmat[0][2] * a32443442 + tmat[0][3] * a32433342);
             _array4x4[1][1] =   tmat[0][0] * a33444334 - tmat[0][2] * a31443441 + tmat[0][3] * a31433341;
             _array4x4[1][2] = -(tmat[0][0] * a32443442 - tmat[0][1] * a31443441 + tmat[0][3] * a31423241);
             _array4x4[1][3] =   tmat[0][0] * a32433342 - tmat[0][1] * a31433341 + tmat[0][2] * a31423241;
-            
+
             _array4x4[2][0] =   tmat[0][1] * a23442443 - tmat[0][2] * a22444224 + tmat[0][3] * a22432342;
             _array4x4[2][1] = -(tmat[0][0] * a23442443 - tmat[0][2] * a21442441 + tmat[0][3] * a21432341);
             _array4x4[2][2] =   tmat[0][0] * a22444224 - tmat[0][1] * a21442441 + tmat[0][3] * a21422241;
             _array4x4[2][3] = -(tmat[0][0] * a22432342 - tmat[0][1] * a21432341 + tmat[0][2] * a21422241);
-            
+
             _array4x4[3][0] = -(tmat[0][1] * a23342433 - tmat[0][2] * a22342432 + tmat[0][3] * a22332332);
             _array4x4[3][1] =   tmat[0][0] * a23342433 - tmat[0][2] * a21342431 + tmat[0][3] * a21332331;
             _array4x4[3][2] = -(tmat[0][0] * a22342432 - tmat[0][1] * a21342431 + tmat[0][3] * a21322231);
             _array4x4[3][3] =   tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
-            
+
             for (size_t i{0}; i < 16; i++) {
                 _array16[i] /= d;
             }
@@ -413,7 +414,7 @@ namespace pbrlib::math
         res._m128_simd[2] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b20_vec), _mm_mul_ps(_m128_simd[1], b21_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b22_vec), _mm_mul_ps(_m128_simd[3], b23_vec)));
         res._m128_simd[3] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b30_vec), _mm_mul_ps(_m128_simd[1], b31_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b32_vec), _mm_mul_ps(_m128_simd[3], b33_vec)));
 
-		return res;
+        return res;
     }
 
     inline Matrix4x4<float> Matrix4x4<float>::operator * (float scal) const
@@ -439,7 +440,6 @@ namespace pbrlib::math
             ), 
             _mm_set1_ps(v.xyzw_simd[0])
         );
-
 
         res.xyzw_simd = _mm_add_ps(
             _mm_mul_ps(
@@ -480,7 +480,7 @@ namespace pbrlib::math
             ), 
             res.xyzw_simd
         );
-        
+
         return res; 
     }
 
@@ -501,7 +501,7 @@ namespace pbrlib::math
     inline Matrix4x4<float>& Matrix4x4<float>::operator *= (const Matrix4x4<float>& mat) 
     {
         *this = *this * mat;
-        
+
         return *this;
     }
 
@@ -614,7 +614,7 @@ namespace pbrlib::math
             s4 = _mm_shuffle_ps(inv_d, inv_d, _MM_SHUFFLE(3, 2, 3, 2));
 
             auto b_mul_inv_d = _mm_add_ps(_mm_mul_ps(s1, s3), _mm_mul_ps(s2, s4));
-            
+
             s1 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(2, 2, 0, 0));
             s2 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(3, 3, 1, 1));
             s3 = _mm_shuffle_ps(inv_a, inv_a, _MM_SHUFFLE(1, 0, 1, 0));

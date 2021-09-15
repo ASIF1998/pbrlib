@@ -124,8 +124,8 @@ namespace pbrlib
 
     void Scene::Node::setWorldAABB(const AABB& bbox)
     {
-        _world_aabb_is_current = true;
-        _world_bbox = bbox;
+        _world_aabb_is_current  = true;
+        _world_bbox             = bbox;
     }
 
     void Scene::Node::setName(const string_view name)
@@ -155,8 +155,8 @@ namespace pbrlib
 
     void Scene::Node::addComponent(const PtrComponent& ptr_component)
     {
-        auto type = ptr_component->getType();
-        auto it = _components.find(type);
+        auto type   = ptr_component->getType();
+        auto it     = _components.find(type);
 
         if (it != end(_components)) {
             it->second = ptr_component;
@@ -167,8 +167,8 @@ namespace pbrlib
 
     void Scene::Node::addScript(const PtrScript& ptr_script)
     {
-        auto type = ptr_script->getType();
-        auto it = _scripts.find(type);
+        auto type   = ptr_script->getType();
+        auto it     = _scripts.find(type);
 
         if (it != end(_scripts)) {
             it->second = ptr_script;
@@ -184,7 +184,7 @@ namespace pbrlib
         for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
             if (!_ptr_children[i]) {
                 swap(_ptr_children[i], child);
-                return ;
+                return;
             }
         }
 
@@ -198,7 +198,7 @@ namespace pbrlib
         for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
             if (!_ptr_children[i]) {
                 _ptr_children[i] = child;
-                return ;
+                return;
             }
         }
 
@@ -249,9 +249,9 @@ namespace pbrlib
             _world_transform = transform;
         }
 
-        if (!_ptr_children.empty())  {
+        if (!_ptr_children.empty()) {
             Transform children_world_transform = _world_transform * _local_transform;
-            
+
             for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
                 _ptr_children[i]->update(delta_time, children_world_transform);
             }
@@ -272,10 +272,10 @@ namespace pbrlib
          * TODO: Добавить отсечение по усечённому конусу.
         */
 
-       for (size_t i{0}, num_child{_ptr_children.size()}; i < num_child; i++) {
-           out_visible_list.push_back(_ptr_children[i]);
-           _ptr_children[i]->_getVisibleList(out_visible_list);
-       }
+        for (size_t i{0}, num_child{_ptr_children.size()}; i < num_child; i++) {
+            out_visible_list.push_back(_ptr_children[i]);
+            _ptr_children[i]->_getVisibleList(out_visible_list);
+        }
     }
 
     Scene::PtrNode Scene::Node::make(const string_view name, Node* parent)
@@ -375,7 +375,7 @@ namespace pbrlib
     Scene::VisibleList Scene::getVisibleList()
     {
         VisibleList visible_list;
-        
+
         if (_ptr_root_node) {
             visible_list.push_back(_ptr_root_node);
             _ptr_root_node->_getVisibleList(visible_list);
@@ -387,7 +387,7 @@ namespace pbrlib
     const Scene::VisibleList Scene::getVisibleList() const
     {
         VisibleList visible_list;
-        
+
         if (_ptr_root_node) {
             visible_list.push_back(_ptr_root_node);
             _ptr_root_node->_getVisibleList(visible_list);
@@ -397,8 +397,8 @@ namespace pbrlib
     }
 
     Scene::PtrNode& Scene::makePointLight(
-        const PointLight::Builder&   light_builder,
-        const string_view            name
+        const PointLight::Builder&  light_builder,
+        const string_view           name
     )
     {
         PtrNode ptr_node = Scene::Node::make(name);
@@ -445,7 +445,7 @@ namespace pbrlib
     void Scene::update(float delta_time)
     {
         const Transform t;
-        
+
         if (_ptr_root_node) {
             _ptr_root_node->update(delta_time, t);
         }

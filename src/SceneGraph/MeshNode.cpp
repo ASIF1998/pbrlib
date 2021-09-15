@@ -34,7 +34,7 @@ namespace pbrlib
         _ptr_mesh = ptr_mesh;
         addComponent(ptr_mesh);
     }
-    
+
     PtrMesh& MeshNode::getMesh() noexcept
     {
         return _ptr_mesh;

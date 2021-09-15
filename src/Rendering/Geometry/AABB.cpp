@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <numeric>
 
+#include <cassert>
+
 using namespace std;
 
 namespace pbrlib
@@ -32,13 +34,13 @@ namespace pbrlib
 
     Vec3<float>& AABB::operator [] (size_t i)
     {
-        assert (i == 0 || i == 1);
+        assert(i == 0 || i == 1);
         return _min_max[i];
     }
 
     Vec3<float> AABB::operator [] (size_t i) const
     {
-        assert (i == 0 || i == 1);
+        assert(i == 0 || i == 1);
         return _min_max[i];
     }
 
@@ -80,7 +82,7 @@ namespace pbrlib
         return d.x * d.y * d.z;
     }
 
-    uint AABB::maximumExtent() const
+    uint32_t AABB::maximumExtent() const
     {
         auto d = diagonal();
 
@@ -149,7 +151,7 @@ namespace pbrlib
             )
         );
     }
-    
+
     bool AABB::overlaps(const AABB& bbox1, const AABB& bbox2)
     {
         bool x =    bbox1._p_max.x >= bbox2._p_min.x && 

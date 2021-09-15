@@ -184,7 +184,7 @@ namespace pbrlib
 
         *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getData() + _index_buffer_offset) + i) = val;
     }
-    
+
     inline void Mesh::setIndexBuffer(const PtrBuffer& ptr_buffer)
     {
         if (ptr_buffer->getSize() % sizeof(uint32_t)) {
@@ -336,7 +336,7 @@ namespace pbrlib
     {
         _name = name;
     }
-   
+
     inline Buffer::Builder<Mesh::VertexAttrib>& Mesh::Builder::getVertexBufferBuilder() noexcept
     {
         return _vertex_buffer_builder;
@@ -361,13 +361,13 @@ namespace pbrlib
     {
         Mesh mesh (_name);
 
-        mesh._aabb                       = _bbox;
-        mesh._index_buffer_offset        = 0;
-        mesh._ptr_index_buffer           = _index_buffer_builder.buildPtr();
-        mesh._ptr_material               = nullptr;
-        mesh._ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
-        mesh._num_vertices               = static_cast<uint32_t>(mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
-        mesh._num_indices                = static_cast<uint32_t>(mesh._ptr_index_buffer->getSize() / sizeof(uint32_t));
+        mesh._aabb                      = _bbox;
+        mesh._index_buffer_offset       = 0;
+        mesh._ptr_index_buffer          = _index_buffer_builder.buildPtr();
+        mesh._ptr_material              = nullptr;
+        mesh._ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
+        mesh._num_vertices              = static_cast<uint32_t>(mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
+        mesh._num_indices               = static_cast<uint32_t>(mesh._ptr_index_buffer->getSize() / sizeof(uint32_t));
 
         return mesh;
     }
@@ -376,13 +376,13 @@ namespace pbrlib
     {
         PtrMesh ptr_mesh = Mesh::make(_name);
 
-        ptr_mesh->_aabb                      = _bbox;
-        ptr_mesh->_index_buffer_offset       = 0;
-        ptr_mesh->_ptr_index_buffer          = _index_buffer_builder.buildPtr();
-        ptr_mesh->_ptr_material              = nullptr;
-        ptr_mesh->_ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
-        ptr_mesh->_num_vertices              = static_cast<uint32_t>(ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
-        ptr_mesh->_num_indices               = static_cast<uint32_t>(ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t));
+        ptr_mesh->_aabb                     = _bbox;
+        ptr_mesh->_index_buffer_offset      = 0;
+        ptr_mesh->_ptr_index_buffer         = _index_buffer_builder.buildPtr();
+        ptr_mesh->_ptr_material             = nullptr;
+        ptr_mesh->_ptr_vertex_attrib_buffer = _vertex_buffer_builder.buildPtr();
+        ptr_mesh->_num_vertices             = static_cast<uint32_t>(ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib));
+        ptr_mesh->_num_indices              = static_cast<uint32_t>(ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t));
 
         return ptr_mesh;
     }
@@ -433,13 +433,13 @@ namespace pbrlib
     {
         Mesh mesh (_name);
 
-        mesh._aabb                       = _bbox;
-        mesh._index_buffer_offset        = 0;
-        mesh._ptr_index_buffer           = _index_buffer_builder.buildPtr();
-        mesh._ptr_material               = nullptr;
-        mesh._ptr_vertex_attrib_buffer   = _vertex_buffer_builder.buildPtr();
-        mesh._num_vertices               = mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
-        mesh._num_indices                = mesh._ptr_index_buffer->getSize() / sizeof(uint32_t);
+        mesh._aabb                      = _bbox;
+        mesh._index_buffer_offset       = 0;
+        mesh._ptr_index_buffer          = _index_buffer_builder.buildPtr();
+        mesh._ptr_material              = nullptr;
+        mesh._ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
+        mesh._num_vertices              = mesh._ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
+        mesh._num_indices               = mesh._ptr_index_buffer->getSize() / sizeof(uint32_t);
 
         return mesh;
     }
@@ -449,14 +449,14 @@ namespace pbrlib
     {
         PtrMesh ptr_mesh = Mesh::make(_name);
 
-        ptr_mesh->_aabb                      = _bbox;
-        ptr_mesh->_index_buffer_offset       = 0;
-        ptr_mesh->_ptr_index_buffer          = _index_buffer_builder.buildPtr();
-        ptr_mesh->_ptr_material              = nullptr;
-        ptr_mesh->_ptr_vertex_attrib_buffer  = _vertex_buffer_builder.buildPtr();
-        ptr_mesh->_num_vertices              = ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
-        ptr_mesh->_num_indices               = ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t);
-        
+        ptr_mesh->_aabb                     = _bbox;
+        ptr_mesh->_index_buffer_offset      = 0;
+        ptr_mesh->_ptr_index_buffer         = _index_buffer_builder.buildPtr();
+        ptr_mesh->_ptr_material             = nullptr;
+        ptr_mesh->_ptr_vertex_attrib_buffer = _vertex_buffer_builder.buildPtr();
+        ptr_mesh->_num_vertices             = ptr_mesh->_ptr_vertex_attrib_buffer->getSize() / sizeof(VertexAttrib);
+        ptr_mesh->_num_indices              = ptr_mesh->_ptr_index_buffer->getSize() / sizeof(uint32_t);
+
         return ptr_mesh;
     }
 }

@@ -27,7 +27,7 @@ namespace pbrlib
 
         if (!ptr_instance) {
             vector<string>      extensions = Instance::getExtensionNames();
-            vector<const char*> pointers_on_extension_name (extensions.size());
+            vector<const char*> pointers_on_extension_name(extensions.size());
 
             vector<const char*> pointers_on_layer_name;
 
@@ -73,7 +73,7 @@ namespace pbrlib
         if (queues_infos.empty()) {
             vector<VkQueueFamilyProperties> queue_family_properties = ptr_physical_device->getQueueFamilyProperties();
 
-             for (size_t i{0}; i < queue_family_properties.size(); i++) {
+            for (size_t i{0}; i < queue_family_properties.size(); i++) {
                 if (
                     (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && 
                     (queue_family_properties[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
@@ -101,15 +101,15 @@ namespace pbrlib
         const PtrPhysicalDevice&                ptr_physical_device
     )
     {
-        static PtrDevice ptr_device  = nullptr;
+        static PtrDevice ptr_device = nullptr;
 
         if (!ptr_device) {
             vector<const char*> pointers_layers_names       (0);
-            vector<const char*> pointers_extencions_names   (2);
+            vector<const char*> pointers_extencions_names   (1);
 
-            pointers_extencions_names[0]    = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
-            pointers_extencions_names[1]    = "VK_KHR_portability_subset";
-            ptr_device                      = ptr_physical_device->makeDevice(
+            pointers_extencions_names[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+
+            ptr_device = ptr_physical_device->makeDevice(
                 instance,
                 queues_infos, 
                 pointers_layers_names, 
@@ -187,16 +187,16 @@ namespace pbrlib
     void SceneView::drawScene(float delta_time)
     {
         assert(_ptr_renderer);
-        
+
         if (_scene._ptr_camera_node) {
             _scene.update(delta_time);
-            
+
             _ptr_renderer->draw(
                 _scene._ptr_camera_node,
-                _scene.getVisibleList(), 
-                _scene._point_light_nodes, 
-                _scene._spot_light_nodes, 
-                _scene._dir_light_nodes, 
+                _scene.getVisibleList(),
+                _scene._point_light_nodes,
+                _scene._spot_light_nodes,
+                _scene._dir_light_nodes,
                 delta_time
             );
         }

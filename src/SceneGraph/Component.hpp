@@ -30,7 +30,7 @@ namespace pbrlib
         virtual type_index getType() const = 0;
 
     protected:
-        string _name;        
+        string _name;
     };
 
     namespace ComponentUtil

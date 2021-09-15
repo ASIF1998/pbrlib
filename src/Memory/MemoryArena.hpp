@@ -19,7 +19,7 @@ namespace pbrlib
 {
     template<typename TMemoryBlock>
     class MemoryArena;
-    
+
     template<typename TMemoryBlock>
     using PtrMemoryArena = shared_ptr<MemoryArena<TMemoryBlock>>;
 
@@ -63,7 +63,7 @@ namespace pbrlib
         inline size_t getNumBytes()             const;
 
         inline static PtrMemoryArena<TMemoryBlock> make();
-        
+
         inline static PtrMemoryArena<TMemoryBlock> make(
             size_t num_memory_blocks, 
             size_t memory_block_size

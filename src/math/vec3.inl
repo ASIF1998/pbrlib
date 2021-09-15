@@ -6,7 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <cmath>
+#include "../core.hpp"
+
+#include <cassert>
 
 using namespace std;
 
@@ -50,7 +52,7 @@ namespace pbrlib::math
     {
         return {x + v.x, y + v.y, z + v.z};
     }
-    
+
     template<typename Type>
     inline Vec3<Type> Vec3<Type>::operator - (const Vec3<Type>& v) const
     {
@@ -121,9 +123,9 @@ namespace pbrlib::math
     void Vec3<Type>::normalize()
     {
         auto l = length();
-    
-        assert(l);
         
+        assert(l);
+
         x /= l;
         y /= l;
         z /= l;

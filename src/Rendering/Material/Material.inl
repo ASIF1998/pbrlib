@@ -1,5 +1,5 @@
 //
-//  material.inl
+//  Material.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 30/05/2020.

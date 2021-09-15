@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <cmath>
+#include "../core.hpp"
 
 using namespace std;
 

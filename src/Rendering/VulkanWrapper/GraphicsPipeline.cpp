@@ -12,6 +12,8 @@
 
 #include <numeric>
 
+#include <cassert>
+
 namespace pbrlib
 {
     VertexInputState::VertexInputState(

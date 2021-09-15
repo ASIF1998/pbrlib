@@ -26,8 +26,8 @@ namespace pbrlib
      * @details 
      *      Этот интерфейс требует реализации следующих методов:
      *          1) const ImageView& outputImpl(size_t id)                                   ;
-     *          2) void             outputImpl(PtrImageView& ptr_image_view, size_t id)    ;
-     *          3) void             outputImpl(ImageView& image_view, size_t id)           .
+     *          2) void             outputImpl(PtrImageView& ptr_image_view, size_t id)     ;
+     *          3) void             outputImpl(ImageView& image_view, size_t id)            .
      * 
      * @tparam PassType тип прохода, реализующий данный интерфейс.
     */

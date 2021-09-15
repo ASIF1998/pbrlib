@@ -62,7 +62,7 @@ namespace pbrlib
         for (size_t i{0}; i < ptr_ai_node->mNumMeshes; i++) {
             aiMesh const* ptr_ai_mesh = ptr_ai_scene->mMeshes[ptr_ai_node->mMeshes[i]];
             aiFace const* ptr_ai_face = ptr_ai_mesh->mFaces;
-            
+
             auto* ptr_texture_coords = ptr_ai_mesh->mTextureCoords[0] ? ptr_ai_mesh->mTextureCoords[0] : ptr_ai_mesh->mTextureCoords[1];
 
             asset->meshes.push_back(MeshAssimp::Mesh{});
@@ -81,24 +81,24 @@ namespace pbrlib
                     position.y = ptr_ai_mesh->mVertices[j].y;
                     position.z = ptr_ai_mesh->mVertices[j].z;
                 }
-                
+
                 if (ptr_texture_coords) {
                     uv.x = ptr_texture_coords[j].x;
                     uv.y = ptr_texture_coords[j].y;
                 }
-                
+
                 if (ptr_ai_mesh->mNormals) {
                     normal.x = ptr_ai_mesh->mNormals[j].x;
                     normal.y = ptr_ai_mesh->mNormals[j].y;
                     normal.z = ptr_ai_mesh->mNormals[j].z;
                 }
-                
+
                 if (ptr_ai_mesh->mTangents) {
                     tangent.x = ptr_ai_mesh->mTangents[j].x;
                     tangent.y = ptr_ai_mesh->mTangents[j].y;
                     tangent.z = ptr_ai_mesh->mTangents[j].z;
                 }
-                
+
                 asset->vert_attr.addData({
                     position,
                     uv,
@@ -112,7 +112,7 @@ namespace pbrlib
                     asset->indices.addData(ptr_ai_face[j].mIndices[k]);
                 }
             }
-        } 
+        }
 
         for (size_t i{0}; i < ptr_ai_node->mNumChildren; i++) {
             processNode(asset, ptr_ai_scene, ptr_ai_node->mChildren[i]);
@@ -154,18 +154,18 @@ namespace pbrlib
         );
 
         if (!ptr_ai_scene) {
-           return nullopt;
+            return nullopt;
         }
 
         if (!ptr_ai_scene->mRootNode) {
-           return nullopt;
+            return nullopt;
         }
 
         size_t total_vertex_count   = 0;
         size_t total_index_count    = 0;
 
         const aiNode* ptr_ai_node = ptr_ai_scene->mRootNode;
-        
+
         countVerticesAndIndices(ptr_ai_scene, ptr_ai_node, &total_vertex_count, &total_index_count);
 
         asset.vert_attr.reserve(total_vertex_count);
@@ -173,7 +173,7 @@ namespace pbrlib
 
         asset.vert_attr.addQueueFamily(_queue_family_index);
         asset.indices.addQueueFamily(_queue_family_index);
-        
+
         asset.vert_attr.setMemoryTypeIndex(_memory_type);
         asset.indices.setMemoryTypeIndex(_memory_type);
 

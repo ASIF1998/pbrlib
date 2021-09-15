@@ -63,7 +63,7 @@ namespace pbrlib
         float surfaceArea() const;
         float volume()      const;
 
-        uint maximumExtent() const;
+        uint32_t maximumExtent() const;
 
         Vec3<float> lerp(const Vec3<float>& t) const;
 
@@ -121,7 +121,7 @@ namespace pbrlib
          * @return true - если p внутри bbox, иначе false.
         */
         static bool inside(const AABB& bbox, const Vec3<float>& p);
-        
+
         /**
          * @brief 
          *      Статический метод, расширяющий bbox постоянным 
@@ -156,7 +156,7 @@ namespace pbrlib
         template<typename TPositions>
         static AABB computeAABB(const TPositions& positions);
 
-    private:
+	private:
         union
         {
             struct
@@ -167,7 +167,7 @@ namespace pbrlib
 
             Vec3<float> _min_max[2];
         };
-    };
+	};
 }
 
 #include "AABB.inl"

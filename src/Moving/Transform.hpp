@@ -28,23 +28,23 @@ namespace pbrlib
         Transform();
         Transform(const Matrix4x4<float>& m);
 
-        bool operator == (const Transform& t) const;
-        bool operator != (const Transform& t) const;
-        
-        Vec3<float> operator () (const Vec3<float>& v)      const;
-        AABB        operator () (const AABB& bbox)          const;
-        Transform   operator *  (const Transform& t)        const;
+		bool operator == (const Transform& t) const;
+		bool operator != (const Transform& t) const;
 
-        bool identity() const;
+		Vec3<float> operator () (const Vec3<float>& v)      const;
+		AABB        operator () (const AABB& bbox)          const;
+		Transform   operator *  (const Transform& t)        const;
 
-        Matrix4x4<float>&       getMatrix()         noexcept;
-        const Matrix4x4<float>& getMatrix()         const noexcept;
-        Matrix4x4<float>        getInverseMatrix()  const noexcept;
+		bool identity() const;
 
-        void setMatrix(const Matrix4x4<float>& m);
+		Matrix4x4<float>&		getMatrix()         noexcept;
+		const Matrix4x4<float>& getMatrix()         const noexcept;
+		Matrix4x4<float>        getInverseMatrix()  const noexcept;
 
-        static Transform translate(const Vec3<float>& t);
-        static Transform scale(const Vec3<float>& s);
+		void setMatrix(const Matrix4x4<float>& m);
+
+		static Transform translate(const Vec3<float>& t);
+		static Transform scale(const Vec3<float>& s);
 
         /**
          * @brief 
@@ -120,12 +120,10 @@ namespace pbrlib
             float z_far
         );
 
-    private:
+	private:
         Matrix4x4<float> _m;
 
-    private:
-        static constexpr Matrix4x4<float> IDENTITY_MATRIX;
-
+	private:
         friend Transform inverse(const Transform& t);
         friend Transform transpose(const Transform& t);
 
@@ -134,7 +132,7 @@ namespace pbrlib
 
     Transform inverse(const Transform& t);
     Transform transpose(const Transform& t);
-    
+
     ostream& operator << (ostream& print, const Transform& t);
 }
 

@@ -36,8 +36,27 @@ namespace pbrlib
         inline STLAlignedAllocator()    noexcept = default;
         inline ~STLAlignedAllocator()   noexcept = default;
 
+        inline STLAlignedAllocator(STLAlignedAllocator&&)       = default;
+        inline STLAlignedAllocator(const STLAlignedAllocator&)  = default;
+
+        template<typename U>
+        STLAlignedAllocator(const STLAlignedAllocator<U>& other) 
+        {}
+
         inline pointer  allocate(size_type n)           noexcept;
         inline void     deallocate(pointer p, size_t)   noexcept;
+
+        template<typename U, typename... Args>
+        void construct(U* ptr, Args&&... args)
+        {
+            new (reinterpret_cast<void*>(ptr)) U { std::forward<Args>(args)... };
+        }
+
+        template<typename U>
+        void destroy(U* ptr)
+        {
+            ptr->~U();
+        }
 
         template<typename U>
         inline bool operator == (const STLAlignedAllocator<U>&) const noexcept;

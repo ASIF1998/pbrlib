@@ -13,30 +13,30 @@
 namespace pbrlib
 {
     Material::Material() :
-        _albedo             (nullptr),
-        _normal_map         (nullptr),
-        _metallic           (nullptr),
-        _roughness          (nullptr),
-        _baked_AO           (nullptr),
-        _anisotropy         (0.0f)
+        _albedo     (nullptr),
+        _normal_map (nullptr),
+        _metallic   (nullptr),
+        _roughness  (nullptr),
+        _baked_AO   (nullptr),
+        _anisotropy (0.0f)
     {}
 
     Material::Material(const Material& material) :
-        _albedo             (material._albedo),
-        _normal_map         (material._normal_map),
-        _metallic           (material._metallic),
-        _roughness          (material._roughness),
-        _baked_AO           (material._baked_AO),
-        _anisotropy         (material._anisotropy)
+        _albedo     (material._albedo),
+        _normal_map (material._normal_map),
+        _metallic   (material._metallic),
+        _roughness  (material._roughness),
+        _baked_AO   (material._baked_AO),
+        _anisotropy (material._anisotropy)
     {}
 
     Material::Material(Material&& material) :
-        _albedo             (move(material._albedo)),
-        _normal_map         (move(material._normal_map)),
-        _metallic           (move(material._metallic)),
-        _roughness          (move(material._roughness)),
-        _baked_AO           (move(material._baked_AO)),
-        _anisotropy         (material._anisotropy)
+        _albedo     (move(material._albedo)),
+        _normal_map (move(material._normal_map)),
+        _metallic   (move(material._metallic)),
+        _roughness  (move(material._roughness)),
+        _baked_AO   (move(material._baked_AO)),
+        _anisotropy (material._anisotropy)
     {}
 
     Material::~Material()
@@ -78,13 +78,13 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Material::Builder::Builder(GPUTextureManager& texture_manager) :
-        _albedo                     (nullptr),
-        _normal_map                 (nullptr),
-        _metallic                   (nullptr),
-        _roughness                  (nullptr),
-        _baked_AO                   (nullptr),
-        _anisotropy                 (0.0f),
-        _texture_manager            (texture_manager)
+        _albedo             (nullptr),
+        _normal_map         (nullptr),
+        _metallic           (nullptr),
+        _roughness          (nullptr),
+        _baked_AO           (nullptr),
+        _anisotropy         (0.0f),
+        _texture_manager    (texture_manager)
     {}
 
     void Material::Builder::setAlbedo(const PtrImageView& albedo)
@@ -228,8 +228,8 @@ namespace pbrlib
         _anisotropy = anisotropy;
     }
 
-   Material Material::Builder::build()
-   {
+    Material Material::Builder::build()
+    {
         assert(_albedo && _normal_map && _metallic && _roughness && _baked_AO);
 
         Material material;
@@ -242,7 +242,7 @@ namespace pbrlib
         material._anisotropy    = _anisotropy;
 
         return material;
-   }
+    }
 
     PtrMaterial Material::Builder::buildPtr()
     {

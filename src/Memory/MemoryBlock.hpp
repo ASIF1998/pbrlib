@@ -35,7 +35,7 @@ namespace pbrlib
     public:
         inline MemoryBlock(size_t size);
         inline ~MemoryBlock();
-        
+
         inline virtual void*       getPtrMemory()          override;
         inline virtual const void* getPtrMemory()  const   override;
         inline virtual size_t      getSize()       const   override;

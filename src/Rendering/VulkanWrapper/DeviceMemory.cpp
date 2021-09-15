@@ -8,6 +8,8 @@
 
 #include "DeviceMemory.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     DeviceMemory::DeviceMemory(const PtrDevice& ptr_device) noexcept :

@@ -8,6 +8,8 @@
 
 #include "DescriptorPool.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     DescriptorPool::DescriptorPool(

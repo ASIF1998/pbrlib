@@ -6,7 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <cmath>
+#include "../core.hpp"
+
+#include <cassert>
 
 namespace pbrlib::math
 {
@@ -141,9 +143,9 @@ namespace pbrlib::math
     inline void Vec4<Type>::normalize()
     {
         auto l = length();
-    
+
         assert(l);
-        
+
         x /= l;
         y /= l;
         z /= l;
@@ -254,13 +256,12 @@ namespace pbrlib::math
     inline void Vec4<float>::normalize()
     {
         float l = length();
-    
+
         assert(l != static_cast<float>(0u));
         xyzw_simd = _mm_div_ps(xyzw_simd, _mm_set1_ps(l));
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     template<typename Type>
     inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2)
     {

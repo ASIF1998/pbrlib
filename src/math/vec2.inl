@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <cmath>
+#include "../core.hpp"
 
 using namespace std;
 
@@ -83,7 +83,7 @@ namespace pbrlib::math
     {
         x *= s;
         y *= s;
-        
+
         return *this;
     }
 
@@ -115,9 +115,9 @@ namespace pbrlib::math
     void Vec2<Type>::normalize()
     {
         auto l = length();
-    
+
         assert(l != static_cast<Type>(0));
-        
+
         x /= l;
         y /= l;
     }

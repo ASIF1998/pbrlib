@@ -8,6 +8,8 @@
 
 #include "Buffer.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     Buffer::Buffer(

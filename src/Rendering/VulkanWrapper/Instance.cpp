@@ -11,6 +11,9 @@
 
 #include "../../core.hpp"
 
+#include <cassert>
+#include <stdexcept>
+
 namespace pbrlib
 {
     VulkanInstanceExtensionSupported    Instance::_supported_extensions = {};

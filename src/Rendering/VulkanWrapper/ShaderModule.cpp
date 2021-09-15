@@ -8,6 +8,8 @@
 
 #include "ShaderModule.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     SpecializationInfo::SpecializationInfo(

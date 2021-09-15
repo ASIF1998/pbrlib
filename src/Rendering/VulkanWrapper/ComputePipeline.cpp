@@ -12,6 +12,9 @@
 
 #include "ShaderModule.hpp"
 
+#include <cassert>
+#include <stdexcept>
+
 namespace pbrlib
 {
     ComputePipeline::ComputePipeline(

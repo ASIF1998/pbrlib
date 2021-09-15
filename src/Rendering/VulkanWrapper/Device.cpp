@@ -9,6 +9,7 @@
 #include "Device.hpp"
 
 #include <stdexcept>
+#include <cassert>
 
 #include "PhysicalDevice.hpp"
 

@@ -8,6 +8,8 @@
 
 #include "CommandPool.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     CommandPool::CommandPool(const PtrDevice& ptr_device, uint32_t queue_family_index) :

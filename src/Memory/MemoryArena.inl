@@ -72,8 +72,8 @@ namespace pbrlib
             }
         }
 
-        void* rptr      =   static_cast<uint8_t*>(_current_memory_block->getPtrMemory()) + _current_pos;
-        _current_pos    +=  size;
+        void* rptr = static_cast<uint8_t*>(_current_memory_block->getPtrMemory()) + _current_pos;
+        _current_pos += size;
 
         _current_memory_block->setNumUsers(_current_memory_block->getNumUsers() + 1);
 

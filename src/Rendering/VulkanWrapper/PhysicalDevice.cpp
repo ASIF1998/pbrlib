@@ -10,6 +10,9 @@
 
 #include <numeric>
 
+#include <cassert>
+#include <stdexcept>
+
 namespace pbrlib
 {
     PhysicalDevice::PhysicalDevice(VkPhysicalDevice physical_device_handle) :

@@ -13,6 +13,10 @@
 #define MAX_SPOT_LIGHT      1024
 #define MAX_DIRECTION_LIGHT 1024
 
+#ifdef __cplusplus 
+    using uint = uint32_t;
+#endif
+
 struct NumLights
 {
     uint point;

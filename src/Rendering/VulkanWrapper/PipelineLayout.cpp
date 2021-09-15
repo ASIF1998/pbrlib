@@ -8,6 +8,8 @@
 
 #include "PipelineLayout.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     DescriptorSetLayoutBindings::DescriptorSetLayoutBindings(

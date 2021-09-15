@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include <stdexcept>
+#include <cassert>
 
 #include <SDL_vulkan.h>
 
@@ -44,7 +45,7 @@ namespace pbrlib
             if (SDL_Init(SDL_INIT_EVERYTHING)) {
                 throw runtime_error(SDL_GetError());
             }
-            
+
             _is_init_SDL = true;
         }
 

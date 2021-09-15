@@ -17,6 +17,7 @@
 #include <tuple>
 
 #include <vector>
+#include <memory>
 
 using namespace std;
 

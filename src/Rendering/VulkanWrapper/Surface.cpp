@@ -11,6 +11,8 @@
 #include "Instance.hpp"
 #include "PhysicalDevice.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     Surface::Surface(

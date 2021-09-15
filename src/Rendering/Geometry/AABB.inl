@@ -15,7 +15,7 @@ namespace pbrlib
             const Vec3<float>*  ptr     (reinterpret_cast<const Vec3<float>*>(ptr_positions));
             AABB                bbox    (ptr[0]);
 
-            for(size_t i{1}; i < num_positions; i++) {
+            for (size_t i{1}; i < num_positions; i++) {
                 bbox = AABB::aabbUnion(bbox, ptr[i]);
             }
 
@@ -32,7 +32,7 @@ namespace pbrlib
             const Vec3<float>*  ptr     (reinterpret_cast<const Vec3<float>*>(&positions[0]));
             AABB                bbox    (ptr[0]);
 
-            for(size_t i{1}; i < positions.size(); i++) {
+            for (size_t i{1}; i < positions.size(); i++) {
                 bbox = AABB::aabbUnion(bbox, ptr[i]);
             }
 

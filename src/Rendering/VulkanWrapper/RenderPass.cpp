@@ -8,6 +8,8 @@
 
 #include "RenderPass.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     SubpassDescription::SubpassDescription(

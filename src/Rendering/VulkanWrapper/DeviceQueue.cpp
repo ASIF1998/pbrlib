@@ -13,6 +13,8 @@
 
 #include "CommandBuffer.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     DeviceQueue::DeviceQueue(

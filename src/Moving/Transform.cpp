@@ -12,7 +12,7 @@
 
 #include "../Rendering/Geometry/AABB.hpp"
 
-#include <cmath>
+#include "../core.hpp"
 
 namespace pbrlib
 {
@@ -23,10 +23,9 @@ namespace pbrlib
     }
 
     /*  -------------------------   */
-    constexpr Matrix4x4<float> Transform::IDENTITY_MATRIX;
 
     Transform::Transform() :
-        _m(IDENTITY_MATRIX)
+        _m(1.0)
     {}
 
     Transform::Transform(const Matrix4x4<float>& m) :
@@ -55,7 +54,7 @@ namespace pbrlib
     AABB Transform::operator () (const AABB& bbox) const
     {
         AABB new_bbox ((*this)(bbox.corner(0)));
-        
+
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(1)));
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(2)));
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(3)));
@@ -74,7 +73,8 @@ namespace pbrlib
 
     bool Transform::identity() const
     {
-        return _m == IDENTITY_MATRIX;
+        constexpr Matrix4x4<float> identity_mat (1.0f);
+        return _m == identity_mat;
     }
 
     Matrix4x4<float>& Transform::getMatrix() noexcept
@@ -109,7 +109,7 @@ namespace pbrlib
 
     Transform Transform::translate(const Vec3<float>& t)
     {
-       return Transform(Matrix4x4<float>(
+        return Transform(Matrix4x4<float>(
            1.0f, 0.0f, 0.0f, 0.0f,
            0.0f, 1.0f, 0.0f, 0.0f,
            0.0f, 0.0f, 1.0f, 0.0f,

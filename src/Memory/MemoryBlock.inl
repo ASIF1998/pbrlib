@@ -10,7 +10,7 @@
 
 namespace pbrlib
 {
-    inline MemoryBlock::MemoryBlock(size_t size)  :
+    inline MemoryBlock::MemoryBlock(size_t size) :
         _ptr_memory (allocAligned(size)),
         _size       (size),
         _num_users  (0),

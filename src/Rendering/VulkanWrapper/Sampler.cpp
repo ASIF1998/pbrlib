@@ -8,6 +8,8 @@
 
 #include "Sampler.hpp"
 
+#include <cassert>
+
 namespace pbrlib
 {
     SamplerInfo::SamplerInfo() noexcept :

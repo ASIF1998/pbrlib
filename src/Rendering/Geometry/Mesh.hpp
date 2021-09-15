@@ -34,12 +34,12 @@ namespace pbrlib
 
         Count
     };
-    
+
     struct Mesh :
         public Component
     {
         friend class MeshAssimp;
-        
+
     public:
         /**
          * @struct Vertex.
@@ -95,7 +95,7 @@ namespace pbrlib
 
             inline Mesh     build()     const;
             inline PtrMesh  buildPtr()  const;
-            
+
         private:
             TVertexBufferBuilder    _vertex_buffer_builder;
             TIndexBufferBuilder     _index_buffer_builder;

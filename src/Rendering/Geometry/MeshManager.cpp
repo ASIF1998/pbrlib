@@ -32,7 +32,7 @@ namespace pbrlib
         optional<vector<PtrMesh>> meshes = _assimp_mesh_loader.load(path);
         auto& temp = meshes.value();
 
-        for(size_t i{0}; i < temp.size(); i++) {
+        for (size_t i{0}; i < temp.size(); i++) {
             _meshes.insert(make_pair(temp[i]->getName(), temp[i]));
         }
 

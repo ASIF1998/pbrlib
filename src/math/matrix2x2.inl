@@ -288,7 +288,6 @@ namespace pbrlib::math
             )
         );
 
-        
         auto m2 = _mm_mul_ps(
             _mm_shuffle_ps(
                 _m128_simd, 
@@ -345,7 +344,6 @@ namespace pbrlib::math
             )
         );
 
-        
         auto m2 = _mm_mul_ps(
             _mm_shuffle_ps(
                 _m128_simd, 
@@ -374,7 +372,7 @@ namespace pbrlib::math
     {
         return _array2x2[i];
     }
-    
+
     inline const float* Matrix2x2<float>::operator [] (size_t i) const
     {
         return _array2x2[i];
