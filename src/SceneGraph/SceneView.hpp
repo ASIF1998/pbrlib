@@ -17,34 +17,18 @@
 
 namespace pbrlib
 {
-    class 	IRenderer;
-    class   Window;
-    struct  PhysicalDevice;
-    class   DeviceQueue;
+    class IRenderer;
+    class Window;
+    class PBRLibResources;
 
-    using PtrIRenderer      = shared_ptr<IRenderer>;
-    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
-    using PtrWindow         = shared_ptr<Window>;
-    using PtrDeviceQueue    = shared_ptr<DeviceQueue>;
+    using PtrIRenderer          = shared_ptr<IRenderer>;
+    using PtrWindow             = shared_ptr<Window>;
+    using PtrPBRLibResources    = shared_ptr<PBRLibResources>; 
 
     class SceneView
     {
-    private:
-        struct VulkanResources
-        {
-        public:
-            VulkanResources();
-
-        public:
-            PtrInstance         ptr_instance;           //!< Указатель на экземпляр Vulkan'а.
-            PtrDevice           ptr_device;             //!< Указатель на логическое устройство (GPU).
-            PtrPhysicalDevice   ptr_physical_device;    //!< Указатель на физическое устройство (GPU).
-            PtrDeviceQueue      ptr_device_queue;       //!< Указатель на очередь устройства.
-            PtrCommandPool      ptr_command_pool;       //!< Указатель на командный пул.
-        };
-
     public:
-        SceneView(const string_view scene_name, const PtrWindow& ptr_window);
+        SceneView(const string_view scene_name, const PtrPBRLibResources& ptr_pbrlib_resources, const PtrWindow& ptr_window);
 
         Scene&              getScene()  noexcept;
         const Scene&        getScene()  const noexcept;
@@ -55,11 +39,10 @@ namespace pbrlib
         void drawScene(float delta_time);
 
     private:
-        static VulkanResources  _vulkan_resources; //!< Необходимые объекты Vulkan.
-
-        PtrIRenderer            _ptr_renderer;  //!< Указатель на визуализатор.
-        PtrWindow               _ptr_window;    //!< Указатель на окно.
-        Scene                   _scene;         //!< Сцена.
+        PtrPBRLibResources      _ptr_pbrlib_resources;
+        PtrIRenderer            _ptr_renderer;          //!< Указатель на визуализатор.
+        PtrWindow               _ptr_window;            //!< Указатель на окно.
+        Scene                   _scene;                 //!< Сцена.
     };
 }
 

@@ -26,9 +26,6 @@
 
 namespace pbrlib
 {
-    bool        Window::_is_init_SDL    = false;
-    uint32_t    Window::_num_window     = 0;
-
     Window::Window(
         const string_view   title, 
         int                 width, 
@@ -41,16 +38,6 @@ namespace pbrlib
         _ptr_swapchain  (nullptr),
         _title          (title)
     {
-        if (!_is_init_SDL) {
-            if (SDL_Init(SDL_INIT_EVERYTHING)) {
-                throw runtime_error(SDL_GetError());
-            }
-
-            _is_init_SDL = true;
-        }
-
-        _num_window++;
-
         _ptr_window = SDL_CreateWindow(
             title.data(), 
             pos_x, 
@@ -70,13 +57,7 @@ namespace pbrlib
 
     Window::~Window()
     {
-        _num_window--;
         SDL_DestroyWindow(_ptr_window);
-
-        if (!_num_window && _is_init_SDL) {
-            SDL_Quit();
-            _is_init_SDL = false;
-        }
     }
 
     tuple<int, int> Window::getExtent() const

@@ -189,9 +189,6 @@ namespace pbrlib
         SDL_Window*     _ptr_window;
         PtrSwapchain    _ptr_swapchain;
         string          _title;
-
-        static bool     _is_init_SDL;
-        static uint32_t _num_window;
     };
 }
 
