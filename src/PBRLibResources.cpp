@@ -7,11 +7,11 @@
 
 #include "PBRLibResources.hpp"
 
-#define PBRLIB_DEBUG_VULKAN 1
+#define PBRLIB_DEBUG_VULKAN 0
 
-/// FIXME: Проверить, есть ли в новой спецификации определение этого макроса.
-/// https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VK_KHR_portability_subset.html.
-#define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
+#ifndef VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME
+#   define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
+#endif
 
 namespace pbrlib
 {
