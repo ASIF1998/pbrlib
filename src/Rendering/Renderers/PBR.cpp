@@ -31,18 +31,18 @@ namespace pbrlib
         vector<VkDescriptorPoolSize> descriptor_pool_size;
         
         descriptor_pool_size.push_back({
-            .type               = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptorCount    = util::enumCast(NumDescriptors::UniformBuffer)
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            util::enumCast(NumDescriptors::UniformBuffer)
         });
         
         descriptor_pool_size.push_back({
-            .type               = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount    = util::enumCast(NumDescriptors::CombinedImageSampler)
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            util::enumCast(NumDescriptors::CombinedImageSampler)
         });
         
         descriptor_pool_size.push_back({
-            .type               = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .descriptorCount    = util::enumCast(NumDescriptors::StorageImage)
+            VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            util::enumCast(NumDescriptors::StorageImage)
         });
         
         uint32_t max_allocate_sets_count = 2;
@@ -156,9 +156,8 @@ namespace pbrlib
         uint32_t image_index = 0;
         
         VkSemaphore             semaphore_handle    = VK_NULL_HANDLE;
-        VkSemaphoreCreateInfo   semaphore_info      = { 
-            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO 
-        };
+        VkSemaphoreCreateInfo   semaphore_info      = { };
+        semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         
         assert(vkCreateSemaphore(_ptr_device->getDeviceHandle(), &semaphore_info, nullptr, &semaphore_handle) == VK_SUCCESS);
         
@@ -172,11 +171,11 @@ namespace pbrlib
         _ptr_command_buffer->begin();
 
         static VkImageSubresourceRange image_subresource_range {
-            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1
+            VK_IMAGE_ASPECT_COLOR_BIT,
+            0,
+            1,
+            0,
+            1
         };
 
         _ptr_command_buffer->imageMemoryBarrier(

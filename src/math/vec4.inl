@@ -67,19 +67,19 @@ namespace pbrlib::math
     template<typename Type>
     inline Vec4<Type> Vec4<Type>::operator + (const Vec4<Type>& v) const
     {
-        return {x + v.x, y + v.y, z + v.z, w + v.w};
+        return Vec4<Type>(x + v.x, y + v.y, z + v.z, w + v.w);
     }
 
     template<typename Type>
     inline Vec4<Type> Vec4<Type>::operator - (const Vec4<Type>& v) const
     {
-        return {x - v.x, y - v.y, z - v.z, w - v.w};
+        return Vec4<Type>(x - v.x, y - v.y, z - v.z, w - v.w);
     }
 
     template<typename Type>
     inline Vec4<Type> Vec4<Type>::operator * (Type s) const
     {
-        return {x * s, y * s, z * s, w * s};
+        return Vec4<Type>(x * s, y * s, z * s, w * s);
     }
 
     template<typename Type>
@@ -153,6 +153,7 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if (defined(__SSE__) || defined(__AVX2__))
     inline Vec4<float>::Vec4(float xyzw) noexcept :
         xyzw_simd(_mm_set1_ps(xyzw))
     {}
@@ -243,8 +244,10 @@ namespace pbrlib::math
     }
 
     inline float Vec4<float>::lengthSquared() const noexcept
-    {
-        auto r = _mm_mul_ps(xyzw_simd, xyzw_simd);
+    {        
+        float r[4];
+        _mm_store_ps(r, _mm_mul_ps(xyzw_simd, xyzw_simd));
+
         return r[0] + r[1] + r[2] + r[3];
     }
 
@@ -260,6 +263,7 @@ namespace pbrlib::math
         assert(l != static_cast<float>(0u));
         xyzw_simd = _mm_div_ps(xyzw_simd, _mm_set1_ps(l));
     }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<typename Type>
@@ -268,12 +272,16 @@ namespace pbrlib::math
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
     }
 
+#if (defined(__SSE__) || defined(__AVX2__))
     template<>
     inline float dot<float>(const Vec4<float> v1, const Vec4<float>& v2)
     {
-        auto r = _mm_mul_ps(v1.xyzw_simd, v2.xyzw_simd);
+        float r[4];
+        _mm_store_ps(r, _mm_mul_ps(v1.xyzw_simd, v2.xyzw_simd));
+
         return r[0] + r[1] + r[2] + r[3];
     }
+#endif
 
     template<typename Type>
     inline Vec4<Type> normalize(const Vec4<Type>& v)

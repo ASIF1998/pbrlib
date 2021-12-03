@@ -21,7 +21,7 @@
 
 namespace pbrlib
 {
-    class Mesh;
+    struct Mesh;
 
     using PtrMesh = shared_ptr<Mesh>;
 

@@ -7,6 +7,7 @@
 //
 
 #include <memory>
+#include <cassert>
 
 #include "vec2.hpp"
 
@@ -29,10 +30,13 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline constexpr Matrix2x2<Type>::Matrix2x2(Type v11, Type v12, Type v21, Type v22) :
+    inline constexpr Matrix2x2<Type>::Matrix2x2(
+        Type x0, Type y0,
+        Type x1, Type y1
+    ) :
         _array4 {
-            v11, v12,
-            v21, v22
+            x0, y0,
+            x1, y1
         }
     {}
 
@@ -87,10 +91,10 @@ namespace pbrlib::math
     inline Matrix2x2<Type> Matrix2x2<Type>::operator * (const Matrix2x2<Type>& mat) const
     {
         return {
-            _array2x2[0][0] * mat._array2x2[0][0] + _array2x2[0][1] * mat._array2x2[1][0],
-            _array2x2[0][0] * mat._array2x2[0][1] + _array2x2[0][1] * mat._array2x2[1][1],
-            _array2x2[1][0] * mat._array2x2[0][0] + _array2x2[1][1] * mat._array2x2[1][0],
-            _array2x2[1][0] * mat._array2x2[0][1] + _array2x2[1][1] * mat._array2x2[1][1]
+            _array2x2[0][0] * mat._array2x2[0][0] + _array2x2[1][0] * mat._array2x2[0][1],
+            _array2x2[0][0] * mat._array2x2[1][0] + _array2x2[1][0] * mat._array2x2[1][1],
+            _array2x2[0][1] * mat._array2x2[0][0] + _array2x2[1][1] * mat._array2x2[0][1],
+            _array2x2[0][1] * mat._array2x2[1][0] + _array2x2[1][1] * mat._array2x2[1][1]
         };
     }
 
@@ -109,8 +113,8 @@ namespace pbrlib::math
     inline Vec2<Type> Matrix2x2<Type>::operator * (const Vec2<Type>& v) const
     {
         return {
-            _array2x2[0][0] * v[0] + _array2x2[0][1] * v[1],
-            _array2x2[1][0] * v[0] + _array2x2[1][1] * v[1]
+            _array2x2[0][0] * v[0] + _array2x2[1][0] * v[1],
+            _array2x2[0][1] * v[0] + _array2x2[1][1] * v[1]
         };
     }
 
@@ -141,10 +145,10 @@ namespace pbrlib::math
     {
         auto temp (*this);
 
-        _array4[0] = temp._array2x2[0][0] * mat._array2x2[0][0] + temp._array2x2[0][1] * mat._array2x2[1][0];
-        _array4[1] = temp._array2x2[0][0] * mat._array2x2[0][1] + temp._array2x2[0][1] * mat._array2x2[1][1];
-        _array4[2] = temp._array2x2[1][0] * mat._array2x2[0][0] + temp._array2x2[1][1] * mat._array2x2[1][0];
-        _array4[3] = temp._array2x2[1][0] * mat._array2x2[0][1] + temp._array2x2[1][1] * mat._array2x2[1][1];
+        _array4[0] = temp._array2x2[0][0] * mat._array2x2[0][0] + _array2x2[1][0] * mat._array2x2[0][1];
+        _array4[1] = temp._array2x2[0][0] * mat._array2x2[1][0] + _array2x2[1][0] * mat._array2x2[1][1];
+        _array4[2] = temp._array2x2[0][1] * mat._array2x2[0][0] + _array2x2[1][1] * mat._array2x2[0][1];
+        _array4[3] = temp._array2x2[0][1] * mat._array2x2[1][0] + _array2x2[1][1] * mat._array2x2[1][1];
 
         return *this;
     }
@@ -222,6 +226,7 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if (defined(__SSE__) || defined(__AVX2__))
     inline constexpr Matrix2x2<float>::Matrix2x2() :
         _array4 {
             1.0f, 0.0f,
@@ -236,15 +241,18 @@ namespace pbrlib::math
         }
     {}
 
-    inline constexpr Matrix2x2<float>::Matrix2x2(float v11, float v12, float v21, float v22) noexcept :
-        _array4 {
-            v11, v12,
-            v21, v22
-        }
-    {}
-
     inline constexpr Matrix2x2<float>::Matrix2x2(const __m128& init_vec) noexcept :
         _m128_simd(init_vec)
+    {}
+
+    inline constexpr Matrix2x2<float>::Matrix2x2(
+        float x0, float y0,
+        float x1, float y1
+    ) noexcept :
+        _array4 {
+            x0, y0,
+            x1, y1
+        }
     {}
 
     inline Matrix2x2<float>::Matrix2x2(const float* ptr_data) 
@@ -279,12 +287,12 @@ namespace pbrlib::math
             _mm_shuffle_ps(
                 _m128_simd, 
                 _m128_simd, 
-                _MM_SHUFFLE(2, 2, 0, 0)
+                _MM_SHUFFLE(3, 3, 2, 2)
             ), 
             _mm_shuffle_ps(
                 mat._m128_simd, 
                 mat._m128_simd, 
-                _MM_SHUFFLE(1, 0, 1, 0)
+                _MM_SHUFFLE(3, 1, 3, 1)
             )
         );
 
@@ -292,12 +300,12 @@ namespace pbrlib::math
             _mm_shuffle_ps(
                 _m128_simd, 
                 _m128_simd, 
-                _MM_SHUFFLE(3, 3, 1, 1)
+                _MM_SHUFFLE(1, 1, 0, 0)
             ), 
             _mm_shuffle_ps(
                 mat._m128_simd, 
                 mat._m128_simd, 
-                _MM_SHUFFLE(3, 2, 3, 2)
+                _MM_SHUFFLE(2, 0, 2, 0)
             )
         );
 
@@ -312,8 +320,8 @@ namespace pbrlib::math
     inline Vec2<float> Matrix2x2<float>::operator * (const Vec2<float>& v) const
     {
         return {
-            _array2x2[0][0] * v[0] + _array2x2[0][1] * v[1],
-            _array2x2[1][0] * v[0] + _array2x2[1][1] * v[1]
+            _array2x2[0][0] * v[0] + _array2x2[1][0] * v[1],
+            _array2x2[0][1] * v[0] + _array2x2[1][1] * v[1]
         };
     }
 
@@ -331,16 +339,17 @@ namespace pbrlib::math
 
     inline Matrix2x2<float>& Matrix2x2<float>::operator *= (const Matrix2x2& mat)
     {
+
         auto m1 = _mm_mul_ps(
             _mm_shuffle_ps(
                 _m128_simd, 
                 _m128_simd, 
-                _MM_SHUFFLE(2, 2, 0, 0)
+                _MM_SHUFFLE(3, 3, 2, 2)
             ), 
             _mm_shuffle_ps(
                 mat._m128_simd, 
                 mat._m128_simd, 
-                _MM_SHUFFLE(1, 0, 1, 0)
+                _MM_SHUFFLE(3, 1, 3, 1)
             )
         );
 
@@ -348,12 +357,12 @@ namespace pbrlib::math
             _mm_shuffle_ps(
                 _m128_simd, 
                 _m128_simd, 
-                _MM_SHUFFLE(3, 3, 1, 1)
+                _MM_SHUFFLE(1, 1, 0, 0)
             ), 
             _mm_shuffle_ps(
                 mat._m128_simd, 
                 mat._m128_simd, 
-                _MM_SHUFFLE(3, 2, 3, 2)
+                _MM_SHUFFLE(2, 0, 2, 0)
             )
         );
 
@@ -420,6 +429,7 @@ namespace pbrlib::math
             );
         }
     }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<typename Type>

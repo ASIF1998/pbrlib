@@ -6,10 +6,10 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../../utils.hpp"
+
 #include "../../../src/Rendering/Cameras/PerspectiveCamera.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 
@@ -25,18 +25,17 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
     constexpr Vec3<float> pos   (0.0f, 0.0f, 0.00f);
     constexpr Vec3<float> up    (0.0f, 1.0f, 0.00f);
-    
-    constexpr Viewport viewport {
-        .x          = width / 2.0f,
-        .y          = height / 2.0f,
-        .width      = width,
-        .height     = height,
-        .minDepth   = 0.0f,
-        .maxDepth   = 1.0f
-    };
 
-    Transform r1 = Transform::lookAt(pos, eye, up);
-    Transform r2 = Transform::perspective(fovy, width / height, near, far);
+    Viewport viewport = { };
+    viewport.x          = width / 2.0f;
+    viewport.y          = height / 2.0f;
+    viewport.width      = width;
+    viewport.height     = height;
+    viewport.minDepth   = 0.0f;
+    viewport.maxDepth   = 1.0f;
+
+    Matrix4x4<float> look_at = Transform::lookAt(pos, eye, up).getMatrix();
+    Matrix4x4<float> perspective = Transform::perspective(fovy, width / height, near, far).getMatrix();
 
     PerspectiveCamera::Builder build_camera;
 
@@ -51,22 +50,24 @@ TEST(RenderingCameraPerspectiveCamera, Builder)
     
     PerspectiveCamera camera = build_camera.build();
 
-    EXPECT_EQ(width / height, camera.getAspect());
-    EXPECT_EQ(near, camera.getNearClipp());
-    EXPECT_EQ(far, camera.getFarClipp());
-    EXPECT_EQ(fovy, camera.getFovy());
-    EXPECT_EQ(eye, camera.getDirection());
-    EXPECT_EQ(pos, camera.getPosition());
-    EXPECT_EQ(r1, camera.getView());
-    EXPECT_EQ(r2, camera.getProjection());
-    EXPECT_EQ(r2 * r1, camera.getViewProjection());
+    pbrlib::testing::utils::equality(width / height, camera.getAspect());
+    pbrlib::testing::utils::equality(near, camera.getNearClipp());
+    pbrlib::testing::utils::equality(far, camera.getFarClipp());
+    pbrlib::testing::utils::equality(fovy, camera.getFovy());
+
+    pbrlib::testing::utils::equality(eye, camera.getDirection());
+    pbrlib::testing::utils::equality(pos, camera.getPosition());
     
-    EXPECT_EQ(viewport.x, camera.getViewport().x);
-    EXPECT_EQ(viewport.y, camera.getViewport().y);
-    EXPECT_EQ(viewport.width, camera.getViewport().width);
-    EXPECT_EQ(viewport.height, camera.getViewport().height);
-    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
-    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(look_at, camera.getView().getMatrix());
+    pbrlib::testing::utils::equality(perspective, camera.getProjection().getMatrix());
+    pbrlib::testing::utils::equality(perspective * look_at, camera.getViewProjection().getMatrix());
+
+    pbrlib::testing::utils::equality(viewport.x, camera.getViewport().x);
+    pbrlib::testing::utils::equality(viewport.y, camera.getViewport().y);
+    pbrlib::testing::utils::equality(viewport.width, camera.getViewport().width);
+    pbrlib::testing::utils::equality(viewport.height, camera.getViewport().height);
+    pbrlib::testing::utils::equality(viewport.minDepth, camera.getViewport().minDepth);
+    pbrlib::testing::utils::equality(viewport.maxDepth, camera.getViewport().maxDepth);
 }
 
 TEST(RenderingCameraPerspectiveCamera, Setters)
@@ -82,14 +83,13 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     Vec3<float> pos   (0.0f, 0.0f, 0.00f);
     Vec3<float> up    (0.0f, 1.0f, 0.00f);
 
-    Viewport viewport {
-        .x          = width / 2.0f,
-        .y          = height / 2.0f,
-        .width      = width,
-        .height     = height,
-        .minDepth   = 0.0f,
-        .maxDepth   = 1.0f
-    };
+    Viewport viewport = { };
+    viewport.x          = width / 2.0f;
+    viewport.y          = height / 2.0f;
+    viewport.width      = width;
+    viewport.height     = height;
+    viewport.minDepth   = 0.0f;
+    viewport.maxDepth   = 1.0f;
 
     PerspectiveCamera::Builder build_camera;
 
@@ -104,17 +104,19 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
 
     PerspectiveCamera camera = build_camera.build();
 
-
-    EXPECT_EQ(viewport.x, camera.getViewport().x);
-    EXPECT_EQ(viewport.y, camera.getViewport().y);
-    EXPECT_EQ(viewport.width, camera.getViewport().width);
-    EXPECT_EQ(viewport.height, camera.getViewport().height);
-    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
-    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(viewport.x, camera.getViewport().x);
+    pbrlib::testing::utils::equality(viewport.y, camera.getViewport().y);
+    pbrlib::testing::utils::equality(viewport.width, camera.getViewport().width);
+    pbrlib::testing::utils::equality(viewport.height, camera.getViewport().height);
+    pbrlib::testing::utils::equality(viewport.minDepth, camera.getViewport().minDepth);
+    pbrlib::testing::utils::equality(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(width / height, camera.getAspect());
     
-    EXPECT_EQ(Transform::lookAt(pos, eye, up), camera.getView());
-    EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
-    EXPECT_EQ(width / height, camera.getAspect());
+    Transform look_at       = Transform::lookAt(pos, eye, up).getMatrix();
+    Transform perspective   = Transform::perspective(fovy, width / height, near, far).getMatrix();
+    
+    pbrlib::testing::utils::equality(look_at.getMatrix(), camera.getView().getMatrix());
+    pbrlib::testing::utils::equality(perspective.getMatrix(), camera.getProjection().getMatrix());
 
     eye[0]  =   1.0f;
     pos[2]  -=  1.0f;
@@ -145,19 +147,21 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
         viewport.height,
         viewport.minDepth,
         viewport.maxDepth
-    );
-    
+    );    
 
-    EXPECT_EQ(viewport.x, camera.getViewport().x);
-    EXPECT_EQ(viewport.y, camera.getViewport().y);
-    EXPECT_EQ(viewport.width, camera.getViewport().width);
-    EXPECT_EQ(viewport.height, camera.getViewport().height);
-    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
-    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(viewport.x, camera.getViewport().x);
+    pbrlib::testing::utils::equality(viewport.y, camera.getViewport().y);
+    pbrlib::testing::utils::equality(viewport.width, camera.getViewport().width);
+    pbrlib::testing::utils::equality(viewport.height, camera.getViewport().height);
+    pbrlib::testing::utils::equality(viewport.minDepth, camera.getViewport().minDepth);
+    pbrlib::testing::utils::equality(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(width / height, camera.getAspect());
     
-    EXPECT_EQ(Transform::lookAt(pos, eye, up), camera.getView());
-    EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
-    EXPECT_EQ(width / height, camera.getAspect());
+    look_at     = Transform::lookAt(pos, eye, up);
+    perspective = Transform::perspective(fovy, width / height, near, far).getMatrix();
+
+    pbrlib::testing::utils::equality(look_at.getMatrix(), camera.getView().getMatrix());
+    pbrlib::testing::utils::equality(perspective.getMatrix(), camera.getProjection().getMatrix());
     
     fovy    -=  35.00f;
     width   =   800.0f;
@@ -171,16 +175,17 @@ TEST(RenderingCameraPerspectiveCamera, Setters)
     viewport.maxDepth   = 0.7000f;
     
     camera.setAspectAndFovy(width, height, fovy);
-    camera.setViewport(viewport);
-    
+    camera.setViewport(viewport);    
 
-    EXPECT_EQ(viewport.x, camera.getViewport().x);
-    EXPECT_EQ(viewport.y, camera.getViewport().y);
-    EXPECT_EQ(viewport.width, camera.getViewport().width);
-    EXPECT_EQ(viewport.height, camera.getViewport().height);
-    EXPECT_EQ(viewport.minDepth, camera.getViewport().minDepth);
-    EXPECT_EQ(viewport.maxDepth, camera.getViewport().maxDepth);
-    
-    EXPECT_EQ(Transform::perspective(fovy, width / height, near, far), camera.getProjection());
-    EXPECT_EQ(width / height, camera.getAspect());
+    pbrlib::testing::utils::equality(viewport.x, camera.getViewport().x);
+    pbrlib::testing::utils::equality(viewport.y, camera.getViewport().y);
+    pbrlib::testing::utils::equality(viewport.width, camera.getViewport().width);
+    pbrlib::testing::utils::equality(viewport.height, camera.getViewport().height);
+    pbrlib::testing::utils::equality(viewport.minDepth, camera.getViewport().minDepth);
+    pbrlib::testing::utils::equality(viewport.maxDepth, camera.getViewport().maxDepth);
+    pbrlib::testing::utils::equality(width / height, camera.getAspect());
+
+    perspective = Transform::perspective(fovy, width / height, near, far);
+
+    pbrlib::testing::utils::equality(perspective.getMatrix(), camera.getProjection().getMatrix());
 }

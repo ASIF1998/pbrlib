@@ -9,6 +9,12 @@
 #ifndef DirectionLightData_h
 #define DirectionLightData_h
 
+#ifdef __cplusplus
+#   include "../../../math/vec4.hpp"
+
+using vec4 = pbrlib::math::Vec4<float>;
+#endif
+
 struct DirectionLightData
 {
     vec4 direction_to_light;

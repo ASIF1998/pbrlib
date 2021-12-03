@@ -147,11 +147,10 @@ namespace pbrlib
             const PtrSampler&               ptr_sampler
         );
 
-        PtrGraphicsPipeline&         getPipeline()       noexcept;
-        const PtrGraphicsPipeline&   getPipeline()       const noexcept;
-        PtrDescriptorSet&            getDescriptorSet()  noexcept;
-        const PtrDescriptorSet&      getDescriptorSet()  const noexcept;
-
+        PtrGraphicsPipeline&        getPipeline()       noexcept;
+        const PtrGraphicsPipeline&  getPipeline()       const noexcept;
+        PtrDescriptorSet&           getDescriptorSet()  noexcept;
+        const PtrDescriptorSet&     getDescriptorSet()  const noexcept;
         const PtrFramebuffer&       getFramebuffer()    const noexcept;
 
         /**

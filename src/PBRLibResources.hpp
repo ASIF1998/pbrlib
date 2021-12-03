@@ -44,10 +44,10 @@ namespace pbrlib
         friend class SceneView;
 
     public:
-        inline PBRLibResources();
-        inline ~PBRLibResources();
+        PBRLibResources();
+        ~PBRLibResources();
 
-        static inline  PtrPBRLibResources init();
+        static  PtrPBRLibResources init();
 
     private:
         VulkanResources _vk_resources;

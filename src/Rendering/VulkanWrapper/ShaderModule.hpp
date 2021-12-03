@@ -17,8 +17,7 @@ namespace pbrlib
 
     using PtrShaderModule = shared_ptr<ShaderModule>;
 
-    class SpecializationInfo :
-        private VkSpecializationInfo
+    class SpecializationInfo
     {
     public:
         SpecializationInfo(
@@ -36,20 +35,23 @@ namespace pbrlib
         
         void addMapEntry(const void* ptr_data, size_t data_size, uint32_t constant_id);
 
-        uint8_t*                         getData()                           noexcept;
-        const uint8_t*                   getData()                           const noexcept;
-        VkSpecializationMapEntry*        getSpecializationMapEntries()       noexcept;
-        const VkSpecializationMapEntry*  getSpecializationMapEntries()       const noexcept;
-        size_t                           getDataSize()                       const noexcept;
-        size_t                           getSpecializationMapEntriesNum()    const noexcept;
-        size_t                           capacityData()                      const noexcept;
-        size_t                           capacitySpecializationMapEntries()  const noexcept;
+        const VkSpecializationInfo&         getSpecializationInfo()             const noexcept;
+        VkSpecializationInfo&               getSpecializationInfo()             noexcept;
+        uint8_t*                            getData()                           noexcept;
+        const uint8_t*                      getData()                           const noexcept;
+        VkSpecializationMapEntry*           getSpecializationMapEntries()       noexcept;
+        const VkSpecializationMapEntry*     getSpecializationMapEntries()       const noexcept;
+        size_t                              getDataSize()                       const noexcept;
+        size_t                              getSpecializationMapEntriesNum()    const noexcept;
+        size_t                              capacityData()                      const noexcept;
+        size_t                              capacitySpecializationMapEntries()  const noexcept;
 
     private:
         uint8_t*                    _ptr_data;
         VkSpecializationMapEntry*   _ptr_map_enties;
         size_t                      _current_byte_in_data;
         size_t                      _current_map_entry;
+        VkSpecializationInfo        _specialization_info;
     };
 
     class ShaderModule

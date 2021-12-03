@@ -18,6 +18,9 @@ using namespace std;
 namespace pbrlib
 {
     class Device;
+    class DeviceMemory;
+
+    using PtrDeviceMemory = unique_ptr<DeviceMemory>;
 
     enum class MapStatus
     {
@@ -84,6 +87,9 @@ namespace pbrlib
         PtrDevice&               getDevice()             noexcept;
         const PtrDevice&         getDevice()             const noexcept;
         VkDeviceSize             getSize()               const noexcept;
+
+        static PtrDeviceMemory make(const PtrDevice& ptr_device);
+        static PtrDeviceMemory make(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
 
     protected:
         PtrDevice       _ptr_device;

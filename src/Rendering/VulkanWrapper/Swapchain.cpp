@@ -65,49 +65,39 @@ namespace pbrlib
         VkSharingMode               sharing_mode
     )
     {
-        VkSwapchainCreateInfoKHR swapchain_info {
-            .sType                  = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-            .pNext                  = nullptr,
-            .flags                  = 0,
-            .surface                = _ptr_surface->getSurfaceHandle(),
-            .minImageCount          = _ptr_surface->getSurfaceCapabilities().maxImageCount,
-            .imageFormat            = _ptr_surface->getSurfaceFormat().format,
-            .imageColorSpace        = _ptr_surface->getSurfaceFormat().colorSpace,
-            .imageExtent            = _ptr_surface->getSurfaceCapabilities().currentExtent,
-            .imageArrayLayers       = 1,
-            .imageUsage             = _ptr_surface->getSurfaceCapabilities().supportedUsageFlags,
-            .imageSharingMode       = sharing_mode,
-            .queueFamilyIndexCount  = static_cast<uint32_t>(queue_family_indices.size()),
-            .pQueueFamilyIndices    = queue_family_indices.data(),
-            .preTransform           = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
-            .compositeAlpha         = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-            .presentMode            = VK_PRESENT_MODE_FIFO_KHR,
-            .clipped                = VK_TRUE,
-            .oldSwapchain           = VK_NULL_HANDLE
-        };
+        VkSwapchainCreateInfoKHR swapchain_info = { };
+        swapchain_info.sType                    = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        swapchain_info.surface                  = _ptr_surface->getSurfaceHandle();
+        swapchain_info.minImageCount            = _ptr_surface->getSurfaceCapabilities().maxImageCount;
+        swapchain_info.imageFormat              = _ptr_surface->getSurfaceFormat().format;
+        swapchain_info.imageColorSpace          = _ptr_surface->getSurfaceFormat().colorSpace;
+        swapchain_info.imageExtent              = _ptr_surface->getSurfaceCapabilities().currentExtent;
+        swapchain_info.imageArrayLayers         = 1;
+        swapchain_info.imageUsage               = _ptr_surface->getSurfaceCapabilities().supportedUsageFlags;
+        swapchain_info.imageSharingMode         = sharing_mode;
+        swapchain_info.queueFamilyIndexCount    = static_cast<uint32_t>(queue_family_indices.size());
+        swapchain_info.pQueueFamilyIndices      = queue_family_indices.data();
+        swapchain_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+        swapchain_info.compositeAlpha           = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        swapchain_info.presentMode              = VK_PRESENT_MODE_FIFO_KHR;
+        swapchain_info.clipped                  = VK_TRUE;
+        swapchain_info.oldSwapchain             = VK_NULL_HANDLE;
 
-        ImageInfo image_info {
-            .image_type     = VK_IMAGE_TYPE_2D,
-            .format         = swapchain_info.imageFormat,
-            .usage          = swapchain_info.imageUsage,
-            .num_samples    = VK_SAMPLE_COUNT_1_BIT,
-            .tiling         = VK_IMAGE_TILING_LINEAR,
-            .mip_levels     = 1,
-            .array_layers   = 1,
-            .image_extend = {
-                swapchain_info.imageExtent.width, 
-                swapchain_info.imageExtent.height, 
-                1
-            }
-        };
+        ImageInfo image_info = { };
+        image_info.image_type       = VK_IMAGE_TYPE_2D;
+        image_info.format           = swapchain_info.imageFormat;
+        image_info.usage            = swapchain_info.imageUsage;
+        image_info.num_samples      = VK_SAMPLE_COUNT_1_BIT;
+        image_info.tiling           = VK_IMAGE_TILING_LINEAR;
+        image_info.mip_levels       = 1;
+        image_info.image_extend     = {swapchain_info.imageExtent.width, swapchain_info.imageExtent.height, 1};
 
-        VkImageSubresourceRange image_subresource_range {
-            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1
-        };
+        VkImageSubresourceRange image_subresource_range = { };
+        image_subresource_range.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+        image_subresource_range.baseMipLevel    = 0;
+        image_subresource_range.levelCount      = 1;
+        image_subresource_range.baseArrayLayer  = 0;
+        image_subresource_range.layerCount      = 1;
 
         assert(vkCreateSwapchainKHR(
             ptr_device->getDeviceHandle(), 
@@ -183,7 +173,7 @@ namespace pbrlib
     }
 
     PtrSwapchain Swapchain::make(
-        const PtrDevice&   ptr_device,
+        const PtrDevice&            ptr_device,
         vector<uint32_t>            queue_family_indices,
         const shared_ptr<Surface>&  surface
     )
@@ -192,7 +182,7 @@ namespace pbrlib
     }
 
     PtrSwapchain Swapchain::make(
-        const PtrDevice&   ptr_device,
+        const PtrDevice&            ptr_device,
         uint32_t                    queue_family_index,
         const shared_ptr<Surface>&  surface
     )

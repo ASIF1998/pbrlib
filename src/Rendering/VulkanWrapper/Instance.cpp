@@ -108,26 +108,21 @@ namespace pbrlib
         const char* const*  ptr_extensions
     )
     {
-        VkApplicationInfo app_info {
-            .sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pNext              = nullptr,
-            .pApplicationName   = app_name.data(),
-            .applicationVersion = app_version,
-            .pEngineName        = "PBRLib",
-            .engineVersion      = EngineVersion,
-            .apiVersion         = VulkanVersion
-        };
+        VkApplicationInfo app_info = { };
+        app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        app_info.pApplicationName   = app_name.data();
+        app_info.apiVersion         = app_version;
+        app_info.pEngineName        = "PBRLib";
+        app_info.engineVersion      = EngineVersion;
+        app_info.apiVersion         = VulkanVersion;
 
-        VkInstanceCreateInfo instance_info {
-            .sType                      = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pNext                      = nullptr,
-            .flags                      = 0,
-            .pApplicationInfo           = &app_info,
-            .enabledLayerCount          = enabled_layer_count,
-            .ppEnabledLayerNames        = ptr_enable_layers,
-            .enabledExtensionCount      = enabled_extension_count,
-            .ppEnabledExtensionNames    = ptr_extensions
-        };
+        VkInstanceCreateInfo instance_info = { };
+        instance_info.sType                     = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        instance_info.pApplicationInfo          = &app_info;
+        instance_info.enabledLayerCount         = enabled_layer_count;
+        instance_info.ppEnabledLayerNames       = ptr_enable_layers;
+        instance_info.enabledExtensionCount     = enabled_extension_count;
+        instance_info.ppEnabledExtensionNames   = ptr_extensions;
 
         assert(vkCreateInstance(&instance_info, nullptr, &_instance_handle) == VK_SUCCESS);
         assert(_instance_handle != VK_NULL_HANDLE);

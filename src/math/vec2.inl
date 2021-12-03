@@ -45,19 +45,19 @@ namespace pbrlib::math
     template<typename Type>
     inline Vec2<Type> Vec2<Type>::operator + (const Vec2<Type>& v) const
     {
-        return {x + v.x, y + v.y};
+        return Vec2<Type>(x + v.x, y + v.y);
     }
 
     template<typename Type>
     inline Vec2<Type> Vec2<Type>::operator - (const Vec2<Type>& v) const
     {
-        return {x - v.x, y - v.y};
+        return Vec2<Type>(x - v.x, y - v.y);
     }
 
     template<typename Type>
     inline Vec2<Type> Vec2<Type>::operator * (Type s) const
     {
-        return {x * s, y * s};
+        return Vec2<Type>(x * s, y * s);
     }
 
     template<typename Type>
@@ -128,7 +128,7 @@ namespace pbrlib::math
         auto l = v.length();
         assert(l != static_cast<Type>(0));
 
-        return {v.x / l, v.y / l};
+        return Vec2<Type>(v.x / l, v.y / l);
     }
 
     template<typename Type>

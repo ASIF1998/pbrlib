@@ -30,10 +30,13 @@ namespace pbrlib
         _loaded_files.push_back(path.data());
 
         optional<vector<PtrMesh>> meshes = _assimp_mesh_loader.load(path);
-        auto& temp = meshes.value();
+        
+        if (meshes.has_value()) {
+            auto& temp = meshes.value();
 
-        for (size_t i{0}; i < temp.size(); i++) {
-            _meshes.insert(make_pair(temp[i]->getName(), temp[i]));
+            for (size_t i{0}; i < temp.size(); i++) {
+                _meshes.insert(make_pair(temp[i]->getName(), temp[i]));
+            }
         }
 
         return meshes;

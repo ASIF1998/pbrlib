@@ -33,16 +33,16 @@ namespace pbrlib::math
 
     template<typename Type>
     inline constexpr Matrix4x4<Type>::Matrix4x4(
-        Type v11, Type v12, Type v13, Type v14,
-        Type v21, Type v22, Type v23, Type v24,
-        Type v31, Type v32, Type v33, Type v34, 
-        Type v41, Type v42, Type v43, Type v44
+        Type x0, Type y0, Type z0, Type w0,
+        Type x1, Type y1, Type z1, Type w1,
+        Type x2, Type y2, Type z2, Type w2,
+        Type x3, Type y3, Type z3, Type w3
     ) :
         _array16 {
-            v11, v12, v13, v14,
-            v21, v22, v23, v24,
-            v31, v32, v33, v34,
-            v41, v42, v43, v44,
+            x0, y0, z0, w0,
+            x1, y1, z1, w1,
+            x2, y2, z2, w2,
+            x3, y3, z3, w3
         }
     {}
 
@@ -82,8 +82,8 @@ namespace pbrlib::math
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 16; i++) {
-            res._array16[i] = _array16[i] + mat._array16[i];
+        for (size_t i{0}; i < 4; ++i) {
+            res._vec_array[i] = _vec_array[i] + mat._vec_array[i]; 
         }
 
         return res;
@@ -94,8 +94,8 @@ namespace pbrlib::math
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 16; i++) {
-            res._array16[i] = _array16[i] - mat._array16[i];
+        for (size_t i{0}; i < 4; ++i) {
+            res._vec_array[i] = _vec_array[i] - mat._vec_array[i]; 
         }
 
         return res;
@@ -108,9 +108,9 @@ namespace pbrlib::math
 
         for (size_t i{0}; i < 4; i++) {
             for (size_t k{0}; k < 4; k++) {
-                auto v = _array4x4[i][k];
+                auto v = mat._array4x4[i][k];
                 for (size_t j{0}; j < 4; j++) {
-                    res._array4x4[i][j] += v * mat._array4x4[k][j];
+                    res._array4x4[i][j] += v * _array4x4[k][j];
                 }
             }
         }
@@ -123,8 +123,8 @@ namespace pbrlib::math
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 16; i++) {
-            res._array16[i] = _array16[i] * scal;
+        for (size_t i{0}; i < 4; i++) {
+            res._vec_array[i] = _vec_array[i] * scal;
         }
 
         return res;
@@ -136,10 +136,10 @@ namespace pbrlib::math
         Vec4<Type> res;
 
         for (size_t i{0}; i < 4; i++) {
-            res.x += _array4x4[0][i] * v[i];
-            res.y += _array4x4[1][i] * v[i];
-            res.z += _array4x4[2][i] * v[i];
-            res.w += _array4x4[3][i] * v[i];
+            res.x += _array4x4[i][0] * v[i];
+            res.y += _array4x4[i][1] * v[i];
+            res.z += _array4x4[i][2] * v[i];
+            res.w += _array4x4[i][3] * v[i];
         }
 
         return res;
@@ -148,8 +148,8 @@ namespace pbrlib::math
     template<typename Type>
     inline Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat)
     {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] += mat._array16[i];
+        for (size_t i{0}; i < 4; ++i) {
+            _vec_array[i] += mat._vec_array[i];
         }
 
         return *this;
@@ -158,8 +158,8 @@ namespace pbrlib::math
     template<typename Type>
     inline Matrix4x4<Type>& Matrix4x4<Type>::operator -= (const Matrix4x4<Type>& mat)
     {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] -= mat._array16[i];
+        for (size_t i{0}; i < 4; ++i) {
+            _vec_array[i] -= mat._vec_array[i];
         }
 
         return *this;
@@ -175,8 +175,8 @@ namespace pbrlib::math
     template<typename Type>
     inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (Type scal)
     {
-        for (size_t i{0}; i < 16; i++) {
-            _array16[i] *= scal;
+        for (size_t i{0}; i < 4; i++) {
+            _vec_array[i] *= scal;
         }
 
         return *this;
@@ -310,6 +310,7 @@ namespace pbrlib::math
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if defined(__AVX2__)
     inline constexpr Matrix4x4<float>::Matrix4x4() :
         _array16 {
             1.0f, 0.0f, 0.0f, 0.0f,
@@ -329,16 +330,16 @@ namespace pbrlib::math
     {}
 
     inline constexpr Matrix4x4<float>::Matrix4x4(
-        float v11, float v12, float v13, float v14,
-        float v21, float v22, float v23, float v24,
-        float v31, float v32, float v33, float v34,
-        float v41, float v42, float v43, float v44
+        float x0, float y0, float z0, float w0,
+        float x1, float y1, float z1, float w1,
+        float x2, float y2, float z2, float w2,
+        float x3, float y3, float z3, float w3
     ) :
         _array16 {
-            v11, v12, v13, v14,
-            v21, v22, v23, v24,
-            v31, v32, v33, v34,
-            v41, v42, v43, v44,
+            x0, y0, z0, w0,
+            x1, y1, z1, w1,
+            x2, y2, z2, w2,
+            x3, y3, z3, w3
         }
     {}
 
@@ -389,25 +390,25 @@ namespace pbrlib::math
     {
         Matrix4x4<float> res;
 
-        __m128 b00_vec = _mm_set1_ps(mat._m128_simd[0][0]);
-        __m128 b01_vec = _mm_set1_ps(mat._m128_simd[0][1]);
-        __m128 b02_vec = _mm_set1_ps(mat._m128_simd[0][2]);
-        __m128 b03_vec = _mm_set1_ps(mat._m128_simd[0][3]);
+        __m128 b00_vec = _mm_set1_ps(mat._array4x4[0][0]);
+        __m128 b01_vec = _mm_set1_ps(mat._array4x4[0][1]);
+        __m128 b02_vec = _mm_set1_ps(mat._array4x4[0][2]);
+        __m128 b03_vec = _mm_set1_ps(mat._array4x4[0][3]);
 
-        __m128 b10_vec = _mm_set1_ps(mat._m128_simd[1][0]);
-        __m128 b11_vec = _mm_set1_ps(mat._m128_simd[1][1]);
-        __m128 b12_vec = _mm_set1_ps(mat._m128_simd[1][2]);
-        __m128 b13_vec = _mm_set1_ps(mat._m128_simd[1][3]);
+        __m128 b10_vec = _mm_set1_ps(mat._array4x4[1][0]);
+        __m128 b11_vec = _mm_set1_ps(mat._array4x4[1][1]);
+        __m128 b12_vec = _mm_set1_ps(mat._array4x4[1][2]);
+        __m128 b13_vec = _mm_set1_ps(mat._array4x4[1][3]);
 
-        __m128 b20_vec = _mm_set1_ps(mat._m128_simd[2][0]);
-        __m128 b21_vec = _mm_set1_ps(mat._m128_simd[2][1]);
-        __m128 b22_vec = _mm_set1_ps(mat._m128_simd[2][2]);
-        __m128 b23_vec = _mm_set1_ps(mat._m128_simd[2][3]);
+        __m128 b20_vec = _mm_set1_ps(mat._array4x4[2][0]);
+        __m128 b21_vec = _mm_set1_ps(mat._array4x4[2][1]);
+        __m128 b22_vec = _mm_set1_ps(mat._array4x4[2][2]);
+        __m128 b23_vec = _mm_set1_ps(mat._array4x4[2][3]);
 
-        __m128 b30_vec = _mm_set1_ps(mat._m128_simd[3][0]);
-        __m128 b31_vec = _mm_set1_ps(mat._m128_simd[3][1]);
-        __m128 b32_vec = _mm_set1_ps(mat._m128_simd[3][2]);
-        __m128 b33_vec = _mm_set1_ps(mat._m128_simd[3][3]);
+        __m128 b30_vec = _mm_set1_ps(mat._array4x4[3][0]);
+        __m128 b31_vec = _mm_set1_ps(mat._array4x4[3][1]);
+        __m128 b32_vec = _mm_set1_ps(mat._array4x4[3][2]);
+        __m128 b33_vec = _mm_set1_ps(mat._array4x4[3][3]);
 
         res._m128_simd[0] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b00_vec), _mm_mul_ps(_m128_simd[1], b01_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b02_vec), _mm_mul_ps(_m128_simd[3], b03_vec)));
         res._m128_simd[1] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(_m128_simd[0], b10_vec), _mm_mul_ps(_m128_simd[1], b11_vec)), _mm_add_ps(_mm_mul_ps(_m128_simd[2], b12_vec), _mm_mul_ps(_m128_simd[3], b13_vec)));
@@ -434,36 +435,22 @@ namespace pbrlib::math
         res.xyzw_simd = _mm_mul_ps(
             _mm_setr_ps(
                 _array4x4[0][0], 
-                _array4x4[1][0], 
-                _array4x4[2][0], 
-                _array4x4[3][0]
+                _array4x4[0][1], 
+                _array4x4[0][2], 
+                _array4x4[0][3]
             ), 
-            _mm_set1_ps(v.xyzw_simd[0])
+            _mm_set1_ps(v.xyzw[0])
         );
 
         res.xyzw_simd = _mm_add_ps(
             _mm_mul_ps(
                 _mm_setr_ps(
-                    _array4x4[0][1], 
+                    _array4x4[1][0], 
                     _array4x4[1][1], 
-                    _array4x4[2][1], 
-                    _array4x4[3][1]
-                ), 
-                _mm_set1_ps(v.xyzw_simd[1])
-            ), 
-            res.xyzw_simd
-        );
-
-
-        res.xyzw_simd = _mm_add_ps(
-            _mm_mul_ps(
-                _mm_setr_ps(
-                    _array4x4[0][2], 
                     _array4x4[1][2], 
-                    _array4x4[2][2], 
-                    _array4x4[3][2]
+                    _array4x4[1][3]
                 ), 
-                _mm_set1_ps(v.xyzw_simd[2])
+                _mm_set1_ps(v.xyzw[1])
             ), 
             res.xyzw_simd
         );
@@ -471,17 +458,30 @@ namespace pbrlib::math
         res.xyzw_simd = _mm_add_ps(
             _mm_mul_ps(
                 _mm_setr_ps(
-                    _array4x4[0][3], 
-                    _array4x4[1][3], 
-                    _array4x4[2][3], 
+                    _array4x4[2][0], 
+                    _array4x4[2][1], 
+                    _array4x4[2][2], 
+                    _array4x4[2][3]
+                ), 
+                _mm_set1_ps(v.xyzw[2])
+            ), 
+            res.xyzw_simd
+        );
+
+        res.xyzw_simd = _mm_add_ps(
+            _mm_mul_ps(
+                _mm_setr_ps(
+                    _array4x4[3][0], 
+                    _array4x4[3][1], 
+                    _array4x4[3][2], 
                     _array4x4[3][3]
                 ), 
-                _mm_set1_ps(v.xyzw_simd[3])
+                _mm_set1_ps(v.xyzw[3])
             ), 
             res.xyzw_simd
         );
 
-        return res; 
+        return res;
     }
 
     inline Matrix4x4<float>& Matrix4x4<float>::operator += (const Matrix4x4<float>& mat) 
@@ -578,7 +578,7 @@ namespace pbrlib::math
         auto xmm1 = _mm_unpacklo_ps(_m128_simd[2], _m128_simd[3]);
         auto xmm2 = _mm_unpackhi_ps(_m128_simd[0], _m128_simd[1]);
         auto xmm3 = _mm_unpackhi_ps(_m128_simd[2], _m128_simd[3]);
-
+            
         _m128_simd[0] = _mm_movelh_ps(xmm0, xmm1);
         _m128_simd[1] = _mm_movehl_ps(xmm1, xmm0);
         _m128_simd[2] = _mm_movelh_ps(xmm2, xmm3);
@@ -587,36 +587,43 @@ namespace pbrlib::math
 
     inline void Matrix4x4<float>::inverse()
     {
+
         auto d = det();
 
         if (d != static_cast<float>(0u)) {
             __m128 s1, s2, s3, s4;
 
-            auto a = _mm_movelh_ps(_m128_simd[0], _m128_simd[1]);
-            auto b = _mm_movehl_ps(_m128_simd[1], _m128_simd[0]);
-            auto c = _mm_movelh_ps(_m128_simd[2], _m128_simd[3]);
-            auto d = _mm_movehl_ps(_m128_simd[3], _m128_simd[2]);
+            union
+            {
+                __m128 simd;
+                float vec[4];
+            } a, b, c, d, sm1, sm4;
 
-            float det_a = a[0] * a[3] - a[2] * a[1];
-            float det_d = d[0] * d[3] - d[2] * d[1];
+            a.simd = _mm_movelh_ps(_m128_simd[0], _m128_simd[1]);
+            b.simd = _mm_movehl_ps(_m128_simd[1], _m128_simd[0]);
+            c.simd = _mm_movelh_ps(_m128_simd[2], _m128_simd[3]);
+            d.simd = _mm_movehl_ps(_m128_simd[3], _m128_simd[2]);
+
+            float det_a = a.vec[0] * a.vec[3] - a.vec[2] * a.vec[1];
+            float det_d = d.vec[0] * d.vec[3] - d.vec[2] * d.vec[1];
 
             assert(det_a != static_cast<float>(0u) && det_d != static_cast<float>(0u));
 
-            auto adj_a = _mm_mul_ps(_mm_shuffle_ps(a, a, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
-            auto adj_d = _mm_mul_ps(_mm_shuffle_ps(d, d, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
+            auto adj_a = _mm_mul_ps(_mm_shuffle_ps(a.simd, a.simd, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
+            auto adj_d = _mm_mul_ps(_mm_shuffle_ps(d.simd, d.simd, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
 
             auto inv_a = _mm_mul_ps(adj_a, _mm_set1_ps(1.0f / det_a));
             auto inv_d = _mm_mul_ps(adj_d, _mm_set1_ps(1.0f / det_d));
 
-            s1 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(2, 2, 0, 0));
-            s2 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 3, 1, 1));
+            s1 = _mm_shuffle_ps(b.simd, b.simd, _MM_SHUFFLE(2, 2, 0, 0));
+            s2 = _mm_shuffle_ps(b.simd, b.simd, _MM_SHUFFLE(3, 3, 1, 1));
             s3 = _mm_shuffle_ps(inv_d, inv_d, _MM_SHUFFLE(1, 0, 1, 0));
             s4 = _mm_shuffle_ps(inv_d, inv_d, _MM_SHUFFLE(3, 2, 3, 2));
 
             auto b_mul_inv_d = _mm_add_ps(_mm_mul_ps(s1, s3), _mm_mul_ps(s2, s4));
 
-            s1 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(2, 2, 0, 0));
-            s2 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(3, 3, 1, 1));
+            s1 = _mm_shuffle_ps(c.simd, c.simd, _MM_SHUFFLE(2, 2, 0, 0));
+            s2 = _mm_shuffle_ps(c.simd, c.simd, _MM_SHUFFLE(3, 3, 1, 1));
             s3 = _mm_shuffle_ps(inv_a, inv_a, _MM_SHUFFLE(1, 0, 1, 0));
             s4 = _mm_shuffle_ps(inv_a, inv_a, _MM_SHUFFLE(3, 2, 3, 2));
 
@@ -624,28 +631,28 @@ namespace pbrlib::math
 
             s1 = _mm_shuffle_ps(b_mul_inv_d, b_mul_inv_d, _MM_SHUFFLE(2, 2, 0, 0));
             s2 = _mm_shuffle_ps(b_mul_inv_d, b_mul_inv_d, _MM_SHUFFLE(3, 3, 1, 1));
-            s3 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(1, 0, 1, 0));
-            s4 = _mm_shuffle_ps(c, c, _MM_SHUFFLE(3, 2, 3, 2));
+            s3 = _mm_shuffle_ps(c.simd, c.simd, _MM_SHUFFLE(1, 0, 1, 0));
+            s4 = _mm_shuffle_ps(c.simd, c.simd, _MM_SHUFFLE(3, 2, 3, 2));
 
             auto b_mul_inv_d_mul_c = _mm_add_ps(_mm_mul_ps(s1, s3), _mm_mul_ps(s2, s4));
 
             s1 = _mm_shuffle_ps(c_mul_inv_a, c_mul_inv_a, _MM_SHUFFLE(2, 2, 0, 0));
             s2 = _mm_shuffle_ps(c_mul_inv_a, c_mul_inv_a, _MM_SHUFFLE(3, 3, 1, 1));
-            s3 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(1, 0, 1, 0));
-            s4 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 2, 3, 2));
+            s3 = _mm_shuffle_ps(b.simd, b.simd, _MM_SHUFFLE(1, 0, 1, 0));
+            s4 = _mm_shuffle_ps(b.simd, b.simd, _MM_SHUFFLE(3, 2, 3, 2));
 
             auto c_mul_inv_a_mul_b = _mm_add_ps(_mm_mul_ps(s1, s3), _mm_mul_ps(s2, s4));
 
-            auto sm1 = _mm_sub_ps(a, b_mul_inv_d_mul_c);
-            auto sm4 = _mm_sub_ps(d, c_mul_inv_a_mul_b);
+            sm1.simd = _mm_sub_ps(a.simd, b_mul_inv_d_mul_c);
+            sm4.simd = _mm_sub_ps(d.simd, c_mul_inv_a_mul_b);
 
-            float det_sm1 = sm1[0] * sm1[3] - sm1[2] * sm1[1];
-            float det_sm4 = sm4[0] * sm4[3] - sm4[2] * sm4[1];
+            float det_sm1 = sm1.vec[0] * sm1.vec[3] - sm1.vec[2] * sm1.vec[1];
+            float det_sm4 = sm4.vec[0] * sm4.vec[3] - sm4.vec[2] * sm4.vec[1];
 
             assert(det_sm1 != static_cast<float>(0u) && det_sm4 != static_cast<float>(0u));
 
-            auto adj_sm1 = _mm_mul_ps(_mm_shuffle_ps(sm1, sm1, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
-            auto adj_sm4 = _mm_mul_ps(_mm_shuffle_ps(sm4, sm4, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
+            auto adj_sm1 = _mm_mul_ps(_mm_shuffle_ps(sm1.simd, sm1.simd, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
+            auto adj_sm4 = _mm_mul_ps(_mm_shuffle_ps(sm4.simd, sm4.simd, _MM_SHUFFLE(0, 2, 1, 3)), _mm_setr_ps(1, -1, -1, 1));
 
             auto x = _mm_mul_ps(adj_sm1, _mm_set1_ps(1.0f / det_sm1));
             auto w = _mm_mul_ps(adj_sm4, _mm_set1_ps(1.0f / det_sm4));
@@ -673,6 +680,7 @@ namespace pbrlib::math
             _m128_simd[3] = _mm_movehl_ps(w, z);
         }
     }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<typename Type>

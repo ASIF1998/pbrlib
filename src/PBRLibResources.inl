@@ -1,3 +1,10 @@
+//
+//  PBRLibResources.inl
+//  PBRLib
+//
+//  Created by Асиф Мамедов on 16.09.2021.
+//
+
 #include <stdexcept>
 
 using namespace std;
@@ -5,7 +12,7 @@ using namespace std;
 namespace pbrlib
 {
     inline PBRLibResources::PBRLibResources() :
-        _vk_resources ()
+        _vk_resources()
     {
         if (SDL_Init(SDL_INIT_EVERYTHING)) {
             throw runtime_error(SDL_GetError());

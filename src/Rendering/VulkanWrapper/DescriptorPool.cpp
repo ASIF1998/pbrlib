@@ -20,13 +20,12 @@ namespace pbrlib
         _ptr_device             (ptr_device),
         _descriptor_pool_handle (VK_NULL_HANDLE)
     {
-        VkDescriptorPoolCreateInfo descriptor_pool_create_info {
-            .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-            .flags          = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-            .maxSets        = max_sets,
-            .poolSizeCount  = static_cast<uint32_t>(descriptor_pool_sizes.size()),
-            .pPoolSizes     = descriptor_pool_sizes.data()
-        };
+        VkDescriptorPoolCreateInfo descriptor_pool_create_info = { };
+        descriptor_pool_create_info.sType           = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        descriptor_pool_create_info.flags           = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        descriptor_pool_create_info.maxSets         = max_sets;
+        descriptor_pool_create_info.poolSizeCount   = static_cast<uint32_t>(descriptor_pool_sizes.size());
+        descriptor_pool_create_info.pPoolSizes      = descriptor_pool_sizes.data();
 
         assert(vkCreateDescriptorPool(
             _ptr_device->getDeviceHandle(),
@@ -46,13 +45,12 @@ namespace pbrlib
         _ptr_device             (ptr_device),
         _descriptor_pool_handle (VK_NULL_HANDLE)
     {
-        VkDescriptorPoolCreateInfo descriptor_pool_create_info {
-            .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-            .flags          = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-            .maxSets        = max_sets,
-            .poolSizeCount  = 1,
-            .pPoolSizes     = &descriptor_pool_size
-        };
+        VkDescriptorPoolCreateInfo descriptor_pool_create_info = { };
+        descriptor_pool_create_info.sType           = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        descriptor_pool_create_info.flags           = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        descriptor_pool_create_info.maxSets         = max_sets;
+        descriptor_pool_create_info.poolSizeCount   = 1;
+        descriptor_pool_create_info.pPoolSizes      = &descriptor_pool_size;
 
         assert(vkCreateDescriptorPool(
             _ptr_device->getDeviceHandle(),

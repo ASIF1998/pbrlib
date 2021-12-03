@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/Memory/MemoryBlock.hpp"
 #include "../../src/Memory/MemoryArena.hpp"
@@ -14,7 +14,6 @@
 
 #include <vector>
 
-using namespace testing;
 using namespace pbrlib;
 using namespace std;
 
@@ -30,16 +29,16 @@ TEST(MemorySTLArenaLinearAllocator, Constructor)
     STLArenaLinearAllocator<int>    linear_allocator1 (ptr_memory_arena, size);
     STLArenaLinearAllocator<int>    linear_allocator2 (ptr_memory_arena, size);
 
-    EXPECT_NE(nullptr, linear_allocator1.getPtrMemory());
-    EXPECT_NE(nullptr, linear_allocator2.getPtrMemory());
+    pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(linear_allocator1.getPtrMemory()));
+    pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(linear_allocator2.getPtrMemory()));
 
-    EXPECT_EQ(size, linear_allocator1.max_size());
-    EXPECT_EQ(size, linear_allocator2.max_size());
+    pbrlib::testing::utils::equality(size, linear_allocator1.max_size());
+    pbrlib::testing::utils::equality(size, linear_allocator2.max_size());
 
-    EXPECT_EQ(linear_allocator1.getMemoryArena(), linear_allocator2.getMemoryArena());
-    EXPECT_EQ(linear_allocator1.getMemoryBlock(), linear_allocator2.getMemoryBlock());
+    pbrlib::testing::utils::equality(linear_allocator1.getMemoryArena(), linear_allocator2.getMemoryArena());
+    pbrlib::testing::utils::equality(linear_allocator1.getMemoryBlock(), linear_allocator2.getMemoryBlock());
 
-    EXPECT_EQ(linear_allocator1.getPtrMemory() + size, linear_allocator2.getPtrMemory());
+    pbrlib::testing::utils::equality(linear_allocator1.getPtrMemory() + size, linear_allocator2.getPtrMemory());
 }
 
 TEST(MemorySTLArenaLinearAllocator, AllocateAndDeallocate)
@@ -52,7 +51,7 @@ TEST(MemorySTLArenaLinearAllocator, AllocateAndDeallocate)
     int* ptr = linear_allocator.allocate(size);
 
     for (size_t i{0}; i < size; i++) {
-        EXPECT_EQ(&ptr[i], linear_allocator.getPtrMemory() + i);
+        pbrlib::testing::utils::equality(reinterpret_cast<size_t>(&ptr[i]), reinterpret_cast<size_t>(linear_allocator.getPtrMemory() + i));
     }
 
     linear_allocator.deallocate(ptr, size);
@@ -74,9 +73,9 @@ TEST(MemorySTLArenaLinearAllocator, UsingInSTLVector)
         tvec.push_back(i);
     }
 
-    EXPECT_EQ(size, tvec.size());
+    pbrlib::testing::utils::equality(size, tvec.size());
 
     for (Type i{0}; i < tvec.size(); i++) {
-        EXPECT_EQ(i, tvec[i]);
+        pbrlib::testing::utils::equality(i, tvec[i]);
     }
 }

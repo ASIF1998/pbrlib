@@ -22,50 +22,50 @@ namespace pbrlib
 
     inline void Mesh::mapVertexAttribBuffer() const
     {
-        _ptr_vertex_attrib_buffer->map();
+        _ptr_vertex_attrib_buffer->getDeviceMemory()->map();
     }
 
     inline void Mesh::unmapVertexAttribBuffer() const
     {
-        _ptr_vertex_attrib_buffer->unmap();
+        _ptr_vertex_attrib_buffer->getDeviceMemory()->unmap();
     }
 
     inline void Mesh::mapIndexBuffer() const
     {
-        _ptr_index_buffer->map();
+        _ptr_index_buffer->getDeviceMemory()->map();
     }
 
     inline void Mesh::unmapIndexBuffer() const
     {
-        _ptr_index_buffer->unmap();
+        _ptr_index_buffer->getDeviceMemory()->unmap();
     }
 
     template<MeshAttribute Attrib>
     inline auto& Mesh::getAttribute(size_t i)
     {
-        assert(_ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_vertex_attrib_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED);
 
         if constexpr (Attrib == MeshAttribute::Position) {
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::UV) {
             size_t offset_to_uv = offsetof(VertexAttrib, uv);
 
             return *reinterpret_cast<Vec2<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Normal) {
             size_t offset_to_normal = offsetof(VertexAttrib, normal);
 
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Tangent) {
             size_t offset_to_tangent = offsetof(VertexAttrib, tangent);
 
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
             );
         }
     }
@@ -73,38 +73,38 @@ namespace pbrlib
     template<MeshAttribute Attrib>
     inline const auto& Mesh::getAttribute(size_t i) const
     {
-        assert(_ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_vertex_attrib_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED);
 
         if constexpr (Attrib == MeshAttribute::Position) {
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::UV) {
             size_t offset_to_uv = offsetof(VertexAttrib, uv);
 
             return *reinterpret_cast<Vec2<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_uv + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Normal) {
             size_t offset_to_normal = offsetof(VertexAttrib, normal);
 
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_normal + _stride * i
             );
         } else if constexpr (Attrib == MeshAttribute::Tangent) {
             size_t offset_to_tangent = offsetof(VertexAttrib, tangent);
 
             return *reinterpret_cast<Vec3<float>*>(
-                _ptr_vertex_attrib_buffer->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
+                _ptr_vertex_attrib_buffer->getDeviceMemory()->getData() + _vertex_attrib_buffer_offset + offset_to_tangent + _stride * i
             );
         }
     }
 
     inline uint32_t Mesh::getIndex(size_t i) const
     {
-        assert(_ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_index_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED);
         assert(i < _num_indices);
-        return *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getData() + _index_buffer_offset) + i);
+        return *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getDeviceMemory()->getData() + _index_buffer_offset) + i);
     }
 
     inline PtrBuffer& Mesh::getIndexBuffer() noexcept
@@ -179,10 +179,10 @@ namespace pbrlib
 
     inline void Mesh::setIndex(size_t i, uint32_t val)
     {
-        assert(_ptr_index_buffer->getMapStatus() == MapStatus::MAPPED);
+        assert(_ptr_index_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED);
         assert(i < _num_indices);
 
-        *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getData() + _index_buffer_offset) + i) = val;
+        *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getDeviceMemory()->getData() + _index_buffer_offset) + i) = val;
     }
 
     inline void Mesh::setIndexBuffer(const PtrBuffer& ptr_buffer)
@@ -214,19 +214,19 @@ namespace pbrlib
             throw invalid_argument("Выход за границу памяти.");
         }
 
-        bool is_maped = _ptr_index_buffer->getMapStatus() == MapStatus::MAPPED;
+        bool is_mapped = _ptr_index_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED;
 
-        if (!is_maped) {
-            _ptr_index_buffer->map();
+        if (!is_mapped) {
+            _ptr_index_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr     = _ptr_index_buffer->getData();
+        uint8_t*    ptr     = _ptr_index_buffer->getDeviceMemory()->getData();
         size_t      size    = std::min(static_cast<size_t>(_ptr_index_buffer->getSize()), sizeof(uint32_t) * ib.size());
 
         memcpy(ptr, ib.data(), size);
 
-        if (!is_maped) {
-            _ptr_index_buffer->unmap();
+        if (!is_mapped) {
+            _ptr_index_buffer->getDeviceMemory()->unmap();
         }
     }
 
@@ -236,19 +236,19 @@ namespace pbrlib
             throw invalid_argument("Выход за границу памяти.");
         }
 
-        bool is_maped = _ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED;
+        bool is_mapped = _ptr_vertex_attrib_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED;
 
-        if (!is_maped) {
-            _ptr_vertex_attrib_buffer->map();
+        if (!is_mapped) {
+            _ptr_vertex_attrib_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr     = _ptr_vertex_attrib_buffer->getData();
+        uint8_t*    ptr     = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
         size_t      size    = std::min(static_cast<size_t>(_ptr_vertex_attrib_buffer->getSize()), sizeof(uint32_t) * vb.size());
 
         memcpy(ptr, vb.data(), size);
 
-        if (!is_maped) {
-            _ptr_vertex_attrib_buffer->unmap();
+        if (!is_mapped) {
+            _ptr_vertex_attrib_buffer->getDeviceMemory()->unmap();
         }
     }
 
@@ -274,13 +274,13 @@ namespace pbrlib
 
     inline void Mesh::copyIndexBuffer(vector<uint32_t>& ib)
     {
-        bool is_maped = _ptr_index_buffer->getMapStatus() == MapStatus::MAPPED;
+        bool is_mapped = _ptr_index_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED;
 
-        if (!is_maped) {
-            _ptr_index_buffer->map();
+        if (!is_mapped) {
+            _ptr_index_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr_data    = _ptr_index_buffer->getData();
+        uint8_t*    ptr_data    = _ptr_index_buffer->getDeviceMemory()->getData();
         size_t      size        = _ptr_index_buffer->getSize();
 
         if (size_t num_ind = size / sizeof(uint32_t); num_ind != ib.size()) {
@@ -289,8 +289,8 @@ namespace pbrlib
 
         memcpy(ib.data(), ptr_data, size);
 
-        if (!is_maped) {
-            _ptr_index_buffer->unmap();
+        if (!is_mapped) {
+            _ptr_index_buffer->getDeviceMemory()->unmap();
         }
     }
 
@@ -301,13 +301,13 @@ namespace pbrlib
 
     inline void Mesh::copyVertexBuffer(vector<Mesh::VertexAttrib>& vb)
     {
-        bool is_maped = _ptr_vertex_attrib_buffer->getMapStatus() == MapStatus::MAPPED;
+        bool is_mapped = _ptr_vertex_attrib_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED;
 
-        if (!is_maped) {
-            _ptr_vertex_attrib_buffer->map();
+        if (!is_mapped) {
+            _ptr_vertex_attrib_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr_data    = _ptr_vertex_attrib_buffer->getData();
+        uint8_t*    ptr_data    = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
         size_t      size        = _ptr_vertex_attrib_buffer->getSize();
 
         if (size_t num_vert = size / sizeof(VertexAttrib); num_vert != vb.size()) {
@@ -316,8 +316,8 @@ namespace pbrlib
 
         memcpy(vb.data(), ptr_data, size);
 
-        if (!is_maped) {
-            _ptr_vertex_attrib_buffer->unmap();
+        if (!is_mapped) {
+            _ptr_vertex_attrib_buffer->getDeviceMemory()->unmap();
         }
     }
 

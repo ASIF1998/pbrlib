@@ -99,12 +99,13 @@ namespace pbrlib
                     tangent.z = ptr_ai_mesh->mTangents[j].z;
                 }
 
-                asset->vert_attr.addData({
-                    position,
-                    uv,
-                    normal,
-                    tangent
-                });
+                MeshAssimp::VertAttrib vert_attr = { };
+                vert_attr.position  = position;
+                vert_attr.normal    = normal;
+                vert_attr.tangent   = tangent;
+                vert_attr.uv        = uv;
+
+                asset->vert_attr.pushBack(vert_attr);
             }
 
             for (size_t j{0}; j < ptr_ai_mesh->mNumFaces; j++) {

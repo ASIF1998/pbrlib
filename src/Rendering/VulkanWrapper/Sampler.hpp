@@ -21,8 +21,7 @@ namespace pbrlib
      * @class SamplerInfo.
      * @brief Класс предназначенный для хранения информации о выборке.
     */
-    class SamplerInfo :
-        private VkSamplerCreateInfo
+    class SamplerInfo
     {
     public:
         SamplerInfo() noexcept;
@@ -89,9 +88,9 @@ namespace pbrlib
         /**
          * @brief Метод устанавливающий максимальный уровень анизотропии.
          * 
-         * @param max_anosotropy максимальный уровень анизотропии.
+         * @param max_anisotropy максимальный уровень анизотропии.
         */
-        void setMaxAnisotropy(float max_anosotropy) noexcept;
+        void setMaxAnisotropy(float max_anisotropy) noexcept;
 
         /**
          * @brief Метод включающий режим для выполнения операции сравнения.
@@ -133,23 +132,28 @@ namespace pbrlib
         */
         void unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept;
 
-        VkFilter             getMagFilter()              const noexcept;
-        VkFilter             getMinFilter()              const noexcept;
-        VkSamplerMipmapMode  getMipmapMode()             const noexcept;
-        VkBool32             anisotropyEnable()          const noexcept;
-        float                getMaxAnisotropy()          const noexcept;
-        VkBool32             compareEnable()             const noexcept;
-        VkCompareOp          getCompareOp()              const noexcept;
-        float                getMinLod()                 const noexcept;
-        float                getMaxLod()                 const noexcept;
-        VkBorderColor        getBorderColor()            const noexcept;
-        VkBool32             unnormalizedCoordinates()   const noexcept;
+        const VkSamplerCreateInfo&  getSamplerCreateInfo()      const noexcept;
+        VkSamplerCreateInfo&        getSamplerCreateInfo()      noexcept; 
+        VkFilter                    getMagFilter()              const noexcept;
+        VkFilter                    getMinFilter()              const noexcept;
+        VkSamplerMipmapMode         getMipmapMode()             const noexcept;
+        VkBool32                    anisotropyEnable()          const noexcept;
+        float                       getMaxAnisotropy()          const noexcept;
+        VkBool32                    compareEnable()             const noexcept;
+        VkCompareOp                 getCompareOp()              const noexcept;
+        float                       getMinLod()                 const noexcept;
+        float                       getMaxLod()                 const noexcept;
+        VkBorderColor               getBorderColor()            const noexcept;
+        VkBool32                    unnormalizedCoordinates()   const noexcept;
+
+    private:
+        VkSamplerCreateInfo _sampler_ci;
     };  
 
     class Sampler
     {
     public:
-        class Builder:
+        class Builder :
             public SamplerInfo
         {
         public:

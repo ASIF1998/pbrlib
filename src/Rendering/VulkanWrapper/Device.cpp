@@ -106,18 +106,14 @@ namespace pbrlib
             }
         }
 
-        VkDeviceCreateInfo device_info {
-            .sType                      = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .pNext                      = nullptr,
-            .flags                      = 0,
-            .queueCreateInfoCount       = static_cast<uint32_t>(queue_infos.size()),
-            .pQueueCreateInfos          = queue_infos.data(),
-            .enabledLayerCount          = enabled_layer_count,
-            .ppEnabledLayerNames        = ptr_enabled_layers,
-            .enabledExtensionCount      = enabled_extension_count,
-            .ppEnabledExtensionNames    = ptr_extensions,
-            .pEnabledFeatures           = nullptr
-        };
+        VkDeviceCreateInfo device_info = { };
+        device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        device_info.queueCreateInfoCount    = static_cast<uint32_t>(queue_infos.size());
+        device_info.pQueueCreateInfos       = queue_infos.data();
+        device_info.enabledLayerCount       = enabled_layer_count;
+        device_info.ppEnabledLayerNames     = ptr_enabled_layers;
+        device_info.enabledExtensionCount   = enabled_extension_count;
+        device_info.ppEnabledExtensionNames = ptr_extensions;
 
         assert(vkCreateDevice(
             physical_device.physical_device_handle, 

@@ -23,12 +23,11 @@ namespace pbrlib
         _ptr_descriptor_set_layout  (ptr_descriptor_set_layout),
         _descriptor_set_handle      (VK_NULL_HANDLE)
     {
-        VkDescriptorSetAllocateInfo descriptor_set_allocate_info {
-            .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-            .descriptorPool     = ptr_descriptor_pool->getDescriptorPoolHandle(),
-            .descriptorSetCount = 1,
-            .pSetLayouts        = &_ptr_descriptor_set_layout->getDescriptorSetLayoutHandle()
-        };
+        VkDescriptorSetAllocateInfo descriptor_set_allocate_info = { };
+        descriptor_set_allocate_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        descriptor_set_allocate_info.descriptorPool     = ptr_descriptor_pool->getDescriptorPoolHandle();
+        descriptor_set_allocate_info.descriptorSetCount = 1;
+        descriptor_set_allocate_info.pSetLayouts        = &_ptr_descriptor_set_layout->getDescriptorSetLayoutHandle();
 
         assert(vkAllocateDescriptorSets(
             getDevice()->getDeviceHandle(),
@@ -102,21 +101,19 @@ namespace pbrlib
         VkDescriptorType    descriptor_type
     ) const
     {
-        VkDescriptorImageInfo descriptor_image_info {
-            .sampler        = sampler.getSamplerHandle(),
-            .imageView      = image_view.getImageViewHandle(),
-            .imageLayout    = image_layout
-        };
+        VkDescriptorImageInfo descriptor_image_info = { };
+        descriptor_image_info.sampler       = sampler.getSamplerHandle();
+        descriptor_image_info.imageView     = image_view.getImageViewHandle();
+        descriptor_image_info.imageLayout   = image_layout;
 
-        VkWriteDescriptorSet write_descriptor_set {
-            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dstSet             = _descriptor_set_handle,
-            .dstBinding         = binding,     
-            .dstArrayElement    = 0,
-            .descriptorCount    = 1,
-            .descriptorType     = descriptor_type,
-            .pImageInfo         = &descriptor_image_info
-        };
+        VkWriteDescriptorSet write_descriptor_set = { };
+        write_descriptor_set.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_descriptor_set.dstSet             = _descriptor_set_handle;
+        write_descriptor_set.dstBinding         = binding;
+        write_descriptor_set.dstArrayElement    = 0;
+        write_descriptor_set.descriptorCount    = 1;
+        write_descriptor_set.descriptorType     = descriptor_type;
+        write_descriptor_set.pImageInfo         = &descriptor_image_info;
 
         vkUpdateDescriptorSets(
             getDevice()->getDeviceHandle(),
@@ -132,21 +129,19 @@ namespace pbrlib
         VkDescriptorType    descriptor_type
     ) const
     {
-        VkDescriptorImageInfo descriptor_image_info {
-            .sampler        = VK_NULL_HANDLE,
-            .imageView      = image_view.getImageViewHandle(),
-            .imageLayout    = image_layout
-        };
+        VkDescriptorImageInfo descriptor_image_info = { };
+        descriptor_image_info.sampler       = VK_NULL_HANDLE;
+        descriptor_image_info.imageView     = image_view.getImageViewHandle();
+        descriptor_image_info.imageLayout   = image_layout;
 
-        VkWriteDescriptorSet write_descriptor_set {
-            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dstSet             = _descriptor_set_handle,
-            .dstBinding         = binding,     
-            .dstArrayElement    = 0,
-            .descriptorCount    = 1,
-            .descriptorType     = descriptor_type,
-            .pImageInfo         = &descriptor_image_info
-        };
+        VkWriteDescriptorSet write_descriptor_set = { };
+        write_descriptor_set.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_descriptor_set.dstSet             = _descriptor_set_handle;
+        write_descriptor_set.dstBinding         = binding;
+        write_descriptor_set.dstArrayElement    = 0;
+        write_descriptor_set.descriptorCount    = 1;
+        write_descriptor_set.descriptorType     = descriptor_type;
+        write_descriptor_set.pImageInfo         = &descriptor_image_info;
 
         vkUpdateDescriptorSets(
             getDevice()->getDeviceHandle(),
@@ -163,21 +158,19 @@ namespace pbrlib
         VkDescriptorType    descriptor_type
     ) const
     {
-        VkDescriptorBufferInfo descriptor_buffer_info {
-            .buffer = buffer.getBufferHandle(),
-            .offset = offset,
-            .range  = range
-        };
+        VkDescriptorBufferInfo descriptor_buffer_info = { };
+        descriptor_buffer_info.buffer   = buffer.getBufferHandle();
+        descriptor_buffer_info.offset   = offset;
+        descriptor_buffer_info.range    = range;
 
-        VkWriteDescriptorSet write_descriptor_set {
-            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dstSet             = _descriptor_set_handle,
-            .dstBinding         = binding,     
-            .dstArrayElement    = 0,
-            .descriptorCount    = 1,
-            .descriptorType     = descriptor_type,
-            .pBufferInfo        = &descriptor_buffer_info
-        };
+        VkWriteDescriptorSet write_descriptor_set = { };
+        write_descriptor_set.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_descriptor_set.dstSet             = _descriptor_set_handle;
+        write_descriptor_set.dstBinding         = binding;
+        write_descriptor_set.dstArrayElement    = 0;
+        write_descriptor_set.descriptorCount    = 1;
+        write_descriptor_set.descriptorType     = descriptor_type;
+        write_descriptor_set.pBufferInfo        = &descriptor_buffer_info;
 
         vkUpdateDescriptorSets(
             getDevice()->getDeviceHandle(),

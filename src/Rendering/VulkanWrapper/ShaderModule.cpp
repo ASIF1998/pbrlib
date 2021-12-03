@@ -15,42 +15,44 @@ namespace pbrlib
     SpecializationInfo::SpecializationInfo(
         size_t size_data,
         size_t num_map_entires
-    ) :
-        VkSpecializationInfo {
-            .mapEntryCount = static_cast<uint32_t>(num_map_entires),
-            .dataSize = size_data
-        },
-        _ptr_data               (new uint8_t                    [size_data]),
-        _ptr_map_enties         (new VkSpecializationMapEntry   [num_map_entires]),
-        _current_byte_in_data   (0),
-        _current_map_entry      (0)
-    {
-        VkSpecializationInfo::pData         = static_cast<void*>(_ptr_data);
-        VkSpecializationInfo::pMapEntries   = _ptr_map_enties;
+    )
+    {        
+        _specialization_info = { };
+        _specialization_info.mapEntryCount = static_cast<uint32_t>(num_map_entires);
+        _specialization_info.dataSize      = size_data;
+
+        _ptr_data               = new uint8_t[size_data];
+        _ptr_map_enties         = new VkSpecializationMapEntry [num_map_entires];
+        _current_byte_in_data   = 0;
+        _current_map_entry      = 0;
+
+        _specialization_info.pData          = static_cast<void*>(_ptr_data);
+        _specialization_info.pMapEntries    = _ptr_map_enties;
     }
 
     SpecializationInfo::SpecializationInfo(SpecializationInfo&& specialization_info) :
         _ptr_data       (nullptr),
         _ptr_map_enties (nullptr)
     {
-        swap(_ptr_data,         specialization_info._ptr_data);
-        swap(_ptr_map_enties,   specialization_info._ptr_map_enties);
+        swap(_ptr_data, specialization_info._ptr_data);
+        swap(_ptr_map_enties, specialization_info._ptr_map_enties);
 
-        memcpy(this, &specialization_info, sizeof(VkSpecializationInfo));
+        memcpy(&_specialization_info, &specialization_info._specialization_info, sizeof(VkSpecializationInfo));
     }
 
-    SpecializationInfo::SpecializationInfo(const SpecializationInfo& specialization_info) : 
-        VkSpecializationInfo {
-            .mapEntryCount = static_cast<uint32_t>(specialization_info.mapEntryCount),
-            .dataSize = specialization_info.dataSize
-        },
-        _ptr_data               (new uint8_t                    [specialization_info.dataSize]),
-        _ptr_map_enties         (new VkSpecializationMapEntry   [specialization_info.mapEntryCount]),
-        _current_byte_in_data   (specialization_info._current_byte_in_data),
-        _current_map_entry      (specialization_info._current_map_entry)
+    SpecializationInfo::SpecializationInfo(const SpecializationInfo& specialization_info)
     {
-        VkSpecializationInfo::pData         = static_cast<void*>(_ptr_data);
-        VkSpecializationInfo::pMapEntries   = _ptr_map_enties;
+        _specialization_info = { };
+        _specialization_info.mapEntryCount = static_cast<uint32_t>(specialization_info._specialization_info.mapEntryCount);
+        _specialization_info.dataSize      = specialization_info._specialization_info.dataSize;
+
+        _ptr_data               = new uint8_t [specialization_info._specialization_info.dataSize];
+        _ptr_map_enties         = new VkSpecializationMapEntry [specialization_info._specialization_info.mapEntryCount];
+        _current_byte_in_data   = specialization_info._current_byte_in_data;
+        _current_map_entry      = specialization_info._current_map_entry;
+
+        _specialization_info.pData         = static_cast<void*>(_ptr_data);
+        _specialization_info.pMapEntries   = _ptr_map_enties;
     }
 
     SpecializationInfo::~SpecializationInfo()
@@ -66,19 +68,29 @@ namespace pbrlib
 
     void SpecializationInfo::addMapEntry(const void* ptr_data, size_t data_size, uint32_t constant_id)
     {
-        assert(VkSpecializationInfo::dataSize >= _current_byte_in_data + data_size &&
-               VkSpecializationInfo::mapEntryCount > _current_map_entry);
+        assert(_specialization_info.dataSize >= _current_byte_in_data + data_size &&
+               _specialization_info.mapEntryCount > _current_map_entry);
 
         _ptr_map_enties[_current_map_entry] = {
-            .constantID = constant_id,
-            .offset     = static_cast<uint32_t>(_current_byte_in_data),
-            .size       = data_size
+            constant_id,
+            static_cast<uint32_t>(_current_byte_in_data),
+            data_size
         };
 
         memcpy(_ptr_data + _current_byte_in_data, ptr_data, data_size);
 
         _current_byte_in_data += data_size;
         _current_map_entry++;
+    }
+
+    const VkSpecializationInfo& SpecializationInfo::getSpecializationInfo() const noexcept
+    {
+        return _specialization_info;
+    }
+
+    VkSpecializationInfo& SpecializationInfo::getSpecializationInfo() noexcept
+    {
+        return _specialization_info;
     }
 
     uint8_t* SpecializationInfo::getData() noexcept
@@ -113,12 +125,12 @@ namespace pbrlib
 
     size_t SpecializationInfo::capacityData() const noexcept
     {
-        return VkSpecializationInfo::dataSize;
+        return _specialization_info.dataSize;
     }
 
     size_t SpecializationInfo::capacitySpecializationMapEntries() const noexcept
     {
-        return VkSpecializationInfo::mapEntryCount;
+        return _specialization_info.mapEntryCount;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,13 +147,10 @@ namespace pbrlib
         _specialization_info    (specialization_info_size_data, specialization_info_num_map_entires),
         _shader_handle          (VK_NULL_HANDLE)
     {
-        VkShaderModuleCreateInfo shader_info {
-            .sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-            .pNext      = nullptr,
-            .flags      = 0,
-            .codeSize   = shader_code_size,
-            .pCode      = ptr_shader_code
-        };
+        VkShaderModuleCreateInfo shader_info = { };
+        shader_info.sType       = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        shader_info.codeSize    = shader_code_size;
+        shader_info.pCode       = ptr_shader_code;
 
         assert(vkCreateShaderModule(
             _ptr_device->getDeviceHandle(), 

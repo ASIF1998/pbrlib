@@ -9,6 +9,12 @@
 #ifndef SpotLightData_h
 #define SpotLightData_h
 
+#ifdef __cplusplus
+#   include "../../../math/vec4.hpp"
+
+using vec4 = pbrlib::math::Vec4<float>;
+#endif
+
 struct SpotLightData
 {
     vec4 position_and_inner_radius;

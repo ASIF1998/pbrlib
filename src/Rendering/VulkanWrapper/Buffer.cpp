@@ -19,21 +19,22 @@ namespace pbrlib
         uint32_t            memory_type_index, 
         uint32_t            queue_family_index
     ) :
-        DeviceMemory            (ptr_device, size, memory_type_index),
         _buffer_handle          (VK_NULL_HANDLE),
         _usage                  (usage),
-        _queue_family_indicies  (1)
+        _queue_family_indicies  (1),
+        _ptr_device             (ptr_device),
+        _ptr_device_memory      (nullptr),
+        _size                   (size)
     {
         _queue_family_indicies[0] = queue_family_index;
-        
-        VkBufferCreateInfo buffer_info {
-            .sType                  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size                   = size,
-            .usage                  = usage,
-            .sharingMode            = VK_SHARING_MODE_EXCLUSIVE,
-            .queueFamilyIndexCount  = 1,
-            .pQueueFamilyIndices    = &queue_family_index
-        };
+
+        VkBufferCreateInfo buffer_info = { };
+        buffer_info.sType                   = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.size                    = _size;
+        buffer_info.usage                   = usage;
+        buffer_info.sharingMode             = VK_SHARING_MODE_EXCLUSIVE;
+        buffer_info.queueFamilyIndexCount   = 1;
+        buffer_info.pQueueFamilyIndices     = &queue_family_index;
 
         assert(vkCreateBuffer(
             _ptr_device->getDeviceHandle(), 
@@ -44,10 +45,15 @@ namespace pbrlib
 
         assert(_buffer_handle != VK_NULL_HANDLE);
 
+        VkMemoryRequirements buffer_mr = { };
+        vkGetBufferMemoryRequirements(_ptr_device->getDeviceHandle(), _buffer_handle, &buffer_mr);
+
+        _ptr_device_memory = DeviceMemory::make(_ptr_device, buffer_mr.size, memory_type_index);
+
         assert(vkBindBufferMemory(
             _ptr_device->getDeviceHandle(), 
             _buffer_handle, 
-            _device_memory_handle, 
+            _ptr_device_memory->getDeviceMemoryHandle(),
             0
         ) == VK_SUCCESS);
     }
@@ -59,21 +65,20 @@ namespace pbrlib
         uint32_t            memory_type_index, 
         vector<uint32_t>    queue_family_indices
     ) :
-        DeviceMemory            (ptr_device, size, memory_type_index),
         _buffer_handle          (VK_NULL_HANDLE),
         _usage                  (usage),
-        _queue_family_indicies  (queue_family_indices)
-    {   
-        VkBufferCreateInfo buffer_info {
-            .sType                  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .pNext                  = nullptr,
-            .flags                  = 0,
-            .size                   = size,
-            .usage                  = usage,
-            .sharingMode            = VK_SHARING_MODE_CONCURRENT,
-            .queueFamilyIndexCount  = static_cast<uint32_t>(queue_family_indices.size()),
-            .pQueueFamilyIndices    = queue_family_indices.data()
-        };
+        _queue_family_indicies  (queue_family_indices),
+        _ptr_device             (ptr_device),
+        _ptr_device_memory      (nullptr),
+        _size                   (size)
+    {
+        VkBufferCreateInfo buffer_info = { };
+        buffer_info.sType                   = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.size                    = _size;
+        buffer_info.usage                   = usage;
+        buffer_info.sharingMode             = VK_SHARING_MODE_CONCURRENT;
+        buffer_info.queueFamilyIndexCount   = static_cast<uint32_t>(queue_family_indices.size());
+        buffer_info.pQueueFamilyIndices     = queue_family_indices.data();
 
         assert(vkCreateBuffer(
             _ptr_device->getDeviceHandle(), 
@@ -84,20 +89,28 @@ namespace pbrlib
 
         assert(_buffer_handle != VK_NULL_HANDLE);
 
+        VkMemoryRequirements buffer_mr = { };
+        vkGetBufferMemoryRequirements(_ptr_device->getDeviceHandle(), _buffer_handle, &buffer_mr);
+
+        _ptr_device_memory = DeviceMemory::make(_ptr_device, buffer_mr.size, memory_type_index);
+
         assert(vkBindBufferMemory(
             _ptr_device->getDeviceHandle(), 
             _buffer_handle, 
-            _device_memory_handle, 
+            _ptr_device_memory->getDeviceMemoryHandle(),
             0
         ) == VK_SUCCESS);
     }
 
     Buffer::Buffer(Buffer&& buffer) :
-        DeviceMemory            (move(buffer)),
         _buffer_handle          (VK_NULL_HANDLE),
         _usage                  (buffer._usage),
-        _queue_family_indicies  (move(buffer._queue_family_indicies))
+        _queue_family_indicies  (move(buffer._queue_family_indicies)),
+        _ptr_device             (buffer._ptr_device),
+        _ptr_device_memory      (nullptr),
+        _size                   (buffer._size)
     {
+        swap(_ptr_device_memory, buffer._ptr_device_memory);
         swap(_buffer_handle, buffer._buffer_handle);
     }
 
@@ -111,5 +124,30 @@ namespace pbrlib
     const VkBuffer& Buffer::getBufferHandle() const noexcept
     {
         return _buffer_handle;
+    }
+
+    PtrDevice& Buffer::getDevice() noexcept
+    {
+        return _ptr_device;
+    }
+
+    const PtrDevice& Buffer::getDevice() const noexcept
+    {
+        return _ptr_device;
+    }
+
+    PtrDeviceMemory& Buffer::getDeviceMemory() noexcept
+    {
+        return _ptr_device_memory;
+    }
+
+    const PtrDeviceMemory& Buffer::getDeviceMemory() const noexcept
+    {
+        return _ptr_device_memory;
+    }
+
+    VkDeviceSize Buffer::getSize() const noexcept
+    {
+        return _size;
     }
 }

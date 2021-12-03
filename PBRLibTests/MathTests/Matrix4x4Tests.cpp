@@ -6,12 +6,11 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/math/matrix4x4.hpp"
 #include "../../src/math/vec4.hpp"
 
-using namespace testing;
 using namespace pbrlib::math;
 
 TEST(MathMatrix4x4, Constructor)
@@ -47,23 +46,9 @@ TEST(MathMatrix4x4, Constructor)
         8, 6, 3, 1
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r1[i * 4 + j], m1[i][j]);
-        }
-    }
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r2[i * 4 + j], m2[i][j]);
-        }
-    }
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r3[i * 4 + j], m3[i][j]);
-        }
-    }
+    pbrlib::testing::utils::equality(m1, r1);
+    pbrlib::testing::utils::equality(m2, r2);
+    pbrlib::testing::utils::equality(m3, r3);
 }
 
 TEST(MathMatrix4x4, ConstructorTypeFloat)
@@ -99,23 +84,9 @@ TEST(MathMatrix4x4, ConstructorTypeFloat)
         23.8f, 2.46f, 3.53f, 13.4f
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r1[i * 4 + j], m1[i][j]);
-        }
-    }
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r2[i * 4 + j], m2[i][j]);
-        }
-    }
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r3[i * 4 + j], m3[i][j]);
-        }
-    }
+    pbrlib::testing::utils::equality(m1, r1);
+    pbrlib::testing::utils::equality(m2, r2);
+    pbrlib::testing::utils::equality(m3, r3);
 }
 
 TEST(MathMatrix4x4, EqualAndNotEqual)
@@ -134,11 +105,11 @@ TEST(MathMatrix4x4, EqualAndNotEqual)
         1, 5, 6, 4
     };
 
-    EXPECT_TRUE(m1 == m2);
+    pbrlib::testing::utils::thisTrue(m1 == m2);
 
     m2.at(2, 3) = 23;
 
-    EXPECT_TRUE(m1 != m2);
+    pbrlib::testing::utils::thisTrue(m1 != m2);
 }
 
 TEST(MathMatrix4x4, EqualAndNotEqualTypeFloat)
@@ -157,11 +128,11 @@ TEST(MathMatrix4x4, EqualAndNotEqualTypeFloat)
         23.8f, 2.46f, 3.53f, 13.4f
     };
 
-    EXPECT_TRUE(m1 == m2);
+    pbrlib::testing::utils::thisTrue(m1 == m2);
 
     m2.at(2, 3) = 23.23f;
 
-    EXPECT_TRUE(m1 != m2);
+    pbrlib::testing::utils::thisTrue(m1 != m2);
 }
 
 TEST(MathMatrix4x4, AdditionAndSubtraction)
@@ -171,53 +142,20 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
 
     Matrix4x4<short> res = m1 + m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(60, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<short>(60), res);
 
     res = m1 - m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(-14, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<short>(-14), res);
 
-    res = m1;
+    res =   m1;
+    res +=  m2;
 
-    res += m2;
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(60, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<short>(60), res);
 
     res -= m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(23, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<short>(23), res);
 }
 
 TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
@@ -227,53 +165,20 @@ TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
 
     Matrix4x4<float> res = m1 + m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(60.0f, res[i][j]);
-            } else {
-                EXPECT_EQ(0.0f, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<float>(60.0f), res);
 
     res = m1 - m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(-14, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<float>(-14.0f), res);
 
-    res = m1;
+    res =   m1;
+    res +=  m2;
 
-    res += m2;
-
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(60, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<float>(60.0f), res);
 
     res -= m2;
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
-            if (i == j) {
-                EXPECT_EQ(23, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }   
+    pbrlib::testing::utils::equality(Matrix4x4<float>(23.0f), res);
 }
 
 TEST(MathMatrix4x4, ScalarMultiplication)
@@ -283,27 +188,11 @@ TEST(MathMatrix4x4, ScalarMultiplication)
 
     Matrix4x4<int> res = m * s;
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
-            if (i == j) {
-                EXPECT_EQ(32, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<int>(32), res);
 
     res *= s;
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
-            if (i == j) {
-                EXPECT_EQ(64, res[i][j]);
-            } else {
-                EXPECT_EQ(0, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<int>(64), res);
 }
 
 TEST(MathMatrix4x4, ScalarMultiplicationTypeFloat)
@@ -313,43 +202,27 @@ TEST(MathMatrix4x4, ScalarMultiplicationTypeFloat)
 
     Matrix4x4<float> res = m * s;
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
-            if (i == j) {
-                EXPECT_EQ(33.0f, res[i][j]);
-            } else {
-                EXPECT_EQ(0.0f, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<float>(33.0f), res);
 
     res *= s;
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
-            if (i == j) {
-                EXPECT_EQ(66.0f, res[i][j]);
-            } else {
-                EXPECT_EQ(0.0f, res[i][j]);
-            }
-        }
-    }
+    pbrlib::testing::utils::equality(Matrix4x4<float>(66.0f), res);
 }
 
 TEST(MathMatrix4x4, MatrixMultiplication)
 {
     constexpr Matrix4x4<int> m1 {
-        1, 2, 3, 4,
-        5, 4, 6, 3,
-        5, 4, 6, 2,
-        7, 6, 4, 2
-    };
-
-    constexpr Matrix4x4<int> m2 {
         6, 4, 5, 3, 
         5, 3, 2, 5,
         7, 5, 3, 2,
         3, 5, 2, 1
+    };
+
+    constexpr Matrix4x4<int> m2 {
+        1, 2, 3, 4,
+        5, 4, 6, 3,
+        5, 4, 6, 2,
+        7, 6, 4, 2
     };
 
     Matrix4x4<int> r1 = m1 * m2;
@@ -361,12 +234,12 @@ TEST(MathMatrix4x4, MatrixMultiplication)
         106, 76, 63, 61
     };
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 
     r1 =     m1;
     r1 *=    m2;
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 }
 
 TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
@@ -394,12 +267,12 @@ TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
         45.0000000f, 40.0000000f, 55.0000000f, 33.0000000f
     };
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 
     r1 =     m1;
     r1 *=    m2;
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 }
 
 TEST(MathMatrix4x4, MatrixAndVectorMultiplication)
@@ -412,11 +285,11 @@ TEST(MathMatrix4x4, MatrixAndVectorMultiplication)
     };
 
     constexpr Vec4<int> v   (2, 1, 3, 4);
-    constexpr Vec4<int> r2  (29, 44, 40, 40);
+    constexpr Vec4<int> r1  (50, 44, 46, 25);
 
-    Vec4<int> r1 = m * v;
+    Vec4<int> r2 = m * v;
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 }
 
 TEST(MathMatrix4x4, MatrixAndVectorMultiplicationTypeFloat)
@@ -429,11 +302,11 @@ TEST(MathMatrix4x4, MatrixAndVectorMultiplicationTypeFloat)
     };
 
     constexpr Vec4<float> v     (2.2f, 23.14f, 3.34f, 4.04f);
-    constexpr Vec4<float> r2    (74.66f, 135.72f, 131.68f, 175.68f);
+    constexpr Vec4<float> r1    (162.879990f, 134.559998f, 181.639999f, 92.9800034f);
 
-    Vec4<float> r1 = m * v;
+    Vec4<float> r2 = m * v;
 
-    EXPECT_EQ(r1, r2);
+    pbrlib::testing::utils::equality(r1, r2);
 }
 
 TEST(MathMatrix4x4, AccessToElement)
@@ -454,13 +327,13 @@ TEST(MathMatrix4x4, AccessToElement)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r[i * 4 + j], m[i][j]);
+            pbrlib::testing::utils::equality(r[i * 4 + j], m[i][j]);
         }
     }
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r[i * 4 + j], m.at(i, j));
+            pbrlib::testing::utils::equality(r[i * 4 + j], m.at(i, j));
         }
     }
 }
@@ -483,13 +356,13 @@ TEST(MathMatrix4x4, AccessToElementTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r[i * 4 + j], m[i][j]);
+            pbrlib::testing::utils::equality(r[i * 4 + j], m[i][j]);
         }
     }
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            EXPECT_EQ(r[i * 4 + j], m.at(i, j));
+            pbrlib::testing::utils::equality(r[i * 4 + j], m.at(i, j));
         }
     }
 }
@@ -505,7 +378,7 @@ TEST(MathMatrix4x4, Determinant)
 
     constexpr int r = 30;
 
-    EXPECT_EQ(r, m.det());
+    pbrlib::testing::utils::equality(r, m.det());
 }
 
 TEST(MathMatrix4x4, DeterminantTypeFloat)
@@ -519,7 +392,7 @@ TEST(MathMatrix4x4, DeterminantTypeFloat)
 
     constexpr float r = 1614.28f;
 
-    EXPECT_EQ(r, m.det());
+    pbrlib::testing::utils::equality(r, m.det());
 }
 
 TEST(MathMatrix4x4, Transpose)
@@ -531,18 +404,18 @@ TEST(MathMatrix4x4, Transpose)
         7, 6, 4, 2
     };
 
-    constexpr Matrix4x4<int> r1 {
+    constexpr Matrix4x4<int> r {
         1, 5, 5, 7, 
         2, 4, 4, 6, 
         3, 6, 6, 4, 
         4, 3, 2, 2
     };
 
-    Matrix4x4<int> r2 = transpose(m);
+    pbrlib::testing::utils::equality(r, transpose(m));
 
-    EXPECT_EQ(r1, r2);
     m.transpose();
-    EXPECT_EQ(r1, m);
+
+    pbrlib::testing::utils::equality(r, m);
 }
 
 TEST(MathMatrix4x4, TransposeTypeFloat)
@@ -554,18 +427,18 @@ TEST(MathMatrix4x4, TransposeTypeFloat)
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    constexpr Matrix4x4<float> r1 {
+    constexpr Matrix4x4<float> r {
         1.0f, 5.0f, 5.0f, 7.0f, 
         2.0f, 4.0f, 4.0f, 6.0f, 
         3.0f, 6.0f, 6.0f, 4.0f, 
         4.0f, 3.0f, 2.0f, 2.0f
     };
 
-    Matrix4x4<float> r2 = transpose(m);
+    pbrlib::testing::utils::equality(r, transpose(m));
 
-    EXPECT_EQ(r1, r2);
     m.transpose();
-    EXPECT_EQ(r1, m);
+
+    pbrlib::testing::utils::equality(r, m);
 }
 
 TEST(MathMatrix4x4, Inverse)
@@ -584,8 +457,8 @@ TEST(MathMatrix4x4, Inverse)
         -3, 3, -2, 2
     };
 
-    EXPECT_EQ(r, inverse(m));
-}   
+    pbrlib::testing::utils::equality(r, inverse(m));
+}
 
 TEST(MathMatrix4x4, InverseTypeFloat)
 {
@@ -602,7 +475,6 @@ TEST(MathMatrix4x4, InverseTypeFloat)
         3.999994280f, -4.076917650f, 3.923071620f, -2.99999619f,
         -2.99999619f, 3.1538419700f, -2.84615016f, 1.999997380f
     };
-    
 
-    EXPECT_EQ(r, inverse(m));
+    pbrlib::testing::utils::equality(r, inverse(m));
 }

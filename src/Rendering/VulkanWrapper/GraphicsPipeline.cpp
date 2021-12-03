@@ -20,76 +20,70 @@ namespace pbrlib
         size_t num_vertex_biding_descriptions,
         size_t num_vertex_attribute_descriptions
     ) :
-        VkPipelineVertexInputStateCreateInfo {
-            .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .vertexBindingDescriptionCount      = static_cast<uint32_t>(num_vertex_biding_descriptions),
-            .vertexAttributeDescriptionCount    = static_cast<uint32_t>(num_vertex_attribute_descriptions),
-        },
         _ptr_vertex_biding_descriptions     (new VkVertexInputBindingDescription[num_vertex_biding_descriptions]),
         _ptr_vertex_attribute_descriptions  (new VkVertexInputAttributeDescription [num_vertex_attribute_descriptions]),
         _curent_vertex_biding_description   (0),
         _curent_vertex_attribute_description(0)
     {
-        VkPipelineVertexInputStateCreateInfo::pVertexBindingDescriptions    = _ptr_vertex_biding_descriptions;
-        VkPipelineVertexInputStateCreateInfo::pVertexAttributeDescriptions  = _ptr_vertex_attribute_descriptions;
+        _pipeline_vertex_input_state_ci = { };
+        _pipeline_vertex_input_state_ci.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount   = static_cast<uint32_t>(num_vertex_biding_descriptions);
+        _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount = static_cast<uint32_t>(num_vertex_attribute_descriptions);
+        _pipeline_vertex_input_state_ci.pVertexBindingDescriptions      = _ptr_vertex_biding_descriptions;
+        _pipeline_vertex_input_state_ci.pVertexAttributeDescriptions    = _ptr_vertex_attribute_descriptions;
     }
 
     VertexInputState::VertexInputState(VertexInputState&& vertex_input_state) :
-        VkPipelineVertexInputStateCreateInfo {
-            .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .vertexBindingDescriptionCount      = vertex_input_state.vertexBindingDescriptionCount,
-            .vertexAttributeDescriptionCount    = vertex_input_state.vertexAttributeDescriptionCount
-        },
-        _ptr_vertex_biding_descriptions     (nullptr),
-        _ptr_vertex_attribute_descriptions  (nullptr),
-        _curent_vertex_biding_description   (vertex_input_state._curent_vertex_biding_description),
-        _curent_vertex_attribute_description(vertex_input_state._curent_vertex_attribute_description)
+        _ptr_vertex_biding_descriptions         (nullptr),
+        _ptr_vertex_attribute_descriptions      (nullptr),
+        _curent_vertex_biding_description       (vertex_input_state._curent_vertex_biding_description),
+        _curent_vertex_attribute_description    (vertex_input_state._curent_vertex_attribute_description)
     {
-        swap(VkPipelineVertexInputStateCreateInfo::pVertexBindingDescriptions,      vertex_input_state.pVertexBindingDescriptions);
-        swap(VkPipelineVertexInputStateCreateInfo::pVertexAttributeDescriptions,    vertex_input_state.pVertexAttributeDescriptions);
-        swap(_ptr_vertex_biding_descriptions,                                       vertex_input_state._ptr_vertex_biding_descriptions);
-        swap(_ptr_vertex_attribute_descriptions,                                    vertex_input_state._ptr_vertex_attribute_descriptions);
+        _pipeline_vertex_input_state_ci = { };
+        _pipeline_vertex_input_state_ci.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount   = vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount;
+        _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount = vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount;
+
+        swap(_pipeline_vertex_input_state_ci.pVertexBindingDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexBindingDescriptions);
+        swap(_pipeline_vertex_input_state_ci.pVertexAttributeDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexAttributeDescriptions);
+        swap(_ptr_vertex_biding_descriptions, vertex_input_state._ptr_vertex_biding_descriptions);
+        swap(_ptr_vertex_attribute_descriptions, vertex_input_state._ptr_vertex_attribute_descriptions);
         
-        vertex_input_state.vertexBindingDescriptionCount    = 0;
-        vertex_input_state.vertexAttributeDescriptionCount  = 0;
+        vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount    = 0;
+        vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount  = 0;
     }
 
     VertexInputState::VertexInputState(const VertexInputState& vertex_input_state) :
-        VkPipelineVertexInputStateCreateInfo {
-            .sType                              = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .pNext                              = nullptr,
-            .flags                              = 0,
-            .vertexBindingDescriptionCount      = vertex_input_state.vertexBindingDescriptionCount,
-            .pVertexBindingDescriptions         = nullptr,
-            .vertexAttributeDescriptionCount    = vertex_input_state.vertexAttributeDescriptionCount,
-            .pVertexAttributeDescriptions       = nullptr
-        },
-        _ptr_vertex_biding_descriptions     (new VkVertexInputBindingDescription[vertex_input_state.vertexBindingDescriptionCount]),
-        _ptr_vertex_attribute_descriptions  (new VkVertexInputAttributeDescription [vertex_input_state.vertexAttributeDescriptionCount]),
-        _curent_vertex_biding_description   (vertex_input_state._curent_vertex_biding_description),
-        _curent_vertex_attribute_description(vertex_input_state._curent_vertex_attribute_description)
+        _ptr_vertex_biding_descriptions         (new VkVertexInputBindingDescription[vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount]),
+        _ptr_vertex_attribute_descriptions      (new VkVertexInputAttributeDescription [vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount]),
+        _curent_vertex_biding_description       (vertex_input_state._curent_vertex_biding_description),
+        _curent_vertex_attribute_description    (vertex_input_state._curent_vertex_attribute_description)
     {
+        _pipeline_vertex_input_state_ci = { };
+        _pipeline_vertex_input_state_ci.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount   = vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount;
+        _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount = vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount;
+
         memcpy(_ptr_vertex_biding_descriptions,
                vertex_input_state._ptr_vertex_biding_descriptions,
-               vertex_input_state.vertexBindingDescriptionCount * sizeof(VkVertexInputBindingDescription));
+               vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount * sizeof(VkVertexInputBindingDescription));
         
         memcpy(_ptr_vertex_attribute_descriptions,
                vertex_input_state._ptr_vertex_attribute_descriptions,
-               vertex_input_state.vertexAttributeDescriptionCount * sizeof(VkVertexInputAttributeDescription));
+               vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount * sizeof(VkVertexInputAttributeDescription));
         
-        VkPipelineVertexInputStateCreateInfo::pVertexBindingDescriptions    = _ptr_vertex_biding_descriptions;
-        VkPipelineVertexInputStateCreateInfo::pVertexAttributeDescriptions  = _ptr_vertex_attribute_descriptions;
+        _pipeline_vertex_input_state_ci.pVertexBindingDescriptions      = _ptr_vertex_biding_descriptions;
+        _pipeline_vertex_input_state_ci.pVertexAttributeDescriptions    = _ptr_vertex_attribute_descriptions;
     }
 
     void VertexInputState::addVertexInputBindingDescription(uint32_t binding, uint32_t stride, VkVertexInputRate input_rate)
     {
-        assert(_curent_vertex_biding_description < VkPipelineVertexInputStateCreateInfo::vertexBindingDescriptionCount);
+        assert(_curent_vertex_biding_description < _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount);
 
-        _ptr_vertex_biding_descriptions[_curent_vertex_biding_description] = {
-            .binding    = binding,
-            .stride     = stride,
-            .inputRate  = input_rate
-        };
+        _ptr_vertex_biding_descriptions[_curent_vertex_biding_description] = { };
+        _ptr_vertex_biding_descriptions[_curent_vertex_biding_description].binding      = binding;
+        _ptr_vertex_biding_descriptions[_curent_vertex_biding_description].stride       = stride;
+        _ptr_vertex_biding_descriptions[_curent_vertex_biding_description].inputRate    = input_rate;
 
         _curent_vertex_biding_description++;
     }
@@ -101,14 +95,13 @@ namespace pbrlib
         uint32_t offset
     )
     {
-        assert(_curent_vertex_attribute_description < VkPipelineVertexInputStateCreateInfo::vertexAttributeDescriptionCount);
+        assert(_curent_vertex_attribute_description < _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount);
 
-        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description] = {
-            .location   = location,
-            .binding    = binding,
-            .format     = format,
-            .offset     = offset
-        };
+        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description] = { };
+        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description].location   = location;
+        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description].binding    = binding;
+        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description].format     = format;
+        _ptr_vertex_attribute_descriptions[_curent_vertex_attribute_description].offset     = offset;
 
         _curent_vertex_attribute_description++;
     }
@@ -117,7 +110,6 @@ namespace pbrlib
     {
         return _ptr_vertex_biding_descriptions;
     }
-
 
     const VkVertexInputAttributeDescription* VertexInputState::getVertexInputAttributeDescriptions() const noexcept
     {
@@ -136,12 +128,22 @@ namespace pbrlib
 
     size_t VertexInputState::capacityVertexInputBindingDescription() const noexcept
     {
-        return VkPipelineVertexInputStateCreateInfo::vertexBindingDescriptionCount;
+        return _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount;
     }
 
     size_t VertexInputState::capacityVertexInputAttributeDescription() const noexcept
     {
-        return VkPipelineVertexInputStateCreateInfo::vertexAttributeDescriptionCount;
+        return _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount;
+    }
+
+    const VkPipelineVertexInputStateCreateInfo& VertexInputState::getPipelineVertexInputStateCreateInfo() const noexcept
+    {
+        return _pipeline_vertex_input_state_ci;
+    }
+
+    VkPipelineVertexInputStateCreateInfo& VertexInputState::getPipelineVertexInputStateCreateInfo() noexcept
+    {
+        return _pipeline_vertex_input_state_ci;
     }
 
     VertexInputState::~VertexInputState()
@@ -163,24 +165,22 @@ namespace pbrlib
         VkBool32                alpha_to_coverage_enable,
         VkBool32                alpha_to_one_enable
     ) :
-        VkPipelineMultisampleStateCreateInfo {
-            .sType                  = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-            .pNext                  = nullptr,
-            .flags                  = 0,
-            .rasterizationSamples   = num_samples,
-            .sampleShadingEnable    = sample_shading_enable,
-            .minSampleShading       = min_sample_shading,
-            .pSampleMask            = &_sample_mask,
-            .alphaToCoverageEnable  = alpha_to_coverage_enable,
-            .alphaToOneEnable       = alpha_to_one_enable
-        },
         _sample_mask(numeric_limits<decltype(_sample_mask)>::max())
-    {}
+    {
+        _pipeline_multisample_state_ci = { };
+        _pipeline_multisample_state_ci.sType                    = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        _pipeline_multisample_state_ci.rasterizationSamples     = num_samples;
+        _pipeline_multisample_state_ci.sampleShadingEnable      = sample_shading_enable;
+        _pipeline_multisample_state_ci.minSampleShading         = min_sample_shading;
+        _pipeline_multisample_state_ci.pSampleMask              = &_sample_mask;
+        _pipeline_multisample_state_ci.alphaToCoverageEnable    = alpha_to_coverage_enable;
+        _pipeline_multisample_state_ci.alphaToOneEnable         = alpha_to_one_enable;
+    }
 
     MultisampleState::MultisampleState(const MultisampleState& multisample_state) noexcept
     {
         memcpy(this, &multisample_state, sizeof(MultisampleState));
-        VkPipelineMultisampleStateCreateInfo::pSampleMask = &_sample_mask;
+        _pipeline_multisample_state_ci.pSampleMask = &_sample_mask;
     }
 
     void MultisampleState::setSampleMask(VkSampleMask sample_mask) noexcept
@@ -190,28 +190,38 @@ namespace pbrlib
 
     void MultisampleState::setRasterizationSamples(VkSampleCountFlagBits num_samples) noexcept
     {
-        VkPipelineMultisampleStateCreateInfo::rasterizationSamples = num_samples;
+        _pipeline_multisample_state_ci.rasterizationSamples = num_samples;
     }
 
     void MultisampleState::setMinSampleShading(float min_sample_shading) noexcept
     {
         assert(min_sample_shading >= 0.0f && min_sample_shading <= 1.0f);
-        VkPipelineMultisampleStateCreateInfo::minSampleShading = min_sample_shading;
+        _pipeline_multisample_state_ci.minSampleShading = min_sample_shading;
     }
     
+    const VkPipelineMultisampleStateCreateInfo& MultisampleState::getPipelineMultisampleStateCreateInfo() const noexcept
+    {
+        return _pipeline_multisample_state_ci;
+    }
+
+    VkPipelineMultisampleStateCreateInfo& MultisampleState::getPipelineMultisampleStateCreateInfo() noexcept
+    {
+        return _pipeline_multisample_state_ci;
+    }
+
     void MultisampleState::sampleShadingEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineMultisampleStateCreateInfo::sampleShadingEnable = is_enable;
+        _pipeline_multisample_state_ci.sampleShadingEnable = is_enable;
     }
 
     void MultisampleState::alphaToCoverageEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineMultisampleStateCreateInfo::alphaToCoverageEnable = is_enable;
+        _pipeline_multisample_state_ci.alphaToCoverageEnable = is_enable;
     }
 
     void MultisampleState::alphaToOneEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineMultisampleStateCreateInfo::alphaToOneEnable = is_enable;
+        _pipeline_multisample_state_ci.alphaToOneEnable = is_enable;
     }
 
     VkSampleMask MultisampleState::getSampleMask() const noexcept
@@ -221,288 +231,301 @@ namespace pbrlib
 
     VkSampleCountFlagBits MultisampleState::getRasterizationSamples() const noexcept
     {
-        return VkPipelineMultisampleStateCreateInfo::rasterizationSamples;
+        return _pipeline_multisample_state_ci.rasterizationSamples;
     }
 
     float MultisampleState::getMinSampleShading() const noexcept
     {
-        return VkPipelineMultisampleStateCreateInfo::minSampleShading;
+        return _pipeline_multisample_state_ci.minSampleShading;
     }
 
     VkBool32 MultisampleState::sampleShadingEnable() const noexcept
     {
-        return VkPipelineMultisampleStateCreateInfo::sampleShadingEnable;
+        return _pipeline_multisample_state_ci.sampleShadingEnable;
     }
 
     VkBool32 MultisampleState::alphaToCoverageEnable() const noexcept
     {
-        return VkPipelineMultisampleStateCreateInfo::alphaToCoverageEnable;
+        return _pipeline_multisample_state_ci.alphaToCoverageEnable;
     }
 
     VkBool32 MultisampleState::alphaToOneEnable() const noexcept
     {
-        return VkPipelineMultisampleStateCreateInfo::alphaToOneEnable;
+        return _pipeline_multisample_state_ci.alphaToOneEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    RasterizationState::RasterizationState() :
-        VkPipelineRasterizationStateCreateInfo {
-            .sType      = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-            .pNext      = nullptr,
-            .flags      = 0,
-            .lineWidth  = 1.0f
-        }
-    {}
+    RasterizationState::RasterizationState() 
+    {
+        _pipeline_rasterization_state_ci = { };
+        _pipeline_rasterization_state_ci.sType      = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        _pipeline_rasterization_state_ci.lineWidth  = 1.0f;
+    }
 
     void RasterizationState::setPolygonMode(VkPolygonMode polygon_mode) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::polygonMode = polygon_mode;
+        _pipeline_rasterization_state_ci.polygonMode = polygon_mode;
     }
 
     void RasterizationState::setCullMode(VkCullModeFlags cull_mode) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::cullMode = cull_mode;
+        _pipeline_rasterization_state_ci.cullMode = cull_mode;
     }
     
     void RasterizationState::setFrontFace(VkFrontFace front_face) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::frontFace = front_face;
+        _pipeline_rasterization_state_ci.frontFace = front_face;
     }
 
     void RasterizationState::setDepthBiasConstantFactor(float depth_bias_constant_factor) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::depthBiasConstantFactor = depthBiasConstantFactor;
+        _pipeline_rasterization_state_ci.depthBiasConstantFactor = depth_bias_constant_factor;
     }
 
     void RasterizationState::setDepthBiasClamp(float depth_bias_clamp) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::depthBiasClamp = depth_bias_clamp;
+        _pipeline_rasterization_state_ci.depthBiasClamp = depth_bias_clamp;
     }
 
     void RasterizationState::setDepthBiasSlopeFactor(float depts_bias_slope_factor) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::depthBiasSlopeFactor = depts_bias_slope_factor;
+        _pipeline_rasterization_state_ci.depthBiasSlopeFactor = depts_bias_slope_factor;
     }
 
     void RasterizationState::setLineWidth(float line_width) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::lineWidth = line_width;
+        _pipeline_rasterization_state_ci.lineWidth = line_width;
     }
 
     void RasterizationState::depthClampEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::depthClampEnable = is_enable;
+        _pipeline_rasterization_state_ci.depthClampEnable = is_enable;
     }
 
     void RasterizationState::rasterizerDiscardEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::rasterizerDiscardEnable = is_enable;
+        _pipeline_rasterization_state_ci.rasterizerDiscardEnable = is_enable;
     }
 
     void RasterizationState::depthBiasEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineRasterizationStateCreateInfo::depthBiasEnable = is_enable;
+        _pipeline_rasterization_state_ci.depthBiasEnable = is_enable;
+    }
+
+    const VkPipelineRasterizationStateCreateInfo& RasterizationState::getPipelineRasterizationStateCreateInfo() const noexcept
+    {
+        return _pipeline_rasterization_state_ci;
+    }
+
+    VkPipelineRasterizationStateCreateInfo& RasterizationState::getPipelineRasterizationStateCreateInfo() noexcept
+    {
+        return _pipeline_rasterization_state_ci;
     }
 
     VkPolygonMode RasterizationState::getPolygonMode() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::polygonMode;
+        return _pipeline_rasterization_state_ci.polygonMode;
     }
 
     VkCullModeFlags RasterizationState::getCullMode() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::cullMode;
+        return _pipeline_rasterization_state_ci.cullMode;
     }
 
     VkFrontFace RasterizationState::getFrontFace() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::frontFace;
+        return _pipeline_rasterization_state_ci.frontFace;
     }
 
     float RasterizationState::getDepthBiasConstantFactor() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::depthBiasConstantFactor;
+        return _pipeline_rasterization_state_ci.depthBiasConstantFactor;
     }
 
     float RasterizationState::getDepthBiasClamp() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::depthBiasClamp;
+        return _pipeline_rasterization_state_ci.depthBiasClamp;
     }
 
     float RasterizationState::getDepthBiasSlopeFactor() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::depthBiasSlopeFactor;
+        return _pipeline_rasterization_state_ci.depthBiasSlopeFactor;
     }
 
     float RasterizationState::getLineWidth() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::lineWidth;
+        return _pipeline_rasterization_state_ci.lineWidth;
     }
 
     VkBool32 RasterizationState::depthClampEnable() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::depthClampEnable;
+        return _pipeline_rasterization_state_ci.depthClampEnable;
     }
 
     VkBool32 RasterizationState::rasterizerDiscardEnable() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::rasterizerDiscardEnable;
+        return _pipeline_rasterization_state_ci.rasterizerDiscardEnable;
     }
 
     VkBool32 RasterizationState::depthBiasEnable() const noexcept
     {
-        return VkPipelineRasterizationStateCreateInfo::depthBiasEnable;
+        return _pipeline_rasterization_state_ci.depthBiasEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DepthStencilState::DepthStencilState(VkBool32 depth_test_enable, VkBool32 stencil_test_enable) noexcept :
-        VkPipelineDepthStencilStateCreateInfo{
-            .sType              = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-            .pNext              = nullptr,
-            .flags              = 0,
-            .depthTestEnable    = depth_test_enable,
-            .stencilTestEnable  = stencil_test_enable
-        }
-    {}
+    DepthStencilState::DepthStencilState(VkBool32 depth_test_enable, VkBool32 stencil_test_enable) noexcept
+    {
+        _pipeline_depth_stencil_static_ci = { };
+        _pipeline_depth_stencil_static_ci.sType             = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        _pipeline_depth_stencil_static_ci.depthTestEnable   = depth_test_enable;
+        _pipeline_depth_stencil_static_ci.stencilTestEnable = stencil_test_enable;
+    }
 
     void DepthStencilState::setDepthCompareOp(VkCompareOp depth_compare_op) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::depthCompareOp = depth_compare_op;
+        _pipeline_depth_stencil_static_ci.depthCompareOp = depth_compare_op;
     }
 
     void DepthStencilState::setFront(VkStencilOpState front) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::front = front;
+        _pipeline_depth_stencil_static_ci.front = front;
     }
 
     void DepthStencilState::setBack(VkStencilOpState back) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::back = back;
+        _pipeline_depth_stencil_static_ci.back = back;
     }
 
     void DepthStencilState::setMinDepthBounds(float min_depth_bounds) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::minDepthBounds = min_depth_bounds;
+        _pipeline_depth_stencil_static_ci.minDepthBounds = min_depth_bounds;
     }
 
     void DepthStencilState::setMaxDepthBounds(float max_depth_bounds) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::maxDepthBounds = max_depth_bounds;
+        _pipeline_depth_stencil_static_ci.maxDepthBounds = max_depth_bounds;
     }
 
     void DepthStencilState::depthTestEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::depthTestEnable = is_enable;
+        _pipeline_depth_stencil_static_ci.depthTestEnable = is_enable;
     }
 
     void DepthStencilState::depthWriteEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::depthWriteEnable = is_enable;
+        _pipeline_depth_stencil_static_ci.depthWriteEnable = is_enable;
     }
 
     void DepthStencilState::depthBoundsTestEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::depthBoundsTestEnable = is_enable;
+        _pipeline_depth_stencil_static_ci.depthBoundsTestEnable = is_enable;
     }
 
     void DepthStencilState::stencilTestEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineDepthStencilStateCreateInfo::stencilTestEnable = is_enable;
+        _pipeline_depth_stencil_static_ci.stencilTestEnable = is_enable;
     }
 
-    VkCompareOp DepthStencilState::getDepthCompareOp() noexcept
+    const VkPipelineDepthStencilStateCreateInfo& DepthStencilState::getPipelineDepthStencilStateCreateInfo() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::depthCompareOp;
+        return _pipeline_depth_stencil_static_ci;
     }
 
-    VkStencilOpState DepthStencilState::getFront() noexcept
+    VkPipelineDepthStencilStateCreateInfo& DepthStencilState::getPipelineDepthStencilStateCreateInfo() noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::front;
+        return _pipeline_depth_stencil_static_ci;
     }
 
-    VkStencilOpState DepthStencilState::getBack() noexcept
+    VkCompareOp DepthStencilState::getDepthCompareOp() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::back;
+        return _pipeline_depth_stencil_static_ci.depthCompareOp;
     }
 
-    float DepthStencilState::getMinDepthBounds() noexcept
+    VkStencilOpState DepthStencilState::getFront() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::minDepthBounds;
+        return _pipeline_depth_stencil_static_ci.front;
     }
 
-    float DepthStencilState::getMaxDepthBounds() noexcept
+    VkStencilOpState DepthStencilState::getBack() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::maxDepthBounds;
+        return _pipeline_depth_stencil_static_ci.back;
     }
 
-    VkBool32 DepthStencilState::depthTestEnable() noexcept
+    float DepthStencilState::getMinDepthBounds() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::depthTestEnable;
+        return _pipeline_depth_stencil_static_ci.minDepthBounds;
     }
 
-    VkBool32 DepthStencilState::depthWriteEnable() noexcept
+    float DepthStencilState::getMaxDepthBounds() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::depthWriteEnable;
+        return _pipeline_depth_stencil_static_ci.maxDepthBounds;
     }
 
-    VkBool32 DepthStencilState::depthBoundsTestEnable() noexcept
+    VkBool32 DepthStencilState::depthTestEnable() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::depthBoundsTestEnable;
+        return _pipeline_depth_stencil_static_ci.depthTestEnable;
     }
 
-    VkBool32 DepthStencilState::stencilTestEnable() noexcept
+    VkBool32 DepthStencilState::depthWriteEnable() const noexcept
     {
-        return VkPipelineDepthStencilStateCreateInfo::stencilTestEnable;
+        return _pipeline_depth_stencil_static_ci.depthWriteEnable;
+    }
+
+    VkBool32 DepthStencilState::depthBoundsTestEnable() const noexcept
+    {
+        return _pipeline_depth_stencil_static_ci.depthBoundsTestEnable;
+    }
+
+    VkBool32 DepthStencilState::stencilTestEnable() const noexcept
+    {
+        return _pipeline_depth_stencil_static_ci.stencilTestEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ViewportState::ViewportState(size_t num_viewports, size_t num_scissors) :
-        VkPipelineViewportStateCreateInfo {
-            .sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-            .pNext          = nullptr,
-            .flags          = 0,
-            .viewportCount  = static_cast<uint32_t>(num_viewports),
-            .scissorCount   = static_cast<uint32_t>(num_scissors)
-        },
         _current_viewport   (0),
         _current_scissor    (0)
     {
         assert(num_viewports > 0 && num_scissors > 0);
-        VkPipelineViewportStateCreateInfo::pViewports   = _ptr_viewports    = new VkViewport    [num_viewports];
-        VkPipelineViewportStateCreateInfo::pScissors    = _ptr_scissors     = new VkRect2D      [num_scissors];
+        _ptr_viewports = new VkViewport [num_viewports];
+        _ptr_scissors  = new VkRect2D [num_scissors];
+
+        _pipeline_viewport_state_ci = { };
+        _pipeline_viewport_state_ci.sType           = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        _pipeline_viewport_state_ci.viewportCount   = static_cast<uint32_t>(num_viewports);
+        _pipeline_viewport_state_ci.scissorCount    = static_cast<uint32_t>(num_scissors); 
+        _pipeline_viewport_state_ci.pViewports      = _ptr_viewports;
+        _pipeline_viewport_state_ci.pScissors       = _ptr_scissors;
     }
 
     ViewportState::ViewportState(ViewportState&& viewport_state) :
         _ptr_viewports  (nullptr),
         _ptr_scissors   (nullptr)
     {
-        swap(_ptr_viewports,    viewport_state._ptr_viewports);
-        swap(_ptr_scissors,     viewport_state._ptr_scissors);
+        swap(_ptr_viewports, viewport_state._ptr_viewports);
+        swap(_ptr_scissors, viewport_state._ptr_scissors);
 
         _current_viewport   = viewport_state._current_viewport;
         _current_scissor    = viewport_state._current_scissor;
 
-        memcpy(this, &viewport_state, sizeof(VkPipelineViewportStateCreateInfo));
+        memcpy(&_pipeline_viewport_state_ci, &viewport_state._pipeline_viewport_state_ci, sizeof(VkPipelineViewportStateCreateInfo));
     }
 
     ViewportState::ViewportState(const ViewportState& viewport_state) :
-        VkPipelineViewportStateCreateInfo {
-            .sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-            .pNext          = nullptr,
-            .flags          = 0,
-            .viewportCount  = viewport_state.viewportCount,
-            .scissorCount   = viewport_state.scissorCount
-        },
-        _ptr_viewports      (new VkViewport [viewport_state.viewportCount]),
-        _ptr_scissors       (new VkRect2D   [viewport_state.scissorCount]),
+        _ptr_viewports      (new VkViewport [viewport_state._pipeline_viewport_state_ci.viewportCount]),
+        _ptr_scissors       (new VkRect2D   [viewport_state._pipeline_viewport_state_ci.scissorCount]),
         _current_viewport   (viewport_state._current_viewport),
         _current_scissor    (viewport_state._current_scissor)
     {
-        VkPipelineViewportStateCreateInfo::pViewports   = _ptr_viewports;
-        VkPipelineViewportStateCreateInfo::pScissors    = _ptr_scissors;
+        _pipeline_viewport_state_ci = { };
+        _pipeline_viewport_state_ci.sType           = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        _pipeline_viewport_state_ci.viewportCount   = viewport_state._pipeline_viewport_state_ci.viewportCount;
+        _pipeline_viewport_state_ci.scissorCount    = viewport_state._pipeline_viewport_state_ci.scissorCount;
+        _pipeline_viewport_state_ci.pViewports      = _ptr_viewports;
+        _pipeline_viewport_state_ci.pScissors       = _ptr_scissors;
 
-        memcpy(_ptr_viewports,  viewport_state._ptr_viewports,  sizeof(VkViewport) * _current_viewport);
-        memcpy(_ptr_scissors,   viewport_state._ptr_scissors,   sizeof(VkRect2D) * _current_scissor);
+        memcpy(_ptr_viewports, viewport_state._ptr_viewports, sizeof(VkViewport) * _current_viewport);
+        memcpy(_ptr_scissors, viewport_state._ptr_scissors, sizeof(VkRect2D) * _current_scissor);
     }
 
     ViewportState::~ViewportState()
@@ -518,31 +541,39 @@ namespace pbrlib
 
     void ViewportState::addViewport(float x, float y, float width, float height, float min_depth, float max_depth)
     {
-        assert(VkPipelineViewportStateCreateInfo::viewportCount > _current_viewport);
+        assert(_pipeline_viewport_state_ci.viewportCount > _current_viewport);
         assert(min_depth >= 0.0f && max_depth <= 1.0f);
 
-        _ptr_viewports[_current_viewport] = {
-            .x          = x,
-            .y          = y,
-            .width      = width,
-            .height     = height,
-            .minDepth   = min_depth,
-            .maxDepth   = max_depth
-        };
+        _ptr_viewports[_current_viewport] = { };
+        _ptr_viewports[_current_viewport].x         = x;
+        _ptr_viewports[_current_viewport].y         = y;
+        _ptr_viewports[_current_viewport].width     = width;
+        _ptr_viewports[_current_viewport].height    = height;
+        _ptr_viewports[_current_viewport].minDepth  = min_depth;
+        _ptr_viewports[_current_viewport].maxDepth  = max_depth;
 
         _current_viewport++;
     }
 
     void ViewportState::addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height)
     {
-        assert(VkPipelineViewportStateCreateInfo::scissorCount > _current_scissor);
+        assert(_pipeline_viewport_state_ci.scissorCount > _current_scissor);
 
-        _ptr_scissors[_current_scissor] = {
-            .offset = {x_offset,    y_offset},
-            .extent = {width,       height}
-        };
+        _ptr_scissors[_current_scissor] = { };
+        _ptr_scissors[_current_scissor].offset = {x_offset, y_offset};
+        _ptr_scissors[_current_scissor].extent = {width, height};
 
         _current_scissor++;
+    }
+
+    const VkPipelineViewportStateCreateInfo& ViewportState::getPipelineViewportStateCreateInfo() const noexcept
+    {
+        return _pipeline_viewport_state_ci;
+    }
+
+    VkPipelineViewportStateCreateInfo& ViewportState::getPipelineViewportStateCreateInfo() noexcept
+    {
+        return _pipeline_viewport_state_ci;
     }
 
     const VkViewport* ViewportState::getViewports() const noexcept
@@ -567,56 +598,63 @@ namespace pbrlib
 
     size_t ViewportState::capacityViewports() const noexcept
     {
-        return VkPipelineViewportStateCreateInfo::viewportCount;
+        return _pipeline_viewport_state_ci.viewportCount;
     }
 
     size_t ViewportState::capacityScissors() const noexcept
     {
-        return VkPipelineViewportStateCreateInfo::scissorCount;
+        return _pipeline_viewport_state_ci.scissorCount;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    InputAssemblyState::InputAssemblyState(VkPrimitiveTopology topology) :
-        VkPipelineInputAssemblyStateCreateInfo {
-            .sType      = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-            .pNext      = nullptr,
-            .flags      = 0,
-            .topology   = topology 
-        }
-    {}
+    InputAssemblyState::InputAssemblyState(VkPrimitiveTopology topology)
+    {
+        _pipeline_input_assembly_state_ci = { };
+        _pipeline_input_assembly_state_ci.sType     = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        _pipeline_input_assembly_state_ci.topology  = topology;
+    }
 
     void InputAssemblyState::setTopology(VkPrimitiveTopology topology) noexcept
     {
-        VkPipelineInputAssemblyStateCreateInfo::topology = topology;
+        _pipeline_input_assembly_state_ci.topology = topology;
     }
 
     void InputAssemblyState::primitiveRestartEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineInputAssemblyStateCreateInfo::primitiveRestartEnable = is_enable;
+        _pipeline_input_assembly_state_ci.primitiveRestartEnable = is_enable;
+    }
+
+    const VkPipelineInputAssemblyStateCreateInfo& InputAssemblyState::getPipelineInputAssemblyStateCreateInfo() const noexcept
+    {
+        return _pipeline_input_assembly_state_ci;
+    }
+
+    VkPipelineInputAssemblyStateCreateInfo& InputAssemblyState::getPipelineInputAssemblyStateCreateInfo() noexcept
+    {
+        return _pipeline_input_assembly_state_ci;
     }
 
     VkPrimitiveTopology InputAssemblyState::getTopology() const noexcept
     {
-        return VkPipelineInputAssemblyStateCreateInfo::topology;
+        return _pipeline_input_assembly_state_ci.topology;
     }
 
     VkBool32 InputAssemblyState::primitiveRestartEnable() const noexcept
     {
-        return VkPipelineInputAssemblyStateCreateInfo::primitiveRestartEnable;
+        return _pipeline_input_assembly_state_ci.primitiveRestartEnable;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ColorBlendState::ColorBlendState(size_t num_attachments) noexcept :
-        VkPipelineColorBlendStateCreateInfo {
-            .sType              = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-            .pNext              = nullptr,
-            .flags              = 0,
-            .attachmentCount    = static_cast<uint32_t>(num_attachments)
-        },
-        _ptr_attachments    (new VkPipelineColorBlendAttachmentState[num_attachments]),
-        _current_attachment (0)
+    ColorBlendState::ColorBlendState(size_t num_attachments) noexcept
     {
-        VkPipelineColorBlendStateCreateInfo::pAttachments = _ptr_attachments;
+        _current_attachment = 0;
+
+        _pipeline_color_blend_state_ci = { };
+        _pipeline_color_blend_state_ci.sType            = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        _pipeline_color_blend_state_ci.attachmentCount  = static_cast<uint32_t>(num_attachments);
+
+        _ptr_attachments                            = new VkPipelineColorBlendAttachmentState[num_attachments];
+        _pipeline_color_blend_state_ci.pAttachments = _ptr_attachments;
     }
 
     ColorBlendState::ColorBlendState(ColorBlendState&& color_blend_state) :
@@ -624,17 +662,17 @@ namespace pbrlib
         _current_attachment (color_blend_state._current_attachment)
     {
         swap(_ptr_attachments, color_blend_state._ptr_attachments);
-        memcpy(this, &color_blend_state, sizeof(VkPipelineColorBlendStateCreateInfo));
+        memcpy(&_pipeline_color_blend_state_ci,  &color_blend_state._pipeline_color_blend_state_ci, sizeof(VkPipelineColorBlendStateCreateInfo));
     }
 
 
     ColorBlendState::ColorBlendState(const ColorBlendState& color_blend_state) :
-        _ptr_attachments    (new VkPipelineColorBlendAttachmentState[color_blend_state.attachmentCount]),
+        _ptr_attachments    (new VkPipelineColorBlendAttachmentState[color_blend_state._pipeline_color_blend_state_ci.attachmentCount]),
         _current_attachment (color_blend_state._current_attachment)
     {
-        memcpy(_ptr_attachments,    color_blend_state._ptr_attachments, sizeof(VkPipelineColorBlendAttachmentState) * _current_attachment);
-        memcpy(this,                &color_blend_state,                 sizeof(VkPipelineColorBlendStateCreateInfo));
-        VkPipelineColorBlendStateCreateInfo::pAttachments = _ptr_attachments;
+        memcpy(_ptr_attachments, color_blend_state._ptr_attachments, sizeof(VkPipelineColorBlendAttachmentState) * _current_attachment);
+        memcpy(&_pipeline_color_blend_state_ci, &color_blend_state._pipeline_color_blend_state_ci, sizeof(VkPipelineColorBlendStateCreateInfo));
+        _pipeline_color_blend_state_ci.pAttachments = _ptr_attachments;
     }
 
     ColorBlendState::~ColorBlendState()
@@ -655,30 +693,39 @@ namespace pbrlib
         VkColorComponentFlags   color_write_mask
     )
     {
-        assert(VkPipelineColorBlendStateCreateInfo::attachmentCount > _current_attachment);
+        assert(_pipeline_color_blend_state_ci.attachmentCount > _current_attachment);
 
-        _ptr_attachments[_current_attachment] = {
-            .blendEnable            = blend_enable,
-            .srcColorBlendFactor    = src_color_blend_factor,
-            .dstColorBlendFactor    = dst_color_blend_factor,
-            .colorBlendOp           = color_blend_op,
-            .srcAlphaBlendFactor    = src_alpha_blend_factor,
-            .dstAlphaBlendFactor    = dst_alpha_blend_factor,
-            .alphaBlendOp           = alpha_blend_op,
-            .colorWriteMask         = color_write_mask
-        };
+        _ptr_attachments[_current_attachment] = { };
+        _ptr_attachments[_current_attachment].blendEnable           = blend_enable;
+        _ptr_attachments[_current_attachment].srcColorBlendFactor   = src_color_blend_factor;
+        _ptr_attachments[_current_attachment].dstColorBlendFactor   = dst_color_blend_factor;
+        _ptr_attachments[_current_attachment].colorBlendOp          = color_blend_op;
+        _ptr_attachments[_current_attachment].srcAlphaBlendFactor   = src_alpha_blend_factor;
+        _ptr_attachments[_current_attachment].dstAlphaBlendFactor   = dst_alpha_blend_factor;
+        _ptr_attachments[_current_attachment].alphaBlendOp          = alpha_blend_op;
+        _ptr_attachments[_current_attachment].colorWriteMask        = color_write_mask;
 
         _current_attachment++;
     }
 
     void ColorBlendState::logicOpEnable(VkBool32 is_enable) noexcept
     {
-        VkPipelineColorBlendStateCreateInfo::logicOpEnable = is_enable;
+        _pipeline_color_blend_state_ci.logicOpEnable = is_enable;
     }
 
     void ColorBlendState::setLogicOp(VkLogicOp logic_op) noexcept
     {
-        VkPipelineColorBlendStateCreateInfo::logicOp= logic_op;
+        _pipeline_color_blend_state_ci.logicOp = logic_op;
+    }
+
+    const VkPipelineColorBlendStateCreateInfo& ColorBlendState::getPipelineColorBlendStateCreateInfo() const noexcept
+    {
+        return _pipeline_color_blend_state_ci;
+    }
+
+    VkPipelineColorBlendStateCreateInfo& ColorBlendState::getPipelineColorBlendStateCreateInfo() noexcept
+    {
+        return _pipeline_color_blend_state_ci;
     }
 
     const VkPipelineColorBlendAttachmentState* ColorBlendState::getAttachments() const noexcept
@@ -693,17 +740,17 @@ namespace pbrlib
 
     size_t ColorBlendState::capacityAttachments() const noexcept
     {
-        return VkPipelineColorBlendStateCreateInfo::attachmentCount;
+        return _pipeline_color_blend_state_ci.attachmentCount;
     }
 
     bool ColorBlendState::logicOpEnable() const noexcept
     {
-        return VkPipelineColorBlendStateCreateInfo::logicOpEnable;
+        return _pipeline_color_blend_state_ci.logicOpEnable;
     }
 
     VkLogicOp ColorBlendState::getLogicOp() const noexcept
     {
-        return VkPipelineColorBlendStateCreateInfo::logicOp;
+        return _pipeline_color_blend_state_ci.logicOp;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -852,8 +899,8 @@ namespace pbrlib
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
-        swap(_pipeline_handle,          graphics_pipeline._pipeline_handle);
-        swap(_pipeline_cache_handle,    graphics_pipeline._pipeline_cache_handle);
+        swap(_pipeline_handle, graphics_pipeline._pipeline_handle);
+        swap(_pipeline_cache_handle, graphics_pipeline._pipeline_cache_handle);
     }
 
     GraphicsPipeline::~GraphicsPipeline()
@@ -873,9 +920,8 @@ namespace pbrlib
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
-        VkPipelineCacheCreateInfo pipeline_cache_info {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO
-        };
+        VkPipelineCacheCreateInfo pipeline_cache_info = { };
+        pipeline_cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 
         assert(vkCreatePipelineCache(
             ptr_device->getDeviceHandle(),
@@ -889,42 +935,36 @@ namespace pbrlib
        vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages_info(shaders.size());
 
        for (size_t i{0}; i < pipeline_shader_stages_info.size(); i++) {
-           pipeline_shader_stages_info[i] = {
-               .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-               .pNext                  = nullptr,
-               .flags                  = 0,
-               .stage                  = shaders[i].getShaderType(),
-               .module                 = shaders[i].getShaderHandle(),
-               .pName                  = "main",
-               .pSpecializationInfo    = reinterpret_cast<const VkSpecializationInfo*>(&shaders[i].getSpecializationInfo())
-           };
+            pipeline_shader_stages_info[i] = { };
+            pipeline_shader_stages_info[i].sType                = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            pipeline_shader_stages_info[i].stage                = shaders[i].getShaderType();
+            pipeline_shader_stages_info[i].module               = shaders[i].getShaderHandle();
+            pipeline_shader_stages_info[i].pName                = "main";
+            pipeline_shader_stages_info[i].pSpecializationInfo  = &shaders[i].getSpecializationInfo().getSpecializationInfo();
        };
 
-        VkGraphicsPipelineCreateInfo grahics_pipeline_info {
-            .sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext                  = nullptr,
-            .flags                  = 0,
-            .stageCount             = static_cast<uint32_t>(pipeline_shader_stages_info.size()),
-            .pStages                = pipeline_shader_stages_info.data(),
-            .pVertexInputState      = reinterpret_cast<VkPipelineVertexInputStateCreateInfo*>   (&_states.getVertexInputState()),
-            .pInputAssemblyState    = reinterpret_cast<VkPipelineInputAssemblyStateCreateInfo*> (&_states.getInputAssemblyState()),
-            .pTessellationState     = nullptr,
-            .pViewportState         = reinterpret_cast<VkPipelineViewportStateCreateInfo*>      (&_states.getViewportState()),
-            .pRasterizationState    = reinterpret_cast<VkPipelineRasterizationStateCreateInfo*> (&_states.getRasterizationState()),
-            .pMultisampleState      = reinterpret_cast<VkPipelineMultisampleStateCreateInfo*>   (&_states.getMultisampleState()),
-            .pDepthStencilState     = reinterpret_cast<VkPipelineDepthStencilStateCreateInfo*>  (&_states.getDepthStencilState()),
-            .pColorBlendState       = reinterpret_cast<VkPipelineColorBlendStateCreateInfo*>    (&_states.getColorBlendState()),
-            .pDynamicState          = nullptr,
-            .layout                 = _ptr_pipeline_layout->getPipelineLayoutHandle(),
-            .renderPass             = _ptr_render_pass->getRenderPassHandle(),
-            .subpass                = _subpass_index
-        };
+        VkGraphicsPipelineCreateInfo graphics_pipeline_info = { };
+        graphics_pipeline_info.sType                = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        graphics_pipeline_info.stageCount           = static_cast<uint32_t>(pipeline_shader_stages_info.size());
+        graphics_pipeline_info.pStages              = pipeline_shader_stages_info.data();
+        graphics_pipeline_info.pVertexInputState    = &_states.getVertexInputState().getPipelineVertexInputStateCreateInfo();
+        graphics_pipeline_info.pInputAssemblyState  = reinterpret_cast<VkPipelineInputAssemblyStateCreateInfo*> (&_states.getInputAssemblyState());
+        graphics_pipeline_info.pTessellationState   = nullptr;
+        graphics_pipeline_info.pViewportState       = &_states.getViewportState().getPipelineViewportStateCreateInfo();
+        graphics_pipeline_info.pRasterizationState  = &_states.getRasterizationState().getPipelineRasterizationStateCreateInfo();
+        graphics_pipeline_info.pMultisampleState    = &_states.getMultisampleState().getPipelineMultisampleStateCreateInfo();
+        graphics_pipeline_info.pDepthStencilState   = &_states.getDepthStencilState().getPipelineDepthStencilStateCreateInfo();
+        graphics_pipeline_info.pColorBlendState     = &_states.getColorBlendState().getPipelineColorBlendStateCreateInfo();
+        graphics_pipeline_info.pDynamicState        = nullptr;
+        graphics_pipeline_info.layout               = _ptr_pipeline_layout->getPipelineLayoutHandle();
+        graphics_pipeline_info.renderPass           = _ptr_render_pass->getRenderPassHandle();
+        graphics_pipeline_info.subpass              = _subpass_index;
 
         assert(vkCreateGraphicsPipelines(
             ptr_device->getDeviceHandle(),
             _pipeline_cache_handle,
             1,
-            &grahics_pipeline_info,
+            &graphics_pipeline_info,
             nullptr,
             &_pipeline_handle
         ) == VK_SUCCESS);

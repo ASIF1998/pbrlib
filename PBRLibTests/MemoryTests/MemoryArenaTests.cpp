@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/Memory/MemoryBlock.hpp"
 #include "../../src/Memory/MemoryArena.hpp"
@@ -14,7 +14,6 @@
 #include <type_traits>
 #include <cstdint>
 
-using namespace testing;
 using namespace pbrlib;
 using namespace std;
 
@@ -27,14 +26,13 @@ TEST(MemoryMemoryArena, Constructor)
     PtrMemoryArena<MemoryBlock> ptr_memory_arena1 = MemoryArena<MemoryBlock>::make();
     PtrMemoryArena<MemoryBlock> ptr_memory_arena2 = MemoryArena<MemoryBlock>::make(num_blocks, num_bytes2);
 
+    pbrlib::testing::utils::equality(0, ptr_memory_arena1->getNumFreeBlocks());
+    pbrlib::testing::utils::equality(0, ptr_memory_arena1->getNumAvailableBlocks());
+    pbrlib::testing::utils::equality(num_bytes1, ptr_memory_arena1->getNumBytes());
 
-    EXPECT_EQ(0, ptr_memory_arena1->getNumFreeBlocks());
-    EXPECT_EQ(0, ptr_memory_arena1->getNumAvailableBlocks());
-    EXPECT_EQ(num_bytes1, ptr_memory_arena1->getNumBytes());
-
-    EXPECT_EQ(num_blocks - 1, ptr_memory_arena2->getNumFreeBlocks());
-    EXPECT_EQ(0, ptr_memory_arena2->getNumAvailableBlocks());
-    EXPECT_EQ(num_bytes2 * num_blocks, ptr_memory_arena2->getNumBytes());
+    pbrlib::testing::utils::equality(num_blocks - 1, ptr_memory_arena2->getNumFreeBlocks());
+    pbrlib::testing::utils::equality(0, ptr_memory_arena2->getNumAvailableBlocks());
+    pbrlib::testing::utils::equality(num_bytes2 * num_blocks, ptr_memory_arena2->getNumBytes());
 }
 
 TEST(MemoryMemoryArena, AllocateAndDeallocate)
@@ -46,30 +44,30 @@ TEST(MemoryMemoryArena, AllocateAndDeallocate)
     {
         auto [ptr, ptr_memory_block] = memory_arena.allocate(size);
 
-        EXPECT_GE(ptr_memory_block->getSize(), size);
-        EXPECT_NE(nullptr, ptr);
-        EXPECT_EQ(ptr, ptr_memory_block->getPtrMemory());
-        EXPECT_EQ(1, ptr_memory_block->getNumUsers());
+        pbrlib::testing::utils::greaterEquality(ptr_memory_block->getSize(), size);
+        pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(ptr));
+        pbrlib::testing::utils::equality(ptr, ptr_memory_block->getPtrMemory());
+        pbrlib::testing::utils::equality(1, ptr_memory_block->getNumUsers());
 
         memory_arena.deallocate(ptr, ptr_memory_block);
 
-        EXPECT_EQ(0, ptr_memory_block->getNumUsers());
+        pbrlib::testing::utils::equality(0, ptr_memory_block->getNumUsers());
     }
 
     {
         auto [ptr, ptr_memory_block] = memory_arena.allocate<int>(size);
         
         if (!is_same<decltype(ptr), int*>::value) {
-            EXPECT_TRUE(false) << "Тип указателя ptr не равняется int*";
+            pbrlib::testing::utils::thisTrue(false, "Тип указателя ptr не равняется int*");
         }
 
-        EXPECT_GE(ptr_memory_block->getSize(), size * sizeof(int));
-        EXPECT_NE(nullptr, ptr);
-        EXPECT_EQ(ptr, ptr_memory_block->getPtrMemory());
-        EXPECT_EQ(1, ptr_memory_block->getNumUsers());
+        pbrlib::testing::utils::greaterEquality(ptr_memory_block->getSize(), size * sizeof(int));
+        pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(ptr));
+        pbrlib::testing::utils::equality(reinterpret_cast<size_t>(ptr), reinterpret_cast<size_t>(ptr_memory_block->getPtrMemory()));
+        pbrlib::testing::utils::equality(1, ptr_memory_block->getNumUsers());
 
         memory_arena.deallocate(ptr, ptr_memory_block);
 
-        EXPECT_EQ(0, ptr_memory_block->getNumUsers());
+        pbrlib::testing::utils::equality(0, ptr_memory_block->getNumUsers());
     }
 }

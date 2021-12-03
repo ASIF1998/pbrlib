@@ -26,13 +26,12 @@ namespace pbrlib::math
          * @brief Конструктор по умолчанию создаёт единичную матрицу.
         */
         inline constexpr Matrix3x3();
-
         inline constexpr Matrix3x3(Type init_value);
 
         inline constexpr Matrix3x3(
-            Type v11, Type v12, Type v13,
-            Type v21, Type v22, Type v23,
-            Type v31, Type v32, Type v33
+            Type x0, Type y0, Type z0,
+            Type x1, Type y1, Type z1,
+            Type x2, Type y2, Type z2 
         );
 
         /**

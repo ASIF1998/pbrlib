@@ -6,12 +6,11 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/Moving/Transform.hpp"
 #include "../../src/math/vec3.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 
 TEST(MovingTransform, Constructor)
@@ -33,8 +32,11 @@ TEST(MovingTransform, Constructor)
     Transform t1;
     Transform t2 (tm2);
 
-    EXPECT_EQ(tm1, t1.getMatrix());
-    EXPECT_EQ(tm2, t2.getMatrix());
+    Matrix4x4<float> mt1 = t1.getMatrix();
+    Matrix4x4<float> mt2 = t2.getMatrix();
+
+    pbrlib::testing::utils::equality(tm1, mt1);
+    pbrlib::testing::utils::equality(tm2, mt2);
 }
 
 TEST(MovingTransform, EqualAndNotEqual)
@@ -49,16 +51,16 @@ TEST(MovingTransform, EqualAndNotEqual)
     Transform t1;
     Transform t2;
 
-    EXPECT_TRUE(t1 == t2);
+    pbrlib::testing::utils::thisTrue(t1 == t2);
 
     t2.setMatrix(tm);
 
-    EXPECT_TRUE(t1 != t2);
+    pbrlib::testing::utils::thisTrue(t1 != t2);
 }
 
 TEST(MovingTransform, GetMatrixAndInverseMatrix)
 {
-    constexpr Matrix4x4<float> tm (
+    Matrix4x4<float> tm (
         1.0f, 2.0f, 3.0f, 4.0f,
         4.0f, 3.0f, 2.0f, 1.0f,
         5.0f, 6.0f, 7.0f, 8.0f,
@@ -67,8 +69,14 @@ TEST(MovingTransform, GetMatrixAndInverseMatrix)
 
     Transform t (tm);
 
-    EXPECT_EQ(tm, t.getMatrix());
-    EXPECT_EQ(inverse(tm), t.getInverseMatrix());
+    Matrix4x4<float> mt = t.getMatrix();
+
+    pbrlib::testing::utils::equality(tm, mt);
+
+    tm = inverse(tm);
+    mt = t.getInverseMatrix();
+
+    pbrlib::testing::utils::equality(tm, mt);
 }
 
 TEST(MovingTransform, Translate)
@@ -84,7 +92,7 @@ TEST(MovingTransform, Translate)
         0.5f, 0.5f, 0.5f, 1.0f
     );
 
-    EXPECT_EQ(r, transform.getMatrix());
+    pbrlib::testing::utils::equality(r, transform.getMatrix());
 }
 
 TEST(MovingTransform, Scale)
@@ -100,7 +108,7 @@ TEST(MovingTransform, Scale)
         0.0f, 0.0f, 0.0f, 1.0f
     );
 
-    EXPECT_EQ(r, transform.getMatrix());
+    pbrlib::testing::utils::equality(r, transform.getMatrix());
 }
 
 TEST(MovingTransform, Rotates)
@@ -129,13 +137,12 @@ TEST(MovingTransform, Rotates)
     Vec3<float> res5 = ra2(v);
     Vec3<float> res6 = ra3(v);
 
-    EXPECT_EQ(r1, res1);
-    EXPECT_EQ(r2, res2);
-    EXPECT_EQ(r3, res3);
-
-    EXPECT_EQ(r1, res4);
-    EXPECT_EQ(r2, res5);
-    EXPECT_EQ(r3, res6);
+    pbrlib::testing::utils::equality(r1, res1);
+    pbrlib::testing::utils::equality(r2, res2);
+    pbrlib::testing::utils::equality(r3, res3);
+    pbrlib::testing::utils::equality(r1, res4);
+    pbrlib::testing::utils::equality(r2, res5);
+    pbrlib::testing::utils::equality(r3, res6);
 }
 
 TEST(MovingTransform, LookAt)
@@ -152,8 +159,8 @@ TEST(MovingTransform, LookAt)
     constexpr Vec3<float> up    (0.00f, 1.00f, 0.00f);
 
     Transform look_at = Transform::lookAt(pos, eye, up);
-    
-    EXPECT_EQ(res, look_at.getMatrix());
+
+    pbrlib::testing::utils::equality(res, look_at.getMatrix());
 }
 
 TEST(MovingTransform, PrespectiveProjection)
@@ -172,5 +179,5 @@ TEST(MovingTransform, PrespectiveProjection)
 
     Transform perspective_projection = Transform::perspective(fov, aspect, z_near, z_far);
 
-    EXPECT_EQ(res, perspective_projection.getMatrix());
+    pbrlib::testing::utils::equality(res, perspective_projection.getMatrix());
 }

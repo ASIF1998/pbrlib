@@ -214,7 +214,7 @@ namespace pbrlib
             return 1;
         }
     };
-    
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
     Image::Builder<TexType, Type, NBits>::Builder()
@@ -228,14 +228,14 @@ namespace pbrlib
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
     inline void Image::Builder<TexType, Type, NBits>::setExtend(
-        uint32_t width, 
-        uint32_t height, 
+        uint32_t width,
+        uint32_t height,
         uint32_t depth
     )  noexcept
     {
-        _image_info.image_extend.width     = width;
-        _image_info.image_extend.height    = height;
-        _image_info.image_extend.depth     = depth;
+        _image_info.image_extend.width  = width;
+        _image_info.image_extend.height = height;
+        _image_info.image_extend.depth  = depth;
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
@@ -266,13 +266,13 @@ namespace pbrlib
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
     inline void Image::Builder<TexType, Type, NBits>::setNumMipLevels(uint32_t mip_levels) noexcept
-    {   
+    {
         _image_info.mip_levels = mip_levels;
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
     inline void Image::Builder<TexType, Type, NBits>::setImageType(VkImageType image_type) noexcept
-    {   
+    {
         _image_info.image_type = image_type;
     }
 
@@ -342,28 +342,30 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::BuilderWithData()
+    Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::BuilderWithData() : 
+        Builder<TexType, Type, NBits>()
     {
         Builder<TexType, Type, NBits>::_image_info.format = FormatDefinition<TexType, Type, NBits>::getFormat();
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
     Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::BuilderWithData(
-        uint32_t width, 
-        uint32_t height, 
+        uint32_t width,
+        uint32_t height,
         uint32_t depth
-    )
+    ) :
+        Builder<TexType, Type, NBits>()
     {
-        Builder<TexType, Type, NBits>::_image_info.format = FormatDefinition<TexType, Type, NBits>::getFormat();
+        _image_info.format = FormatDefinition<TexType, Type, NBits>::getFormat();
 
-        Builder<TexType, Type, NBits>::_image_info.image_extend.width     = width;
-        Builder<TexType, Type, NBits>::_image_info.image_extend.height    = height;
-        Builder<TexType, Type, NBits>::_image_info.image_extend.depth     = depth;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.width   = width;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.height  = height;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.depth   = depth;
 
         _data.resize(
-            width   * 
-            height  * 
-            depth   * 
+            width   *
+            height  *
+            depth   *
             FormatDefinition<TexType, Type, NBits>::getNumComponents()
         );
     }
@@ -371,7 +373,8 @@ namespace pbrlib
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
     Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::BuilderWithData(
         const VkExtent3D& extend
-    )
+    ) :
+        Builder<TexType, Type, NBits>()
     {
         Builder<TexType, Type, NBits>::_image_info.format       = FormatDefinition<TexType, Type, NBits>::getFormat();
         Builder<TexType, Type, NBits>::_image_info.image_extend = extend;
@@ -385,20 +388,20 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setExtend(
-        uint32_t width, 
-        uint32_t height, 
-        uint32_t depth
-    )  noexcept
+    Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::~BuilderWithData()
+    {}
+
+    template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setExtend(uint32_t width, uint32_t height, uint32_t depth) noexcept
     {
-        Builder<TexType, Type, NBits>::_image_info.image_extend.width     = width;
-        Builder<TexType, Type, NBits>::_image_info.image_extend.height    = height;
-        Builder<TexType, Type, NBits>::_image_info.image_extend.depth     = depth;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.width   = width;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.height  = height;
+        Builder<TexType, Type, NBits>::_image_info.image_extend.depth   = depth;
 
         _data.resize(
-            width   * 
-            height  * 
-            depth   * 
+            width   *
+            height  *
+            depth   *
             FormatDefinition<TexType, Type, NBits>::getNumComponents()
         );
     }
@@ -644,17 +647,17 @@ namespace pbrlib
         } else if constexpr (TexType == TexelType::RG) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
             Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = r;
         } else if constexpr (TexType == TexelType::RGB) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
             Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = r;
         } else if constexpr (TexType == TexelType::RGBA) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
             Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = r;
         }
     }
@@ -667,18 +670,18 @@ namespace pbrlib
         } else if constexpr (TexType == TexelType::RG) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
             Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j] = c;
         } else if constexpr (TexType == TexelType::RGB) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
             Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGBA) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
             Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         }
@@ -692,18 +695,18 @@ namespace pbrlib
         } else if constexpr (TexType == TexelType::RG) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
             Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
             Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j] = c;
         } else if constexpr (TexType == TexelType::RGBA) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
             Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
             ptr[i * _image_info.image_extend.width + j].b = c.b;
@@ -718,20 +721,20 @@ namespace pbrlib
         } else if constexpr (TexType == TexelType::RG) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
             Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
             Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
             ptr[i * _image_info.image_extend.width + j].b = c.b;
         } else if constexpr (TexType == TexelType::RGBA) {
             assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
             Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
-            
+
             ptr[i * _image_info.image_extend.width + j] = c;
         }
     }
@@ -754,9 +757,9 @@ namespace pbrlib
                 _ptr_queue->getFamilyIndex()
             );
 
-       	if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
+        if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
             Buffer::BuilderWithData<Type> builder_buffer;
-            
+
             builder_buffer.setData(_data.data(), _data.size());
             builder_buffer.setUsage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
             builder_buffer.addQueueFamily(_ptr_queue->getFamilyIndex());
@@ -765,57 +768,55 @@ namespace pbrlib
 
             Buffer temp_buffer = builder_buffer.build();
 
-            VkImageSubresourceLayers image_subresource_layers {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                .mipLevel       = 0,
-                .baseArrayLayer = 0,
-                .layerCount     = 1
-            };
+            VkImageSubresourceLayers image_subresource_layers = { };
+            image_subresource_layers.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            image_subresource_layers.mipLevel       = 0;
+            image_subresource_layers.baseArrayLayer = 0 ;
+            image_subresource_layers.layerCount     = 1;
 
-            VkImageSubresourceRange image_subresource_range {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                .baseMipLevel   = 0,
-                .levelCount     = 1,
-                .baseArrayLayer = 0,
-                .layerCount     = 1
-            };
+            VkImageSubresourceRange image_subresource_range = { };
+            image_subresource_range.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            image_subresource_range.baseMipLevel    = 0;
+            image_subresource_range.levelCount      = 1;
+            image_subresource_range.baseArrayLayer  = 0;
+            image_subresource_range.layerCount      = 1;
 
-             _ptr_command_buffer->reset();
-             _ptr_command_buffer->begin();
+            _ptr_command_buffer->reset();
+            _ptr_command_buffer->begin();
 
             _ptr_command_buffer->imageMemoryBarrier(
-                VK_PIPELINE_STAGE_HOST_BIT, 
-                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
-                0, 
-                0, 
-                VK_IMAGE_LAYOUT_UNDEFINED, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                _ptr_queue->getFamilyIndex(), 
-                _ptr_queue->getFamilyIndex(), 
-                image, 
+                VK_PIPELINE_STAGE_HOST_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0,
+                0,
+                VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                _ptr_queue->getFamilyIndex(),
+                _ptr_queue->getFamilyIndex(),
+                image,
                 image_subresource_range
             );
 
             _ptr_command_buffer->copyBufferToImage(
-                temp_buffer, 
-                0, 
-                image, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                image_subresource_layers, 
-                {0, 0, 0}, 
+                temp_buffer,
+                0,
+                image,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                image_subresource_layers,
+                {0, 0, 0},
                 Builder<TexType, Type, NBits>::_image_info.image_extend
             );
 
             _ptr_command_buffer->imageMemoryBarrier(
-                VK_PIPELINE_STAGE_HOST_BIT, 
-                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
-                0, 
-                0, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-                _ptr_queue->getFamilyIndex(), 
-                _ptr_queue->getFamilyIndex(), 
-                image, 
+                VK_PIPELINE_STAGE_HOST_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0,
+                0,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                _ptr_queue->getFamilyIndex(),
+                _ptr_queue->getFamilyIndex(),
+                image,
                 image_subresource_range
             );
 
@@ -823,10 +824,11 @@ namespace pbrlib
 
             _ptr_queue->submit(*_ptr_command_buffer);
             _ptr_queue->waitIdle();
-        } else {
-            image.map();
-            image.setData(_data);
-            image.unmap();
+        }
+        else {
+            image.getDeviceMemory()->map();
+            image.getDeviceMemory()->setData(_data);
+            image.getDeviceMemory()->unmap();
         }
 
         return image;
@@ -855,7 +857,7 @@ namespace pbrlib
 
         if (Image::Builder<TexType, Type, NBits>::_image_info.tiling == VK_IMAGE_TILING_OPTIMAL) {
             Buffer::BuilderWithData<Type> builder_buffer;
-            
+
             builder_buffer.setData(_data.data(), _data.size());
             builder_buffer.setUsage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
             builder_buffer.addQueueFamily(_ptr_queue->getFamilyIndex());
@@ -864,57 +866,55 @@ namespace pbrlib
 
             Buffer temp_buffer = builder_buffer.build();
 
-            VkImageSubresourceLayers image_subresource_layers {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                .mipLevel       = 0,
-                .baseArrayLayer = 0,
-                .layerCount     = 1
-            };
+            VkImageSubresourceLayers image_subresource_layers = { };
+            image_subresource_layers.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            image_subresource_layers.mipLevel       = 0;
+            image_subresource_layers.baseArrayLayer = 0;
+            image_subresource_layers.layerCount     = 1; 
 
-            VkImageSubresourceRange image_subresource_range {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                .baseMipLevel   = 0,
-                .levelCount     = 1,
-                .baseArrayLayer = 0,
-                .layerCount     = 1
-            };
+            VkImageSubresourceRange image_subresource_range = { };
+            image_subresource_range.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            image_subresource_range.baseMipLevel    = 0;
+            image_subresource_range.levelCount      = 1;
+            image_subresource_range.baseArrayLayer  = 0;
+            image_subresource_range.layerCount      = 1;
 
             _ptr_command_buffer->reset();
             _ptr_command_buffer->begin();
 
             _ptr_command_buffer->imageMemoryBarrier(
-                VK_PIPELINE_STAGE_HOST_BIT, 
-                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
-                0, 
-                0, 
-                VK_IMAGE_LAYOUT_UNDEFINED, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                _ptr_queue->getFamilyIndex(), 
-                _ptr_queue->getFamilyIndex(), 
-                *ptr_image, 
+                VK_PIPELINE_STAGE_HOST_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0,
+                0,
+                VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                _ptr_queue->getFamilyIndex(),
+                _ptr_queue->getFamilyIndex(),
+                *ptr_image,
                 image_subresource_range
             );
 
             _ptr_command_buffer->copyBufferToImage(
-                temp_buffer, 
-                0, 
-                *ptr_image, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                image_subresource_layers, 
-                {0, 0, 0}, 
+                temp_buffer,
+                0,
+                *ptr_image,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                image_subresource_layers,
+                { 0, 0, 0 },
                 Builder<TexType, Type, NBits>::_image_info.image_extend
             );
 
             _ptr_command_buffer->imageMemoryBarrier(
-                VK_PIPELINE_STAGE_HOST_BIT, 
-                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
-                0, 
-                0, 
-                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-                _ptr_queue->getFamilyIndex(), 
-                _ptr_queue->getFamilyIndex(), 
-                *ptr_image, 
+                VK_PIPELINE_STAGE_HOST_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0,
+                0,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                _ptr_queue->getFamilyIndex(),
+                _ptr_queue->getFamilyIndex(),
+                *ptr_image,
                 image_subresource_range
             );
 
@@ -923,9 +923,9 @@ namespace pbrlib
             _ptr_queue->submit(*_ptr_command_buffer);
             _ptr_queue->waitIdle();
         } else {
-            ptr_image->map();
-            ptr_image->setData(_data);
-            ptr_image->unmap();
+            ptr_image->getDeviceMemory()->map();
+            ptr_image->getDeviceMemory()->setData(_data);
+            ptr_image->getDeviceMemory()->unmap();
         }
 
         return ptr_image;
@@ -963,7 +963,7 @@ namespace pbrlib
     {
         _subresource_range.baseArrayLayer = base_array_layer;
     }
-    
+
     inline void ImageView::Builder::setLayerCount(uint32_t layer_count) noexcept
     {
         _subresource_range.layerCount = layer_count;
@@ -983,5 +983,5 @@ namespace pbrlib
     {
         return make_shared<ImageView>(_ptr_image, _format, _subresource_range, _image_view_type);
     }
-} 
+}
 

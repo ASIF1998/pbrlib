@@ -31,15 +31,15 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline constexpr Matrix3x3<Type>::Matrix3x3(
-        Type v11, Type v12, Type v13,
-        Type v21, Type v22, Type v23,
-        Type v31, Type v32, Type v33
+    inline constexpr Matrix3x3<Type>::Matrix3x3(        
+        Type x0, Type y0, Type z0,
+        Type x1, Type y1, Type z1,
+        Type x2, Type y2, Type z2
     ) :
         _array9 {
-            v11, v12, v13,
-            v21, v22, v23,
-            v31, v32, v33
+            x0, y0, z0,
+            x1, y1, z1,
+            x2, y2, z2
         }
     {}
 
@@ -105,9 +105,9 @@ namespace pbrlib::math
 
         for (size_t i{0}; i < 3; i++) {
             for (size_t k{0}; k < 3; k++) {
-                auto v = _array3x3[i][k];
+                auto v = mat._array3x3[i][k];
                 for (size_t j{0}; j < 3; j++) {
-                    res._array3x3[i][j] += v * mat._array3x3[k][j];
+                    res._array3x3[i][j] += v * _array3x3[k][j];
                 }
             }
         }
@@ -133,9 +133,9 @@ namespace pbrlib::math
         Vec3<Type> res;
 
         for (size_t i{0}; i < 3; i++) {
-            res.x += _array3x3[0][i] * v[i];
-            res.y += _array3x3[1][i] * v[i];
-            res.z += _array3x3[2][i] * v[i];
+            res.x += _array3x3[i][0] * v[i];
+            res.y += _array3x3[i][1] * v[i];
+            res.z += _array3x3[i][2] * v[i];
         }
 
         return res;

@@ -49,18 +49,17 @@ namespace pbrlib
 
    void DeviceQueue::submit(const CommandBuffer& command_buffer)
    {
-       VkSubmitInfo submit_info {
-           .sType                  = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-           .commandBufferCount     = 1,
-           .pCommandBuffers        = &command_buffer.getCommandBufferHandle()
-       };
+        VkSubmitInfo submit_info = { };
+        submit_info.sType               = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount  = 1;
+        submit_info.pCommandBuffers     = &command_buffer.getCommandBufferHandle();
 
-       assert(vkQueueSubmit(
+        assert(vkQueueSubmit(
            _queue_handle,
            1,
            &submit_info,
            VK_NULL_HANDLE
-       ) == VK_SUCCESS);
+        ) == VK_SUCCESS);
    }
 
     PtrDevice& DeviceQueue::getDevice() noexcept
@@ -93,12 +92,11 @@ namespace pbrlib
         uint32_t            image_index
     )
     {
-        VkPresentInfoKHR present_info {
-            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .swapchainCount     = 1,
-            .pSwapchains        = &ptr_swapchain->getSwapchainHandle(),
-            .pImageIndices      = &image_index,
-        };
+        VkPresentInfoKHR present_info = { };
+        present_info.sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.swapchainCount = 1;
+        present_info.pSwapchains    = &ptr_swapchain->getSwapchainHandle();
+        present_info.pImageIndices  = &image_index;
 
         assert(vkQueuePresentKHR(_queue_handle, &present_info) == VK_SUCCESS);
     }
@@ -108,12 +106,11 @@ namespace pbrlib
         uint32_t            image_index
     )
     {
-        VkPresentInfoKHR present_info {
-            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .swapchainCount     = 1,
-            .pSwapchains        = &swapchain.getSwapchainHandle(),
-            .pImageIndices      = &image_index,
-        };
+        VkPresentInfoKHR present_info = { };
+        present_info.sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.swapchainCount = 1;
+        present_info.pSwapchains    = &swapchain.getSwapchainHandle();
+        present_info.pImageIndices  = &image_index;
 
         assert(vkQueuePresentKHR(_queue_handle, &present_info) == VK_SUCCESS);
     }

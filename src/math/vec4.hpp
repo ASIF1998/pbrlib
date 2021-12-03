@@ -11,7 +11,9 @@
 
 #include <iostream>
 
-#include <xmmintrin.h>
+#if (defined(__SSE__) || defined(__AVX2__))
+#   include <xmmintrin.h>
+#endif
 
 #include "vec3.hpp"
 #include "vec2.hpp"
@@ -87,6 +89,7 @@ namespace pbrlib::math
         };
     };
 
+#if (defined(__SSE__) || defined(__AVX2__))
     template<>
     struct Vec4<float>
     {
@@ -155,6 +158,7 @@ namespace pbrlib::math
             __m128  xyzw_simd;
         };
     };
+#endif
 
     /**
      * @brief Функция предназначенная для осуществления скалярного произведения.
@@ -165,9 +169,11 @@ namespace pbrlib::math
     */
     template<typename Type>
     inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2);
-    
+
+#if (defined(__SSE__) || defined(__AVX2__))
     template<>
     inline float dot<float>(const Vec4<float> v1, const Vec4<float>& v2);
+#endif
 
     /**
      * @brief Функция необходимая для нормирования вектора.

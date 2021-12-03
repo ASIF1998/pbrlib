@@ -41,6 +41,9 @@ namespace pbrlib
             size_t                                  size
         );
 
+        template<typename U>
+        inline STLArenaLinearAllocator(const STLArenaLinearAllocator<U>& linear_allocator);
+
         inline STLArenaLinearAllocator(STLArenaLinearAllocator&& linear_allocator);
         inline STLArenaLinearAllocator(const STLArenaLinearAllocator& linear_allocator);
 

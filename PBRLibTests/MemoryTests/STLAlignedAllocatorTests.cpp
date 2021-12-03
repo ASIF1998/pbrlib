@@ -6,13 +6,12 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/Memory/STLAlignedAllocator.hpp"
 
 #include <vector>
 
-using namespace testing;
 using namespace pbrlib;
 using namespace std;
 
@@ -20,7 +19,7 @@ TEST(MemorySTLAlignedAllocator, AllTests)
 {
     vector<float, STLAlignedAllocator<float>> tvec(12);
 
-    EXPECT_EQ(12, tvec.size());
+    pbrlib::testing::utils::equality(12, tvec.size());
 
     tvec.reserve(1000);
 
@@ -28,10 +27,10 @@ TEST(MemorySTLAlignedAllocator, AllTests)
         tvec.push_back(1.0f);
     }
 
-    EXPECT_EQ(1012, tvec.size());
+    pbrlib::testing::utils::equality(1012, tvec.size());
 
     tvec.resize(tvec.size() * 10000);
     tvec.resize(1);
 
-    EXPECT_EQ(1, tvec.size());
+    pbrlib::testing::utils::equality(1, tvec.size());
 }

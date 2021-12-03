@@ -459,21 +459,19 @@ namespace pbrlib
         float       depth_clear_val     = 1.0;
         uint32_t    stencil_clear_val   = 0;
 
-        VkImageSubresourceRange color_image_subresource_range {
-            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1
-        };
+        VkImageSubresourceRange color_image_subresource_range = { };
+        color_image_subresource_range.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        color_image_subresource_range.baseMipLevel   = 0;
+        color_image_subresource_range.levelCount     = 1;
+        color_image_subresource_range.baseArrayLayer = 0;
+        color_image_subresource_range.layerCount     = 1;
 
-        VkImageSubresourceRange depth_stencil_image_subresource_range {
-            .aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1
-        };
+        VkImageSubresourceRange depth_stencil_image_subresource_range = { };
+        depth_stencil_image_subresource_range.aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        depth_stencil_image_subresource_range.baseMipLevel   = 0;
+        depth_stencil_image_subresource_range.levelCount     = 1;
+        depth_stencil_image_subresource_range.baseArrayLayer = 0;
+        depth_stencil_image_subresource_range.layerCount     = 1;
 
         ptr_command_buffer->imageMemoryBarrier(
             VK_PIPELINE_STAGE_HOST_BIT,
@@ -595,8 +593,8 @@ namespace pbrlib
 
                     uniform_material_buffer_data.anisotropy = ptr_material->getAnisotropy();
 
-                    _ptr_uniform_matrices_data_buffer->setData(&uniform_matrices_buffer_data, 1);
-                    _ptr_uniform_material_data_buffer->setData(&uniform_material_buffer_data, 1);
+                    _ptr_uniform_matrices_data_buffer->getDeviceMemory()->setData(&uniform_matrices_buffer_data, 1);
+                    _ptr_uniform_material_data_buffer->getDeviceMemory()->setData(&uniform_material_buffer_data, 1);
                     
                     PtrBuffer& ptr_vertex_buffer    = mesh.getVertexBuffer();
                     PtrBuffer& ptr_index_buffer     = mesh.getIndexBuffer();

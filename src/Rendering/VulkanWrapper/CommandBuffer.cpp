@@ -28,12 +28,11 @@ namespace pbrlib
         _ptr_command_pool       (ptr_command_pool),
         _command_buffer_handle  (VK_NULL_HANDLE)
     {
-        VkCommandBufferAllocateInfo allocate_info {
-            .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-            .commandPool        = _ptr_command_pool->getCommandPoolHandle(),
-            .level              = level,
-            .commandBufferCount = 1
-        };
+        VkCommandBufferAllocateInfo allocate_info = { };
+        allocate_info.sType                 = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocate_info.commandPool           = _ptr_command_pool->getCommandPoolHandle();
+        allocate_info.level                 = level;
+        allocate_info.commandBufferCount    = 1;
 
         assert(vkAllocateCommandBuffers(
             _ptr_command_pool->getDevice()->getDeviceHandle(),
@@ -232,11 +231,10 @@ namespace pbrlib
         VkDeviceSize    size
     ) const noexcept
     {
-        VkBufferCopy region_info {
-            .srcOffset  = 0,
-            .dstOffset  = 0,
-            .size       = size
-        };
+        VkBufferCopy region_info = { };
+        region_info.srcOffset   = 0;
+        region_info.dstOffset   = 0;
+        region_info.size        = size;
 
         vkCmdCopyBuffer(
             _command_buffer_handle,
@@ -306,14 +304,13 @@ namespace pbrlib
         VkExtent3D                  dst_image_extent
     )
     {
-        VkBufferImageCopy region {
-            .bufferOffset       = src_buffer_offset,
-            .bufferRowLength    = 0,
-            .bufferImageHeight  = 0,
-            .imageSubresource   = dst_image_subresource_layers,
-            .imageOffset        = dst_image_offset,
-            .imageExtent        = dst_image_extent
-        };
+        VkBufferImageCopy region = { };
+        region.bufferOffset         = src_buffer_offset;
+        region.bufferRowLength      = 0;
+        region.bufferImageHeight    = 0;
+        region.imageSubresource     = dst_image_subresource_layers;
+        region.imageOffset          = dst_image_offset;
+        region.imageExtent          = dst_image_extent;
 
         vkCmdCopyBufferToImage(_command_buffer_handle, src_buffer.getBufferHandle(), dst_image.getImageHandle(), dst_image_layout, 1, &region);
     }
@@ -331,17 +328,16 @@ namespace pbrlib
         const VkImageSubresourceRange&  subresource_range
     ) const noexcept
     {
-        VkImageMemoryBarrier image_memory_barier {
-            .sType                  = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-            .srcAccessMask          = src_access_mask,
-            .dstAccessMask          = dst_access_mask,
-            .oldLayout              = old_image_layout,
-            .newLayout              = new_image_layout,
-            .srcQueueFamilyIndex    = src_queue_family_index,
-            .dstQueueFamilyIndex    = dst_queue_family_index,
-            .image                  = image.getImageHandle(),
-            .subresourceRange       = subresource_range
-        };
+        VkImageMemoryBarrier image_memory_barier = { };
+        image_memory_barier.sType                   = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barier.srcAccessMask           = src_access_mask;
+        image_memory_barier.dstAccessMask           = dst_access_mask;
+        image_memory_barier.oldLayout               = old_image_layout;
+        image_memory_barier.newLayout               = new_image_layout;
+        image_memory_barier.srcQueueFamilyIndex     = src_queue_family_index;
+        image_memory_barier.dstQueueFamilyIndex     = dst_queue_family_index;
+        image_memory_barier.image                   = image.getImageHandle();
+        image_memory_barier.subresourceRange        = subresource_range;
 
         vkCmdPipelineBarrier(
             _command_buffer_handle,
@@ -366,16 +362,15 @@ namespace pbrlib
         VkDeviceSize                    size
     ) const noexcept
     {
-        VkBufferMemoryBarrier buffer_memory_barrier {
-            .sType                  = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-            .srcAccessMask          = src_access_mask,
-            .dstAccessMask          = dst_access_mask,
-            .srcQueueFamilyIndex    = src_queue_family_index,
-            .dstQueueFamilyIndex    = dst_queue_family_index,
-            .buffer                 = buffer.getBufferHandle(),
-            .offset                 = offset,
-            .size                   = size
-        };
+        VkBufferMemoryBarrier buffer_memory_barrier = { };
+        buffer_memory_barrier.sType                 = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+        buffer_memory_barrier.srcAccessMask         = src_access_mask;
+        buffer_memory_barrier.dstAccessMask         = dst_access_mask;
+        buffer_memory_barrier.srcQueueFamilyIndex   = src_queue_family_index;
+        buffer_memory_barrier.dstQueueFamilyIndex   = dst_queue_family_index;
+        buffer_memory_barrier.buffer                = buffer.getBufferHandle();
+        buffer_memory_barrier.offset                = offset;
+        buffer_memory_barrier.size                  = size;
 
         vkCmdPipelineBarrier(
             _command_buffer_handle,
@@ -395,12 +390,11 @@ namespace pbrlib
         const VkImageSubresourceRange&  image_subresource_range
     ) const noexcept
     {
-        VkClearColorValue vk_clear_color {
-            .float32[0] = clear_color.r,
-            .float32[1] = clear_color.g,
-            .float32[2] = clear_color.b,
-            .float32[3] = clear_color.a
-        };
+        VkClearColorValue vk_clear_color = { };
+        vk_clear_color.float32[0] = clear_color.r;
+        vk_clear_color.float32[1] = clear_color.g;
+        vk_clear_color.float32[2] = clear_color.b;
+        vk_clear_color.float32[3] = clear_color.a;
 
         vkCmdClearColorImage(
             _command_buffer_handle, 
@@ -418,10 +412,9 @@ namespace pbrlib
         const VkImageSubresourceRange&  image_subresource_range
     ) const noexcept
     {
-        VkClearDepthStencilValue vk_clear_depth_stencil_val {
-            .depth      = depth_val,
-            .stencil    = stencil_val
-        };
+        VkClearDepthStencilValue vk_clear_depth_stencil_val = { };
+        vk_clear_depth_stencil_val.depth    = depth_val;
+        vk_clear_depth_stencil_val.stencil  = stencil_val;
 
         vkCmdClearDepthStencilImage(
             _command_buffer_handle,
@@ -463,9 +456,8 @@ namespace pbrlib
 
     void PrimaryCommandBuffer::begin() const
     {
-        VkCommandBufferBeginInfo begin_info {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
-        };
+        VkCommandBufferBeginInfo begin_info = { };
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
     }
@@ -477,69 +469,48 @@ namespace pbrlib
 
     void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept
     {
-        VkRenderPassBeginInfo begin_indo {
-            .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
-            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
-            .renderArea     = {
-                .offset = {
-                    .x = 0, 
-                    .y = 0
-                },
-                .extent = {
-                    .width  = ptr_framebuffer->getWidth(),
-                    .height = ptr_framebuffer->getHeight()
-                }
-            },
-            .clearValueCount    = static_cast<uint32_t>(clear_values.size()),
-            .pClearValues       = clear_values.data()
-        };
+        VkRenderPassBeginInfo begin_indo = { };
+        begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        begin_indo.renderPass               = ptr_framebuffer->getRenderPass()->getRenderPassHandle();
+        begin_indo.framebuffer              = ptr_framebuffer->getFramebufferHandle();
+        begin_indo.renderArea.offset.x      = 0;
+        begin_indo.renderArea.offset.y      = 0;
+        begin_indo.renderArea.extent.width  = ptr_framebuffer->getWidth();
+        begin_indo.renderArea.extent.height = ptr_framebuffer->getHeight();
+        begin_indo.clearValueCount          = static_cast<uint32_t>(clear_values.size());
+        begin_indo.pClearValues             = clear_values.data();
 
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value) const noexcept
-    {
-        VkRenderPassBeginInfo begin_indo {
-            .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
-            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
-            .renderArea     = {
-                .offset = {
-                    .x = 0, 
-                    .y = 0
-                },
-                .extent = {
-                    .width  = ptr_framebuffer->getWidth(),
-                    .height = ptr_framebuffer->getHeight()
-                }
-            },
-            .clearValueCount    = 1,
-            .pClearValues       = &clear_value
-        };
+    {   
+        VkRenderPassBeginInfo begin_indo = { };
+        begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        begin_indo.renderPass               = ptr_framebuffer->getRenderPass()->getRenderPassHandle();
+        begin_indo.framebuffer              = ptr_framebuffer->getFramebufferHandle();
+        begin_indo.renderArea.offset.x      = 0;
+        begin_indo.renderArea.offset.y      = 0;
+        begin_indo.renderArea.extent.width  = ptr_framebuffer->getWidth();
+        begin_indo.renderArea.extent.height = ptr_framebuffer->getHeight();
+        begin_indo.clearValueCount          = 1;
+        begin_indo.pClearValues             = &clear_value;
 
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer) const noexcept
     {
-        VkRenderPassBeginInfo begin_indo {
-            .sType          = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(), 
-            .framebuffer    = ptr_framebuffer->getFramebufferHandle(),
-            .renderArea     = {
-                .offset = {
-                    .x = 0, 
-                    .y = 0
-                },
-                .extent = {
-                    .width  = ptr_framebuffer->getWidth(),
-                    .height = ptr_framebuffer->getHeight()
-                }
-            },
-            .clearValueCount    = 0,
-            .pClearValues       = nullptr
-        };
+        VkRenderPassBeginInfo begin_indo = { };
+        begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        begin_indo.renderPass               = ptr_framebuffer->getRenderPass()->getRenderPassHandle();
+        begin_indo.framebuffer              = ptr_framebuffer->getFramebufferHandle();
+        begin_indo.renderArea.offset.x      = 0;
+        begin_indo.renderArea.offset.y      = 0;
+        begin_indo.renderArea.extent.width  = ptr_framebuffer->getWidth();
+        begin_indo.renderArea.extent.height = ptr_framebuffer->getHeight();
+        begin_indo.clearValueCount          = 0;
+        begin_indo.pClearValues             = nullptr;
 
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
@@ -575,19 +546,16 @@ namespace pbrlib
 
     void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer, const PtrFramebuffer& ptr_framebuffer) const
     {
-        VkCommandBufferInheritanceInfo inheritance_info {
-            .sType          = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
-            .renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle(),
-            .subpass        = primary_command_buffer.getPipeline()->getSubpassIndex(),
-            .framebuffer    = ptr_framebuffer->getFramebufferHandle()
-        };
+        VkCommandBufferInheritanceInfo inheritance_info = { };
+        inheritance_info.sType          = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+        inheritance_info.renderPass     = ptr_framebuffer->getRenderPass()->getRenderPassHandle();
+        inheritance_info.subpass        = primary_command_buffer.getPipeline()->getSubpassIndex();
+        inheritance_info.framebuffer    = ptr_framebuffer->getFramebufferHandle();
 
-
-        VkCommandBufferBeginInfo begin_info {
-            .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .flags              = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT,
-            .pInheritanceInfo   = &inheritance_info
-        };
+        VkCommandBufferBeginInfo begin_info = { };
+        begin_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags            = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+        begin_info.pInheritanceInfo = &inheritance_info;
 
         assert(vkBeginCommandBuffer(_command_buffer_handle, &begin_info) == VK_SUCCESS);
     }     

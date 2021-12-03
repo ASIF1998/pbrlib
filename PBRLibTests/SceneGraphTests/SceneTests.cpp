@@ -6,14 +6,14 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/SceneGraph/Scene.hpp" 
 #include "../../src/SceneGraph/SceneView.hpp"
 
 #include "../../src/Rendering/Window.hpp"
+#include "../../src/PBRLibResources.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 
 TEST(SceneGraphScene, Constructor)
@@ -27,19 +27,20 @@ TEST(SceneGraphScene, Constructor)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrWindow ptr_window = window_builder.buildPtr();
+    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
+    PtrWindow           ptr_window              = window_builder.buildPtr();
     
-    SceneView scene_view1 (name1, ptr_window);
-    SceneView scene_view2 (name2, ptr_window);
+    SceneView scene_view1 (name1, ptr_pbrlib_resources, ptr_window);
+    SceneView scene_view2 (name2, ptr_pbrlib_resources, ptr_window);
 
     Scene& scene1 = scene_view1.getScene();
     Scene& scene2 = scene_view2.getScene();
 
-    EXPECT_EQ(nullptr, scene1.getRootNode()) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть)." << endl;
-    EXPECT_EQ(nullptr, scene2.getRootNode()) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть)." << endl;
+    pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(scene1.getRootNode().get()), "При инициализации у объекта появился указатель на корневой узел (его не должно быть).");
+    pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(scene2.getRootNode().get()), "При инициализации у объекта появился указатель на корневой узел (его не должно быть).");
 
-    EXPECT_EQ(name1, scene1.getName()) << "Не правильное инициализирование имени." << endl;
-    EXPECT_EQ(name2, scene2.getName()) << "Не правильное инициализирование имени." << endl;
+    pbrlib::testing::utils::equality(string(name1), scene1.getName(), "Не правильное инициализирование имени.");
+    pbrlib::testing::utils::equality(string(name2), scene2.getName(), "Не правильное инициализирование имени.");
 }
 
 TEST(SceneGraphScene, GettersAndSetters)
@@ -52,9 +53,10 @@ TEST(SceneGraphScene, GettersAndSetters)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrWindow ptr_window = window_builder.buildPtr();
+    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
+    PtrWindow           ptr_window              = window_builder.buildPtr();
     
-    SceneView scene_view (name, ptr_window);
+    SceneView scene_view (name, ptr_pbrlib_resources, ptr_window);
 
     Scene& scene = scene_view.getScene();
 
@@ -63,8 +65,8 @@ TEST(SceneGraphScene, GettersAndSetters)
     scene.setName(name);
     scene.setRootNode(ptr_node);
     
-    EXPECT_EQ(name, scene.getName())            << "Ошибка в методе setName(...)." << endl;
-    EXPECT_EQ(ptr_node, scene.getRootNode())    << "Ошибка в методе setRootNode(...)." << endl;
+    pbrlib::testing::utils::equality(string(name), scene.getName(), "Ошибка в методе setName(...).");
+    pbrlib::testing::utils::equality(ptr_node, scene.getRootNode(), "Ошибка в методе setRootNode(...).");
 }
 
 TEST(SceneGraphScene, UpdateAndCompanentTest)
@@ -105,15 +107,14 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
     constexpr Vec3<float> pos   (0.0f, 0.0f, 0.0f);
     constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
-    
-    constexpr Viewport viewport {
-        .x          = width / 2.0f,
-        .y          = height / 2.0f,
-        .width      = width,
-        .height     = height,
-        .minDepth   = 0.0f,
-        .maxDepth   = 1.0f
-    };
+
+    Viewport viewport = { };
+    viewport.x          = width / 2.0f;
+    viewport.y          = height / 2.0f;
+    viewport.width      = width;
+    viewport.height     = height;
+    viewport.minDepth   = 0.0f;
+    viewport.maxDepth   = 1.0f;
 
     PerspectiveCamera::Builder  camera_builder;
     SpotLight::Builder          slight_builder;
@@ -128,6 +129,7 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     camera_builder.setFovy(fovy);
     camera_builder.setViewport(viewport);
     camera_builder.setName("Camera Buidler");
+    
     slight_builder.setColor(light_color);
     slight_builder.setIntensity(intensity);
     slight_builder.setPosition(light_pos);
@@ -147,9 +149,10 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrWindow ptr_window = window_builder.buildPtr();
+    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
+    PtrWindow           ptr_window              = window_builder.buildPtr();
     
-    SceneView scene_view ("Scene", ptr_window);
+    SceneView scene_view ("Scene", ptr_pbrlib_resources, ptr_window);
 
     Scene& scene = scene_view.getScene();
 
@@ -173,28 +176,37 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     node5->setWorldAABB(bbox2);
 
     scene.setRootNode(node1);
-    scene.update(0.2);
+    scene.update(0.2f);
     
-    EXPECT_TRUE(node1->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
-    EXPECT_TRUE(node2->hasComponent<PointLight>())  << "Не правильно работает метод makePointLight(...)." << endl;
-    EXPECT_TRUE(node3->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
-    EXPECT_TRUE(node4->hasComponent<SpotLight>())   << "Не правильно работает метод makeSpotLight(...)." << endl;
-    EXPECT_TRUE(node5->hasComponent<PointLight>())  << "Не правильно работает метод makePointLight(...)." << endl;
-    EXPECT_TRUE(node6->hasComponent<CameraBase>())  << "Не правильно работает метод makeCamera(...)." << endl;
+    pbrlib::testing::utils::thisTrue(node1->hasComponent<SpotLight>(), "Не правильно работает метод makeSpotLight(...).");
+    pbrlib::testing::utils::thisTrue(node2->hasComponent<PointLight>(), "Не правильно работает метод makePointLight(...).");
+    pbrlib::testing::utils::thisTrue(node3->hasComponent<SpotLight>(), "Не правильно работает метод makeSpotLight(...).");
+    pbrlib::testing::utils::thisTrue(node4->hasComponent<SpotLight>(), "Не правильно работает метод makeSpotLight(...).");
+    pbrlib::testing::utils::thisTrue(node5->hasComponent<PointLight>(), "Не правильно работает метод makePointLight(...).");
+    pbrlib::testing::utils::thisTrue(node6->hasComponent<CameraBase>(), "Не правильно работает метод makeCamera(...).");
     
-    EXPECT_EQ("Spot Light Builder", node1->getComponent<SpotLight>().getName());
-    EXPECT_EQ("Point Light Builder", node2->getComponent<PointLight>().getName());
-    EXPECT_EQ("Camera Buidler", node6->getComponent<CameraBase>().getName());
+    pbrlib::testing::utils::equality(string("Spot Light Builder"), node1->getComponent<SpotLight>().getName());
+    pbrlib::testing::utils::equality(string("Point Light Builder"), node2->getComponent<PointLight>().getName());
+    pbrlib::testing::utils::equality(string("Camera Buidler"), node6->getComponent<CameraBase>().getName());
 
-    EXPECT_EQ(t1.getMatrix(), node1->getLocalTransform().getMatrix())           << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(t1.getMatrix(), node2->getWorldTransform().getMatrix())           << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(t1.getMatrix(), node3->getWorldTransform().getMatrix())           << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ((t1 * t2).getMatrix(), node4->getWorldTransform().getMatrix())    << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ((t1 * t3).getMatrix(), node5->getWorldTransform().getMatrix())    << "Не правильно работает метод update(...)." << endl;
+    pbrlib::testing::utils::equality(t1.getMatrix(), node1->getLocalTransform().getMatrix(), "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(t1.getMatrix(), node2->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(t1.getMatrix(), node3->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality((t1 * t2).getMatrix(), node4->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality((t1 * t3).getMatrix(), node5->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");
 
-    EXPECT_EQ(bbox3, node1->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(bbox1, node2->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(bbox2, node3->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(bbox1, node4->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
-    EXPECT_EQ(bbox2, node5->getWorldAABB()) << "Не правильно работает метод update(...)." << endl;
+    pbrlib::testing::utils::equality(bbox3[0], node1->getWorldAABB()[0], "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(bbox3[1], node1->getWorldAABB()[1], "Не правильно работает метод update(...).");
+
+    pbrlib::testing::utils::equality(bbox1[0], node2->getWorldAABB()[0], "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(bbox1[1], node2->getWorldAABB()[1], "Не правильно работает метод update(...).");
+    
+    pbrlib::testing::utils::equality(bbox2[0], node3->getWorldAABB()[0], "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(bbox2[1], node3->getWorldAABB()[1], "Не правильно работает метод update(...).");
+
+    pbrlib::testing::utils::equality(bbox1[0], node4->getWorldAABB()[0], "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(bbox1[1], node4->getWorldAABB()[1], "Не правильно работает метод update(...).");
+
+    pbrlib::testing::utils::equality(bbox2[0], node5->getWorldAABB()[0], "Не правильно работает метод update(...).");
+    pbrlib::testing::utils::equality(bbox2[1], node5->getWorldAABB()[1], "Не правильно работает метод update(...).");
 }

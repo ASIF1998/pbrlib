@@ -7,7 +7,10 @@
 
 #include "PBRLibResources.hpp"
 
-#define PBRLIB_DEBUG_VULKAN 0
+#include <vector>
+#include <cassert>
+
+#define PBRLIB_DEBUG_VULKAN  0
 
 #ifndef VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME
 #   define VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME "VK_KHR_portability_subset"
@@ -42,8 +45,8 @@ namespace pbrlib
 
     inline vector<VkDeviceQueueCreateInfo> getVulkanDeviceQueuesCreateInfo(const PtrPhysicalDevice& ptr_physical_device)
     {
-        vector<VkDeviceQueueCreateInfo>  queues_infos; 
-        float                            priority = 1.0f;
+        vector<VkDeviceQueueCreateInfo> queues_infos; 
+        static const float              priority = 1.0f;
 
         vector<VkQueueFamilyProperties> queue_family_properties = ptr_physical_device->getQueueFamilyProperties();
 
@@ -52,14 +55,15 @@ namespace pbrlib
                 (queue_family_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && 
                 (queue_family_properties[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
             ) {
+                VkDeviceQueueCreateInfo queue_ci = { };
+                queue_ci.sType              = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+                queue_ci.pQueuePriorities   = &priority;
+                queue_ci.queueCount         = 1;
+                queue_ci.queueFamilyIndex   = static_cast<uint32_t>(i);
+
                 /// Пока что будет поддерживаться только одна очередь и
                 /// только одно семейство очередей.
-                queues_infos.push_back({
-                    .sType              = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                    .queueFamilyIndex   = static_cast<uint32_t>(i),
-                    .queueCount         = 1,
-                    .pQueuePriorities   = &priority
-                });
+                queues_infos.push_back(queue_ci);
 
                 break;
             }

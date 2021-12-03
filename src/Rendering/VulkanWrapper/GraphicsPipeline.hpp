@@ -28,8 +28,7 @@ namespace pbrlib
      * @class VertexInputState.
      * @brief Класс описывающий состояние входных данных вершин.
     */
-    class VertexInputState :
-        private VkPipelineVertexInputStateCreateInfo
+    class VertexInputState 
     {
     public:
         /**
@@ -74,26 +73,28 @@ namespace pbrlib
         */
         void addVertexInputAttributeDescription(uint32_t location, uint32_t binding, VkFormat format, uint32_t offset);
 
-        const VkVertexInputBindingDescription*   getVertexInputBindingDescriptions()         const noexcept;
-        const VkVertexInputAttributeDescription* getVertexInputAttributeDescriptions()       const noexcept;
-        size_t                                   numVertexInputBindingDescription()          const noexcept;
-        size_t                                   numVertexInputAttributeDescription()        const noexcept;
-        size_t                                   capacityVertexInputBindingDescription()     const noexcept;
-        size_t                                   capacityVertexInputAttributeDescription()   const noexcept;
+        const VkVertexInputBindingDescription*      getVertexInputBindingDescriptions()         const noexcept;
+        const VkVertexInputAttributeDescription*    getVertexInputAttributeDescriptions()       const noexcept;
+        size_t                                      numVertexInputBindingDescription()          const noexcept;
+        size_t                                      numVertexInputAttributeDescription()        const noexcept;
+        size_t                                      capacityVertexInputBindingDescription()     const noexcept;
+        size_t                                      capacityVertexInputAttributeDescription()   const noexcept;
+        const VkPipelineVertexInputStateCreateInfo& getPipelineVertexInputStateCreateInfo()     const noexcept;
+        VkPipelineVertexInputStateCreateInfo&       getPipelineVertexInputStateCreateInfo()     noexcept;
 
     private:
-        VkVertexInputBindingDescription*    _ptr_vertex_biding_descriptions;
-        VkVertexInputAttributeDescription*  _ptr_vertex_attribute_descriptions;
-        size_t                              _curent_vertex_biding_description;
-        size_t                              _curent_vertex_attribute_description;
+        VkVertexInputBindingDescription*        _ptr_vertex_biding_descriptions;
+        VkVertexInputAttributeDescription*      _ptr_vertex_attribute_descriptions;
+        size_t                                  _curent_vertex_biding_description;
+        size_t                                  _curent_vertex_attribute_description;
+        VkPipelineVertexInputStateCreateInfo    _pipeline_vertex_input_state_ci;
     };
 
     /**
      * @class MultisampleState.
      * @brief Класс описывающий состояние мультисэмплинга.
     */
-    class MultisampleState :
-        private VkPipelineMultisampleStateCreateInfo
+    class MultisampleState
     {
     public:
         MultisampleState(
@@ -138,6 +139,9 @@ namespace pbrlib
          * @throw В случае если min_sample_shading < 0 или min_sample_shading > 1.
         */
         void setMinSampleShading(float min_sample_shading) noexcept;
+
+        const VkPipelineMultisampleStateCreateInfo& getPipelineMultisampleStateCreateInfo() const noexcept;
+        VkPipelineMultisampleStateCreateInfo&       getPipelineMultisampleStateCreateInfo() noexcept;
         
         /**
          * @brief Метод позволяющий включать или выключать закрашивание с частотой образцов.
@@ -167,15 +171,15 @@ namespace pbrlib
         VkBool32                 alphaToOneEnable()          const noexcept;
 
     private:
-        VkSampleMask _sample_mask;
+        VkSampleMask                            _sample_mask;
+        VkPipelineMultisampleStateCreateInfo    _pipeline_multisample_state_ci;
     };
 
     /**
      * @class RasterizationState.
      * @brief Класс описывающий состояние растеризации.
     */
-    class RasterizationState :
-        private VkPipelineRasterizationStateCreateInfo
+    class RasterizationState
     {
     public:
         RasterizationState();
@@ -277,24 +281,28 @@ namespace pbrlib
         */
         void depthBiasEnable(VkBool32 is_enable) noexcept;
 
-        VkPolygonMode    getPolygonMode()                const noexcept;
-        VkCullModeFlags  getCullMode()                   const noexcept;
-        VkFrontFace      getFrontFace()                  const noexcept;
-        float            getDepthBiasConstantFactor()    const noexcept;
-        float            getDepthBiasClamp()             const noexcept;
-        float            getDepthBiasSlopeFactor()       const noexcept;
-        float            getLineWidth()                  const noexcept;
-        VkBool32         depthClampEnable()              const noexcept;
-        VkBool32         rasterizerDiscardEnable()       const noexcept;
-        VkBool32         depthBiasEnable()               const noexcept;
+        const VkPipelineRasterizationStateCreateInfo&   getPipelineRasterizationStateCreateInfo()   const noexcept;
+        VkPipelineRasterizationStateCreateInfo&         getPipelineRasterizationStateCreateInfo()   noexcept;
+        VkPolygonMode                                   getPolygonMode()                            const noexcept;
+        VkCullModeFlags                                 getCullMode()                               const noexcept;
+        VkFrontFace                                     getFrontFace()                              const noexcept;
+        float                                           getDepthBiasConstantFactor()                const noexcept;
+        float                                           getDepthBiasClamp()                         const noexcept;
+        float                                           getDepthBiasSlopeFactor()                   const noexcept;
+        float                                           getLineWidth()                              const noexcept;
+        VkBool32                                        depthClampEnable()                          const noexcept;
+        VkBool32                                        rasterizerDiscardEnable()                   const noexcept;
+        VkBool32                                        depthBiasEnable()                           const noexcept;
+
+    private:
+        VkPipelineRasterizationStateCreateInfo _pipeline_rasterization_state_ci;
     };
 
     /**
      * @class DepthStencilState.
      * @brief Класс, описывающий состояние глубины и трафарета.
     */
-    class DepthStencilState :
-        private VkPipelineDepthStencilStateCreateInfo
+    class DepthStencilState
     {
     public:
         /**
@@ -389,23 +397,27 @@ namespace pbrlib
         */
         void stencilTestEnable(VkBool32 is_enable) noexcept;
 
-        VkCompareOp      getDepthCompareOp()     noexcept;
-        VkStencilOpState getFront()              noexcept;
-        VkStencilOpState getBack()               noexcept;
-        float            getMinDepthBounds()     noexcept;
-        float            getMaxDepthBounds()     noexcept;
-        VkBool32         depthTestEnable()       noexcept;
-        VkBool32         depthWriteEnable()      noexcept;
-        VkBool32         depthBoundsTestEnable() noexcept;
-        VkBool32         stencilTestEnable()     noexcept;
+        const VkPipelineDepthStencilStateCreateInfo&    getPipelineDepthStencilStateCreateInfo()    const noexcept;
+        VkPipelineDepthStencilStateCreateInfo&          getPipelineDepthStencilStateCreateInfo()    noexcept;
+        VkCompareOp                                     getDepthCompareOp()                         const noexcept;
+        VkStencilOpState                                getFront()                                  const noexcept;
+        VkStencilOpState                                getBack()                                   const noexcept;
+        float                                           getMinDepthBounds()                         const noexcept;
+        float                                           getMaxDepthBounds()                         const noexcept;
+        VkBool32                                        depthTestEnable()                           const noexcept;
+        VkBool32                                        depthWriteEnable()                          const noexcept;
+        VkBool32                                        depthBoundsTestEnable()                     const noexcept;
+        VkBool32                                        stencilTestEnable()                         const noexcept;
+
+    private:
+        VkPipelineDepthStencilStateCreateInfo _pipeline_depth_stencil_static_ci;
     };
 
     /**
      * @class ViewportState.
      * @brief Класс, описывающий состояние области вывода.
     */
-    class ViewportState :
-        private VkPipelineViewportStateCreateInfo
+    class ViewportState
     {
     public:
         /**
@@ -455,26 +467,28 @@ namespace pbrlib
         */
         void addScissor(int32_t x_offset, int32_t y_offset, uint32_t width, uint32_t height);
 
-        const VkViewport*    getViewports()      const noexcept;
-        const VkRect2D*      getScissors()       const noexcept;
-        size_t               numViewports()      const noexcept;
-        size_t               numScissors()       const noexcept;
-        size_t               capacityViewports() const noexcept;
-        size_t               capacityScissors()  const noexcept;
+        const VkPipelineViewportStateCreateInfo&    getPipelineViewportStateCreateInfo()    const noexcept;
+        VkPipelineViewportStateCreateInfo&          getPipelineViewportStateCreateInfo()    noexcept;
+        const VkViewport*                           getViewports()                          const noexcept;
+        const VkRect2D*                             getScissors()                           const noexcept;
+        size_t                                      numViewports()                          const noexcept;
+        size_t                                      numScissors()                           const noexcept;
+        size_t                                      capacityViewports()                     const noexcept;
+        size_t                                      capacityScissors()                      const noexcept;
 
     private:
-        VkViewport* _ptr_viewports;
-        VkRect2D*   _ptr_scissors;
-        size_t      _current_viewport;
-        size_t      _current_scissor;
+        VkViewport*                         _ptr_viewports;
+        VkRect2D*                           _ptr_scissors;
+        size_t                              _current_viewport;
+        size_t                              _current_scissor;
+        VkPipelineViewportStateCreateInfo   _pipeline_viewport_state_ci;
     };
 
     /**
      * @class InputAssemblyState.
      * @brief Класс, необходимы для описания входной сборки.
     */
-    class InputAssemblyState :
-        private VkPipelineInputAssemblyStateCreateInfo
+    class InputAssemblyState
     {
     public:
         /**
@@ -513,16 +527,20 @@ namespace pbrlib
         */
         void primitiveRestartEnable(VkBool32 is_enable) noexcept;
 
-        VkPrimitiveTopology  getTopology()               const noexcept;
-        VkBool32             primitiveRestartEnable()    const noexcept;
+        const VkPipelineInputAssemblyStateCreateInfo&   getPipelineInputAssemblyStateCreateInfo()   const noexcept;
+        VkPipelineInputAssemblyStateCreateInfo&         getPipelineInputAssemblyStateCreateInfo()   noexcept;
+        VkPrimitiveTopology                             getTopology()                               const noexcept;
+        VkBool32                                        primitiveRestartEnable()                    const noexcept;
+
+    private:
+        VkPipelineInputAssemblyStateCreateInfo _pipeline_input_assembly_state_ci;
     };
 
     /**
      * @class ColorBlendState.
      * @brief Класс, описывающий состояние смешивания цветов.
     */
-    class ColorBlendState :
-        private VkPipelineColorBlendStateCreateInfo
+    class ColorBlendState
     {
     public:
         /**
@@ -571,15 +589,18 @@ namespace pbrlib
 
         void setLogicOp(VkLogicOp logic_op) noexcept;
 
-        const VkPipelineColorBlendAttachmentState*   getAttachments()        const noexcept;
-        size_t                                       numAttachments()        const noexcept;
-        size_t                                       capacityAttachments()   const noexcept;
-        bool                                         logicOpEnable()         const noexcept;
-        VkLogicOp                                    getLogicOp()            const noexcept;
+        const VkPipelineColorBlendStateCreateInfo&      getPipelineColorBlendStateCreateInfo()  const noexcept;
+        VkPipelineColorBlendStateCreateInfo&            getPipelineColorBlendStateCreateInfo()  noexcept;
+        const VkPipelineColorBlendAttachmentState*      getAttachments()                        const noexcept;
+        size_t                                          numAttachments()                        const noexcept;
+        size_t                                          capacityAttachments()                   const noexcept;
+        bool                                            logicOpEnable()                         const noexcept;
+        VkLogicOp                                       getLogicOp()                            const noexcept;
 
     private:
         VkPipelineColorBlendAttachmentState*    _ptr_attachments;
         size_t                                  _current_attachment;
+        VkPipelineColorBlendStateCreateInfo     _pipeline_color_blend_state_ci;
     };
 
     /**

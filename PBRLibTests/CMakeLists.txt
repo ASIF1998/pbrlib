@@ -1,46 +1,57 @@
 set(PBRLIB_MATH_TESTS_SOURCE
-    MathTests/Matrix2x2Tests.cpp
-    MathTests/Matrix3x3Tests.cpp
-    MathTests/Matrix4x4Tests.cpp
-    MathTests/QuaternionTests.cpp
-    MathTests/Vec2Tests.cpp
-    MathTests/Vec3Tests.cpp
-    MathTests/Vec4Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Matrix2x2Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Matrix3x3Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Matrix4x4Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/QuaternionTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Vec2Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Vec3Tests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MathTests/Vec4Tests.cpp
 )
 
 set(PBRLIB_MEMORY_TESTS_SOURCE
-    MemoryTests/MemoryArenaTests.cpp
-    MemoryTests/MemoryBlockTests.cpp
-    MemoryTests/STLAlignedAllocatorTests.cpp
-    MemoryTests/STLArenaLinearAllocatorTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MemoryTests/MemoryArenaTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MemoryTests/MemoryBlockTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MemoryTests/STLAlignedAllocatorTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MemoryTests/STLArenaLinearAllocatorTests.cpp
 )
 
 set(PBRLIB_MOVING_TESTS_SOURCE
-    MovingTests/TransformTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/MovingTests/TransformTests.cpp
 )
 
 set(PBRLIB_CAMERAS_TESTS_SOURCE
-    RenderingTests/CamerasTests/PerspectiveCameraTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/CamerasTests/PerspectiveCameraTests.cpp
 )
 
 set(PBRLIB_GEOMETRY_TESTS_SOURCE
-    RenderingTests/GeometryTests/AABBTests.cpp
-    RenderingTests/GeometryTests/MeshTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/GeometryTests/AABBTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/GeometryTests/MeshTests.cpp
 )
 
 set(PBRLIB_LIGHTS_TESTS_SOURCE
-    RenderingTests/LightsTests/DirectionLightTests.cpp
-    RenderingTests/LightsTests/PointLightTests.cpp
-    RenderingTests/LightsTests/SpotLightTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/LightsTests/DirectionLightTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/LightsTests/PointLightTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/RenderingTests/LightsTests/SpotLightTests.cpp
 )
 
 set(PBRLIB_SCENE_GRAPH_TESTS_SOURCE
-    SceneGraphTests/MeshNodeTests.cpp
-    SceneGraphTests/SceneNodeTests.cpp
-    SceneGraphTests/SceneTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/SceneGraphTests/MeshNodeTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/SceneGraphTests/SceneNodeTests.cpp
+    ${PROJECT_SOURCE_DIR}/PBRLibTests/SceneGraphTests/SceneTests.cpp
 )
 
+if (WIN32)
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/googletest third_party/googletest)
+enable_testing()
+include_directories(../third_party/googletest/googletest/include ${gtest_SOURCE_DIR})
+
 add_executable(PBRLibTests
+    "../src/PBRLibResources.hpp"
+    "../src/PBRLibResources.inl"
+    "../src/PBRLibResources.cpp"
     ${PBRLIB_MATH_HEADERS}
     ${PBRLIB_MEMORY_SOURCE}
     ${PBRLIB_MEMORY_HEADERS}
@@ -72,26 +83,24 @@ add_executable(PBRLibTests
     ${PBRLIB_GEOMETRY_TESTS_SOURCE}
     ${PBRLIB_LIGHTS_TESTS_SOURCE}
     ${PBRLIB_SCENE_GRAPH_TESTS_SOURCE}
+
+    utils.hpp
     pbrlib_tests_run.cpp
 )
 
-find_package(GTest REQUIRED)
-
 target_link_libraries(PBRLibTests PUBLIC 
     ${Vulkan_LIBRARIES}
-    ${SDL2_LIBRARIES} 
-    ${assimp_LIBRARIES}
-    ${GTEST_LIBRARIES}
+    assimp
+    SDL2
+    SDL2main
+    gtest
 )
 
 target_include_directories(PBRLibTests PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIRS} 
-    ${assimp_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/${STB_INCLUDE_DIR}
-    ${GTEST_INCLUDE_DIRS}
 )
 
+source_group("" FILES pbrlib_tests_run.cpp utils.hpp)
 source_group(MathTests FILES ${PBRLIB_MATH_TESTS_SOURCE})
 source_group(MemoryTests FILES ${PBRLIB_MEMORY_TESTS_SOURCE})
 source_group(MovingTests FILES ${PBRLIB_MOVING_TESTS_SOURCE})
@@ -99,4 +108,3 @@ source_group(RenderingTests\\CamerasTests FILES ${PBRLIB_CAMERAS_TESTS_SOURCE})
 source_group(RenderingTests\\GeometryTests FILES ${PBRLIB_GEOMETRY_TESTS_SOURCE})
 source_group(RenderingTests\\LightsTests FILES ${PBRLIB_LIGHTS_TESTS_SOURCE})
 source_group(SceneGraphTests FILES ${PBRLIB_SCENE_GRAPH_TESTS_SOURCE})
-source_group("" FILES pbrlib_tests_run.cpp)

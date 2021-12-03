@@ -21,9 +21,6 @@
 
 #include "../../Cameras/CameraBase.hpp"
 
-using vec3 = pbrlib::math::Vec3<float>;
-using vec4 = pbrlib::math::Vec4<float>;
-
 #include "../Shaders/PointLightData.h"
 #include "../Shaders/SpotLightData.h"
 #include "../Shaders/DirectionLightData.h"
@@ -160,19 +157,19 @@ namespace pbrlib
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_num_lights_buffer, 
-            0, _ptr_uniform_num_lights_buffer->getSize(), 
+            0, _ptr_uniform_num_lights_buffer->getSize(),
             util::enumCast(PBRPassBindings::NumLights), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_point_lights_data_buffer, 
-            0, _ptr_uniform_point_lights_data_buffer->getSize(), 
+            0, _ptr_uniform_point_lights_data_buffer->getSize(),
             util::enumCast(PBRPassBindings::PointLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_spot_lights_data_buffer, 
-            0, _ptr_uniform_spot_lights_data_buffer->getSize(), 
+            0, _ptr_uniform_spot_lights_data_buffer->getSize(),
             util::enumCast(PBRPassBindings::SpotLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
@@ -184,7 +181,7 @@ namespace pbrlib
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_camera_data_buffer, 
-            0, _ptr_uniform_camera_data_buffer->getSize(), 
+            0, _ptr_uniform_camera_data_buffer->getSize(),
             util::enumCast(PBRPassBindings::CameraData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
     }
@@ -232,17 +229,16 @@ namespace pbrlib
         VkExtent3D  out_image_size  = _out_image_view->getImage()->getImageInfo().image_extend;
         NumLights   num_lights;
 
-        num_lights.point    = static_cast<uint>(std::min<size_t>(MAX_POINT_LIGHT, point_lights.size()));
-        num_lights.spot     = static_cast<uint>(std::min<size_t>(MAX_SPOT_LIGHT, spot_lights.size()));
-        num_lights.direct   = static_cast<uint>(std::min<size_t>(MAX_DIRECTION_LIGHT, direction_lights.size()));
+        num_lights.point    = static_cast<uint32_t>(std::min<size_t>(MAX_POINT_LIGHT, point_lights.size()));
+        num_lights.spot     = static_cast<uint32_t>(std::min<size_t>(MAX_SPOT_LIGHT, spot_lights.size()));
+        num_lights.direct   = static_cast<uint32_t>(std::min<size_t>(MAX_DIRECTION_LIGHT, direction_lights.size()));
 
         vector<PointLightData>      point_lights_data       (num_lights.point);
         vector<SpotLightData>       spot_lights_data        (num_lights.spot);
         vector<DirectionLightData>  direction_lights_data   (num_lights.direct);
 
-        CameraData camera_data = {
-            .position = (ptr_camera->getWorldTransform() * ptr_camera->getLocalTransform())(ptr_camera->getComponent<CameraBase>().getPosition())
-        };
+        CameraData camera_data = { };
+        camera_data.position = (ptr_camera->getWorldTransform() * ptr_camera->getLocalTransform())(ptr_camera->getComponent<CameraBase>().getPosition());
 
         /// Point Lights.
         for (size_t i{0}; i < num_lights.point; i++) {
@@ -271,19 +267,19 @@ namespace pbrlib
             direction_lights_data[i].direction_to_light     = direction_light.getDirectionToLight();
         }
 
-        _ptr_uniform_num_lights_buffer->setData(&num_lights, 1);
-        _ptr_uniform_camera_data_buffer->setData(&camera_data, 1);
+        _ptr_uniform_num_lights_buffer->getDeviceMemory()->setData(&num_lights, 1);
+        _ptr_uniform_camera_data_buffer->getDeviceMemory()->setData(&camera_data, 1);
 
         if (num_lights.point) {
-            _ptr_uniform_point_lights_data_buffer->setData(point_lights_data);
+            _ptr_uniform_point_lights_data_buffer->getDeviceMemory()->setData(point_lights_data);
         }
 
         if (num_lights.spot) {
-            _ptr_uniform_spot_lights_data_buffer->setData(spot_lights_data);
+            _ptr_uniform_spot_lights_data_buffer->getDeviceMemory()->setData(spot_lights_data);
         }
 
         if (num_lights.direct) {
-            _ptr_uniform_direction_lights_data_buffer->setData(direction_lights_data);
+            _ptr_uniform_direction_lights_data_buffer->getDeviceMemory()->setData(direction_lights_data);
         }
 
         _ptr_descriptor_set->writeImageView(

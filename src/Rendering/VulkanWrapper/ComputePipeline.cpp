@@ -26,17 +26,14 @@ namespace pbrlib
     {
         assert(shader_module.getShaderType() == VK_SHADER_STAGE_COMPUTE_BIT);
 
-        VkComputePipelineCreateInfo compute_pipeline_info {
-            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
-            .stage = {
-                .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
-                .module                 = shader_module.getShaderHandle(),
-                .pName                  = "main",
-                .pSpecializationInfo    = reinterpret_cast<const VkSpecializationInfo*>(&shader_module.getSpecializationInfo())
-            },
-            .layout     = _ptr_pipeline_layout->getPipelineLayoutHandle()
-        };
+        VkComputePipelineCreateInfo compute_pipeline_info = { };
+        compute_pipeline_info.sType                     = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        compute_pipeline_info.stage.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        compute_pipeline_info.stage.stage               = VK_SHADER_STAGE_COMPUTE_BIT;
+        compute_pipeline_info.stage.module              = shader_module.getShaderHandle();
+        compute_pipeline_info.stage.pName               = "main";
+        compute_pipeline_info.stage.pSpecializationInfo = &shader_module.getSpecializationInfo().getSpecializationInfo();
+        compute_pipeline_info.layout                    = _ptr_pipeline_layout->getPipelineLayoutHandle();
 
         assert(vkCreateComputePipelines(
             _ptr_pipeline_layout->getDevice()->getDeviceHandle(), 

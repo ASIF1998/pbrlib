@@ -9,6 +9,12 @@
 #ifndef PointLightData_h
 #define PointLightData_h
 
+#ifdef __cplusplus
+#   include "../../../math/vec4.hpp"
+
+using vec4 = pbrlib::math::Vec4<float>;
+#endif
+
 struct PointLightData
 {
     vec4 position;

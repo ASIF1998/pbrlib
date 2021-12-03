@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "../../utils.hpp"
 
 #include "../../../src/Rendering/Geometry/Mesh.hpp"
 #include "../../../src/Rendering/Geometry/MeshManager.hpp"
@@ -16,13 +16,10 @@
 #include "../../../src/math/vec3.hpp"
 #include "../../../src/math/vec2.hpp"
 
-#include "../../../src/Rendering/VulkanWrapper/Instance.hpp"
-#include "../../../src/Rendering/VulkanWrapper/PhysicalDevice.hpp"
-#include "../../../src/Rendering/VulkanWrapper/Device.hpp"
+#include "../../../src/PBRLibResources.hpp"
 
 #include "../../../src/Rendering/VulkanWrapper/Buffer.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 using namespace std;
@@ -46,14 +43,13 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     vector<VkDeviceQueueCreateInfo> device_queue_create_info;
 
-    device_queue_create_info.push_back(
-        VkDeviceQueueCreateInfo {
-            .sType              = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-            .queueFamilyIndex   = 0,
-            .queueCount         = 1,
-            .pQueuePriorities   = &queue_priority
-        }
-    );
+    VkDeviceQueueCreateInfo device_queue_ci = { };
+    device_queue_ci.sType               = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    device_queue_ci.queueFamilyIndex    = 0;
+    device_queue_ci.queueCount          = 1;
+    device_queue_ci.pQueuePriorities    = &queue_priority;
+
+    device_queue_create_info.push_back(device_queue_ci);
 
     PtrDevice ptr_device = gpu->makeDevice(ptr_instance, device_queue_create_info);
 
@@ -71,30 +67,30 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     indices.reserve(num_indices);
 
     for(size_t i{0}; i < num_vertex; i++) {
-        vertices.push_back(Mesh::VertexAttrib{
-            .position = Vec3<float> (
-                static_cast<float>(rand()),
-                static_cast<float>(rand()),
-                static_cast<float>(rand())
-            ),
+        Mesh::VertexAttrib vert_attrib = { };
 
-            .uv = Vec2<float> (
-                static_cast<float>(rand()),
-                static_cast<float>(rand())
-            ),
+        vert_attrib.position = Vec3<float> (
+            static_cast<float>(rand()),
+            static_cast<float>(rand()),
+            static_cast<float>(rand())
+        );
 
-            .normal = Vec3<float> (
-                static_cast<float>(rand()),
-                static_cast<float>(rand()),
-                static_cast<float>(rand())
-            ),
+        vert_attrib.uv = Vec2<float> (
+            static_cast<float>(rand()),
+            static_cast<float>(rand())
+        );
 
-            .tangent = Vec3<float> (
-                static_cast<float>(rand()),
-                static_cast<float>(rand()),
-                static_cast<float>(rand())
-            ),
-        });
+        vert_attrib.normal = Vec3<float> (
+            static_cast<float>(rand()),
+            static_cast<float>(rand()),
+            static_cast<float>(rand())
+        );
+
+        vert_attrib.tangent = Vec3<float> (
+            static_cast<float>(rand()),
+            static_cast<float>(rand()),
+            static_cast<float>(rand())
+        );
     }
 
     for (uint32_t i{0}; i < num_indices; i++) {
@@ -105,16 +101,18 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     Buffer::BuilderWithData<uint32_t>           build_index_buffer;
 
     build_vertex_buffer.setUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    build_vertex_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+    build_vertex_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
     build_vertex_buffer.setDevice(ptr_device);
     build_vertex_buffer.setData(vertices);
     build_vertex_buffer.addQueueFamily(0);
+    build_vertex_buffer.setSize(num_vertex);
 
     build_index_buffer.setUsage(VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
-    build_index_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+    build_index_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
     build_index_buffer.setDevice(ptr_device);
     build_index_buffer.setData(indices);
     build_index_buffer.addQueueFamily(0);
+    build_index_buffer.setSize(num_indices);
 
     PtrBuffer ptr_vertex_buffer = build_vertex_buffer.buildPtr();
     PtrBuffer ptr_index_buffer  = build_index_buffer.buildPtr();
@@ -139,10 +137,10 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh1.mapVertexAttribBuffer();
 
     for (size_t i{0}; i < num_vertex / 2; i++) {
-        EXPECT_EQ(vertices[i].position, mesh1.getAttribute<MeshAttribute::Position>(i));
-        EXPECT_EQ(vertices[i].uv, mesh1.getAttribute<MeshAttribute::UV>(i));
-        EXPECT_EQ(vertices[i].normal, mesh1.getAttribute<MeshAttribute::Normal>(i));
-        EXPECT_EQ(vertices[i].tangent, mesh1.getAttribute<MeshAttribute::Tangent>(i));
+        pbrlib::testing::utils::equality(vertices[i].position, mesh1.getAttribute<MeshAttribute::Position>(i));
+        pbrlib::testing::utils::equality(vertices[i].uv, mesh1.getAttribute<MeshAttribute::UV>(i));
+        pbrlib::testing::utils::equality(vertices[i].normal, mesh1.getAttribute<MeshAttribute::Normal>(i));
+        pbrlib::testing::utils::equality(vertices[i].tangent, mesh1.getAttribute<MeshAttribute::Tangent>(i));
     }
 
     mesh1.unmapVertexAttribBuffer();
@@ -150,7 +148,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh1.mapIndexBuffer();
 
     for (size_t i{0}; i < num_indices / 2; i++) {
-        EXPECT_EQ(indices[i], mesh1.getIndex(i));
+        pbrlib::testing::utils::equality(indices[i], mesh1.getIndex(i));
     }
 
     mesh1.unmapIndexBuffer();
@@ -158,10 +156,10 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh2.mapVertexAttribBuffer();
 
     for (size_t i{mesh1.getVertexBufferOffset()}; i < mesh1.getNumVertices(); i++) {
-        EXPECT_EQ(vertices[i].position, mesh2.getAttribute<MeshAttribute::Position>(i - (num_vertex / 2)));
-        EXPECT_EQ(vertices[i].uv, mesh2.getAttribute<MeshAttribute::UV>(i - (num_vertex / 2)));
-        EXPECT_EQ(vertices[i].normal, mesh2.getAttribute<MeshAttribute::Normal>(i - (num_vertex / 2)));
-        EXPECT_EQ(vertices[i].tangent, mesh2.getAttribute<MeshAttribute::Tangent>(i - (num_vertex / 2)));
+        pbrlib::testing::utils::equality(vertices[i].position, mesh2.getAttribute<MeshAttribute::Position>(i - (num_vertex / 2)));
+        pbrlib::testing::utils::equality(vertices[i].uv, mesh2.getAttribute<MeshAttribute::UV>(i - (num_vertex / 2)));
+        pbrlib::testing::utils::equality(vertices[i].normal, mesh2.getAttribute<MeshAttribute::Normal>(i - (num_vertex / 2)));
+        pbrlib::testing::utils::equality(vertices[i].tangent, mesh2.getAttribute<MeshAttribute::Tangent>(i - (num_vertex / 2)));
     }
 
     mesh2.unmapVertexAttribBuffer();
@@ -169,7 +167,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh2.mapIndexBuffer();
 
     for (size_t i{num_indices / 2}; i < num_indices; i++) {
-        EXPECT_EQ(indices[i], mesh2.getIndex(i - (num_indices / 2)));
+        pbrlib::testing::utils::equality(indices[i], mesh2.getIndex(i - (num_indices / 2)));
     }
 
     mesh2.unmapIndexBuffer();
@@ -187,15 +185,15 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh2.getAttribute<MeshAttribute::Normal>(13)   = pnt_r;
     mesh2.getAttribute<MeshAttribute::Tangent>(13)  = pnt_r;
 
-    EXPECT_EQ(mesh1.getAttribute<MeshAttribute::Position>(13), pnt_r);
-    EXPECT_EQ(mesh1.getAttribute<MeshAttribute::UV>(13), uv_r);
-    EXPECT_EQ(mesh1.getAttribute<MeshAttribute::Normal>(13), pnt_r);
-    EXPECT_EQ(mesh1.getAttribute<MeshAttribute::Tangent>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh1.getAttribute<MeshAttribute::Position>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh1.getAttribute<MeshAttribute::UV>(13), uv_r);
+    pbrlib::testing::utils::equality(mesh1.getAttribute<MeshAttribute::Normal>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh1.getAttribute<MeshAttribute::Tangent>(13), pnt_r);
 
-    EXPECT_EQ(mesh2.getAttribute<MeshAttribute::Position>(13), pnt_r);
-    EXPECT_EQ(mesh2.getAttribute<MeshAttribute::UV>(13), uv_r);
-    EXPECT_EQ(mesh2.getAttribute<MeshAttribute::Normal>(13), pnt_r);
-    EXPECT_EQ(mesh2.getAttribute<MeshAttribute::Tangent>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh2.getAttribute<MeshAttribute::Position>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh2.getAttribute<MeshAttribute::UV>(13), uv_r);
+    pbrlib::testing::utils::equality(mesh2.getAttribute<MeshAttribute::Normal>(13), pnt_r);
+    pbrlib::testing::utils::equality(mesh2.getAttribute<MeshAttribute::Tangent>(13), pnt_r);
 
     mesh2.unmapVertexAttribBuffer();
     mesh1.unmapVertexAttribBuffer();
@@ -206,8 +204,8 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh1.setIndex(23, index_r);
     mesh2.setIndex(23, index_r);
 
-    EXPECT_EQ(index_r, mesh1.getIndex(23));
-    EXPECT_EQ(index_r, mesh2.getIndex(23));
+    pbrlib::testing::utils::equality(index_r, mesh1.getIndex(23));
+    pbrlib::testing::utils::equality(index_r, mesh2.getIndex(23));
 
     mesh2.unmapIndexBuffer();
     mesh1.unmapIndexBuffer();

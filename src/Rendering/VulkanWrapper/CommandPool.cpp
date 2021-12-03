@@ -17,12 +17,10 @@ namespace pbrlib
         _command_pool_handle(VK_NULL_HANDLE),
         _queue_family_index (queue_family_index)
     {
-        VkCommandPoolCreateInfo command_pool_info {
-            .sType              = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-            .pNext              = nullptr,
-            .flags              = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-            .queueFamilyIndex   = _queue_family_index
-        };
+        VkCommandPoolCreateInfo command_pool_info = { };
+        command_pool_info.sType             = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        command_pool_info.flags             = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        command_pool_info.queueFamilyIndex  = _queue_family_index;
         
         assert(vkCreateCommandPool(
             _ptr_device->getDeviceHandle(), 

@@ -21,6 +21,8 @@
 
 #include "DeviceQueue.hpp"
 
+#include <memory>
+
 using namespace std;
 using namespace pbrlib::math;
 
@@ -52,11 +54,10 @@ namespace pbrlib
         uint32_t                array_layers;
     };
 
-    class Image: 
-        public DeviceMemory
+    class Image
     {
         friend class Swapchain;
-    
+
     public:
         enum class TexelType
         {
@@ -79,15 +80,15 @@ namespace pbrlib
         class Builder
         {
         public:
-            inline          Builder();
+            inline Builder();
 
             Builder(Builder&&)      = delete;
             Builder(const Builder&) = delete;
 
             inline virtual ~Builder();
 
-            Builder& operator = (Builder&&)      = delete;
-            Builder& operator = (const Builder&) = delete;
+            Builder& operator = (Builder&&)         = delete;
+            Builder& operator = (const Builder&)    = delete;
 
             inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
             inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;
@@ -113,9 +114,9 @@ namespace pbrlib
         };
 
         template<
-            TexelType   TexType, 
-            typename    Type, 
-            NumBits     NBits, 
+            TexelType   TexType,
+            typename    Type,
+            NumBits     NBits,
             typename    AllocatorType = STLAlignedAllocator<Type>
         >
         class BuilderWithData :
@@ -126,13 +127,15 @@ namespace pbrlib
             inline BuilderWithData(uint32_t width, uint32_t height, uint32_t depth);
             inline BuilderWithData(const VkExtent3D& extend);
 
-            BuilderWithData(BuilderWithData&&)      = delete;
+            BuilderWithData(BuilderWithData&&) = delete;
             BuilderWithData(const BuilderWithData&) = delete;
 
-            BuilderWithData& operator = (BuilderWithData&&)      = delete;
-            BuilderWithData& operator = (const BuilderWithData&) = delete;
+            inline virtual ~BuilderWithData();
 
-            inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept;
+            BuilderWithData& operator = (BuilderWithData&&)         = delete;
+            BuilderWithData& operator = (const BuilderWithData&)    = delete;
+
+            inline virtual void setExtend(uint32_t width, uint32_t height, uint32_t depth)  noexcept override;
             inline virtual void setExtend(const VkExtent3D& extend)                         noexcept;
 
             template<typename Container>
@@ -143,7 +146,7 @@ namespace pbrlib
             void setDeviceLocalMemoryTypeIndex(uint32_t memory_type_index)      noexcept;
             void setHostLocalMemoryTypeIndex(uint32_t memory_type_index)        noexcept;
             void setCommandBuffer(const PtrPrimaryCommandBuffer& ptr_command_buffer);
-            void setDeviceQueue(const PtrDeviceQueue& ptr_device_queue);
+            void setDeviceQueue(const PtrDeviceQueue& ptr_device_queue); 
 
             inline void pushBack(Type r);
             inline void pushBack(const Vec2<Type>& c);
@@ -181,10 +184,27 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
         */
         Image(
-            const PtrDevice&            ptr_device,
-            uint32_t                    memory_type_index, 
-            const ImageInfo&            image_info, 
-            uint32_t                    queue_family_index
+            const PtrDevice&    ptr_device,
+            uint32_t            memory_type_index,
+            const ImageInfo&    image_info,
+            uint32_t            queue_family_index
+        );
+
+        /**
+         * @brief Конструктор.
+         * @details На данный момент поддерживаются только типы float.
+         * 
+         * @param ptr_device            указатель на устройство.
+         * @param memory_type_index     индекс типа памяти.
+         * @param image_info            информация об изображении.
+         * @param queue_family_indices  индексы семейства очередей.
+        */
+
+        Image(
+            const PtrDevice&        ptr_device,
+            uint32_t                memory_type_index,
+            const ImageInfo&        image_info,
+            const vector<uint32_t>& queue_family_indices
         );
 
         /**
@@ -197,26 +217,10 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
         */
         Image(
-            const PtrDevice&            ptr_device,
-            uint32_t                    memory_type_index, 
-            const ImageInfo&            image_info, 
-            const vector<uint32_t>&     queue_family_indices
-        );
-
-        /**
-         * @brief Конструктор.
-         * @details На данный момент поддерживаются только типы float.
-         * 
-         * @param ptr_device            указатель на устройство.
-         * @param memory_type_index     индекс типа памяти.
-         * @param image_info            информация об изображении.
-         * @param queue_family_indices  индексы семейства очередей.
-        */
-        Image(
-            const PtrDevice&            ptr_device,
-            uint32_t                    memory_type_index, 
-            const ImageInfo&            image_info, 
-            vector<uint32_t>&&          queue_family_indices
+            const PtrDevice&    ptr_device,
+            uint32_t            memory_type_index,
+            const ImageInfo&    image_info,
+            vector<uint32_t>&&  queue_family_indices
         );
 
         /**
@@ -228,25 +232,10 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
         */
         Image(
-            const PtrDevice&            ptr_device,
-            VkImage                     image,
-            ImageInfo                   image_info,
-            uint32_t                    queue_family_index
-        );
-        
-        /**
-         * @brief Конструктор.
-         *
-         * @param ptr_device            указатель на устройство.
-         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info            информация об изображении.
-         * @param queue_family_indicies индексы семейства очередей.
-        */
-        Image(
-            const PtrDevice&            ptr_device,
-            VkImage                     image,
-            ImageInfo                   image_info,
-            const vector<uint32_t>&     queue_family_indicies
+            const PtrDevice&    ptr_device,
+            VkImage             image,
+            ImageInfo           image_info,
+            uint32_t            queue_family_index
         );
 
         /**
@@ -258,10 +247,25 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
         */
         Image(
-            const PtrDevice&            ptr_device,
-            VkImage                     image,
-            ImageInfo                   image_info,
-            vector<uint32_t>&&          queue_family_indicies
+            const PtrDevice&        ptr_device,
+            VkImage                 image,
+            ImageInfo               image_info,
+            const vector<uint32_t>& queue_family_indicies
+        );
+
+        /**
+         * @brief Конструктор.
+         *
+         * @param ptr_device            указатель на устройство.
+         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
+         * @param image_info            информация об изображении.
+         * @param queue_family_indicies индексы семейства очередей.
+        */
+        Image(
+            const PtrDevice&    ptr_device,
+            VkImage             image,
+            ImageInfo           image_info,
+            vector<uint32_t>&&  queue_family_indicies
         );
 
         Image(Image&& image);
@@ -269,12 +273,16 @@ namespace pbrlib
 
         ~Image();
 
-        Image& operator = (Image&&)         = delete;
-        Image& operator = (const Image&)    = delete;
+        Image& operator = (Image&&) = delete;
+        Image& operator = (const Image&) = delete;
 
-        ImageInfo&       getImageInfo();
-        const ImageInfo& getImageInfo()      const;
-        const VkImage&   getImageHandle()    const;
+        ImageInfo&              getImageInfo();
+        const ImageInfo&        getImageInfo()    const;
+        const VkImage&          getImageHandle()  const;
+        PtrDevice&              getDevice()       noexcept;
+        const PtrDevice&        getDevice()       const noexcept;
+        PtrDeviceMemory&        getDeviceMemory() noexcept;
+        const PtrDeviceMemory&  getDeviceMemory() const noexcept;
 
         /**
          * @brief Статический метод для создания Image.
@@ -286,10 +294,10 @@ namespace pbrlib
          * @return указатель на Image.
         */
         static PtrImage make(
-            const PtrDevice&            ptr_device,
-            uint32_t                    memory_type_index,
-            const ImageInfo&            image_info,
-            uint32_t                    queue_family_index
+            const PtrDevice&    ptr_device,
+            uint32_t            memory_type_index,
+            const ImageInfo&    image_info,
+            uint32_t            queue_family_index
         );
 
         /**
@@ -302,10 +310,10 @@ namespace pbrlib
          * @return указатель на Image.
         */
         static PtrImage make(
-            const PtrDevice&            ptr_device,
-            uint32_t                    memory_type_index,
-            const ImageInfo&            image_info,
-            const vector<uint32_t>&     queue_family_indices
+            const PtrDevice&        ptr_device,
+            uint32_t                memory_type_index,
+            const ImageInfo&        image_info,
+            const vector<uint32_t>& queue_family_indices
         );
 
         /**
@@ -318,10 +326,10 @@ namespace pbrlib
          * @return указатель на Image.
         */
         static PtrImage make(
-            const PtrDevice&            ptr_device,
-            VkImage                     image,
-            const ImageInfo&            image_info,
-            uint32_t                    queue_family_index
+            const PtrDevice&    ptr_device,
+            VkImage             image,
+            const ImageInfo&    image_info,
+            uint32_t            queue_family_index
         );
 
         /**
@@ -334,19 +342,21 @@ namespace pbrlib
          * @return указатель на Image.
         */
         static PtrImage make(
-            const PtrDevice&            ptr_device,
-            VkImage                     image,
-            const ImageInfo&            image_info,
-            const vector<uint32_t>&     queue_family_indicies
+            const PtrDevice&        ptr_device,
+            VkImage                 image,
+            const ImageInfo&        image_info,
+            const vector<uint32_t>& queue_family_indicies
         );
 
     private:
-        void _create();
+        void _create(uint32_t memory_type_index);
 
     private:
         VkImage             _image_handle;
         ImageInfo           _image_info;
         vector<uint32_t>    _queue_family_indicies;
+        PtrDevice           _ptr_device;
+        PtrDeviceMemory     _ptr_device_memory;
     };
 
     class ImageView
@@ -375,7 +385,7 @@ namespace pbrlib
             VkImageSubresourceRange _subresource_range;
             VkImageViewType         _image_view_type;
         };
-        
+
     public:
         /**
          * @brief Конструктор.
@@ -387,8 +397,8 @@ namespace pbrlib
         */
         ImageView(
             const PtrImage&                 ptr_image,
-            VkFormat                        format, 
-            const VkImageSubresourceRange&  subresource_range, 
+            VkFormat                        format,
+            const VkImageSubresourceRange&  subresource_range,
             VkImageViewType                 type
         );
 
@@ -400,13 +410,13 @@ namespace pbrlib
         ImageView& operator = (ImageView&&)         = delete;
         ImageView& operator = (const ImageView&)    = delete;
 
-        PtrImage&                        getImage()              noexcept;
-        const PtrImage&                  getImage()              const noexcept;
-        VkImageViewType                  getImageViewType()      const noexcept;
-        VkFormat                         getFormat()             const noexcept;
-        VkImageSubresourceRange&         getSubresourceRange()   noexcept;
-        const VkImageSubresourceRange&   getSubresourceRange()   const noexcept;
-        const VkImageView&               getImageViewHandle()    const noexcept;
+        PtrImage&                       getImage()              noexcept;
+        const PtrImage&                 getImage()              const noexcept;
+        VkImageViewType                 getImageViewType()      const noexcept;
+        VkFormat                        getFormat()             const noexcept;
+        VkImageSubresourceRange&        getSubresourceRange()   noexcept;
+        const VkImageSubresourceRange&  getSubresourceRange()   const noexcept;
+        const VkImageView&              getImageViewHandle()    const noexcept;
 
     private:
         PtrImage                _ptr_image;

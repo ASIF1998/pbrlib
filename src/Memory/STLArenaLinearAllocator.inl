@@ -24,6 +24,20 @@ namespace pbrlib
     }
 
     template<typename Type>
+    template<typename U>
+    inline STLArenaLinearAllocator<Type>::STLArenaLinearAllocator(const STLArenaLinearAllocator<U>& linear_allocator) :
+        _ptr_memory_arena   (linear_allocator.getMemoryArena()),
+        _ptr_memory_block   (nullptr),
+        _memory_size        (linear_allocator.max_size()),
+        _current_pos        (0)
+    {
+        auto[ptr_memory, ptr_memory_block] = _ptr_memory_arena->allocate<Type>(_memory_size);
+
+        _ptr_memory         = ptr_memory;
+        _ptr_memory_block   = ptr_memory_block;
+    }
+
+    template<typename Type>
     inline STLArenaLinearAllocator<Type>::STLArenaLinearAllocator(
         STLArenaLinearAllocator&& linear_allocator
     ) :

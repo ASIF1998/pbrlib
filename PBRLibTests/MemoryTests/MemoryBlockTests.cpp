@@ -6,11 +6,10 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../utils.hpp"
 
 #include "../../src/Memory/MemoryBlock.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 
 TEST(MemoryMemoryBlock, Constructor)
@@ -19,9 +18,9 @@ TEST(MemoryMemoryBlock, Constructor)
 
     PtrIMemoryBlock ptr_memory_block = MemoryBlock::make(size);
 
-    EXPECT_EQ(size, ptr_memory_block->getSize());
-    EXPECT_EQ(0, ptr_memory_block->getNumUsers());
-    EXPECT_NE(nullptr, ptr_memory_block->getPtrMemory());
+    pbrlib::testing::utils::equality(size, ptr_memory_block->getSize());
+    pbrlib::testing::utils::equality(0, ptr_memory_block->getNumUsers());
+    pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(ptr_memory_block->getPtrMemory()));
 }
 
 TEST(MemoryMemoryBlock, SetMethods)
@@ -36,7 +35,7 @@ TEST(MemoryMemoryBlock, SetMethods)
     ptr_memory_block->setMemory(new_memory, size2, true);
     ptr_memory_block->setNumUsers(num_users);
 
-    EXPECT_EQ(size2, ptr_memory_block->getSize());
-    EXPECT_NE(nullptr, ptr_memory_block->getPtrMemory());
-    EXPECT_EQ(num_users, ptr_memory_block->getNumUsers());
+    pbrlib::testing::utils::equality(size2, ptr_memory_block->getSize());
+    pbrlib::testing::utils::notEquality(static_cast<size_t>(0), reinterpret_cast<size_t>(ptr_memory_block->getPtrMemory()));
+    pbrlib::testing::utils::equality(num_users, ptr_memory_block->getNumUsers());
 }

@@ -24,8 +24,7 @@ namespace pbrlib
 
     using PtrBuffer = shared_ptr<Buffer>;
 
-    class Buffer :
-        public DeviceMemory
+    class Buffer
     {
     public:
         template<typename Type>
@@ -174,12 +173,20 @@ namespace pbrlib
         Buffer& operator = (Buffer&&)       = delete;
         Buffer& operator = (const Buffer&)  = delete;
 
-        const VkBuffer& getBufferHandle() const noexcept;
+        const VkBuffer&         getBufferHandle()   const noexcept;
+        PtrDevice&              getDevice()         noexcept;
+        const PtrDevice&        getDevice()         const noexcept;
+        PtrDeviceMemory&        getDeviceMemory()   noexcept;
+        const PtrDeviceMemory&  getDeviceMemory()   const noexcept;
+        VkDeviceSize            getSize()           const noexcept;
 
     private:
         VkBuffer            _buffer_handle;
         VkBufferUsageFlags  _usage;
         vector<uint32_t>    _queue_family_indicies;
+        PtrDevice           _ptr_device;
+        PtrDeviceMemory     _ptr_device_memory;
+        VkDeviceSize        _size;
     };
 }
 

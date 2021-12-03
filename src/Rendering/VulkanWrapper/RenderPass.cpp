@@ -28,9 +28,9 @@ namespace pbrlib
         _depth_stencil_attachment       (subpass_descriptoin._depth_stencil_attachment),
         _use_depth_stencil_attachment   (subpass_descriptoin._use_depth_stencil_attachment)
     {
-        swap(_color_attachment,     subpass_descriptoin._color_attachment);
-        swap(_input_attachment,     subpass_descriptoin._input_attachment);
-        swap(_present_attachment,   subpass_descriptoin._present_attachment);
+        swap(_color_attachment, subpass_descriptoin._color_attachment);
+        swap(_input_attachment, subpass_descriptoin._input_attachment);
+        swap(_present_attachment, subpass_descriptoin._present_attachment);
     }
 
     SubpassDescription::SubpassDescription(const SubpassDescription& subpass_descriptoin) :
@@ -44,16 +44,16 @@ namespace pbrlib
     void SubpassDescription::addInputAttachment(uint32_t attachment, VkImageLayout layout)
     {
         _input_attachment.push_back({
-            .attachment = attachment,
-            .layout     = layout
+            attachment,
+            layout
         });
     }
 
     void SubpassDescription::addColorAttachment(uint32_t attachment, VkImageLayout layout)
     {
         _color_attachment.push_back({
-            .attachment = attachment,
-            .layout     = layout
+            attachment,
+            layout
         });
     }
 
@@ -67,8 +67,8 @@ namespace pbrlib
         _use_depth_stencil_attachment = true;
 
         _depth_stencil_attachment = {
-            .attachment = attachment,
-            .layout     = layout
+            attachment,
+            layout
         };
     }
 
@@ -136,9 +136,9 @@ namespace pbrlib
 
     RenderPassInfo::RenderPassInfo(RenderPassInfo&& render_pass_info)
     {
-        swap(_attribute_descriptions,   render_pass_info._attribute_descriptions);
-        swap(_subpass_descriptions,     render_pass_info._subpass_descriptions);
-        swap(_subpass_dependencies,     render_pass_info._subpass_dependencies);
+        swap(_attribute_descriptions, render_pass_info._attribute_descriptions);
+        swap(_subpass_descriptions, render_pass_info._subpass_descriptions);
+        swap(_subpass_dependencies, render_pass_info._subpass_dependencies);
     }
 
     void RenderPassInfo::setNumSubpassDescription(size_t num_subpass_description)
@@ -167,15 +167,15 @@ namespace pbrlib
     )
     {
         _attribute_descriptions.push_back({
-            .flags          = 0,
-            .format         = format,
-            .samples        = samples,
-            .loadOp         = load_op,
-            .storeOp        = store_op,
-            .stencilLoadOp  = stencil_load_op,
-            .stencilStoreOp = stencil_store_op,
-            .initialLayout  = initial_layout,
-            .finalLayout    = final_layout
+            0,
+            format,
+            samples,
+            load_op,
+            store_op,
+            stencil_load_op,
+            stencil_store_op,
+            initial_layout,
+            final_layout
         });
     }
 
@@ -199,13 +199,13 @@ namespace pbrlib
     )
     {
         _subpass_dependencies.push_back({
-            .srcSubpass         = src_subpass,
-            .dstSubpass         = dst_subpass,
-            .srcStageMask       = src_stage_mask,
-            .dstStageMask       = dst_stage_mask,
-            .srcAccessMask      = src_access_mask,
-            .dstAccessMask      = dst_access_mask,
-            .dependencyFlags    = 0
+            src_subpass,
+            dst_subpass,
+            src_stage_mask,
+            dst_stage_mask,
+            src_access_mask,
+            dst_access_mask,
+            0
         });
     }
 
@@ -278,31 +278,28 @@ namespace pbrlib
 
         for (size_t i{0}; i < subpass_description.size(); i++) {
             subpass_description[i] = {
-                .flags                      = 0,
-                .pipelineBindPoint          = VK_PIPELINE_BIND_POINT_GRAPHICS,
-                .inputAttachmentCount       = static_cast<uint32_t>(psubpass_descritions[i].getInputAttachment().size()),
-                .pInputAttachments          = psubpass_descritions[i].getInputAttachment().data(),
-                .colorAttachmentCount       = static_cast<uint32_t>(psubpass_descritions[i].getColorAttachment().size()),
-                .pColorAttachments          = psubpass_descritions[i].getColorAttachment().data(),
-                .pResolveAttachments        = nullptr,
-                .pDepthStencilAttachment    = (psubpass_descritions[i].useDepthStencilAttachment() ?
-                                                &psubpass_descritions[i].getDepthStencilAttachment() : nullptr),
-                .preserveAttachmentCount    = static_cast<uint32_t>(psubpass_descritions[i].getPresentAttachment().size()),
-                .pPreserveAttachments       = psubpass_descritions[i].getPresentAttachment().data()
+                0,
+                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                static_cast<uint32_t>(psubpass_descritions[i].getInputAttachment().size()),
+                psubpass_descritions[i].getInputAttachment().data(),
+                static_cast<uint32_t>(psubpass_descritions[i].getColorAttachment().size()),
+                psubpass_descritions[i].getColorAttachment().data(),
+                nullptr,
+                (psubpass_descritions[i].useDepthStencilAttachment() ?
+                    &psubpass_descritions[i].getDepthStencilAttachment() : nullptr),
+                static_cast<uint32_t>(psubpass_descritions[i].getPresentAttachment().size()),
+                psubpass_descritions[i].getPresentAttachment().data()
             };
         }
 
-       VkRenderPassCreateInfo render_pass_create_info {
-           .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-           .pNext           = nullptr,
-           .flags           = 0,
-           .attachmentCount = static_cast<uint32_t>(_render_pass_info.getAttachmentDescriptions().size()),
-           .pAttachments    = _render_pass_info.getAttachmentDescriptions().data(),
-           .subpassCount    = static_cast<uint32_t>(subpass_description.size()),
-           .pSubpasses      = subpass_description.data(),
-           .dependencyCount = static_cast<uint32_t>(_render_pass_info.getSubpassDependencies().size()),
-           .pDependencies   = _render_pass_info.getSubpassDependencies().data()
-       };
+        VkRenderPassCreateInfo render_pass_create_info = { };
+        render_pass_create_info.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        render_pass_create_info.attachmentCount = static_cast<uint32_t>(_render_pass_info.getAttachmentDescriptions().size());
+        render_pass_create_info.pAttachments    = _render_pass_info.getAttachmentDescriptions().data();
+        render_pass_create_info.subpassCount    = static_cast<uint32_t>(subpass_description.size());
+        render_pass_create_info.pSubpasses      = subpass_description.data();
+        render_pass_create_info.dependencyCount = static_cast<uint32_t>(_render_pass_info.getSubpassDependencies().size());
+        render_pass_create_info.pDependencies   = _render_pass_info.getSubpassDependencies().data();
 
        assert(vkCreateRenderPass(
            _ptr_device->getDeviceHandle(), 

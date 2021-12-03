@@ -1,15 +1,9 @@
-if (NOT APPLE)
-    message(FATAL_ERROR "Этот CMakeLists.txt предназначен для Mac OS.")
-endif()
-
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQURED ON)
 
-set(CMAKE_CXX_FLAGS "-mavx2")
-
-project(PBRLib LANGUAGES CXX)
+project(PBRLib)
 
 option(PBRLIB_ENABLE_TESTS "Осуществлять тестирование." ON)
 
@@ -232,7 +226,10 @@ set(PBRLIB_UTIL_HEADERS
     ${PROJECT_SOURCE_DIR}/src/Util/enumCast.hpp
 )
 
-add_executable(PBRLib 
+add_library(PBRLib
+    "src/PBRLibResources.hpp"
+    "src/PBRLibResources.inl"
+    "src/PBRLibResources.cpp"
     ${PBRLIB_MATH_HEADERS}
     ${PBRLIB_MEMORY_SOURCE}
     ${PBRLIB_MEMORY_HEADERS}
@@ -258,8 +255,10 @@ add_executable(PBRLib
     ${PBRLIB_VULKAN_WRAPPER_HEADERS}
     ${PBRLIB_SCENE_GRAPH_SOURCE}
     ${PBRLIB_SCENE_GRAPH_HEADERS}
+    ${PBRLIB_UTIL_HEADERS}
 )
 
+source_group("" FILES "src/PBRLibResources.hpp" "src/PBRLibResources.inl" "src/PBRLibResources.cpp")
 source_group(math FILES ${PBRLIB_MATH_HEADERS})
 source_group(Memory FILES ${PBRLIB_MEMORY_SOURCE} ${PBRLIB_MEMORY_HEADERS})
 source_group(Moving FILES ${PBRLIB_MOVING_SOURCE} ${PBRLIB_MOVING_HEADERS})
@@ -276,42 +275,48 @@ source_group(Rendering\\VulkanWrapper FILES ${PBRLIB_VULKAN_WRAPPER_SOURCE} ${PB
 source_group(SceneGraph FILES ${PBRLIB_SCENE_GRAPH_SOURCE} ${PBRLIB_SCENE_GRAPH_HEADERS})
 source_group(Util FILES ${PBRLIB_UTIL_HEADERS})
 
-find_package(SDL2 REQUIRED)
-find_package(Vulkan)
+include_directories(third_party/assimp/include)
+include_directories(third_party/SDL/include)
+include_directories(third_party/stb)
 
-if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR 
-        "Ошибка при поиске Vulkan SDK.\n"
-        "Для корректной сборки проекта, нужно делать следующее:\n"
-        "   1) Скачать Vulkan SDK (https://vulkan.lunarg.com/sdk/home);\n"
-        "   2) Расположить содержимое в директории /usr//local/Cellar/;\n"
-        "   3) Ввести в терминал следующее: \"export VULKAN_SDK=/usr/local/Cellar/vulkansdk/macOS\"."
-    )
+add_subdirectory(third_party/assimp)
+add_subdirectory(third_party/SDL)
+
+if (APPLE) 
+    find_package(Vulkan)
+
+    if (NOT Vulkan_FOUND)
+        message(FATAL_ERROR 
+            "Ошибка при поиске Vulkan SDK.\n"
+            "Для корректной сборки проекта, нужно делать следующее:\n"
+            "   1) Скачать Vulkan SDK (https://vulkan.lunarg.com/sdk/home);\n"
+            "   2) Расположить содержимое в директории /usr//local/Cellar/;\n"
+            "   3) Ввести в терминал следующее: \"export VULKAN_SDK=/usr/local/Cellar/vulkansdk/macOS\"."
+        )
+    endif()
+else()
+    find_package(Vulkan REQUIRED)
 endif()
-
-include("third_party/assimp/cmake-modules/Findassimp.cmake")
-
-set(STB_INCLUDE_DIR "third_party/stb")
 
 target_link_libraries(PBRLib PUBLIC
     ${Vulkan_LIBRARIES}
-    ${SDL2_LIBRARIES} 
-    ${assimp_LIBRARIES}
+    assimp
+    SDL2
+    SDL2main
 )
 
 target_include_directories(PBRLib PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIRS} 
-    ${assimp_INCLUDE_DIRS}
-    ${STB_INCLUDE_DIR}
 )
 
-message(STATUS 
-    "При открытии проекта XCode необходимо установить следующие переменные окружения:\n"
-    "   1) DYLD_LIBRARY_PATH    ${Vulkan_LIBRARIES}\n"
-    "   2) VK_ICD_FILENAMES     /usr/local/Cellar/vulkansdk/macOS/share/vulkan/icd.d/MoltenVK_icd.json\n"
-    "   3) VK_LAYER_PATH        /usr/local/Cellar/vulkansdk/macOS/share/vulkan/explicit_layer.d"
-)
+if (APPLE)
+    message(STATUS 
+        "При открытии проекта XCode необходимо установить следующие переменные окружения:\n"
+        "   1) DYLD_LIBRARY_PATH    ${Vulkan_LIBRARIES}\n"
+        "   2) VK_ICD_FILENAMES     /usr/local/Cellar/vulkansdk/macOS/share/vulkan/icd.d/MoltenVK_icd.json\n"
+        "   3) VK_LAYER_PATH        /usr/local/Cellar/vulkansdk/macOS/share/vulkan/explicit_layer.d"
+    )
+endif()
 
 if (PBRLIB_ENABLE_TESTS) 
     add_subdirectory(PBRLibTests)

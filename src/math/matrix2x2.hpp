@@ -11,7 +11,9 @@
 
 #include <iostream>
 
-#include <xmmintrin.h>
+#if (defined(__SSE__) || defined(__AVX2__))
+#   include <xmmintrin.h>
+#endif
 
 using namespace std;
 
@@ -28,9 +30,12 @@ namespace pbrlib::math
          * @brief Конструктор по умолчанию создаёт единичную матрицу.
         */
         inline constexpr Matrix2x2();
-
         inline constexpr Matrix2x2(Type init_value);
-        inline constexpr Matrix2x2(Type v11, Type v12, Type v21, Type v22);
+
+        inline constexpr Matrix2x2(
+            Type x0, Type y0,
+            Type x1, Type y1
+        );
 
         /**
          * @brief Констуктор.
@@ -88,6 +93,7 @@ namespace pbrlib::math
         };
     };
 
+#if (defined(__SSE__) || defined(__AVX2__))
     template<>
     class Matrix2x2<float>
     {
@@ -98,8 +104,12 @@ namespace pbrlib::math
         inline constexpr Matrix2x2();
 
         inline constexpr Matrix2x2(float init_value)                            noexcept;
-        inline constexpr Matrix2x2(float v11, float v12, float v21, float v22)  noexcept;
         inline constexpr Matrix2x2(const __m128& init_vec)                      noexcept;
+
+        inline constexpr Matrix2x2(
+            float x0, float y0,
+            float x1, float y1
+        )  noexcept;
 
         /**
          * @brief Констуктор.
@@ -157,6 +167,7 @@ namespace pbrlib::math
             __m128  _m128_simd;
         };
     };
+#endif
 
     /**
      * @brief Функция необходимая для транспонирования матрицы.

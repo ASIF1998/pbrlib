@@ -147,17 +147,14 @@ namespace pbrlib
             }
         }
 
-        VkFramebufferCreateInfo framebuffer_info = {
-            .sType              = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .pNext              = nullptr,
-            .flags              = 0,
-            .renderPass         = _ptr_render_pass->getRenderPassHandle(),
-            .attachmentCount    = static_cast<uint32_t>(attachments.size()),
-            .pAttachments       = attachments.data(),
-            .width              = _width,
-            .height             = _height,
-            .layers             = _layers
-        };
+        VkFramebufferCreateInfo framebuffer_info = { };
+        framebuffer_info.sType              = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_info.renderPass         = _ptr_render_pass->getRenderPassHandle();
+        framebuffer_info.attachmentCount    = static_cast<uint32_t>(attachments.size());
+        framebuffer_info.pAttachments       = attachments.data();
+        framebuffer_info.width              = _width;
+        framebuffer_info.height             = _height;
+        framebuffer_info.layers             = _layers;
 
         assert(vkCreateFramebuffer(
             _ptr_render_pass->getDevice()->getDeviceHandle(), 

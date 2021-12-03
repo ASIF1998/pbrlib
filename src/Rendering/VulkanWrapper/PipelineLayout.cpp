@@ -34,11 +34,11 @@ namespace pbrlib
     )
     {
         _descriptor_set_layout_bindings.push_back({
-            .binding            = binding,
-            .descriptorType     = descriptor_type,
-            .descriptorCount    = 1,
-            .stageFlags         = stage_flags,
-            .pImmutableSamplers = nullptr
+            binding,
+            descriptor_type,
+            1,
+            stage_flags,
+            nullptr
         });
     }
 
@@ -57,11 +57,11 @@ namespace pbrlib
         _samplers.push_back(move(sampler));
 
         _descriptor_set_layout_bindings.push_back({
-            .binding            = binding,
-            .descriptorType     = descriptor_type,
-            .descriptorCount    = 1,
-            .stageFlags         = stage_flags,
-            .pImmutableSamplers = &_samplers.back().getSamplerHandle()
+            binding,
+            descriptor_type,
+            1,
+            stage_flags,
+            &_samplers.back().getSamplerHandle()
         });
     }
 
@@ -113,13 +113,10 @@ namespace pbrlib
 
     void DescriptorSetLayout::_create()
     {
-        VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info {
-            .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-            .pNext          = nullptr,
-            .flags          = 0,
-            .bindingCount   = static_cast<uint32_t>(_descriptor_set_layout_bindings.getDescriptorSetLayoutBindings().size()),
-            .pBindings      = _descriptor_set_layout_bindings.getDescriptorSetLayoutBindings().data()
-        };
+        VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info = { };
+        descriptor_set_layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        descriptor_set_layout_info.bindingCount = static_cast<uint32_t>(_descriptor_set_layout_bindings.getDescriptorSetLayoutBindings().size());
+        descriptor_set_layout_info.pBindings    = _descriptor_set_layout_bindings.getDescriptorSetLayoutBindings().data();
 
         assert(vkCreateDescriptorSetLayout(
             _descriptor_set_layout_bindings.getDevice()->getDeviceHandle(),
@@ -332,15 +329,12 @@ namespace pbrlib
             set_layout_handles[i] = _descriptor_set_layouts[i]->getDescriptorSetLayoutHandle();
         }
 
-        VkPipelineLayoutCreateInfo pipeline_layout_info {
-            .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .pNext                  = 0,
-            .flags                  = 0,
-            .setLayoutCount         = static_cast<uint32_t>(set_layout_handles.size()),
-            .pSetLayouts            = set_layout_handles.data(),
-            .pushConstantRangeCount = static_cast<uint32_t>(_push_constant_ranges.size()),
-            .pPushConstantRanges    = _push_constant_ranges.data()
-        };
+        VkPipelineLayoutCreateInfo pipeline_layout_info = { };
+        pipeline_layout_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_info.setLayoutCount         = static_cast<uint32_t>(set_layout_handles.size());
+        pipeline_layout_info.pSetLayouts            = set_layout_handles.data();
+        pipeline_layout_info.pushConstantRangeCount = static_cast<uint32_t>(_push_constant_ranges.size());
+        pipeline_layout_info.pPushConstantRanges    = _push_constant_ranges.data();
 
         assert(vkCreatePipelineLayout(
             _ptr_device->getDeviceHandle(), 

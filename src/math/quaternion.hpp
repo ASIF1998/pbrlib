@@ -11,7 +11,9 @@
 
 #include <iostream>
 
-#include <xmmintrin.h>
+#if (defined(__SSE__) || defined(__AVX2__))
+#   include <xmmintrin.h>
+#endif
 
 #include "vec3.hpp"
 
@@ -28,8 +30,8 @@ namespace pbrlib::math
         inline constexpr Quaternion(float x, float y, float z, float w);
         inline constexpr Quaternion(const Vec3<float>& v, float w);
 
-        bool operator == (const Quaternion& q) const noexcept;
-        bool operator != (const Quaternion& q) const noexcept;
+        inline bool operator == (const Quaternion& q) const noexcept;
+        inline bool operator != (const Quaternion& q) const noexcept;
 
         inline Quaternion operator + (const Quaternion& q)  const noexcept;
         inline Quaternion operator - (const Quaternion& q)  const noexcept;
@@ -46,7 +48,7 @@ namespace pbrlib::math
         inline float    operator [] (size_t i) const noexcept;
         inline float&   operator [] (size_t i) noexcept;
 
-        friend ostream& operator << (ostream& print, const Quaternion& q);
+        friend inline ostream& operator << (ostream& print, const Quaternion& q);
         
         inline float lengthSquared()    const noexcept;
         inline float length()           const noexcept;
@@ -96,8 +98,10 @@ namespace pbrlib::math
         */
         inline static Quaternion zerro() noexcept;
 
+#if (defined(__SSE__) || defined(__AVX2__))
     private:
         inline constexpr Quaternion(const __m128& m) noexcept;
+#endif
 
     public:
         union
@@ -108,7 +112,10 @@ namespace pbrlib::math
                 float       w;
             };
 
+#if (defined(__SSE__) || defined(__AVX2__))
             __m128  xyzw_simd;
+#endif
+
             float   xyzw[4];
         };
     };

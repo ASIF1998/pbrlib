@@ -253,10 +253,10 @@ namespace pbrlib
         RenderPass& operator = (RenderPass&&)       = delete;
         RenderPass& operator = (const RenderPass&)  = delete;
 
-        const RenderPassInfo&        getRenderPassInfo()         const noexcept;
-        const VkRenderPass&          getRenderPassHandle()       const noexcept;
-        PtrDevice&          getDevice()                 noexcept;
-        const PtrDevice&    getDevice()                 const noexcept;
+        const RenderPassInfo&   getRenderPassInfo()     const noexcept;
+        const VkRenderPass&     getRenderPassHandle()   const noexcept;
+        PtrDevice&              getDevice()             noexcept;
+        const PtrDevice&        getDevice()             const noexcept;
 
         /**
          * @brief Статический метод создающий объект типа PtrRenderPass.
@@ -265,8 +265,8 @@ namespace pbrlib
          * @param render_pass_info информация о проходе рендера.
         */
         static PtrRenderPass make(
-            const PtrDevice&   ptr_device, 
-            const RenderPassInfo&       render_pass_info
+            const PtrDevice&        ptr_device, 
+            const RenderPassInfo&   render_pass_info
         );
 
         /**
@@ -276,17 +276,17 @@ namespace pbrlib
          * @param render_pass_info информация о проходе рендера.
         */
         static PtrRenderPass make(
-            const PtrDevice&   ptr_device, 
-            RenderPassInfo&&            render_pass_info
+            const PtrDevice&    ptr_device, 
+            RenderPassInfo&&    render_pass_info
         );
 
     private:
         void _create();
 
     private:
-        RenderPassInfo      _render_pass_info;
-        VkRenderPass        _render_pass_handle;
-        PtrDevice  _ptr_device;
+        RenderPassInfo  _render_pass_info;
+        VkRenderPass    _render_pass_handle;
+        PtrDevice       _ptr_device;
     };
 }
 

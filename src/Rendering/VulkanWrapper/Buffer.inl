@@ -1,5 +1,5 @@
 //
-//  Buffer.c
+//  Buffer.inl
 //  PBRLib
 //
 //  Created by Асиф Мамедов on 03/05/2020.
@@ -111,18 +111,18 @@ namespace pbrlib
     template<typename Container>
     inline void Buffer::BuilderWithData<Type, AllocatorType>::setData(const Container& data)
     {
-         static_assert(
-             is_same<const Type&, decltype(data[0])>::value,
-             "The type of items in the container does not match the type of items in the buffer"
-         );
+        static_assert(
+            is_same<const Type&, decltype(data[0])>::value,
+            "The type of items in the container does not match the type of items in the buffer"
+        );
 
-         if (data.size() != _data.size()) {
-             _data.resize(data.size());
-         }
+        if (data.size() != _data.size()) {
+            _data.resize(data.size());
+        }
 
-         if (data.size()) {
-             memcpy(_data.data(), data.data(), sizeof(Type) * data.size());
-         }
+        if (data.size()) {
+            memcpy(_data.data(), data.data(), sizeof(Type) * data.size());
+        }
     }
 
     template<typename Type, typename AllocatorType>
@@ -183,9 +183,9 @@ namespace pbrlib
                 Builder<Type>::_queue_family_indicies
             );
         
-        buffer.map();
-        buffer.setData(_data);
-        buffer.unmap();
+        buffer.getDeviceMemory()->map();
+        buffer.getDeviceMemory()->setData(_data);
+        buffer.getDeviceMemory()->unmap();
 
         return buffer;
     }
@@ -213,9 +213,9 @@ namespace pbrlib
             );
         }
 
-        ptr_buffer->map();
-        ptr_buffer->setData(_data);
-        ptr_buffer->unmap();
+        ptr_buffer->getDeviceMemory()->map();
+        ptr_buffer->getDeviceMemory()->setData(_data);
+        ptr_buffer->getDeviceMemory()->unmap();
 
         return ptr_buffer;
     }

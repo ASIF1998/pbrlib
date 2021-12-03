@@ -7,18 +7,17 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <gtest/gtest.h>
+#include "../../utils.hpp"
 
 #include "../../../src/Rendering/Lights/DirectionLight.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 
 TEST(RenderingLightsDirectionLight, BuilderAndSetters)
 {
-    constexpr Vec3<float>   color           (1.00f, 0.0f, 0.0f);
-    constexpr Vec3<float>   dir_on_light    (0.00f, 0.0f, 1.0f);
+    Vec3<float>             color           (1.00f, 0.0f, 0.0f);
+    Vec3<float>             dir_on_light    (0.00f, 0.0f, 1.0f);
     constexpr float         intensity       (50.0f);
 
     DirectionLight::Builder build_direction_light;
@@ -29,15 +28,18 @@ TEST(RenderingLightsDirectionLight, BuilderAndSetters)
     
     DirectionLight light = build_direction_light.build();
 
-    EXPECT_EQ(color, light.getColor());
-    EXPECT_EQ(dir_on_light, light.getDirectionToLight());
-    EXPECT_EQ(intensity, light.getIntensity());
+    pbrlib::testing::utils::equality(color, light.getColor());
+    pbrlib::testing::utils::equality(dir_on_light, light.getDirectionToLight());
+    pbrlib::testing::utils::equality(intensity, light.getIntensity());
 
     light.setIntensity(intensity * 1232.434f);
     light.setDirectionToLight(dir_on_light * 223.321f);
     light.setColor(color * 3232.323442f);
 
-    EXPECT_EQ(color * 3232.323442f, light.getColor());
-    EXPECT_EQ(dir_on_light * 223.321f, light.getDirectionToLight());
-    EXPECT_EQ(intensity * 1232.434f, light.getIntensity());
+    color           *= 3232.323442f;
+    dir_on_light    *= 223.321f;
+
+    pbrlib::testing::utils::equality(color, light.getColor());
+    pbrlib::testing::utils::equality(dir_on_light, light.getDirectionToLight());
+    pbrlib::testing::utils::equality(intensity * 1232.434f, light.getIntensity());
 }

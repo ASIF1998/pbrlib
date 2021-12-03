@@ -8,12 +8,11 @@
 
 #include <numeric>
 
-#include <gtest/gtest.h>
+#include "../../utils.hpp"
 
 #include "../../../src/Rendering/Geometry/AABB.hpp"
 #include "../../../src/math/vec3.hpp"
 
-using namespace testing;
 using namespace pbrlib;
 using namespace pbrlib::math;
 using namespace std;
@@ -32,22 +31,12 @@ TEST(RenderingGeometryAABB, Constructor)
     AABB bbox2 (p);
     AABB bbox3 (p1, p2);
 
-    EXPECT_EQ(bbox1[0].x, min_value);
-    EXPECT_EQ(bbox1[0].y, min_value);
-    EXPECT_EQ(bbox1[0].z, min_value);
-    EXPECT_EQ(bbox1[1].x, max_value);
-    EXPECT_EQ(bbox1[1].y, max_value);
-    EXPECT_EQ(bbox1[1].z, max_value);
-
-    EXPECT_EQ(bbox2[0], p);
-    EXPECT_EQ(bbox2[1], p);
-
-    EXPECT_EQ(bbox3[0].x, -1.0f);
-    EXPECT_EQ(bbox3[0].y, -1.0f);
-    EXPECT_EQ(bbox3[0].z, -1.0f);
-    EXPECT_EQ(bbox3[1].x, 1.00f);
-    EXPECT_EQ(bbox3[1].y, 1.00f);
-    EXPECT_EQ(bbox3[1].z, 1.00f);
+    pbrlib::testing::utils::equality(bbox1[0], Vec3<float>(min_value));
+    pbrlib::testing::utils::equality(bbox1[1], Vec3<float>(max_value));
+    pbrlib::testing::utils::equality(bbox2[0], p);
+    pbrlib::testing::utils::equality(bbox2[1], p);
+    pbrlib::testing::utils::equality(bbox3[0], Vec3<float>(-1.0f));
+    pbrlib::testing::utils::equality(bbox3[1], Vec3<float>(1.0f));
 }
 
 TEST(RenderingGeometryAABB, EqualAndNotEqual)
@@ -57,11 +46,11 @@ TEST(RenderingGeometryAABB, EqualAndNotEqual)
     AABB bbox1 (p);
     AABB bbox2 (p);
 
-    EXPECT_TRUE(bbox1 == bbox2);
+    pbrlib::testing::utils::thisTrue(bbox1 == bbox2);
 
     bbox2[0].y = -1.0f;
 
-    EXPECT_TRUE(bbox1 != bbox2);
+    pbrlib::testing::utils::thisTrue(bbox1 != bbox2);
 }
 
 TEST(RenderingGeometryAABB, Corner)
@@ -80,14 +69,14 @@ TEST(RenderingGeometryAABB, Corner)
 
     AABB bbox (p1, p2);
 
-    EXPECT_TRUE(bbox.corner(0) == r0);
-    EXPECT_TRUE(bbox.corner(1) == r1);
-    EXPECT_TRUE(bbox.corner(2) == r2);
-    EXPECT_TRUE(bbox.corner(3) == r3);
-    EXPECT_TRUE(bbox.corner(4) == r4);
-    EXPECT_TRUE(bbox.corner(5) == r5);
-    EXPECT_TRUE(bbox.corner(6) == r6);
-    EXPECT_TRUE(bbox.corner(7) == r7);
+    pbrlib::testing::utils::equality(bbox.corner(0), r0);
+    pbrlib::testing::utils::equality(bbox.corner(1), r1);
+    pbrlib::testing::utils::equality(bbox.corner(2), r2);
+    pbrlib::testing::utils::equality(bbox.corner(3), r3);
+    pbrlib::testing::utils::equality(bbox.corner(4), r4);
+    pbrlib::testing::utils::equality(bbox.corner(5), r5);
+    pbrlib::testing::utils::equality(bbox.corner(6), r6);
+    pbrlib::testing::utils::equality(bbox.corner(7), r7);
 }
 
 TEST(RenderingGeometryAABB, Diagonal)
@@ -99,7 +88,7 @@ TEST(RenderingGeometryAABB, Diagonal)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(r, bbox.diagonal());
+    pbrlib::testing::utils::equality(r, bbox.diagonal());
 }
 
 TEST(RenderingGeometryAABB, SurfaceArea)
@@ -111,7 +100,7 @@ TEST(RenderingGeometryAABB, SurfaceArea)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(r, bbox.surfaceArea());
+    pbrlib::testing::utils::equality(r, bbox.surfaceArea());
 }
 
 TEST(RenderingGeometryAABB, Volume)
@@ -123,7 +112,7 @@ TEST(RenderingGeometryAABB, Volume)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(r, bbox.volume());
+    pbrlib::testing::utils::equality(r, bbox.volume());
 }
 
 TEST(RenderingGeometryAABB, MaximumExtend)
@@ -135,7 +124,7 @@ TEST(RenderingGeometryAABB, MaximumExtend)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(r, bbox.maximumExtent());
+    pbrlib::testing::utils::equality(r, bbox.maximumExtent());
 }
 
 TEST(RenderingGeometryAABB,  Lerp)
@@ -149,7 +138,7 @@ TEST(RenderingGeometryAABB,  Lerp)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(r, bbox.lerp(t));
+    pbrlib::testing::utils::equality(r, bbox.lerp(t));
 }
 
 TEST(RenderingGeometryAABB, Union)
@@ -168,8 +157,10 @@ TEST(RenderingGeometryAABB, Union)
     AABB res1 = AABB::aabbUnion(bbox1, bbox2);
     AABB res2 = AABB::aabbUnion(res1, p4);
 
-    EXPECT_EQ(r1, res1);
-    EXPECT_EQ(r2, res2);
+    pbrlib::testing::utils::equality(r1[0], res1[0]);
+    pbrlib::testing::utils::equality(r1[1], res1[1]);
+    pbrlib::testing::utils::equality(r2[0], res2[0]);
+    pbrlib::testing::utils::equality(r2[1], res2[1]);
 }
 
 TEST(RenderingGeometryAABB, Intersect)
@@ -184,7 +175,10 @@ TEST(RenderingGeometryAABB, Intersect)
     AABB bbox1 (p1, p2);
     AABB bbox2 (p3, p4);
 
-    EXPECT_EQ(r, AABB::intersect(bbox1, bbox2));
+    AABB res = AABB::intersect(bbox1, bbox2);
+
+    pbrlib::testing::utils::equality(r[0], res[0]);
+    pbrlib::testing::utils::equality(r[1], res[1]);
 }
 
 TEST(RenderingGeometryAABB, Overlaps)
@@ -197,7 +191,7 @@ TEST(RenderingGeometryAABB, Overlaps)
     AABB bbox1 (p1, p2);
     AABB bbox2 (p3, p4);
 
-    EXPECT_EQ(true, AABB::overlaps(bbox1, bbox2));
+    pbrlib::testing::utils::equality(true, AABB::overlaps(bbox1, bbox2));
 }
 
 TEST(RenderingGeometryAABB, Inside)
@@ -208,7 +202,7 @@ TEST(RenderingGeometryAABB, Inside)
 
     AABB bbox (p1, p2);
 
-    EXPECT_EQ(true, AABB::inside(bbox, p3));
+    pbrlib::testing::utils::equality(true, AABB::inside(bbox, p3));
 }
 
 TEST(RenderingGeometryAABB, Expand)
@@ -223,5 +217,8 @@ TEST(RenderingGeometryAABB, Expand)
 
     AABB bbox (p);
 
-    EXPECT_EQ(r, AABB::expand(bbox, delta));
+    AABB res = AABB::expand(bbox, delta);
+
+    pbrlib::testing::utils::equality(r[0], res[0]);
+    pbrlib::testing::utils::equality(r[1], res[1]);
 }

@@ -11,7 +11,9 @@
 
 #include <iostream>
 
-#include <immintrin.h>
+#if defined(__AVX2__)
+#   include <immintrin.h>
+#endif
 
 #include "vec4.hpp"
 
@@ -31,10 +33,10 @@ namespace pbrlib::math
         inline constexpr Matrix4x4(Type init_value);
 
         inline constexpr Matrix4x4(
-            Type v11, Type v12, Type v13, Type v14,
-            Type v21, Type v22, Type v23, Type v24,
-            Type v31, Type v32, Type v33, Type v34,
-            Type v41, Type v42, Type v43, Type v44
+            Type x0, Type y0, Type z0, Type w0,
+            Type x1, Type y1, Type z1, Type w1,
+            Type x2, Type y2, Type z2, Type w2,
+            Type x3, Type y3, Type z3, Type w3
         );
 
         /**
@@ -88,11 +90,13 @@ namespace pbrlib::math
     private:
         union
         {
-            Type _array4x4[4][4];
-            Type _array16[16];
+            Type        _array4x4[4][4];
+            Type        _array16[16];
+            Vec4<Type>  _vec_array[4];
         };
     };
 
+#if defined(__AVX2__)
     template<>
     class Matrix4x4<float>
     {
@@ -105,10 +109,10 @@ namespace pbrlib::math
         inline constexpr Matrix4x4(float init_value);
 
         inline constexpr Matrix4x4(
-            float v11, float v12, float v13, float v14,
-            float v21, float v22, float v23, float v24,
-            float v31, float v32, float v33, float v34,
-            float v41, float v42, float v43, float v44
+            float x0, float y0, float z0, float w0,
+            float x1, float y1, float z1, float w1,
+            float x2, float y2, float z2, float w2,
+            float x3, float y3, float z3, float w3
         );
 
         /**
@@ -170,6 +174,7 @@ namespace pbrlib::math
             __m256  _m256_simd[2];
         };
     };
+#endif
 
     /**
      * @brief Функция необходимая для транспонирования матрицы.

@@ -12,27 +12,25 @@
 
 namespace pbrlib
 {
-    SamplerInfo::SamplerInfo() noexcept :
-        VkSamplerCreateInfo {
-            .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0
-        }
-    {}
+    SamplerInfo::SamplerInfo() noexcept 
+    {
+        _sampler_ci = { };
+        _sampler_ci.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    }
 
     void SamplerInfo::setMagFilter(VkFilter filter) noexcept
     {
-        VkSamplerCreateInfo::magFilter = filter;
+        _sampler_ci.magFilter = filter;
     }
 
     void SamplerInfo::setMinFilter(VkFilter filter) noexcept
     {
-        VkSamplerCreateInfo::minFilter = filter;
+        _sampler_ci.minFilter = filter;
     }
 
     void SamplerInfo::setMipmapMode(VkSamplerMipmapMode mipmap_mode) noexcept
     {
-        VkSamplerCreateInfo::mipmapMode = mipmap_mode;
+        _sampler_ci.mipmapMode = mipmap_mode;
     }
 
     void SamplerInfo::setAdressMode(
@@ -41,105 +39,115 @@ namespace pbrlib
         VkSamplerAddressMode w
     ) noexcept
     {
-        VkSamplerCreateInfo::addressModeU = u;
-        VkSamplerCreateInfo::addressModeV = v;
-        VkSamplerCreateInfo::addressModeW = w;
+        _sampler_ci.addressModeU = u;
+        _sampler_ci.addressModeV = v;    
+        _sampler_ci.addressModeW = w;    
     }
 
     void SamplerInfo::setMipLodBias(float mip_lod_bias) noexcept
     {
-        VkSamplerCreateInfo::mipLodBias = mip_lod_bias;
+        _sampler_ci.mipLodBias = mip_lod_bias;
     }
 
     void SamplerInfo::anisotropyEnable(VkBool32 is_enable) noexcept
     {
-        VkSamplerCreateInfo::anisotropyEnable = is_enable;
+        _sampler_ci.anisotropyEnable = is_enable;
     }
 
-    void SamplerInfo::setMaxAnisotropy(float max_anosotropy) noexcept
+    void SamplerInfo::setMaxAnisotropy(float max_anisotropy) noexcept
     {
-        VkSamplerCreateInfo::maxAnisotropy = max_anosotropy;
+        _sampler_ci.maxAnisotropy = max_anisotropy;
     }
 
     void SamplerInfo::compareEnable(VkBool32 is_enable) noexcept
     {
-        VkSamplerCreateInfo::compareEnable = is_enable;
+        _sampler_ci.compareEnable = is_enable;
     }
 
     void SamplerInfo::setCompareOp(VkCompareOp compare_op) noexcept
     {
-        VkSamplerCreateInfo::compareOp = compare_op;
+        _sampler_ci.compareOp = compare_op;
     }
 
     void SamplerInfo::setLodRange(float min_lod, float max_lod) noexcept
     {
-        VkSamplerCreateInfo::minLod = min_lod;
-        VkSamplerCreateInfo::maxLod = max_lod;
+        _sampler_ci.minLod = min_lod;
+        _sampler_ci.maxLod = max_lod;        
     }
 
     void SamplerInfo::setBorderColor(VkBorderColor border_color) noexcept
     {
-        VkSamplerCreateInfo::borderColor = border_color;
+        _sampler_ci.borderColor = border_color;
     }
 
     void SamplerInfo::unnormalizedCoordinates(VkBool32 unnormalized_coordinates) noexcept
     {
-        VkSamplerCreateInfo::unnormalizedCoordinates = unnormalized_coordinates;
+        _sampler_ci.unnormalizedCoordinates = unnormalized_coordinates;
+    }
+
+    const VkSamplerCreateInfo& SamplerInfo::getSamplerCreateInfo() const noexcept
+    {
+        return _sampler_ci;
+    }
+
+    VkSamplerCreateInfo& SamplerInfo::getSamplerCreateInfo() noexcept
+    {
+        return _sampler_ci;
     }
 
     VkFilter SamplerInfo::getMagFilter() const noexcept
     {
-        return VkSamplerCreateInfo::magFilter;
+        return _sampler_ci.magFilter;
     }
 
     VkFilter SamplerInfo::getMinFilter() const noexcept
     {
-        return VkSamplerCreateInfo::minFilter;
+        return _sampler_ci.minFilter;
     }
 
     VkSamplerMipmapMode SamplerInfo::getMipmapMode() const noexcept
     {
-        return VkSamplerCreateInfo::mipmapMode;
+        return _sampler_ci.mipmapMode;
     }
 
     VkBool32 SamplerInfo::anisotropyEnable() const noexcept
     {
-        return VkSamplerCreateInfo::anisotropyEnable;
+        return _sampler_ci.anisotropyEnable;
     }
 
     float SamplerInfo::getMaxAnisotropy() const noexcept
     {
-        return VkSamplerCreateInfo::maxAnisotropy;
+        return _sampler_ci.maxAnisotropy;
     }
 
     VkBool32 SamplerInfo::compareEnable() const noexcept
     {
-        return VkSamplerCreateInfo::compareEnable;
+        return _sampler_ci.compareEnable;
     }
 
     VkCompareOp SamplerInfo::getCompareOp() const noexcept
     {
-        return VkSamplerCreateInfo::compareOp;
+        return _sampler_ci.compareOp;
     }
 
     float SamplerInfo::getMinLod() const noexcept
     {
-        return VkSamplerCreateInfo::minLod;
+        return _sampler_ci.minLod;
     }
 
     float SamplerInfo::getMaxLod() const noexcept
     {
-        return VkSamplerCreateInfo::maxLod;
+        return _sampler_ci.maxLod;
     }
 
     VkBorderColor SamplerInfo::getBorderColor() const noexcept
     {
-        return VkSamplerCreateInfo::borderColor;
+        return _sampler_ci.borderColor;
     }
 
     VkBool32 SamplerInfo::unnormalizedCoordinates() const noexcept
     {
-        return VkSamplerCreateInfo::unnormalizedCoordinates;
+        return _sampler_ci.unnormalizedCoordinates;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +158,7 @@ namespace pbrlib
     {
         assert(vkCreateSampler(
             _ptr_device->getDeviceHandle(),
-            reinterpret_cast<VkSamplerCreateInfo*>(&_sampler_info),
+            &_sampler_info.getSamplerCreateInfo(),
             nullptr,
             &_sampler_handle
         ) == VK_SUCCESS);

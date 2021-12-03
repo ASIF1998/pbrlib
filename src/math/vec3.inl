@@ -50,19 +50,19 @@ namespace pbrlib::math
     template<typename Type>
     inline Vec3<Type> Vec3<Type>::operator + (const Vec3<Type>& v) const
     {
-        return {x + v.x, y + v.y, z + v.z};
+        return Vec3<Type>(x + v.x, y + v.y, z + v.z);
     }
 
     template<typename Type>
     inline Vec3<Type> Vec3<Type>::operator - (const Vec3<Type>& v) const
     {
-        return {x - v.x, y - v.y, z - v.z};
+        return Vec3<Type>(x - v.x, y - v.y, z - v.z);
     }
 
     template<typename Type>
     inline Vec3<Type> Vec3<Type>::operator * (const Type s) const
     {
-        return {x * s, y * s, z * s};
+        return Vec3<Type>(x * s, y * s, z * s);
     }
 
     template<typename Type>
@@ -140,11 +140,11 @@ namespace pbrlib::math
     template<typename Type>
     inline Vec3<Type> cross(const Vec3<Type> v1, const Vec3<Type>& v2)
     {
-        return {
+        return Vec3<Type>(
             v1.y * v2.z - v1.z * v2.y,
             v1.z * v2.x - v1.x * v2.z,
             v1.x * v2.y - v1.y * v2.x
-        };
+        );
     }
 
     template<typename Type>
@@ -153,7 +153,7 @@ namespace pbrlib::math
         auto l = v.length();
         assert(l != static_cast<Type>(0));
 
-        return {v.x / l, v.y / l, v.z / l};
+        return Vec3<Type>(v.x / l, v.y / l, v.z / l);
     }
 
     template<typename Type>
