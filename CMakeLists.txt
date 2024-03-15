@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQURED ON)
 
 project(PBRLib)
 
-option(PBRLIB_ENABLE_TESTS "Осуществлять тестирование." ON)
+option(PBRLIB_ENABLE_TESTS "Осуществлять тестирование." OFF)
+option(PBRLIB_SANDBOX "Проект, в котором можно тестировать возможности библиотеки." ON)
 
 set(PRLIB_ENGINE_VERSION_MAJOR 0)
 set(PRLIB_ENGINE_VERSION_MINOR 0)
@@ -258,6 +259,8 @@ add_library(PBRLib
     ${PBRLIB_UTIL_HEADERS}
 )
 
+add_library(pbrlib::PBRLib ALIAS PBRLib)
+
 source_group("" FILES "src/PBRLibResources.hpp" "src/PBRLibResources.inl" "src/PBRLibResources.cpp")
 source_group(math FILES ${PBRLIB_MATH_HEADERS})
 source_group(Memory FILES ${PBRLIB_MEMORY_SOURCE} ${PBRLIB_MEMORY_HEADERS})
@@ -301,8 +304,7 @@ endif()
 target_link_libraries(PBRLib PUBLIC
     ${Vulkan_LIBRARIES}
     assimp
-    SDL2
-    SDL2main
+    SDL3::SDL3
 )
 
 target_include_directories(PBRLib PUBLIC 
@@ -320,4 +322,10 @@ endif()
 
 if (PBRLIB_ENABLE_TESTS) 
     add_subdirectory(PBRLibTests)
+endif()
+
+if (PBRLIB_SANDBOX)
+    add_executable(pbrlib_sandbox "sandbox/main.cpp")
+    target_link_libraries(pbrlib_sandbox pbrlib::PBRLib)
+    target_include_directories(pbrlib_sandbox PUBLIC "src/")
 endif()
