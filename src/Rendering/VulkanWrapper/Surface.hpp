@@ -15,7 +15,7 @@
 
 #include <memory>
 
-#include <SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 
 using namespace std;
 

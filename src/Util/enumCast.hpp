@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace pbrlib::util
+namespace pbrlib::utils
 {
     template<typename T>
     constexpr typename underlying_type<T>::type enumCast(T x)

@@ -94,7 +94,7 @@ namespace pbrlib
         build_shader.setShaderCode(reinterpret_cast<const uint32_t*>(pbrpass_comp_spirv), sizeof(pbrpass_comp_spirv));
         build_shader.setShaderType(VK_SHADER_STAGE_COMPUTE_BIT);
         build_shader.setSpecializationInfoSizeData(sizeof(Optionals));
-        build_shader.setSpecializationInfoNumMapEntries(util::enumCast(ConstantID::Num));
+        build_shader.setSpecializationInfoNumMapEntries(utils::enumCast(ConstantID::Num));
 
         build_point_lights_data_buffer.setDevice(ptr_device);
         build_point_lights_data_buffer.setMemoryTypeIndex(ptr_physical_device->getMemoryTypeIndex(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
@@ -126,24 +126,24 @@ namespace pbrlib
         build_camera_data_buffer.setUsage(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         build_camera_data_buffer.addQueueFamily(queue_family_index);
 
-        bindings.addBinding(util::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::PositionAndMetallic), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::NormalAndRoughness), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::AlbedoAndBakedAO), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::TangentAndAnisotropy), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::NumLights), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::PointLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::SpotLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::DirectionLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
-        bindings.addBinding(util::enumCast(PBRPassBindings::CameraData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::PositionAndMetallic), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::NormalAndRoughness), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::AlbedoAndBakedAO), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::TangentAndAnisotropy), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::NumLights), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::PointLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::SpotLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::DirectionLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
+        bindings.addBinding(utils::enumCast(PBRPassBindings::CameraData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT);
 
         ShaderModule        compute_shader  = build_shader.build();
         SpecializationInfo& spec_info       = compute_shader.getSpecializationInfo();
 
-        spec_info.addMapEntry(&optionals._distrib_func, sizeof(optionals._distrib_func), util::enumCast(ConstantID::DistributionFunctionID));
-        spec_info.addMapEntry(&optionals._geom_func, sizeof(optionals._geom_func), util::enumCast(ConstantID::GeometryFunctionID));
-        spec_info.addMapEntry(&optionals._fresnel_approx, sizeof(optionals._fresnel_approx), util::enumCast(ConstantID::FresnelApproximationFunctionID));
-        spec_info.addMapEntry(&optionals._other_options.mask, sizeof(optionals._other_options.mask), util::enumCast(ConstantID::PBR_OtherOptions));
+        spec_info.addMapEntry(&optionals._distrib_func, sizeof(optionals._distrib_func), utils::enumCast(ConstantID::DistributionFunctionID));
+        spec_info.addMapEntry(&optionals._geom_func, sizeof(optionals._geom_func), utils::enumCast(ConstantID::GeometryFunctionID));
+        spec_info.addMapEntry(&optionals._fresnel_approx, sizeof(optionals._fresnel_approx), utils::enumCast(ConstantID::FresnelApproximationFunctionID));
+        spec_info.addMapEntry(&optionals._other_options.mask, sizeof(optionals._other_options.mask), utils::enumCast(ConstantID::PBR_OtherOptions));
 
         _ptr_pipeline       = ComputePipeline::make(compute_shader, PipelineLayout::make(ptr_device, DescriptorSetLayout::make(move(bindings))));
         _ptr_descriptor_set = DescriptorSet::make(ptr_descriptor_pool, _ptr_pipeline->getPipelineLayout()->getDescriptorSetLayouts()[0]);
@@ -158,31 +158,31 @@ namespace pbrlib
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_num_lights_buffer, 
             0, _ptr_uniform_num_lights_buffer->getSize(),
-            util::enumCast(PBRPassBindings::NumLights), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            utils::enumCast(PBRPassBindings::NumLights), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_point_lights_data_buffer, 
             0, _ptr_uniform_point_lights_data_buffer->getSize(),
-            util::enumCast(PBRPassBindings::PointLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            utils::enumCast(PBRPassBindings::PointLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_spot_lights_data_buffer, 
             0, _ptr_uniform_spot_lights_data_buffer->getSize(),
-            util::enumCast(PBRPassBindings::SpotLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            utils::enumCast(PBRPassBindings::SpotLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_direction_lights_data_buffer,
             0, _ptr_uniform_direction_lights_data_buffer->getSize(),
-            util::enumCast(PBRPassBindings::DirectionLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            utils::enumCast(PBRPassBindings::DirectionLightsData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
 
         _ptr_descriptor_set->writeBuffer(
             *_ptr_uniform_camera_data_buffer, 
             0, _ptr_uniform_camera_data_buffer->getSize(),
-            util::enumCast(PBRPassBindings::CameraData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            utils::enumCast(PBRPassBindings::CameraData), VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
         );
     }
 
@@ -285,7 +285,7 @@ namespace pbrlib
         _ptr_descriptor_set->writeImageView(
             *_out_image_view,
             VK_IMAGE_LAYOUT_GENERAL,
-            util::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
+            utils::enumCast(PBRPassBindings::OutImage), VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
         );
 
         ptr_command_buffer->reset();

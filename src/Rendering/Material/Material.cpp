@@ -44,7 +44,7 @@ namespace pbrlib
 
     void Material::setTexture(size_t i, const PtrImageView& ptr_image_view)
     {
-        assert(i < util::enumCast(Textures::Count));
+        assert(i < utils::enumCast(Textures::Count));
         _textures[i] = ptr_image_view;
     }
 
@@ -56,13 +56,13 @@ namespace pbrlib
 
     PtrImageView& Material::getTexture(size_t i)
     {
-        assert(i < util::enumCast(Textures::Count));
+        assert(i < utils::enumCast(Textures::Count));
         return _textures[i];
     }
 
     const PtrImageView& Material::getTexture(size_t i) const
     {
-        assert(i < util::enumCast(Textures::Count));
+        assert(i < utils::enumCast(Textures::Count));
         return _textures[i];
     }
 

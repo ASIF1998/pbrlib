@@ -233,7 +233,7 @@ namespace pbrlib
                 PtrImageView _baked_AO;
             };
 
-            PtrImageView _textures[util::enumCast(Textures::Count)];
+            PtrImageView _textures[utils::enumCast(Textures::Count)];
         };
 
         float _anisotropy;

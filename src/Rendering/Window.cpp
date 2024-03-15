@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <cassert>
 
-#include <SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 
 #include "Window.hpp"
 
@@ -38,14 +38,7 @@ namespace pbrlib
         _ptr_swapchain  (nullptr),
         _title          (title)
     {
-        _ptr_window = SDL_CreateWindow(
-            title.data(), 
-            pos_x, 
-            pos_y, 
-            width, 
-            height, 
-            SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | util::enumCast(resizable)
-        );
+        _ptr_window = SDL_CreateWindow(title.data(), width, height, SDL_WINDOW_VULKAN | utils::enumCast(resizable));
 
         assert(_ptr_window);
     }
@@ -75,7 +68,8 @@ namespace pbrlib
         int width   = 0;
         int height  = 0;
 
-        SDL_Vulkan_GetDrawableSize(_ptr_window, &width, &height);
+        SDL_GetWindowSizeInPixels(_ptr_window, &width, &height);        
+        
 
         return make_tuple(width, height);
     }
@@ -157,7 +151,8 @@ namespace pbrlib
 
     bool Window::showCursor(bool e) noexcept
     {
-        return SDL_ShowCursor(e);
+        // return SDL_ShowCursor(e);
+        return true;
     }
 
     void Window::captureMouse(bool e) noexcept
@@ -168,12 +163,14 @@ namespace pbrlib
 
     void Window::getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions)
     {
-        uint32_t num_extensions_names = 0;
+        uint32_t    num_extensions_names    = 0;
+        auto        ptr_extensions_names    = SDL_Vulkan_GetInstanceExtensions(&num_extensions_names);
 
-        assert(SDL_Vulkan_GetInstanceExtensions(window._ptr_window, &num_extensions_names, nullptr) == SDL_TRUE);
-        uint32_t offset = static_cast<uint32_t>(out_extensions.size());
+        auto offset = out_extensions.size();
         out_extensions.resize(offset + num_extensions_names);
-        assert(SDL_Vulkan_GetInstanceExtensions(window._ptr_window, &num_extensions_names, out_extensions.data() + offset) == SDL_TRUE);
+        
+        for (size_t i = 0; i < num_extensions_names; ++i)
+            out_extensions[offset + i] = ptr_extensions_names[i];
     }
 
     PtrWindow Window::make(

@@ -17,12 +17,12 @@ namespace pbrlib
     template<Material::Textures TextureType>
     PtrImageView& Material::getTexture()
     {
-        return _textures[util::enumCast(TextureType)];
+        return _textures[utils::enumCast(TextureType)];
     }
 
     template<Material::Textures TextureType>
     const PtrImageView& Material::getTexture() const
     {
-        return _textures[util::enumCast(TextureType)];
+        return _textures[utils::enumCast(TextureType)];
     }
 }

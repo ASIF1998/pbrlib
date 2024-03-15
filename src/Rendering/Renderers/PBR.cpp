@@ -32,17 +32,17 @@ namespace pbrlib
         
         descriptor_pool_size.push_back({
             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            util::enumCast(NumDescriptors::UniformBuffer)
+            utils::enumCast(NumDescriptors::UniformBuffer)
         });
         
         descriptor_pool_size.push_back({
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            util::enumCast(NumDescriptors::CombinedImageSampler)
+            utils::enumCast(NumDescriptors::CombinedImageSampler)
         });
         
         descriptor_pool_size.push_back({
             VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            util::enumCast(NumDescriptors::StorageImage)
+            utils::enumCast(NumDescriptors::StorageImage)
         });
         
         uint32_t max_allocate_sets_count = 2;

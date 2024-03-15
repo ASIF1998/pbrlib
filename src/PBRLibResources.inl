@@ -14,7 +14,7 @@ namespace pbrlib
     inline PBRLibResources::PBRLibResources() :
         _vk_resources()
     {
-        if (SDL_Init(SDL_INIT_EVERYTHING)) {
+        if (SDL_Init(SDL_INIT_VIDEO)) {
             throw runtime_error(SDL_GetError());
         }
     }

@@ -9,7 +9,7 @@
 #ifndef Window_hpp
 #define Window_hpp
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <string>
 #include <string_view>

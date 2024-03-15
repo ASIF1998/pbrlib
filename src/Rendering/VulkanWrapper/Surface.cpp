@@ -23,7 +23,7 @@ namespace pbrlib
         _ptr_instance   (ptr_instance),
         _surface_handle (VK_NULL_HANDLE)
     {
-        assert(SDL_Vulkan_CreateSurface(window._ptr_window, _ptr_instance->getHandle(), &_surface_handle) == SDL_TRUE);
+        assert(SDL_Vulkan_CreateSurface(window._ptr_window, _ptr_instance->getHandle(), nullptr, &_surface_handle) == SDL_TRUE);
         assert(_surface_handle);
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(ptr_physical_device->physical_device_handle, _surface_handle, &_surface_capabilities);
     }
