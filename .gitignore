@@ -3,3 +3,4 @@ PBRLib.xcodeproj/
 main.cpp
 gtest/
 build/
+src/core.hpp
