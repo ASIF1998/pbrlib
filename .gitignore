@@ -1,6 +1,5 @@
 PBRLib.xcodeproj/
 .vscode/*
-main.cpp
 gtest/
 build/
-src/core.hpp
+include/pbrlib/core.hpp
