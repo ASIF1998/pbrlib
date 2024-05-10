@@ -6,11 +6,11 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Swapchain.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Swapchain.hpp>
 
-#include "DeviceQueue.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DeviceQueue.hpp>
 
-#include "Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
 namespace pbrlib
 {

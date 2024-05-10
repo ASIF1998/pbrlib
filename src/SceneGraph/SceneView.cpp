@@ -6,18 +6,17 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "SceneView.hpp"
+#include <pbrlib/SceneGraph/SceneView.hpp>
 
-#include "../Rendering/Renderers/IRenderer.h"
+#include <pbrlib/Rendering/Renderers/IRenderer.h>
 
-#include "../Rendering/Window.hpp"
-#include "../Rendering/VulkanWrapper/PhysicalDevice.hpp"
+#include <pbrlib/Rendering/Window.hpp>
 
-#include "../Rendering/VulkanWrapper/Swapchain.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Swapchain.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/DeviceQueue.hpp>
 
-#include "../Rendering/VulkanWrapper/DeviceQueue.hpp"
-
-#include "../PBRLibResources.hpp"
+#include <pbrlib/PBRLibResources.hpp>
 
 namespace pbrlib
 {

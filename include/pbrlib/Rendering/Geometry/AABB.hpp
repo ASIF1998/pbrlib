@@ -9,7 +9,7 @@
 #ifndef AABB_hpp
 #define AABB_hpp
 
-#include "../../math/vec3.hpp"
+#include <pbrlib/math/vec3.hpp>
 
 namespace pbrlib
 {

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "DescriptorPool.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorPool.hpp>
 
 #include <cassert>
 

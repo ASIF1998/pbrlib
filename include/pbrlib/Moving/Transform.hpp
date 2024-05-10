@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "../math/matrix4x4.hpp"
-#include "../math/vec3.hpp"
+#include <pbrlib/math/matrix4x4.hpp>
+#include <pbrlib/math/vec3.hpp>
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Sampler.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Sampler.hpp>
 
 #include <cassert>
 

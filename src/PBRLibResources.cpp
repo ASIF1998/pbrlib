@@ -5,7 +5,7 @@
 //  Created by Асиф Мамедов on 16.09.2021.
 //
 
-#include "PBRLibResources.hpp"
+#include <pbrlib/PBRLibResources.hpp>
 
 #include <vector>
 #include <cassert>

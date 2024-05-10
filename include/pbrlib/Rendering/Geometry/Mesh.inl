@@ -11,8 +11,8 @@
 
 #include "Mesh.hpp"
 
-#include "../../math/vec3.hpp"
-#include "../../math/vec2.hpp"
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec2.hpp>
 
 namespace pbrlib
 {

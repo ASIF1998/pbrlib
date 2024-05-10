@@ -16,9 +16,9 @@
 
 #define STBI_NO_GIF
 
-#include "GPUTextureManager.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
 
-#include "CommandBuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
 #include <stb_image.h>
 

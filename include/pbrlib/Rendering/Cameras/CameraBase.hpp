@@ -9,9 +9,10 @@
 #ifndef CameraBase_hpp
 #define CameraBase_hpp
 
-#include "../../Moving/Transform.hpp"
+#include <pbrlib/Moving/Transform.hpp>
 
 #include "../../SceneGraph/Component.hpp"
+// #include <src/SceneGraph/Component.hpp>
 
 #include <vulkan/vulkan.h>
 

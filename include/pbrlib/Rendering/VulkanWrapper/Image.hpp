@@ -13,11 +13,12 @@
 
 #include <vector>
 #include <memory>
-#include "../../Memory/STLAlignedAllocator.hpp"
 
-#include "../../math/vec2.hpp"
-#include "../../math/vec3.hpp"
-#include "../../math/vec4.hpp"
+#include <pbrlib/Memory/STLAlignedAllocator.hpp>
+
+#include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec4.hpp>
 
 #include "DeviceQueue.hpp"
 

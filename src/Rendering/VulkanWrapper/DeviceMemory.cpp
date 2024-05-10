@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "DeviceMemory.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DeviceMemory.hpp>
 
 #include <cassert>
 

@@ -13,7 +13,8 @@
 
 #include <vector>
 #include <memory>
-#include "../../Memory/STLAlignedAllocator.hpp"
+
+#include <pbrlib/Memory/STLAlignedAllocator.hpp>
 
 using namespace std;
 

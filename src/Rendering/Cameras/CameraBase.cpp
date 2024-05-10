@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "CameraBase.hpp"
+#include <pbrlib/Rendering/Cameras/CameraBase.hpp>
 
 namespace pbrlib
 {

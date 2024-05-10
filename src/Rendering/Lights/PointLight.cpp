@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PointLight.hpp"
+#include <pbrlib/Rendering/Lights/PointLight.hpp>
 
 namespace pbrlib
 {

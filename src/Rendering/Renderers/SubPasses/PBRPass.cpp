@@ -6,31 +6,32 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PBRPass.hpp"
+#include <pbrlib/Rendering/Renderers/SubPasses/PBRPass.hpp>
 
-#include "../../VulkanWrapper/PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "../../VulkanWrapper/ComputePipeline.hpp"
-#include "../../VulkanWrapper/ShaderModule.hpp"
-#include "../../VulkanWrapper/PipelineLayout.hpp"
-#include "../../VulkanWrapper/DescriptorSet.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ComputePipeline.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/ShaderModule.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/PipelineLayout.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorSet.hpp>
 
-#include "../../VulkanWrapper/CommandBuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
-#include "../../VulkanWrapper/Image.hpp"
 
-#include "../../Cameras/CameraBase.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-#include "../Shaders/PointLightData.h"
-#include "../Shaders/SpotLightData.h"
-#include "../Shaders/DirectionLightData.h"
-#include "../Shaders/NumLights.h"
+#include <pbrlib/Rendering/Cameras/CameraBase.hpp>
 
-#include "../Shaders/CameraData.h"
+#include <pbrlib/Rendering/Renderers/Shaders/PointLightData.h>
+#include <pbrlib/Rendering/Renderers/Shaders/SpotLightData.h>
+#include <pbrlib/Rendering/Renderers/Shaders/DirectionLightData.h>
+#include <pbrlib/Rendering/Renderers/Shaders/NumLights.h>
 
-#include "../../../Util/enumCast.hpp"
+#include <pbrlib/Rendering/Renderers/Shaders/CameraData.h>
 
-#include "spv/PBRPass.glsl.comp.spv.h"
+#include <pbrlib/Util/enumCast.hpp>
+
+#include <pbrlib/Rendering/Renderers/SubPasses/spv/PBRPass.glsl.comp.spv.h>
 
 #include <algorithm>
 

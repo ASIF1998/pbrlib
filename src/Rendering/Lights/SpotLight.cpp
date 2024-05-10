@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "SpotLight.hpp"
+#include <pbrlib/Rendering/Lights/SpotLight.hpp>
 
 namespace pbrlib
 {

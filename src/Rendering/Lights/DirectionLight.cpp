@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "DirectionLight.hpp"
+#include <pbrlib/Rendering/Lights/DirectionLight.hpp>
 
 namespace pbrlib
 {

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Buffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Buffer.hpp>
 
 #include <cassert>
 

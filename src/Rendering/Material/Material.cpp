@@ -6,9 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Material.hpp"
+#include <pbrlib/Rendering/Material/Material.hpp>
 
-#include "../VulkanWrapper/GPUTextureManager.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
 
 namespace pbrlib
 {

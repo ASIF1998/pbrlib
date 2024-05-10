@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PipelineLayout.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PipelineLayout.hpp>
 
 #include <cassert>
 

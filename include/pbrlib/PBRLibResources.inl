@@ -26,6 +26,6 @@ namespace pbrlib
 
     inline PtrPBRLibResources PBRLibResources::init()
     {
-        return make_shared<PBRLibResources>();
+        return shared_ptr<PBRLibResources>(new PBRLibResources);
     }
 }

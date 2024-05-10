@@ -6,10 +6,10 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Instance.hpp"
-#include "PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Instance.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "../../core.hpp"
+#include <pbrlib/core.hpp>
 
 #include <cassert>
 #include <stdexcept>

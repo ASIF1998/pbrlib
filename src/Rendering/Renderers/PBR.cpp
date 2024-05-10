@@ -6,15 +6,15 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PBR.hpp"
+#include <pbrlib/Rendering/Renderers/PBR.hpp>
 
-#include "../VulkanWrapper/PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "../VulkanWrapper/DescriptorPool.hpp"
-#include "../VulkanWrapper/Framebuffer.hpp"
-#include "../VulkanWrapper/Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorPool.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-#include "../VulkanWrapper/CommandBuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
 namespace pbrlib
 {

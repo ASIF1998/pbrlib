@@ -11,7 +11,7 @@
 
 #include "../VulkanWrapper/Buffer.hpp"
 
-#include "../../math/vec3.hpp"
+#include <pbrlib/math/vec3.hpp>
 
 #include "AABB.hpp"
 

@@ -6,12 +6,12 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "DeviceQueue.hpp"
-#include "Device.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DeviceQueue.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
 
-#include "PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "CommandBuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
 #include <cassert>
 

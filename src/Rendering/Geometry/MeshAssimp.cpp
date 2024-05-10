@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "MeshAssimp.hpp"
+#include <pbrlib/Rendering/Geometry/MeshAssimp.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>

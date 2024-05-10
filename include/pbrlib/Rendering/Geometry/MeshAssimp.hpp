@@ -13,7 +13,7 @@
 
 #include "Mesh.hpp"
 
-#include "../../Moving/Transform.hpp"
+#include <pbrlib/Moving/Transform.hpp>
 
 #include <assimp/scene.h>
 

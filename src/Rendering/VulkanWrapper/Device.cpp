@@ -6,12 +6,12 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Device.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
 #include <stdexcept>
 #include <cassert>
 
-#include "PhysicalDevice.hpp"
 
 namespace pbrlib
 {

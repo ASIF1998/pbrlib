@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "ShaderModule.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ShaderModule.hpp>
 
 #include <cassert>
 

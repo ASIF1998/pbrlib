@@ -6,9 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "GraphicsPipeline.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/GraphicsPipeline.hpp>
 
-#include "ShaderModule.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ShaderModule.hpp>
 
 #include <numeric>
 

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "../core.hpp"
+#include <pbrlib/core.hpp>
 
 using namespace std;
 

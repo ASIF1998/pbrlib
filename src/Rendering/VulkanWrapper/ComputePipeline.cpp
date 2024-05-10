@@ -6,11 +6,11 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "ComputePipeline.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ComputePipeline.hpp>
 
-#include "PipelineLayout.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PipelineLayout.hpp>
 
-#include "ShaderModule.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ShaderModule.hpp>
 
 #include <cassert>
 #include <stdexcept>

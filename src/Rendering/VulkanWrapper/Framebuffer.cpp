@@ -6,8 +6,8 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Framebuffer.hpp"
-#include "Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
 namespace pbrlib
 {

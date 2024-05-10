@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PerspectiveCamera.hpp"
+#include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
 namespace pbrlib
 {

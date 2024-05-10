@@ -10,7 +10,7 @@
 #define CameraData_h
 
 #ifdef __cplusplus
-#   include "../../../math/vec3.hpp"
+#   include <pbrlib/math/vec3.hpp>
 
 using vec3 = pbrlib::math::Vec3<float>;
 #endif

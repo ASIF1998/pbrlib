@@ -6,18 +6,17 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "CommandBuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
+#include <pbrlib/Rendering/VulkanWrapper/RenderPass.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorSet.hpp>
 
-#include "RenderPass.hpp"
-#include "DescriptorSet.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Buffer.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-#include "Buffer.hpp"
-#include "Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
 
-#include "Framebuffer.hpp"
-
-#include "ComputePipeline.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ComputePipeline.hpp>
 
 namespace pbrlib
 {

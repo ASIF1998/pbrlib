@@ -6,29 +6,29 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "GBufferPass.hpp"
+#include <pbrlib/Rendering/Renderers/SubPasses/GBufferPass.hpp>
 
-#include "../../VulkanWrapper/Device.hpp"
-#include "../../VulkanWrapper/PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "../../VulkanWrapper/ShaderModule.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/ShaderModule.hpp>
 
-#include "../../VulkanWrapper/DescriptorSet.hpp"
-#include "../../VulkanWrapper/GraphicsPipeline.hpp"
-#include "../../VulkanWrapper/RenderPass.hpp"
-#include "../../VulkanWrapper/Framebuffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorSet.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/GraphicsPipeline.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/RenderPass.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Sampler.hpp>
 
-#include "../../Geometry/Mesh.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
-#include "../../VulkanWrapper/CommandBuffer.hpp"
+#include <pbrlib/Rendering/Geometry/Mesh.hpp>
 
-#include "../../VulkanWrapper/Sampler.hpp"
-#include "../../Material/Material.hpp"
+#include <pbrlib/Rendering/Material/Material.hpp>
 
-#include "../Shaders/MaterialData.h"
+#include <pbrlib/Rendering/Renderers/Shaders/MaterialData.h>
 
-#include "spv/GBuffer.glsl.vert.spv.h"
-#include "spv/GBuffer.glsl.frag.spv.h"
+#include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.vert.spv.h>
+#include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.frag.spv.h>
 
 namespace pbrlib
 {
@@ -409,7 +409,7 @@ namespace pbrlib
 
         build_graphics_pipline.getViewportState().addViewport(
             0.0f, 0.0f,
-            window_width, window_height,
+            static_cast<float>(window_width), static_cast<float>(window_height),
             0.0f, 1.0f
         );
 

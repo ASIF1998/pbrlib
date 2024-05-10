@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "RenderPass.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/RenderPass.hpp>
 
 #include <cassert>
 

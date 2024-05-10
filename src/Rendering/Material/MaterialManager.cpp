@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "MaterialManager.hpp"
+#include <pbrlib/Rendering/Material/MaterialManager.hpp>
 
 namespace pbrlib
 {

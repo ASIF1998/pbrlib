@@ -18,7 +18,7 @@
 
 #include <typeindex>
 
-#include "../Moving/Transform.hpp"
+#include <pbrlib/Moving/Transform.hpp>
 #include "../Rendering/Geometry/AABB.hpp"
 
 #include "../Rendering/Lights/PointLight.hpp"
@@ -29,7 +29,7 @@
 #include "../Rendering/VulkanWrapper/GPUTextureManager.hpp"
 #include "../Rendering/Geometry/MeshManager.hpp"
 
-#include "../Rendering/Cameras/PerspectiveCamera.hpp"
+#include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
 using namespace std;
 

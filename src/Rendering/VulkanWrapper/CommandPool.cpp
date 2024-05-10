@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "CommandPool.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/CommandPool.hpp>
 
 #include <cassert>
 

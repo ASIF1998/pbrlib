@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
 #include <numeric>
 

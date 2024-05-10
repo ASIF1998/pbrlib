@@ -6,19 +6,19 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Transform.hpp"
+#include <pbrlib/Moving/Transform.hpp>
 
-#include "../math/matrix4x4.hpp"
+#include <pbrlib/math/matrix4x4.hpp>
 
-#include "../Rendering/Geometry/AABB.hpp"
+#include <pbrlib/Rendering/Geometry/AABB.hpp>
 
-#include "../core.hpp"
+#include <pbrlib/core.hpp>
 
 namespace pbrlib
 {
     float getRadians(float angle)
     {
-        constexpr float p = M_PI / 180.0f;
+        constexpr float p = static_cast<float>(M_PI) / 180.0f;
         return angle * p;
     }
 

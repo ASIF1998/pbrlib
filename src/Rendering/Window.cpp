@@ -13,16 +13,16 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include "Window.hpp"
+#include <pbrlib/Rendering/Window.hpp>
 
-#include "VulkanWrapper/Instance.hpp"
-#include "VulkanWrapper/PhysicalDevice.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Instance.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/PhysicalDevice.hpp>
 
-#include "VulkanWrapper/Swapchain.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Swapchain.hpp>
 
-#include "VulkanWrapper/DeviceQueue.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DeviceQueue.hpp>
 
-#include "../Util/enumCast.hpp"
+#include <pbrlib/Util/enumCast.hpp>
 
 namespace pbrlib
 {

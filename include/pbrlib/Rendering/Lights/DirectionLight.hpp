@@ -9,7 +9,7 @@
 #ifndef DirectionLight_hpp
 #define DirectionLight_hpp
 
-#include "../../math/vec3.hpp"
+#include <pbrlib/math/vec3.hpp>
 
 #include "../../SceneGraph/Component.hpp"
 

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
 namespace pbrlib
 {

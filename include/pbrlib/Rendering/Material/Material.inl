@@ -11,7 +11,7 @@ namespace pbrlib
     template<Material::Textures TextureType>
     void Material::setTexture(const PtrImageView& ptr_image_view)
     {
-        _textures[util::enumCast(TextureType)] = ptr_image_view;
+        _textures[utils::enumCast(TextureType)] = ptr_image_view;
     }
 
     template<Material::Textures TextureType>

@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "AABB.hpp"
+#include <pbrlib/Rendering/Geometry/AABB.hpp>
 
 #include <algorithm>
 #include <numeric>

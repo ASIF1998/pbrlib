@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "MeshManager.hpp"
+#include <pbrlib/Rendering/Geometry/MeshManager.hpp>
 
 namespace pbrlib
 {

@@ -16,7 +16,7 @@
 #include <memory>
 #include <vector>
 
-#include "../../math/vec4.hpp"
+#include <pbrlib/math/vec4.hpp>
 
 using namespace std;
 

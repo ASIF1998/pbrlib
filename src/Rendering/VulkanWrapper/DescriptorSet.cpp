@@ -6,12 +6,12 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "DescriptorSet.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/DescriptorSet.hpp>
 
-#include "Sampler.hpp"
-#include "Image.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Sampler.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-#include "Buffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Buffer.hpp>
 
 namespace pbrlib
 {
