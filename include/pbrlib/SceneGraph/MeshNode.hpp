@@ -19,7 +19,7 @@ namespace pbrlib
     using PtrMeshNode = shared_ptr<MeshNode>;
 
     class MeshNode :
-        public Scene::Node
+        public SceneItem
     {
     public:
         MeshNode(const string_view name = "Mesh Node");

@@ -66,13 +66,13 @@ namespace pbrlib
          * @param direction_lights  направленные источники света.
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
-        virtual void draw(
-            const Scene::PtrNode&           ptr_camera,
-            const Scene::VisibleList&       visible_list, 
-            const vector<Scene::PtrNode>    point_lights,
-            const vector<Scene::PtrNode>    spot_lights,
-            const vector<Scene::PtrNode>    direction_lights,
-            float                           delta_time
+        void draw(
+            const PtrSceneItem&         ptr_camera,
+            const VisibleList&          visible_list, 
+            const vector<PtrSceneItem>  point_lights,
+            const vector<PtrSceneItem>  spot_lights,
+            const vector<PtrSceneItem>  direction_lights,
+            float                       delta_time
         ) override;
 
         PtrGBufferPass&          getGBUfferPass()    noexcept;

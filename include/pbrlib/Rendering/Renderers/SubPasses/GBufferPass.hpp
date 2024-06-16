@@ -142,7 +142,7 @@ namespace pbrlib
         void draw(
             const Transform&                projection,
             const Transform&                view,
-            const Scene::VisibleList&       drawable_objects, 
+            const VisibleList&              drawable_objects, 
             const PtrPrimaryCommandBuffer&  ptr_command_buffer,
             const PtrSampler&               ptr_sampler
         );

@@ -77,15 +77,16 @@ namespace pbrlib
     {
         assert(_ptr_renderer);
 
-        if (_scene._ptr_camera_node) {
+        if (_scene._ptr_camera)
+        {
             _scene.update(delta_time);
 
             _ptr_renderer->draw(
-                _scene._ptr_camera_node,
+                _scene._ptr_camera,
                 _scene.getVisibleList(),
-                _scene._point_light_nodes,
-                _scene._spot_light_nodes,
-                _scene._dir_light_nodes,
+                _scene._point_lights,
+                _scene._spot_lights,
+                _scene._dir_lights,
                 delta_time
             );
         }

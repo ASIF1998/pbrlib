@@ -21,13 +21,13 @@
 #include <pbrlib/Moving/Transform.hpp>
 #include "../Rendering/Geometry/AABB.hpp"
 
-#include "../Rendering/Lights/PointLight.hpp"
-#include "../Rendering/Lights/SpotLight.hpp"
-#include "../Rendering/Lights/DirectionLight.hpp"
+#include <pbrlib/Rendering/Lights/PointLight.hpp>
+#include <pbrlib/Rendering/Lights/SpotLight.hpp>
+#include <pbrlib/Rendering/Lights/DirectionLight.hpp>
 
-#include "../Rendering/Material/MaterialManager.hpp"
-#include "../Rendering/VulkanWrapper/GPUTextureManager.hpp"
-#include "../Rendering/Geometry/MeshManager.hpp"
+#include <pbrlib/Rendering/Material/MaterialManager.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
+#include <pbrlib/Rendering/Geometry/MeshManager.hpp>
 
 #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
@@ -35,140 +35,129 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Component;
-    class Script;
+    class ComponentBase;
     
-    using PtrComponent  = shared_ptr<Component>;
-    using PtrScript     = shared_ptr<Script>;
+    using PtrComponent = shared_ptr<ComponentBase>;
+}
 
-    class Scene
+namespace pbrlib
+{
+    class SceneItem;
+
+    using PtrSceneItem = shared_ptr<SceneItem>;
+    using VisibleList = vector<PtrSceneItem>;
+
+    class SceneItem
     {
-        friend class SceneView;
-        
+        friend class Scene;
+
     public:
-        class Node;
+        SceneItem(
+            const string_view   name = "No name",
+            SceneItem* parent = nullptr
+        );
 
-        using PtrNode       = shared_ptr<Node>;
-        using VisibleList   = vector<PtrNode>;
+        virtual ~SceneItem();
 
-        class Node
-        {
-            friend class Scene;
+        AABB&                       getWorldAABB()      noexcept;
+        const AABB&                 getWorldAABB()      const noexcept;
+        SceneItem*                  getParent()         noexcept;
+        const SceneItem*            getParent()         const noexcept;
+        PtrSceneItem&               getChild(size_t i);
+        const PtrSceneItem&         getChild(size_t i)  const;
+        vector<PtrSceneItem>&       getChildren()       noexcept;
+        const vector<PtrSceneItem>& getChildren()       const noexcept;
+        Transform&                  getLocalTransform() noexcept;
+        const Transform&            getLocalTransform() const noexcept;
+        Transform&                  getWorldTransform() noexcept;
+        const Transform&            getWorldTransform() const noexcept;
+        string&                     getName()           noexcept;
+        const string&               getName()           const noexcept;
 
-        public:
-            Node(
-                const string_view   name    = "No name",
-                Node*               parent  = nullptr
-            );
+        template<typename TComponent>
+        inline TComponent& getComponent();
 
-            virtual ~Node();
+        template<typename TComponent>
+        inline const TComponent& getComponent() const;
 
-            AABB&                   getWorldAABB()      noexcept;
-            const AABB&             getWorldAABB()      const noexcept;
-            Node*                   getParent()         noexcept;
-            const Node*             getParent()         const noexcept;
-            PtrNode&                getChild(size_t i);
-            const PtrNode&          getChild(size_t i)  const;
-            vector<PtrNode>&        getChildren()       noexcept;
-            const vector<PtrNode>&  getChildren()       const noexcept;
-            Transform&              getLocalTransform() noexcept;
-            const Transform&        getLocalTransform() const noexcept;
-            Transform&              getWorldTransform() noexcept;
-            const Transform&        getWorldTransform() const noexcept;
-            string&                 getName()           noexcept;
-            const string&           getName()           const noexcept;
+        template<typename TComponent>
+        bool hasComponent() const;
 
-            template<typename TComponent>
-            inline TComponent& getComponent();
+        void setParent(SceneItem* ptr_parent) noexcept;
+        void setChildren(vector<PtrSceneItem>&& children);
+        void setChildren(const vector<PtrSceneItem>& children);
+        void setLocalTransform(const Transform& transform);
+        void setWorldTransform(const Transform& transform);
+        void setWorldAABB(const AABB& bbox);
+        void setName(const string_view name);
 
-            template<typename TComponent>
-            inline const TComponent& getComponent() const;
+        bool worldTransformIsCurrent()              const noexcept;
+        void worldTransformIsCurrent(bool current)  noexcept;
+        bool worldAABBIsCurrent()                   const noexcept;
+        void worldAABBIsCurrent(bool current)       noexcept;
 
-            template<typename TScript>
-            inline TScript& getScript();
+        void addComponent(const PtrComponent& ptr_component);
 
-            template<typename TScript>
-            inline const TScript& getScript() const;
+        /**
+         * @brief Метод необходимый для добавления дочернего узла.
+         * @details
+         *      При добавлении дочернего узла указатель на родителя
+         *      устанавливается автоматически.
+         *
+         * @param child ссылка на дочерний узел.
+        */
+        void addChild(PtrSceneItem&& child);
 
-            template<typename TComponent>
-            bool hasComponent() const;
+        /**
+         * @brief Метод необходимый для добавления дочернего узла.
+         * @details
+         *      При добавлении дочернего узла указатель на родителя
+         *      устанавливается автоматически.
+         *
+         * @param child ссылка на дочерний узел.
+        */
+        void addChild(const PtrSceneItem& child);
 
-            template<typename TScript>
-            bool hasScript() const;
+        /**
+         * @brief Метод необходимый для добавления дочернего узла.
+         * @details
+         *      При добавлении дочернего узла указатель на родителя
+         *      устанавливается автоматически.
+         *
+         * @param SceneItem_name название дочернего узла.
+         * @return Указатель на дочерний узел.
+        */
+        PtrSceneItem& addChild(const string_view name);
 
-            void setParent(Node* ptr_parent) noexcept;
-            void setChildren(vector<PtrNode>&& children);
-            void setChildren(const vector<PtrNode>& children);
-            void setLocalTransform(const Transform& transform);
-            void setWorldTransform(const Transform& transform);
-            void setWorldAABB(const AABB& bbox);
-            void setName(const string_view name);
+        void detachChild(const PtrSceneItem& ptr_item);
+        void detachChild(const string_view name);
 
-            bool worldTransformIsCurrent()              const noexcept;
-            void worldTransformIsCurrent(bool current)  noexcept;
-            bool worldAABBIsCurrent()                   const noexcept;
-            void worldAABBIsCurrent(bool current)       noexcept;
+        virtual void update(float delta_time, const Transform& world_transform);
 
-            void addComponent(const PtrComponent& ptr_component);
-            void addScript(const PtrScript& ptr_script);
-
-            /**
-             * @brief Метод необходимый для добавления дочернего узла.
-             * @details 
-             *      При добавлении дочернего узла указатель на родителя 
-             *      устанавливается автоматически.
-             * 
-             * @param child ссылка на дочерний узел.
-            */
-            void addChild(PtrNode&& child);
-
-            /**
-             * @brief Метод необходимый для добавления дочернего узла.
-             * @details 
-             *      При добавлении дочернего узла указатель на родителя 
-             *      устанавливается автоматически.
-             * 
-             * @param child ссылка на дочерний узел.
-            */
-            void addChild(const PtrNode& child);
-
-            /**
-             * @brief Метод необходимый для добавления дочернего узла.
-             * @details 
-             *      При добавлении дочернего узла указатель на родителя 
-             *      устанавливается автоматически.
-             * 
-             * @param node_name название дочернего узла.
-             * @return Указатель на дочерний узел.
-            */
-            PtrNode& addChild(const string_view node_name);
-
-            void detachChild(const PtrNode& ptr_node);
-            void detachChild(const string_view name);
-
-            virtual void update(float delta_time, const Transform& world_transform);
-
-            static PtrNode make(
-                const string_view   name    = "No name",
-                Node*               parent  = nullptr
-            );
+        static PtrSceneItem make(
+            const string_view   name        = "No name",
+            SceneItem*          ptr_parent  = nullptr
+        );
 
         private:
             void _getVisibleList(VisibleList& out_visible_list);
 
         protected:
-            Node*                                    _ptr_parent; 
-            vector<PtrNode>                          _ptr_children;
-            Transform                                _local_transform;
-            Transform                                _world_transform;
-            bool                                     _world_transform_is_current;
-            bool                                     _world_aabb_is_current;
-            AABB                                     _world_bbox;
-            unordered_map<type_index, PtrComponent>  _components;
-            unordered_map<type_index, PtrScript>     _scripts;
-            string                                   _name;
+            SceneItem*                              _ptr_parent;
+            vector<PtrSceneItem>                    _ptr_children;
+            Transform                               _local_transform;
+            Transform                               _world_transform;
+            bool                                    _world_transform_is_current;
+            bool                                    _world_aabb_is_current;
+            AABB                                    _world_bbox;
+            unordered_map<type_index, PtrComponent> _components;
+            string                                  _name;
         };
 
+    class Scene
+    {
+        friend class SceneView;
+        
     public:
         /**
          * @brief Конструктор.
@@ -189,12 +178,12 @@ namespace pbrlib
             uint32_t                host_local_memory_type_index
         );
         
-        void setRootNode(const PtrNode& node);
-        void setRootNode(PtrNode&& node);
+        void setRoot(const PtrSceneItem& ptr_root);
+        void setRoot(PtrSceneItem&& ptr_root);
         void setName(const string_view name);
 
-        PtrNode&                    getRootNode()           noexcept;
-        const PtrNode&              getRootNode()           const noexcept;
+        PtrSceneItem&               getRoot()               noexcept;
+        const PtrSceneItem&         getRoot()               const noexcept;
         string&                     getName()               noexcept;
         const string&               getName()               const noexcept;
         MaterialManager&            getMaterialManager()    noexcept;
@@ -216,7 +205,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrNode& makePointLight(
+        PtrSceneItem& makePointLight(
             const PointLight::Builder&   light_builder,
             const string_view            name = "Point Light"
         );
@@ -231,7 +220,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrNode& makeSpotLight(
+        PtrSceneItem& makeSpotLight(
             const SpotLight::Builder&   light_builder,
             const string_view           name = "Spot Light"
         );
@@ -246,7 +235,7 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        PtrNode& makeDirectionLight(
+        PtrSceneItem& makeDirectionLight(
             const DirectionLight::Builder&  light_builder,
             const string_view               name = "Spot Light"
         );
@@ -263,7 +252,7 @@ namespace pbrlib
          * @param name              название узла.
          * @return Указатель на узел.
         */
-        PtrNode& makeCamera(
+        PtrSceneItem& makeCamera(
             const PerspectiveCamera::Builder&   camera_builder,
             const string_view                   name = "Camera"
         );
@@ -271,15 +260,15 @@ namespace pbrlib
         void update(float delta_time);
 
     private:
-        PtrNode             _ptr_root_node;     //!< Корневой узел сцены.
-        PtrNode             _ptr_camera_node;   //!< Камера.
-        vector<PtrNode>     _dir_light_nodes;   //!< Направленные источники света.
-        vector<PtrNode>     _spot_light_nodes;  //!< Прожекторные источники света.
-        vector<PtrNode>     _point_light_nodes; //!< Точечные источники света.
-        MaterialManager     _material_manager;  //!< Менеджер материалов.
-        GPUTextureManager   _texture_manager;   //!< Менеджер текстур.
-        MeshManager         _mesh_manager;      //!< Менеджер сеток.
-        string              _name;              //!< Имя сцены.
+        PtrSceneItem            _ptr_root;          //!< Корневой узел сцены.
+        PtrSceneItem            _ptr_camera;        //!< Камера.
+        vector<PtrSceneItem>    _dir_lights;        //!< Направленные источники света.
+        vector<PtrSceneItem>    _spot_lights;       //!< Прожекторные источники света.
+        vector<PtrSceneItem>    _point_lights;      //!< Точечные источники света.
+        MaterialManager         _material_manager;  //!< Менеджер материалов.
+        GPUTextureManager       _texture_manager;   //!< Менеджер текстур.
+        MeshManager             _mesh_manager;      //!< Менеджер сеток.
+        string                  _name;              //!< Имя сцены.
     };
 }
 

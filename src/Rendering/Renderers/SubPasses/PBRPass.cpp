@@ -218,11 +218,11 @@ namespace pbrlib
     }
 
     void PBRPass::draw(
-        const Scene::PtrNode&           ptr_camera,
+        const PtrSceneItem&             ptr_camera,
         const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-        const vector<Scene::PtrNode>    point_lights,
-        const vector<Scene::PtrNode>    spot_lights,
-        const vector<Scene::PtrNode>    direction_lights
+        const vector<PtrSceneItem>      point_lights,
+        const vector<PtrSceneItem>      spot_lights,
+        const vector<PtrSceneItem>      direction_lights
     )
     {
         const CameraBase& camera = ptr_camera->getComponent<CameraBase>();

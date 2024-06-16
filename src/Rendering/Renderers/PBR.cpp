@@ -139,17 +139,16 @@ namespace pbrlib
     }
 
     void PBR::draw(
-        const Scene::PtrNode&           ptr_camera,
-        const Scene::VisibleList&       visible_list,
-        const vector<Scene::PtrNode>    point_lights,
-        const vector<Scene::PtrNode>    spot_lights,
-        const vector<Scene::PtrNode>    direction_lights,
-        float                           delta_time
+        const PtrSceneItem&         ptr_camera,
+        const VisibleList&          visible_list,
+        const vector<PtrSceneItem>  point_lights,
+        const vector<PtrSceneItem>  spot_lights,
+        const vector<PtrSceneItem>  direction_lights,
+        float                       delta_time
     )
     {
-        if (!ptr_camera->hasComponent<CameraBase>()) {
+        if (!ptr_camera->hasComponent<CameraBase>())
             throw runtime_error("Нет камеры.");
-        }
 
         const auto& camera = ptr_camera->getComponent<CameraBase>();
 
