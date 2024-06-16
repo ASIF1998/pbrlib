@@ -10,19 +10,19 @@
 
 namespace pbrlib
 {
-    Component::Component(const string_view name) :
+    ComponentBase::ComponentBase(const string_view name) :
         _name(name)
     {}
 
-    Component::~Component()
+    ComponentBase::~ComponentBase()
     {}
 
-    string& Component::getName() noexcept
+    string& ComponentBase::getName() noexcept
     {
         return _name;
     }
 
-    const string& Component::getName() const noexcept
+    const string& ComponentBase::getName() const noexcept
     {
         return _name;
     }

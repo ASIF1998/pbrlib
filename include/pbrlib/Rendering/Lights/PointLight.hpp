@@ -11,7 +11,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include "../../SceneGraph/Component.hpp"
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <memory>
 
@@ -26,7 +26,7 @@ namespace pbrlib
     using PtrPointLight = shared_ptr<PointLight>;
     
     class PointLight :
-        public Component
+        public Component<PointLight>
     {
     public:
         class Builder
@@ -72,8 +72,6 @@ namespace pbrlib
         const Vec3<float>&      getColor()      const noexcept;
         Vec3<float>&            getPosition()   noexcept;
         const Vec3<float>&      getPosition()   const noexcept;
-        
-        virtual type_index getType() const override;
         
     private:
         Vec3<float> _color;

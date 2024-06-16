@@ -11,7 +11,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include "../../SceneGraph/Component.hpp"
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <memory>
 
@@ -26,7 +26,7 @@ namespace pbrlib
     using PtrDirectionLight = shared_ptr<DirectionLight>;
 
     class DirectionLight :
-        public Component
+        public Component<DirectionLight>
     {
     public:
         class Builder
@@ -72,8 +72,6 @@ namespace pbrlib
         const Vec3<float>&  getColor()              const noexcept;
         Vec3<float>&        getDirectionToLight()   noexcept;
         const Vec3<float>&  getDirectionToLight()   const noexcept;
-
-        virtual type_index getType() const override;
 
     private:
         Vec3<float> _dir_to_lihght;

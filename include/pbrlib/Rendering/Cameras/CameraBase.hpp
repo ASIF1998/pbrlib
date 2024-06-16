@@ -11,8 +11,7 @@
 
 #include <pbrlib/Moving/Transform.hpp>
 
-#include "../../SceneGraph/Component.hpp"
-// #include <src/SceneGraph/Component.hpp>
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <vulkan/vulkan.h>
 
@@ -27,7 +26,7 @@ namespace pbrlib
     using PtrCameraBase = shared_ptr<CameraBase>;
     
     class CameraBase :
-        public Component
+        public Component<CameraBase>
     {
     protected:
         /**
@@ -130,8 +129,6 @@ namespace pbrlib
             float min_depth,
             float max_depth
         ) noexcept;
-
-        virtual type_index getType() const override;
 
     protected:
         virtual Transform _calculateProjection() const = 0;

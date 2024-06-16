@@ -73,11 +73,6 @@ namespace pbrlib
         return _dir_to_lihght;
     }
 
-    type_index DirectionLight::getType() const
-    {
-        return ComponentUtil::getTypeIndex<DirectionLight>();
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     DirectionLight::Builder::Builder(const string_view name) :
         _name(name)

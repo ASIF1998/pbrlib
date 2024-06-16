@@ -172,11 +172,6 @@ namespace pbrlib
         return _ptr_material;
     }
 
-    inline type_index Mesh::getType() const
-    {
-        return ComponentUtil::getTypeIndex<Mesh>();
-    }
-
     inline void Mesh::setIndex(size_t i, uint32_t val)
     {
         assert(_ptr_index_buffer->getDeviceMemory()->getMapStatus() == MapStatus::MAPPED);

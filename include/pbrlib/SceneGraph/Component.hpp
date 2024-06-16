@@ -18,29 +18,43 @@ using namespace std;
 
 namespace pbrlib
 {
-    class Component
+    class SceneItem;
+}
+
+namespace pbrlib
+{
+    class ComponentBase
     {
     public:
-        Component(const string_view name = "Component");
-        virtual ~Component();
+        ComponentBase(const string_view name = "Component");
+        virtual ~ComponentBase();
 
         string&         getName() noexcept;
         const string&   getName() const noexcept;
 
         virtual type_index getType() const = 0;
 
+        virtual void update(SceneItem* ptr_node, float delta_time) 
+        { }
+
     protected:
         string _name;
     };
 
-    namespace ComponentUtil
+    template<typename T>
+    class Component :
+        public ComponentBase
     {
-        template<typename T>
-        inline type_index getTypeIndex()
+        type_index getType() const override final
         {
             return typeid(T);
         }
-    }
+
+    public:
+        Component(const string_view name = "Component") :
+            ComponentBase(name)
+        { }
+    };
 }
 
 #endif /* Component_hpp */

@@ -120,11 +120,6 @@ namespace pbrlib
         return _outer_radius;
     }
 
-    type_index SpotLight::getType() const
-    {
-        return ComponentUtil::getTypeIndex<SpotLight>();
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SpotLight::Builder::Builder(const string_view name) :
         _name(name)

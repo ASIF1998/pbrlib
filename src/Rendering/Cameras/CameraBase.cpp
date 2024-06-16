@@ -146,9 +146,4 @@ namespace pbrlib
         _viewport.minDepth  = min_depth;
         _viewport.maxDepth  = max_depth;
     }
-
-    type_index CameraBase::getType() const
-    {
-        return ComponentUtil::getTypeIndex<CameraBase>();
-    }
 }

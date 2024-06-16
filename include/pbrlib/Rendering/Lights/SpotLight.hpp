@@ -11,7 +11,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include "../../SceneGraph/Component.hpp"
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <memory>
 
@@ -26,7 +26,7 @@ namespace pbrlib
     using PtrSpotLight = shared_ptr<SpotLight>;
 
     class SpotLight :
-        public Component
+        public Component<SpotLight>
     {
     public:
         class Builder
@@ -91,8 +91,6 @@ namespace pbrlib
         const Vec3<float>&      getDirection()      const noexcept;
         float                   getInnerRadius()    const noexcept;
         float                   getOuterRadius()    const noexcept;
-
-        virtual type_index getType() const override;
 
     private:
         Vec3<float> _pos;

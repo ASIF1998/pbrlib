@@ -73,11 +73,6 @@ namespace pbrlib
         return _pos;
     }
 
-    type_index PointLight::getType() const
-    {
-        return ComponentUtil::getTypeIndex<PointLight>();
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PointLight::Builder::Builder(const string_view name) :
         _name(name)

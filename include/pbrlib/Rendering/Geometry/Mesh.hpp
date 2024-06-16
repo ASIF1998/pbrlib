@@ -36,7 +36,7 @@ namespace pbrlib
     };
 
     struct Mesh :
-        public Component
+        public Component<Mesh>
     {
         friend class MeshAssimp;
 
@@ -132,7 +132,6 @@ namespace pbrlib
         inline const AABB&          getAABB()                   const noexcept; 
         inline PtrMaterial&         getMaterial()               noexcept;
         inline const PtrMaterial&   getMaterial()               const noexcept;
-        inline virtual type_index   getType()                   const override;
 
         inline void setIndex(size_t i, uint32_t val);
         inline void setIndexBuffer(const PtrBuffer& ptr_buffer);
