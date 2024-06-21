@@ -13,17 +13,15 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class ShaderModule;
     class PipelineLayout;
     class ComputePipeline;
 
-    using PtrShaderModule       = shared_ptr<ShaderModule>;
-    using PtrPipelineLayout     = shared_ptr<PipelineLayout>;
-    using PtrComputePipeline    = shared_ptr<ComputePipeline>;
+    using PtrShaderModule       = std::shared_ptr<ShaderModule>;
+    using PtrPipelineLayout     = std::shared_ptr<PipelineLayout>;
+    using PtrComputePipeline    = std::shared_ptr<ComputePipeline>;
 
     class ComputePipeline
     {

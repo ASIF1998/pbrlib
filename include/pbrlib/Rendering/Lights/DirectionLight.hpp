@@ -15,15 +15,11 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
-    using namespace math;
-
     class DirectionLight;
 
-    using PtrDirectionLight = shared_ptr<DirectionLight>;
+    using PtrDirectionLight = std::shared_ptr<DirectionLight>;
 
     class DirectionLight :
         public Component<DirectionLight>
@@ -32,51 +28,51 @@ namespace pbrlib
         class Builder
         {
         public:
-            Builder(const string_view name = "Direction Light");
+            Builder(const std::string_view name = "Direction Light");
 
             void setIntensity(float intensity) noexcept;
-            void setColor(const Vec3<float>& color);
-            void setDirectionToLight(const Vec3<float>& direction);
-            void setName(const string_view name);
+            void setColor(const math::Vec3<float>& color);
+            void setDirectionToLight(const math::Vec3<float>& direction);
+            void setName(const std::string_view name);
 
             DirectionLight      build()     const;
             PtrDirectionLight   buildPtr()  const;
 
         private:
-            Vec3<float> _dir_to_light;
-            Vec3<float> _color;
-            float       _intensity;
-            string      _name;
+            math::Vec3<float>   _dir_to_light;
+            math::Vec3<float>   _color;
+            float               _intensity;
+            std::string         _name;
         };
 
     public:
         DirectionLight(
-            const Vec3<float>&  direction_to_light,
-            const Vec3<float>&  color,
-            float               intensity
+            const math::Vec3<float>&    direction_to_light,
+            const math::Vec3<float>&    color,
+            float                       intensity
         );
 
         DirectionLight(
-            const string_view   name,
-            const Vec3<float>&  direction_to_light,
-            const Vec3<float>&  color,
-            float               intensity
+            const std::string_view      name,
+            const math::Vec3<float>&    direction_to_light,
+            const math::Vec3<float>&    color,
+            float                       intensity
         );
 
         void setIntensity(float intensity) noexcept;
-        void setColor(const Vec3<float>& color);
-        void setDirectionToLight(const Vec3<float>& direction);
+        void setColor(const math::Vec3<float>& color);
+        void setDirectionToLight(const math::Vec3<float>& direction);
 
-        float               getIntensity()          const noexcept;
-        Vec3<float>&        getColor()              noexcept;
-        const Vec3<float>&  getColor()              const noexcept;
-        Vec3<float>&        getDirectionToLight()   noexcept;
-        const Vec3<float>&  getDirectionToLight()   const noexcept;
+        float                       getIntensity()          const noexcept;
+        math::Vec3<float>&          getColor()              noexcept;
+        const math::Vec3<float>&    getColor()              const noexcept;
+        math::Vec3<float>&          getDirectionToLight()   noexcept;
+        const math::Vec3<float>&    getDirectionToLight()   const noexcept;
 
     private:
-        Vec3<float> _dir_to_lihght;
-        Vec3<float> _color;
-        float       _intensity;
+        math::Vec3<float>   _dir_to_lihght;
+        math::Vec3<float>   _color;
+        float               _intensity;
     };
 }
 

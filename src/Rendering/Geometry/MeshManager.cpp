@@ -8,6 +8,8 @@
 
 #include <pbrlib/Rendering/Geometry/MeshManager.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     MeshManager::MeshManager(

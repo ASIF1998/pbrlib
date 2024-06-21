@@ -8,6 +8,8 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     /**
@@ -65,26 +67,11 @@ namespace pbrlib
         const PtrDevice&        ptr_device,
         uint32_t                memory_type_index,
         const ImageInfo&        image_info,
-        const vector<uint32_t>& queue_family_indices
+        span<const uint32_t>    queue_family_indices
     ) :
         _image_handle           (VK_NULL_HANDLE),
         _image_info             (image_info),
-        _queue_family_indicies  (queue_family_indices),
-        _ptr_device             (ptr_device),
-        _ptr_device_memory      (nullptr)
-    {
-        _create(memory_type_index);
-    }
-
-    Image::Image(
-        const PtrDevice&    ptr_device,
-        uint32_t            memory_type_index,
-        const ImageInfo&    image_info,
-        vector<uint32_t>&&  queue_family_indices
-    ) :
-        _image_handle           (VK_NULL_HANDLE),
-        _image_info             (image_info),
-        _queue_family_indicies  (move(queue_family_indices)),
+        _queue_family_indicies  (std::begin(queue_family_indices), std::end(queue_family_indices)),
         _ptr_device             (ptr_device),
         _ptr_device_memory      (nullptr)
     {
@@ -110,24 +97,11 @@ namespace pbrlib
         const PtrDevice&        ptr_device,
         VkImage                 image,
         ImageInfo               image_info,
-        const vector<uint32_t>& queue_family_indicies
+        span<const uint32_t>    queue_family_indicies
     ) :
         _image_handle           (image),
         _image_info             (image_info),
-        _queue_family_indicies  (queue_family_indicies),
-        _ptr_device             (ptr_device),
-        _ptr_device_memory      (nullptr)
-    {}
-
-    Image::Image(
-        const PtrDevice&    ptr_device,
-        VkImage             image,
-        ImageInfo           image_info,
-        vector<uint32_t>&&  queue_family_indicies
-    ) :
-        _image_handle           (image),
-        _image_info             (image_info),
-        _queue_family_indicies  (move(queue_family_indicies)),
+        _queue_family_indicies  (std::begin(queue_family_indicies), std::end(queue_family_indicies)),
         _ptr_device             (ptr_device),
         _ptr_device_memory      (nullptr)
     {}
@@ -231,7 +205,7 @@ namespace pbrlib
         const PtrDevice&            ptr_device,
         uint32_t                    memory_type_index,
         const ImageInfo&            image_info,
-        const vector<uint32_t>&     queue_family_indices
+        std::span<const uint32_t>   queue_family_indices
     )
     {
         return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
@@ -251,7 +225,7 @@ namespace pbrlib
         const PtrDevice&            ptr_device,
         VkImage                     image,
         const ImageInfo&            image_info,
-        const vector<uint32_t>&     queue_family_indicies
+        span<const uint32_t>        queue_family_indicies
     )
     {
         return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);

@@ -12,6 +12,7 @@
 #include "DeviceMemory.hpp"
 
 #include <vector>
+#include <span>
 #include <memory>
 
 #include <pbrlib/Memory/STLAlignedAllocator.hpp>
@@ -24,9 +25,6 @@
 
 #include <memory>
 
-using namespace std;
-using namespace pbrlib::math;
-
 namespace pbrlib
 {
     class Image;
@@ -34,10 +32,10 @@ namespace pbrlib
     class PrimaryCommandBuffer;
     class DeviceQueue;
 
-    using PtrImage                  = shared_ptr<Image>;
-    using PtrImageView              = shared_ptr<ImageView>;
-    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
-    using PtrDeviceQueue            = shared_ptr<DeviceQueue>;
+    using PtrImage                  = std::shared_ptr<Image>;
+    using PtrImageView              = std::shared_ptr<ImageView>;
+    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
+    using PtrDeviceQueue            = std::shared_ptr<DeviceQueue>;
 
     /**
      * @struct ImageInfo.
@@ -108,10 +106,10 @@ namespace pbrlib
             inline virtual PtrImage    buildPtr()  const;
 
         protected:
-            PtrDevice           _ptr_device;
-            ImageInfo           _image_info;
-            uint32_t            _memory_type_index;
-            vector<uint32_t>    _queue_family_indicies;
+            PtrDevice               _ptr_device;
+            ImageInfo               _image_info;
+            uint32_t                _memory_type_index;
+            std::vector<uint32_t>    _queue_family_indicies;
         };
 
         template<
@@ -150,28 +148,28 @@ namespace pbrlib
             void setDeviceQueue(const PtrDeviceQueue& ptr_device_queue); 
 
             inline void pushBack(Type r);
-            inline void pushBack(const Vec2<Type>& c);
-            inline void pushBack(const Vec3<Type>& c);
-            inline void pushBack(const Vec4<Type>& c);
+            inline void pushBack(const math::Vec2<Type>& c);
+            inline void pushBack(const math::Vec3<Type>& c);
+            inline void pushBack(const math::Vec4<Type>& c);
 
             inline void set(size_t i, Type r);
-            inline void set(size_t i, const Vec2<Type>& c);
-            inline void set(size_t i, const Vec3<Type>& c);
-            inline void set(size_t i, const Vec4<Type>& c);
+            inline void set(size_t i, const math::Vec2<Type>& c);
+            inline void set(size_t i, const math::Vec3<Type>& c);
+            inline void set(size_t i, const math::Vec4<Type>& c);
 
             inline void set(size_t i, size_t j, Type r);
-            inline void set(size_t i, size_t j, const Vec2<Type>& c);
-            inline void set(size_t i, size_t j, const Vec3<Type>& c);
-            inline void set(size_t i, size_t j, const Vec4<Type>& c);
+            inline void set(size_t i, size_t j, const math::Vec2<Type>& c);
+            inline void set(size_t i, size_t j, const math::Vec3<Type>& c);
+            inline void set(size_t i, size_t j, const math::Vec4<Type>& c);
 
             inline virtual Image       build()     const;
             inline virtual PtrImage    buildPtr()  const;
 
         private:
-            vector<Type, AllocatorType> _data;
-            uint32_t                    _device_local_memory_type_index;
-            PtrPrimaryCommandBuffer     _ptr_command_buffer;
-            PtrDeviceQueue              _ptr_queue;
+            std::vector<Type, AllocatorType>    _data;
+            uint32_t                            _device_local_memory_type_index;
+            PtrPrimaryCommandBuffer             _ptr_command_buffer;
+            PtrDeviceQueue                      _ptr_queue;
         };
 
     public:
@@ -205,23 +203,7 @@ namespace pbrlib
             const PtrDevice&        ptr_device,
             uint32_t                memory_type_index,
             const ImageInfo&        image_info,
-            const vector<uint32_t>& queue_family_indices
-        );
-
-        /**
-         * @brief Конструктор.
-         * @details На данный момент поддерживаются только типы float.
-         * 
-         * @param ptr_device            указатель на устройство.
-         * @param memory_type_index     индекс типа памяти.
-         * @param image_info            информация об изображении.
-         * @param queue_family_indices  индексы семейства очередей.
-        */
-        Image(
-            const PtrDevice&    ptr_device,
-            uint32_t            memory_type_index,
-            const ImageInfo&    image_info,
-            vector<uint32_t>&&  queue_family_indices
+            std::span<const uint32_t>    queue_family_indices
         );
 
         /**
@@ -251,22 +233,7 @@ namespace pbrlib
             const PtrDevice&        ptr_device,
             VkImage                 image,
             ImageInfo               image_info,
-            const vector<uint32_t>& queue_family_indicies
-        );
-
-        /**
-         * @brief Конструктор.
-         *
-         * @param ptr_device            указатель на устройство.
-         * @param image                 дескриптор уже созданного, но не прикреплённого к памяти изображения.
-         * @param image_info            информация об изображении.
-         * @param queue_family_indicies индексы семейства очередей.
-        */
-        Image(
-            const PtrDevice&    ptr_device,
-            VkImage             image,
-            ImageInfo           image_info,
-            vector<uint32_t>&&  queue_family_indicies
+            std::span<const uint32_t>    queue_family_indicies
         );
 
         Image(Image&& image);
@@ -314,7 +281,7 @@ namespace pbrlib
             const PtrDevice&        ptr_device,
             uint32_t                memory_type_index,
             const ImageInfo&        image_info,
-            const vector<uint32_t>& queue_family_indices
+            std::span<const uint32_t>    queue_family_indices
         );
 
         /**
@@ -343,21 +310,21 @@ namespace pbrlib
          * @return указатель на Image.
         */
         static PtrImage make(
-            const PtrDevice&        ptr_device,
-            VkImage                 image,
-            const ImageInfo&        image_info,
-            const vector<uint32_t>& queue_family_indicies
+            const PtrDevice&            ptr_device,
+            VkImage                     image,
+            const ImageInfo&            image_info,
+            std::span<const uint32_t>   queue_family_indicies
         );
 
     private:
         void _create(uint32_t memory_type_index);
 
     private:
-        VkImage             _image_handle;
-        ImageInfo           _image_info;
-        vector<uint32_t>    _queue_family_indicies;
-        PtrDevice           _ptr_device;
-        PtrDeviceMemory     _ptr_device_memory;
+        VkImage                 _image_handle;
+        ImageInfo               _image_info;
+        std::vector<uint32_t>   _queue_family_indicies;
+        PtrDevice               _ptr_device;
+        PtrDeviceMemory         _ptr_device_memory;
     };
 
     class ImageView

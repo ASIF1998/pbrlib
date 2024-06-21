@@ -9,13 +9,11 @@
 #ifndef PBRPass_hpp
 #define PBRPass_hpp
 
+#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/Rendering/Renderers/SubPasses/Pass.hpp>
+
 #include <memory>
-
-#include "../../../SceneGraph/Scene.hpp"
-
-#include "Pass.hpp"
-
-using namespace std;
+#include <span>
 
 namespace pbrlib
 {
@@ -32,15 +30,15 @@ namespace pbrlib
     class   CameraBase;
     class   Scene;
 
-    using PtrComputePipeline    = shared_ptr<ComputePipeline>;
-    using PtrDevice             = shared_ptr<Device>;
-    using PtrDescriptorSet      = shared_ptr<DescriptorSet>;
-    using PtrCommandBuffer      = shared_ptr<CommandBuffer>;
-    using PtrPBRPass            = unique_ptr<PBRPass>;
-    using PtrSampler            = shared_ptr<Sampler>;
-    using PtrDescriptorPool     = shared_ptr<DescriptorPool>;
-    using PtrBuffer             = shared_ptr<Buffer>;
-    using PtrPhysicalDevice     = shared_ptr<PhysicalDevice>;
+    using PtrComputePipeline    = std::shared_ptr<ComputePipeline>;
+    using PtrDevice             = std::shared_ptr<Device>;
+    using PtrDescriptorSet      = std::shared_ptr<DescriptorSet>;
+    using PtrCommandBuffer      = std::shared_ptr<CommandBuffer>;
+    using PtrPBRPass            = std::unique_ptr<PBRPass>;
+    using PtrSampler            = std::shared_ptr<Sampler>;
+    using PtrDescriptorPool     = std::shared_ptr<DescriptorPool>;
+    using PtrBuffer             = std::shared_ptr<Buffer>;
+    using PtrPhysicalDevice     = std::shared_ptr<PhysicalDevice>;
 
     /**
      * @class PBRPass.
@@ -242,9 +240,9 @@ namespace pbrlib
         void draw(
             const PtrSceneItem&             ptr_camera,
             const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-            const vector<PtrSceneItem>      point_lights,
-            const vector<PtrSceneItem>      spot_lights,
-            const vector<PtrSceneItem>      direction_lights
+            std::span<const PtrSceneItem>        point_lights,
+            std::span<const PtrSceneItem>        spot_lights,
+            std::span<const PtrSceneItem>        direction_lights
         );
 
         inline PtrComputePipeline&         getPipeline() noexcept;

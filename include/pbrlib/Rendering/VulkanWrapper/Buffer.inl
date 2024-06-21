@@ -56,7 +56,7 @@ namespace pbrlib
             static_cast<VkDeviceSize>(_size * sizeof(Type)),
             _usage,
             _memory_type_index,
-            _queue_family_indicies
+            std::span<const uint32_t>(_queue_family_indicies)
         );
     }
 
@@ -112,7 +112,7 @@ namespace pbrlib
     inline void Buffer::BuilderWithData<Type, AllocatorType>::setData(const Container& data)
     {
         static_assert(
-            is_same<const Type&, decltype(data[0])>::value,
+            std::is_same<const Type&, decltype(data[0])>::value,
             "The type of items in the container does not match the type of items in the buffer"
         );
 

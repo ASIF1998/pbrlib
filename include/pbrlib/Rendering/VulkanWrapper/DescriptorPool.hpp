@@ -11,9 +11,7 @@
 
 #include "Device.hpp"
 
-#include <vector>
-
-using namespace std;
+#include <span>
 
 /**
  * TODO: Добавить метод createDescriptorSet(...) в класс DescriptorPool.
@@ -23,15 +21,15 @@ namespace pbrlib
 {
     class DescriptorPool;
 
-    using PtrDescriptorPool = shared_ptr<DescriptorPool>;
+    using PtrDescriptorPool = std::shared_ptr<DescriptorPool>;
 
     class DescriptorPool
     {
     public:
         DescriptorPool(
-            const PtrDevice&                    ptr_device,
-            const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
-            uint32_t                            max_sets
+            const PtrDevice&                        ptr_device,
+            std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
+            uint32_t                                max_sets
         );
 
         DescriptorPool(
@@ -55,9 +53,9 @@ namespace pbrlib
         const VkDescriptorPool&  getDescriptorPoolHandle()   const noexcept;
 
         static PtrDescriptorPool make(
-            const PtrDevice&                    ptr_device,
-            const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
-            uint32_t                            max_sets
+            const PtrDevice&                        ptr_device,
+            std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
+            uint32_t                                max_sets
         );
 
         static PtrDescriptorPool make(

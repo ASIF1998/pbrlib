@@ -15,6 +15,7 @@
 
 #include <filesystem>
 
+using namespace std;
 using namespace pbrlib;
 using namespace pbrlib::math;
 
@@ -195,8 +196,8 @@ int main(int argc, char* argv[])
     MaterialManager&    material_manager    = scene.getMaterialManager();
     GPUTextureManager&  texture_manager     = scene.getTextureManager();
 
-    vector<PtrMesh> model_meshes    = mesh_manager.load(model.path_to_mesh.string()).value();
-    PtrMaterial     material        = getMaterial(model, texture_manager, material_manager);
+    std::vector<PtrMesh>    model_meshes    = mesh_manager.load(model.path_to_mesh.string()).value();
+    PtrMaterial             material        = getMaterial(model, texture_manager, material_manager);
     model_meshes[0]->setMaterial(material);
 
     auto mesh_node = MeshNode::make("Floor", model_meshes[0]);

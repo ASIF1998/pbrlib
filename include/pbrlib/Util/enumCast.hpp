@@ -11,14 +11,12 @@
 
 #include <type_traits>
 
-using namespace std;
-
 namespace pbrlib::utils
 {
     template<typename T>
-    constexpr typename underlying_type<T>::type enumCast(T x)
+    constexpr typename std::underlying_type<T>::type enumCast(T x)
     {
-        return static_cast<typename underlying_type<T>::type>(x);
+        return static_cast<typename std::underlying_type<T>::type>(x);
     }
 }
 

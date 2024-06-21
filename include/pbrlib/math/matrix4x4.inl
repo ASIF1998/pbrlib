@@ -703,11 +703,10 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix4x4<Type>& mat)
+    inline std::ostream& operator << (std::ostream& print, const Matrix4x4<Type>& mat)
     {
-        for (size_t i{0}; i < 4; i++) {
-            print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << endl;
-        }
+        for (size_t i{0}; i < 4; i++)
+            print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << std::endl;
         
         return print;
     }

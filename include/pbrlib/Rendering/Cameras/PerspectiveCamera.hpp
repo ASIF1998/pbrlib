@@ -13,12 +13,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class PerspectiveCamera;
-    using PtrPerspectiveCamera = shared_ptr<PerspectiveCamera>;
+    using PtrPerspectiveCamera = std::shared_ptr<PerspectiveCamera>;
 
     class PerspectiveCamera :
         public CameraBase
@@ -27,11 +25,11 @@ namespace pbrlib
         class Builder
         {
         public:
-            Builder(const string_view name = "Perspective Camera");
+            Builder(const std::string_view name = "Perspective Camera");
 
-            void setPosition(const Vec3<float>& pos);
-            void setEye(const Vec3<float>& eye);
-            void setUp(const Vec3<float>& up);
+            void setPosition(const math::Vec3<float>& pos);
+            void setEye(const math::Vec3<float>& eye);
+            void setUp(const math::Vec3<float>& up);
 
             /**
              * @brief 
@@ -102,21 +100,21 @@ namespace pbrlib
                 float max_depth
             ) noexcept;
 
-            void setName(const string_view name);
+            void setName(const std::string_view name);
 
             PerspectiveCamera       build()     const;
             PtrPerspectiveCamera    buildPtr()  const;
 
         private:
-            Vec3<float> _pos;
-            Vec3<float> _eye;
-            Vec3<float> _up;
-            float       _z_near;
-            float       _z_far;
-            float       _aspect;
-            float       _fovy;
-            Viewport    _viewport;
-            string      _name;
+            math::Vec3<float>       _pos;
+            math::Vec3<float>       _eye;
+            math::Vec3<float>       _up;
+            float                   _z_near;
+            float                   _z_far;
+            float                   _aspect;
+            float                   _fovy;
+            Viewport                _viewport;
+            std::string             _name;
         };
 
     public:
@@ -133,14 +131,14 @@ namespace pbrlib
          * @param viewport      параметры области просмотра.
         */
         PerspectiveCamera(
-            const Vec3<float>&  pos,
-            const Vec3<float>&  eye,
-            const Vec3<float>&  up,
-            float               near_clipp,
-            float               far_clipp,
-            float               aspect,
-            float               fovy,
-            const Viewport&     viewport
+            const math::Vec3<float>&    pos,
+            const math::Vec3<float>&    eye,
+            const math::Vec3<float>&    up,
+            float                       near_clipp,
+            float                       far_clipp,
+            float                       aspect,
+            float                       fovy,
+            const Viewport&             viewport
         );
 
         /**
@@ -157,15 +155,15 @@ namespace pbrlib
          * @param viewport          параметры области просмотра.
         */
         PerspectiveCamera(
-            const string_view   component_name,
-            const Vec3<float>&  pos,
-            const Vec3<float>&  eye,
-            const Vec3<float>&  up,
-            float               near_clipp,
-            float               far_clipp,
-            float               aspect,
-            float               fovy,
-            const Viewport&     viewport
+            const std::string_view  component_name,
+            const math::Vec3<float>&      pos,
+            const math::Vec3<float>&      eye,
+            const math::Vec3<float>&      up,
+            float                   near_clipp,
+            float                   far_clipp,
+            float                   aspect,
+            float                   fovy,
+            const Viewport&         viewport
         );
 
         float getAspect()   const noexcept;

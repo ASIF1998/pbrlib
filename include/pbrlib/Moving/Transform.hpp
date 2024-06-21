@@ -14,37 +14,33 @@
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/vec3.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
-    using namespace math;
-
     class AABB;
 
     class Transform
     {
     public:
         Transform();
-        Transform(const Matrix4x4<float>& m);
+        Transform(const math::Matrix4x4<float>& m);
 
 		bool operator == (const Transform& t) const;
 		bool operator != (const Transform& t) const;
 
-		Vec3<float> operator () (const Vec3<float>& v)      const;
-		AABB        operator () (const AABB& bbox)          const;
-		Transform   operator *  (const Transform& t)        const;
+		math::Vec3<float>   operator () (const math::Vec3<float>& v)    const;
+		AABB                operator () (const AABB& bbox)              const;
+		Transform           operator *  (const Transform& t)            const;
 
 		bool identity() const;
 
-		Matrix4x4<float>&		getMatrix()         noexcept;
-		const Matrix4x4<float>& getMatrix()         const noexcept;
-		Matrix4x4<float>        getInverseMatrix()  const noexcept;
+		math::Matrix4x4<float>&		    getMatrix()         noexcept;
+		const math::Matrix4x4<float>&   getMatrix()         const noexcept;
+		math::Matrix4x4<float>          getInverseMatrix()  const noexcept;
 
-		void setMatrix(const Matrix4x4<float>& m);
+		void setMatrix(const math::Matrix4x4<float>& m);
 
-		static Transform translate(const Vec3<float>& t);
-		static Transform scale(const Vec3<float>& s);
+		static Transform translate(const math::Vec3<float>& t);
+		static Transform scale(const math::Vec3<float>& s);
 
         /**
          * @brief 
@@ -85,7 +81,7 @@ namespace pbrlib
          * @param theta угол в градусах.
          * @return Трансформацию, осуществляющую поворот вокруг оси OX.
         */
-        static Transform rotate(const Vec3<float>& axis, float theta);
+        static Transform rotate(const math::Vec3<float>& axis, float theta);
 
         /**
          * @brief 
@@ -98,9 +94,9 @@ namespace pbrlib
          * @return трансформация, которая осуществляет перевод в пространства вида.
         */
         static Transform lookAt(
-            const Vec3<float>& pos, 
-            const Vec3<float>& eye, 
-            const Vec3<float>& up
+            const math::Vec3<float>& pos, 
+            const math::Vec3<float>& eye, 
+            const math::Vec3<float>& up
         );
 
         /**
@@ -121,19 +117,19 @@ namespace pbrlib
         );
 
 	private:
-        Matrix4x4<float> _m;
+        math::Matrix4x4<float> _m;
 
 	private:
         friend Transform inverse(const Transform& t);
         friend Transform transpose(const Transform& t);
 
-        friend ostream& operator << (ostream& print, const Transform& t);
+        friend std::ostream& operator << (std::ostream& print, const Transform& t);
     };
 
     Transform inverse(const Transform& t);
     Transform transpose(const Transform& t);
 
-    ostream& operator << (ostream& print, const Transform& t);
+    std::ostream& operator << (std::ostream& print, const Transform& t);
 }
 
 #endif /* Transform_hpp */

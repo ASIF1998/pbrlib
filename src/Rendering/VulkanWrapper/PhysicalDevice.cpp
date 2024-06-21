@@ -13,6 +13,8 @@
 #include <cassert>
 #include <stdexcept>
 
+using namespace std;
+
 namespace pbrlib
 {
     PhysicalDevice::PhysicalDevice(VkPhysicalDevice physical_device_handle) :
@@ -82,16 +84,16 @@ namespace pbrlib
         return format_properties;
     }
 
-    PtrDevice PhysicalDevice::makeDevice(const PtrInstance& ptr_instance, const vector<VkDeviceQueueCreateInfo>& queue_info) const
+    PtrDevice PhysicalDevice::makeDevice(const PtrInstance& ptr_instance, span<const VkDeviceQueueCreateInfo> queue_info) const
     {
         return make_shared<Device>(ptr_instance, *this, queue_info);
     }
 
     PtrDevice PhysicalDevice::makeDevice(
         const PtrInstance&                      ptr_instance,
-        const vector<VkDeviceQueueCreateInfo>&  queue_info,
-        const vector<const char*>&              layer_names,
-        const vector<const char*>&              extension_names
+        span<const VkDeviceQueueCreateInfo>     queue_info,
+        span<const char*>                       layer_names,
+        span<const char*>                       extension_names
     ) const
     {
         return make_shared<Device>(ptr_instance, *this, queue_info, layer_names, extension_names);

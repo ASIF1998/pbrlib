@@ -8,6 +8,8 @@
 
 #include <pbrlib/Rendering/Material/MaterialManager.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     bool MaterialManager::addMaterial(

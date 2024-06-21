@@ -18,8 +18,6 @@
 
 #include "Material.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class MaterialManager
@@ -27,14 +25,14 @@ namespace pbrlib
     public:
         MaterialManager() = default;
 
-        bool addMaterial(const PtrMaterial& ptr_material, const string_view material_name);
-        bool addMaterial(Material::Builder& material_builder, const string_view material_name);
+        bool addMaterial(const PtrMaterial& ptr_material, const std::string_view material_name);
+        bool addMaterial(Material::Builder& material_builder, const std::string_view material_name);
 
-        optional<PtrMaterial>       getMaterial(const string_view material_name);
-        optional<const PtrMaterial> getMaterial(const string_view material_name) const;
+        std::optional<PtrMaterial>          getMaterial(const std::string_view material_name);
+        std::optional<const PtrMaterial>    getMaterial(const std::string_view material_name) const;
 
     private:
-        unordered_map<string, PtrMaterial> _materials;
+        std::unordered_map<std::string, PtrMaterial> _materials;
     };
 }
 

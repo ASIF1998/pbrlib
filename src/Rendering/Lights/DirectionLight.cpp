@@ -8,6 +8,9 @@
 
 #include <pbrlib/Rendering/Lights/DirectionLight.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     DirectionLight::DirectionLight(

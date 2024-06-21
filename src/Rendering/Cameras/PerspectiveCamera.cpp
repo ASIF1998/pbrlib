@@ -8,6 +8,9 @@
 
 #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     PerspectiveCamera::PerspectiveCamera(

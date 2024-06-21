@@ -42,7 +42,7 @@ namespace pbrlib
          * @param path путь до файла.
          * @return Указатели на сетки.
         */
-        optional<vector<PtrMesh>> load(const string_view path);
+        std::optional<std::vector<PtrMesh>> load(const std::string_view path);
         
         void addMesh(const PtrMesh& ptr_mesh);
         void addMesh(PtrMesh&& ptr_mesh);
@@ -55,13 +55,13 @@ namespace pbrlib
             _meshes.insert(make_pair(ptr_mesh->getName(), ptr_mesh));
         }
         
-        optional<PtrMesh>           get(const string_view name);
-        optional<const PtrMesh>     get(const string_view name) const;
+        std::optional<PtrMesh>          get(const std::string_view name);
+        std::optional<const PtrMesh>    get(const std::string_view name) const;
         
     private:
-        unordered_map<string, PtrMesh>  _meshes;                //!< Загруженные сетки.
-        vector<string>                  _loaded_files;          //!< Файлы которые уже загружены.
-        MeshAssimp                      _assimp_mesh_loader;    //!< Загрузчик сеток.
+        std::unordered_map<std::string, PtrMesh>    _meshes;                //!< Загруженные сетки.
+        std::vector<std::string>                    _loaded_files;          //!< Файлы которые уже загружены.
+        MeshAssimp                                  _assimp_mesh_loader;    //!< Загрузчик сеток.
     };
 }
 

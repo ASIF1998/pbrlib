@@ -37,7 +37,7 @@ namespace pbrlib
         _command_pool_handle(VK_NULL_HANDLE),
         _queue_family_index (command_pool._queue_family_index)
     {
-        swap(_command_pool_handle, command_pool._command_pool_handle);
+        std::swap(_command_pool_handle, command_pool._command_pool_handle);
     }
 
     CommandPool::~CommandPool()

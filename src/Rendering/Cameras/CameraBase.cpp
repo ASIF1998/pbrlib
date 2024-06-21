@@ -8,17 +8,19 @@
 
 #include <pbrlib/Rendering/Cameras/CameraBase.hpp>
 
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     CameraBase::CameraBase(
-        const string_view   component_name,
-        const Transform&    view,
-        const Transform&    projection,
-        const Vec3<float>&  pos,
-        const Vec3<float>&  eye,
-        float               z_near,
-        float               z_far,
-        const Viewport&     viewport
+        const std::string_view  component_name,
+        const Transform&        view,
+        const Transform&        projection,
+        const Vec3<float>&      pos,
+        const Vec3<float>&      eye,
+        float                   z_near,
+        float                   z_far,
+        const Viewport&         viewport
     ) :
         Component   (component_name),
         _view       (view),

@@ -10,6 +10,8 @@
 
 #include <pbrlib/SceneGraph/Component.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     SceneItem::SceneItem(
@@ -100,14 +102,9 @@ namespace pbrlib
         _ptr_parent = ptr_parent;
     }
 
-    void SceneItem::setChildren(vector<PtrSceneItem>&& children)
+    void SceneItem::setChildren(span<const PtrSceneItem> children)
     {
-        swap(_ptr_children, children);
-    }
-
-    void SceneItem::setChildren(const vector<PtrSceneItem>& children)
-    {
-        _ptr_children = children;
+        _ptr_children = std::vector(std::begin(children), std::end(children));
     }
 
     void SceneItem::setLocalTransform(const Transform& transform)

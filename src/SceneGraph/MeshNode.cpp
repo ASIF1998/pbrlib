@@ -8,6 +8,9 @@
 
 #include <pbrlib/SceneGraph/MeshNode.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     MeshNode::MeshNode(const string_view name) :

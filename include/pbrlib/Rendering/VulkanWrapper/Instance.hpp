@@ -10,6 +10,7 @@
 #define Instance_hpp
 
 #include <vector>
+#include <span>
 #include <set>
 
 #include <string_view>
@@ -19,15 +20,13 @@
 
 #include <vulkan/vulkan.h>
 
-using namespace std;
-
 namespace pbrlib
 {
     struct  PhysicalDevice;
     class   Instance;
     
-    using PtrInstance       = shared_ptr<Instance>;
-    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
+    using PtrInstance       = std::shared_ptr<Instance>;
+    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
 
     /**
      * @class VulkanInstanceExtensionSupported.
@@ -46,10 +45,10 @@ namespace pbrlib
          * @param name название расширения.
          * @return true - если расширение поддерживается.
         */
-        bool check(const string& name) const;
+        bool check(const std::string& name) const;
 
     private:
-        set<string> _extension_supported;
+        std::set<std::string> _extension_supported;
     };
 
     /**
@@ -69,10 +68,10 @@ namespace pbrlib
          * @param name название слоя.
          * @return true - если слой поддерживается.
         */
-        bool check(const string& name) const;
+        bool check(const std::string& name) const;
 
     private:
-        set<string> _layer_supported;
+        std::set<std::string> _layer_supported;
     };
 
     class Instance
@@ -84,7 +83,7 @@ namespace pbrlib
          * @param app_name      название приложения.
          * @param app_version   номер приложения.
         */
-        Instance(const string_view app_name, uint32_t app_version);
+        Instance(const std::string_view app_name, uint32_t app_version);
 
         /**
          * @brief Конструктор.
@@ -95,10 +94,10 @@ namespace pbrlib
          * @param extension_names   названия расширений.
         */
         Instance(
-            const string_view           app_name, 
-            uint32_t                    app_version,
-            const vector<const char*>&  layer_names,
-            const vector<const char*>&  extension_names
+            const std::string_view  app_name, 
+            uint32_t                app_version,
+            std::span<const char*>  layer_names,
+            std::span<const char*>  extension_names
         );
 
         Instance(Instance&& instance);
@@ -111,25 +110,25 @@ namespace pbrlib
 
         const VkInstance& getHandle() const;
 
-        PtrPhysicalDevice           getPhysicalDevice(int type);
-        vector<PtrPhysicalDevice>   getAllPhysicalDevice(int type) const;
+        PtrPhysicalDevice               getPhysicalDevice(int type);
+        std::vector<PtrPhysicalDevice>  getAllPhysicalDevice(int type) const;
 
         /**
          * @brief Статический метод проверяющий поддержку расширения.
          * 
          * @return true - если расширение поддерживается.
         */
-        static bool isExtensionSupported(const string& name);
+        static bool isExtensionSupported(const std::string& name);
 
         /**
          * @brief Статический метод проверяющий поддержку слоя.
          * 
          * @return true - если слой поддерживается.
         */
-        static bool isLayerSupported(const string& name);
+        static bool isLayerSupported(const std::string& name);
 
-        static vector<string> getExtensionNames();
-        static vector<string> getLayerNames();
+        static std::vector<std::string> getExtensionNames();
+        static std::vector<std::string> getLayerNames();
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
@@ -137,7 +136,7 @@ namespace pbrlib
          * @param app_name      название приложения.
          * @param app_version   номер приложения.
         */
-        static PtrInstance make(const string_view app_name, uint32_t app_version);
+        static PtrInstance make(const std::string_view app_name, uint32_t app_version);
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
@@ -148,25 +147,25 @@ namespace pbrlib
          * @param extension_names   названия расширений.
         */
         static PtrInstance make(
-            const string_view           app_name,
-            uint32_t                    app_version,
-            const vector<const char*>&  layer_names,
-            const vector<const char*>&  extension_names
+            const std::string_view  app_name,
+            uint32_t                app_version,
+            std::span<const char*>  layer_names,
+            std::span<const char*>  extension_names
         );
 
     private:
         void _create(
-            const string_view   app_name,
-            uint32_t            app_version, 
-            uint32_t            enabled_layer_count,
-            const char* const*  ptr_enable_layers,
-            uint32_t            enabled_extension_count,
-            const char* const*  ptr_extensions
+            const std::string_view  app_name,
+            uint32_t                app_version, 
+            uint32_t                enabled_layer_count,
+            const char* const*      ptr_enable_layers,
+            uint32_t                enabled_extension_count,
+            const char* const*      ptr_extensions
         );
 
     private:
-        VkInstance              _instance_handle;
-        vector<PhysicalDevice>  _physical_device_handles;
+        VkInstance                      _instance_handle;
+        std::vector<PhysicalDevice>     _physical_device_handles;
 
         static VulkanInstanceExtensionSupported _supported_extensions;
         static VulkanInstanceLayerSupported     _supported_layers;

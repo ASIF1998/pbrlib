@@ -13,7 +13,14 @@
 
 #include <map>
 
-using namespace std;
+namespace pbrlib
+{
+    template<typename T>
+    concept IsMemoryBlock = requires(T memory_block)
+    {
+        dynamic_cast<IMemoryBlock*>(&memory_block);
+    };
+}
 
 namespace pbrlib
 {
@@ -36,7 +43,7 @@ namespace pbrlib
      * 
      * @tparam TMemoryBlock Тип блока памяти.
     */
-    template<typename TMemoryBlock>
+    template<IsMemoryBlock TMemoryBlock>
     class MemoryArena
     {
     public:

@@ -15,8 +15,6 @@
 
 #include "Pass.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class   GraphicsPipeline;
@@ -31,18 +29,18 @@ namespace pbrlib
     class   Framebuffer;
     struct  PhysicalDevice;
 
-    using PtrGraphicsPipeline   = shared_ptr<GraphicsPipeline>;
-    using PtrBuffer             = shared_ptr<Buffer>;
-    using PtrDescriptorPool     = shared_ptr<DescriptorPool>;
-    using PtrDescriptorSet      = shared_ptr<DescriptorSet>;
-    using PtrDevice             = shared_ptr<Device>;
-    using PtrRenderPass         = shared_ptr<RenderPass>;
-    using PtrCommandBuffer      = shared_ptr<CommandBuffer>;
-    using PtrSampler            = shared_ptr<Sampler>;
-    using PtrGBufferPass        = unique_ptr<GBufferPass>;
-    using PtrAttachments        = shared_ptr<vector<ImageView>>;
-    using PtrFramebuffer        = shared_ptr<Framebuffer>;
-    using PtrPhysicalDevice     = shared_ptr<PhysicalDevice>;
+    using PtrGraphicsPipeline   = std::shared_ptr<GraphicsPipeline>;
+    using PtrBuffer             = std::shared_ptr<Buffer>;
+    using PtrDescriptorPool     = std::shared_ptr<DescriptorPool>;
+    using PtrDescriptorSet      = std::shared_ptr<DescriptorSet>;
+    using PtrDevice             = std::shared_ptr<Device>;
+    using PtrRenderPass         = std::shared_ptr<RenderPass>;
+    using PtrCommandBuffer      = std::shared_ptr<CommandBuffer>;
+    using PtrSampler            = std::shared_ptr<Sampler>;
+    using PtrGBufferPass        = std::unique_ptr<GBufferPass>;
+    using PtrAttachments        = std::shared_ptr<std::vector<ImageView>>;
+    using PtrFramebuffer        = std::shared_ptr<Framebuffer>;
+    using PtrPhysicalDevice     = std::shared_ptr<PhysicalDevice>;
 
     /**
      * @class GBufferPass.

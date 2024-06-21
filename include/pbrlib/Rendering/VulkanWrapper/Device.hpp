@@ -12,11 +12,9 @@
 #include <vulkan/vulkan.h>
 
 #include <vector>
+#include <span>
 #include <set>
-
 #include <memory>
-
-using namespace std;
 
 namespace pbrlib
 {
@@ -24,8 +22,8 @@ namespace pbrlib
     class   Device;
     class   Instance;
 
-    using PtrDevice     = shared_ptr<Device>;
-    using PtrInstance   = shared_ptr<Instance>;
+    using PtrDevice     = std::shared_ptr<Device>;
+    using PtrInstance   = std::shared_ptr<Instance>;
 
     class Device
     {
@@ -38,9 +36,9 @@ namespace pbrlib
          * @param queue_infos       информация о создаваемых очередях логического устройства.
         */
         Device(
-            const PtrInstance&                      ptr_instance,
-            const PhysicalDevice&                   physical_device, 
-            const vector<VkDeviceQueueCreateInfo>&  queue_infos
+            const PtrInstance&                          ptr_instance,
+            const PhysicalDevice&                       physical_device, 
+            std::span<const VkDeviceQueueCreateInfo>    queue_infos
         );
 
         /**
@@ -53,11 +51,11 @@ namespace pbrlib
          * @param extension_names   названия расширений.
         */
         Device(
-            const PtrInstance&                      ptr_instance,
-            const PhysicalDevice&                   physical_device, 
-            const vector<VkDeviceQueueCreateInfo>&  queue_infos, 
-            const vector<const char*>&              layer_names, 
-            const vector<const char*>&              extension_names
+            const PtrInstance&                          ptr_instance,
+            const PhysicalDevice&                       physical_device, 
+            std::span<const VkDeviceQueueCreateInfo>    queue_infos, 
+            std::span<const char*>                      layer_names, 
+            std::span<const char*>                      extension_names
         );
 
         Device(Device&& device);
@@ -68,10 +66,10 @@ namespace pbrlib
         Device& operator = (Device&&)       = delete;
         Device& operator = (const Device&)  = delete;
 
-        const VkDevice&                         getDeviceHandle()       const noexcept;
-        const vector<VkDeviceQueueCreateInfo>&  getDeviceQueueInfo()    const noexcept;
-        PtrInstance&                            getInstance()           noexcept;
-        const PtrInstance&                      getInstance()           const noexcept;
+        const VkDevice&                             getDeviceHandle()       const noexcept;
+        const std::vector<VkDeviceQueueCreateInfo>& getDeviceQueueInfo()    const noexcept;
+        PtrInstance&                                getInstance()           noexcept;
+        const PtrInstance&                          getInstance()           const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
@@ -80,19 +78,19 @@ namespace pbrlib
 
     private:
         void _create(
-            const PtrInstance&                      ptr_instance,
-            const PhysicalDevice&                   physical_device,
-            const vector<VkDeviceQueueCreateInfo>&  queue_infos,
-            uint32_t                                enabled_layer_count,
-            const char* const*                      ptr_enabled_layers,
-            uint32_t                                enabled_extension_count,
-            const char* const*                      ptr_extensions
+            const PtrInstance&                          ptr_instance,
+            const PhysicalDevice&                       physical_device,
+            std::span<const VkDeviceQueueCreateInfo>    queue_infos,
+            uint32_t                                    enabled_layer_count,
+            const char* const*                          ptr_enabled_layers,
+            uint32_t                                    enabled_extension_count,
+            const char* const*                          ptr_extensions
         );
 
     private:
-        PtrInstance                     _ptr_instance;
-        VkDevice                        _device_handle; //!< Дескриптор логического устройства.
-        vector<VkDeviceQueueCreateInfo> _queues_infos;  //!< Информация об используемых очередях устройства.
+        PtrInstance                             _ptr_instance;
+        VkDevice                                _device_handle; //!< Дескриптор логического устройства.
+        std::vector<VkDeviceQueueCreateInfo>    _queues_infos;  //!< Информация об используемых очередях устройства.
     };
 }
 

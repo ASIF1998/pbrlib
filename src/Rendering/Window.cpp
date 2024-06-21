@@ -24,6 +24,8 @@
 
 #include <pbrlib/Util/enumCast.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     Window::Window(

@@ -9,9 +9,9 @@
 #ifndef SceneView_hpp
 #define SceneView_hpp
 
-#include "../Rendering/VulkanWrapper/Instance.hpp"
-#include "../Rendering/VulkanWrapper/Device.hpp"
-#include "../Rendering/VulkanWrapper/CommandPool.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Instance.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
 #include "Scene.hpp"
 
@@ -21,14 +21,14 @@ namespace pbrlib
     class Window;
     class PBRLibResources;
 
-    using PtrIRenderer          = shared_ptr<IRenderer>;
-    using PtrWindow             = shared_ptr<Window>;
-    using PtrPBRLibResources    = shared_ptr<PBRLibResources>; 
+    using PtrIRenderer          = std::shared_ptr<IRenderer>;
+    using PtrWindow             = std::shared_ptr<Window>;
+    using PtrPBRLibResources    = std::shared_ptr<PBRLibResources>; 
 
     class SceneView
     {
     public:
-        SceneView(const string_view scene_name, const PtrPBRLibResources& ptr_pbrlib_resources, const PtrWindow& ptr_window);
+        SceneView(const std::string_view scene_name, const PtrPBRLibResources& ptr_pbrlib_resources, const PtrWindow& ptr_window);
 
         Scene&              getScene()  noexcept;
         const Scene&        getScene()  const noexcept;

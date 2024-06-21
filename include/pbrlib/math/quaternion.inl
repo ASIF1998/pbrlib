@@ -8,8 +8,6 @@
 
 #include "../core.hpp"
 
-using namespace std;
-
 namespace pbrlib::math
 {
     inline constexpr Quaternion::Quaternion() :

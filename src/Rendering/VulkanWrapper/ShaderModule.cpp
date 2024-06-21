@@ -34,8 +34,8 @@ namespace pbrlib
         _ptr_data       (nullptr),
         _ptr_map_enties (nullptr)
     {
-        swap(_ptr_data, specialization_info._ptr_data);
-        swap(_ptr_map_enties, specialization_info._ptr_map_enties);
+        std::swap(_ptr_data, specialization_info._ptr_data);
+        std::swap(_ptr_map_enties, specialization_info._ptr_map_enties);
 
         memcpy(&_specialization_info, &specialization_info._specialization_info, sizeof(VkSpecializationInfo));
     }
@@ -168,7 +168,7 @@ namespace pbrlib
         _specialization_info    (shader_module._specialization_info),
         _shader_handle          (VK_NULL_HANDLE)
     {
-        swap(_shader_handle, shader_module._shader_handle);
+        std::swap(_shader_handle, shader_module._shader_handle);
     }
 
     ShaderModule::~ShaderModule()

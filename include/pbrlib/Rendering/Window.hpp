@@ -19,8 +19,6 @@
 #include <vector>
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class   Surface;
@@ -30,12 +28,12 @@ namespace pbrlib
     class 	Device;
     class 	Window;
 
-    using PtrSurface        = shared_ptr<Surface>;
-    using PtrSwapchain      = shared_ptr<Swapchain>;
-    using PtrInstance       = shared_ptr<Instance>;
-    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
-    using PtrDevice         = shared_ptr<Device>;
-    using PtrWindow         = shared_ptr<Window>;
+    using PtrSurface        = std::shared_ptr<Surface>;
+    using PtrSwapchain      = std::shared_ptr<Swapchain>;
+    using PtrInstance       = std::shared_ptr<Instance>;
+    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
+    using PtrDevice         = std::shared_ptr<Device>;
+    using PtrWindow         = std::shared_ptr<Window>;
 
     /**
      * @class Window.
@@ -76,7 +74,7 @@ namespace pbrlib
             Builder& operator = (Builder&&)      = delete;
             Builder& operator = (const Builder&) = delete;
 
-            void setTitle(const string_view title);
+            void setTitle(const std::string_view title);
 
             void setWidth(int width)                noexcept;
             void setHeight(int height)              noexcept;
@@ -97,12 +95,12 @@ namespace pbrlib
             PtrWindow   buildPtr()  const;
 
         private:
-            string          _title;
-            int             _width;
-            int             _height;
-            int             _pos_x;
-            int             _pos_y;
-            Resizable       _resizable;
+            std::string _title;
+            int         _width;
+            int         _height;
+            int         _pos_x;
+            int         _pos_y;
+            Resizable   _resizable;
         };
 
     public:
@@ -117,12 +115,12 @@ namespace pbrlib
          * @param resizable параметр, указывающий возможность изменения размера окна.
         */
         Window(
-            const string_view   title, 
-            int                 width, 
-            int                 height, 
-            int                 pos_x, 
-            int                 pos_y, 
-            Resizable           resizable = Resizable::STATIC
+            const std::string_view  title, 
+            int                     width, 
+            int                     height, 
+            int                     pos_x, 
+            int                     pos_y, 
+            Resizable               resizable = Resizable::STATIC
         );
 
         Window(Window&& window);
@@ -133,21 +131,21 @@ namespace pbrlib
         Window& operator = (const Window&)  = delete;
         Window& operator = (Window&&)       = delete;
 
-        tuple<int, int> getExtent()         const;
-        tuple<int, int> getDrawableExtent() const;
+        std::tuple<int, int> getExtent()         const;
+        std::tuple<int, int> getDrawableExtent() const;
 
-        string&         getTitle();
-        const string&   getTitle() const;
+        std::string&        getTitle();
+        const std::string&  getTitle() const;
 
         PtrSwapchain&       getSwapchain() noexcept;
         const PtrSwapchain& getSwapchain() const noexcept;
 
-        void setTitle(const string_view title);
+        void setTitle(const std::string_view title);
 
         static bool showCursor(bool e)      noexcept;    
         static void captureMouse(bool e)    noexcept;
 
-        static void getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions);
+        static void getVulkanInstanceExtensions(const Window& window, std::vector<const char*>& out_extensions);
 
         /**
          * @brief Статический метод, создающий окно.
@@ -161,12 +159,12 @@ namespace pbrlib
          * @return Указатель на окно.
         */
         static PtrWindow make(
-            const string_view   title, 
-            int                 width, 
-            int                 height, 
-            int                 pos_x, 
-            int                 pos_y, 
-            Resizable           resizable = Resizable::STATIC
+            const std::string_view  title, 
+            int                     width, 
+            int                     height, 
+            int                     pos_x, 
+            int                     pos_y, 
+            Resizable               resizable = Resizable::STATIC
         );
 
     public:
@@ -188,7 +186,7 @@ namespace pbrlib
     private:
         SDL_Window*     _ptr_window;
         PtrSwapchain    _ptr_swapchain;
-        string          _title;
+        std::string     _title;
     };
 }
 

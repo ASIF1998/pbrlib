@@ -292,7 +292,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Vec4<Type>& vec)
+    std::ostream& operator << (std::ostream& print, const Vec4<Type>& vec)
     {
         print << vec.x << ' ' << vec.y << ' ' << vec.z << ' ' << vec.w;
         return print;

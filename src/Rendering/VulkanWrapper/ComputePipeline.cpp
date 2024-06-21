@@ -53,7 +53,7 @@ namespace pbrlib
     )
     {
         if (!ptr_shader_module) {
-            throw invalid_argument("ptr_shader_module is null");
+            throw std::invalid_argument("ptr_shader_module is null");
         } 
 
         ComputePipeline(*ptr_shader_module, ptr_pipeline_layout);
@@ -62,8 +62,8 @@ namespace pbrlib
     ComputePipeline::ComputePipeline(ComputePipeline&& pipeline) :
         _pipeline_handle(VK_NULL_HANDLE)
     {
-        swap(_pipeline_handle, pipeline._pipeline_handle);
-        swap(_ptr_pipeline_layout, pipeline._ptr_pipeline_layout);
+        std::swap(_pipeline_handle, pipeline._pipeline_handle);
+        std::swap(_ptr_pipeline_layout, pipeline._ptr_pipeline_layout);
     }
 
     ComputePipeline::~ComputePipeline()

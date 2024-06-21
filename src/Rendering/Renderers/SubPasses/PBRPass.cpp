@@ -36,6 +36,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace pbrlib::math;
 
 namespace pbrlib
 {
@@ -220,9 +221,9 @@ namespace pbrlib
     void PBRPass::draw(
         const PtrSceneItem&             ptr_camera,
         const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-        const vector<PtrSceneItem>      point_lights,
-        const vector<PtrSceneItem>      spot_lights,
-        const vector<PtrSceneItem>      direction_lights
+        span<const PtrSceneItem>        point_lights,
+        span<const PtrSceneItem>        spot_lights,
+        span<const PtrSceneItem>        direction_lights
     )
     {
         const CameraBase& camera = ptr_camera->getComponent<CameraBase>();

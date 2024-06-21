@@ -15,7 +15,7 @@ namespace pbrlib
 {
     class Sampler;
 
-    using PtrSampler = shared_ptr<Sampler>;
+    using PtrSampler = std::shared_ptr<Sampler>;
 
     /**
      * @class SamplerInfo.

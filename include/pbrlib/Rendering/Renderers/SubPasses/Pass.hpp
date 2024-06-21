@@ -11,15 +11,13 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class ImageView;
     class RenderPass;
 
-    using PtrImageView  = shared_ptr<ImageView>;
-    using PtrRenderPass = shared_ptr<RenderPass>;
+    using PtrImageView  = std::shared_ptr<ImageView>;
+    using PtrRenderPass = std::shared_ptr<RenderPass>;
 
     /**
      * @interface IPassOutput.

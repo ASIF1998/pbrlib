@@ -148,7 +148,7 @@ namespace pbrlib
     inline PtrPBRPass PBRPass::Builder::buildPtr()
     {
         if (_position_and_metallic_image_view && _normal_and_roughness_image_view && _albedo_and_baked_AO_image_view && _anisotropy_image_view) {
-            return make_unique<PBRPass>(
+            return std::make_unique<PBRPass>(
                 _ptr_device,
                 _ptr_physical_deviec,
                 _ptr_device_queue,
@@ -162,7 +162,7 @@ namespace pbrlib
             );
         }
 
-        return make_unique<PBRPass>(
+        return std::make_unique<PBRPass>(
             _ptr_device,
             _ptr_physical_deviec,
             _ptr_device_queue,
@@ -224,7 +224,7 @@ namespace pbrlib
         const Optionals&            optionals
     )
     {
-        return make_unique<PBRPass>(
+        return std::make_unique<PBRPass>(
             ptr_device,
             ptr_physical_deviec,
             ptr_queue,
@@ -247,7 +247,7 @@ namespace pbrlib
         const Optionals&            optionals
     )
     {
-        return make_unique<PBRPass>(
+        return std::make_unique<PBRPass>(
             ptr_device,
             ptr_physical_deviec,
             ptr_queue,

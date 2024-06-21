@@ -22,6 +22,8 @@
 
 #include <stb_image.h>
 
+using namespace std;
+
 namespace pbrlib
 {
     GPUTextureManager::GPUTextureManager(

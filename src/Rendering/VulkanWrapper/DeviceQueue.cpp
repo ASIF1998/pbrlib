@@ -37,7 +37,7 @@ namespace pbrlib
         _family_index   (device_queue._family_index),
         _index          (device_queue._index)
     {
-        swap(_queue_handle, device_queue._queue_handle);
+        std::swap(_queue_handle, device_queue._queue_handle);
     }
 
     DeviceQueue::~DeviceQueue()

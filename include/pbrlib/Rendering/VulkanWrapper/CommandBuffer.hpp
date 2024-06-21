@@ -9,16 +9,13 @@
 #ifndef CommandBuffer_hpp
 #define CommandBuffer_hpp
 
-#include "CommandPool.hpp"
-
-#include "GraphicsPipeline.hpp"
-
-#include <memory>
-#include <vector>
+#include <pbrlib/Rendering/VulkanWrapper/CommandPool.hpp>
+#include <pbrlib/Rendering/VulkanWrapper/GraphicsPipeline.hpp>
 
 #include <pbrlib/math/vec4.hpp>
 
-using namespace std;
+#include <memory>
+#include <span>
 
 namespace pbrlib
 {
@@ -33,13 +30,11 @@ namespace pbrlib
     class Framebuffer;
     class ComputePipeline;
 
-    using PtrCommandBuffer          = shared_ptr<CommandBuffer>;
-    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
-    using PtrSecondaryCommandBuffer = shared_ptr<SecondaryCommandBuffer>;
-    using PtrFramebuffer            = shared_ptr<Framebuffer>;
-    using PtrComputePipeline        = shared_ptr<ComputePipeline>;
-
-    using namespace math;
+    using PtrCommandBuffer          = std::shared_ptr<CommandBuffer>;
+    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
+    using PtrSecondaryCommandBuffer = std::shared_ptr<SecondaryCommandBuffer>;
+    using PtrFramebuffer            = std::shared_ptr<Framebuffer>;
+    using PtrComputePipeline        = std::shared_ptr<ComputePipeline>;
 
     class CommandBuffer
     {
@@ -75,9 +70,9 @@ namespace pbrlib
          * @throw в случае, если offsets.size() < buffer_handles.size().
         */
         void bindVertexBuffers(
-            uint32_t 		            first_binding, 
-            const vector<Buffer>& 	    buffers, 
-            const vector<VkDeviceSize>& offsets
+            uint32_t 		                first_binding, 
+            std::span<const Buffer> 	    buffers, 
+            std::span<const VkDeviceSize>   offsets
     	) const;
 
         /**
@@ -264,7 +259,7 @@ namespace pbrlib
         void copyBuffer(
             const Buffer&                   src_buffer,
             const Buffer&                   dst_buffer,
-            const vector<VkBufferCopy>&     regions
+            std::span<const VkBufferCopy>   regions
         ) const noexcept;
 
         /**
@@ -292,9 +287,9 @@ namespace pbrlib
          * @param regions      регионы для копирования.
         */
         void copyImage(
-            const Image&                src_image,
-            const Image&                dst_image,
-            const vector<VkImageCopy>&  regions
+            const Image&                    src_image,
+            const Image&                    dst_image,
+            std::span<const VkImageCopy>    regions
         );
 
         /**
@@ -384,7 +379,7 @@ namespace pbrlib
         void clearColorImage(
             const Image&                    image,
             VkImageLayout                   image_layout,
-            const Vec4<float>&              clear_color,
+            const math::Vec4<float>&              clear_color,
             const VkImageSubresourceRange&  image_subresource_range
         ) const noexcept;
 
@@ -433,7 +428,7 @@ namespace pbrlib
 
         void begin()                                                                                            const;
         void end()                                                                                              const;
-        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept;
+        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, std::span<const VkClearValue> clear_values)     const noexcept;
         void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value)           const noexcept;
         void begineRenderPass(const PtrFramebuffer& ptr_framebuffer)                                            const noexcept;
         void endRenderPass()                                                                                    const noexcept;

@@ -30,6 +30,8 @@
 #include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.vert.spv.h>
 #include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.frag.spv.h>
 
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     /**
@@ -189,7 +191,7 @@ namespace pbrlib
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
         );
     
-        build_render_pass.addSubpassDescription(move(subpass_description1));
+        build_render_pass.addSubpassDescription(std::move(subpass_description1));
 
         return build_render_pass.buildPtr();
     }
@@ -202,7 +204,7 @@ namespace pbrlib
         uint32_t                    height
     )
     {
-        PtrAttachments ptr_framebuffer_attachments (new vector<ImageView>());
+        PtrAttachments ptr_framebuffer_attachments (new std::vector<ImageView>());
 
         Image::Builder<Image::TexelType::RGBA, float, Image::NumBits::NB32>         image_rgba_builder;
         ImageView::Builder                                                          image_view_builder;
@@ -319,7 +321,7 @@ namespace pbrlib
         descriptor_set_layout_bindings.addBinding(GBufferPassBindings::AO, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
         descriptor_set_layout_bindings.addBinding(GBufferPassBindings::MaterailData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
 
-        PtrDescriptorSetLayout ptr_descriptor_set_layout = DescriptorSetLayout::make(move(descriptor_set_layout_bindings));
+        PtrDescriptorSetLayout ptr_descriptor_set_layout = DescriptorSetLayout::make(std::move(descriptor_set_layout_bindings));
 
         _ptr_descriptor_set = DescriptorSet::make(ptr_descriptor_pool, ptr_descriptor_set_layout);
 
@@ -698,7 +700,7 @@ namespace pbrlib
         uint32_t                    window_height
     )
     {
-        return make_unique<GBufferPass>(
+        return std::make_unique<GBufferPass>(
             ptr_device, 
             ptr_queue,
             ptr_physical_device,

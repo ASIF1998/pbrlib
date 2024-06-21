@@ -13,14 +13,12 @@
 
 namespace pbrlib
 {
-    using namespace math;
-
     class AABB
     {
     public:
         AABB();
-        AABB(const Vec3<float>& p);
-        AABB(const Vec3<float>& p1, const Vec3<float>& p2);
+        AABB(const math::Vec3<float>& p);
+        AABB(const math::Vec3<float>& p1, const math::Vec3<float>& p2);
 
         /**
          * @brief 
@@ -30,7 +28,7 @@ namespace pbrlib
          * @param i индекс точки (i == 0 => p_min, i == 1 => p_max).
          * @return минимальную или максимальную точку ограничивающего объёма.
         */
-        Vec3<float>& operator [] (size_t i);
+        math::Vec3<float>& operator [] (size_t i);
 
         /**
          * @brief 
@@ -40,7 +38,7 @@ namespace pbrlib
          * @param i индекс точки (i == 0 => p_min, i == 1 => p_max).
          * @return минимальную или максимальную точку ограничивающего объёма.
         */
-        Vec3<float> operator [] (size_t i) const;
+        math::Vec3<float> operator [] (size_t i) const;
 
         bool operator == (const AABB& bbox) const;
         bool operator != (const AABB& bbox) const;
@@ -51,21 +49,21 @@ namespace pbrlib
          * @param c индекс угла.
          * @return угол ограничивающего объёма.
         */
-        Vec3<float> corner(size_t c) const;
+        math::Vec3<float> corner(size_t c) const;
 
         /**
          * @brief Метод, вычисляющий диагональ ограничивающего объёма.
          * 
          * @return диагональ ограничивающего объёма.
         */
-        Vec3<float> diagonal() const;
+        math::Vec3<float> diagonal() const;
 
         float surfaceArea() const;
         float volume()      const;
 
         uint32_t maximumExtent() const;
 
-        Vec3<float> lerp(const Vec3<float>& t) const;
+        math::Vec3<float> lerp(const math::Vec3<float>& t) const;
 
         /**
          * @brief 
@@ -76,7 +74,7 @@ namespace pbrlib
          * @param p     координаты точки.
          * @return ограничивающий объём, который охватывает как bbox, так и p.
         */
-        static AABB aabbUnion(const AABB& bbox, const Vec3<float>& p);
+        static AABB aabbUnion(const AABB& bbox, const math::Vec3<float>& p);
 
         /**
          * @brief 
@@ -120,7 +118,7 @@ namespace pbrlib
          * @param p     координаты точки.
          * @return true - если p внутри bbox, иначе false.
         */
-        static bool inside(const AABB& bbox, const Vec3<float>& p);
+        static bool inside(const AABB& bbox, const math::Vec3<float>& p);
 
         /**
          * @brief 
@@ -161,11 +159,11 @@ namespace pbrlib
         {
             struct
             {
-                Vec3<float> _p_min;
-                Vec3<float> _p_max;
+                math::Vec3<float> _p_min;
+                math::Vec3<float> _p_max;
             };
 
-            Vec3<float> _min_max[2];
+            math::Vec3<float> _min_max[2];
         };
 	};
 }

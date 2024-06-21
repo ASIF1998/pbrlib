@@ -11,8 +11,6 @@
 
 #include "IMemoryBlock.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     /**

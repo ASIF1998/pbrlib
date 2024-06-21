@@ -9,21 +9,21 @@
 #ifndef Mesh_hpp
 #define Mesh_hpp
 
-#include "../VulkanWrapper/Buffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Buffer.hpp>
+#include <pbrlib/Rendering/Geometry/AABB.hpp>
+#include <pbrlib/Rendering/Material/Material.hpp>
+
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <pbrlib/math/vec3.hpp>
 
-#include "AABB.hpp"
-
-#include "../../SceneGraph/Component.hpp"
-
-#include "../Material/Material.hpp"
+#include <span>
 
 namespace pbrlib
 {
     struct Mesh;
 
-    using PtrMesh = shared_ptr<Mesh>;
+    using PtrMesh = std::shared_ptr<Mesh>;
 
     enum class MeshAttribute
     {
@@ -47,17 +47,17 @@ namespace pbrlib
         */
         struct VertexAttrib
         {
-            Vec3<float> position;
-            Vec2<float> uv;
-            Vec3<float> normal;
-            Vec3<float> tangent;
+            math::Vec3<float> position;
+            math::Vec2<float> uv;
+            math::Vec3<float> normal;
+            math::Vec3<float> tangent;
         };
 
         class Builder
         {
         public:
             inline void setAABB(const AABB& bbox);
-            inline void setName(const string_view name);
+            inline void setName(const std::string_view name);
 
             inline Buffer::Builder<VertexAttrib>&           getVertexBufferBuilder()    noexcept;
             inline const Buffer::Builder<VertexAttrib>&     getVertexBufferBuilder()    const noexcept;
@@ -71,7 +71,7 @@ namespace pbrlib
             Buffer::Builder<VertexAttrib>   _vertex_buffer_builder;
             Buffer::Builder<uint32_t>       _index_buffer_builder;
             AABB                            _bbox;
-            string                          _name;
+            std::string                     _name;
         };
 
         template<
@@ -86,7 +86,7 @@ namespace pbrlib
 
         public:
             inline void setAABB(const AABB& bbox);
-            inline void setName(const string_view name);
+            inline void setName(const std::string_view name);
 
             inline TVertexBufferBuilder&        getVertexBufferBuilder()    noexcept;
             inline const TVertexBufferBuilder&  getVertexBufferBuilder()    const noexcept;
@@ -100,11 +100,11 @@ namespace pbrlib
             TVertexBufferBuilder    _vertex_buffer_builder;
             TIndexBufferBuilder     _index_buffer_builder;
             AABB                    _bbox;
-            string                  _name;
+            std::string             _name;
         };
 
     public:
-        inline Mesh(const string_view name = "Mesh");
+        inline Mesh(const std::string_view name = "Mesh");
 
         inline void mapVertexAttribBuffer()    const;
         inline void unmapVertexAttribBuffer()  const;
@@ -147,24 +147,24 @@ namespace pbrlib
          * При использовании этих методов ограничивающий объём остаётся прежним.
          * Для установки огрничивающего объёма воспользуйтесь методом setAABB.
         */
-        inline void setData(const vector<uint32_t>& ib);
-        inline void setData(const vector<VertexAttrib>& vb);
+        inline void setData(std::span<const uint32_t> ib);
+        inline void setData(std::span<const VertexAttrib> vb);
 
         /**
          * @brief Метод копирует содержимое индексного буффера в ib.
          * 
          * @param[out] ib буффер, в который будет осуществлятся копирование.
         */
-        inline void copyIndexBuffer(vector<uint32_t>& ib);
+        inline void copyIndexBuffer(std::vector<uint32_t>& ib);
 
         /**
          * @brief Метод копирует содержимое вершинного буффера в vb.
          * 
          * @param[out] vb буффер, в который будет осуществлятся копирование.
         */
-        inline void copyVertexBuffer(vector<VertexAttrib>& vb);
+        inline void copyVertexBuffer(std::vector<VertexAttrib>& vb);
 
-        inline static PtrMesh make(const string_view name = "Mesh");
+        inline static PtrMesh make(const std::string_view name = "Mesh");
 
     private:
         PtrBuffer           _ptr_index_buffer;

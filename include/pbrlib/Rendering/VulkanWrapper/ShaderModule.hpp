@@ -15,7 +15,7 @@ namespace pbrlib
 {
     class ShaderModule;
 
-    using PtrShaderModule = shared_ptr<ShaderModule>;
+    using PtrShaderModule = std::shared_ptr<ShaderModule>;
 
     class SpecializationInfo
     {

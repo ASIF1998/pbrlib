@@ -14,16 +14,14 @@
 
 #include "Sampler.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class PipelineLayout;
     class DescriptorSetLayout;
     class SamplerInfo;
 
-    using PtrPipelineLayout         = shared_ptr<PipelineLayout>;
-    using PtrDescriptorSetLayout    = shared_ptr<DescriptorSetLayout>;
+    using PtrPipelineLayout         = std::shared_ptr<PipelineLayout>;
+    using PtrDescriptorSetLayout    = std::shared_ptr<DescriptorSetLayout>;
 
     /**
      * @class DescriptorSetLayoutBindings.
@@ -80,15 +78,15 @@ namespace pbrlib
             const SamplerInfo&  sampler_info
         );
 
-        const vector<VkDescriptorSetLayoutBinding>&  getDescriptorSetLayoutBindings()    const noexcept;
-        PtrDevice&                                   getDevice()                         noexcept;
-        const PtrDevice&                             getDevice()                         const noexcept;
-        const vector<Sampler>&                       getSamplers()                       const noexcept;
+        const std::vector<VkDescriptorSetLayoutBinding>&    getDescriptorSetLayoutBindings()    const noexcept;
+        PtrDevice&                                          getDevice()                         noexcept;
+        const PtrDevice&                                    getDevice()                         const noexcept;
+        const std::vector<Sampler>&                         getSamplers()                       const noexcept;
 
     private:
-        PtrDevice                               _ptr_device;
-        vector<VkDescriptorSetLayoutBinding>    _descriptor_set_layout_bindings;
-        vector<Sampler>                         _samplers;
+        PtrDevice                                   _ptr_device;
+        std::vector<VkDescriptorSetLayoutBinding>   _descriptor_set_layout_bindings;
+        std::vector<Sampler>                        _samplers;
     };
 
     class DescriptorSetLayout
@@ -130,36 +128,13 @@ namespace pbrlib
     public:
         PipelineLayout(
             const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts
+            std::span<const PtrDescriptorSetLayout> descriptor_set_layouts
         );
         
         PipelineLayout(
             const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts,
-            const vector<VkPushConstantRange>&      push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts,
-            vector<VkPushConstantRange>&&           push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts,
-            vector<VkPushConstantRange>&&       push_constant_ranges
+            std::span<const PtrDescriptorSetLayout> descriptor_set_layouts,
+            std::span<const VkPushConstantRange>    push_constant_ranges
         );
 
         PipelineLayout(
@@ -168,32 +143,9 @@ namespace pbrlib
         );
         
         PipelineLayout(
-            const PtrDevice&            ptr_device,
-            PtrDescriptorSetLayout&&    descriptor_set_layout
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                    ptr_device,
-            const PtrDescriptorSetLayout&       descriptor_set_layout,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                    ptr_device,
-            PtrDescriptorSetLayout&&            descriptor_set_layout,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                ptr_device,
-            const PtrDescriptorSetLayout&   descriptor_set_layout,
-            vector<VkPushConstantRange>&&   push_constant_ranges
-        );
-        
-        PipelineLayout(
-            const PtrDevice&                ptr_device,
-            PtrDescriptorSetLayout&&        descriptor_set_layout,
-            vector<VkPushConstantRange>&&   push_constant_ranges
+            const PtrDevice&                        ptr_device,
+            const PtrDescriptorSetLayout&           descriptor_set_layout,
+            std::span<const VkPushConstantRange>    push_constant_ranges
         );
 
         PipelineLayout(PipelineLayout&& pipeline_layout);
@@ -204,45 +156,22 @@ namespace pbrlib
         PipelineLayout& operator = (PipelineLayout&&)       = delete;
         PipelineLayout& operator = (const PipelineLayout&)  = delete;
 
-        PtrDevice&                               getDevice()                 noexcept;
-        const PtrDevice&                         getDevice()                 const noexcept;
-        vector<PtrDescriptorSetLayout>&          getDescriptorSetLayouts()   noexcept;
-        const vector<PtrDescriptorSetLayout>&    getDescriptorSetLayouts()   const noexcept;
-        const vector<VkPushConstantRange>&       getPushConstantRanges()     const noexcept;
-        const VkPipelineLayout&                  getPipelineLayoutHandle()   const noexcept;
+        PtrDevice&                                  getDevice()                 noexcept;
+        const PtrDevice&                            getDevice()                 const noexcept;
+        std::vector<PtrDescriptorSetLayout>&        getDescriptorSetLayouts()   noexcept;
+        const std::vector<PtrDescriptorSetLayout>&  getDescriptorSetLayouts()   const noexcept;
+        const std::vector<VkPushConstantRange>&     getPushConstantRanges()     const noexcept;
+        const VkPipelineLayout&                     getPipelineLayoutHandle()   const noexcept;
 
         static PtrPipelineLayout make(
-            const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts
+            const PtrDevice&                            ptr_device,
+            std::span<const PtrDescriptorSetLayout>     descriptor_set_layouts
         );
 
         static PtrPipelineLayout make(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts,
-            const vector<VkPushConstantRange>&      push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                        ptr_device,
-            const vector<PtrDescriptorSetLayout>&   descriptor_set_layouts,
-            vector<VkPushConstantRange>&&           push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                    ptr_device,
-            vector<PtrDescriptorSetLayout>&&    descriptor_set_layouts,
-            vector<VkPushConstantRange>&&       push_constant_ranges
+            const PtrDevice&                            ptr_device,
+            std::span<const PtrDescriptorSetLayout>     descriptor_set_layouts,
+            std::span<const VkPushConstantRange>        push_constant_ranges
         );
 
         static PtrPipelineLayout make(
@@ -251,42 +180,19 @@ namespace pbrlib
         );
 
         static PtrPipelineLayout make(
-            const PtrDevice&            ptr_device,
-            PtrDescriptorSetLayout&&    descriptor_set_layouts
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                    ptr_device,
-            const PtrDescriptorSetLayout&       descriptor_set_layouts,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                    ptr_device,
-            PtrDescriptorSetLayout&&            descriptor_set_layouts,
-            const vector<VkPushConstantRange>&  push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                ptr_device,
-            const PtrDescriptorSetLayout&   descriptor_set_layouts,
-            vector<VkPushConstantRange>&&   push_constant_ranges
-        );
-
-        static PtrPipelineLayout make(
-            const PtrDevice&                ptr_device,
-            PtrDescriptorSetLayout&&        descriptor_set_layouts,
-            vector<VkPushConstantRange>&&   push_constant_ranges
+            const PtrDevice&                        ptr_device,
+            const PtrDescriptorSetLayout&           descriptor_set_layouts,
+            std::span<const VkPushConstantRange>    push_constant_ranges
         );
 
     private:
         void _create();
     
     private:
-        PtrDevice                       _ptr_device;
-        vector<PtrDescriptorSetLayout>  _descriptor_set_layouts;
-        vector<VkPushConstantRange>     _push_constant_ranges;
-        VkPipelineLayout                _pipeline_layout_handle;
+        PtrDevice                           _ptr_device;
+        std::vector<PtrDescriptorSetLayout> _descriptor_set_layouts;
+        std::vector<VkPushConstantRange>    _push_constant_ranges;
+        VkPipelineLayout                    _pipeline_layout_handle;
     };
 }
 

@@ -10,6 +10,8 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     Material::Material() :
@@ -73,7 +75,7 @@ namespace pbrlib
 
     PtrMaterial Material::make()
     {
-        return make_shared<Material>();
+        return std::make_shared<Material>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +94,7 @@ namespace pbrlib
         _albedo = albedo;
     }
 
-    bool Material::Builder::setAlbedo(const string_view texture_name)
+    bool Material::Builder::setAlbedo(const std::string_view texture_name)
     {
         if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
             _albedo = texture.value();

@@ -14,6 +14,7 @@
 #include <cassert>
 
 using namespace std;
+using namespace pbrlib::math;
 
 namespace pbrlib
 {

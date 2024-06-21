@@ -13,14 +13,12 @@
 
 #include "Device.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class Device;
     class DeviceMemory;
 
-    using PtrDeviceMemory = unique_ptr<DeviceMemory>;
+    using PtrDeviceMemory = std::unique_ptr<DeviceMemory>;
 
     enum class MapStatus
     {

@@ -23,7 +23,7 @@ namespace pbrlib
 {
     class CameraBase;
 
-    using PtrCameraBase = shared_ptr<CameraBase>;
+    using PtrCameraBase = std::shared_ptr<CameraBase>;
     
     class CameraBase :
         public Component<CameraBase>
@@ -42,14 +42,14 @@ namespace pbrlib
          * @param z_far             расстояние до дальней плоскости отсечения по оси Z.
         */
         CameraBase(
-            const string_view   component_name,
-            const Transform&    view,
-            const Transform&    projection,
-            const Vec3<float>&  pos,
-            const Vec3<float>&  eye,
-            float               z_near,
-            float               z_far,
-            const Viewport&     viewport
+            const std::string_view      component_name,
+            const Transform&            view,
+            const Transform&            projection,
+            const math::Vec3<float>&    pos,
+            const math::Vec3<float>&    eye,
+            float                       z_near,
+            float                       z_far,
+            const Viewport&             viewport
         );
 
     public:
@@ -59,10 +59,10 @@ namespace pbrlib
         const Transform&    getProjection()     const noexcept;
         Transform           getViewProjection() const noexcept;
         
-        Vec3<float>&        getPosition()   noexcept;
-        const Vec3<float>&  getPosition()   const noexcept;
-        Vec3<float>&        getDirection()  noexcept;
-        const Vec3<float>&  getDirection()  const noexcept;
+        math::Vec3<float>&          getPosition()   noexcept;
+        const math::Vec3<float>&    getPosition()   const noexcept;
+        math::Vec3<float>&          getDirection()  noexcept;
+        const math::Vec3<float>&    getDirection()  const noexcept;
         
         float getNearClipp()    const noexcept;
         float getFarClipp()     const noexcept;
@@ -71,9 +71,9 @@ namespace pbrlib
         const Viewport& getViewport() const noexcept;
 
         void setLookAt(
-            const Vec3<float>& eye,
-            const Vec3<float>& pos,
-            const Vec3<float>& up
+            const math::Vec3<float>& eye,
+            const math::Vec3<float>& pos,
+            const math::Vec3<float>& up
         );
 
         /**
@@ -134,13 +134,13 @@ namespace pbrlib
         virtual Transform _calculateProjection() const = 0;
 
     protected:
-        Transform   _view;
-        Transform   _projection;
-        Vec3<float> _pos;
-        Vec3<float> _dir;
-        float       _z_near;
-        float       _z_far;
-        Viewport    _viewport;
+        Transform           _view;
+        Transform           _projection;
+        math::Vec3<float>   _pos;
+        math::Vec3<float>   _dir;
+        float               _z_near;
+        float               _z_far;
+        Viewport            _viewport;
     };
 }
 

@@ -11,6 +11,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     /**

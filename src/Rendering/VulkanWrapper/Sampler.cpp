@@ -171,7 +171,7 @@ namespace pbrlib
         _sampler_info   (sampler._sampler_info),
         _sampler_handle (VK_NULL_HANDLE)
     {
-        swap(_sampler_handle, sampler._sampler_handle);
+        std::swap(_sampler_handle, sampler._sampler_handle);
     }
 
     Sampler::~Sampler()

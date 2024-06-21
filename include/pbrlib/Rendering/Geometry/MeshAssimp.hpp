@@ -34,19 +34,19 @@ namespace pbrlib
 
         struct Mesh
         {
-            uint32_t    vert_offset;
-            uint32_t    ind_offset;
-            uint32_t    num_vert;
-            uint32_t    num_ind;
-            AABB        bbox;
-            string      name;
+            uint32_t        vert_offset;
+            uint32_t        ind_offset;
+            uint32_t        num_vert;
+            uint32_t        num_ind;
+            AABB            bbox;
+            std::string     name;
         };
 
         struct Asset
         {
             Buffer::BuilderWithData<VertAttrib> vert_attr;
             Buffer::BuilderWithData<uint32_t>   indices;
-            vector<MeshAssimp::Mesh>            meshes;
+            std::vector<MeshAssimp::Mesh>       meshes;
         };
 
     private:
@@ -75,7 +75,7 @@ namespace pbrlib
          * @param path путь до файла.
          * @return Указатели на сетки.
         */
-        optional<vector<PtrMesh>> load(const string_view path);
+        std::optional<std::vector<PtrMesh>> load(const std::string_view path);
 
     private:
         PtrDevice _ptr_device;          //!< Указатель на устройство.

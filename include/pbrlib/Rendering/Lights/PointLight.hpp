@@ -15,15 +15,11 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
-    using namespace math;
-
     class PointLight;
 
-    using PtrPointLight = shared_ptr<PointLight>;
+    using PtrPointLight = std::shared_ptr<PointLight>;
     
     class PointLight :
         public Component<PointLight>
@@ -32,51 +28,51 @@ namespace pbrlib
         class Builder
         {
         public:
-            Builder(const string_view name = "Point Light");
+            Builder(const std::string_view name = "Point Light");
 
             void setIntensity(float intensity) noexcept;
-            void setColor(const Vec3<float>& color);
-            void setPosition(const Vec3<float>& position);
-            void setName(const string_view name);
+            void setColor(const math::Vec3<float>& color);
+            void setPosition(const math::Vec3<float>& position);
+            void setName(const std::string_view name);
 
             PointLight      build()     const;
             PtrPointLight   buildPtr()  const;
 
         private:
-            Vec3<float> _color;
-            Vec3<float> _pos;
-            float       _intensity;
-            string      _name;
+            math::Vec3<float>   _color;
+            math::Vec3<float>   _pos;
+            float               _intensity;
+            std::string         _name;
         };
 
     public:
         PointLight(
-            const Vec3<float>&  position,
-            const Vec3<float>&  color,
-            float               intensity
+            const math::Vec3<float>&    position,
+            const math::Vec3<float>&    color,
+            float                       intensity
         );
 
         PointLight(
-            const string_view   name,
-            const Vec3<float>&  position,
-            const Vec3<float>&  color,
-            float               intensity
+            const std::string_view      name,
+            const math::Vec3<float>&    position,
+            const math::Vec3<float>&    color,
+            float                       intensity
         );
 
         void setIntensity(float intensity) noexcept;
-        void setColor(const Vec3<float>& color);
-        void setPosition(const Vec3<float>& position);
+        void setColor(const math::Vec3<float>& color);
+        void setPosition(const math::Vec3<float>& position);
 
-        float                   getIntensity()  const noexcept;
-        Vec3<float>&            getColor()      noexcept;
-        const Vec3<float>&      getColor()      const noexcept;
-        Vec3<float>&            getPosition()   noexcept;
-        const Vec3<float>&      getPosition()   const noexcept;
+        float                           getIntensity()  const noexcept;
+        math::Vec3<float>&              getColor()      noexcept;
+        const math::Vec3<float>&        getColor()      const noexcept;
+        math::Vec3<float>&              getPosition()   noexcept;
+        const math::Vec3<float>&        getPosition()   const noexcept;
         
     private:
-        Vec3<float> _color;
-        Vec3<float> _pos;
-        float       _intensity;
+        math::Vec3<float>   _color;
+        math::Vec3<float>   _pos;
+        float               _intensity;
     };
 }
 

@@ -14,6 +14,8 @@
 
 #include <cassert>
 
+using namespace std;
+
 namespace pbrlib
 {
     VertexInputState::VertexInputState(
@@ -859,7 +861,7 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineStates&           graphics_pipeline_states,
-        const vector<ShaderModule>&             shaders,
+        span<const ShaderModule>                shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
         const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
@@ -876,7 +878,7 @@ namespace pbrlib
     
     GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineStates&&                graphics_pipeline_states,
-        const vector<ShaderModule>&             shaders,
+        span<const ShaderModule>             shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
         const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index
@@ -916,7 +918,7 @@ namespace pbrlib
         }
     }
 
-    void GraphicsPipeline::_create(const vector<ShaderModule>& shaders)
+    void GraphicsPipeline::_create(span<const ShaderModule> shaders)
     {
         auto& ptr_device = _ptr_render_pass->getDevice();
 
@@ -1026,7 +1028,7 @@ namespace pbrlib
 
     PtrGraphicsPipeline GraphicsPipeline::make(
         GraphicsPipelineStates&&                graphics_pipeline_states,
-        const vector<ShaderModule>&             shaders,
+        span<const ShaderModule>                shaders,
         const PtrPipelineLayout&                ptr_pipeline_layout,
         const PtrRenderPass&                    ptr_render_pass,
         uint32_t                                subpass_index

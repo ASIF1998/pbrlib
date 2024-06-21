@@ -46,7 +46,7 @@ namespace pbrlib
         _memory_size            (device_memory._memory_size),
         _ptr_mapped_data        (device_memory._ptr_mapped_data)
     {
-        swap(_device_memory_handle, device_memory._device_memory_handle);
+        std::swap(_device_memory_handle, device_memory._device_memory_handle);
     }
 
     DeviceMemory::~DeviceMemory()

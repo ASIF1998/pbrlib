@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>

@@ -14,8 +14,6 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class Sampler;
@@ -23,7 +21,7 @@ namespace pbrlib
     class Buffer;
     class DescriptorSet;
 
-    using PtrDescriptorSet = shared_ptr<DescriptorSet>;
+    using PtrDescriptorSet = std::shared_ptr<DescriptorSet>;
 
     class DescriptorSet
     {

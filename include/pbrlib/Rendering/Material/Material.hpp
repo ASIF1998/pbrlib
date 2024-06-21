@@ -12,16 +12,15 @@
 #include <string>
 #include <string_view>
 
-#include "../VulkanWrapper/Image.hpp"
-
-#include "../../Util/enumCast.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
+#include <pbrlib/Util/enumCast.hpp>
 
 namespace pbrlib
 {
     class Material;
     class GPUTextureManager;
 
-    using PtrMaterial = shared_ptr<Material>;
+    using PtrMaterial = std::shared_ptr<Material>;
 
     class Material
     {
@@ -58,7 +57,7 @@ namespace pbrlib
              * @param texture_name название текстуры.
              * @return false - если не удалось найти текстуру.
             */
-            bool setAlbedo(const string_view texture_name);
+            bool setAlbedo(const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для загрузки и установки альбедо.
@@ -68,7 +67,7 @@ namespace pbrlib
              * @param texture_name      наименование текстуры альбедо.
              * @return false - не удалось загрузить текстуру.
             */
-            bool setAlbedo(const string_view path_to_albedo, const string_view texture_name);
+            bool setAlbedo(const std::string_view path_to_albedo, const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для установки карты нормалей.
@@ -84,7 +83,7 @@ namespace pbrlib
              * @param texture_name наименование текстуры.
              * @return false - если не удалось найти текстуру.
             */
-            bool setNormalMap(const string_view texture_name);
+            bool setNormalMap(const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для загрузки и установки карты нормалей.
@@ -94,7 +93,7 @@ namespace pbrlib
              * @param texture_name          наименование текстуры.
              * @return false - не удалось загрузить текстуру.
             */
-            bool setNormalMap(const string_view path_to_normal_map, const string_view texture_name);
+            bool setNormalMap(const std::string_view path_to_normal_map, const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для установки текстуры с металичностью.
@@ -110,7 +109,7 @@ namespace pbrlib
              * @param texture_name наименование текстуры.
              * @return false - если не удалось найти текстуру.
             */
-            bool setMetallic(const string_view texture_name);
+            bool setMetallic(const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для загрузки и установки текстуры с металичностью.
@@ -120,7 +119,7 @@ namespace pbrlib
              * @param texture_name      наименование текстуры.
              * @return false - не удалось загрузить текстуру.
             */
-            bool setMetallic(const string_view path_to_metallic, const string_view texture_name);
+            bool setMetallic(const std::string_view path_to_metallic, const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для установки текстуры с шероховатостью.
@@ -136,7 +135,7 @@ namespace pbrlib
              * @param texture_name наименование текстуры.
              * @return false - если не удалось найти текстуру.
             */
-            bool setRoughness(const string_view texture_name);
+            bool setRoughness(const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для загрузки и установки текстуры с шероховатостью.
@@ -146,7 +145,7 @@ namespace pbrlib
              * @param texture_name          наименование текстуры.
              * @return false - не удалось загрузить текстуру.
             */
-            bool setRoughness(const string_view path_to_roughness, const string_view texture_name);
+            bool setRoughness(const std::string_view path_to_roughness, const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для установки запечённого ambient occlusion.
@@ -162,7 +161,7 @@ namespace pbrlib
              * @param texture_name наименование текстуры.
              * @return false - если не удалось найти текстуру.
             */
-            bool setBakedAO(const string_view texture_name);
+            bool setBakedAO(const std::string_view texture_name);
 
             /**
              * @brief Метод, предназначенный для загрузки и установки текстуры с запечённой ambient occlusion.
@@ -172,7 +171,7 @@ namespace pbrlib
              * @param texture_name      наименование текстуры.
              * @return false - не удалось загрузить текстуру.
             */
-            bool setBakedAO(const string_view path_to_baked_AO, const string_view texture_name);
+            bool setBakedAO(const std::string_view path_to_baked_AO, const std::string_view texture_name);
 
             /**
              * @brief Метод, позволяющий установить значение анизотропности материала.

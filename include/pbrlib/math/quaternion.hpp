@@ -17,9 +17,7 @@
 
 #include "vec3.hpp"
 
-#include "../Moving/Transform.hpp"
-
-using namespace std;
+#include <pbrlib/Moving/Transform.hpp>
 
 namespace pbrlib::math
 {

@@ -18,6 +18,9 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/ComputePipeline.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     CommandBuffer::CommandBuffer(
@@ -63,8 +66,8 @@ namespace pbrlib
 
     void CommandBuffer::bindVertexBuffers(
         uint32_t                    first_binding,
-        const vector<Buffer>&       buffers,
-        const vector<VkDeviceSize>& offsets
+        span<const Buffer>          buffers,
+        span<const VkDeviceSize>    offsets
     ) const
     {
         vector<VkBuffer> buffer_handles(buffers.size());
@@ -247,7 +250,7 @@ namespace pbrlib
     void CommandBuffer::copyBuffer(
         const Buffer&                   src_buffer,
         const Buffer&                   dst_buffer,
-        const vector<VkBufferCopy>&     regions
+        span<const VkBufferCopy>        regions
     ) const noexcept
     {
         vkCmdCopyBuffer(
@@ -279,7 +282,7 @@ namespace pbrlib
     void CommandBuffer::copyImage(
         const Image&                src_image,
         const Image&                dst_image,
-        const vector<VkImageCopy>&  regions
+        span<const VkImageCopy>     regions
     )
     {
         vkCmdCopyImage(
@@ -466,7 +469,7 @@ namespace pbrlib
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const vector<VkClearValue>& clear_values)  const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, span<const VkClearValue> clear_values)  const noexcept
     {
         VkRenderPassBeginInfo begin_indo = { };
         begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

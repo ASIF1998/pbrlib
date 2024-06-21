@@ -9,6 +9,8 @@
 #include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     Framebuffer::Framebuffer(

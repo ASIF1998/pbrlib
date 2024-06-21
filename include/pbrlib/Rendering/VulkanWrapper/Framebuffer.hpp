@@ -17,8 +17,8 @@ namespace pbrlib
     class Framebuffer;
     class ImageView;
 
-    using PtrAttachments = shared_ptr<vector<ImageView>>;
-    using PtrFramebuffer = shared_ptr<Framebuffer>;
+    using PtrAttachments = std::shared_ptr<std::vector<ImageView>>;
+    using PtrFramebuffer = std::shared_ptr<Framebuffer>;
 
     class Framebuffer
     {

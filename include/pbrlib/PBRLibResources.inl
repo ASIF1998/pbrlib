@@ -7,16 +7,13 @@
 
 #include <stdexcept>
 
-using namespace std;
-
 namespace pbrlib
 {
     inline PBRLibResources::PBRLibResources() :
         _vk_resources()
     {
-        if (SDL_Init(SDL_INIT_VIDEO)) {
-            throw runtime_error(SDL_GetError());
-        }
+        if (SDL_Init(SDL_INIT_VIDEO))
+            throw std::runtime_error(SDL_GetError());
     }
 
     inline PBRLibResources::~PBRLibResources()
@@ -26,6 +23,6 @@ namespace pbrlib
 
     inline PtrPBRLibResources PBRLibResources::init()
     {
-        return shared_ptr<PBRLibResources>(new PBRLibResources);
+        return std::shared_ptr<PBRLibResources>(new PBRLibResources);
     }
 }

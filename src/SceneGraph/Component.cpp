@@ -8,6 +8,8 @@
 
 #include <pbrlib/SceneGraph/Component.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     ComponentBase::ComponentBase(const string_view name) :

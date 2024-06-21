@@ -15,7 +15,7 @@ namespace pbrlib
 {
     class RenderPass;
 
-    using PtrRenderPass = shared_ptr<RenderPass>;
+    using PtrRenderPass = std::shared_ptr<RenderPass>;
 
     /**
      * @class SubpassDescription.
@@ -46,14 +46,14 @@ namespace pbrlib
         void setDepthStencilAttachment(uint32_t attachment, VkImageLayout layout);
         void resetDepthStencilAttahment() noexcept;
 
-        vector<VkAttachmentReference>&       getInputAttachment()        noexcept;
-        const vector<VkAttachmentReference>& getInputAttachment()        const noexcept;
-        vector<VkAttachmentReference>&       getColorAttachment()        noexcept;
-        const vector<VkAttachmentReference>& getColorAttachment()        const noexcept;
-        vector<uint32_t>&                    getPresentAttachment()      noexcept;
-        const vector<uint32_t>&              getPresentAttachment()      const noexcept;
-        VkAttachmentReference&               getDepthStencilAttachment() noexcept;
-        const VkAttachmentReference&         getDepthStencilAttachment() const noexcept;
+        std::vector<VkAttachmentReference>&         getInputAttachment()        noexcept;
+        const std::vector<VkAttachmentReference>&   getInputAttachment()        const noexcept;
+        std::vector<VkAttachmentReference>&         getColorAttachment()        noexcept;
+        const std::vector<VkAttachmentReference>&   getColorAttachment()        const noexcept;
+        std::vector<uint32_t>&                      getPresentAttachment()      noexcept;
+        const std::vector<uint32_t>&                getPresentAttachment()      const noexcept;
+        VkAttachmentReference&                      getDepthStencilAttachment() noexcept;
+        const VkAttachmentReference&                getDepthStencilAttachment() const noexcept;
 
         /**
          * @brief Метод сообщающий о том, использует ли подпроход подключение глубина-трафарет.
@@ -63,11 +63,11 @@ namespace pbrlib
         bool useDepthStencilAttachment() const noexcept;
 
     private:
-        vector<VkAttachmentReference>   _input_attachment;
-        vector<VkAttachmentReference>   _color_attachment;
-        vector<uint32_t>                _present_attachment;
-        VkAttachmentReference           _depth_stencil_attachment;
-        bool                            _use_depth_stencil_attachment;
+        std::vector<VkAttachmentReference>   _input_attachment;
+        std::vector<VkAttachmentReference>   _color_attachment;
+        std::vector<uint32_t>                _present_attachment;
+        VkAttachmentReference               _depth_stencil_attachment;
+        bool                                _use_depth_stencil_attachment;
     };
 
     /**
@@ -180,17 +180,17 @@ namespace pbrlib
             VkAccessFlags           dst_access_mask
         );
 
-        vector<VkAttachmentDescription>&         getAttachmentDescriptions() noexcept;
-        const vector<VkAttachmentDescription>&   getAttachmentDescriptions() const noexcept;
-        vector<SubpassDescription>&              getSubpassDescriptions()    noexcept;
-        const vector<SubpassDescription>&        getSubpassDescriptions()    const noexcept;
-        vector<VkSubpassDependency>&             getSubpassDependencies()    noexcept;
-        const vector<VkSubpassDependency>&       getSubpassDependencies()    const noexcept;
+        std::vector<VkAttachmentDescription>&       getAttachmentDescriptions() noexcept;
+        const std::vector<VkAttachmentDescription>& getAttachmentDescriptions() const noexcept;
+        std::vector<SubpassDescription>&            getSubpassDescriptions()    noexcept;
+        const std::vector<SubpassDescription>&      getSubpassDescriptions()    const noexcept;
+        std::vector<VkSubpassDependency>&           getSubpassDependencies()    noexcept;
+        const std::vector<VkSubpassDependency>&     getSubpassDependencies()    const noexcept;
 
     private:
-        vector<VkAttachmentDescription> _attribute_descriptions;
-        vector<SubpassDescription>      _subpass_descriptions;
-        vector<VkSubpassDependency>     _subpass_dependencies;
+        std::vector<VkAttachmentDescription>    _attribute_descriptions;
+        std::vector<SubpassDescription>         _subpass_descriptions;
+        std::vector<VkSubpassDependency>        _subpass_dependencies;
     };
 
     class RenderPass

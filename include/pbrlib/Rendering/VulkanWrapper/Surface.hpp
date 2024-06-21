@@ -11,13 +11,12 @@
 
 #include <vulkan/vulkan.h>
 
-#include "../Window.hpp"
-
-#include <memory>
+#include <pbrlib/Rendering/Window.hpp>
 
 #include <SDL3/SDL_vulkan.h>
 
-using namespace std;
+#include <vector>
+#include <memory>
 
 namespace pbrlib
 {
@@ -25,9 +24,9 @@ namespace pbrlib
     struct  PhysicalDevice;
     class   Instance;
 
-    using PtrSurface        = shared_ptr<Surface>;
-    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
-    using PtrInstance       = shared_ptr<Instance>;
+    using PtrSurface        = std::shared_ptr<Surface>;
+    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
+    using PtrInstance       = std::shared_ptr<Instance>;
 
     class Surface
     {
@@ -67,7 +66,7 @@ namespace pbrlib
             const PtrPhysicalDevice&    ptr_physical_device
         );
         
-        static vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
+        static std::vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
             const Surface&              surface, 
             const PtrPhysicalDevice&    ptr_physical_device
         );

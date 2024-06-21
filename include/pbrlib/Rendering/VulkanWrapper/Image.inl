@@ -324,7 +324,7 @@ namespace pbrlib
     inline PtrImage Image::Builder<TexType, Type, NBits>::buildPtr() const
     {
         if (_queue_family_indicies.size() == 1) {
-            return make_shared<Image>(
+            return std::make_shared<Image>(
                 _ptr_device,
                 _memory_type_index,
                 _image_info,
@@ -332,7 +332,7 @@ namespace pbrlib
             );
         }
 
-        return make_shared<Image>(
+        return std::make_shared<Image>(
             _ptr_device,
             _memory_type_index,
             _image_info,
@@ -479,7 +479,7 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const Vec2<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const math::Vec2<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             _data.push_back(c.r);
@@ -499,7 +499,7 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const Vec3<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const math::Vec3<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             _data.push_back(c.r);
@@ -519,7 +519,7 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const Vec4<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::pushBack(const math::Vec4<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             _data.push_back(c.r);
@@ -545,40 +545,40 @@ namespace pbrlib
             assert(i < _data.size());
             _data[i] = r;
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
             ptr[i].r = r;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
             ptr[i].r = r;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
             ptr[i].r = r;
         }
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const Vec2<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const math::Vec2<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(i < _data.size());
             _data[i] = c.r;
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i] = c;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
@@ -586,25 +586,25 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const Vec3<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const math::Vec3<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(i < _data.size());
             _data[i] = c.r;
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i] = c;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
@@ -613,27 +613,27 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const Vec4<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, const math::Vec4<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(i < _data.size());
             _data[i] = c.r;
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i].r = c.r;
             ptr[i].g = c.g;
             ptr[i].b = c.b;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i] = c;
         }
@@ -645,42 +645,42 @@ namespace pbrlib
         if constexpr (TexType == TexelType::R) {
             assert(!"This type of texel does not support two-dimensional iteration according to data");
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = r;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = r;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = r;
         }
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const Vec2<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const math::Vec2<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(!"This type of texel does not support two-dimensional iteration according to data");
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j] = c;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
@@ -688,24 +688,24 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const Vec3<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const math::Vec3<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(!"This type of texel does not support two-dimensional iteration according to data");
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j] = c;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
@@ -714,26 +714,26 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const Vec4<Type>& c)
+    inline void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::set(size_t i, size_t j, const math::Vec4<Type>& c)
     {
         if constexpr (TexType == TexelType::R) {
             assert(!"This type of texel does not support two-dimensional iteration according to data");
         } else if constexpr (TexType == TexelType::RG) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec2<Type>));
-            Vec2<Type>* ptr = reinterpret_cast<Vec2<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec2<Type>));
+            math::Vec2<Type>* ptr = reinterpret_cast<math::Vec2<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
         } else if constexpr (TexType == TexelType::RGB) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec3<Type>));
-            Vec3<Type>* ptr = reinterpret_cast<Vec3<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec3<Type>));
+            math::Vec3<Type>* ptr = reinterpret_cast<math::Vec3<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j].r = c.r;
             ptr[i * _image_info.image_extend.width + j].g = c.g;
             ptr[i * _image_info.image_extend.width + j].b = c.b;
         } else if constexpr (TexType == TexelType::RGBA) {
-            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(Vec4<Type>));
-            Vec4<Type>* ptr = reinterpret_cast<Vec4<Type>*>(_data.data());
+            assert(i * _image_info.image_extend.width + j < _data.size() / sizeof(math::Vec4<Type>));
+            math::Vec4<Type>* ptr = reinterpret_cast<math::Vec4<Type>*>(_data.data());
 
             ptr[i * _image_info.image_extend.width + j] = c;
         }

@@ -13,8 +13,6 @@
 
 #include "vec2.hpp"
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -110,7 +108,7 @@ namespace pbrlib::math
     Vec3<Type> normalize(const Vec3<Type>& v);
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Vec3<Type>& vec);
+    std::ostream& operator << (std::ostream& print, const Vec3<Type>& vec);
 }
 
 #include "vec3.inl"

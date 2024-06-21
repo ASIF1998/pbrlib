@@ -43,7 +43,7 @@ namespace pbrlib
         _ptr_descriptor_set_layout  (move(descriptor_set._ptr_descriptor_set_layout)),
         _descriptor_set_handle      (VK_NULL_HANDLE)
     {
-        swap(_descriptor_set_handle, descriptor_set._descriptor_set_handle);
+        std::swap(_descriptor_set_handle, descriptor_set._descriptor_set_handle);
     }
 
     DescriptorSet::~DescriptorSet()

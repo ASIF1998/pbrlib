@@ -59,15 +59,15 @@ namespace pbrlib
     }
 
     Buffer::Buffer(
-        const PtrDevice&    ptr_device, 
-        VkDeviceSize        size, 
-        VkBufferUsageFlags  usage, 
-        uint32_t            memory_type_index, 
-        vector<uint32_t>    queue_family_indices
+        const PtrDevice&        ptr_device, 
+        VkDeviceSize            size, 
+        VkBufferUsageFlags      usage, 
+        uint32_t                memory_type_index, 
+        std::span<const uint32_t>    queue_family_indices
     ) :
         _buffer_handle          (VK_NULL_HANDLE),
         _usage                  (usage),
-        _queue_family_indicies  (queue_family_indices),
+        _queue_family_indicies  (std::begin(queue_family_indices), std::end(queue_family_indices)),
         _ptr_device             (ptr_device),
         _ptr_device_memory      (nullptr),
         _size                   (size)
@@ -110,8 +110,8 @@ namespace pbrlib
         _ptr_device_memory      (nullptr),
         _size                   (buffer._size)
     {
-        swap(_ptr_device_memory, buffer._ptr_device_memory);
-        swap(_buffer_handle, buffer._buffer_handle);
+        std::swap(_ptr_device_memory, buffer._ptr_device_memory);
+        std::swap(_buffer_handle, buffer._buffer_handle);
     }
 
     Buffer::~Buffer()

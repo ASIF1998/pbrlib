@@ -13,14 +13,12 @@
 
 #include "Device.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class Device;
     class CommandPool;
 
-    using PtrCommandPool = shared_ptr<CommandPool>;
+    using PtrCommandPool = std::shared_ptr<CommandPool>;
 
     class CommandPool
     {

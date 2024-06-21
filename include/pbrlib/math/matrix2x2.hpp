@@ -15,8 +15,6 @@
 #   include <xmmintrin.h>
 #endif
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -190,7 +188,7 @@ namespace pbrlib::math
     Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat);
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix2x2<Type>& mat);
+    inline std::ostream& operator << (std::ostream& print, const Matrix2x2<Type>& mat);
 }
 
 #include "matrix2x2.inl"

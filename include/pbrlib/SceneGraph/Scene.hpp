@@ -19,7 +19,7 @@
 #include <typeindex>
 
 #include <pbrlib/Moving/Transform.hpp>
-#include "../Rendering/Geometry/AABB.hpp"
+#include <pbrlib/Rendering/Geometry/AABB.hpp>
 
 #include <pbrlib/Rendering/Lights/PointLight.hpp>
 #include <pbrlib/Rendering/Lights/SpotLight.hpp>
@@ -31,21 +31,19 @@
 
 #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     class ComponentBase;
     
-    using PtrComponent = shared_ptr<ComponentBase>;
+    using PtrComponent = std::shared_ptr<ComponentBase>;
 }
 
 namespace pbrlib
 {
     class SceneItem;
 
-    using PtrSceneItem = shared_ptr<SceneItem>;
-    using VisibleList = vector<PtrSceneItem>;
+    using PtrSceneItem = std::shared_ptr<SceneItem>;
+    using VisibleList = std::vector<PtrSceneItem>;
 
     class SceneItem
     {
@@ -53,26 +51,26 @@ namespace pbrlib
 
     public:
         SceneItem(
-            const string_view   name = "No name",
-            SceneItem* parent = nullptr
+            const std::string_view  name    = "No name",
+            SceneItem*              parent  = nullptr
         );
 
         virtual ~SceneItem();
 
-        AABB&                       getWorldAABB()      noexcept;
-        const AABB&                 getWorldAABB()      const noexcept;
-        SceneItem*                  getParent()         noexcept;
-        const SceneItem*            getParent()         const noexcept;
-        PtrSceneItem&               getChild(size_t i);
-        const PtrSceneItem&         getChild(size_t i)  const;
-        vector<PtrSceneItem>&       getChildren()       noexcept;
-        const vector<PtrSceneItem>& getChildren()       const noexcept;
-        Transform&                  getLocalTransform() noexcept;
-        const Transform&            getLocalTransform() const noexcept;
-        Transform&                  getWorldTransform() noexcept;
-        const Transform&            getWorldTransform() const noexcept;
-        string&                     getName()           noexcept;
-        const string&               getName()           const noexcept;
+        AABB&                               getWorldAABB()      noexcept;
+        const AABB&                         getWorldAABB()      const noexcept;
+        SceneItem*                          getParent()         noexcept;
+        const SceneItem*                    getParent()         const noexcept;
+        PtrSceneItem&                       getChild(size_t i);
+        const PtrSceneItem&                 getChild(size_t i)  const;
+        std::vector<PtrSceneItem>&          getChildren()       noexcept;
+        const std::vector<PtrSceneItem>&    getChildren()       const noexcept;
+        Transform&                          getLocalTransform() noexcept;
+        const Transform&                    getLocalTransform() const noexcept;
+        Transform&                          getWorldTransform() noexcept;
+        const Transform&                    getWorldTransform() const noexcept;
+        std::string&                        getName()           noexcept;
+        const std::string&                  getName()           const noexcept;
 
         template<typename TComponent>
         inline TComponent& getComponent();
@@ -84,12 +82,11 @@ namespace pbrlib
         bool hasComponent() const;
 
         void setParent(SceneItem* ptr_parent) noexcept;
-        void setChildren(vector<PtrSceneItem>&& children);
-        void setChildren(const vector<PtrSceneItem>& children);
+        void setChildren(std::span<const PtrSceneItem> children);
         void setLocalTransform(const Transform& transform);
         void setWorldTransform(const Transform& transform);
         void setWorldAABB(const AABB& bbox);
-        void setName(const string_view name);
+        void setName(const std::string_view name);
 
         bool worldTransformIsCurrent()              const noexcept;
         void worldTransformIsCurrent(bool current)  noexcept;
@@ -127,31 +124,31 @@ namespace pbrlib
          * @param SceneItem_name название дочернего узла.
          * @return Указатель на дочерний узел.
         */
-        PtrSceneItem& addChild(const string_view name);
+        PtrSceneItem& addChild(const std::string_view name);
 
         void detachChild(const PtrSceneItem& ptr_item);
-        void detachChild(const string_view name);
+        void detachChild(const std::string_view name);
 
         virtual void update(float delta_time, const Transform& world_transform);
 
         static PtrSceneItem make(
-            const string_view   name        = "No name",
-            SceneItem*          ptr_parent  = nullptr
+            const std::string_view  name        = "No name",
+            SceneItem*              ptr_parent  = nullptr
         );
 
         private:
             void _getVisibleList(VisibleList& out_visible_list);
 
         protected:
-            SceneItem*                              _ptr_parent;
-            vector<PtrSceneItem>                    _ptr_children;
-            Transform                               _local_transform;
-            Transform                               _world_transform;
-            bool                                    _world_transform_is_current;
-            bool                                    _world_aabb_is_current;
-            AABB                                    _world_bbox;
-            unordered_map<type_index, PtrComponent> _components;
-            string                                  _name;
+            SceneItem*                                          _ptr_parent;
+            std::vector<PtrSceneItem>                           _ptr_children;
+            Transform                                           _local_transform;
+            Transform                                           _world_transform;
+            bool                                                _world_transform_is_current;
+            bool                                                _world_aabb_is_current;
+            AABB                                                _world_bbox;
+            std::unordered_map<std::type_index, PtrComponent>   _components;
+            std::string                                         _name;
         };
 
     class Scene
@@ -170,22 +167,22 @@ namespace pbrlib
          * @param host_local_memory_type_index      тип памяти, которая может быть отображена и читаться или записываться CPU.
         */
         Scene(
-            const string_view       name, 
-            const PtrDevice&        ptr_device,
-            const PtrDeviceQueue&   ptr_device_queue,
-            const PtrCommandPool&   ptr_command_pool,    
-            uint32_t                device_local_memory_type_index,
-            uint32_t                host_local_memory_type_index
+            const std::string_view      name, 
+            const PtrDevice&            ptr_device,
+            const PtrDeviceQueue&       ptr_device_queue,
+            const PtrCommandPool&       ptr_command_pool,    
+            uint32_t                    device_local_memory_type_index,
+            uint32_t                    host_local_memory_type_index
         );
         
         void setRoot(const PtrSceneItem& ptr_root);
         void setRoot(PtrSceneItem&& ptr_root);
-        void setName(const string_view name);
+        void setName(const std::string_view name);
 
         PtrSceneItem&               getRoot()               noexcept;
         const PtrSceneItem&         getRoot()               const noexcept;
-        string&                     getName()               noexcept;
-        const string&               getName()               const noexcept;
+        std::string&                getName()               noexcept;
+        const std::string&          getName()               const noexcept;
         MaterialManager&            getMaterialManager()    noexcept;
         const MaterialManager&      getMaterialManager()    const noexcept;
         GPUTextureManager&          getTextureManager()     noexcept;
@@ -206,8 +203,8 @@ namespace pbrlib
          * @return Указатель на узел.
         */
         PtrSceneItem& makePointLight(
-            const PointLight::Builder&   light_builder,
-            const string_view            name = "Point Light"
+            const PointLight::Builder&  light_builder,
+            const std::string_view      name = "Point Light"
         );
 
         /**
@@ -222,7 +219,7 @@ namespace pbrlib
         */
         PtrSceneItem& makeSpotLight(
             const SpotLight::Builder&   light_builder,
-            const string_view           name = "Spot Light"
+            const std::string_view      name = "Spot Light"
         );
 
         /**
@@ -237,7 +234,7 @@ namespace pbrlib
         */
         PtrSceneItem& makeDirectionLight(
             const DirectionLight::Builder&  light_builder,
-            const string_view               name = "Spot Light"
+            const std::string_view          name = "Spot Light"
         );
 
         /**
@@ -254,21 +251,21 @@ namespace pbrlib
         */
         PtrSceneItem& makeCamera(
             const PerspectiveCamera::Builder&   camera_builder,
-            const string_view                   name = "Camera"
+            const std::string_view              name = "Camera"
         );
         
         void update(float delta_time);
 
     private:
-        PtrSceneItem            _ptr_root;          //!< Корневой узел сцены.
-        PtrSceneItem            _ptr_camera;        //!< Камера.
-        vector<PtrSceneItem>    _dir_lights;        //!< Направленные источники света.
-        vector<PtrSceneItem>    _spot_lights;       //!< Прожекторные источники света.
-        vector<PtrSceneItem>    _point_lights;      //!< Точечные источники света.
-        MaterialManager         _material_manager;  //!< Менеджер материалов.
-        GPUTextureManager       _texture_manager;   //!< Менеджер текстур.
-        MeshManager             _mesh_manager;      //!< Менеджер сеток.
-        string                  _name;              //!< Имя сцены.
+        PtrSceneItem                _ptr_root;          //!< Корневой узел сцены.
+        PtrSceneItem                _ptr_camera;        //!< Камера.
+        std::vector<PtrSceneItem>   _dir_lights;        //!< Направленные источники света.
+        std::vector<PtrSceneItem>   _spot_lights;       //!< Прожекторные источники света.
+        std::vector<PtrSceneItem>   _point_lights;      //!< Точечные источники света.
+        MaterialManager             _material_manager;  //!< Менеджер материалов.
+        GPUTextureManager           _texture_manager;   //!< Менеджер текстур.
+        MeshManager                 _mesh_manager;      //!< Менеджер сеток.
+        std::string                 _name;              //!< Имя сцены.
     };
 }
 

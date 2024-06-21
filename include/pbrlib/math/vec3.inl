@@ -6,11 +6,9 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "../core.hpp"
+#include <pbrlib/core.hpp>
 
 #include <cassert>
-
-using namespace std;
 
 namespace pbrlib::math
 {
@@ -157,7 +155,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Vec3<Type>& vec)
+    std::ostream& operator << (std::ostream& print, const Vec3<Type>& vec)
     {
         print << vec.x << ' ' << vec.y << ' ' << vec.z;
         return print;

@@ -17,8 +17,6 @@
 
 #include "vec4.hpp"
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -197,7 +195,7 @@ namespace pbrlib::math
     inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat);
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix4x4<Type>& mat);
+    inline std::ostream& operator << (std::ostream& print, const Matrix4x4<Type>& mat);
 }
 
 #include "matrix4x4.inl"

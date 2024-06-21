@@ -28,7 +28,7 @@ namespace pbrlib
 
     PtrDescriptorPool descriptorPoolCreate(const PtrDevice& ptr_device)
     {
-        vector<VkDescriptorPoolSize> descriptor_pool_size;
+        std::vector<VkDescriptorPoolSize> descriptor_pool_size;
         
         descriptor_pool_size.push_back({
             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -139,16 +139,16 @@ namespace pbrlib
     }
 
     void PBR::draw(
-        const PtrSceneItem&         ptr_camera,
-        const VisibleList&          visible_list,
-        const vector<PtrSceneItem>  point_lights,
-        const vector<PtrSceneItem>  spot_lights,
-        const vector<PtrSceneItem>  direction_lights,
-        float                       delta_time
+        const PtrSceneItem&             ptr_camera,
+        const VisibleList&              visible_list,
+        std::span<const PtrSceneItem>   point_lights,
+        std::span<const PtrSceneItem>   spot_lights,
+        std::span<const PtrSceneItem>   direction_lights,
+        float                           delta_time
     )
     {
         if (!ptr_camera->hasComponent<CameraBase>())
-            throw runtime_error("Нет камеры.");
+            throw std::runtime_error("Нет камеры.");
 
         const auto& camera = ptr_camera->getComponent<CameraBase>();
 
@@ -251,6 +251,6 @@ namespace pbrlib
 
     PtrPBR PBR::make(const PBRPass::Optionals& optionals)
     {
-        return make_shared<PBR>(optionals);
+        return std::make_shared<PBR>(optionals);
     }
 }

@@ -8,6 +8,9 @@
 
 #include <pbrlib/Rendering/Lights/PointLight.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     PointLight::PointLight(

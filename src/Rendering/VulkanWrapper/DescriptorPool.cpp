@@ -10,11 +10,13 @@
 
 #include <cassert>
 
+using namespace std;
+
 namespace pbrlib
 {
     DescriptorPool::DescriptorPool(
         const PtrDevice&                    ptr_device, 
-        const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
+        span<const VkDescriptorPoolSize>    descriptor_pool_sizes,
         uint32_t                            max_sets
     ) :
         _ptr_device             (ptr_device),
@@ -102,7 +104,7 @@ namespace pbrlib
 
     PtrDescriptorPool DescriptorPool::make(
         const PtrDevice&                    ptr_device,
-        const vector<VkDescriptorPoolSize>& descriptor_pool_sizes,
+        span<const VkDescriptorPoolSize>    descriptor_pool_sizes,
         uint32_t                            max_sets
     )
     {

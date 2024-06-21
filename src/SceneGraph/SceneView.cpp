@@ -18,6 +18,8 @@
 
 #include <pbrlib/PBRLibResources.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     SceneView::SceneView(const string_view scene_name, const PtrPBRLibResources& ptr_pbrlib_resources, const PtrWindow& ptr_window) :

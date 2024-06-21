@@ -14,15 +14,13 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class Device;
     class CommandBuffer;
     class DeviceQueue;
 
-    using PtrDeviceQueue = shared_ptr<DeviceQueue>;
+    using PtrDeviceQueue = std::shared_ptr<DeviceQueue>;
     
     class DeviceQueue
     {

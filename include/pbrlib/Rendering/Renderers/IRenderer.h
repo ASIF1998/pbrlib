@@ -9,7 +9,9 @@
 #ifndef IRenderer_h
 #define IRenderer_h
 
-#include "../../SceneGraph/Scene.hpp"
+#include <pbrlib/SceneGraph/Scene.hpp>
+
+#include <span>
 
 namespace pbrlib
 {
@@ -17,8 +19,8 @@ namespace pbrlib
     class Device;
     class CameraBase;
 
-    using PtrIRenderer  = shared_ptr<IRenderer>;
-    using PtrDevice     = shared_ptr<Device>;
+    using PtrIRenderer  = std::shared_ptr<IRenderer>;
+    using PtrDevice     = std::shared_ptr<Device>;
 
     /**
      * @class IRenderer.
@@ -57,9 +59,9 @@ namespace pbrlib
         virtual void draw(
             const PtrSceneItem&         ptr_camera,
             const VisibleList&          visible_list, 
-            const vector<PtrSceneItem>  point_lights,
-            const vector<PtrSceneItem>  spot_lights,
-            const vector<PtrSceneItem>  direction_lights,
+            std::span<const PtrSceneItem>    point_lights,
+            std::span<const PtrSceneItem>    spot_lights,
+            std::span<const PtrSceneItem>    direction_lights,
             float                       delta_time
         ) = 0;
     };

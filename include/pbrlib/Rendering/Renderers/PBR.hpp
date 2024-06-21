@@ -17,8 +17,6 @@
 #include <vector>
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     class ImageView;
@@ -26,10 +24,10 @@ namespace pbrlib
     class PrimaryCommandBuffer;
     class PBR;
 
-    using PtrAttachments            = shared_ptr<vector<ImageView>>;
-    using PtrFramebuffer            = shared_ptr<Framebuffer>; 
-    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
-    using PtrPBR                    = shared_ptr<PBR>;
+    using PtrAttachments            = std::shared_ptr<std::vector<ImageView>>;
+    using PtrFramebuffer            = std::shared_ptr<Framebuffer>; 
+    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
+    using PtrPBR                    = std::shared_ptr<PBR>;
 
     class PBR :
         public IRenderer
@@ -67,12 +65,12 @@ namespace pbrlib
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
         void draw(
-            const PtrSceneItem&         ptr_camera,
-            const VisibleList&          visible_list, 
-            const vector<PtrSceneItem>  point_lights,
-            const vector<PtrSceneItem>  spot_lights,
-            const vector<PtrSceneItem>  direction_lights,
-            float                       delta_time
+            const PtrSceneItem&             ptr_camera,
+            const VisibleList&              visible_list, 
+            std::span<const PtrSceneItem>   point_lights,
+            std::span<const PtrSceneItem>   spot_lights,
+            std::span<const PtrSceneItem>   direction_lights,
+            float                           delta_time
         ) override;
 
         PtrGBufferPass&          getGBUfferPass()    noexcept;

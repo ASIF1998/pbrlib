@@ -14,6 +14,8 @@
 
 #include <pbrlib/core.hpp>
 
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     float getRadians(float angle)
@@ -235,7 +237,7 @@ namespace pbrlib
        ));
     }
 
-    ostream& operator << (ostream& print, const Transform& t)
+    std::ostream& operator << (std::ostream& print, const Transform& t)
     {
         print << t._m;
         return print;

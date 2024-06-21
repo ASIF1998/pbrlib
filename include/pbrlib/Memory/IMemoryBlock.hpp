@@ -14,8 +14,6 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace pbrlib
 {
     struct IMemoryBlock

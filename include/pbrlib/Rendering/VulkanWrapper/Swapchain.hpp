@@ -13,13 +13,15 @@
 
 #include <numeric>
 
+#include <span>
+
 namespace pbrlib
 {
     class Swapchain;
     class DeviceQueue;
     class ImageView;
 
-    using PtrSwapchain = shared_ptr<Swapchain>;
+    using PtrSwapchain = std::shared_ptr<Swapchain>;
 
     class Swapchain
     {
@@ -36,7 +38,7 @@ namespace pbrlib
         */
         Swapchain(
             const PtrDevice&            ptr_device,
-            const vector<uint32_t>&     queue_family_indices,
+            std::span<const uint32_t>   queue_family_indices,
             const PtrSurface&           surface
         );
         
@@ -64,13 +66,13 @@ namespace pbrlib
         Swapchain& operator = (Swapchain&&)         = delete;
         Swapchain& operator = (const Swapchain&)    = delete;
 
-        vector<ImageView>&           getImagesView()         noexcept;
-        const vector<ImageView>&     getImagesView()         const noexcept;
-        const VkSwapchainKHR&        getSwapchainHandle()    const noexcept;
-        PtrSurface&                  getSurface()            noexcept;
-        const PtrSurface&            getSurface()            const noexcept;
-        PtrDevice&                   getDevice()             noexcept;
-        const PtrDevice&             getDevice()             const noexcept;
+        std::vector<ImageView>&         getImagesView()         noexcept;
+        const std::vector<ImageView>&   getImagesView()         const noexcept;
+        const VkSwapchainKHR&           getSwapchainHandle()    const noexcept;
+        PtrSurface&                     getSurface()            noexcept;
+        const PtrSurface&               getSurface()            const noexcept;
+        PtrDevice&                      getDevice()             noexcept;
+        const PtrDevice&                getDevice()             const noexcept;
 
         void getNextPresentImageIndex(
             uint32_t&   image_index, 
@@ -86,9 +88,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         static PtrSwapchain make(
-            const PtrDevice&            ptr_device,
-            vector<uint32_t>            queue_family_indices,
-            const shared_ptr<Surface>&  surface
+            const PtrDevice&                ptr_device,
+            std::span<const uint32_t>       queue_family_indices,
+            const std::shared_ptr<Surface>& surface
         );
 
         /**
@@ -99,9 +101,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         static PtrSwapchain make(
-            const PtrDevice&            ptr_device,
-            uint32_t                    queue_family_index,
-            const shared_ptr<Surface>&  surface
+            const PtrDevice&                ptr_device,
+            uint32_t                        queue_family_index,
+            const std::shared_ptr<Surface>& surface
         );
 
     private:
@@ -113,15 +115,15 @@ namespace pbrlib
          * @param sharing_mode          сообщает о том как изображения будут использоваться в разных очередях.
         */
         void _create(
-            const PtrDevice&        ptr_device, 
-            const vector<uint32_t>& queue_family_indices,
-            VkSharingMode           sharing_mode
+            const PtrDevice&            ptr_device, 
+            std::span<const uint32_t>   queue_family_indices,
+            VkSharingMode               sharing_mode
         );
 
     private:
-        VkSwapchainKHR      _swapchain_handle;
-        PtrSurface          _ptr_surface;
-        vector<ImageView>   _images_view;
+        VkSwapchainKHR          _swapchain_handle;
+        PtrSurface              _ptr_surface;
+        std::vector<ImageView>  _images_view;
     };
 }
 

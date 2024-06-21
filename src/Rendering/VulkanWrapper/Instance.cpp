@@ -14,6 +14,8 @@
 #include <cassert>
 #include <stdexcept>
 
+using namespace std;
+
 namespace pbrlib
 {
     VulkanInstanceExtensionSupported    Instance::_supported_extensions = {};
@@ -70,8 +72,8 @@ namespace pbrlib
     Instance::Instance(
         const string_view           app_name, 
         uint32_t                    app_version, 
-        const vector<const char*>&  layer_names, 
-        const vector<const char*>&  extension_names
+        span<const char*>           layer_names, 
+        span<const char*>           extension_names
     ) :
         _instance_handle(VK_NULL_HANDLE)
     {
@@ -166,8 +168,8 @@ namespace pbrlib
     PtrInstance Instance::make(
         const string_view           app_name,
         uint32_t                    app_version,
-        const vector<const char*>&  layer_names,
-        const vector<const char*>&  extension_names
+        span<const char*>           layer_names,
+        span<const char*>           extension_names
     )
     {
         return make_shared<Instance>(app_name, app_version, layer_names, extension_names);

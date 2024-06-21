@@ -8,6 +8,9 @@
 
 #include <pbrlib/Rendering/Lights/SpotLight.hpp>
 
+using namespace std;
+using namespace pbrlib::math;
+
 namespace pbrlib
 {
     SpotLight::SpotLight(

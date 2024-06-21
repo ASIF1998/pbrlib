@@ -18,15 +18,13 @@
 
 #include "Image.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     class PrimaryCommandBuffer;
     class DeviceQueue;
 
-    using PtrPrimaryCommandBuffer   = shared_ptr<PrimaryCommandBuffer>;
-    using PtrDeviceQueue            = shared_ptr<DeviceQueue>;
+    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
+    using PtrDeviceQueue            = std::shared_ptr<DeviceQueue>;
 
     /**
      * @class GPUTextureManager.
@@ -67,7 +65,7 @@ namespace pbrlib
          * @param name название текстуры.
          * @return true - если получилось загрузить текстуру.
         */
-        bool loadR(const string_view path, const string_view name);
+        bool loadR(const std::string_view path, const std::string_view name);
 
         /**
          * @brief 
@@ -78,7 +76,7 @@ namespace pbrlib
          * @param name название текстуры.
          * @return true - если получилось загрузить текстуру.
         */
-        bool loadRG(const string_view path, const string_view name);
+        bool loadRG(const std::string_view path, const std::string_view name);
 
         /**
          * @brief 
@@ -89,7 +87,7 @@ namespace pbrlib
          * @param name название текстуры.
          * @return true - если получилось загрузить текстуру.
         */
-        bool loadRGB(const string_view path, const string_view name);
+        bool loadRGB(const std::string_view path, const std::string_view name);
 
         /**
          * @brief 
@@ -100,23 +98,23 @@ namespace pbrlib
          * @param name название текстуры.
          * @return true - если получилось загрузить текстуру.
         */
-        bool loadRGBA(const string_view path, const string_view name);
+        bool loadRGBA(const std::string_view path, const std::string_view name);
 
-        bool add(const PtrImageView& ptr_image_view, const string_view name);
-        bool has(const string_view name);
+        bool add(const PtrImageView& ptr_image_view, const std::string_view name);
+        bool has(const std::string_view name);
 
-        optional<PtrImageView>          get(const string_view name);
-        optional<const PtrImageView>    get(const string_view name) const;
+        std::optional<PtrImageView>          get(const std::string_view name);
+        std::optional<const PtrImageView>    get(const std::string_view name) const;
 
     private:
-        unordered_map<string, PtrImageView> _textures;                          //!< Текстуры.
-        PtrDevice                           _ptr_device;                        //!< Указатель на устройство.
-        PtrPrimaryCommandBuffer             _ptr_command_buffer;                //!< Указатель на командный буфер.
-        uint32_t                            _device_local_memory_type_index;    //!< Тип памяти, являющийся локальной для устройства (GPU).
-        uint32_t                            _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
-        PtrDeviceQueue                      _ptr_device_queue;                  //!< Указатель на очередь устройства.
-        VkImageTiling                       _image_tiling;                      //!< Способ размещения текстуры на устройстве.
-        VkSampleCountFlagBits               _num_samples;                       //!< Количество выборок в текстуре на устройстве.
+        std::unordered_map<std::string, PtrImageView>    _textures;                          //!< Текстуры.
+        PtrDevice                                       _ptr_device;                        //!< Указатель на устройство.
+        PtrPrimaryCommandBuffer                         _ptr_command_buffer;                //!< Указатель на командный буфер.
+        uint32_t                                        _device_local_memory_type_index;    //!< Тип памяти, являющийся локальной для устройства (GPU).
+        uint32_t                                        _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
+        PtrDeviceQueue                                  _ptr_device_queue;                  //!< Указатель на очередь устройства.
+        VkImageTiling                                   _image_tiling;                      //!< Способ размещения текстуры на устройстве.
+        VkSampleCountFlagBits                           _num_samples;                       //!< Количество выборок в текстуре на устройстве.
     };
 }
 

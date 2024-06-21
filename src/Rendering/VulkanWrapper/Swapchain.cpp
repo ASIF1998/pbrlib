@@ -12,11 +12,13 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
+using namespace std;
+
 namespace pbrlib
 {
     Swapchain::Swapchain(
         const PtrDevice&            ptr_device,
-        const vector<uint32_t>&     queue_family_indices,
+        span<const uint32_t>     queue_family_indices,
         const PtrSurface&           surface
     ) :
         _swapchain_handle(VK_NULL_HANDLE),
@@ -61,7 +63,7 @@ namespace pbrlib
 
     void Swapchain::_create(
         const PtrDevice&            ptr_device,
-        const vector<uint32_t>&     queue_family_indices,
+        span<const uint32_t>        queue_family_indices,
         VkSharingMode               sharing_mode
     )
     {
@@ -174,7 +176,7 @@ namespace pbrlib
 
     PtrSwapchain Swapchain::make(
         const PtrDevice&            ptr_device,
-        vector<uint32_t>            queue_family_indices,
+        span<const uint32_t>        queue_family_indices,
         const shared_ptr<Surface>&  surface
     )
     {

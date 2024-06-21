@@ -14,8 +14,6 @@
 
 #include <typeindex>
 
-using namespace std;
-
 namespace pbrlib
 {
     class SceneItem;
@@ -26,32 +24,32 @@ namespace pbrlib
     class ComponentBase
     {
     public:
-        ComponentBase(const string_view name = "Component");
+        ComponentBase(const std::string_view name = "Component");
         virtual ~ComponentBase();
 
-        string&         getName() noexcept;
-        const string&   getName() const noexcept;
+        std::string&        getName() noexcept;
+        const std::string&  getName() const noexcept;
 
-        virtual type_index getType() const = 0;
+        virtual std::type_index getType() const = 0;
 
         virtual void update(SceneItem* ptr_node, float delta_time) 
         { }
 
     protected:
-        string _name;
+        std::string _name;
     };
 
     template<typename T>
     class Component :
         public ComponentBase
     {
-        type_index getType() const override final
+        std::type_index getType() const override final
         {
             return typeid(T);
         }
 
     public:
-        Component(const string_view name = "Component") :
+        Component(const std::string_view name = "Component") :
             ComponentBase(name)
         { }
     };

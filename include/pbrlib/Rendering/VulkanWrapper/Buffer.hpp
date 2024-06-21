@@ -12,18 +12,17 @@
 #include "DeviceMemory.hpp"
 
 #include <vector>
+#include <span>
 #include <memory>
 
 #include <pbrlib/Memory/STLAlignedAllocator.hpp>
-
-using namespace std;
 
 namespace pbrlib
 {
     class DeviceMemory;
     class Buffer;
 
-    using PtrBuffer = shared_ptr<Buffer>;
+    using PtrBuffer = std::shared_ptr<Buffer>;
 
     class Buffer
     {
@@ -80,11 +79,11 @@ namespace pbrlib
             inline virtual PtrBuffer   buildPtr()  const;
 
         protected:
-            PtrDevice           _ptr_device;
-            vector<uint32_t>    _queue_family_indicies;
-            size_t              _size;
-            VkBufferUsageFlags  _usage;
-            uint32_t            _memory_type_index;
+            PtrDevice               _ptr_device;
+            std::vector<uint32_t>   _queue_family_indicies;
+            size_t                  _size;
+            VkBufferUsageFlags      _usage;
+            uint32_t                _memory_type_index;
         };
 
         template<typename Type, typename AllocatorType = STLAlignedAllocator<Type>>
@@ -128,7 +127,7 @@ namespace pbrlib
             inline virtual PtrBuffer   buildPtr()  const;
 
         private:
-            vector<Type, AllocatorType> _data;
+            std::vector<Type, AllocatorType> _data;
         };
 
     public:
@@ -159,11 +158,11 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
         */
         Buffer(
-            const PtrDevice&    ptr_device, 
-            VkDeviceSize        size, 
-            VkBufferUsageFlags  usage, 
-            uint32_t            memory_type_index, 
-            vector<uint32_t>    queue_family_indices
+            const PtrDevice&            ptr_device, 
+            VkDeviceSize                size, 
+            VkBufferUsageFlags          usage, 
+            uint32_t                    memory_type_index, 
+            std::span<const uint32_t>   queue_family_indices
         );
 
         Buffer(Buffer&& buffer);
@@ -182,12 +181,12 @@ namespace pbrlib
         VkDeviceSize            getSize()           const noexcept;
 
     private:
-        VkBuffer            _buffer_handle;
-        VkBufferUsageFlags  _usage;
-        vector<uint32_t>    _queue_family_indicies;
-        PtrDevice           _ptr_device;
-        PtrDeviceMemory     _ptr_device_memory;
-        VkDeviceSize        _size;
+        VkBuffer                _buffer_handle;
+        VkBufferUsageFlags      _usage;
+        std::vector<uint32_t>   _queue_family_indicies;
+        PtrDevice               _ptr_device;
+        PtrDeviceMemory         _ptr_device_memory;
+        VkDeviceSize            _size;
     };
 }
 

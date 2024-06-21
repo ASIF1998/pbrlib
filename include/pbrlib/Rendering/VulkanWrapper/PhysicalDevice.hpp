@@ -18,13 +18,11 @@
 
 #include "Device.hpp"
 
-using namespace std;
-
 namespace pbrlib
 {
     struct PhysicalDevice;
 
-    using PtrPhysicalDevice = shared_ptr<PhysicalDevice>;
+    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
 
     struct PhysicalDevice
     {
@@ -43,8 +41,8 @@ namespace pbrlib
     public:
         PhysicalDevice(VkPhysicalDevice physical_device_handle);
 
-        bool isExtensionSupported(const string& name)    const;
-        bool isLayerSupported(const string& name)        const;
+        bool isExtensionSupported(const std::string& name)  const;
+        bool isLayerSupported(const std::string& name)      const;
 
         bool isFormatSupported(
             VkFormat            format, 
@@ -61,13 +59,13 @@ namespace pbrlib
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @return Логическое устройство.
         */
-        PtrDevice makeDevice(const PtrInstance& ptr_instance, const vector<VkDeviceQueueCreateInfo>& queue_info) const;
+        PtrDevice makeDevice(const PtrInstance& ptr_instance, std::span<const VkDeviceQueueCreateInfo> queue_info) const;
         
         PtrDevice makeDevice(
             const PtrInstance&                      ptr_instance,
-            const vector<VkDeviceQueueCreateInfo>&  queue_info,
-            const vector<const char*>&              layer_names,
-            const vector<const char*>&              extension_names
+            std::span<const VkDeviceQueueCreateInfo>     queue_info,
+            std::span<const char*>                       layer_names,
+            std::span<const char*>                       extension_names
         ) const;
 
         /**
@@ -86,17 +84,17 @@ namespace pbrlib
          * @param type набор флагов VkMemoryPropertyFlags.
          * @return индексы типа памяти.
         */
-        vector<uint32_t> getAllMemoryTypeIndicies(uint32_t type) const;
+        std::vector<uint32_t> getAllMemoryTypeIndicies(uint32_t type) const;
 
-        vector<VkQueueFamilyProperties> getQueueFamilyProperties() const;
+        std::vector<VkQueueFamilyProperties> getQueueFamilyProperties() const;
 
     public:
         VkPhysicalDevice        physical_device_handle;
         PhysicalDevice::Memory  memory;
 
     private:
-        set<string> _search_extension_names;
-        set<string> _search_layer_names;
+        std::set<std::string> _search_extension_names;
+        std::set<std::string> _search_layer_names;
     };
 }
 

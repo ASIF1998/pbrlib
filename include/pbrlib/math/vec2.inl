@@ -8,8 +8,6 @@
 
 #include <pbrlib/core.hpp>
 
-using namespace std;
-
 namespace pbrlib::math
 {
     template<typename Type>
@@ -132,7 +130,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    ostream& operator << (ostream& print, const Vec2<Type>& vec)
+    std::ostream& operator << (std::ostream& print, const Vec2<Type>& vec)
     {
         print << vec.x << ' ' << vec.y;
         return print;
