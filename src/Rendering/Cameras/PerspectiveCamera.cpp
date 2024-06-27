@@ -8,7 +8,6 @@
 
 #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -38,15 +37,15 @@ namespace pbrlib
     {}
 
     PerspectiveCamera::PerspectiveCamera(
-        const string_view   name,
-        const Vec3<float>&  pos,
-        const Vec3<float>&  eye,
-        const Vec3<float>&  up,
-        float               near_clipp,
-        float               far_clipp,
-        float               aspect,
-        float               fovy,
-        const Viewport&     viewport
+        const std::string_view  name,
+        const Vec3<float>&      pos,
+        const Vec3<float>&      eye,
+        const Vec3<float>&      up,
+        float                   near_clipp,
+        float                   far_clipp,
+        float                   aspect,
+        float                   fovy,
+        const Viewport&         viewport
     ) :
         CameraBase(
             name,
@@ -112,7 +111,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PerspectiveCamera::Builder::Builder(const string_view name) :
+    PerspectiveCamera::Builder::Builder(const std::string_view name) :
         _name(name)
     {}
 
@@ -179,7 +178,7 @@ namespace pbrlib
         _viewport.maxDepth  = max_depth;
     }
 
-    void PerspectiveCamera::Builder::setName(const string_view name)
+    void PerspectiveCamera::Builder::setName(const std::string_view name)
     {
         _name = name;
     }
@@ -199,9 +198,9 @@ namespace pbrlib
         );
     }
 
-    PtrPerspectiveCamera PerspectiveCamera::Builder::buildPtr() const
+    std::unique_ptr<PerspectiveCamera> PerspectiveCamera::Builder::buildPtr() const
     {
-        return make_shared<PerspectiveCamera>(
+        return make_unique<PerspectiveCamera>(
             _name,
             _pos,
             _eye,

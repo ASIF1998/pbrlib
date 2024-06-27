@@ -19,21 +19,17 @@
 
 namespace pbrlib
 {
-    class DescriptorPool;
-
-    using PtrDescriptorPool = std::shared_ptr<DescriptorPool>;
-
     class DescriptorPool
     {
     public:
         DescriptorPool(
-            const PtrDevice&                        ptr_device,
+            const Device*                           ptr_device,
             std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
             uint32_t                                max_sets
         );
 
         DescriptorPool(
-            const PtrDevice&            ptr_device,
+            const Device*               ptr_device,
             const VkDescriptorPoolSize& descriptor_pool_size,
             uint32_t                    max_sets
         );
@@ -48,25 +44,24 @@ namespace pbrlib
 
         void reset(VkDescriptorPoolResetFlags reset_flags) const noexcept;
 
-        PtrDevice&               getDevice()                 noexcept;
-        const PtrDevice&         getDevice()                 const noexcept;
-        const VkDescriptorPool&  getDescriptorPoolHandle()   const noexcept;
+        const Device*           getDevice()                 const noexcept;
+        const VkDescriptorPool& getDescriptorPoolHandle()   const noexcept;
 
-        static PtrDescriptorPool make(
-            const PtrDevice&                        ptr_device,
+        static std::unique_ptr<DescriptorPool> make(
+            const Device*                           ptr_device,
             std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
             uint32_t                                max_sets
         );
 
-        static PtrDescriptorPool make(
-            const PtrDevice&            ptr_device,
+        static std::unique_ptr<DescriptorPool> make(
+            const Device*               ptr_device,
             const VkDescriptorPoolSize& descriptor_pool_size,
             uint32_t                    max_sets
         );
 
     private:
-        PtrDevice        _ptr_device;
-        VkDescriptorPool _descriptor_pool_handle;
+        const Device*       _ptr_device;
+        VkDescriptorPool    _descriptor_pool_handle;
     };
 }
 

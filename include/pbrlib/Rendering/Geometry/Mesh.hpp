@@ -21,10 +21,6 @@
 
 namespace pbrlib
 {
-    struct Mesh;
-
-    using PtrMesh = std::shared_ptr<Mesh>;
-
     enum class MeshAttribute
     {
         Position,
@@ -64,8 +60,8 @@ namespace pbrlib
             inline Buffer::Builder<uint32_t>&               getIndexBufferBuilder()     noexcept;
             inline const Buffer::Builder<uint32_t>&         getIndexBufferBuilder()     const noexcept;
 
-            inline Mesh     build()     const;
-            inline PtrMesh  buildPtr()  const;
+            inline Mesh                     build()     const;
+            inline std::unique_ptr<Mesh>    buildPtr()  const;
 
         private:
             Buffer::Builder<VertexAttrib>   _vertex_buffer_builder;
@@ -93,8 +89,8 @@ namespace pbrlib
             inline TIndexBufferBuilder&         getIndexBufferBuilder()     noexcept;
             inline const TIndexBufferBuilder&   getIndexBufferBuilder()     const noexcept;
 
-            inline Mesh     build()     const;
-            inline PtrMesh  buildPtr()  const;
+            inline Mesh                     build()     const;
+            inline std::unique_ptr<Mesh>    buildPtr()  const;
 
         private:
             TVertexBufferBuilder    _vertex_buffer_builder;
@@ -106,11 +102,11 @@ namespace pbrlib
     public:
         inline Mesh(const std::string_view name = "Mesh");
 
-        inline void mapVertexAttribBuffer()    const;
-        inline void unmapVertexAttribBuffer()  const;
+        inline void mapVertexAttribBuffer()     const;
+        inline void unmapVertexAttribBuffer()   const;
 
-        inline void mapIndexBuffer()   const;
-        inline void unmapIndexBuffer() const;
+        inline void mapIndexBuffer()    const;
+        inline void unmapIndexBuffer()  const;
 
         template<MeshAttribute Attrib>
         inline auto& getAttribute(size_t i);
@@ -118,30 +114,27 @@ namespace pbrlib
         template<MeshAttribute Attrib>
         inline const auto& getAttribute(size_t i) const;
 
-        inline uint32_t             getIndex(size_t i)          const;
-        inline PtrBuffer&           getIndexBuffer()            noexcept;
-        inline const PtrBuffer&     getIndexBuffer()            const noexcept;
-        inline PtrBuffer&           getVertexBuffer()           noexcept;
-        inline const PtrBuffer&     getVertexBuffer()           const noexcept;
-        inline uint32_t             getNumIndices()             const noexcept;
-        inline uint32_t             getNumVertices()            const noexcept;
-        inline uint32_t             getIndexBufferOffset()      const noexcept; //!< Возвращает смещение в байтах.
-        inline uint32_t             getVertexBufferOffset()     const noexcept; //!< Возвращает смещение в байтах.
-        inline VkIndexType          getIndexType()              const noexcept;
-        inline AABB&                getAABB()                   noexcept;
-        inline const AABB&          getAABB()                   const noexcept; 
-        inline PtrMaterial&         getMaterial()               noexcept;
-        inline const PtrMaterial&   getMaterial()               const noexcept;
+        inline uint32_t                         getIndex(size_t i)          const;
+        inline std::shared_ptr<const Buffer>    getIndexBuffer()            const noexcept;
+        inline std::shared_ptr<const Buffer>    getVertexBuffer()           const noexcept;
+        inline uint32_t                         getNumIndices()             const noexcept;
+        inline uint32_t                         getNumVertices()            const noexcept;
+        inline uint32_t                         getIndexBufferOffset()      const noexcept; //!< Возвращает смещение в байтах.
+        inline uint32_t                         getVertexBufferOffset()     const noexcept; //!< Возвращает смещение в байтах.
+        inline VkIndexType                      getIndexType()              const noexcept;
+        inline AABB&                            getAABB()                   noexcept;
+        inline const AABB&                      getAABB()                   const noexcept; 
+        inline std::shared_ptr<const Material>  getMaterial()               const noexcept;
 
         inline void setIndex(size_t i, uint32_t val);
-        inline void setIndexBuffer(const PtrBuffer& ptr_buffer);
-        inline void setVertexBuffer(const PtrBuffer& ptr_buffer);
+        inline void setIndexBuffer(std::shared_ptr<Buffer> ptr_buffer);
+        inline void setVertexBuffer(std::shared_ptr<Buffer> ptr_buffer);
         inline void setAABB(const AABB& bbox);
         inline void setNumVertices(size_t num);
         inline void setNumIndices(size_t num);
         inline void setVertexBufferOffset(size_t offset);
         inline void setIndexBufferOffset(size_t offset);
-        inline void setMaterial(const PtrMaterial& ptr_material);
+        inline void setMaterial(std::shared_ptr<const Material> ptr_material);
 
         /**
          * При использовании этих методов ограничивающий объём остаётся прежним.
@@ -164,19 +157,19 @@ namespace pbrlib
         */
         inline void copyVertexBuffer(std::vector<VertexAttrib>& vb);
 
-        inline static PtrMesh make(const std::string_view name = "Mesh");
+        inline static std::unique_ptr<Mesh> make(const std::string_view name = "Mesh");
 
     private:
-        PtrBuffer           _ptr_index_buffer;
-        PtrBuffer           _ptr_vertex_attrib_buffer;
-        uint32_t            _num_vertices;
-        uint32_t            _vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
-        uint32_t            _num_indices;
-        uint32_t            _index_buffer_offset;  	         //!< В sizeof(uint8_t).
-        VkIndexType         _index_type                      = VK_INDEX_TYPE_UINT32;
-        uint32_t            _stride                          = sizeof(VertexAttrib);
-        AABB                _aabb;
-        PtrMaterial         _ptr_material;
+        std::shared_ptr<Buffer>         _ptr_index_buffer;
+        std::shared_ptr<Buffer>         _ptr_vertex_attrib_buffer;
+        uint32_t                        _num_vertices;
+        uint32_t                        _vertex_attrib_buffer_offset;    //!< В sizeof(uint8_t).
+        uint32_t                        _num_indices;
+        uint32_t                        _index_buffer_offset;  	         //!< В sizeof(uint8_t).
+        VkIndexType                     _index_type                      = VK_INDEX_TYPE_UINT32;
+        uint32_t                        _stride                          = sizeof(VertexAttrib);
+        AABB                            _aabb;
+        std::shared_ptr<const Material> _ptr_material;
     };
 }
 

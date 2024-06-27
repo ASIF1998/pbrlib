@@ -13,14 +13,13 @@
 
 #include <cassert>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
 {
     AABB::AABB() :
-        _p_min(numeric_limits<float>::lowest()),
-        _p_max(numeric_limits<float>::max())
+        _p_min(std::numeric_limits<float>::lowest()),
+        _p_max(std::numeric_limits<float>::max())
     {}
 
     AABB::AABB(const Vec3<float>& p) :
@@ -29,8 +28,8 @@ namespace pbrlib
     {}
 
     AABB::AABB(const Vec3<float>& p1, const Vec3<float>& p2) :
-        _p_min(min(p1.x, p2.x), min(p1.y, p2.y), min(p1.z, p2.z)),
-        _p_max(max(p1.x, p2.x), max(p1.y, p2.y), max(p1.z, p2.z))
+        _p_min(std::min(p1.x, p2.x), std::min(p1.y, p2.y), std::min(p1.z, p2.z)),
+        _p_max(std::max(p1.x, p2.x), std::max(p1.y, p2.y), std::max(p1.z, p2.z))
     {}
 
     Vec3<float>& AABB::operator [] (size_t i)
@@ -109,14 +108,14 @@ namespace pbrlib
     {
         return AABB (
             Vec3<float> (
-                min(bbox._p_min.x, p.x),
-                min(bbox._p_min.y, p.y),
-                min(bbox._p_min.z, p.z)
+                std::min(bbox._p_min.x, p.x),
+                std::min(bbox._p_min.y, p.y),
+                std::min(bbox._p_min.z, p.z)
             ),
             Vec3<float> (
-                max(bbox._p_max.x, p.x),
-                max(bbox._p_max.y, p.y),
-                max(bbox._p_max.z, p.z)
+                std::max(bbox._p_max.x, p.x),
+                std::max(bbox._p_max.y, p.y),
+                std::max(bbox._p_max.z, p.z)
             )
         );
     }
@@ -125,14 +124,14 @@ namespace pbrlib
     {
         return AABB (
             Vec3<float> (
-                min(bbox1._p_min.x, bbox2._p_min.x),
-                min(bbox1._p_min.y, bbox2._p_min.y),
-                min(bbox1._p_min.z, bbox2._p_min.z)
+                std::min(bbox1._p_min.x, bbox2._p_min.x),
+                std::min(bbox1._p_min.y, bbox2._p_min.y),
+                std::min(bbox1._p_min.z, bbox2._p_min.z)
             ),
             Vec3<float> (
-                max(bbox1._p_max.x, bbox2._p_max.x),
-                max(bbox1._p_max.y, bbox2._p_max.y),
-                max(bbox1._p_max.z, bbox2._p_max.z)
+                std::max(bbox1._p_max.x, bbox2._p_max.x),
+                std::max(bbox1._p_max.y, bbox2._p_max.y),
+                std::max(bbox1._p_max.z, bbox2._p_max.z)
             )
         );
     }
@@ -141,14 +140,14 @@ namespace pbrlib
     {
         return AABB (
             Vec3<float> (
-                max(bbox1._p_min.x, bbox2._p_min.x),
-                max(bbox1._p_min.y, bbox2._p_min.y),
-                max(bbox1._p_min.z, bbox2._p_min.z)
+                std::max(bbox1._p_min.x, bbox2._p_min.x),
+                std::max(bbox1._p_min.y, bbox2._p_min.y),
+                std::max(bbox1._p_min.z, bbox2._p_min.z)
             ),
             Vec3<float> (
-                min(bbox1._p_max.x, bbox2._p_max.x),
-                min(bbox1._p_max.y, bbox2._p_max.y),
-                min(bbox1._p_max.z, bbox2._p_max.z)
+                std::min(bbox1._p_max.x, bbox2._p_max.x),
+                std::min(bbox1._p_max.y, bbox2._p_max.y),
+                std::min(bbox1._p_max.z, bbox2._p_max.z)
             )
         );
     }

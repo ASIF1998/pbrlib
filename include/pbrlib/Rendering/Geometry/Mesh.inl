@@ -107,22 +107,12 @@ namespace pbrlib
         return *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getDeviceMemory()->getData() + _index_buffer_offset) + i);
     }
 
-    inline PtrBuffer& Mesh::getIndexBuffer() noexcept
+    inline std::shared_ptr<const Buffer> Mesh::getIndexBuffer() const noexcept
     {
         return _ptr_index_buffer;
     }
 
-    inline const PtrBuffer& Mesh::getIndexBuffer() const noexcept
-    {
-        return _ptr_index_buffer;
-    }
-
-    inline PtrBuffer& Mesh::getVertexBuffer() noexcept
-    {
-        return _ptr_vertex_attrib_buffer;
-    }
-
-    inline const PtrBuffer& Mesh::getVertexBuffer() const noexcept
+    inline std::shared_ptr<const Buffer> Mesh::getVertexBuffer() const noexcept
     {
         return _ptr_vertex_attrib_buffer;
     }
@@ -162,12 +152,7 @@ namespace pbrlib
         return _aabb;
     }
 
-    inline PtrMaterial& Mesh::getMaterial() noexcept
-    {
-        return _ptr_material;
-    }
-
-    inline const PtrMaterial& Mesh::getMaterial() const noexcept
+    inline std::shared_ptr<const Material> Mesh::getMaterial() const noexcept
     {
         return _ptr_material;
     }
@@ -180,7 +165,7 @@ namespace pbrlib
         *(reinterpret_cast<uint32_t*>(_ptr_index_buffer->getDeviceMemory()->getData() + _index_buffer_offset) + i) = val;
     }
 
-    inline void Mesh::setIndexBuffer(const PtrBuffer& ptr_buffer)
+    inline void Mesh::setIndexBuffer(std::shared_ptr<Buffer> ptr_buffer)
     {
         if (ptr_buffer->getSize() % sizeof(uint32_t))
             throw std::invalid_argument("Размер буфера не кратен sizeof(uint32_t)");
@@ -188,7 +173,7 @@ namespace pbrlib
         _ptr_index_buffer = ptr_buffer;
     }
 
-    inline void Mesh::setVertexBuffer(const PtrBuffer& ptr_buffer)
+    inline void Mesh::setVertexBuffer(std::shared_ptr<Buffer> ptr_buffer)
     {
         if (ptr_buffer->getSize() % sizeof(VertexAttrib)) 
             throw std::invalid_argument("Размер буфера не кратен sizeof(Mesh::VertexAttrib)");
@@ -212,7 +197,7 @@ namespace pbrlib
             _ptr_index_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr     = _ptr_index_buffer->getDeviceMemory()->getData();
+        auto    ptr     = _ptr_index_buffer->getDeviceMemory()->getData();
         size_t      size    = std::min(static_cast<size_t>(_ptr_index_buffer->getSize()), sizeof(uint32_t) * ib.size());
 
         std::memcpy(ptr, ib.data(), size);
@@ -232,7 +217,7 @@ namespace pbrlib
             _ptr_vertex_attrib_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr     = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
+        auto    ptr     = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
         size_t      size    = std::min(static_cast<size_t>(_ptr_vertex_attrib_buffer->getSize()), sizeof(uint32_t) * vb.size());
 
         std::memcpy(ptr, vb.data(), size);
@@ -284,7 +269,7 @@ namespace pbrlib
         }
     }
 
-    inline void Mesh::setMaterial(const PtrMaterial& ptr_material)
+    inline void Mesh::setMaterial(std::shared_ptr<const Material> ptr_material)
     {
         _ptr_material = ptr_material;
     }
@@ -297,8 +282,8 @@ namespace pbrlib
             _ptr_vertex_attrib_buffer->getDeviceMemory()->map();
         }
 
-        uint8_t*    ptr_data    = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
-        size_t      size        = _ptr_vertex_attrib_buffer->getSize();
+        auto    ptr_data    = _ptr_vertex_attrib_buffer->getDeviceMemory()->getData();
+        size_t  size        = _ptr_vertex_attrib_buffer->getSize();
 
         if (size_t num_vert = size / sizeof(VertexAttrib); num_vert != vb.size()) {
             vb.resize(num_vert);
@@ -311,9 +296,9 @@ namespace pbrlib
         }
     }
 
-    inline PtrMesh Mesh::make(const std::string_view name)
+    inline std::unique_ptr<Mesh> Mesh::make(const std::string_view name)
     {
-        return make_shared<Mesh>(name);
+        return make_unique<Mesh>(name);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,9 +347,9 @@ namespace pbrlib
         return mesh;
     }
 
-    inline PtrMesh Mesh::Builder::buildPtr()  const
+    inline std::unique_ptr<Mesh> Mesh::Builder::buildPtr()  const
     {
-        PtrMesh ptr_mesh = Mesh::make(_name);
+        auto ptr_mesh = Mesh::make(_name);
 
         ptr_mesh->_aabb                     = _bbox;
         ptr_mesh->_index_buffer_offset      = 0;
@@ -435,9 +420,9 @@ namespace pbrlib
     }
 
     template<typename VertexAttribAllocatorType, typename IndexAllocatorType>
-    inline PtrMesh Mesh::BuilderWithData<VertexAttribAllocatorType, IndexAllocatorType>::buildPtr() const
+    inline std::unique_ptr<Mesh> Mesh::BuilderWithData<VertexAttribAllocatorType, IndexAllocatorType>::buildPtr() const
     {
-        PtrMesh ptr_mesh = Mesh::make(_name);
+        auto ptr_mesh = Mesh::make(_name);
 
         ptr_mesh->_aabb                     = _bbox;
         ptr_mesh->_index_buffer_offset      = 0;

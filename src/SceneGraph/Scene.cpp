@@ -10,13 +10,11 @@
 
 #include <pbrlib/SceneGraph/Component.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     SceneItem::SceneItem(
-        const string_view   name,
-        SceneItem*          ptr_parent 
+        const std::string_view  name,
+        SceneItem*              ptr_parent 
     ) :
         _ptr_parent                 (ptr_parent),
         _world_transform_is_current (false),
@@ -47,24 +45,9 @@ namespace pbrlib
         return _ptr_parent;
     }
 
-    PtrSceneItem& SceneItem::getChild(size_t i)
+    std::shared_ptr<const SceneItem> SceneItem::getChild(size_t i) const
     {
         return _ptr_children[i];
-    }
-
-    const PtrSceneItem& SceneItem::getChild(size_t i) const
-    {
-        return _ptr_children[i];
-    }
-
-    vector<PtrSceneItem>& SceneItem::getChildren() noexcept
-    {
-        return _ptr_children;
-    }
-
-    const vector<PtrSceneItem>& SceneItem::getChildren() const noexcept
-    {
-        return _ptr_children;
     }
 
     Transform& SceneItem::getLocalTransform() noexcept
@@ -87,12 +70,12 @@ namespace pbrlib
         return _world_transform;
     }
 
-    string& SceneItem::getName() noexcept
+    std::string& SceneItem::getName() noexcept
     {
         return _name;
     }
 
-    const string& SceneItem::getName() const noexcept
+    const std::string& SceneItem::getName() const noexcept
     {
         return _name;
     }
@@ -102,7 +85,7 @@ namespace pbrlib
         _ptr_parent = ptr_parent;
     }
 
-    void SceneItem::setChildren(span<const PtrSceneItem> children)
+    void SceneItem::setChildren(std::span<std::shared_ptr<SceneItem>> children)
     {
         _ptr_children = std::vector(std::begin(children), std::end(children));
     }
@@ -124,7 +107,7 @@ namespace pbrlib
         _world_bbox             = bbox;
     }
 
-    void SceneItem::setName(const string_view name)
+    void SceneItem::setName(const std::string_view name)
     {
         _name = name;
     }
@@ -149,7 +132,7 @@ namespace pbrlib
         _world_aabb_is_current = current;
     }
 
-    void SceneItem::addComponent(const PtrComponent& ptr_component)
+    void SceneItem::addComponent(std::shared_ptr<ComponentBase> ptr_component)
     {
         auto type   = ptr_component->getType();
         auto it     = _components.find(type);
@@ -160,21 +143,7 @@ namespace pbrlib
             _components.insert(make_pair(type, ptr_component));
     }
 
-    void SceneItem::addChild(PtrSceneItem&& child)
-    {
-        child->setParent(this);
-
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
-            if (!_ptr_children[i]) {
-                swap(_ptr_children[i], child);
-                return;
-            }
-        }
-
-        _ptr_children.push_back(move(child));
-    }
-
-    void SceneItem::addChild(const PtrSceneItem& child)
+    void SceneItem::addChild(std::shared_ptr<SceneItem> child)
     {
         child->setParent(this);
 
@@ -188,12 +157,14 @@ namespace pbrlib
         _ptr_children.push_back(child);
     }
 
-    PtrSceneItem& SceneItem::addChild(const string_view name)
+    std::shared_ptr<const SceneItem> SceneItem::addChild(const std::string_view name)
     {
-        PtrSceneItem child = make_shared<SceneItem>(name, this);
+        auto child = std::make_shared<SceneItem>(name, this);
 
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
-            if (!_ptr_children[i]) {
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) 
+        {
+            if (!_ptr_children[i]) 
+            {
                 _ptr_children[i] = child;
                 return _ptr_children[i];
             }
@@ -203,7 +174,7 @@ namespace pbrlib
         return _ptr_children.back();
     }
 
-    void SceneItem::detachChild(const PtrSceneItem& ptr_item)
+    void SceneItem::detachChild(std::shared_ptr<const SceneItem> ptr_item)
     {
         for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
             if (_ptr_children[i] == ptr_item) {
@@ -213,12 +184,12 @@ namespace pbrlib
     }
 
 
-    void SceneItem::detachChild(const string_view name)
+    void SceneItem::detachChild(const std::string_view name)
     {
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
-            if (_ptr_children[i]->_name == name) {
+        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) 
+        {
+            if (_ptr_children[i]->_name == name)
                 _ptr_children[i] = nullptr;
-            }
         }
     }
 
@@ -257,17 +228,17 @@ namespace pbrlib
         }
     }
 
-    PtrSceneItem SceneItem::make(const string_view name, SceneItem* ptr_parent)
+    std::unique_ptr<SceneItem> SceneItem::make(const std::string_view name, SceneItem* ptr_parent)
     {
-        return make_shared<SceneItem>(name, ptr_parent);
+        return make_unique<SceneItem>(name, ptr_parent);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Scene::Scene(
-        const string_view       name, 
-        const PtrDevice&        ptr_device,
-        const PtrDeviceQueue&   ptr_device_queue,
-        const PtrCommandPool&   ptr_command_pool,    
+        const std::string_view  name, 
+        const Device*           ptr_device,
+        const DeviceQueue*      ptr_device_queue,
+        const CommandPool*      ptr_command_pool,    
         uint32_t                device_local_memory_type_index,
         uint32_t                host_local_memory_type_index
     ) :
@@ -286,37 +257,32 @@ namespace pbrlib
         _name               (name)
     {}
 
-    void Scene::setRoot(const PtrSceneItem& ptr_root)
+    void Scene::setRoot(std::shared_ptr<SceneItem> ptr_root)
     {
         _ptr_root = ptr_root;
     }
 
-    void Scene::setRoot(PtrSceneItem&& ptr_root)
-    {
-        swap(_ptr_root, ptr_root);
-    }
-
-    void Scene::setName(const string_view name)
+    void Scene::setName(const std::string_view name)
     {
         _name = name;
     }
 
-    PtrSceneItem& Scene::getRoot() noexcept
+    std::shared_ptr<SceneItem> Scene::getRoot() noexcept
     {
         return _ptr_root;
     }
 
-    const PtrSceneItem& Scene::getRoot() const noexcept
+    std::shared_ptr<const SceneItem> Scene::getRoot() const noexcept
     {
         return _ptr_root;
     }
 
-    string& Scene::getName() noexcept
+    std::string& Scene::getName() noexcept
     {
         return _name;
     }
 
-    const string& Scene::getName() const noexcept
+    const std::string& Scene::getName() const noexcept
     {
         return _name;
     }
@@ -377,45 +343,45 @@ namespace pbrlib
         return visible_list;
     }
 
-    PtrSceneItem& Scene::makePointLight(
+    std::shared_ptr<SceneItem> Scene::makePointLight(
         const PointLight::Builder&  light_builder,
-        const string_view           name
+        const std::string_view      name
     )
     {
-        PtrSceneItem ptr_item = SceneItem::make(name);
+        std::shared_ptr ptr_item = SceneItem::make(name);
 
         ptr_item->addComponent(light_builder.buildPtr());
         _point_lights.push_back(ptr_item);
         return _point_lights.back();
     }
 
-    PtrSceneItem& Scene::makeSpotLight(
+    std::shared_ptr<SceneItem> Scene::makeSpotLight(
         const SpotLight::Builder&   light_builder,
-        const string_view           name
+        const std::string_view      name
     )
     {
-        PtrSceneItem ptr_item = SceneItem::make(name);
+        std::shared_ptr ptr_item = SceneItem::make(name);
 
         ptr_item->addComponent(light_builder.buildPtr());
         _spot_lights.push_back(ptr_item);
         return _spot_lights.back();
     }
 
-    PtrSceneItem& Scene::makeDirectionLight(
+    std::shared_ptr<SceneItem> Scene::makeDirectionLight(
         const DirectionLight::Builder&  light_builder,
-        const string_view               name
+        const std::string_view          name
     )
     {
-        PtrSceneItem ptr_item = SceneItem::make(name);
+        std::shared_ptr ptr_item = SceneItem::make(name);
 
         ptr_item->addComponent(light_builder.buildPtr());
         _dir_lights.push_back(ptr_item);
         return _dir_lights.back();
     }
 
-    PtrSceneItem& Scene::makeCamera(
+    std::shared_ptr<SceneItem> Scene::makeCamera(
         const PerspectiveCamera::Builder&   camera_builder,
-        const string_view                   name
+        const std::string_view              name
     )    
     {
         _ptr_camera = SceneItem::make(name);

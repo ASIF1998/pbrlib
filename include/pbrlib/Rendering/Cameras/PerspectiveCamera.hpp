@@ -15,9 +15,6 @@
 
 namespace pbrlib
 {
-    class PerspectiveCamera;
-    using PtrPerspectiveCamera = std::shared_ptr<PerspectiveCamera>;
-
     class PerspectiveCamera :
         public CameraBase
     {
@@ -102,8 +99,8 @@ namespace pbrlib
 
             void setName(const std::string_view name);
 
-            PerspectiveCamera       build()     const;
-            PtrPerspectiveCamera    buildPtr()  const;
+            PerspectiveCamera                   build()     const;
+            std::unique_ptr<PerspectiveCamera>  buildPtr()  const;
 
         private:
             math::Vec3<float>       _pos;

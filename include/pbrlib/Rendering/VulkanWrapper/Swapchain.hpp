@@ -17,11 +17,9 @@
 
 namespace pbrlib
 {
-    class Swapchain;
     class DeviceQueue;
     class ImageView;
-
-    using PtrSwapchain = std::shared_ptr<Swapchain>;
+    class Device;
 
     class Swapchain
     {
@@ -37,9 +35,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         Swapchain(
-            const PtrDevice&            ptr_device,
-            std::span<const uint32_t>   queue_family_indices,
-            const PtrSurface&           surface
+            const Device*                   ptr_device,
+            std::span<const uint32_t>       queue_family_indices,
+            std::shared_ptr<const Surface>  surface
         );
         
         /**
@@ -53,9 +51,9 @@ namespace pbrlib
          * @param surface               поверхность.
         */
         Swapchain(
-            const PtrDevice&            ptr_device,
-            uint32_t                    queue_family_index,
-            const PtrSurface&           surface
+            const Device*                   ptr_device,
+            uint32_t                        queue_family_index,
+            std::shared_ptr<const Surface>  surface
         );
 
         Swapchain(Swapchain&& swapchain);
@@ -69,16 +67,14 @@ namespace pbrlib
         std::vector<ImageView>&         getImagesView()         noexcept;
         const std::vector<ImageView>&   getImagesView()         const noexcept;
         const VkSwapchainKHR&           getSwapchainHandle()    const noexcept;
-        PtrSurface&                     getSurface()            noexcept;
-        const PtrSurface&               getSurface()            const noexcept;
-        PtrDevice&                      getDevice()             noexcept;
-        const PtrDevice&                getDevice()             const noexcept;
+        std::shared_ptr<const Surface>  getSurface()            const noexcept;
+        const Device*                   getDevice()             const noexcept;
 
         void getNextPresentImageIndex(
             uint32_t&   image_index, 
             VkSemaphore semaphore, 
             VkFence     fence = VK_NULL_HANDLE
-        );
+        ) const;
 
         /**
          * @brief Статический метод создающий объект типа PtrSwapchain.
@@ -87,10 +83,10 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
          * @param surface               поверхность.
         */
-        static PtrSwapchain make(
-            const PtrDevice&                ptr_device,
+        static std::unique_ptr<Swapchain> make(
+            const Device*                   ptr_device,
             std::span<const uint32_t>       queue_family_indices,
-            const std::shared_ptr<Surface>& surface
+            std::shared_ptr<const Surface>  surface
         );
 
         /**
@@ -100,10 +96,10 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @param surface               поверхность.
         */
-        static PtrSwapchain make(
-            const PtrDevice&                ptr_device,
+        static std::unique_ptr<Swapchain> make(
+            const Device*                   ptr_device,
             uint32_t                        queue_family_index,
-            const std::shared_ptr<Surface>& surface
+            std::shared_ptr<const Surface>  surface
         );
 
     private:
@@ -115,15 +111,15 @@ namespace pbrlib
          * @param sharing_mode          сообщает о том как изображения будут использоваться в разных очередях.
         */
         void _create(
-            const PtrDevice&            ptr_device, 
+            const Device*               ptr_device, 
             std::span<const uint32_t>   queue_family_indices,
             VkSharingMode               sharing_mode
         );
 
     private:
-        VkSwapchainKHR          _swapchain_handle;
-        PtrSurface              _ptr_surface;
-        std::vector<ImageView>  _images_view;
+        VkSwapchainKHR                  _swapchain_handle;
+        std::shared_ptr<const Surface>  _ptr_surface;
+        std::vector<ImageView>          _images_view;
     };
 }
 

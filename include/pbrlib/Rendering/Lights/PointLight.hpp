@@ -17,10 +17,6 @@
 
 namespace pbrlib
 {
-    class PointLight;
-
-    using PtrPointLight = std::shared_ptr<PointLight>;
-    
     class PointLight :
         public Component<PointLight>
     {
@@ -35,8 +31,8 @@ namespace pbrlib
             void setPosition(const math::Vec3<float>& position);
             void setName(const std::string_view name);
 
-            PointLight      build()     const;
-            PtrPointLight   buildPtr()  const;
+            PointLight                  build()     const;
+            std::unique_ptr<PointLight> buildPtr()  const;
 
         private:
             math::Vec3<float>   _color;

@@ -71,17 +71,17 @@ namespace pbrlib
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void GBufferPass::Builder::setDevice(const PtrDevice& ptr_device)
+    void GBufferPass::Builder::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
 
-    void GBufferPass::Builder::setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device)
+    void GBufferPass::Builder::setPhysicalDevice(const PhysicalDevice* ptr_physical_device)
     {
         _ptr_physical_device = ptr_physical_device;
     }
 
-    void GBufferPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
+    void GBufferPass::Builder::setDescriptorPool(std::shared_ptr<const DescriptorPool> ptr_descriptor_pool)
     {
        _ptr_descriptor_pool = ptr_descriptor_pool;
     }
@@ -97,7 +97,7 @@ namespace pbrlib
         _window_height  = height;
     }
 
-    void GBufferPass::Builder::setQueue(const PtrDeviceQueue& ptr_queue) 
+    void GBufferPass::Builder::setQueue(std::shared_ptr<DeviceQueue> ptr_queue) 
     {
         _ptr_device_queue = ptr_queue;
     }
@@ -112,7 +112,7 @@ namespace pbrlib
         );
     }
     
-    PtrGBufferPass GBufferPass::Builder::buildPtr()
+    std::unique_ptr<GBufferPass> GBufferPass::Builder::buildPtr()
     {
         return GBufferPass::make(
             _ptr_device, _ptr_device_queue, _ptr_physical_device,
@@ -123,7 +123,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PtrRenderPass makeRenderPass(const PtrDevice& ptr_device, const PtrAttachments& image_view)
+    std::unique_ptr<RenderPass> makeRenderPass(const Device* ptr_device, const PtrAttachments& image_view)
     {
         RenderPass::Builder build_render_pass       (GBufferPass::OutputImagesViewsIDs::Count, 1, 0);
         SubpassDescription  subpass_description1    (0, 4, 0);
@@ -197,11 +197,11 @@ namespace pbrlib
     }
 
     PtrAttachments makeFramebufferAttachments(
-        const PtrDevice&            ptr_device,
-        const PtrPhysicalDevice&    ptr_physical_device,
-        uint32_t                    gpu_queue_family_index,
-        uint32_t                    width,
-        uint32_t                    height
+        const Device*           ptr_device,
+        const PhysicalDevice*   ptr_physical_device,
+        uint32_t                gpu_queue_family_index,
+        uint32_t                width,
+        uint32_t                height
     )
     {
         PtrAttachments ptr_framebuffer_attachments (new std::vector<ImageView>());
@@ -262,15 +262,14 @@ namespace pbrlib
         return ptr_framebuffer_attachments;
     }
 
-    PtrFramebuffer makeFramebuffer(
-        const PtrAttachments&   ptr_framebuffer_attachments,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height
+    std::shared_ptr<const Framebuffer> makeFramebuffer(
+        const PtrAttachments&               ptr_framebuffer_attachments,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height
     )
     {
         Framebuffer::Builder    build_framebuffer;
-        PtrFramebuffer  framebuffer;
 
         build_framebuffer.setAttachments(ptr_framebuffer_attachments);
         build_framebuffer.setRenderPass(ptr_render_pass);
@@ -283,13 +282,13 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GBufferPass::GBufferPass(
-        const PtrDevice&            ptr_device, 
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrPhysicalDevice&    ptr_physical_device,
-        const PtrDescriptorPool&    ptr_descriptor_pool,  
-        uint32_t                    gpu_memory_index,
-        uint32_t                    window_width,
-        uint32_t                    window_height
+        const Device*                           ptr_device, 
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        const PhysicalDevice*                   ptr_physical_device,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,  
+        uint32_t                                gpu_memory_index,
+        uint32_t                                window_width,
+        uint32_t                                window_height
     ) :
         _ptr_device_queue (ptr_queue)
     {
@@ -321,7 +320,7 @@ namespace pbrlib
         descriptor_set_layout_bindings.addBinding(GBufferPassBindings::AO, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
         descriptor_set_layout_bindings.addBinding(GBufferPassBindings::MaterailData, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
 
-        PtrDescriptorSetLayout ptr_descriptor_set_layout = DescriptorSetLayout::make(std::move(descriptor_set_layout_bindings));
+        std::shared_ptr ptr_descriptor_set_layout = DescriptorSetLayout::make(std::move(descriptor_set_layout_bindings));
 
         _ptr_descriptor_set = DescriptorSet::make(ptr_descriptor_pool, ptr_descriptor_set_layout);
 
@@ -439,11 +438,11 @@ namespace pbrlib
     }
 
     void GBufferPass::draw(
-        const Transform&                projection,
-        const Transform&                view,
-        const VisibleList&              drawable_objects, 
-        const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-        const PtrSampler&               ptr_sampler
+        const Transform&                                projection,
+        const Transform&                                view,
+        const VisibleList&                              drawable_objects, 
+        std::shared_ptr<const PrimaryCommandBuffer>     ptr_command_buffer,
+        std::shared_ptr<const Sampler>                  ptr_sampler
     )
     {
         UniformBufferMatrices   uniform_matrices_buffer_data;
@@ -582,12 +581,12 @@ namespace pbrlib
 
         for (size_t i{0}, size{drawable_objects.size()}; i < size; i++) {
             if (drawable_objects[i]->hasComponent<Mesh>()) {
-                Mesh& mesh = drawable_objects[i]->getComponent<Mesh>();
+                auto mesh = drawable_objects[i]->getComponent<Mesh>();
 
                 if(mesh.getMaterial()) {
                     /*  ----------------------------------------------------------------------  */
-                    const PtrMaterial&  ptr_material    = mesh.getMaterial();
-                    Transform           model           = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
+                    auto        ptr_material    = mesh.getMaterial();
+                    Transform   model           = drawable_objects[i]->getWorldTransform() * drawable_objects[i]->getLocalTransform();
 
                     uniform_matrices_buffer_data.model_view_matrix  = (view * model).getMatrix();
                     uniform_matrices_buffer_data.MVP                = projection.getMatrix() * uniform_matrices_buffer_data.model_view_matrix;
@@ -598,8 +597,8 @@ namespace pbrlib
                     _ptr_uniform_matrices_data_buffer->getDeviceMemory()->setData(&uniform_matrices_buffer_data, 1);
                     _ptr_uniform_material_data_buffer->getDeviceMemory()->setData(&uniform_material_buffer_data, 1);
                     
-                    PtrBuffer& ptr_vertex_buffer    = mesh.getVertexBuffer();
-                    PtrBuffer& ptr_index_buffer     = mesh.getIndexBuffer();
+                    auto ptr_vertex_buffer    = mesh.getVertexBuffer();
+                    auto ptr_index_buffer     = mesh.getIndexBuffer();
 
                     _ptr_descriptor_set->writeImageView(
                         *ptr_material->getTexture<Material::Textures::Albedo>(), 
@@ -657,27 +656,17 @@ namespace pbrlib
         }
     }
 
-    PtrGraphicsPipeline& GBufferPass::getPipeline() noexcept
+    std::shared_ptr<const GraphicsPipeline> GBufferPass::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
 
-    const PtrGraphicsPipeline& GBufferPass::getPipeline() const noexcept
-    {
-        return _ptr_pipeline;
-    }
-
-    PtrDescriptorSet& GBufferPass::getDescriptorSet() noexcept
+    std::shared_ptr<const DescriptorSet> GBufferPass::getDescriptorSet() const noexcept
     {
         return _ptr_descriptor_set;
     }
 
-    const PtrDescriptorSet& GBufferPass::getDescriptorSet() const noexcept
-    {
-        return _ptr_descriptor_set;
-    }
-
-    const PtrFramebuffer& GBufferPass::getFramebuffer() const noexcept
+    std::shared_ptr<const Framebuffer> GBufferPass::getFramebuffer() const noexcept
     {
         return _ptr_framebuffer;
     }
@@ -687,17 +676,17 @@ namespace pbrlib
         return _ptr_framebuffer_attachments->at(id);
     }
 
-    void GBufferPass::outputImpl(PtrImageView& ptr_image_view, size_t id)
+    void GBufferPass::outputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id)
     {}
 
-    PtrGBufferPass GBufferPass::make(
-        const PtrDevice&            ptr_device, 
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrPhysicalDevice&    ptr_physical_device,
-        const PtrDescriptorPool&    ptr_descriptor_pool,  
-        uint32_t                    gpu_memory_index,
-        uint32_t                    window_width,
-        uint32_t                    window_height
+    std::unique_ptr<GBufferPass> GBufferPass::make(
+        const Device*                           ptr_device, 
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        const PhysicalDevice*                   ptr_physical_device,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,  
+        uint32_t                                gpu_memory_index,
+        uint32_t                                window_width,
+        uint32_t                                window_height
     )
     {
         return std::make_unique<GBufferPass>(

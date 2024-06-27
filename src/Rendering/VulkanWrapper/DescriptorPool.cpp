@@ -10,14 +10,12 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace pbrlib
 {
     DescriptorPool::DescriptorPool(
-        const PtrDevice&                    ptr_device, 
-        span<const VkDescriptorPoolSize>    descriptor_pool_sizes,
-        uint32_t                            max_sets
+        const Device*                           ptr_device, 
+        std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
+        uint32_t                                max_sets
     ) :
         _ptr_device             (ptr_device),
         _descriptor_pool_handle (VK_NULL_HANDLE)
@@ -40,7 +38,7 @@ namespace pbrlib
     }
 
     DescriptorPool::DescriptorPool(
-        const PtrDevice&            ptr_device,
+        const Device*               ptr_device,
         const VkDescriptorPoolSize& descriptor_pool_size,
         uint32_t                    max_sets
     ) :
@@ -65,17 +63,16 @@ namespace pbrlib
     }
 
     DescriptorPool::DescriptorPool(DescriptorPool&& descriptor_pool) :
-        _ptr_device             (move(descriptor_pool._ptr_device)),
+        _ptr_device             (std::move(descriptor_pool._ptr_device)),
         _descriptor_pool_handle (VK_NULL_HANDLE)
     {
-        swap(_descriptor_pool_handle, descriptor_pool._descriptor_pool_handle);
+        std::swap(_descriptor_pool_handle, descriptor_pool._descriptor_pool_handle);
     }
 
     DescriptorPool::~DescriptorPool()
     {
-        if (_descriptor_pool_handle != VK_NULL_HANDLE) {
+        if (_descriptor_pool_handle != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(_ptr_device->getDeviceHandle(), _descriptor_pool_handle, nullptr);
-        }
     }
 
     void DescriptorPool::reset(VkDescriptorPoolResetFlags reset_flags) const noexcept
@@ -87,12 +84,7 @@ namespace pbrlib
         ) == VK_SUCCESS);
     }
 
-    PtrDevice& DescriptorPool::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& DescriptorPool::getDevice() const noexcept
+    const Device* DescriptorPool::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -102,21 +94,21 @@ namespace pbrlib
         return _descriptor_pool_handle;
     }
 
-    PtrDescriptorPool DescriptorPool::make(
-        const PtrDevice&                    ptr_device,
-        span<const VkDescriptorPoolSize>    descriptor_pool_sizes,
-        uint32_t                            max_sets
+    std::unique_ptr<DescriptorPool> DescriptorPool::make(
+        const Device*                           ptr_device,
+        std::span<const VkDescriptorPoolSize>   descriptor_pool_sizes,
+        uint32_t                                max_sets
     )
     {
-        return make_shared<DescriptorPool>(ptr_device, descriptor_pool_sizes, max_sets);
+        return std::make_unique<DescriptorPool>(ptr_device, descriptor_pool_sizes, max_sets);
     }
 
-    PtrDescriptorPool DescriptorPool::make(
-        const PtrDevice&            ptr_device,
+    std::unique_ptr<DescriptorPool> DescriptorPool::make(
+        const Device*               ptr_device,
         const VkDescriptorPoolSize& descriptor_pool_size,
         uint32_t                    max_sets
     )
     {
-        return make_shared<DescriptorPool>(ptr_device, descriptor_pool_size, max_sets);
+        return std::make_unique<DescriptorPool>(ptr_device, descriptor_pool_size, max_sets);
     }   
 }

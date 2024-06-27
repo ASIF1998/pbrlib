@@ -24,17 +24,15 @@
 
 #include <pbrlib/Util/enumCast.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     Window::Window(
-        const string_view   title, 
-        int                 width, 
-        int                 height, 
-        int                 pos_x, 
-        int                 pos_y, 
-        Window::Resizable   resizable
+        const std::string_view  title, 
+        int                     width, 
+        int                     height, 
+        int                     pos_x, 
+        int                     pos_y, 
+        Window::Resizable       resizable
     ) :
         _ptr_window     (nullptr),
         _ptr_swapchain  (nullptr),
@@ -47,7 +45,7 @@ namespace pbrlib
 
     Window::Window(Window&& window) 
     {
-        swap(_ptr_window, window._ptr_window);
+        std::swap(_ptr_window, window._ptr_window);
     }
 
     Window::~Window()
@@ -55,17 +53,17 @@ namespace pbrlib
         SDL_DestroyWindow(_ptr_window);
     }
 
-    tuple<int, int> Window::getExtent() const
+    std::tuple<int, int> Window::getExtent() const
     {
         int width   = 0;
         int height  = 0;
 
         SDL_GetWindowSize(_ptr_window, &width, &height);
 
-        return make_tuple(width, height);
+        return std::make_tuple(width, height);
     }
 
-    tuple<int, int> Window::getDrawableExtent() const
+    std::tuple<int, int> Window::getDrawableExtent() const
     {
         int width   = 0;
         int height  = 0;
@@ -73,45 +71,45 @@ namespace pbrlib
         SDL_GetWindowSizeInPixels(_ptr_window, &width, &height);        
         
 
-        return make_tuple(width, height);
+        return std::make_tuple(width, height);
     }
 
-    string& Window::getTitle()
+    std::string& Window::getTitle()
     {
         return _title;
     }
 
-    const string& Window::getTitle() const
+    const std::string& Window::getTitle() const
     {
         return _title;
     }
 
-    PtrSwapchain& Window::getSwapchain() noexcept
+    std::shared_ptr<Swapchain> Window::getSwapchain() noexcept
     {
         return _ptr_swapchain;
     }
 
-    const PtrSwapchain& Window::getSwapchain() const noexcept
+    std::shared_ptr<const Swapchain> Window::getSwapchain() const noexcept
     {
         return _ptr_swapchain;
     }
 
-    void Window::setTitle(const string_view title) 
+    void Window::setTitle(const std::string_view title) 
     {
         _title = title;
         SDL_SetWindowTitle(_ptr_window, _title.data());
     }
 
     void Window::_initVulkanResources(
-        const PtrInstance&          ptr_instance, 
-        const PtrPhysicalDevice&    ptr_physical_device,
-        const PtrDevice&            ptr_device,
-        uint32_t                    queue_family_index
+        const Instance*         ptr_instance, 
+        const PhysicalDevice*   ptr_physical_device,
+        const Device*           ptr_device,
+        uint32_t                queue_family_index
     )
     {
         if (!_ptr_swapchain) {
-            PtrSurface                  ptr_surface                 = Surface::make(*this, ptr_instance, ptr_physical_device);
-            vector<VkSurfaceFormatKHR>  surface_supported_formats   = Surface::getAllSurfaceFormats(*ptr_surface, ptr_physical_device);
+            std::shared_ptr                 ptr_surface                 = Surface::make(*this, ptr_instance, ptr_physical_device);
+            std::vector<VkSurfaceFormatKHR> surface_supported_formats   = Surface::getAllSurfaceFormats(*ptr_surface, ptr_physical_device);
             
             VkSurfaceFormatKHR current_surface_format;
 
@@ -141,12 +139,12 @@ namespace pbrlib
         return _ptr_swapchain != nullptr;
     }
 
-    PtrSurface& Window::_getVulkanSurface() noexcept
+    std::shared_ptr<const Surface> Window::_getVulkanSurface() noexcept
     {
         return _ptr_swapchain->getSurface();
     }
 
-    PtrSwapchain& Window::_getVulkanSwapchain() noexcept
+    std::shared_ptr<Swapchain> Window::_getVulkanSwapchain() noexcept
     {
         return _ptr_swapchain;
     }
@@ -163,7 +161,7 @@ namespace pbrlib
         SDL_CaptureMouse(es);
     }
 
-    void Window::getVulkanInstanceExtensions(const Window& window, vector<const char*>& out_extensions)
+    void Window::getVulkanInstanceExtensions(const Window& window, std::vector<const char*>& out_extensions)
     {
         uint32_t    num_extensions_names    = 0;
         auto        ptr_extensions_names    = SDL_Vulkan_GetInstanceExtensions(&num_extensions_names);
@@ -175,16 +173,16 @@ namespace pbrlib
             out_extensions[offset + i] = ptr_extensions_names[i];
     }
 
-    PtrWindow Window::make(
-        const string_view   title, 
-        int                 width, 
-        int                 height, 
-        int                 pos_x, 
-        int                 pos_y, 
-        Window::Resizable   resizable
+    std::unique_ptr<Window> Window::make(
+        const std::string_view  title, 
+        int                     width, 
+        int                     height, 
+        int                     pos_x, 
+        int                     pos_y, 
+        Window::Resizable       resizable
     )
     {
-        return make_shared<Window>(title, width, height, pos_x, pos_y, resizable);
+        return make_unique<Window>(title, width, height, pos_x, pos_y, resizable);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +195,7 @@ namespace pbrlib
         _resizable  (Resizable::STATIC)
     {}
 
-    void Window::Builder::setTitle(const string_view title)
+    void Window::Builder::setTitle(const std::string_view title)
     {
         _title = title;
     }
@@ -244,7 +242,7 @@ namespace pbrlib
         return Window(_title, _width, _height, _pos_x, _pos_y, _resizable);
     }
 
-    PtrWindow Window::Builder::buildPtr() const
+    std::unique_ptr<Window> Window::Builder::buildPtr() const
     {
         return Window::make(_title, _width, _height, _pos_x, _pos_y, _resizable);
     }

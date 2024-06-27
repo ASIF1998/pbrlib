@@ -20,10 +20,6 @@
 
 namespace pbrlib
 {
-    struct PhysicalDevice;
-
-    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
-
     struct PhysicalDevice
     {
     public:
@@ -59,13 +55,13 @@ namespace pbrlib
          * @param queue_info информация о создаваемых очередях логического устройства.
          * @return Логическое устройство.
         */
-        PtrDevice makeDevice(const PtrInstance& ptr_instance, std::span<const VkDeviceQueueCreateInfo> queue_info) const;
+        std::unique_ptr<Device> makeDevice(const Instance* ptr_instance, std::span<const VkDeviceQueueCreateInfo> queue_info) const;
         
-        PtrDevice makeDevice(
-            const PtrInstance&                      ptr_instance,
-            std::span<const VkDeviceQueueCreateInfo>     queue_info,
-            std::span<const char*>                       layer_names,
-            std::span<const char*>                       extension_names
+        std::unique_ptr<Device> makeDevice(
+            const Instance*                             ptr_instance,
+            std::span<const VkDeviceQueueCreateInfo>    queue_info,
+            std::span<const char*>                      layer_names,
+            std::span<const char*>                      extension_names
         ) const;
 
         /**

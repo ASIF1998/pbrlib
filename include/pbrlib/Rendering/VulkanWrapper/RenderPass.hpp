@@ -13,10 +13,6 @@
 
 namespace pbrlib
 {
-    class RenderPass;
-
-    using PtrRenderPass = std::shared_ptr<RenderPass>;
-
     /**
      * @class SubpassDescription.
      * @brief Данный класс необходим для описания подпрохода.
@@ -63,9 +59,9 @@ namespace pbrlib
         bool useDepthStencilAttachment() const noexcept;
 
     private:
-        std::vector<VkAttachmentReference>   _input_attachment;
-        std::vector<VkAttachmentReference>   _color_attachment;
-        std::vector<uint32_t>                _present_attachment;
+        std::vector<VkAttachmentReference>  _input_attachment;
+        std::vector<VkAttachmentReference>  _color_attachment;
+        std::vector<uint32_t>               _present_attachment;
         VkAttachmentReference               _depth_stencil_attachment;
         bool                                _use_depth_stencil_attachment;
     };
@@ -219,13 +215,13 @@ namespace pbrlib
                 size_t num_subpass_dependencies
             );
             
-            void setDevice(const PtrDevice& ptr_device);
+            void setDevice(const Device* ptr_device);
 
-            RenderPass      build()     const;
-            PtrRenderPass   buildPtr()  const;
+            RenderPass                  build()     const;
+            std::unique_ptr<RenderPass> buildPtr()  const;
 
         private:
-            PtrDevice _ptr_device;
+            const Device* _ptr_device;
         };
 
     public:
@@ -235,7 +231,7 @@ namespace pbrlib
          * @param ptr_device        указатель на устройство.
          * @param render_pass_info  информация о проходе рендера.
         */
-        RenderPass(const PtrDevice& ptr_device, const RenderPassInfo& render_pass_info);
+        RenderPass(const Device* ptr_device, const RenderPassInfo& render_pass_info);
 
         /**
          * @brief Конструктор.
@@ -243,7 +239,7 @@ namespace pbrlib
          * @param ptr_device        указатель на устройство.
          * @param render_pass_info  информация о проходе рендера.
         */
-        RenderPass(const PtrDevice& ptr_device, RenderPassInfo&& render_pass_info);
+        RenderPass(const Device* ptr_device, RenderPassInfo&& render_pass_info);
 
         RenderPass(RenderPass&& render_pass);
         RenderPass(const RenderPass&) = delete;
@@ -255,8 +251,7 @@ namespace pbrlib
 
         const RenderPassInfo&   getRenderPassInfo()     const noexcept;
         const VkRenderPass&     getRenderPassHandle()   const noexcept;
-        PtrDevice&              getDevice()             noexcept;
-        const PtrDevice&        getDevice()             const noexcept;
+        const Device*           getDevice()             const noexcept;
 
         /**
          * @brief Статический метод создающий объект типа PtrRenderPass.
@@ -264,8 +259,8 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        static PtrRenderPass make(
-            const PtrDevice&        ptr_device, 
+        static std::unique_ptr<RenderPass> make(
+            const Device*           ptr_device, 
             const RenderPassInfo&   render_pass_info
         );
 
@@ -275,8 +270,8 @@ namespace pbrlib
          * @param ptr_device указатель на устройство.
          * @param render_pass_info информация о проходе рендера.
         */
-        static PtrRenderPass make(
-            const PtrDevice&    ptr_device, 
+        static std::unique_ptr<RenderPass> make(
+            const Device*       ptr_device, 
             RenderPassInfo&&    render_pass_info
         );
 
@@ -286,7 +281,7 @@ namespace pbrlib
     private:
         RenderPassInfo  _render_pass_info;
         VkRenderPass    _render_pass_handle;
-        PtrDevice       _ptr_device;
+        const Device*   _ptr_device;
     };
 }
 

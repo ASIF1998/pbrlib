@@ -21,8 +21,8 @@ namespace pbrlib
         SDL_Quit();
     }
 
-    inline PtrPBRLibResources PBRLibResources::init()
+    inline std::unique_ptr<PBRLibResources> PBRLibResources::init()
     {
-        return std::shared_ptr<PBRLibResources>(new PBRLibResources);
+        return std::unique_ptr<PBRLibResources>(new PBRLibResources);
     }
 }

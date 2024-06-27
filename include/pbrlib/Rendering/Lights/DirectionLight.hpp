@@ -17,10 +17,6 @@
 
 namespace pbrlib
 {
-    class DirectionLight;
-
-    using PtrDirectionLight = std::shared_ptr<DirectionLight>;
-
     class DirectionLight :
         public Component<DirectionLight>
     {
@@ -35,8 +31,8 @@ namespace pbrlib
             void setDirectionToLight(const math::Vec3<float>& direction);
             void setName(const std::string_view name);
 
-            DirectionLight      build()     const;
-            PtrDirectionLight   buildPtr()  const;
+            DirectionLight                  build()     const;
+            std::unique_ptr<DirectionLight> buildPtr()  const;
 
         private:
             math::Vec3<float>   _dir_to_light;

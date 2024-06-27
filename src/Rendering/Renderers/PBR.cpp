@@ -26,7 +26,7 @@ namespace pbrlib
         StorageImage            = 1
     };
 
-    PtrDescriptorPool descriptorPoolCreate(const PtrDevice& ptr_device)
+    std::shared_ptr<DescriptorPool> descriptorPoolCreate(const Device* ptr_device)
     {
         std::vector<VkDescriptorPoolSize> descriptor_pool_size;
         
@@ -50,7 +50,7 @@ namespace pbrlib
         return DescriptorPool::make(ptr_device, descriptor_pool_size, max_allocate_sets_count);
     }
 
-    PtrSampler createSampler(const PtrDevice& ptr_device)
+    std::unique_ptr<Sampler> createSampler(const Device* ptr_device)
     {
         Sampler::Builder build_sampler;
 
@@ -75,9 +75,9 @@ namespace pbrlib
     {}
 
     void PBR::init(
-        const PtrWindow&            ptr_window,
-        const PtrDevice&            ptr_device,
-        const PtrPhysicalDevice&    ptr_physical_device
+        std::shared_ptr<const Window>   ptr_window,
+        const Device*                   ptr_device,
+        const PhysicalDevice*           ptr_physical_device
     )
     {
         _ptr_device = ptr_device;
@@ -106,7 +106,8 @@ namespace pbrlib
         _ptr_swapchain          = ptr_window->getSwapchain();
         _ptr_device_queue       = DeviceQueue::make(_ptr_device, gpu_queue_family_index, 0);
         _ptr_descriptor_pool    = descriptorPoolCreate(_ptr_device);
-        _ptr_command_buffer     = PrimaryCommandBuffer::make(CommandPool::make(_ptr_device, gpu_queue_family_index));
+        _ptr_command_pool       = CommandPool::make(_ptr_device, gpu_queue_family_index);
+        _ptr_command_buffer     = PrimaryCommandBuffer::make(_ptr_command_pool.get());
         _ptr_sampler_linear     = build_sampler.buildPtr();
 
         build_sampler.setMagFilter(VK_FILTER_NEAREST);
@@ -139,12 +140,12 @@ namespace pbrlib
     }
 
     void PBR::draw(
-        const PtrSceneItem&             ptr_camera,
-        const VisibleList&              visible_list,
-        std::span<const PtrSceneItem>   point_lights,
-        std::span<const PtrSceneItem>   spot_lights,
-        std::span<const PtrSceneItem>   direction_lights,
-        float                           delta_time
+        std::shared_ptr<const SceneItem>            ptr_camera,
+        const VisibleList&                          visible_list, 
+        std::span<std::shared_ptr<SceneItem>>       point_lights,
+        std::span<std::shared_ptr<SceneItem>>       spot_lights,
+        std::span<std::shared_ptr<SceneItem>>       direction_lights,
+        float                                       delta_time
     )
     {
         if (!ptr_camera->hasComponent<CameraBase>())
@@ -229,28 +230,18 @@ namespace pbrlib
         _ptr_device_queue->waitIdle();
     }
 
-    PtrGBufferPass& PBR::getGBUfferPass() noexcept
+    const GBufferPass* PBR::getGBUfferPass() const noexcept
     {
-        return _ptr_gbuffer_pass;
+        return _ptr_gbuffer_pass.get();
     }
 
-    const PtrGBufferPass& PBR::getGBUfferPass() const noexcept
+    const PBRPass* PBR::getPBRPass() const noexcept
     {
-        return _ptr_gbuffer_pass;
+        return _ptr_pbr_pass.get();
     }
 
-    PtrPBRPass& PBR::getPBRPass() noexcept
+    std::unique_ptr<PBR> PBR::make(const PBRPass::Optionals& optionals)
     {
-        return _ptr_pbr_pass;
-    }
-
-    const PtrPBRPass& PBR::getPBRPass() const noexcept
-    {
-        return _ptr_pbr_pass;
-    }
-
-    PtrPBR PBR::make(const PBRPass::Optionals& optionals)
-    {
-        return std::make_shared<PBR>(optionals);
+        return std::make_unique<PBR>(optionals);
     }
 }

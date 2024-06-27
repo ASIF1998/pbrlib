@@ -9,38 +9,21 @@
 #ifndef GBufferPass_hpp
 #define GBufferPass_hpp
 
-#include <memory>
-
-#include "../../../SceneGraph/Scene.hpp"
+#include <pbrlib/SceneGraph/Scene.hpp>
 
 #include "Pass.hpp"
 
+#include <memory> 
+
 namespace pbrlib
 {
-    class   GraphicsPipeline;
-    class   Buffer;
-    class   DescriptorPool;
-    class   DescriptorSet;
-    class   Device;
-    class   RenderPass;
-    class   CommandBuffer;
-    class   Sampler;
-    class   GBufferPass;
-    class   Framebuffer;
-    struct  PhysicalDevice;
+    class DescriptorPool;
 
-    using PtrGraphicsPipeline   = std::shared_ptr<GraphicsPipeline>;
-    using PtrBuffer             = std::shared_ptr<Buffer>;
-    using PtrDescriptorPool     = std::shared_ptr<DescriptorPool>;
-    using PtrDescriptorSet      = std::shared_ptr<DescriptorSet>;
-    using PtrDevice             = std::shared_ptr<Device>;
-    using PtrRenderPass         = std::shared_ptr<RenderPass>;
-    using PtrCommandBuffer      = std::shared_ptr<CommandBuffer>;
-    using PtrSampler            = std::shared_ptr<Sampler>;
-    using PtrGBufferPass        = std::unique_ptr<GBufferPass>;
-    using PtrAttachments        = std::shared_ptr<std::vector<ImageView>>;
-    using PtrFramebuffer        = std::shared_ptr<Framebuffer>;
-    using PtrPhysicalDevice     = std::shared_ptr<PhysicalDevice>;
+    using PtrAttachments = std::shared_ptr<std::vector<ImageView>>;
+}
+
+namespace pbrlib
+{
 
     /**
      * @class GBufferPass.
@@ -83,24 +66,24 @@ namespace pbrlib
             Builder& operator = (Builder&&)         = delete;
             Builder& operator = (const Builder&)    = delete;
 
-            void setDevice(const PtrDevice& ptr_device);
-            void setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device);
-            void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
+            void setDevice(const Device* ptr_device);
+            void setPhysicalDevice(const PhysicalDevice* ptr_physical_device);
+            void setDescriptorPool(std::shared_ptr<const DescriptorPool> ptr_descriptor_pool);
             void setDeviceMemoryIndex(uint32_t memory_index);
-            void setQueue(const PtrDeviceQueue& ptr_queue);
+            void setQueue(std::shared_ptr<DeviceQueue> ptr_queue);
             void windowSize(uint32_t width, uint32_t height);
 
-            GBufferPass     build();
-            PtrGBufferPass  buildPtr();
+            GBufferPass                     build();
+            std::unique_ptr<GBufferPass>    buildPtr();
 
         private:
-            PtrDevice           _ptr_device;
-            PtrDescriptorPool   _ptr_descriptor_pool;
-            PtrPhysicalDevice   _ptr_physical_device;
-            uint32_t            _window_width;
-            uint32_t            _window_height;
-            uint32_t            _gpu_memory_index;
-            PtrDeviceQueue      _ptr_device_queue;
+            const Device*                           _ptr_device;
+            std::shared_ptr<const DescriptorPool>   _ptr_descriptor_pool;
+            const PhysicalDevice*                   _ptr_physical_device;
+            uint32_t                                _window_width;
+            uint32_t                                _window_height;
+            uint32_t                                _gpu_memory_index;
+            std::shared_ptr<DeviceQueue>            _ptr_device_queue;
         };
         
     public:
@@ -116,13 +99,13 @@ namespace pbrlib
          * @param window_height             высота окна.
         */
         GBufferPass(
-            const PtrDevice&            ptr_device, 
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrPhysicalDevice&    ptr_physical_device,
-            const PtrDescriptorPool&    ptr_descriptor_pool,  
-            uint32_t                    gpu_memory_index,
-            uint32_t                    window_width,
-            uint32_t                    window_height
+            const Device*                           ptr_device, 
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            const PhysicalDevice*                   ptr_physical_device,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,  
+            uint32_t                                gpu_memory_index,
+            uint32_t                                window_width,
+            uint32_t                                window_height
         );
 
         /**
@@ -138,18 +121,16 @@ namespace pbrlib
          * @param ptr_sampler           указатель на сэмплер.
         */
         void draw(
-            const Transform&                projection,
-            const Transform&                view,
-            const VisibleList&              drawable_objects, 
-            const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-            const PtrSampler&               ptr_sampler
+            const Transform&                            projection,
+            const Transform&                            view,
+            const VisibleList&                          drawable_objects, 
+            std::shared_ptr<const PrimaryCommandBuffer> ptr_command_buffer,
+            std::shared_ptr<const Sampler>              ptr_sampler
         );
 
-        PtrGraphicsPipeline&        getPipeline()       noexcept;
-        const PtrGraphicsPipeline&  getPipeline()       const noexcept;
-        PtrDescriptorSet&           getDescriptorSet()  noexcept;
-        const PtrDescriptorSet&     getDescriptorSet()  const noexcept;
-        const PtrFramebuffer&       getFramebuffer()    const noexcept;
+        std::shared_ptr<const GraphicsPipeline> getPipeline()       const noexcept;
+        std::shared_ptr<const DescriptorSet>    getDescriptorSet()  const noexcept;
+        std::shared_ptr<const Framebuffer>      getFramebuffer()    const noexcept;
 
         /**
          * @brief Метод, позволяющий создавать указатель на объект типа GBufferPass.
@@ -163,31 +144,31 @@ namespace pbrlib
          * @param window_height             высота окна.
          * @return Указатель на GBufferPass.
         */
-        static PtrGBufferPass make(
-            const PtrDevice&            ptr_device, 
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrPhysicalDevice&    ptr_physical_device,
-            const PtrDescriptorPool&    ptr_descriptor_pool,  
-            uint32_t                    gpu_memory_index,
-            uint32_t                    window_width,
-            uint32_t                    window_height
+        static std::unique_ptr<GBufferPass> make(
+            const Device*                           ptr_device, 
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            const PhysicalDevice*                   ptr_physical_device,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,  
+            uint32_t                                gpu_memory_index,
+            uint32_t                                window_width,
+            uint32_t                                window_height
         );
 
     private:
         friend class IPassOutput<GBufferPass>;
 
         const ImageView&    outputImpl(size_t id) const;
-        void                outputImpl(PtrImageView& ptr_image_view, size_t id);
+        void                outputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id);
 
     private:
-        PtrGraphicsPipeline     _ptr_pipeline;
-        PtrDeviceQueue          _ptr_device_queue;
-        PtrDescriptorSet        _ptr_descriptor_set;
-        PtrBuffer               _ptr_uniform_matrices_data_buffer;
-        PtrBuffer               _ptr_uniform_material_data_buffer;
-        PtrRenderPass           _ptr_render_pass;
-        PtrAttachments          _ptr_framebuffer_attachments;
-        PtrFramebuffer          _ptr_framebuffer;
+        std::shared_ptr<const GraphicsPipeline> _ptr_pipeline;
+        std::shared_ptr<DeviceQueue>            _ptr_device_queue;
+        std::shared_ptr<const DescriptorSet>    _ptr_descriptor_set;
+        std::shared_ptr<Buffer>                 _ptr_uniform_matrices_data_buffer;
+        std::shared_ptr<const RenderPass>       _ptr_render_pass;
+        PtrAttachments                          _ptr_framebuffer_attachments;
+        std::shared_ptr<Buffer>                 _ptr_uniform_material_data_buffer;
+        std::shared_ptr<const Framebuffer>      _ptr_framebuffer;
     };
 }
 

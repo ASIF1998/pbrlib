@@ -8,42 +8,36 @@
 
 #include <pbrlib/SceneGraph/MeshNode.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
 {
-    MeshNode::MeshNode(const string_view name) :
+    MeshNode::MeshNode(const std::string_view name) :
         SceneItem (name),
         _ptr_mesh (nullptr)
     {}
 
-    MeshNode::MeshNode(const string_view name, const PtrMesh& ptr_mesh) :
+    MeshNode::MeshNode(const std::string_view name, const std::shared_ptr<Mesh> ptr_mesh) :
         SceneItem (name),
         _ptr_mesh (ptr_mesh)
     {
         addComponent(ptr_mesh);
     }
 
-    MeshNode::MeshNode(const PtrMesh& ptr_mesh) :
+    MeshNode::MeshNode(std::shared_ptr<Mesh> ptr_mesh) :
         SceneItem (ptr_mesh->getName()),
         _ptr_mesh (ptr_mesh)
     {
         addComponent(ptr_mesh);
     }
 
-    void MeshNode::setMesh(const PtrMesh& ptr_mesh)
+    void MeshNode::setMesh(std::shared_ptr<Mesh> ptr_mesh)
     {
         _ptr_mesh = ptr_mesh;
         addComponent(ptr_mesh);
     }
 
-    PtrMesh& MeshNode::getMesh() noexcept
-    {
-        return _ptr_mesh;
-    }
-
-    const PtrMesh& MeshNode::getMesh() const noexcept
+    std::shared_ptr<const Mesh> MeshNode::getMesh() const noexcept
     {
         return _ptr_mesh;
     }
@@ -74,18 +68,18 @@ namespace pbrlib
         }
     }
 
-    PtrMeshNode MeshNode::make(const string_view name)
+    std::unique_ptr<MeshNode> MeshNode::make(const std::string_view name)
     {
-        return make_shared<MeshNode>(name);
+        return make_unique<MeshNode>(name);
     }
 
-    PtrMeshNode MeshNode::make(const string_view name, const PtrMesh& ptr_mesh)
+    std::unique_ptr<MeshNode> MeshNode::make(const std::string_view name, std::shared_ptr<Mesh> ptr_mesh)
     {
-        return make_shared<MeshNode>(name, ptr_mesh);
+        return make_unique<MeshNode>(name, ptr_mesh);
     }
 
-    PtrMeshNode MeshNode::make(const PtrMesh& ptr_mesh)
+    std::unique_ptr<MeshNode> MeshNode::make(std::shared_ptr<Mesh> ptr_mesh)
     {
-        return make_shared<MeshNode>(ptr_mesh);
+        return make_unique<MeshNode>(ptr_mesh);
     }
 }

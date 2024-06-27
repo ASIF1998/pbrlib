@@ -16,11 +16,11 @@
 
 namespace pbrlib
 {
-    class Device;
     class CommandBuffer;
-    class DeviceQueue;
+}
 
-    using PtrDeviceQueue = std::shared_ptr<DeviceQueue>;
+namespace pbrlib
+{
     
     class DeviceQueue
     {
@@ -32,7 +32,7 @@ namespace pbrlib
          * @param family_index  индекс семейства очередей.
          * @param index         индекс очереди в семействе очередей.
         */
-        DeviceQueue(const PtrDevice& ptr_device, uint32_t family_index, uint32_t index);
+        DeviceQueue(const Device* ptr_device, uint32_t family_index, uint32_t index);
 
         DeviceQueue(DeviceQueue&& device_queue);
         DeviceQueue(const DeviceQueue&) = delete;
@@ -42,13 +42,12 @@ namespace pbrlib
         DeviceQueue& operator = (DeviceQueue&&)         = delete;
         DeviceQueue& operator = (const DeviceQueue&)    = delete;
 
-        void submit(const CommandBuffer& command_buffer);
+        void submit(const CommandBuffer& command_buffer) const;
 
-        PtrDevice&           getDevice()         noexcept;
-        const PtrDevice&     getDevice()         const noexcept; 
-        const VkQueue&       getQueueHandle()    const noexcept;
-        uint32_t             getFamilyIndex()    const noexcept;
-        uint32_t             getIndex()          const noexcept;
+        const Device*   getDevice()         const noexcept; 
+        const VkQueue&  getQueueHandle()    const noexcept;
+        uint32_t        getFamilyIndex()    const noexcept;
+        uint32_t        getIndex()          const noexcept;
 
         /**
          * @brief Метод позволяющий показать пользователю изображение.
@@ -57,8 +56,8 @@ namespace pbrlib
          * @param image_index   индекс изображения в списке показа.
         */
         void setPresent(
-            const PtrSwapchain& ptr_swapchain,
-            uint32_t            image_index
+            std::shared_ptr<const Swapchain>    ptr_swapchain,
+            uint32_t                            image_index
         );
 
         /**
@@ -90,10 +89,11 @@ namespace pbrlib
          * @param family_index  индекс семейства очередей.
          * @param index         индекс очереди в семействе очередей.
         */
-        static PtrDeviceQueue make(const PtrDevice& ptr_device, uint32_t family_index, uint32_t index);
+        static std::unique_ptr<DeviceQueue> make(const Device* ptr_device, uint32_t family_index, uint32_t index);
 
     private:
-        PtrDevice   _ptr_device;
+        const Device* _ptr_device;
+        
         VkQueue     _queue_handle;
         uint32_t    _family_index;
         uint32_t    _index;

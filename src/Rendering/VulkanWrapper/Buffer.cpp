@@ -13,7 +13,7 @@
 namespace pbrlib
 {
     Buffer::Buffer(
-        const PtrDevice&    ptr_device, 
+        const Device*       ptr_device, 
         VkDeviceSize        size, 
         VkBufferUsageFlags  usage, 
         uint32_t            memory_type_index, 
@@ -59,11 +59,11 @@ namespace pbrlib
     }
 
     Buffer::Buffer(
-        const PtrDevice&        ptr_device, 
-        VkDeviceSize            size, 
-        VkBufferUsageFlags      usage, 
-        uint32_t                memory_type_index, 
-        std::span<const uint32_t>    queue_family_indices
+        const Device*               ptr_device, 
+        VkDeviceSize                size, 
+        VkBufferUsageFlags          usage, 
+        uint32_t                    memory_type_index, 
+        std::span<const uint32_t>   queue_family_indices
     ) :
         _buffer_handle          (VK_NULL_HANDLE),
         _usage                  (usage),
@@ -126,24 +126,21 @@ namespace pbrlib
         return _buffer_handle;
     }
 
-    PtrDevice& Buffer::getDevice() noexcept
+    const Device* Buffer::getDevice() const noexcept
     {
         return _ptr_device;
     }
 
-    const PtrDevice& Buffer::getDevice() const noexcept
+    DeviceMemory* Buffer::getDeviceMemory() noexcept
     {
-        return _ptr_device;
+        assert(_ptr_device_memory != nullptr);
+        return _ptr_device_memory.get();
     }
-
-    PtrDeviceMemory& Buffer::getDeviceMemory() noexcept
+    
+    const DeviceMemory* Buffer::getDeviceMemory() const noexcept
     {
-        return _ptr_device_memory;
-    }
-
-    const PtrDeviceMemory& Buffer::getDeviceMemory() const noexcept
-    {
-        return _ptr_device_memory;
+        assert(_ptr_device_memory != nullptr);
+        return _ptr_device_memory.get();
     }
 
     VkDeviceSize Buffer::getSize() const noexcept

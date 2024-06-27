@@ -18,8 +18,8 @@
 namespace pbrlib
 {
     ComputePipeline::ComputePipeline(
-        const ShaderModule&         shader_module,
-        const PtrPipelineLayout&    ptr_pipeline_layout
+        const ShaderModule&                     shader_module,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout
     ) :
         _pipeline_handle        (VK_NULL_HANDLE),
         _ptr_pipeline_layout    (ptr_pipeline_layout)
@@ -48,8 +48,8 @@ namespace pbrlib
     }
 
     ComputePipeline::ComputePipeline(
-        const PtrShaderModule&      ptr_shader_module,
-        const PtrPipelineLayout&    ptr_pipeline_layout
+        std::shared_ptr<const ShaderModule>     ptr_shader_module,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout
     )
     {
         if (!ptr_shader_module) {
@@ -78,21 +78,16 @@ namespace pbrlib
         return _pipeline_handle;
     }
 
-    PtrPipelineLayout& ComputePipeline::getPipelineLayout() noexcept
+    std::shared_ptr<const PipelineLayout> ComputePipeline::getPipelineLayout() const noexcept
     {
         return _ptr_pipeline_layout;
     }
 
-    const PtrPipelineLayout& ComputePipeline::getPipelineLayout() const noexcept
-    {
-        return _ptr_pipeline_layout;
-    }
-
-    PtrComputePipeline ComputePipeline::make(
-        const ShaderModule&         shader_module,
-        const PtrPipelineLayout&    ptr_pipeline_layout
+    std::unique_ptr<ComputePipeline> ComputePipeline::make(
+        const ShaderModule&                     shader_module,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout
     )
     {
-        return make_shared<ComputePipeline>(shader_module, ptr_pipeline_layout);
+        return make_unique<ComputePipeline>(shader_module, ptr_pipeline_layout);
     }
 }

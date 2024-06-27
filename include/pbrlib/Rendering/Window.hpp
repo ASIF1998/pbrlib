@@ -21,19 +21,11 @@
 
 namespace pbrlib
 {
-    class   Surface;
     class   Swapchain;
     class   Instance;
     struct  PhysicalDevice;
     class 	Device;
     class 	Window;
-
-    using PtrSurface        = std::shared_ptr<Surface>;
-    using PtrSwapchain      = std::shared_ptr<Swapchain>;
-    using PtrInstance       = std::shared_ptr<Instance>;
-    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
-    using PtrDevice         = std::shared_ptr<Device>;
-    using PtrWindow         = std::shared_ptr<Window>;
 
     /**
      * @class Window.
@@ -91,8 +83,8 @@ namespace pbrlib
             */
             void setResizableWindow(Resizable resizable) noexcept;
 
-            Window      build()     const;
-            PtrWindow   buildPtr()  const;
+            Window                  build()     const;
+            std::unique_ptr<Window> buildPtr()  const;
 
         private:
             std::string _title;
@@ -137,8 +129,8 @@ namespace pbrlib
         std::string&        getTitle();
         const std::string&  getTitle() const;
 
-        PtrSwapchain&       getSwapchain() noexcept;
-        const PtrSwapchain& getSwapchain() const noexcept;
+        std::shared_ptr<Swapchain>          getSwapchain() noexcept;
+        std::shared_ptr<const Swapchain>    getSwapchain() const noexcept;
 
         void setTitle(const std::string_view title);
 
@@ -158,7 +150,7 @@ namespace pbrlib
          * @param resizable параметр указывающий возможность изменения размера окна.
          * @return Указатель на окно.
         */
-        static PtrWindow make(
+        static std::unique_ptr<Window> make(
             const std::string_view  title, 
             int                     width, 
             int                     height, 
@@ -172,21 +164,21 @@ namespace pbrlib
 
     private:
         void _initVulkanResources(
-            const PtrInstance&          ptr_instance, 
-            const PtrPhysicalDevice&    ptr_physical_device,
-            const PtrDevice&            ptr_device,
-            uint32_t                    queue_family_index
+            const Instance*         ptr_instance, 
+            const PhysicalDevice*   ptr_physical_device,
+            const Device*           ptr_device,
+            uint32_t                queue_family_index
         );
         
         bool _hasVulkanResources() const noexcept;
 
-        PtrSurface&     _getVulkanSurface()     noexcept;
-        PtrSwapchain&   _getVulkanSwapchain()   noexcept;
+        std::shared_ptr<const Surface>  _getVulkanSurface()     noexcept;
+        std::shared_ptr<Swapchain>      _getVulkanSwapchain()   noexcept;
 
     private:
-        SDL_Window*     _ptr_window;
-        PtrSwapchain    _ptr_swapchain;
-        std::string     _title;
+        SDL_Window*                 _ptr_window;
+        std::shared_ptr<Swapchain>  _ptr_swapchain;
+        std::string                 _title;
     };
 }
 

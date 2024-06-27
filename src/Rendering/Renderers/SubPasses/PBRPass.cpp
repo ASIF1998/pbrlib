@@ -35,7 +35,6 @@
 
 #include <algorithm>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -68,12 +67,12 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PBRPass::PBRPass(
-        const PtrDevice&            ptr_device, 
-        const PtrPhysicalDevice&    ptr_physical_device,
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrDescriptorPool&    ptr_descriptor_pool,
-        const PtrSampler&           ptr_sampler,
-        const Optionals&            optionals
+        const Device*                           ptr_device, 
+        const PhysicalDevice*                   ptr_physical_device,
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+        std::shared_ptr<const Sampler>          ptr_sampler,
+        const Optionals&                        optionals
     ) :
         _ptr_device_queue (ptr_queue)
     {
@@ -147,7 +146,7 @@ namespace pbrlib
         spec_info.addMapEntry(&optionals._fresnel_approx, sizeof(optionals._fresnel_approx), utils::enumCast(ConstantID::FresnelApproximationFunctionID));
         spec_info.addMapEntry(&optionals._other_options.mask, sizeof(optionals._other_options.mask), utils::enumCast(ConstantID::PBR_OtherOptions));
 
-        _ptr_pipeline       = ComputePipeline::make(compute_shader, PipelineLayout::make(ptr_device, DescriptorSetLayout::make(move(bindings))));
+        _ptr_pipeline       = ComputePipeline::make(compute_shader, PipelineLayout::make(ptr_device, DescriptorSetLayout::make(std::move(bindings))));
         _ptr_descriptor_set = DescriptorSet::make(ptr_descriptor_pool, _ptr_pipeline->getPipelineLayout()->getDescriptorSetLayouts()[0]);
 
         _ptr_uniform_point_lights_data_buffer       = build_point_lights_data_buffer.buildPtr();
@@ -189,16 +188,16 @@ namespace pbrlib
     }
 
     PBRPass::PBRPass(
-        const PtrDevice&            ptr_device, 
-        const PtrPhysicalDevice&    ptr_physical_device,
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrDescriptorPool&    ptr_descriptor_pool,
-        const ImageView&            position_and_metallic_image_view,
-        const ImageView&            normal_and_roughness_image_view,
-        const ImageView&            albedo_and_baked_AO_image_view,
-        const ImageView&            anisotropy_image_view,
-        const PtrSampler&           ptr_sampler,
-        const Optionals&            optionals
+        const Device*                           ptr_device, 
+        const PhysicalDevice*                   ptr_physical_device,
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+        const ImageView&                        position_and_metallic_image_view,
+        const ImageView&                        normal_and_roughness_image_view,
+        const ImageView&                        albedo_and_baked_AO_image_view,
+        const ImageView&                        anisotropy_image_view,
+        std::shared_ptr<const Sampler>          ptr_sampler,
+        const Optionals&                        optionals
     ) :
         PBRPass(ptr_device, ptr_physical_device, ptr_queue, ptr_descriptor_pool, ptr_sampler, optionals)
     {
@@ -219,11 +218,11 @@ namespace pbrlib
     }
 
     void PBRPass::draw(
-        const PtrSceneItem&             ptr_camera,
-        const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-        span<const PtrSceneItem>        point_lights,
-        span<const PtrSceneItem>        spot_lights,
-        span<const PtrSceneItem>        direction_lights
+        std::shared_ptr<const SceneItem>            ptr_camera,
+        std::shared_ptr<const PrimaryCommandBuffer> ptr_command_buffer,
+        std::span<std::shared_ptr<SceneItem>>       point_lights,
+        std::span<std::shared_ptr<SceneItem>>       spot_lights,
+        std::span<std::shared_ptr<SceneItem>>       direction_lights
     )
     {
         const CameraBase& camera = ptr_camera->getComponent<CameraBase>();
@@ -235,9 +234,9 @@ namespace pbrlib
         num_lights.spot     = static_cast<uint32_t>(std::min<size_t>(MAX_SPOT_LIGHT, spot_lights.size()));
         num_lights.direct   = static_cast<uint32_t>(std::min<size_t>(MAX_DIRECTION_LIGHT, direction_lights.size()));
 
-        vector<PointLightData>      point_lights_data       (num_lights.point);
-        vector<SpotLightData>       spot_lights_data        (num_lights.spot);
-        vector<DirectionLightData>  direction_lights_data   (num_lights.direct);
+        std::vector<PointLightData>      point_lights_data       (num_lights.point);
+        std::vector<SpotLightData>       spot_lights_data        (num_lights.spot);
+        std::vector<DirectionLightData>  direction_lights_data   (num_lights.direct);
 
         CameraData camera_data = { };
         camera_data.position = (ptr_camera->getWorldTransform() * ptr_camera->getLocalTransform())(ptr_camera->getComponent<CameraBase>().getPosition());

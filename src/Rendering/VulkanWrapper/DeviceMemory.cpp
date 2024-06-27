@@ -12,14 +12,14 @@
 
 namespace pbrlib
 {
-    DeviceMemory::DeviceMemory(const PtrDevice& ptr_device) noexcept :
+    DeviceMemory::DeviceMemory(const Device* ptr_device) noexcept :
         _ptr_device             (ptr_device),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (0),
         _ptr_mapped_data        (nullptr)
     {}
 
-    DeviceMemory::DeviceMemory(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index) :
+    DeviceMemory::DeviceMemory(const Device* ptr_device, VkDeviceSize size, uint32_t memory_type_index) :
         _ptr_device             (ptr_device),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (size),
@@ -41,7 +41,7 @@ namespace pbrlib
     }
 
     DeviceMemory::DeviceMemory(DeviceMemory&& device_memory) :
-        _ptr_device             (move(device_memory._ptr_device)),
+        _ptr_device             (device_memory._ptr_device),
         _device_memory_handle   (VK_NULL_HANDLE),
         _memory_size            (device_memory._memory_size),
         _ptr_mapped_data        (device_memory._ptr_mapped_data)
@@ -56,7 +56,8 @@ namespace pbrlib
 
     void DeviceMemory::map()
     {
-        if (!_ptr_mapped_data && _device_memory_handle != VK_NULL_HANDLE) {
+        if (!_ptr_mapped_data && _device_memory_handle != VK_NULL_HANDLE) 
+        {
             assert(vkMapMemory(
                 _ptr_device->getDeviceHandle(),
                 _device_memory_handle,
@@ -72,10 +73,8 @@ namespace pbrlib
 
     void DeviceMemory::unmap()
     {
-        if (_ptr_mapped_data) {
+        if (_ptr_mapped_data) 
             vkUnmapMemory(_ptr_device->getDeviceHandle(), _device_memory_handle);
-            _ptr_mapped_data = nullptr;
-        }
     }
 
     MapStatus DeviceMemory::getMapStatus() const noexcept
@@ -98,12 +97,7 @@ namespace pbrlib
         return _device_memory_handle;
     }
 
-    PtrDevice& DeviceMemory::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& DeviceMemory::getDevice() const noexcept
+    const Device* DeviceMemory::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -113,13 +107,13 @@ namespace pbrlib
         return _memory_size;
     }
 
-    PtrDeviceMemory DeviceMemory::make(const PtrDevice& ptr_device)
+    std::unique_ptr<DeviceMemory> DeviceMemory::make(const Device* ptr_device)
     {
-        return make_unique<DeviceMemory>(ptr_device);
+        return std::make_unique<DeviceMemory>(ptr_device);
     }
 
-    PtrDeviceMemory DeviceMemory::make(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index)
+    std::unique_ptr<DeviceMemory> DeviceMemory::make(const Device* ptr_device, VkDeviceSize size, uint32_t memory_type_index)
     {
-        return make_unique<DeviceMemory>(ptr_device, size, memory_type_index);
+        return std::make_unique<DeviceMemory>(ptr_device, size, memory_type_index);
     }
 }

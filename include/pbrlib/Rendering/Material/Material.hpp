@@ -17,10 +17,7 @@
 
 namespace pbrlib
 {
-    class Material;
     class GPUTextureManager;
-
-    using PtrMaterial = std::shared_ptr<Material>;
 
     class Material
     {
@@ -48,7 +45,7 @@ namespace pbrlib
              * 
              * @param albedo указатель на текстуру.
             */
-            void setAlbedo(const PtrImageView& albedo);
+            void setAlbedo(std::shared_ptr<const ImageView> albedo);
 
             /**
              * @brief Метод, предназначенный для установки альбедо.
@@ -74,7 +71,7 @@ namespace pbrlib
              * 
              * @param normal_map указатель на текстуру.
             */
-            void setNormalMap(const PtrImageView& normal_map);
+            void setNormalMap(std::shared_ptr<const ImageView> normal_map);
 
             /**
              * @brief Метод, предназначенный для установки карты нормалей.
@@ -100,7 +97,7 @@ namespace pbrlib
              * 
              * @param metallic указатель на текстуру.
             */
-            void setMetallic(const PtrImageView& metallic);
+            void setMetallic(std::shared_ptr<const ImageView> metallic);
 
             /**
              * @brief Метод, предназначенный для установки текстуры с металичностью.
@@ -126,7 +123,7 @@ namespace pbrlib
              * 
              * @param roughness указатель на текстуру.
             */
-            void setRoughness(const PtrImageView& roughness);
+            void setRoughness(std::shared_ptr<const ImageView> roughness);
 
             /**
              * @brief Метод, предназначенный для установки текстуры с шероховатостью.
@@ -152,7 +149,7 @@ namespace pbrlib
              * 
              * @param baked_AO указатель на текстуру.
             */
-            void setBakedAO(const PtrImageView& baked_AO);
+            void setBakedAO(std::shared_ptr<const ImageView> baked_AO);
 
             /**
              * @brief Метод, предназначенный для установки текстуры с запечённой ambient occlusion.
@@ -181,15 +178,15 @@ namespace pbrlib
             */
             void setAnisotropy(float anisotropy);
 
-            Material    build();
-            PtrMaterial buildPtr();
+            Material                    build();
+            std::unique_ptr<Material>   buildPtr();
 
         private:    
-            PtrImageView    _albedo;
-            PtrImageView    _normal_map;
-            PtrImageView    _metallic;
-            PtrImageView    _roughness;
-            PtrImageView    _baked_AO;
+            std::shared_ptr<const ImageView> _albedo;
+            std::shared_ptr<const ImageView> _normal_map;
+            std::shared_ptr<const ImageView> _metallic;
+            std::shared_ptr<const ImageView> _roughness;
+            std::shared_ptr<const ImageView> _baked_AO;
 
             float _anisotropy;
 
@@ -203,36 +200,32 @@ namespace pbrlib
         ~Material();
 
         template<Textures TextureType>
-        void setTexture(const PtrImageView& ptr_image_view);
+        void setTexture(std::shared_ptr<const ImageView> ptr_image_view);
 
-        void setTexture(size_t i, const PtrImageView& ptr_image_view);
+        void setTexture(size_t i, std::shared_ptr<const ImageView> ptr_image_view);
         void setAnisotropy(float anisotropy);
 
         template<Textures TextureType>
-        PtrImageView& getTexture();
+        std::shared_ptr<const ImageView> getTexture() const;
 
-        template<Textures TextureType>
-        const PtrImageView& getTexture() const;
+        std::shared_ptr<const ImageView>    getTexture(size_t i)    const;
+        float                               getAnisotropy()         const noexcept;
 
-        PtrImageView&       getTexture(size_t i);
-        const PtrImageView& getTexture(size_t i)    const;
-        float               getAnisotropy()         const noexcept;
-
-        static PtrMaterial make();
+        static std::unique_ptr<Material> make();
 
     private:
         union
         {
             struct 
             {
-                PtrImageView _albedo;
-                PtrImageView _normal_map;
-                PtrImageView _metallic;
-                PtrImageView _roughness;
-                PtrImageView _baked_AO;
+                std::shared_ptr<const ImageView> _albedo;
+                std::shared_ptr<const ImageView> _normal_map;
+                std::shared_ptr<const ImageView> _metallic;
+                std::shared_ptr<const ImageView> _roughness;
+                std::shared_ptr<const ImageView> _baked_AO;
             };
 
-            PtrImageView _textures[utils::enumCast(Textures::Count)];
+            std::shared_ptr<const ImageView> _textures[utils::enumCast(Textures::Count)];
         };
 
         float _anisotropy;

@@ -20,14 +20,8 @@
 namespace pbrlib
 {
     class ImageView;
-    class Framebuffer;
-    class PrimaryCommandBuffer;
-    class PBR;
 
-    using PtrAttachments            = std::shared_ptr<std::vector<ImageView>>;
-    using PtrFramebuffer            = std::shared_ptr<Framebuffer>; 
-    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
-    using PtrPBR                    = std::shared_ptr<PBR>;
+    using PtrAttachments = std::shared_ptr<std::vector<ImageView>>;
 
     class PBR :
         public IRenderer
@@ -49,9 +43,9 @@ namespace pbrlib
          * @param ptr_physical_device   указатель на физическое устройство.
         */
         virtual void init(
-            const PtrWindow&            ptr_window, 
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_device
+            std::shared_ptr<const Window>   ptr_window, 
+            const Device*                   ptr_device, 
+            const PhysicalDevice*           ptr_physical_device
         ) override;
 
         /**
@@ -65,35 +59,34 @@ namespace pbrlib
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
         void draw(
-            const PtrSceneItem&             ptr_camera,
-            const VisibleList&              visible_list, 
-            std::span<const PtrSceneItem>   point_lights,
-            std::span<const PtrSceneItem>   spot_lights,
-            std::span<const PtrSceneItem>   direction_lights,
-            float                           delta_time
+            std::shared_ptr<const SceneItem>            ptr_camera,
+            const VisibleList&                          visible_list, 
+            std::span<std::shared_ptr<SceneItem>>       point_lights,
+            std::span<std::shared_ptr<SceneItem>>       spot_lights,
+            std::span<std::shared_ptr<SceneItem>>       direction_lights,
+            float                                       delta_time
         ) override;
 
-        PtrGBufferPass&          getGBUfferPass()    noexcept;
-        const PtrGBufferPass&    getGBUfferPass()    const noexcept;
-        PtrPBRPass&              getPBRPass()        noexcept;
-        const PtrPBRPass&        getPBRPass()        const noexcept;
+        const GBufferPass*  getGBUfferPass()    const noexcept;
+        const PBRPass*      getPBRPass()        const noexcept;
 
-        static PtrPBR make(const PBRPass::Optionals& optionals = PBRPass::Optionals());
+        static std::unique_ptr<PBR> make(const PBRPass::Optionals& optionals = PBRPass::Optionals());
 
     private:
-        PtrGBufferPass  _ptr_gbuffer_pass;
-        PtrPBRPass      _ptr_pbr_pass;
+        std::unique_ptr<GBufferPass>    _ptr_gbuffer_pass;
+        std::unique_ptr<PBRPass>  _ptr_pbr_pass;
 
-        PtrDevice _ptr_device;
+        const Device* _ptr_device;
 
-        PtrDescriptorPool _ptr_descriptor_pool;
+        std::shared_ptr<const DescriptorPool> _ptr_descriptor_pool;
 
-        PtrSwapchain            _ptr_swapchain;
-        PtrSampler              _ptr_sampler_linear;
-        PtrSampler              _ptr_sampler_nearest;
+        std::shared_ptr<const Swapchain>    _ptr_swapchain;
+        std::shared_ptr<const Sampler>      _ptr_sampler_linear;
+        std::shared_ptr<const Sampler>      _ptr_sampler_nearest;
 
-        PtrPrimaryCommandBuffer _ptr_command_buffer;
-        PtrDeviceQueue          _ptr_device_queue;
+        std::unique_ptr<CommandPool>            _ptr_command_pool;
+        std::shared_ptr<PrimaryCommandBuffer>   _ptr_command_buffer;
+        std::shared_ptr<DeviceQueue>            _ptr_device_queue;
 
         PBRPass::Optionals  _optionals;
     };

@@ -27,7 +27,7 @@ namespace pbrlib
     }
 
     template<typename Type>
-    inline void Buffer::Builder<Type>::setDevice(const PtrDevice& ptr_device)
+    inline void Buffer::Builder<Type>::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
@@ -61,12 +61,12 @@ namespace pbrlib
     }
 
     template<typename Type>
-    inline PtrBuffer Buffer::Builder<Type>::buildPtr() const
+    inline std::unique_ptr<Buffer> Buffer::Builder<Type>::buildPtr() const
     {
-        PtrBuffer ptr_buffer;
+        std::unique_ptr<Buffer> ptr_buffer;
         
         if (_queue_family_indicies.size() == 1) {
-            return make_shared<Buffer>(
+            return std::make_unique<Buffer>(
                 _ptr_device,
                 static_cast<VkDeviceSize>(_size * sizeof(Type)),
                 _usage,
@@ -74,7 +74,7 @@ namespace pbrlib
                 _queue_family_indicies[0]
             );
         } 
-        return make_shared<Buffer>(
+        return std::make_unique<Buffer>(
             _ptr_device,
             static_cast<VkDeviceSize>(_size * sizeof(Type)),
             _usage,
@@ -191,12 +191,12 @@ namespace pbrlib
     }
 
     template<typename Type, typename AllocatorType>
-    inline PtrBuffer Buffer::BuilderWithData<Type, AllocatorType>::buildPtr() const
+    inline std::unique_ptr<Buffer> Buffer::BuilderWithData<Type, AllocatorType>::buildPtr() const
     {
-        PtrBuffer ptr_buffer;
+        std::unique_ptr<Buffer> ptr_buffer;
         
         if (Builder<Type>::_queue_family_indicies.size() == 1) {
-            ptr_buffer = make_shared<Buffer>(
+            ptr_buffer = std::make_unique<Buffer>(
                 Builder<Type>::_ptr_device,
                 static_cast<VkDeviceSize>(_data.size() * sizeof(Type)),
                 Builder<Type>::_usage,
@@ -204,7 +204,7 @@ namespace pbrlib
                 Builder<Type>::_queue_family_indicies[0]
             );
         } else {
-            ptr_buffer = make_shared<Buffer>(
+            ptr_buffer = std::make_unique<Buffer>(
                 Builder<Type>::_ptr_device,
                 static_cast<VkDeviceSize>(_data.size() * sizeof(Type)),
                 Builder<Type>::_usage,

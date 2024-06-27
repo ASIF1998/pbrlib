@@ -27,15 +27,7 @@
 
 namespace pbrlib
 {
-    class Image;
-    class ImageView;
     class PrimaryCommandBuffer;
-    class DeviceQueue;
-
-    using PtrImage                  = std::shared_ptr<Image>;
-    using PtrImageView              = std::shared_ptr<ImageView>;
-    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
-    using PtrDeviceQueue            = std::shared_ptr<DeviceQueue>;
 
     /**
      * @struct ImageInfo.
@@ -97,19 +89,19 @@ namespace pbrlib
             inline void         setNumMipLevels(uint32_t mip_levels)                        noexcept;
             inline void         setImageType(VkImageType image_type)                        noexcept;
             inline void         setNumArrayLayers(uint32_t array_layers)                    noexcept;
-            inline void         setDevice(const PtrDevice& ptr_device)                      noexcept;
+            inline void         setDevice(const Device* ptr_device)         noexcept;
             inline void         setMemoryTypeIndex(uint32_t memory_type_index)              noexcept;
 
             inline void addQueueFamilyIndex(uint32_t queue_family_index) noexcept;
 
-            inline virtual Image       build()     const;
-            inline virtual PtrImage    buildPtr()  const;
+            inline virtual Image                    build()     const;
+            inline virtual std::unique_ptr<Image>   buildPtr()  const;
 
         protected:
-            PtrDevice               _ptr_device;
+            const Device*           _ptr_device;
             ImageInfo               _image_info;
             uint32_t                _memory_type_index;
-            std::vector<uint32_t>    _queue_family_indicies;
+            std::vector<uint32_t>   _queue_family_indicies;
         };
 
         template<
@@ -144,8 +136,8 @@ namespace pbrlib
 
             void setDeviceLocalMemoryTypeIndex(uint32_t memory_type_index)      noexcept;
             void setHostLocalMemoryTypeIndex(uint32_t memory_type_index)        noexcept;
-            void setCommandBuffer(const PtrPrimaryCommandBuffer& ptr_command_buffer);
-            void setDeviceQueue(const PtrDeviceQueue& ptr_device_queue); 
+            void setCommandBuffer(std::shared_ptr<PrimaryCommandBuffer> ptr_command_buffer);
+            void setDeviceQueue(const DeviceQueue* ptr_device_queue); 
 
             inline void pushBack(Type r);
             inline void pushBack(const math::Vec2<Type>& c);
@@ -162,14 +154,14 @@ namespace pbrlib
             inline void set(size_t i, size_t j, const math::Vec3<Type>& c);
             inline void set(size_t i, size_t j, const math::Vec4<Type>& c);
 
-            inline virtual Image       build()     const;
-            inline virtual PtrImage    buildPtr()  const;
+            inline virtual Image                    build()     const;
+            inline virtual std::unique_ptr<Image>   buildPtr()  const;
 
         private:
-            std::vector<Type, AllocatorType>    _data;
-            uint32_t                            _device_local_memory_type_index;
-            PtrPrimaryCommandBuffer             _ptr_command_buffer;
-            PtrDeviceQueue                      _ptr_queue;
+            std::vector<Type, AllocatorType>        _data;
+            uint32_t                                _device_local_memory_type_index;
+            std::shared_ptr<PrimaryCommandBuffer>   _ptr_command_buffer;
+            const DeviceQueue*                      _ptr_queue;
         };
 
     public:
@@ -183,7 +175,7 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
         */
         Image(
-            const PtrDevice&    ptr_device,
+            const Device*       ptr_device,
             uint32_t            memory_type_index,
             const ImageInfo&    image_info,
             uint32_t            queue_family_index
@@ -200,10 +192,10 @@ namespace pbrlib
         */
 
         Image(
-            const PtrDevice&        ptr_device,
-            uint32_t                memory_type_index,
-            const ImageInfo&        image_info,
-            std::span<const uint32_t>    queue_family_indices
+            const Device*               ptr_device,
+            uint32_t                    memory_type_index,
+            const ImageInfo&            image_info,
+            std::span<const uint32_t>   queue_family_indices
         );
 
         /**
@@ -215,10 +207,10 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
         */
         Image(
-            const PtrDevice&    ptr_device,
-            VkImage             image,
-            ImageInfo           image_info,
-            uint32_t            queue_family_index
+            const Device*   ptr_device,
+            VkImage         image,
+            ImageInfo       image_info,
+            uint32_t        queue_family_index
         );
 
         /**
@@ -230,10 +222,10 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
         */
         Image(
-            const PtrDevice&        ptr_device,
-            VkImage                 image,
-            ImageInfo               image_info,
-            std::span<const uint32_t>    queue_family_indicies
+            const Device*               ptr_device,
+            VkImage                     image,
+            ImageInfo                   image_info,
+            std::span<const uint32_t>   queue_family_indicies
         );
 
         Image(Image&& image);
@@ -244,13 +236,12 @@ namespace pbrlib
         Image& operator = (Image&&) = delete;
         Image& operator = (const Image&) = delete;
 
-        ImageInfo&              getImageInfo();
-        const ImageInfo&        getImageInfo()    const;
-        const VkImage&          getImageHandle()  const;
-        PtrDevice&              getDevice()       noexcept;
-        const PtrDevice&        getDevice()       const noexcept;
-        PtrDeviceMemory&        getDeviceMemory() noexcept;
-        const PtrDeviceMemory&  getDeviceMemory() const noexcept;
+        ImageInfo&          getImageInfo();
+        const ImageInfo&    getImageInfo()    const;
+        const VkImage&      getImageHandle()  const;
+        const Device*       getDevice()       const noexcept;
+        DeviceMemory*       getDeviceMemory() noexcept;
+        const DeviceMemory* getDeviceMemory() const noexcept;
 
         /**
          * @brief Статический метод для создания Image.
@@ -261,8 +252,8 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        static PtrImage make(
-            const PtrDevice&    ptr_device,
+        static std::unique_ptr<Image> make(
+            const Device*       ptr_device,
             uint32_t            memory_type_index,
             const ImageInfo&    image_info,
             uint32_t            queue_family_index
@@ -277,11 +268,11 @@ namespace pbrlib
          * @param queue_family_indices  индексы семейства очередей.
          * @return указатель на Image.
         */
-        static PtrImage make(
-            const PtrDevice&        ptr_device,
-            uint32_t                memory_type_index,
-            const ImageInfo&        image_info,
-            std::span<const uint32_t>    queue_family_indices
+        static std::unique_ptr<Image> make(
+            const Device*               ptr_device,
+            uint32_t                    memory_type_index,
+            const ImageInfo&            image_info,
+            std::span<const uint32_t>   queue_family_indices
         );
 
         /**
@@ -293,8 +284,8 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @return указатель на Image.
         */
-        static PtrImage make(
-            const PtrDevice&    ptr_device,
+        static std::unique_ptr<Image> make(
+            const Device*       ptr_device,
             VkImage             image,
             const ImageInfo&    image_info,
             uint32_t            queue_family_index
@@ -309,8 +300,8 @@ namespace pbrlib
          * @param queue_family_indicies индексы семейства очередей.
          * @return указатель на Image.
         */
-        static PtrImage make(
-            const PtrDevice&            ptr_device,
+        static std::unique_ptr<Image> make(
+            const Device*               ptr_device,
             VkImage                     image,
             const ImageInfo&            image_info,
             std::span<const uint32_t>   queue_family_indicies
@@ -320,11 +311,11 @@ namespace pbrlib
         void _create(uint32_t memory_type_index);
 
     private:
-        VkImage                 _image_handle;
-        ImageInfo               _image_info;
-        std::vector<uint32_t>   _queue_family_indicies;
-        PtrDevice               _ptr_device;
-        PtrDeviceMemory         _ptr_device_memory;
+        VkImage                         _image_handle;
+        ImageInfo                       _image_info;
+        std::vector<uint32_t>           _queue_family_indicies;
+        const Device*                   _ptr_device;
+        std::unique_ptr<DeviceMemory>   _ptr_device_memory;
     };
 
     class ImageView
@@ -335,7 +326,7 @@ namespace pbrlib
         class Builder
         {
         public:
-            inline void setImage(const PtrImage& ptr_image);
+            inline void setImage(std::shared_ptr<const Image> ptr_image);
             inline void setFormat(VkFormat format)                     noexcept;
             inline void setAspectMask(VkImageAspectFlags aspect_mask)  noexcept;
             inline void setBaseMipLevel(uint32_t base_mip_level)       noexcept;
@@ -344,14 +335,14 @@ namespace pbrlib
             inline void setLayerCount(uint32_t layer_count)            noexcept;
             inline void setType(VkImageViewType type)                  noexcept;
 
-            inline ImageView       build()     const;
-            inline PtrImageView    buildPtr()  const;
+            inline ImageView                    build()     const;
+            inline std::unique_ptr<ImageView>   buildPtr()  const;
 
         private:
-            PtrImage                _ptr_image;
-            VkFormat                _format;
-            VkImageSubresourceRange _subresource_range;
-            VkImageViewType         _image_view_type;
+            std::shared_ptr<const Image>    _ptr_image;
+            VkFormat                        _format;
+            VkImageSubresourceRange         _subresource_range;
+            VkImageViewType                 _image_view_type;
         };
 
     public:
@@ -364,7 +355,7 @@ namespace pbrlib
          * @param type              тип вида изображения.
         */
         ImageView(
-            const PtrImage&                 ptr_image,
+            std::shared_ptr<const Image>    ptr_image,
             VkFormat                        format,
             const VkImageSubresourceRange&  subresource_range,
             VkImageViewType                 type
@@ -378,8 +369,7 @@ namespace pbrlib
         ImageView& operator = (ImageView&&)         = delete;
         ImageView& operator = (const ImageView&)    = delete;
 
-        PtrImage&                       getImage()              noexcept;
-        const PtrImage&                 getImage()              const noexcept;
+        std::shared_ptr<const Image>    getImage()              const noexcept;
         VkImageViewType                 getImageViewType()      const noexcept;
         VkFormat                        getFormat()             const noexcept;
         VkImageSubresourceRange&        getSubresourceRange()   noexcept;
@@ -387,11 +377,11 @@ namespace pbrlib
         const VkImageView&              getImageViewHandle()    const noexcept;
 
     private:
-        PtrImage                _ptr_image;
-        VkImageView             _image_view_handle;
-        VkFormat                _format;
-        VkImageSubresourceRange _subresource_range;
-        VkImageViewType         _type;
+        std::shared_ptr<const Image>    _ptr_image;
+        VkImageView                     _image_view_handle;
+        VkFormat                        _format;
+        VkImageSubresourceRange         _subresource_range;
+        VkImageViewType                 _type;
     };
 }
 

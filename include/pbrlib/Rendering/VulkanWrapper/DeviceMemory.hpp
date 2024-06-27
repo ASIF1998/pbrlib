@@ -15,11 +15,6 @@
 
 namespace pbrlib
 {
-    class Device;
-    class DeviceMemory;
-
-    using PtrDeviceMemory = std::unique_ptr<DeviceMemory>;
-
     enum class MapStatus
     {
         MAPPED,
@@ -34,7 +29,7 @@ namespace pbrlib
          * 
          * @param ptr_device указатель на устройство.
         */
-        DeviceMemory(const PtrDevice& ptr_device) noexcept;
+        DeviceMemory(const Device* ptr_device) noexcept;
 
         /**
          * @brief Конструктор.
@@ -43,7 +38,7 @@ namespace pbrlib
          * @param size              размер требуемой памяти.
          * @param memory_type_index индекс типа памяти.
         */
-        DeviceMemory(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
+        DeviceMemory(const Device* ptr_device, VkDeviceSize size, uint32_t memory_type_index);
 
         DeviceMemory(DeviceMemory&& device_memory);
         DeviceMemory(const DeviceMemory&) = delete;
@@ -79,18 +74,17 @@ namespace pbrlib
 
         MapStatus getMapStatus() const noexcept;
 
-        uint8_t*                 getData()               noexcept;
-        const uint8_t*           getData()               const noexcept;
-        const VkDeviceMemory&    getDeviceMemoryHandle() const noexcept;
-        PtrDevice&               getDevice()             noexcept;
-        const PtrDevice&         getDevice()             const noexcept;
-        VkDeviceSize             getSize()               const noexcept;
+        uint8_t*                getData()               noexcept;
+        const uint8_t*          getData()               const noexcept;
+        const VkDeviceMemory&   getDeviceMemoryHandle() const noexcept;
+        const Device*           getDevice()             const noexcept;
+        VkDeviceSize            getSize()               const noexcept;
 
-        static PtrDeviceMemory make(const PtrDevice& ptr_device);
-        static PtrDeviceMemory make(const PtrDevice& ptr_device, VkDeviceSize size, uint32_t memory_type_index);
+        static std::unique_ptr<DeviceMemory> make(const Device* ptr_device);
+        static std::unique_ptr<DeviceMemory> make(const Device* ptr_device, VkDeviceSize size, uint32_t memory_type_index);
 
     protected:
-        PtrDevice       _ptr_device;
+        const Device*   _ptr_device;
         VkDeviceMemory  _device_memory_handle;
         VkDeviceSize    _memory_size;
         uint8_t*        _ptr_mapped_data;

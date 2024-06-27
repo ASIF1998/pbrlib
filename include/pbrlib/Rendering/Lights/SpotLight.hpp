@@ -17,10 +17,6 @@
 
 namespace pbrlib
 {
-    class SpotLight;
-
-    using PtrSpotLight = std::shared_ptr<SpotLight>;
-
     class SpotLight :
         public Component<SpotLight>
     {
@@ -38,8 +34,8 @@ namespace pbrlib
             void setOuterRadius(float outer_radius)                 noexcept;
             void setName(const std::string_view name);
 
-            SpotLight       build()     const;
-            PtrSpotLight    buildPtr()  const;
+            SpotLight                   build()     const;
+            std::unique_ptr<SpotLight>  buildPtr()  const;
 
         private:
             math::Vec3<float>   _pos;

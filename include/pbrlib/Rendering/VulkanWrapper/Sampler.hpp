@@ -13,10 +13,6 @@
 
 namespace pbrlib
 {
-    class Sampler;
-
-    using PtrSampler = std::shared_ptr<Sampler>;
-
     /**
      * @class SamplerInfo.
      * @brief Класс предназначенный для хранения информации о выборке.
@@ -165,13 +161,13 @@ namespace pbrlib
             Builder& operator = (Builder&&)      = delete;
             Builder& operator = (const Builder&) = delete;
 
-            void setDevice(const PtrDevice& ptr_device);
+            void setDevice(const Device* ptr_device);
 
-            Sampler     build()     const;
-            PtrSampler  buildPtr()  const;
+            Sampler                     build()     const;
+            std::unique_ptr<Sampler>    buildPtr()  const;
 
         private:
-            PtrDevice _ptr_device;
+            const Device* _ptr_device;
         };
 
     public:
@@ -182,8 +178,8 @@ namespace pbrlib
          * @param sampler_info  информация о создаваемой выборке.
         */
         Sampler(
-            const PtrDevice&            ptr_device,
-            const SamplerInfo&          sampler_info
+            const Device*       ptr_device,
+            const SamplerInfo&  sampler_info
         );
 
         Sampler(Sampler&& sampler);
@@ -194,16 +190,15 @@ namespace pbrlib
         Sampler& operator = (Sampler&&)         = delete;
         Sampler& operator = (const Sampler&)    = delete;
 
-        PtrDevice&           getDevice()         noexcept;
-        const PtrDevice&     getDevice()         const noexcept;
-        SamplerInfo&         getSamplerInfo()    noexcept;
-        const SamplerInfo&   getSamplerInfo()    const noexcept;
-        const VkSampler&     getSamplerHandle()  const noexcept;
+        const Device*       getDevice()         const noexcept;
+        SamplerInfo&        getSamplerInfo()    noexcept;
+        const SamplerInfo&  getSamplerInfo()    const noexcept;
+        const VkSampler&    getSamplerHandle()  const noexcept;
         
     private:
-        PtrDevice   _ptr_device;
-        SamplerInfo _sampler_info;
-        VkSampler   _sampler_handle;
+        const Device*   _ptr_device;
+        SamplerInfo     _sampler_info;
+        VkSampler       _sampler_handle;
     };
 }
 

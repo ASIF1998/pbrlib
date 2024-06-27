@@ -8,7 +8,6 @@
 
 #include <pbrlib/Rendering/Lights/PointLight.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -25,10 +24,10 @@ namespace pbrlib
     {}
     
     PointLight::PointLight(
-        const string_view   name,
-        const Vec3<float>&  position,
-        const Vec3<float>&  color,
-        float               intensity
+        const std::string_view  name,
+        const Vec3<float>&      position,
+        const Vec3<float>&      color,
+        float                   intensity
     ) :
         Component   (name),
         _color      (color),
@@ -77,7 +76,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PointLight::Builder::Builder(const string_view name) :
+    PointLight::Builder::Builder(const std::string_view name) :
         _name(name)
     {}
 
@@ -96,7 +95,7 @@ namespace pbrlib
         _pos = position;
     }
 
-    void PointLight::Builder::setName(const string_view name) 
+    void PointLight::Builder::setName(const std::string_view name) 
     {
         _name = name;
     }
@@ -106,8 +105,8 @@ namespace pbrlib
         return PointLight(_name, _pos, _color, _intensity);
     }
 
-    PtrPointLight PointLight::Builder::buildPtr() const
+    std::unique_ptr<PointLight> PointLight::Builder::buildPtr() const
     {
-        return make_shared<PointLight>(_name, _pos, _color, _intensity);
+        return make_unique<PointLight>(_name, _pos, _color, _intensity);
     }
 }

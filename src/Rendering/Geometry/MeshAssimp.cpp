@@ -11,7 +11,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -124,23 +123,19 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MeshAssimp::MeshAssimp(const PtrDevice& ptr_device, uint32_t queue_family_index, uint32_t memory_type) :
+    MeshAssimp::MeshAssimp(const Device* ptr_device, uint32_t queue_family_index, uint32_t memory_type) :
         _ptr_device         (ptr_device),
         _queue_family_index (queue_family_index),
         _memory_type        (memory_type)
     {}
 
-    PtrDevice& MeshAssimp::getDevice() noexcept
+    const Device* MeshAssimp::getDevice() const noexcept
     {
         return _ptr_device;
     }
 
-    const PtrDevice& MeshAssimp::getDevice() const noexcept
-    {
-        return _ptr_device;
-    }
-
-    optional<vector<PtrMesh>> MeshAssimp::load(const string_view path)
+    auto MeshAssimp::load(const std::string_view path)
+        -> std::optional<std::vector<std::shared_ptr<pbrlib::Mesh>>>
     {
         Asset       asset;
         Importer    importer;
@@ -157,13 +152,11 @@ namespace pbrlib
             aiProcess_Triangulate
         );
 
-        if (!ptr_ai_scene) {
-            return nullopt;
-        }
+        if (!ptr_ai_scene)
+            return std::nullopt;
 
-        if (!ptr_ai_scene->mRootNode) {
-            return nullopt;
-        }
+        if (!ptr_ai_scene->mRootNode)
+            return std::nullopt;
 
         size_t total_vertex_count   = 0;
         size_t total_index_count    = 0;
@@ -198,15 +191,17 @@ namespace pbrlib
 
         processNode(&asset, ptr_ai_scene, ptr_ai_node);
 
-        vector<PtrMesh> meshes;
+        std::vector<std::shared_ptr<pbrlib::Mesh>> meshes;
 
-        PtrBuffer   ptr_vertex_buffer   = asset.vert_attr.buildPtr();
-        PtrBuffer   ptr_index_buffer    = asset.indices.buildPtr();
-        PtrMesh     ptr_mesh            = nullptr;
+        std::shared_ptr ptr_vertex_buffer   = asset.vert_attr.buildPtr();
+        std::shared_ptr ptr_index_buffer    = asset.indices.buildPtr();
+
+        std::shared_ptr<pbrlib::Mesh> ptr_mesh = nullptr;
 
         meshes.reserve(asset.meshes.size());
 
-        for (size_t i{0}; i < asset.meshes.size(); i++) {
+        for (size_t i{0}; i < asset.meshes.size(); i++) 
+        {
             ptr_mesh = pbrlib::Mesh::make();
 
             ptr_mesh->_ptr_index_buffer             = ptr_index_buffer;
@@ -223,6 +218,6 @@ namespace pbrlib
             meshes.push_back(ptr_mesh);
         }
 
-        return make_optional(meshes);
+        return meshes;
     }
 }

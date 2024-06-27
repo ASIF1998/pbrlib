@@ -23,8 +23,6 @@ namespace pbrlib
 {
     class CameraBase;
 
-    using PtrCameraBase = std::shared_ptr<CameraBase>;
-    
     class CameraBase :
         public Component<CameraBase>
     {

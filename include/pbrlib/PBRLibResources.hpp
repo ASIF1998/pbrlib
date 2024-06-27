@@ -25,18 +25,14 @@ namespace pbrlib
         VulkanResources();
 
     public:
-        PtrInstance         _ptr_instance;          //!< Указатель на экземпляр Vulkan'а.
-        PtrPhysicalDevice   _ptr_physical_device;   //!< Указатель на физическое устройство (GPU).
-        PtrDevice           _ptr_device;            //!< Указатель на логическое устройство (GPU).
-        PtrDeviceQueue      _ptr_device_queue;      //!< Указатель на очередь устройства.
-        PtrCommandPool      _ptr_command_pool;      //!< Указатель на командный пул.
+        std::unique_ptr<const Instance>         _ptr_instance;          //!< Указатель на экземпляр Vulkan'а.
+        std::unique_ptr<const PhysicalDevice>   _ptr_physical_device;   //!< Указатель на физическое устройство (GPU).
+        std::unique_ptr<const Device>           _ptr_device;            //!< Указатель на логическое устройство (GPU).
+        std::unique_ptr<const DeviceQueue>      _ptr_device_queue;      //!< Указатель на очередь устройства.
+        std::unique_ptr<const CommandPool>      _ptr_command_pool;      //!< Указатель на командный пул.
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    class PBRLibResources;
-
-    using PtrPBRLibResources = std::shared_ptr<PBRLibResources>;
-
     class PBRLibResources
     {
         friend class SceneView;
@@ -46,7 +42,7 @@ namespace pbrlib
     public:
         ~PBRLibResources();
         
-        static PtrPBRLibResources init();
+        static std::unique_ptr<PBRLibResources> init();
 
     private:
         VulkanResources _vk_resources;

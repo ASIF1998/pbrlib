@@ -27,9 +27,6 @@ namespace pbrlib
     template<typename TMemoryBlock>
     class MemoryArena;
 
-    template<typename TMemoryBlock>
-    using PtrMemoryArena = shared_ptr<MemoryArena<TMemoryBlock>>;
-
     /**
      * @class MemoryArena.
      * @brief

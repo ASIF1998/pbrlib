@@ -18,13 +18,12 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/ComputePipeline.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
 {
     CommandBuffer::CommandBuffer(
-        const PtrCommandPool&   ptr_command_pool, 
+        const CommandPool*      ptr_command_pool, 
         VkCommandBufferLevel    level
     ) :
         _ptr_command_pool       (ptr_command_pool),
@@ -46,10 +45,10 @@ namespace pbrlib
     }
 
     CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) :
-        _ptr_command_pool       (move(command_buffer._ptr_command_pool)),
+        _ptr_command_pool       (std::move(command_buffer._ptr_command_pool)),
         _command_buffer_handle  (VK_NULL_HANDLE)
     {
-        swap(_command_buffer_handle, command_buffer._command_buffer_handle);
+        std::swap(_command_buffer_handle, command_buffer._command_buffer_handle);
     }
 
     CommandBuffer::~CommandBuffer()
@@ -65,16 +64,15 @@ namespace pbrlib
     }
 
     void CommandBuffer::bindVertexBuffers(
-        uint32_t                    first_binding,
-        span<const Buffer>          buffers,
-        span<const VkDeviceSize>    offsets
+        uint32_t                        first_binding,
+        std::span<const Buffer>         buffers,
+        std::span<const VkDeviceSize>   offsets
     ) const
     {
-        vector<VkBuffer> buffer_handles(buffers.size());
+        std::vector<VkBuffer> buffer_handles(buffers.size());
 
-        for (size_t i{0}; i < buffer_handles.size(); i++) {
+        for (size_t i{0}; i < buffer_handles.size(); i++)
             buffer_handles[i] = buffers[i].getBufferHandle();
-        }
 
         assert(offsets.size() >= buffer_handles.size());
 
@@ -102,9 +100,9 @@ namespace pbrlib
     }
 
     void CommandBuffer::bindDescriptorSet(
-        const PtrGraphicsPipeline&  ptr_graphics_pipeline,
-        const DescriptorSet&        descriptor_set
-    )
+        std::shared_ptr<const GraphicsPipeline> ptr_graphics_pipeline,
+        const DescriptorSet&                    descriptor_set
+    ) const
     {
         vkCmdBindDescriptorSets(
             _command_buffer_handle,
@@ -116,9 +114,9 @@ namespace pbrlib
     }
 
     void CommandBuffer::bindDescriptorSet(
-        const PtrComputePipeline&   ptr_compute_pipeline,
-        const DescriptorSet&        descriptor_set
-    )
+        std::shared_ptr<const ComputePipeline>  ptr_compute_pipeline,
+        const DescriptorSet&                    descriptor_set
+    ) const
     {
         vkCmdBindDescriptorSets(
             _command_buffer_handle,
@@ -129,12 +127,12 @@ namespace pbrlib
         );
     }
 
-    void CommandBuffer::bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const
+    void CommandBuffer::bindToPipeline(std::shared_ptr<const GraphicsPipeline> ptr_pipeline) const
     {
         vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, ptr_pipeline->getPipelineHandle());
     }
 
-    void CommandBuffer::bindToPipeline(const PtrComputePipeline& ptr_pipeline) const
+    void CommandBuffer::bindToPipeline(std::shared_ptr<const ComputePipeline> ptr_pipeline) const
     {
         vkCmdBindPipeline(_command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, ptr_pipeline->getPipelineHandle());
     }
@@ -250,7 +248,7 @@ namespace pbrlib
     void CommandBuffer::copyBuffer(
         const Buffer&                   src_buffer,
         const Buffer&                   dst_buffer,
-        span<const VkBufferCopy>        regions
+        std::span<const VkBufferCopy>   regions
     ) const noexcept
     {
         vkCmdCopyBuffer(
@@ -280,9 +278,9 @@ namespace pbrlib
     }
 
     void CommandBuffer::copyImage(
-        const Image&                src_image,
-        const Image&                dst_image,
-        span<const VkImageCopy>     regions
+        const Image&                    src_image,
+        const Image&                    dst_image,
+        std::span<const VkImageCopy>    regions
     )
     {
         vkCmdCopyImage(
@@ -431,12 +429,7 @@ namespace pbrlib
         vkResetCommandBuffer(_command_buffer_handle, 0);
     }
 
-    PtrDevice& CommandBuffer::getDevice() noexcept
-    {
-        return _ptr_command_pool->getDevice();
-    }
-
-    const PtrDevice& CommandBuffer::getDevice() const noexcept
+    const Device* CommandBuffer::getDevice() const noexcept
     {
         return _ptr_command_pool->getDevice();
     }
@@ -447,13 +440,13 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimaryCommandBuffer::PrimaryCommandBuffer(const PtrCommandPool&       ptr_command_pool) :
+    PrimaryCommandBuffer::PrimaryCommandBuffer(const CommandPool* ptr_command_pool) :
         CommandBuffer (ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY)
     {}
 
     PrimaryCommandBuffer::PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer) :
-        CommandBuffer       (move(command_buffer)),
-        _ptr_pipeline       (move(command_buffer._ptr_pipeline))
+        CommandBuffer (std::move(command_buffer)),
+        _ptr_pipeline (std::move(command_buffer._ptr_pipeline))
     {}
 
     void PrimaryCommandBuffer::begin() const
@@ -469,7 +462,7 @@ namespace pbrlib
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, span<const VkClearValue> clear_values)  const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer, std::span<const VkClearValue> clear_values)  const noexcept
     {
         VkRenderPassBeginInfo begin_indo = { };
         begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -485,7 +478,7 @@ namespace pbrlib
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value) const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer, const VkClearValue& clear_value) const noexcept
     {   
         VkRenderPassBeginInfo begin_indo = { };
         begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -501,7 +494,7 @@ namespace pbrlib
         vkCmdBeginRenderPass(_command_buffer_handle, &begin_indo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void PrimaryCommandBuffer::begineRenderPass(const PtrFramebuffer& ptr_framebuffer) const noexcept
+    void PrimaryCommandBuffer::begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer) const noexcept
     {
         VkRenderPassBeginInfo begin_indo = { };
         begin_indo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -527,26 +520,26 @@ namespace pbrlib
         vkCmdNextSubpass(_command_buffer_handle, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    const PtrGraphicsPipeline& PrimaryCommandBuffer::getPipeline() const noexcept
+    std::shared_ptr<const GraphicsPipeline> PrimaryCommandBuffer::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
 
-    PtrPrimaryCommandBuffer PrimaryCommandBuffer::make(const PtrCommandPool& ptr_command_pool)
+    std::unique_ptr<PrimaryCommandBuffer> PrimaryCommandBuffer::make(const CommandPool* ptr_command_pool)
     {
-        return make_shared<PrimaryCommandBuffer>(ptr_command_pool);
+        return std::make_unique<PrimaryCommandBuffer>(ptr_command_pool);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SecondaryCommandBuffer::SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool) :
+    SecondaryCommandBuffer::SecondaryCommandBuffer(const CommandPool* ptr_command_pool) :
         CommandBuffer(ptr_command_pool, VK_COMMAND_BUFFER_LEVEL_SECONDARY)
     {}
 
     SecondaryCommandBuffer::SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer) :
-        CommandBuffer       (move(command_buffer))
+        CommandBuffer (std::move(command_buffer))
     {} 
 
-    void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer, const PtrFramebuffer& ptr_framebuffer) const
+    void SecondaryCommandBuffer::begin(const PrimaryCommandBuffer& primary_command_buffer, std::shared_ptr<const Framebuffer> ptr_framebuffer) const
     {
         VkCommandBufferInheritanceInfo inheritance_info = { };
         inheritance_info.sType          = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
@@ -567,8 +560,8 @@ namespace pbrlib
         assert(vkEndCommandBuffer(_command_buffer_handle) == VK_SUCCESS);
     }
 
-    PtrSecondaryCommandBuffer SecondaryCommandBuffer::make(const PtrCommandPool& ptr_command_pool)
+    std::unique_ptr<SecondaryCommandBuffer> SecondaryCommandBuffer::make(const CommandPool* ptr_command_pool)
     {
-        return make_shared<SecondaryCommandBuffer>(ptr_command_pool);
+        return std::make_unique<SecondaryCommandBuffer>(ptr_command_pool);
     }
 }

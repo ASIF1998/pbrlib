@@ -64,17 +64,17 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline void PBRPass::Builder::setDevice(const PtrDevice& ptr_device)
+    inline void PBRPass::Builder::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
 
-    inline void PBRPass::Builder::setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device)
+    inline void PBRPass::Builder::setPhysicalDevice(const PhysicalDevice* ptr_physical_device)
     {
         _ptr_physical_deviec = ptr_physical_device;
     }
 
-    inline void PBRPass::Builder::setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool)
+    inline void PBRPass::Builder::setDescriptorPool(std::shared_ptr<const DescriptorPool> ptr_descriptor_pool)
     {
         _ptr_descriptor_pool = ptr_descriptor_pool;
     }
@@ -103,7 +103,7 @@ namespace pbrlib
         _anisotropy_image_view = anisotropy_image_view;
     }
 
-    inline void PBRPass::Builder::setSampler(const PtrSampler& ptr_sampler)
+    inline void PBRPass::Builder::setSampler(std::shared_ptr<const Sampler> ptr_sampler)
     {
         _ptr_sampler = ptr_sampler;
     }
@@ -113,7 +113,7 @@ namespace pbrlib
         _optionals = optionals;
     }
 
-    inline void PBRPass::Builder::setQueue(const PtrDeviceQueue& ptr_queue)
+    inline void PBRPass::Builder::setQueue(std::shared_ptr<DeviceQueue> ptr_queue)
     {
         _ptr_device_queue = ptr_queue;
     }
@@ -145,7 +145,7 @@ namespace pbrlib
         );
     }
 
-    inline PtrPBRPass PBRPass::Builder::buildPtr()
+    inline std::unique_ptr<PBRPass> PBRPass::Builder::buildPtr()
     {
         if (_position_and_metallic_image_view && _normal_and_roughness_image_view && _albedo_and_baked_AO_image_view && _anisotropy_image_view) {
             return std::make_unique<PBRPass>(
@@ -173,12 +173,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline PtrComputePipeline& PBRPass::getPipeline() noexcept
-    {
-        return _ptr_pipeline;
-    }
-
-    inline const PtrComputePipeline& PBRPass::getPipeline() const noexcept
+    inline std::shared_ptr<const ComputePipeline> PBRPass::getPipeline() const noexcept
     {
         return _ptr_pipeline;
     }
@@ -189,19 +184,19 @@ namespace pbrlib
         return *_out_image_view;
     }
 
-    inline void PBRPass::outputImpl(ImageView& image_view, size_t id)
+    inline void PBRPass::outputImpl(const ImageView& image_view, size_t id)
     {
         assert(id < OutputImagesViewsIDs::Count);
         _out_image_view = &image_view;
     }
 
-    inline void PBRPass::outputImpl(PtrImageView& ptr_image_view, size_t id)
+    inline void PBRPass::outputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id)
     {
         assert(ptr_image_view && id < OutputImagesViewsIDs::Count);
         _out_image_view = ptr_image_view.get();
     }
 
-    inline void PBRPass::inputImpl(const PtrImageView& ptr_image_view, size_t id)
+    inline void PBRPass::inputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id)
     {
         assert(id < InputImagesViewsIDs::Count);
         _ptr_images_views[id] = ptr_image_view.get();
@@ -215,13 +210,13 @@ namespace pbrlib
         );
     }
 
-    inline PtrPBRPass PBRPass::make(
-        const PtrDevice&            ptr_device, 
-        const PtrPhysicalDevice&    ptr_physical_deviec,
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrDescriptorPool&    ptr_descriptor_pool,
-        const PtrSampler&           ptr_sampler,
-        const Optionals&            optionals
+    inline std::unique_ptr<PBRPass> PBRPass::make(
+        const Device*                           ptr_device, 
+        const PhysicalDevice*                   ptr_physical_deviec,
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+        std::shared_ptr<const Sampler>          ptr_sampler,
+        const Optionals&                        optionals
     )
     {
         return std::make_unique<PBRPass>(
@@ -234,17 +229,17 @@ namespace pbrlib
         );
     }
 
-    inline PtrPBRPass PBRPass::make(
-        const PtrDevice&            ptr_device, 
-        const PtrPhysicalDevice&    ptr_physical_deviec,
-        const PtrDeviceQueue&       ptr_queue,
-        const PtrDescriptorPool&    ptr_descriptor_pool,
-        const ImageView&            position_and_metallic_image_view,
-        const ImageView&            normal_and_roughness_image_view,
-        const ImageView&            albedo_and_baked_AO_image_view,
-        const ImageView&            anisotropy_image_view,
-        const PtrSampler&           ptr_sampler,
-        const Optionals&            optionals
+    inline std::unique_ptr<PBRPass> PBRPass::make(
+        const Device*                           ptr_device, 
+        const PhysicalDevice*                   ptr_physical_deviec,
+        std::shared_ptr<DeviceQueue>            ptr_queue,
+        std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+        const ImageView&                        position_and_metallic_image_view,
+        const ImageView&                        normal_and_roughness_image_view,
+        const ImageView&                        albedo_and_baked_AO_image_view,
+        const ImageView&                        anisotropy_image_view,
+        std::shared_ptr<const Sampler>          ptr_sampler,
+        const Optionals&                        optionals
     )
     {
         return std::make_unique<PBRPass>(

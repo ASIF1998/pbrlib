@@ -283,7 +283,7 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
-    inline void Image::Builder<TexType, Type, NBits>::setDevice(const PtrDevice& ptr_device) noexcept
+    inline void Image::Builder<TexType, Type, NBits>::setDevice(const Device* ptr_device) noexcept
     {
         _ptr_device = ptr_device;
     }
@@ -321,10 +321,10 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits>
-    inline PtrImage Image::Builder<TexType, Type, NBits>::buildPtr() const
+    inline std::unique_ptr<Image> Image::Builder<TexType, Type, NBits>::buildPtr() const
     {
         if (_queue_family_indicies.size() == 1) {
-            return std::make_shared<Image>(
+            return std::make_unique<Image>(
                 _ptr_device,
                 _memory_type_index,
                 _image_info,
@@ -332,7 +332,7 @@ namespace pbrlib
             );
         }
 
-        return std::make_shared<Image>(
+        return std::make_unique<Image>(
             _ptr_device,
             _memory_type_index,
             _image_info,
@@ -447,13 +447,13 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setCommandBuffer(const PtrPrimaryCommandBuffer& ptr_command_buffer)
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setCommandBuffer(std::shared_ptr<PrimaryCommandBuffer> ptr_command_buffer)
     {
         _ptr_command_buffer = ptr_command_buffer;
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setDeviceQueue(const PtrDeviceQueue& ptr_device_queue)
+    void Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::setDeviceQueue(const DeviceQueue* ptr_device_queue)
     {
         _ptr_queue = ptr_device_queue;
     }
@@ -835,19 +835,19 @@ namespace pbrlib
     }
 
     template<Image::TexelType TexType, typename Type, Image::NumBits NBits, typename AllocatorType>
-    inline PtrImage Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::buildPtr() const
+    inline std::unique_ptr<Image> Image::BuilderWithData<TexType, Type, NBits, AllocatorType>::buildPtr() const
     {
-        PtrImage ptr_image;
+        std::unique_ptr<Image> ptr_image;
 
         if (Builder<TexType, Type, NBits>::_queue_family_indicies.size() == 1) {
-            ptr_image = make_shared<Image>(
+            ptr_image = std::make_unique<Image>(
                 Builder<TexType, Type, NBits>::_ptr_device,
                 _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
                 _ptr_queue->getFamilyIndex()
             );
         } else {
-            ptr_image = make_shared<Image>(
+            ptr_image = std::make_unique<Image>(
                 Builder<TexType, Type, NBits>::_ptr_device,
                 _device_local_memory_type_index,
                 Builder<TexType, Type, NBits>::_image_info,
@@ -932,7 +932,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    inline void ImageView::Builder::setImage(const PtrImage& ptr_image)
+    inline void ImageView::Builder::setImage(std::shared_ptr<const Image> ptr_image)
     {
         _ptr_image = ptr_image;
     }
@@ -979,9 +979,9 @@ namespace pbrlib
         return ImageView(_ptr_image, _format, _subresource_range, _image_view_type);
     }
 
-    inline PtrImageView ImageView::Builder::buildPtr() const
+    inline std::unique_ptr<ImageView> ImageView::Builder::buildPtr() const
     {
-        return make_shared<ImageView>(_ptr_image, _format, _subresource_range, _image_view_type);
+        return make_unique<ImageView>(_ptr_image, _format, _subresource_range, _image_view_type);
     }
 }
 

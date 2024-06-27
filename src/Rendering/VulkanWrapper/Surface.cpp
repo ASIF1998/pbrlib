@@ -13,14 +13,12 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace pbrlib
 {
     Surface::Surface(
-        const Window&               window, 
-        const PtrInstance&          ptr_instance, 
-        const PtrPhysicalDevice&    ptr_physical_device
+        const Window&           window, 
+        const Instance*         ptr_instance, 
+        const PhysicalDevice*   ptr_physical_device
     ) :
         _ptr_instance   (ptr_instance),
         _surface_handle (VK_NULL_HANDLE)
@@ -31,12 +29,12 @@ namespace pbrlib
     }
 
     Surface::Surface(Surface&& surface) :
-        _ptr_instance           (move(surface._ptr_instance)),
+        _ptr_instance           (std::move(surface._ptr_instance)),
         _surface_handle         (VK_NULL_HANDLE),
         _surface_capabilities   (surface._surface_capabilities),
         _surface_format         (surface._surface_format)
     {
-        swap(_surface_handle, surface._surface_handle);
+        std::swap(_surface_handle, surface._surface_handle);
     }
 
     Surface::~Surface()
@@ -46,13 +44,13 @@ namespace pbrlib
         }
     }
 
-    shared_ptr<Surface> Surface::make(
-        const Window&               window,
-        const PtrInstance&          ptr_instance,
-        const PtrPhysicalDevice&    ptr_physical_device
+    std::unique_ptr<Surface> Surface::make(
+        const Window&           window,
+        const Instance*         ptr_instance, 
+        const PhysicalDevice*   ptr_physical_device
     )
     {
-        return make_shared<Surface>(window, ptr_instance, ptr_physical_device);
+        return std::make_unique<Surface>(window, ptr_instance, ptr_physical_device);
     }
 
     const VkSurfaceKHR& Surface::getSurfaceHandle() const noexcept
@@ -60,12 +58,7 @@ namespace pbrlib
         return _surface_handle;
     }
 
-    PtrInstance& Surface::getInstance() noexcept
-    {
-        return _ptr_instance;
-    }
-
-    const PtrInstance& Surface::getInstance() const noexcept
+    const Instance* Surface::getInstance() const noexcept
     {
         return _ptr_instance;
     }
@@ -85,9 +78,9 @@ namespace pbrlib
         _surface_format = format;
     }
 
-    vector<VkSurfaceFormatKHR> Surface::getAllSurfaceFormats(
-        const Surface&              surface, 
-        const PtrPhysicalDevice&    ptr_physical_device
+    std::vector<VkSurfaceFormatKHR> Surface::getAllSurfaceFormats(
+        const Surface&          surface, 
+        const PhysicalDevice*   ptr_physical_device
     )
     {
         uint32_t num_formats = 0;
@@ -99,7 +92,7 @@ namespace pbrlib
             nullptr
         );
 
-        vector<VkSurfaceFormatKHR> formats (num_formats);
+        std::vector<VkSurfaceFormatKHR> formats (num_formats);
 
         vkGetPhysicalDeviceSurfaceFormatsKHR(
             ptr_physical_device->physical_device_handle, 

@@ -19,23 +19,15 @@
 
 namespace pbrlib
 {
-    class RenderPass;
     class DescriptorSet;
     class Buffer;
     class Image;
-    class CommandPool;
-    class CommandBuffer;
-    class PrimaryCommandBuffer;
-    class SecondaryCommandBuffer;
     class Framebuffer;
     class ComputePipeline;
+}
 
-    using PtrCommandBuffer          = std::shared_ptr<CommandBuffer>;
-    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
-    using PtrSecondaryCommandBuffer = std::shared_ptr<SecondaryCommandBuffer>;
-    using PtrFramebuffer            = std::shared_ptr<Framebuffer>;
-    using PtrComputePipeline        = std::shared_ptr<ComputePipeline>;
-
+namespace pbrlib
+{
     class CommandBuffer
     {
     public:
@@ -46,7 +38,7 @@ namespace pbrlib
          * @param level             уровень командного буфера.
         */
         CommandBuffer(
-            const PtrCommandPool&   ptr_command_pool, 
+            const CommandPool*      ptr_command_pool, 
             VkCommandBufferLevel    level
         );
 
@@ -107,9 +99,9 @@ namespace pbrlib
          * @param descriptor_set        множество дескрипторов.
         */
         void bindDescriptorSet(
-            const PtrGraphicsPipeline&  ptr_graphics_pipeline,
-            const DescriptorSet&        descriptor_set
-        );
+            std::shared_ptr<const GraphicsPipeline> ptr_graphics_pipeline,
+            const DescriptorSet&                    descriptor_set
+        ) const;
 
         /**
          * @brief Метод, позволяющий привязать набор дескрипторов к командному буферу.
@@ -118,23 +110,23 @@ namespace pbrlib
          * @param descriptor_set        множество дескрипторов.
         */
         void bindDescriptorSet(
-            const PtrComputePipeline&   ptr_compute_pipeline,
-            const DescriptorSet&        descriptor_set
-        );
+            std::shared_ptr<const ComputePipeline>  ptr_compute_pipeline,
+            const DescriptorSet&                    descriptor_set
+        ) const;
 
         /**
          * @brief Метод, привязывающий буфер команд к конвейеру.
          * 
          * @param ptr_pipeline указатель на графический конвейер.
         */
-        void bindToPipeline(const PtrGraphicsPipeline& ptr_pipeline) const;
+        void bindToPipeline(std::shared_ptr<const GraphicsPipeline> ptr_pipeline) const;
 
         /**
          * @brief Метод, привязывающий буфер команд к конвейеру.
          * 
          * @param ptr_pipeline указатель на вычислительный конвейер.
         */
-        void bindToPipeline(const PtrComputePipeline& ptr_pipeline) const;
+        void bindToPipeline(std::shared_ptr<const ComputePipeline> ptr_pipeline) const;
 
         /**
          * @brief Метод, позволяющий создать команду для отрисовки.
@@ -405,20 +397,19 @@ namespace pbrlib
         */
         void reset() const noexcept;
 
-        PtrDevice&               getDevice()                 noexcept;
-        const PtrDevice&         getDevice()                 const noexcept;
-        const VkCommandBuffer&   getCommandBufferHandle()    const noexcept;
+        const Device*           getDevice()                 const noexcept;
+        const VkCommandBuffer&  getCommandBufferHandle()    const noexcept;
 
     protected:
-        PtrCommandPool  _ptr_command_pool;
-        VkCommandBuffer _command_buffer_handle;
+        const CommandPool*  _ptr_command_pool;
+        VkCommandBuffer     _command_buffer_handle;
     };
 
     class PrimaryCommandBuffer :
         public CommandBuffer
     {
     public:
-        PrimaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
+        PrimaryCommandBuffer(const CommandPool* ptr_command_pool);
 
         PrimaryCommandBuffer(PrimaryCommandBuffer&& command_buffer);
         PrimaryCommandBuffer(const PrimaryCommandBuffer&) = delete;
@@ -426,27 +417,27 @@ namespace pbrlib
         PrimaryCommandBuffer& operator = (PrimaryCommandBuffer&&)       = delete;
         PrimaryCommandBuffer& operator = (const PrimaryCommandBuffer&)  = delete;
 
-        void begin()                                                                                            const;
-        void end()                                                                                              const;
-        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, std::span<const VkClearValue> clear_values)     const noexcept;
-        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer, const VkClearValue& clear_value)           const noexcept;
-        void begineRenderPass(const PtrFramebuffer& ptr_framebuffer)                                            const noexcept;
-        void endRenderPass()                                                                                    const noexcept;
-        void nextSubpass()                                                                                      const noexcept;
+        void begin()                                                                                                            const;
+        void end()                                                                                                              const;
+        void begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer, std::span<const VkClearValue> clear_values)   const noexcept;
+        void begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer, const VkClearValue& clear_value)              const noexcept;
+        void begineRenderPass(std::shared_ptr<const Framebuffer> ptr_framebuffer)                                               const noexcept;
+        void endRenderPass()                                                                                                    const noexcept;
+        void nextSubpass()                                                                                                      const noexcept;
 
-        const PtrGraphicsPipeline& getPipeline() const noexcept;
+        std::shared_ptr<const GraphicsPipeline> getPipeline() const noexcept;
 
-        static PtrPrimaryCommandBuffer make(const PtrCommandPool& ptr_command_pool);
+        static std::unique_ptr<PrimaryCommandBuffer> make(const CommandPool* ptr_command_pool);
 
     private:
-        PtrGraphicsPipeline _ptr_pipeline;
+        std::shared_ptr<const GraphicsPipeline> _ptr_pipeline;
     };
 
     class SecondaryCommandBuffer :
         public CommandBuffer
     {
     public:
-        SecondaryCommandBuffer(const PtrCommandPool& ptr_command_pool);
+        SecondaryCommandBuffer(const CommandPool* ptr_command_pool);
 
         SecondaryCommandBuffer(SecondaryCommandBuffer&& command_buffer);
         SecondaryCommandBuffer(const SecondaryCommandBuffer&) = delete;
@@ -464,11 +455,11 @@ namespace pbrlib
          * @param primary_command_buffer    первичный командный буфер.
          * @param ptr_framebuffer           указатель на кадровый буфер.
         */
-        void begin(const PrimaryCommandBuffer& primary_command_buffer, const PtrFramebuffer& ptr_framebuffer) const;
+        void begin(const PrimaryCommandBuffer& primary_command_buffer, std::shared_ptr<const Framebuffer> ptr_framebuffer) const;
         
         void end() const;
 
-        static PtrSecondaryCommandBuffer make(const PtrCommandPool& ptr_command_pool);
+        static std::unique_ptr<SecondaryCommandBuffer> make(const CommandPool* ptr_command_pool);
     };
 }
 

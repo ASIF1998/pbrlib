@@ -12,14 +12,12 @@
 #include <stdexcept>
 #include <cassert>
 
-using namespace std;
-
 namespace pbrlib
 {
     Device::Device(
-        const PtrInstance&                      ptr_instance,
-        const PhysicalDevice&                   physical_device, 
-        span<const VkDeviceQueueCreateInfo>     queue_infos
+        const Instance*                             ptr_instance,
+        const PhysicalDevice&                       physical_device, 
+        std::span<const VkDeviceQueueCreateInfo>    queue_infos
     ) :
         _device_handle(VK_NULL_HANDLE)
     {
@@ -27,11 +25,11 @@ namespace pbrlib
     }
 
     Device::Device(
-        const PtrInstance&                      ptr_instance,
-        const PhysicalDevice&                   physical_device, 
-        span<const VkDeviceQueueCreateInfo>     queue_infos, 
-        span<const char*>                       layer_names, 
-        span<const char*>                       extension_names
+        const Instance*                             ptr_instance,
+        const PhysicalDevice&                       physical_device, 
+        std::span<const VkDeviceQueueCreateInfo>    queue_infos, 
+        std::span<const char*>                      layer_names, 
+        std::span<const char*>                      extension_names
     ) :
         _device_handle(VK_NULL_HANDLE)
     {
@@ -48,14 +46,13 @@ namespace pbrlib
     Device::Device(Device&& device) :
         _device_handle(VK_NULL_HANDLE)
     {
-        swap(_device_handle, device._device_handle);
+        std::swap(_device_handle, device._device_handle);
     }
 
     Device::~Device()
     {
-        if (_device_handle != VK_NULL_HANDLE) {
+        if (_device_handle != VK_NULL_HANDLE)
             vkDestroyDevice(_device_handle, nullptr);
-        }
     }
 
     const VkDevice& Device::getDeviceHandle() const noexcept
@@ -63,17 +60,12 @@ namespace pbrlib
         return _device_handle;
     }
 
-    const vector<VkDeviceQueueCreateInfo>& Device::getDeviceQueueInfo() const noexcept
+    const std::vector<VkDeviceQueueCreateInfo>& Device::getDeviceQueueInfo() const noexcept
     {
         return _queues_infos;
     }
 
-    PtrInstance& Device::getInstance() noexcept
-    {
-        return _ptr_instance;
-    }
-
-    const PtrInstance& Device::getInstance() const noexcept
+    const Instance* Device::getInstance() const noexcept
     {
         return _ptr_instance;
     }
@@ -84,27 +76,27 @@ namespace pbrlib
     }
 
     void Device::_create(
-        const PtrInstance&                      ptr_instance,
-        const PhysicalDevice&                   physical_device,
-        span<const VkDeviceQueueCreateInfo>     queue_infos,
-        uint32_t                                enabled_layer_count,
-        const char* const*                      ptr_enabled_layers,
-        uint32_t                                enabled_extension_count,
-        const char* const*                      ptr_extensions
+        const Instance*                             ptr_instance,
+        const PhysicalDevice&                       physical_device,
+        std::span<const VkDeviceQueueCreateInfo>    queue_infos,
+        uint32_t                                    enabled_layer_count,
+        const char* const*                          ptr_enabled_layers,
+        uint32_t                                    enabled_extension_count,
+        const char* const*                          ptr_extensions
     )
     {
         _ptr_instance = ptr_instance;  
         _queues_infos = std::vector(std::begin(queue_infos), std::end(queue_infos));
 
-        vector<VkQueueFamilyProperties> queue_properties (queue_infos.size());
+        std::vector<VkQueueFamilyProperties> queue_properties (queue_infos.size());
         uint32_t queue_num = static_cast<uint32_t>(queue_properties.size());
 
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device.physical_device_handle, &queue_num, queue_properties.data());
 
-        for (size_t i{0}; i < queue_properties.size(); i++) {
-            if (!(queue_properties[i].queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT))) {
-                throw invalid_argument("Семейство очередей #" + to_string(i) + " не поддерживает графические операции.");
-            }
+        for (size_t i{0}; i < queue_properties.size(); i++) 
+        {
+            if (!(queue_properties[i].queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)))
+                throw std::invalid_argument("Семейство очередей #" + std::to_string(i) + " не поддерживает графические операции.");
         }
 
         VkDeviceCreateInfo device_info = { };

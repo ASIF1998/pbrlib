@@ -17,29 +17,11 @@
 
 namespace pbrlib
 {
-    class   ComputePipeline;
-    class   Device;
-    class   DescriptorSet;
-    class   CommandBuffer;
-    class   ImageView;
-    class   PBRPass;
-    class   Sampler;
-    class   DescriptorPool;
-    class   Buffer;
-    struct  PhysicalDevice;
-    class   CameraBase;
-    class   Scene;
+    class DescriptorPool;
+}
 
-    using PtrComputePipeline    = std::shared_ptr<ComputePipeline>;
-    using PtrDevice             = std::shared_ptr<Device>;
-    using PtrDescriptorSet      = std::shared_ptr<DescriptorSet>;
-    using PtrCommandBuffer      = std::shared_ptr<CommandBuffer>;
-    using PtrPBRPass            = std::unique_ptr<PBRPass>;
-    using PtrSampler            = std::shared_ptr<Sampler>;
-    using PtrDescriptorPool     = std::shared_ptr<DescriptorPool>;
-    using PtrBuffer             = std::shared_ptr<Buffer>;
-    using PtrPhysicalDevice     = std::shared_ptr<PhysicalDevice>;
-
+namespace pbrlib
+{
     /**
      * @class PBRPass.
      * @brief Данный класс необходим для прохода физически-корректного рендеринга.
@@ -154,31 +136,31 @@ namespace pbrlib
             Builder& operator = (Builder&&)         = delete;
             Builder& operator = (const Builder&)    = delete;
 
-            inline void setDevice(const PtrDevice& ptr_device);
-            inline void setPhysicalDevice(const PtrPhysicalDevice& ptr_physical_device);
-            inline void setDescriptorPool(const PtrDescriptorPool& ptr_descriptor_pool);
+            inline void setDevice(const Device* ptr_device);
+            inline void setPhysicalDevice(const PhysicalDevice* ptr_physical_device);
+            inline void setDescriptorPool(std::shared_ptr<const DescriptorPool> ptr_descriptor_pool);
             inline void setPositionAndMetallicImageView(const ImageView* position_and_metallic_image_view);
             inline void setNormalAndRoughnessImageView(const ImageView* normal_and_roughness_image_view);
             inline void setAlbedoAndBakedAOImageView(const ImageView* albedo_and_baked_AO_image_view);
             inline void setAnisotropyImageView(const ImageView* anisotropy_image_view);
-            inline void setSampler(const PtrSampler& ptr_sampler);
+            inline void setSampler(std::shared_ptr<const Sampler> ptr_sampler);
             inline void setOptionals(const Optionals& optionals);
-            inline void setQueue(const PtrDeviceQueue& ptr_queue);
+            inline void setQueue(std::shared_ptr<DeviceQueue> ptr_queue);
 
-            inline PBRPass      build();
-            inline PtrPBRPass   buildPtr();
+            inline PBRPass                  build();
+            inline std::unique_ptr<PBRPass> buildPtr();
 
         private:
-            PtrDevice           _ptr_device;
-            PtrPhysicalDevice   _ptr_physical_deviec;
-            PtrDescriptorPool   _ptr_descriptor_pool;
-            const ImageView*    _position_and_metallic_image_view;
-            const ImageView*    _normal_and_roughness_image_view;
-            const ImageView*    _albedo_and_baked_AO_image_view;
-            const ImageView*    _anisotropy_image_view;
-            PtrSampler          _ptr_sampler;
-            Optionals           _optionals;
-            PtrDeviceQueue      _ptr_device_queue;
+            const Device*                           _ptr_device;
+            const PhysicalDevice*                   _ptr_physical_deviec;
+            std::shared_ptr<const DescriptorPool>   _ptr_descriptor_pool;
+            const ImageView*                        _position_and_metallic_image_view;
+            const ImageView*                        _normal_and_roughness_image_view;
+            const ImageView*                        _albedo_and_baked_AO_image_view;
+            const ImageView*                        _anisotropy_image_view;
+            std::shared_ptr<const Sampler>          _ptr_sampler;
+            Optionals                               _optionals;
+            std::shared_ptr<DeviceQueue>            _ptr_device_queue;
         };
 
     public:
@@ -193,12 +175,12 @@ namespace pbrlib
          * @param optionals             опции рендера.
         */
         PBRPass(
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_deviec,
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrDescriptorPool&    ptr_descriptor_pool,
-            const PtrSampler&           ptr_sampler,
-            const Optionals&            optionals = Optionals()
+            const Device*                           ptr_device, 
+            const PhysicalDevice*                   ptr_physical_deviec,
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+            std::shared_ptr<const Sampler>          ptr_sampler,
+            const Optionals&                        optionals = Optionals()
         );
 
         /**
@@ -216,16 +198,16 @@ namespace pbrlib
          * @param optionals                         опции рендера.
         */
         PBRPass(
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_deviec,
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrDescriptorPool&    ptr_descriptor_pool,
-            const ImageView&            position_and_metallic_image_view,
-            const ImageView&            normal_and_roughness_image_view,
-            const ImageView&            albedo_and_baked_AO_image_view,
-            const ImageView&            anisotropy_image_view,
-            const PtrSampler&           ptr_sampler,
-            const Optionals&            optionals = Optionals()
+            const Device*                           ptr_device, 
+            const PhysicalDevice*                   ptr_physical_deviec,
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+            const ImageView&                        position_and_metallic_image_view,
+            const ImageView&                        normal_and_roughness_image_view,
+            const ImageView&                        albedo_and_baked_AO_image_view,
+            const ImageView&                        anisotropy_image_view,
+            std::shared_ptr<const Sampler>          ptr_sampler,
+            const Optionals&                        optionals = Optionals()
         );
 
         /**
@@ -238,15 +220,14 @@ namespace pbrlib
          * @param direction_lights      направленные источники света.
         */
         void draw(
-            const PtrSceneItem&             ptr_camera,
-            const PtrPrimaryCommandBuffer&  ptr_command_buffer,
-            std::span<const PtrSceneItem>        point_lights,
-            std::span<const PtrSceneItem>        spot_lights,
-            std::span<const PtrSceneItem>        direction_lights
+            std::shared_ptr<const SceneItem>            ptr_camera,
+            std::shared_ptr<const PrimaryCommandBuffer> ptr_command_buffer,
+            std::span<std::shared_ptr<SceneItem>>       point_lights,
+            std::span<std::shared_ptr<SceneItem>>       spot_lights,
+            std::span<std::shared_ptr<SceneItem>>       direction_lights
         );
 
-        inline PtrComputePipeline&         getPipeline() noexcept;
-        inline const PtrComputePipeline&   getPipeline() const noexcept;
+        inline std::shared_ptr<const ComputePipeline> getPipeline() const noexcept;
 
         /**
          * @brief Метод, позволяющий создавать указатель на объект типа PBRPass.
@@ -258,13 +239,13 @@ namespace pbrlib
          * @param ptr_sampler           указатель на сэмплер.
          * @param optionals             опции рендера.
         */
-        inline static PtrPBRPass make(
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_deviec,
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrDescriptorPool&    ptr_descriptor_pool,
-            const PtrSampler&           ptr_sampler,
-            const Optionals&            optionals = Optionals()
+        inline static std::unique_ptr<PBRPass> make(
+            const Device*                           ptr_device, 
+            const PhysicalDevice*                   ptr_physical_deviec,
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+            std::shared_ptr<const Sampler>          ptr_sampler,
+            const Optionals&                        optionals = Optionals()
         );
 
         /**
@@ -281,17 +262,17 @@ namespace pbrlib
          * @param ptr_sampler                       указатель на сэмплер.
          * @param optionals                         опции рендера.
         */
-        inline static PtrPBRPass make(
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_deviec,
-            const PtrDeviceQueue&       ptr_queue,
-            const PtrDescriptorPool&    ptr_descriptor_pool,
-            const ImageView&            position_and_metallic_image_view,
-            const ImageView&            normal_and_roughness_image_view,
-            const ImageView&            albedo_and_baked_AO_image_view,
-            const ImageView&            anisotropy_image_view,
-            const PtrSampler&           ptr_sampler,
-            const Optionals&            optionals = Optionals()
+        inline static std::unique_ptr<PBRPass> make(
+            const Device*                           ptr_device, 
+            const PhysicalDevice*                   ptr_physical_deviec,
+            std::shared_ptr<DeviceQueue>            ptr_queue,
+            std::shared_ptr<const DescriptorPool>   ptr_descriptor_pool,
+            const ImageView&                        position_and_metallic_image_view,
+            const ImageView&                        normal_and_roughness_image_view,
+            const ImageView&                        albedo_and_baked_AO_image_view,
+            const ImageView&                        anisotropy_image_view,
+            std::shared_ptr<const Sampler>          ptr_sampler,
+            const Optionals&                        optionals = Optionals()
         );
 
     private:
@@ -299,24 +280,24 @@ namespace pbrlib
         friend class IPassOutput<PBRPass>;
         
         inline const ImageView&    outputImpl(size_t id) const;
-        inline void                outputImpl(ImageView& image_view, size_t id);
-        inline void                outputImpl(PtrImageView& ptr_image_view, size_t id);
+        inline void                outputImpl(const ImageView& image_view, size_t id);
+        inline void                outputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id);
 
-        inline void inputImpl(const PtrImageView& ptr_image_view, size_t id);
+        inline void inputImpl(std::shared_ptr<const ImageView> ptr_image_view, size_t id);
 
     private:
-        PtrComputePipeline  _ptr_pipeline;
-        PtrDescriptorSet    _ptr_descriptor_set;
-        PtrSampler          _ptr_sampler;
+        std::shared_ptr<const ComputePipeline>  _ptr_pipeline;
+        std::shared_ptr<const DescriptorSet>    _ptr_descriptor_set;
+        std::shared_ptr<const Sampler>          _ptr_sampler;
 
-        PtrDeviceQueue _ptr_device_queue;
+        std::shared_ptr<DeviceQueue> _ptr_device_queue;
 
-        PtrBuffer _ptr_uniform_point_lights_data_buffer;
-        PtrBuffer _ptr_uniform_spot_lights_data_buffer;
-        PtrBuffer _ptr_uniform_direction_lights_data_buffer;
-        PtrBuffer _ptr_uniform_num_lights_buffer;
+        std::shared_ptr<Buffer> _ptr_uniform_point_lights_data_buffer;
+        std::shared_ptr<Buffer> _ptr_uniform_spot_lights_data_buffer;
+        std::shared_ptr<Buffer> _ptr_uniform_direction_lights_data_buffer;
+        std::shared_ptr<Buffer> _ptr_uniform_num_lights_buffer;
 
-        PtrBuffer _ptr_uniform_camera_data_buffer;
+        std::shared_ptr<Buffer> _ptr_uniform_camera_data_buffer;
 
         union
         {

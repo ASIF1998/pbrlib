@@ -22,16 +22,14 @@
 
 #include <stb_image.h>
 
-using namespace std;
-
 namespace pbrlib
 {
     GPUTextureManager::GPUTextureManager(
-        const PtrDevice&        ptr_device,
-        const PtrCommandPool&   ptr_command_pool,
+        const Device*           ptr_device,
+        const CommandPool*      ptr_command_pool,
         uint32_t                device_local_memory_type_index,
         uint32_t                host_local_memory_type_index,
-        PtrDeviceQueue          ptr_device_queue,
+        const DeviceQueue*      ptr_device_queue,
         VkImageTiling           image_tiling,
         VkSampleCountFlagBits   num_samples
     ) :
@@ -44,11 +42,10 @@ namespace pbrlib
         _num_samples                    (num_samples)
     {}
 
-    bool GPUTextureManager::loadR(const string_view path, const string_view name)
+    bool GPUTextureManager::loadR(const std::string_view path, const std::string_view name)
     {
-        if (_textures.find(name.data()) != end(_textures)) {
+        if (_textures.find(name.data()) != end(_textures))
             return true;
-        }
 
         int width           = 0;
         int height          = 0;
@@ -59,9 +56,9 @@ namespace pbrlib
         if (data && width && height) {
             using ImageBuilder = Image::BuilderWithData<Image::TexelType::R, float, Image::NumBits::NB32>;
 
-            PtrImage            ptr_image;
-            ImageBuilder        image_builder;
-            ImageView::Builder  image_view_builder;
+            std::shared_ptr<Image>  ptr_image;
+            ImageBuilder            image_builder;
+            ImageView::Builder      image_view_builder;
 
             image_builder.setExtend(width, height, 1);
             image_builder.setData(data, width * height);
@@ -98,7 +95,7 @@ namespace pbrlib
         return false;
     }
 
-    bool GPUTextureManager::loadRG(const string_view path, const string_view name)
+    bool GPUTextureManager::loadRG(const std::string_view path, const std::string_view name)
     {
         if (_textures.find(name.data()) != end(_textures)) {
             return true;
@@ -113,9 +110,9 @@ namespace pbrlib
         if (data && width && height) {
             using ImageBuilder = Image::BuilderWithData<Image::TexelType::RG, float, Image::NumBits::NB32>;
 
-            PtrImage            ptr_image;
-            ImageBuilder        image_builder;
-            ImageView::Builder  image_view_builder;
+            std::shared_ptr<Image>  ptr_image;
+            ImageBuilder            image_builder;
+            ImageView::Builder      image_view_builder;
 
             image_builder.setExtend(width, height, 1);
             image_builder.setData(data, width * height * 2);
@@ -152,11 +149,10 @@ namespace pbrlib
         return false;
     }
 
-    bool GPUTextureManager::loadRGB(const string_view path, const string_view name)
+    bool GPUTextureManager::loadRGB(const std::string_view path, const std::string_view name)
     {
-        if (_textures.find(name.data()) != end(_textures)) {
+        if (_textures.find(name.data()) != end(_textures))
             return true;
-        }
 
         int width           = 0;
         int height          = 0;
@@ -167,9 +163,9 @@ namespace pbrlib
         if (data && width && height) {
             using ImageBuilder = Image::BuilderWithData<Image::TexelType::RGB, float, Image::NumBits::NB32>;
         
-            PtrImage            ptr_image;
-            ImageBuilder        image_builder;
-            ImageView::Builder  image_view_builder;
+            std::shared_ptr<Image>  ptr_image;
+            ImageBuilder            image_builder;
+            ImageView::Builder      image_view_builder;
 
             image_builder.setExtend(width, height, 1);
             image_builder.setData(data, width * height * 3);
@@ -206,11 +202,10 @@ namespace pbrlib
         return false;
     }
 
-    bool GPUTextureManager::loadRGBA(const string_view path, const string_view name)
+    bool GPUTextureManager::loadRGBA(const std::string_view path, const std::string_view name)
     {
-        if (_textures.find(name.data()) != end(_textures)) {
+        if (_textures.find(name.data()) != end(_textures))
             return true;
-        }
 
         int width           = 0;
         int height          = 0;
@@ -221,9 +216,9 @@ namespace pbrlib
         if (data && width && height) {
             using ImageBuilder = Image::BuilderWithData<Image::TexelType::RGBA, float, Image::NumBits::NB32>;
 
-            PtrImage            ptr_image;
-            ImageBuilder        image_builder;
-            ImageView::Builder  image_view_builder;
+            std::shared_ptr<Image>  ptr_image;
+            ImageBuilder            image_builder;
+            ImageView::Builder      image_view_builder;
 
             image_builder.setExtend(width, height, 1);
             image_builder.setData(data, width * height * 4);
@@ -260,31 +255,24 @@ namespace pbrlib
         return false;
     }
 
-    bool GPUTextureManager::add(const PtrImageView& ptr_image_view, const string_view name)
+    bool GPUTextureManager::add(std::shared_ptr<const ImageView> ptr_image_view, const std::string_view name)
     {
-        if (_textures.find(name.data()) != end(_textures)) {
+        if (_textures.find(name.data()) != std::end(_textures))
             return false;
-        }
         
-        _textures.insert(make_pair(name, ptr_image_view));
+        _textures.insert(std::make_pair(name, ptr_image_view));
         
         return true;
     }
 
-    bool GPUTextureManager::has(const string_view name)
+    bool GPUTextureManager::has(const std::string_view name)
     {
-        return _textures.find(name.data()) != end(_textures);
+        return _textures.find(name.data()) != std::end(_textures);
     }
 
-    optional<PtrImageView> GPUTextureManager::get(const string_view name)
+    std::shared_ptr<const ImageView> GPUTextureManager::get(const std::string_view name) const
     {
         auto it = _textures.find(name.data());
-        return it != end(_textures) ? make_optional(it->second) : nullopt;
-    }
-
-    optional<const PtrImageView> GPUTextureManager::get(const string_view name) const
-    {
-        auto it = _textures.find(name.data());
-        return it != end(_textures) ? make_optional(it->second) : nullopt;
+        return it != end(_textures) ? it->second : nullptr;
     }
 }

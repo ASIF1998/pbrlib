@@ -135,12 +135,12 @@ namespace pbrlib
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ShaderModule::ShaderModule(
-        const PtrDevice&            ptr_device,
-        VkShaderStageFlagBits       shader_type,
-        const uint32_t*             ptr_shader_code,
-        size_t                      shader_code_size,
-        size_t                      specialization_info_size_data,
-        size_t                      specialization_info_num_map_entires
+        const Device*           ptr_device,
+        VkShaderStageFlagBits   shader_type,
+        const uint32_t*         ptr_shader_code,
+        size_t                  shader_code_size,
+        size_t                  specialization_info_size_data,
+        size_t                  specialization_info_num_map_entires
     ) :
         _ptr_device             (ptr_device),
         _shader_type            (shader_type),
@@ -163,7 +163,7 @@ namespace pbrlib
     }
 
     ShaderModule::ShaderModule(ShaderModule&& shader_module) :
-        _ptr_device             (move(shader_module._ptr_device)),
+        _ptr_device             (shader_module._ptr_device),
         _shader_type            (shader_module._shader_type),
         _specialization_info    (shader_module._specialization_info),
         _shader_handle          (VK_NULL_HANDLE)
@@ -178,12 +178,7 @@ namespace pbrlib
         }
     }
 
-    PtrDevice& ShaderModule::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& ShaderModule::getDevice() const noexcept
+    const Device* ShaderModule::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -208,16 +203,16 @@ namespace pbrlib
         return _specialization_info;
     }
 
-    PtrShaderModule ShaderModule::make(
-        const PtrDevice&            ptr_device,
-        VkShaderStageFlagBits       shader_type,
-        const uint32_t*             ptr_shader_code,
-        size_t                      shader_code_size,
-        size_t                      specialization_info_size_data,
-        size_t                      specialization_info_num_map_entires
+    std::unique_ptr<ShaderModule> ShaderModule::make(
+        const Device*           ptr_device,
+        VkShaderStageFlagBits   shader_type,
+        const uint32_t*         ptr_shader_code,
+        size_t                  shader_code_size,
+        size_t                  specialization_info_size_data,
+        size_t                  specialization_info_num_map_entires
     )
     {
-        return make_shared<ShaderModule>(
+        return std::make_unique<ShaderModule>(
             ptr_device,
             shader_type,
             ptr_shader_code,
@@ -233,7 +228,7 @@ namespace pbrlib
         _specialization_info_num_map_entires(0)
     {}
 
-    void ShaderModule::Builder::setDevice(const PtrDevice& ptr_device)
+    void ShaderModule::Builder::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
@@ -278,9 +273,9 @@ namespace pbrlib
         );
     }
 
-    PtrShaderModule ShaderModule::Builder::buildPtr() const
+    std::unique_ptr<ShaderModule> ShaderModule::Builder::buildPtr() const
     {
-        return make_shared<ShaderModule>(
+        return std::make_unique<ShaderModule>(
             _ptr_device,
             _shader_type,
             _ptr_shader_code,

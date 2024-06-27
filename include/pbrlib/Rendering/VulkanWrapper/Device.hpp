@@ -19,12 +19,11 @@
 namespace pbrlib
 {
     struct  PhysicalDevice;
-    class   Device;
     class   Instance;
+}
 
-    using PtrDevice     = std::shared_ptr<Device>;
-    using PtrInstance   = std::shared_ptr<Instance>;
-
+namespace pbrlib
+{
     class Device
     {
     public:
@@ -36,7 +35,7 @@ namespace pbrlib
          * @param queue_infos       информация о создаваемых очередях логического устройства.
         */
         Device(
-            const PtrInstance&                          ptr_instance,
+            const Instance*                             ptr_instance,
             const PhysicalDevice&                       physical_device, 
             std::span<const VkDeviceQueueCreateInfo>    queue_infos
         );
@@ -51,7 +50,7 @@ namespace pbrlib
          * @param extension_names   названия расширений.
         */
         Device(
-            const PtrInstance&                          ptr_instance,
+            const Instance*                             ptr_instance,
             const PhysicalDevice&                       physical_device, 
             std::span<const VkDeviceQueueCreateInfo>    queue_infos, 
             std::span<const char*>                      layer_names, 
@@ -68,8 +67,7 @@ namespace pbrlib
 
         const VkDevice&                             getDeviceHandle()       const noexcept;
         const std::vector<VkDeviceQueueCreateInfo>& getDeviceQueueInfo()    const noexcept;
-        PtrInstance&                                getInstance()           noexcept;
-        const PtrInstance&                          getInstance()           const noexcept;
+        const Instance*                             getInstance()           const noexcept;
 
         /**
          * @brief Метод необходимый для ожидания завершения всех очередей на устройстве.
@@ -78,7 +76,7 @@ namespace pbrlib
 
     private:
         void _create(
-            const PtrInstance&                          ptr_instance,
+            const Instance*                             ptr_instance,
             const PhysicalDevice&                       physical_device,
             std::span<const VkDeviceQueueCreateInfo>    queue_infos,
             uint32_t                                    enabled_layer_count,
@@ -88,7 +86,7 @@ namespace pbrlib
         );
 
     private:
-        PtrInstance                             _ptr_instance;
+        const Instance*                         _ptr_instance;
         VkDevice                                _device_handle; //!< Дескриптор логического устройства.
         std::vector<VkDeviceQueueCreateInfo>    _queues_infos;  //!< Информация об используемых очередях устройства.
     };

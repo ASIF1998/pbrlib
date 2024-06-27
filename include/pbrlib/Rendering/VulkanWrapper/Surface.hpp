@@ -20,14 +20,12 @@
 
 namespace pbrlib
 {
-    class   Surface;
     struct  PhysicalDevice;
     class   Instance;
+}
 
-    using PtrSurface        = std::shared_ptr<Surface>;
-    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
-    using PtrInstance       = std::shared_ptr<Instance>;
-
+namespace pbrlib
+{
     class Surface
     {
     public:
@@ -39,9 +37,9 @@ namespace pbrlib
          * @param ptr_physical_device   физическое устройство.
         */
         Surface(
-            const Window&               window, 
-            const PtrInstance&          ptr_instance, 
-            const PtrPhysicalDevice&    ptr_physical_device
+            const Window&           window, 
+            const Instance*         ptr_instance, 
+            const PhysicalDevice*   ptr_physical_device
         );
 
         Surface(Surface&& surface);
@@ -52,30 +50,26 @@ namespace pbrlib
         Surface& operator = (Surface&&)         = delete;
         Surface& operator = (const Surface&)    = delete;
 
-        const VkSurfaceKHR&              getSurfaceHandle()          const noexcept;
-        PtrInstance&                     getInstance()               noexcept;
-        const PtrInstance&               getInstance()               const noexcept;
-        const VkSurfaceCapabilitiesKHR&  getSurfaceCapabilities()    const noexcept;
-        const VkSurfaceFormatKHR&        getSurfaceFormat()          const noexcept;
+        const VkSurfaceKHR&             getSurfaceHandle()          const noexcept;
+        const Instance*                 getInstance()               const noexcept;
+        const VkSurfaceCapabilitiesKHR& getSurfaceCapabilities()    const noexcept;
+        const VkSurfaceFormatKHR&       getSurfaceFormat()          const noexcept;
 
         void setFormat(const VkSurfaceFormatKHR& format) noexcept;
         
-        static PtrSurface make(
-            const Window&               window,
-            const PtrInstance&          ptr_instance,
-            const PtrPhysicalDevice&    ptr_physical_device
+        static std::unique_ptr<Surface> make(
+            const Window&           window,
+            const Instance*         ptr_instance,
+            const PhysicalDevice*   ptr_physical_device
         );
         
-        static std::vector<VkSurfaceFormatKHR> getAllSurfaceFormats(
-            const Surface&              surface, 
-            const PtrPhysicalDevice&    ptr_physical_device
-        );
+        static std::vector<VkSurfaceFormatKHR> getAllSurfaceFormats(const Surface& surface, const PhysicalDevice* ptr_physical_device);
 
     private:
-        PtrInstance                 _ptr_instance;
-        VkSurfaceKHR                _surface_handle;
-        VkSurfaceCapabilitiesKHR    _surface_capabilities;
-        VkSurfaceFormatKHR          _surface_format;
+        const Instance*                     _ptr_instance;
+        VkSurfaceKHR                        _surface_handle;
+        VkSurfaceCapabilitiesKHR            _surface_capabilities;
+        VkSurfaceFormatKHR                  _surface_format;
     };
 }
 

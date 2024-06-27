@@ -8,23 +8,21 @@
 
 #include <pbrlib/SceneGraph/Component.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
-    ComponentBase::ComponentBase(const string_view name) :
+    ComponentBase::ComponentBase(const std::string_view name) :
         _name(name)
     {}
 
     ComponentBase::~ComponentBase()
     {}
 
-    string& ComponentBase::getName() noexcept
+    std::string& ComponentBase::getName() noexcept
     {
         return _name;
     }
 
-    const string& ComponentBase::getName() const noexcept
+    const std::string& ComponentBase::getName() const noexcept
     {
         return _name;
     }

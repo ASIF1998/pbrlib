@@ -98,7 +98,7 @@ auto getModelResourcesReferences()
     return refs;
 }
 
-PtrWindow makeWindow()
+std::shared_ptr<Window> makeWindow()
 {
     Window::Builder window_builder;
     window_builder.setTitle("Sand Box");
@@ -109,7 +109,7 @@ PtrWindow makeWindow()
     return window_builder.buildPtr();
 }
 
-PtrMaterial getMaterial(const ModelResourcesReferences& model, GPUTextureManager& texture_manager, MaterialManager& material_manager)
+auto getMaterial(const ModelResourcesReferences& model, GPUTextureManager& texture_manager, MaterialManager& material_manager)
 {
     Material::Builder material_builder (texture_manager);
     material_builder.setAlbedo(model.path_to_albedo.string(), "Albedo");
@@ -119,7 +119,7 @@ PtrMaterial getMaterial(const ModelResourcesReferences& model, GPUTextureManager
     material_builder.setRoughness(model.path_to_roughness.string(), "Roughness");
     material_builder.setAnisotropy(0.3f);
 
-    auto material = material_builder.buildPtr();
+    std::shared_ptr material = material_builder.buildPtr();
     material_manager.addMaterial(material, "Material");
 
     return material;
@@ -182,25 +182,25 @@ int main(int argc, char* argv[])
     std::cout << "Hello world !!!" << std::endl;
     return 0;
 #else
-	PtrPBRLibResources engine_resources = PBRLibResources::init();
-    PtrWindow window = makeWindow();
+	std::shared_ptr engine_resources = PBRLibResources::init();
+    auto window = makeWindow();
 
     SceneView scene_view ("Scene", engine_resources, window);
 
 
 	auto model = getModelResourcesReferences();
-    PtrSceneItem ptr_point_light = nullptr;
+    std::shared_ptr<SceneItem> ptr_point_light = nullptr;
 
     Scene&              scene               = scene_view.getScene();
     MeshManager&        mesh_manager        = scene.getMeshManager();
     MaterialManager&    material_manager    = scene.getMaterialManager();
     GPUTextureManager&  texture_manager     = scene.getTextureManager();
 
-    std::vector<PtrMesh>    model_meshes    = mesh_manager.load(model.path_to_mesh.string()).value();
-    PtrMaterial             material        = getMaterial(model, texture_manager, material_manager);
+    auto model_meshes   = mesh_manager.load(model.path_to_mesh.string()).value();
+    auto material       = getMaterial(model, texture_manager, material_manager);
     model_meshes[0]->setMaterial(material);
 
-    auto mesh_node = MeshNode::make("Floor", model_meshes[0]);
+    std::shared_ptr mesh_node = MeshNode::make("Floor", model_meshes[0]);
     mesh_node->addComponent(Rotate::make());
 
     // Регестрируем модель в сцене.
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
     pbr_optionals.setGeometryFunction(PBRPass::GeometryFunction::Kelemen);
     pbr_optionals.setFresnelApproximation(PBRPass::FresnelApproximation::Schlick);
 
-    PtrIRenderer renderer = PBR::make(pbr_optionals);
+    std::shared_ptr renderer = PBR::make(pbr_optionals);
     scene_view.setRenderer(renderer);
 
     SDL_Event event;

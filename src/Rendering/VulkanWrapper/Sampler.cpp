@@ -151,7 +151,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Sampler::Sampler(const PtrDevice& ptr_device, const SamplerInfo& sampler_info) :
+    Sampler::Sampler(const Device* ptr_device, const SamplerInfo& sampler_info) :
         _ptr_device     (ptr_device),
         _sampler_info   (sampler_info),
         _sampler_handle (VK_NULL_HANDLE)
@@ -167,7 +167,7 @@ namespace pbrlib
     }
 
     Sampler::Sampler(Sampler&& sampler) :
-        _ptr_device     (move(sampler._ptr_device)),
+        _ptr_device     (sampler._ptr_device),
         _sampler_info   (sampler._sampler_info),
         _sampler_handle (VK_NULL_HANDLE)
     {
@@ -176,17 +176,11 @@ namespace pbrlib
 
     Sampler::~Sampler()
     {
-        if (_sampler_handle != VK_NULL_HANDLE) {
+        if (_sampler_handle != VK_NULL_HANDLE)
             vkDestroySampler(_ptr_device->getDeviceHandle(), _sampler_handle, nullptr);
-        }
     }
 
-    PtrDevice& Sampler::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& Sampler::getDevice() const noexcept
+    const Device* Sampler::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -211,7 +205,7 @@ namespace pbrlib
         SamplerInfo()
     {}
 
-    void Sampler::Builder::setDevice(const PtrDevice& ptr_device)
+    void Sampler::Builder::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
@@ -224,11 +218,8 @@ namespace pbrlib
         );
     }
 
-    PtrSampler Sampler::Builder::buildPtr() const
+    std::unique_ptr<Sampler> Sampler::Builder::buildPtr() const
     {
-        return make_shared<Sampler>(
-            _ptr_device,
-            *this
-        );
+        return std::make_unique<Sampler>(_ptr_device, *this);
     }
 }

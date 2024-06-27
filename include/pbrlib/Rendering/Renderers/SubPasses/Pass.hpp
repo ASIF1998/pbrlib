@@ -13,12 +13,6 @@
 
 namespace pbrlib
 {
-    class ImageView;
-    class RenderPass;
-
-    using PtrImageView  = std::shared_ptr<ImageView>;
-    using PtrRenderPass = std::shared_ptr<RenderPass>;
-
     /**
      * @interface IPassOutput.
      * @details 
@@ -46,12 +40,12 @@ namespace pbrlib
             return static_cast<const PassType*>(this)->outputImpl(id);
         }
 
-        void output(PtrImageView& ptr_image_view, size_t id)
+        void output(std::shared_ptr<const ImageView> ptr_image_view, size_t id)
         {
             static_cast<PassType*>(this)->outputImpl(ptr_image_view, id);
         }
 
-        void output(ImageView& image_view, size_t id)
+        void output(const ImageView& image_view, size_t id)
         {
             static_cast<PassType*>(this)->outputImpl(image_view, id);
         }
@@ -79,7 +73,7 @@ namespace pbrlib
         IPassInputOutput& operator = (IPassInputOutput&&)       = delete;
         IPassInputOutput& operator = (const IPassInputOutput&)  = delete;
 
-        void input(const PtrImageView& ptr_image_view, size_t id)
+        void input(std::shared_ptr<const ImageView> ptr_image_view, size_t id)
         {
             static_cast<PassType*>(this)->inputImpl(ptr_image_view, id);
         }

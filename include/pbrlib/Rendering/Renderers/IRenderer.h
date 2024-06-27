@@ -19,9 +19,6 @@ namespace pbrlib
     class Device;
     class CameraBase;
 
-    using PtrIRenderer  = std::shared_ptr<IRenderer>;
-    using PtrDevice     = std::shared_ptr<Device>;
-
     /**
      * @class IRenderer.
      * @brief Интерфейс для реализации рендера.
@@ -41,9 +38,9 @@ namespace pbrlib
          * @param ptr_physical_device   указатель на физическое устройство.
         */
         virtual void init(
-            const PtrWindow&            ptr_window, 
-            const PtrDevice&            ptr_device, 
-            const PtrPhysicalDevice&    ptr_physical_device
+            std::shared_ptr<const Window>   ptr_window, 
+            const Device*                   ptr_device, 
+            const PhysicalDevice*           ptr_physical_device
         ) = 0;
 
         /**
@@ -57,12 +54,12 @@ namespace pbrlib
          * @param delta_time        количество пройденного времени с момента завершения последнего кадра.
         */
         virtual void draw(
-            const PtrSceneItem&         ptr_camera,
-            const VisibleList&          visible_list, 
-            std::span<const PtrSceneItem>    point_lights,
-            std::span<const PtrSceneItem>    spot_lights,
-            std::span<const PtrSceneItem>    direction_lights,
-            float                       delta_time
+            std::shared_ptr<const SceneItem>            ptr_camera,
+            const VisibleList&                          visible_list, 
+            std::span<std::shared_ptr<SceneItem>>       point_lights,
+            std::span<std::shared_ptr<SceneItem>>       spot_lights,
+            std::span<std::shared_ptr<SceneItem>>       direction_lights,
+            float                                       delta_time
         ) = 0;
     };
 }

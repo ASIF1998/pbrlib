@@ -14,8 +14,6 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace pbrlib
 {
     VertexInputState::VertexInputState(
@@ -46,10 +44,10 @@ namespace pbrlib
         _pipeline_vertex_input_state_ci.vertexBindingDescriptionCount   = vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount;
         _pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount = vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount;
 
-        swap(_pipeline_vertex_input_state_ci.pVertexBindingDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexBindingDescriptions);
-        swap(_pipeline_vertex_input_state_ci.pVertexAttributeDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexAttributeDescriptions);
-        swap(_ptr_vertex_biding_descriptions, vertex_input_state._ptr_vertex_biding_descriptions);
-        swap(_ptr_vertex_attribute_descriptions, vertex_input_state._ptr_vertex_attribute_descriptions);
+        std::swap(_pipeline_vertex_input_state_ci.pVertexBindingDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexBindingDescriptions);
+        std::swap(_pipeline_vertex_input_state_ci.pVertexAttributeDescriptions, vertex_input_state._pipeline_vertex_input_state_ci.pVertexAttributeDescriptions);
+        std::swap(_ptr_vertex_biding_descriptions, vertex_input_state._ptr_vertex_biding_descriptions);
+        std::swap(_ptr_vertex_attribute_descriptions, vertex_input_state._ptr_vertex_attribute_descriptions);
         
         vertex_input_state._pipeline_vertex_input_state_ci.vertexBindingDescriptionCount    = 0;
         vertex_input_state._pipeline_vertex_input_state_ci.vertexAttributeDescriptionCount  = 0;
@@ -167,7 +165,7 @@ namespace pbrlib
         VkBool32                alpha_to_coverage_enable,
         VkBool32                alpha_to_one_enable
     ) :
-        _sample_mask(numeric_limits<decltype(_sample_mask)>::max())
+        _sample_mask(std::numeric_limits<decltype(_sample_mask)>::max())
     {
         _pipeline_multisample_state_ci = { };
         _pipeline_multisample_state_ci.sType                    = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -504,8 +502,8 @@ namespace pbrlib
         _ptr_viewports  (nullptr),
         _ptr_scissors   (nullptr)
     {
-        swap(_ptr_viewports, viewport_state._ptr_viewports);
-        swap(_ptr_scissors, viewport_state._ptr_scissors);
+        std::swap(_ptr_viewports, viewport_state._ptr_viewports);
+        std::swap(_ptr_scissors, viewport_state._ptr_scissors);
 
         _current_viewport   = viewport_state._current_viewport;
         _current_scissor    = viewport_state._current_scissor;
@@ -663,7 +661,7 @@ namespace pbrlib
         _ptr_attachments    (nullptr),
         _current_attachment (color_blend_state._current_attachment)
     {
-        swap(_ptr_attachments, color_blend_state._ptr_attachments);
+        std::swap(_ptr_attachments, color_blend_state._ptr_attachments);
         memcpy(&_pipeline_color_blend_state_ci,  &color_blend_state._pipeline_color_blend_state_ci, sizeof(VkPipelineColorBlendStateCreateInfo));
     }
 
@@ -769,13 +767,13 @@ namespace pbrlib
     {}
 
     GraphicsPipelineStates::GraphicsPipelineStates(GraphicsPipelineStates&& graphics_pipeline_states) :
-        _vertex_input_state     (move(graphics_pipeline_states._vertex_input_state)),
-        _multisample_state      (move(graphics_pipeline_states._multisample_state)),
-        _rasterization_state    (move(graphics_pipeline_states._rasterization_state)),
-        _depth_stencil_state    (move(graphics_pipeline_states._depth_stencil_state)),
-        _viewport_state         (move(graphics_pipeline_states._viewport_state)),
-        _input_assembly_state   (move(graphics_pipeline_states._input_assembly_state)),
-        _color_blend_state      (move(graphics_pipeline_states._color_blend_state))
+        _vertex_input_state     (std::move(graphics_pipeline_states._vertex_input_state)),
+        _multisample_state      (std::move(graphics_pipeline_states._multisample_state)),
+        _rasterization_state    (std::move(graphics_pipeline_states._rasterization_state)),
+        _depth_stencil_state    (std::move(graphics_pipeline_states._depth_stencil_state)),
+        _viewport_state         (std::move(graphics_pipeline_states._viewport_state)),
+        _input_assembly_state   (std::move(graphics_pipeline_states._input_assembly_state)),
+        _color_blend_state      (std::move(graphics_pipeline_states._color_blend_state))
     {}
 
     GraphicsPipelineStates::GraphicsPipelineStates(const GraphicsPipelineStates& graphics_pipeline_states) :
@@ -861,9 +859,9 @@ namespace pbrlib
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GraphicsPipeline::GraphicsPipeline(
         const GraphicsPipelineStates&           graphics_pipeline_states,
-        span<const ShaderModule>                shaders,
-        const PtrPipelineLayout&                ptr_pipeline_layout,
-        const PtrRenderPass&                    ptr_render_pass,
+        std::span<const ShaderModule>           shaders,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+        std::shared_ptr<const RenderPass>       ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),
@@ -878,15 +876,15 @@ namespace pbrlib
     
     GraphicsPipeline::GraphicsPipeline(
         GraphicsPipelineStates&&                graphics_pipeline_states,
-        span<const ShaderModule>             shaders,
-        const PtrPipelineLayout&                ptr_pipeline_layout,
-        const PtrRenderPass&                    ptr_render_pass,
+        std::span<const ShaderModule>           shaders,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+        std::shared_ptr<const RenderPass>       ptr_render_pass,
         uint32_t                                subpass_index
     ) :
         _subpass_index          (subpass_index),
         _ptr_pipeline_layout    (ptr_pipeline_layout),
         _ptr_render_pass        (ptr_render_pass),
-        _states                 (move(graphics_pipeline_states)),
+        _states                 (std::move(graphics_pipeline_states)),
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
@@ -895,32 +893,30 @@ namespace pbrlib
 
     GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& graphics_pipeline) :
         _subpass_index          (graphics_pipeline._subpass_index),
-        _ptr_pipeline_layout    (move(graphics_pipeline._ptr_pipeline_layout)),
-        _ptr_render_pass        (move(graphics_pipeline._ptr_render_pass)),
-        _states                 (move(graphics_pipeline._states)),
+        _ptr_pipeline_layout    (std::move(graphics_pipeline._ptr_pipeline_layout)),
+        _ptr_render_pass        (std::move(graphics_pipeline._ptr_render_pass)),
+        _states                 (std::move(graphics_pipeline._states)),
         _pipeline_handle        (VK_NULL_HANDLE),
         _pipeline_cache_handle  (VK_NULL_HANDLE)
     {
-        swap(_pipeline_handle, graphics_pipeline._pipeline_handle);
-        swap(_pipeline_cache_handle, graphics_pipeline._pipeline_cache_handle);
+        std::swap(_pipeline_handle, graphics_pipeline._pipeline_handle);
+        std::swap(_pipeline_cache_handle, graphics_pipeline._pipeline_cache_handle);
     }
 
     GraphicsPipeline::~GraphicsPipeline()
     {
-        auto& ptr_device = _ptr_render_pass->getDevice();
+        auto ptr_device = _ptr_render_pass->getDevice();
 
-        if (_pipeline_handle != VK_NULL_HANDLE) {
+        if (_pipeline_handle != VK_NULL_HANDLE)
             vkDestroyPipeline(ptr_device->getDeviceHandle(), _pipeline_handle, nullptr);
-        }
 
-        if (_pipeline_cache_handle != VK_NULL_HANDLE) {
+        if (_pipeline_cache_handle != VK_NULL_HANDLE)
             vkDestroyPipelineCache(ptr_device->getDeviceHandle(), _pipeline_cache_handle, nullptr);
-        }
     }
 
-    void GraphicsPipeline::_create(span<const ShaderModule> shaders)
+    void GraphicsPipeline::_create(std::span<const ShaderModule> shaders)
     {
-        auto& ptr_device = _ptr_render_pass->getDevice();
+        auto ptr_device = _ptr_render_pass->getDevice();
 
         VkPipelineCacheCreateInfo pipeline_cache_info = { };
         pipeline_cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -934,7 +930,7 @@ namespace pbrlib
 
         assert(_pipeline_cache_handle != VK_NULL_HANDLE);
 
-       vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages_info(shaders.size());
+       std::vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages_info(shaders.size());
 
        for (size_t i{0}; i < pipeline_shader_stages_info.size(); i++) {
             pipeline_shader_stages_info[i] = { };
@@ -979,12 +975,7 @@ namespace pbrlib
         return _subpass_index;
     }
 
-    PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() noexcept
-    {
-        return _ptr_pipeline_layout;
-    }
-
-    const PtrPipelineLayout& GraphicsPipeline::getPipelineLayout() const noexcept
+    std::shared_ptr<const PipelineLayout> GraphicsPipeline::getPipelineLayout() const noexcept
     {
         return _ptr_pipeline_layout;
     }
@@ -1009,15 +1000,15 @@ namespace pbrlib
         return _pipeline_cache_handle;
     }
 
-    PtrGraphicsPipeline GraphicsPipeline::make(
+    std::unique_ptr<GraphicsPipeline> GraphicsPipeline::make(
         const GraphicsPipelineStates&           graphics_pipeline_states,
-        const vector<ShaderModule>&             shaders,
-        const PtrPipelineLayout&                ptr_pipeline_layout,
-        const PtrRenderPass&                    ptr_render_pass,
+        const std::vector<ShaderModule>&        shaders,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+        std::shared_ptr<const RenderPass>       ptr_render_pass,
         uint32_t                                subpass_index
     )
     {
-        return make_shared<GraphicsPipeline>(
+        return make_unique<GraphicsPipeline>(
             graphics_pipeline_states,
             shaders,
             ptr_pipeline_layout,
@@ -1026,16 +1017,16 @@ namespace pbrlib
         );
     }
 
-    PtrGraphicsPipeline GraphicsPipeline::make(
+    std::unique_ptr<GraphicsPipeline> GraphicsPipeline::make(
         GraphicsPipelineStates&&                graphics_pipeline_states,
-        span<const ShaderModule>                shaders,
-        const PtrPipelineLayout&                ptr_pipeline_layout,
-        const PtrRenderPass&                    ptr_render_pass,
+        std::span<const ShaderModule>           shaders,
+        std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+        std::shared_ptr<const RenderPass>       ptr_render_pass,
         uint32_t                                subpass_index
     )
     {
-        return make_shared<GraphicsPipeline>(
-            move(graphics_pipeline_states),
+        return make_unique<GraphicsPipeline>(
+            std::move(graphics_pipeline_states),
             shaders,
             ptr_pipeline_layout,
             ptr_render_pass,
@@ -1061,12 +1052,12 @@ namespace pbrlib
         _subpass_index(0)
     {}
 
-    void GraphicsPipeline::Builder::setPipleineLayout(const PtrPipelineLayout& ptr_pipeline_layout)
+    void GraphicsPipeline::Builder::setPipleineLayout(std::shared_ptr<const PipelineLayout> ptr_pipeline_layout)
     {
         _ptr_pipeline_layout = ptr_pipeline_layout;
     }
 
-    void GraphicsPipeline::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
+    void GraphicsPipeline::Builder::setRenderPass(std::shared_ptr<const RenderPass> ptr_render_pass)
     {
         _ptr_render_pass = ptr_render_pass;
     }
@@ -1076,14 +1067,14 @@ namespace pbrlib
         _subpass_index = subpass_index;
     }
 
-    void GraphicsPipeline::Builder::setShadersModules(vector<ShaderModule>&& shaders)
+    void GraphicsPipeline::Builder::setShadersModules(std::vector<ShaderModule>&& shaders)
     {
-        swap(_shaders, shaders);
+        std::swap(_shaders, shaders);
     }
 
     void GraphicsPipeline::Builder::addShader(ShaderModule&& shader_module)
     {
-        _shaders.push_back(move(shader_module));
+        _shaders.push_back(std::move(shader_module));
     }
 
     GraphicsPipeline GraphicsPipeline::Builder::build() const
@@ -1097,9 +1088,9 @@ namespace pbrlib
         );
     }
 
-    PtrGraphicsPipeline GraphicsPipeline::Builder::buildPtr() const
+    std::unique_ptr<GraphicsPipeline> GraphicsPipeline::Builder::buildPtr() const
     {
-        return make_shared<GraphicsPipeline>(
+        return make_unique<GraphicsPipeline>(
             *this,
             _shaders,
             _ptr_pipeline_layout,

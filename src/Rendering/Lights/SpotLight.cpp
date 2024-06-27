@@ -8,7 +8,6 @@
 
 #include <pbrlib/Rendering/Lights/SpotLight.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -31,13 +30,13 @@ namespace pbrlib
     {}
 
     SpotLight::SpotLight(
-        const string_view   name,
-        const Vec3<float>&  position,
-        const Vec3<float>&  direction,
-        float               inner_radius,
-        float               outer_radius,
-        const Vec3<float>&  color,
-        float               intensity
+        const std::string_view  name,
+        const Vec3<float>&      position,
+        const Vec3<float>&      direction,
+        float                   inner_radius,
+        float                   outer_radius,
+        const Vec3<float>&      color,
+        float                   intensity
     ) :
         Component       (name),
         _pos            (position),
@@ -124,7 +123,7 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SpotLight::Builder::Builder(const string_view name) :
+    SpotLight::Builder::Builder(const std::string_view name) :
         _name(name)
     {}
 
@@ -158,7 +157,7 @@ namespace pbrlib
         _outer_radius = outer_radius;
     }
 
-    void SpotLight::Builder::setName(const string_view name)
+    void SpotLight::Builder::setName(const std::string_view name)
     {
         _name = name;
     }
@@ -176,9 +175,9 @@ namespace pbrlib
         );
     }
 
-    PtrSpotLight SpotLight::Builder::buildPtr() const
+    std::unique_ptr<SpotLight> SpotLight::Builder::buildPtr() const
     {
-        return make_shared<SpotLight>(
+        return make_unique<SpotLight>(
             _name,
             _pos,
             _dir,

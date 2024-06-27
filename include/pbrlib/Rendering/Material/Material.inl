@@ -9,19 +9,13 @@
 namespace pbrlib
 {
     template<Material::Textures TextureType>
-    void Material::setTexture(const PtrImageView& ptr_image_view)
+    void Material::setTexture(std::shared_ptr<const ImageView> ptr_image_view)
     {
         _textures[utils::enumCast(TextureType)] = ptr_image_view;
     }
 
     template<Material::Textures TextureType>
-    PtrImageView& Material::getTexture()
-    {
-        return _textures[utils::enumCast(TextureType)];
-    }
-
-    template<Material::Textures TextureType>
-    const PtrImageView& Material::getTexture() const
+    std::shared_ptr<const ImageView> Material::getTexture() const
     {
         return _textures[utils::enumCast(TextureType)];
     }

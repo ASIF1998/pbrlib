@@ -17,11 +17,11 @@
 
 namespace pbrlib
 {
-    class GraphicsPipeline;
     class ShaderModule;
+}
 
-    using PtrGraphicsPipeline = std::shared_ptr<GraphicsPipeline>;
-
+namespace pbrlib
+{
     /**
      * @class VertexInputState.
      * @brief Класс описывающий состояние входных данных вершин.
@@ -686,21 +686,21 @@ namespace pbrlib
             Builder& operator = (Builder&&)      = delete;
             Builder& operator = (const Builder&) = delete;
 
-            void setPipleineLayout(const PtrPipelineLayout& ptr_pipeline_layout);
-            void setRenderPass(const PtrRenderPass& ptr_render_pass);
+            void setPipleineLayout(std::shared_ptr<const PipelineLayout> ptr_pipeline_layout);
+            void setRenderPass(std::shared_ptr<const RenderPass> ptr_render_pass);
             void setSubpassIndex(uint32_t subpass_index) noexcept;
             void setShadersModules(std::vector<ShaderModule>&& shaders);
 
             void addShader(ShaderModule&& shader_module);
 
-            GraphicsPipeline    build()     const;
-            PtrGraphicsPipeline buildPtr()  const;
+            GraphicsPipeline                    build()     const;
+            std::unique_ptr<GraphicsPipeline>   buildPtr()  const;
 
         private:
-            PtrPipelineLayout           _ptr_pipeline_layout;
-            PtrRenderPass               _ptr_render_pass;
-            uint32_t                    _subpass_index;
-            std::vector<ShaderModule>    _shaders;
+            std::shared_ptr<const PipelineLayout>   _ptr_pipeline_layout;
+            std::shared_ptr<const RenderPass>       _ptr_render_pass;
+            uint32_t                                _subpass_index;
+            std::vector<ShaderModule>               _shaders;
         };
 
     public:
@@ -714,11 +714,11 @@ namespace pbrlib
          * @param subpass_index             индекс подпрохода.
         */
         GraphicsPipeline(
-            const GraphicsPipelineStates&   graphics_pipeline_states,
-            std::span<const ShaderModule>   shaders,
-            const PtrPipelineLayout&        ptr_pipeline_layout,
-            const PtrRenderPass&            ptr_render_pass,
-            uint32_t                        subpass_index
+            const GraphicsPipelineStates&           graphics_pipeline_states,
+            std::span<const ShaderModule>           shaders,
+            std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+            std::shared_ptr<const RenderPass>       ptr_render_pass,
+            uint32_t                                subpass_index
         );
 
         /**
@@ -731,11 +731,11 @@ namespace pbrlib
          * @param subpass_index             индекс подпрохода.
         */
         GraphicsPipeline(
-            GraphicsPipelineStates&&        graphics_pipeline_states,
-            std::span<const ShaderModule>   shaders,
-            const PtrPipelineLayout&        ptr_pipeline_layout,
-            const PtrRenderPass&            ptr_render_pass,
-            uint32_t                        subpass_index
+            GraphicsPipelineStates&&                graphics_pipeline_states,
+            std::span<const ShaderModule>           shaders,
+            std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+            std::shared_ptr<const RenderPass>       ptr_render_pass,
+            uint32_t                                subpass_index
         );
 
         GraphicsPipeline(GraphicsPipeline&& graphics_pipeline);
@@ -747,8 +747,7 @@ namespace pbrlib
         GraphicsPipeline& operator = (const GraphicsPipeline&)  = delete;
 
         uint32_t                                getSubpassIndex()           const noexcept;
-        PtrPipelineLayout&                      getPipelineLayout()         noexcept;
-        const PtrPipelineLayout&                getPipelineLayout()         const noexcept;
+        std::shared_ptr<const PipelineLayout>   getPipelineLayout()         const noexcept;
         GraphicsPipelineStates&                 getGraphicsPipelineStates() noexcept;
         const GraphicsPipelineStates&           getGraphicsPipelineStates() const noexcept;
         VkPipeline                              getPipelineHandle()         const noexcept;
@@ -763,12 +762,12 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        static PtrGraphicsPipeline make(
-            const GraphicsPipelineStates&       graphics_pipeline_states,
-            const std::vector<ShaderModule>&    shaders,
-            const PtrPipelineLayout&            ptr_pipeline_layout,
-            const PtrRenderPass&                ptr_render_pass,
-            uint32_t                            subpass_index
+        static std::unique_ptr<GraphicsPipeline> make(
+            const GraphicsPipelineStates&           graphics_pipeline_states,
+            const std::vector<ShaderModule>&        shaders,
+            std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+            std::shared_ptr<const RenderPass>       ptr_render_pass,
+            uint32_t                                subpass_index
         );
 
         /**
@@ -780,24 +779,24 @@ namespace pbrlib
          * @param ptr_render_pass           указатель на проход рендера.
          * @param subpass_index             индекс подпрохода.
         */
-        static PtrGraphicsPipeline make(
-            GraphicsPipelineStates&&        graphics_pipeline_states,
-            std::span<const ShaderModule>    shaders,
-            const PtrPipelineLayout&        ptr_pipeline_layout,
-            const PtrRenderPass&            ptr_render_pass,
-            uint32_t                        subpass_index
+        static std::unique_ptr<GraphicsPipeline> make(
+            GraphicsPipelineStates&&                graphics_pipeline_states,
+            std::span<const ShaderModule>           shaders,
+            std::shared_ptr<const PipelineLayout>   ptr_pipeline_layout,
+            std::shared_ptr<const RenderPass>       ptr_render_pass,
+            uint32_t                                subpass_index
         );
 
     private:
         void _create(std::span<const ShaderModule> shaders);
 
     private:
-        uint32_t                _subpass_index;
-        PtrPipelineLayout       _ptr_pipeline_layout;
-        PtrRenderPass           _ptr_render_pass;
-        GraphicsPipelineStates  _states;
-        VkPipeline              _pipeline_handle;
-        VkPipelineCache         _pipeline_cache_handle;
+        uint32_t                                _subpass_index;
+        std::shared_ptr<const PipelineLayout>   _ptr_pipeline_layout;
+        std::shared_ptr<const RenderPass>       _ptr_render_pass;
+        GraphicsPipelineStates                  _states;
+        VkPipeline                              _pipeline_handle;
+        VkPipelineCache                         _pipeline_cache_handle;
     };
 }
 

@@ -10,8 +10,6 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     Material::Material() :
@@ -44,7 +42,7 @@ namespace pbrlib
     Material::~Material()
     {}
 
-    void Material::setTexture(size_t i, const PtrImageView& ptr_image_view)
+    void Material::setTexture(size_t i, std::shared_ptr<const ImageView> ptr_image_view)
     {
         assert(i < utils::enumCast(Textures::Count));
         _textures[i] = ptr_image_view;
@@ -56,13 +54,7 @@ namespace pbrlib
         _anisotropy = anisotropy;
     }
 
-    PtrImageView& Material::getTexture(size_t i)
-    {
-        assert(i < utils::enumCast(Textures::Count));
-        return _textures[i];
-    }
-
-    const PtrImageView& Material::getTexture(size_t i) const
+    std::shared_ptr<const ImageView> Material::getTexture(size_t i) const
     {
         assert(i < utils::enumCast(Textures::Count));
         return _textures[i];
@@ -73,9 +65,9 @@ namespace pbrlib
         return _anisotropy;
     }
 
-    PtrMaterial Material::make()
+    std::unique_ptr<Material> Material::make()
     {
-        return std::make_shared<Material>();
+        return std::make_unique<Material>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,137 +81,131 @@ namespace pbrlib
         _texture_manager    (texture_manager)
     {}
 
-    void Material::Builder::setAlbedo(const PtrImageView& albedo)
+    void Material::Builder::setAlbedo(std::shared_ptr<const ImageView> albedo)
     {
         _albedo = albedo;
     }
 
     bool Material::Builder::setAlbedo(const std::string_view texture_name)
     {
-        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
-            _albedo = texture.value();
+        if (auto texture = _texture_manager.get(texture_name); texture) 
+        {
+            _albedo = texture;
             return true;
         }
 
         return false;
     }
 
-    bool Material::Builder::setAlbedo(const string_view path_to_albedo, const string_view texture_name)
+    bool Material::Builder::setAlbedo(const std::string_view path_to_albedo, const std::string_view texture_name)
     {
-        if (!_texture_manager.loadRGBA(path_to_albedo, texture_name)) {
-            /// Не удалось загрузить тектуру.
+        if (!_texture_manager.loadRGBA(path_to_albedo, texture_name))
             return false;
-        }
 
-        _albedo = _texture_manager.get(texture_name).value();
+        _albedo = _texture_manager.get(texture_name);
 
         return true;
     }
 
-    void Material::Builder::setNormalMap(const PtrImageView& normal_map)
+    void Material::Builder::setNormalMap(std::shared_ptr<const ImageView> normal_map)
     {
         _normal_map = normal_map;
     }
 
-    bool Material::Builder::setNormalMap(const string_view texture_name)
+    bool Material::Builder::setNormalMap(const std::string_view texture_name)
     {
-        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
-            _normal_map = texture.value();
+        if (auto texture = _texture_manager.get(texture_name); texture) {
+            _normal_map = texture;
             return true;
         }
 
         return false;
     }
 
-    bool Material::Builder::setNormalMap(const string_view path_to_normal_map, const string_view texture_name)
+    bool Material::Builder::setNormalMap(const std::string_view path_to_normal_map, const std::string_view texture_name)
     {
-        if (!_texture_manager.loadRGBA(path_to_normal_map, texture_name)) {
-            /// Не удалось загрузить тектуру.
+        if (!_texture_manager.loadRGBA(path_to_normal_map, texture_name))
             return false;
-        }
 
-        _normal_map = _texture_manager.get(texture_name).value();
+        _normal_map = _texture_manager.get(texture_name);
 
         return true;
     }
 
-    void Material::Builder::setMetallic(const PtrImageView& metallic)
+    void Material::Builder::setMetallic(std::shared_ptr<const ImageView> metallic)
     {
         _metallic = metallic;
     }
 
-    bool Material::Builder::setMetallic(const string_view texture_name)
+    bool Material::Builder::setMetallic(const std::string_view texture_name)
     {
-        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
-            _metallic = texture.value();
+        if (auto texture = _texture_manager.get(texture_name); texture) 
+        {
+            _metallic = texture;
             return true;
         }
 
         return false;
     }
 
-    bool Material::Builder::setMetallic(const string_view path_to_metallic, const string_view texture_name)
+    bool Material::Builder::setMetallic(const std::string_view path_to_metallic, const std::string_view texture_name)
     {
-        if (!_texture_manager.loadR(path_to_metallic, texture_name)) {
-            /// Не удалось загрузить тектуру.
+        if (!_texture_manager.loadR(path_to_metallic, texture_name))
             return false;
-        }
 
-        _metallic = _texture_manager.get(texture_name).value();
+        _metallic = _texture_manager.get(texture_name);
 
         return true;
     }
 
-    void Material::Builder::setRoughness(const PtrImageView& roughness)
+    void Material::Builder::setRoughness(std::shared_ptr<const ImageView> roughness)
     {
         _roughness = roughness;
     }
 
-    bool Material::Builder::setRoughness(const string_view texture_name)
+    bool Material::Builder::setRoughness(const std::string_view texture_name)
     {
-        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
-            _roughness = texture.value();
+        if (auto texture = _texture_manager.get(texture_name); texture) 
+        {
+            _roughness = texture;
             return true;
         }
 
         return false;
     }
 
-    bool Material::Builder::setRoughness(const string_view path_to_roughness, const string_view texture_name)
+    bool Material::Builder::setRoughness(const std::string_view path_to_roughness, const std::string_view texture_name)
     {
-        if (!_texture_manager.loadR(path_to_roughness, texture_name)) {
-            /// Не удалось загрузить тектуру.
+        if (!_texture_manager.loadR(path_to_roughness, texture_name))
             return false;
-        }
 
-        _roughness = _texture_manager.get(texture_name).value();
+        _roughness = _texture_manager.get(texture_name);
 
         return true;
     }
 
-    void Material::Builder::setBakedAO(const PtrImageView& baked_AO)
+    void Material::Builder::setBakedAO(std::shared_ptr<const ImageView> baked_AO)
     {
         _baked_AO = baked_AO;
     }
 
-    bool Material::Builder::setBakedAO(const string_view texture_name)
+    bool Material::Builder::setBakedAO(const std::string_view texture_name)
     {
-        if (auto texture = _texture_manager.get(texture_name); texture != nullopt) {
-            _baked_AO = texture.value();
+        if (auto texture = _texture_manager.get(texture_name); texture) 
+        {
+            _baked_AO = texture;
             return true;
         }
 
         return false;
     }
 
-    bool Material::Builder::setBakedAO(const string_view path_to_baked_AO, const string_view texture_name)
+    bool Material::Builder::setBakedAO(const std::string_view path_to_baked_AO, const std::string_view texture_name)
     {
-        if (!_texture_manager.loadR(path_to_baked_AO, texture_name)) {
-            /// Не удалось загрузить тектуру.
+        if (!_texture_manager.loadR(path_to_baked_AO, texture_name))
             return false;
-        }
 
-        _baked_AO = _texture_manager.get(texture_name).value();
+        _baked_AO = _texture_manager.get(texture_name);
 
         return true;
     }
@@ -246,11 +232,11 @@ namespace pbrlib
         return material;
     }
 
-    PtrMaterial Material::Builder::buildPtr()
+    std::unique_ptr<Material> Material::Builder::buildPtr()
     {
         assert(_albedo && _normal_map && _metallic && _roughness && _baked_AO);
 
-        PtrMaterial ptr_material = Material::make();
+        auto ptr_material = Material::make();
 
         ptr_material->_albedo       = _albedo;
         ptr_material->_normal_map   = _normal_map;

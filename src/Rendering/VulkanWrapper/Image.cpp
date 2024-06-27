@@ -8,8 +8,6 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     /**
@@ -48,7 +46,7 @@ namespace pbrlib
     }
 
     Image::Image(
-        const PtrDevice&    ptr_device,
+        const Device*       ptr_device,
         uint32_t            memory_type_index,
         const ImageInfo&    image_info,
         uint32_t            queue_family_index
@@ -64,10 +62,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const PtrDevice&        ptr_device,
-        uint32_t                memory_type_index,
-        const ImageInfo&        image_info,
-        span<const uint32_t>    queue_family_indices
+        const Device*               ptr_device,
+        uint32_t                    memory_type_index,
+        const ImageInfo&            image_info,
+        std::span<const uint32_t>   queue_family_indices
     ) :
         _image_handle           (VK_NULL_HANDLE),
         _image_info             (image_info),
@@ -79,10 +77,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const PtrDevice&    ptr_device,
-        VkImage             image,
-        ImageInfo           image_info,
-        uint32_t            queue_family_index
+        const Device*   ptr_device,
+        VkImage         image,
+        ImageInfo       image_info,
+        uint32_t        queue_family_index
     ) :
         _image_handle           (image),
         _image_info             (image_info),
@@ -94,10 +92,10 @@ namespace pbrlib
     }
 
     Image::Image(
-        const PtrDevice&        ptr_device,
-        VkImage                 image,
-        ImageInfo               image_info,
-        span<const uint32_t>    queue_family_indicies
+        const Device*               ptr_device,
+        VkImage                     image,
+        ImageInfo                   image_info,
+        std::span<const uint32_t>   queue_family_indicies
     ) :
         _image_handle           (image),
         _image_info             (image_info),
@@ -109,19 +107,18 @@ namespace pbrlib
     Image::Image(Image&& image) :
         _image_handle           (VK_NULL_HANDLE),
         _image_info             (image._image_info),
-        _queue_family_indicies  (move(image._queue_family_indicies)),
+        _queue_family_indicies  (std::move(image._queue_family_indicies)),
         _ptr_device             (image._ptr_device),
         _ptr_device_memory      (nullptr)
     {
-        swap(_ptr_device_memory, image._ptr_device_memory);
-        swap(_image_handle, image._image_handle);
+        std::swap(_ptr_device_memory, image._ptr_device_memory);
+        std::swap(_image_handle, image._image_handle);
     }
 
     Image::~Image()
     {
-        if (_image_handle != VK_NULL_HANDLE) {
+        if (_image_handle != VK_NULL_HANDLE)
             vkDestroyImage(_ptr_device->getDeviceHandle(), _image_handle, nullptr);
-        }
     }
 
     void Image::_create(uint32_t memory_type_index)
@@ -171,69 +168,66 @@ namespace pbrlib
         return _image_handle;
     }
 
-    PtrDevice& Image::getDevice() noexcept
+    const Device* Image::getDevice() const noexcept
     {
         return _ptr_device;
-    }
-
-    const PtrDevice& Image::getDevice() const noexcept
-    {
-        return _ptr_device;
-    }   
-
-    PtrDeviceMemory& Image::getDeviceMemory() noexcept
-    {
-        return _ptr_device_memory;
-    }
-
-    const PtrDeviceMemory& Image::getDeviceMemory() const noexcept
-    {
-        return _ptr_device_memory;
     } 
 
-    PtrImage Image::make(
-        const PtrDevice&            ptr_device,
-        uint32_t                    memory_type_index,
-        const ImageInfo&            image_info,
-        uint32_t                    queue_family_index
+    DeviceMemory* Image::getDeviceMemory() noexcept
+    {
+        assert(_ptr_device_memory != nullptr);
+        return _ptr_device_memory.get();
+    }   
+
+    const DeviceMemory* Image::getDeviceMemory() const noexcept
+    {
+        assert(_ptr_device_memory != nullptr);
+        return _ptr_device_memory.get();
+    } 
+
+    std::unique_ptr<Image> Image::make(
+        const Device*       ptr_device,
+        uint32_t            memory_type_index,
+        const ImageInfo&    image_info,
+        uint32_t            queue_family_index
     )
     {
-        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
+        return std::make_unique<Image>(ptr_device, memory_type_index, image_info, queue_family_index);
     }
 
-    PtrImage Image::make(
-        const PtrDevice&            ptr_device,
+    std::unique_ptr<Image> Image::make(
+        const Device*               ptr_device,
         uint32_t                    memory_type_index,
         const ImageInfo&            image_info,
         std::span<const uint32_t>   queue_family_indices
     )
     {
-        return make_shared<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
+        return make_unique<Image>(ptr_device, memory_type_index, image_info, queue_family_indices);
     }
 
-    PtrImage Image::make(
-        const PtrDevice&            ptr_device,
-        VkImage                     image,
-        const ImageInfo&            image_info,
-        uint32_t                    queue_family_index
+    std::unique_ptr<Image> Image::make(
+        const Device*       ptr_device,
+        VkImage             image,
+        const ImageInfo&    image_info,
+        uint32_t            queue_family_index
     )
     {
-        return make_shared<Image>(ptr_device, image, image_info, queue_family_index);
+        return std::make_unique<Image>(ptr_device, image, image_info, queue_family_index);
     }
 
-    PtrImage Image::make(
-        const PtrDevice&            ptr_device,
+    std::unique_ptr<Image> Image::make(
+        const Device*               ptr_device,
         VkImage                     image,
         const ImageInfo&            image_info,
-        span<const uint32_t>        queue_family_indicies
+        std::span<const uint32_t>   queue_family_indicies
     )
     {
-        return make_shared<Image>(ptr_device, image, image_info, queue_family_indicies);
+        return std::make_unique<Image>(ptr_device, image, image_info, queue_family_indicies);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ImageView::ImageView(
-        const PtrImage&                 ptr_image,
+        std::shared_ptr<const Image>    ptr_image,
         VkFormat                        format,
         const VkImageSubresourceRange&  subresource_range,
         VkImageViewType                 type
@@ -269,7 +263,7 @@ namespace pbrlib
         _subresource_range  (image_view._subresource_range),
         _type               (image_view._type)
     {
-        swap(image_view._image_view_handle, _image_view_handle);
+        std::swap(image_view._image_view_handle, _image_view_handle);
     }
 
     ImageView::~ImageView()
@@ -279,12 +273,7 @@ namespace pbrlib
         }
     }
 
-    PtrImage& ImageView::getImage() noexcept
-    {
-        return _ptr_image;
-    }
-
-    const PtrImage& ImageView::getImage() const noexcept
+    std::shared_ptr<const Image> ImageView::getImage() const noexcept
     {
         return _ptr_image;
     }

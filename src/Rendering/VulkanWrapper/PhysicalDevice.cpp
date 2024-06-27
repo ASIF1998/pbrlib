@@ -13,8 +13,6 @@
 #include <cassert>
 #include <stdexcept>
 
-using namespace std;
-
 namespace pbrlib
 {
     PhysicalDevice::PhysicalDevice(VkPhysicalDevice physical_device_handle) :
@@ -25,32 +23,29 @@ namespace pbrlib
 
         assert(vkEnumerateDeviceExtensionProperties(physical_device_handle, nullptr, &num, nullptr) == VK_SUCCESS);
 
-        vector<VkExtensionProperties> extension_properties (num);
+        std::vector<VkExtensionProperties> extension_properties (num);
 
         assert(vkEnumerateDeviceExtensionProperties(physical_device_handle, nullptr, &num, extension_properties.data()) == VK_SUCCESS);
 
-        for (size_t i{0}; i < extension_properties.size(); i++) {
+        for (size_t i{0}; i < extension_properties.size(); i++)
             _search_extension_names.insert(extension_properties[i].extensionName);
-        }
 
         assert(vkEnumerateDeviceLayerProperties(physical_device_handle, &num, nullptr) == VK_SUCCESS);
 
-        vector<VkLayerProperties> layer_properties (num);
+        std::vector<VkLayerProperties> layer_properties (num);
 
         assert(vkEnumerateDeviceLayerProperties(physical_device_handle, &num, layer_properties.data()) == VK_SUCCESS);
 
-        for (size_t i{0}; i < layer_properties.size(); i++) {
+        for (size_t i{0}; i < layer_properties.size(); i++)
             _search_layer_names.insert(layer_properties[i].layerName);
-            
-        }
     }
 
-    bool PhysicalDevice::isExtensionSupported(const string& name) const
+    bool PhysicalDevice::isExtensionSupported(const std::string& name) const
     {
         return _search_extension_names.find(name) != _search_extension_names.end();
     }
 
-    bool PhysicalDevice::isLayerSupported(const string& name) const
+    bool PhysicalDevice::isLayerSupported(const std::string& name) const
     {
         return _search_layer_names.find(name) != _search_layer_names.end();
     }
@@ -84,24 +79,24 @@ namespace pbrlib
         return format_properties;
     }
 
-    PtrDevice PhysicalDevice::makeDevice(const PtrInstance& ptr_instance, span<const VkDeviceQueueCreateInfo> queue_info) const
+    std::unique_ptr<Device> PhysicalDevice::makeDevice(const Instance* ptr_instance, std::span<const VkDeviceQueueCreateInfo> queue_info) const
     {
-        return make_shared<Device>(ptr_instance, *this, queue_info);
+        return std::make_unique<Device>(ptr_instance, *this, queue_info);
     }
 
-    PtrDevice PhysicalDevice::makeDevice(
-        const PtrInstance&                      ptr_instance,
-        span<const VkDeviceQueueCreateInfo>     queue_info,
-        span<const char*>                       layer_names,
-        span<const char*>                       extension_names
+    std::unique_ptr<Device> PhysicalDevice::makeDevice(
+        const Instance*                             ptr_instance,
+        std::span<const VkDeviceQueueCreateInfo>    queue_info,
+        std::span<const char*>                      layer_names,
+        std::span<const char*>                      extension_names
     ) const
     {
-        return make_shared<Device>(ptr_instance, *this, queue_info, layer_names, extension_names);
+        return std::make_unique<Device>(ptr_instance, *this, queue_info, layer_names, extension_names);
     }
 
     uint32_t PhysicalDevice::getMemoryTypeIndex(uint32_t type) const
     {
-        constexpr uint32_t invalid_type_index = numeric_limits<uint32_t>::max();
+        constexpr uint32_t invalid_type_index = std::numeric_limits<uint32_t>::max();
 
         VkPhysicalDeviceMemoryProperties memory_properties;
 
@@ -116,30 +111,30 @@ namespace pbrlib
         return invalid_type_index;
     }
 
-    vector<uint32_t> PhysicalDevice::getAllMemoryTypeIndicies(uint32_t type) const
+    std::vector<uint32_t> PhysicalDevice::getAllMemoryTypeIndicies(uint32_t type) const
     {
-        vector<uint32_t> memory_type_indicies;
+        std::vector<uint32_t> memory_type_indicies;
         VkPhysicalDeviceMemoryProperties memory_properties;
 
         vkGetPhysicalDeviceMemoryProperties(physical_device_handle, &memory_properties);
 
-        for (uint32_t i{0}; i < memory_properties.memoryTypeCount; i++) {
-            if ((memory_properties.memoryTypes[i].propertyFlags & type) == type) {
+        for (uint32_t i{0}; i < memory_properties.memoryTypeCount; i++) 
+        {
+            if ((memory_properties.memoryTypes[i].propertyFlags & type) == type)
                 memory_type_indicies.push_back(i);
-            }
         }
 
         return memory_type_indicies;
     }
 
-    vector<VkQueueFamilyProperties> PhysicalDevice::getQueueFamilyProperties() const
+    std::vector<VkQueueFamilyProperties> PhysicalDevice::getQueueFamilyProperties() const
     {
         uint32_t num_queue_families = 0;
         
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device_handle, &num_queue_families, nullptr);
         assert(num_queue_families);
 
-        vector<VkQueueFamilyProperties> properties (num_queue_families);
+        std::vector<VkQueueFamilyProperties> properties (num_queue_families);
 
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device_handle, &num_queue_families, properties.data());
 
@@ -160,6 +155,6 @@ namespace pbrlib
             }
         }
 
-        throw invalid_argument ("Типа памяти с таким флагом нет.");
+        throw std::invalid_argument ("Типа памяти с таким флагом нет.");
     }
 }

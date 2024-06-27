@@ -20,9 +20,10 @@ namespace pbrlib
     class ImageView;
     class Buffer;
     class DescriptorSet;
+}
 
-    using PtrDescriptorSet = std::shared_ptr<DescriptorSet>;
-
+namespace pbrlib
+{
     class DescriptorSet
     {
     public:
@@ -33,8 +34,8 @@ namespace pbrlib
          * @param ptr_descriptor_set_layout указатель на объект размещения множества дескрипторов.
         */
         DescriptorSet(
-            const PtrDescriptorPool&        ptr_descriptor_pool, 
-            const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+            std::shared_ptr<const DescriptorPool>       ptr_descriptor_pool, 
+            std::shared_ptr<const DescriptorSetLayout>  ptr_descriptor_set_layout
         );
 
         DescriptorSet(DescriptorSet&& descriptor_set);
@@ -45,13 +46,10 @@ namespace pbrlib
         DescriptorSet& operator = (DescriptorSet&&)         = delete;
         DescriptorSet& operator = (const DescriptorSet&)    = delete;
 
-        PtrDevice&                       getDevice()                 noexcept;
-        const PtrDevice&                 getDevice()                 const noexcept;
-        PtrDescriptorPool&               getDescriptorPool()         noexcept;
-        const PtrDescriptorPool&         getDescriptorPool()         const noexcept;
-        PtrDescriptorSetLayout&          getDescriptorSetLayout()    noexcept;
-        const PtrDescriptorSetLayout&    getDescriptorSetLayout()    const noexcept;
-        const VkDescriptorSet&           getDescriptorSetHandle()    const noexcept;
+        const Device*                               getDevice()                 const noexcept;
+        std::shared_ptr<const DescriptorPool>       getDescriptorPool()         const noexcept;
+        std::shared_ptr<const DescriptorSetLayout>  getDescriptorSetLayout()    const noexcept;
+        const VkDescriptorSet&                      getDescriptorSetHandle()    const noexcept;
 
         /**
          * @brief 
@@ -114,15 +112,15 @@ namespace pbrlib
          * @param ptr_descriptor_pool       указатель на пул дескрипторов.
          * @param ptr_descriptor_set_layout указатель на объект размещения множества дескрипторов.
         */
-        static PtrDescriptorSet make(
-             const PtrDescriptorPool&        ptr_descriptor_pool,
-             const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+        static std::unique_ptr<DescriptorSet> make(
+             std::shared_ptr<const DescriptorPool>      ptr_descriptor_pool,
+             std::shared_ptr<const DescriptorSetLayout> ptr_descriptor_set_layout
          );
 
     private:
-        PtrDescriptorPool       _ptr_descriptor_pool;
-        PtrDescriptorSetLayout  _ptr_descriptor_set_layout;
-        VkDescriptorSet         _descriptor_set_handle;
+        std::shared_ptr<const DescriptorPool>       _ptr_descriptor_pool;
+        std::shared_ptr<const DescriptorSetLayout>  _ptr_descriptor_set_layout;
+        VkDescriptorSet                             _descriptor_set_handle;
     };
 }
 

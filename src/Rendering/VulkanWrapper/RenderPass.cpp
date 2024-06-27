@@ -10,8 +10,6 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace pbrlib
 {
     SubpassDescription::SubpassDescription(
@@ -79,32 +77,32 @@ namespace pbrlib
         _use_depth_stencil_attachment = false;
     }
 
-    vector<VkAttachmentReference>& SubpassDescription::getInputAttachment() noexcept
+    std::vector<VkAttachmentReference>& SubpassDescription::getInputAttachment() noexcept
     {
         return _input_attachment;
     }
 
-    const vector<VkAttachmentReference>& SubpassDescription::getInputAttachment() const noexcept
+    const std::vector<VkAttachmentReference>& SubpassDescription::getInputAttachment() const noexcept
     {
         return _input_attachment;
     }
 
-    vector<VkAttachmentReference>& SubpassDescription::getColorAttachment() noexcept
+    std::vector<VkAttachmentReference>& SubpassDescription::getColorAttachment() noexcept
     {
         return _color_attachment;
     }
 
-    const vector<VkAttachmentReference>& SubpassDescription::getColorAttachment() const noexcept
+    const std::vector<VkAttachmentReference>& SubpassDescription::getColorAttachment() const noexcept
     {
         return _color_attachment;
     }
 
-    vector<uint32_t>& SubpassDescription::getPresentAttachment() noexcept
+    std::vector<uint32_t>& SubpassDescription::getPresentAttachment() noexcept
     {
         return _present_attachment;
     }
 
-    const vector<uint32_t>& SubpassDescription::getPresentAttachment() const noexcept
+    const std::vector<uint32_t>& SubpassDescription::getPresentAttachment() const noexcept
     {
         return _present_attachment;
     }
@@ -183,7 +181,7 @@ namespace pbrlib
 
     void RenderPassInfo::addSubpassDescription(SubpassDescription&& subpass_description)
     {
-        _subpass_descriptions.push_back(move(subpass_description));
+        _subpass_descriptions.push_back(std::move(subpass_description));
     }
 
     void RenderPassInfo::addSubpassDescription(const SubpassDescription& subpass_description)
@@ -211,38 +209,38 @@ namespace pbrlib
         });
     }
 
-    vector<VkAttachmentDescription>& RenderPassInfo::getAttachmentDescriptions() noexcept
+    std::vector<VkAttachmentDescription>& RenderPassInfo::getAttachmentDescriptions() noexcept
     {
         return _attribute_descriptions;
     }
 
-    const vector<VkAttachmentDescription>& RenderPassInfo::getAttachmentDescriptions() const noexcept
+    const std::vector<VkAttachmentDescription>& RenderPassInfo::getAttachmentDescriptions() const noexcept
     {
         return _attribute_descriptions;
     }
 
-    vector<SubpassDescription>& RenderPassInfo::getSubpassDescriptions() noexcept
+    std::vector<SubpassDescription>& RenderPassInfo::getSubpassDescriptions() noexcept
     {
         return _subpass_descriptions;
     }
 
-    const vector<SubpassDescription>& RenderPassInfo::getSubpassDescriptions() const noexcept
+    const std::vector<SubpassDescription>& RenderPassInfo::getSubpassDescriptions() const noexcept
     {
         return _subpass_descriptions;
     }
 
-    vector<VkSubpassDependency>& RenderPassInfo::getSubpassDependencies() noexcept
+    std::vector<VkSubpassDependency>& RenderPassInfo::getSubpassDependencies() noexcept
     {
         return _subpass_dependencies;
     }
 
-    const vector<VkSubpassDependency>& RenderPassInfo::getSubpassDependencies() const noexcept
+    const std::vector<VkSubpassDependency>& RenderPassInfo::getSubpassDependencies() const noexcept
     {
         return _subpass_dependencies;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderPass::RenderPass(const PtrDevice& ptr_device, const RenderPassInfo& render_pass_info) :
+    RenderPass::RenderPass(const Device* ptr_device, const RenderPassInfo& render_pass_info) :
         _render_pass_info   (render_pass_info),
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
@@ -250,8 +248,8 @@ namespace pbrlib
         _create();
     }
 
-    RenderPass::RenderPass(const PtrDevice& ptr_device, RenderPassInfo&& render_pass_info) :
-        _render_pass_info   (move(render_pass_info)),
+    RenderPass::RenderPass(const Device* ptr_device, RenderPassInfo&& render_pass_info) :
+        _render_pass_info   (std::move(render_pass_info)),
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (ptr_device)
     {
@@ -259,11 +257,11 @@ namespace pbrlib
     }
 
     RenderPass::RenderPass(RenderPass&& render_pass) :
-        _render_pass_info   (move(render_pass._render_pass_info)),
+        _render_pass_info   (std::move(render_pass._render_pass_info)),
         _render_pass_handle (VK_NULL_HANDLE),
         _ptr_device         (render_pass._ptr_device)
     {
-        swap(_render_pass_handle, render_pass._render_pass_handle);
+        std::swap(_render_pass_handle, render_pass._render_pass_handle);
     }
 
     RenderPass::~RenderPass() noexcept
@@ -276,7 +274,7 @@ namespace pbrlib
     void RenderPass::_create()
     {
         auto& psubpass_descritions = _render_pass_info.getSubpassDescriptions();
-        vector<VkSubpassDescription> subpass_description (psubpass_descritions.size());
+        std::vector<VkSubpassDescription> subpass_description (psubpass_descritions.size());
 
         for (size_t i{0}; i < subpass_description.size(); i++) {
             subpass_description[i] = {
@@ -323,30 +321,25 @@ namespace pbrlib
         return _render_pass_handle;
     }
 
-    PtrDevice& RenderPass::getDevice() noexcept
-    {
-        return _ptr_device;   
-    }
-
-    const PtrDevice& RenderPass::getDevice() const noexcept
+    const Device* RenderPass::getDevice() const noexcept
     {
          return _ptr_device;
     }
 
-    PtrRenderPass RenderPass::make(
-        const PtrDevice&   ptr_device,
-        const RenderPassInfo&       render_pass_info
+    std::unique_ptr<RenderPass> RenderPass::make(
+        const Device*   ptr_device,
+        const RenderPassInfo&           render_pass_info
     )
     {
-        return make_shared<RenderPass>(ptr_device, render_pass_info);
+        return std::make_unique<RenderPass>(ptr_device, render_pass_info);
     }
 
-    PtrRenderPass RenderPass::make(
-        const PtrDevice&   ptr_device,
-        RenderPassInfo&&            render_pass_info
+    std::unique_ptr<RenderPass> RenderPass::make(
+        const Device*       ptr_device,
+        RenderPassInfo&&    render_pass_info
     )
     {
-        return make_shared<RenderPass>(ptr_device, move(render_pass_info));
+        return std::make_unique<RenderPass>(ptr_device, std::move(render_pass_info));
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,7 +355,7 @@ namespace pbrlib
         )
     {}
 
-    void RenderPass::Builder::setDevice(const PtrDevice& ptr_device)
+    void RenderPass::Builder::setDevice(const Device* ptr_device)
     {
         _ptr_device = ptr_device;
     }
@@ -375,9 +368,9 @@ namespace pbrlib
         );
     }
     
-    PtrRenderPass RenderPass::Builder::buildPtr() const
+    std::unique_ptr<RenderPass> RenderPass::Builder::buildPtr() const
     {
-        return make_shared<RenderPass>(
+        return std::make_unique<RenderPass>(
             _ptr_device,
             *this
         );

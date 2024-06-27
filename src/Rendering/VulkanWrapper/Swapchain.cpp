@@ -12,14 +12,12 @@
 
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     Swapchain::Swapchain(
-        const PtrDevice&            ptr_device,
-        span<const uint32_t>     queue_family_indices,
-        const PtrSurface&           surface
+        const Device*                   ptr_device,
+        std::span<const uint32_t>       queue_family_indices,
+        std::shared_ptr<const Surface>  surface
     ) :
         _swapchain_handle(VK_NULL_HANDLE),
         _ptr_surface(surface)
@@ -28,14 +26,14 @@ namespace pbrlib
     }
 
     Swapchain::Swapchain(
-        const PtrDevice&            ptr_device,
-        uint32_t                    queue_family_index,
-        const PtrSurface&           surface
+        const Device*                   ptr_device,
+        uint32_t                        queue_family_index,
+        std::shared_ptr<const Surface>  surface
     ) :
         _swapchain_handle   (VK_NULL_HANDLE),
         _ptr_surface        (surface)
     {
-        vector<uint32_t> queue_family_indicies {queue_family_index};
+        std::vector<uint32_t> queue_family_indicies {queue_family_index};
         _create(ptr_device, queue_family_indicies, VK_SHARING_MODE_EXCLUSIVE);
     }
 
@@ -44,26 +42,23 @@ namespace pbrlib
         _ptr_surface        (move(swapchain._ptr_surface)),
         _images_view        (move(swapchain._images_view))
     {
-        swap(_swapchain_handle, swapchain._swapchain_handle);
+        std::swap(_swapchain_handle, swapchain._swapchain_handle);
     }
 
     Swapchain::~Swapchain()
     {
-        if (_swapchain_handle != VK_NULL_HANDLE) {
-            for (size_t i{0}; i < _images_view.size(); i++) {
+        if (_swapchain_handle != VK_NULL_HANDLE) 
+        {
+            for (size_t i{0}; i < _images_view.size(); i++) 
                 vkDestroyImageView(_images_view[i].getImage()->getDevice()->getDeviceHandle(), _images_view[i]._image_view_handle, nullptr);
-
-                _images_view[i]._image_view_handle          = VK_NULL_HANDLE;
-                _images_view[i]._ptr_image->_image_handle   = VK_NULL_HANDLE;
-            }
             
             vkDestroySwapchainKHR(_images_view[0]._ptr_image->getDevice()->getDeviceHandle(), _swapchain_handle, nullptr);
         }
     }
 
     void Swapchain::_create(
-        const PtrDevice&            ptr_device,
-        span<const uint32_t>        queue_family_indices,
+        const Device*               ptr_device, 
+        std::span<const uint32_t>   queue_family_indices,
         VkSharingMode               sharing_mode
     )
     {
@@ -115,8 +110,8 @@ namespace pbrlib
         vkGetSwapchainImagesKHR(ptr_device->getDeviceHandle(), _swapchain_handle, &num_images, nullptr);
         assert(num_images);
 
-        vector<VkImage>             vk_images (num_images);
-        vector<PtrImage>   ptr_images;
+        std::vector<VkImage>                vk_images (num_images);
+        std::vector<std::shared_ptr<Image>> ptr_images;
 
         vkGetSwapchainImagesKHR(ptr_device->getDeviceHandle(), _swapchain_handle, &num_images, vk_images.data());
         
@@ -132,22 +127,22 @@ namespace pbrlib
         }
     }
 
-    vector<ImageView>& Swapchain::getImagesView() noexcept
+    std::vector<ImageView>& Swapchain::getImagesView() noexcept
     {
         return _images_view;
     }
 
 
-    const vector<ImageView>& Swapchain::getImagesView() const noexcept
+    const std::vector<ImageView>& Swapchain::getImagesView() const noexcept
     {
         return _images_view;
     }
 
-    void Swapchain::getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence)
+    void Swapchain::getNextPresentImageIndex(uint32_t& image_index, VkSemaphore semaphore, VkFence fence) const
     {
         VkDevice device_handle = _images_view[0].getImage()->getDevice()->getDeviceHandle();
 
-        vkAcquireNextImageKHR(device_handle, _swapchain_handle, numeric_limits<uint64_t>::max(), semaphore, fence, &image_index);
+        vkAcquireNextImageKHR(device_handle, _swapchain_handle, std::numeric_limits<uint64_t>::max(), semaphore, fence, &image_index);
     }
 
     const VkSwapchainKHR& Swapchain::getSwapchainHandle() const noexcept
@@ -155,40 +150,31 @@ namespace pbrlib
         return _swapchain_handle;
     }
 
-    PtrSurface& Swapchain::getSurface() noexcept
+    std::shared_ptr<const Surface> Swapchain::getSurface() const noexcept
     {
         return _ptr_surface;
     }
 
-    const PtrSurface& Swapchain::getSurface() const noexcept
-    {
-        return _ptr_surface;
-    }
-
-    PtrDevice& Swapchain::getDevice() noexcept
-    {
-        return _images_view[0].getImage()->getDevice();
-    }
-    const PtrDevice& Swapchain::getDevice() const noexcept
+    const Device* Swapchain::getDevice() const noexcept
     {
         return _images_view[0].getImage()->getDevice();
     }
 
-    PtrSwapchain Swapchain::make(
-        const PtrDevice&            ptr_device,
-        span<const uint32_t>        queue_family_indices,
-        const shared_ptr<Surface>&  surface
+    std::unique_ptr<Swapchain> Swapchain::make(
+        const Device*                   ptr_device,
+        std::span<const uint32_t>       queue_family_indices,
+        std::shared_ptr<const Surface>  surface
     )
     {
-        return make_shared<Swapchain>(ptr_device, queue_family_indices, surface);
+        return make_unique<Swapchain>(ptr_device, queue_family_indices, surface);
     }
 
-    PtrSwapchain Swapchain::make(
-        const PtrDevice&            ptr_device,
-        uint32_t                    queue_family_index,
-        const shared_ptr<Surface>&  surface
+    std::unique_ptr<Swapchain> Swapchain::make(
+        const Device*                   ptr_device,
+        uint32_t                        queue_family_index,
+        std::shared_ptr<const Surface>  surface
     )
     {
-        return make_shared<Swapchain>(ptr_device, queue_family_index, surface);
+        return make_unique<Swapchain>(ptr_device, queue_family_index, surface);
     }
 }

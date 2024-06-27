@@ -9,18 +9,16 @@
 #include <pbrlib/Rendering/VulkanWrapper/Framebuffer.hpp>
 #include <pbrlib/Rendering/VulkanWrapper/Image.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     Framebuffer::Framebuffer(
-        const PtrSwapchain&     ptr_swapchain,
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        PtrAttachments&&        attachments,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+        std::shared_ptr<const Swapchain>    ptr_swapchain,
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        PtrAttachments&&                    attachments,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     ) :
         _ptr_swapchain              (ptr_swapchain),
         _ptr_render_pass            (ptr_render_pass),
@@ -35,13 +33,13 @@ namespace pbrlib
     }
 
     Framebuffer::Framebuffer(
-        const PtrSwapchain&     ptr_swapchain,
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        const PtrAttachments&   attachments,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+        std::shared_ptr<const Swapchain>    ptr_swapchain,
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        const PtrAttachments&               attachments,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     ) :
         _ptr_swapchain              (ptr_swapchain),
         _ptr_render_pass            (ptr_render_pass),
@@ -56,12 +54,12 @@ namespace pbrlib
     }
 
     Framebuffer::Framebuffer(
-        const PtrSwapchain&     ptr_swapchain,
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+        std::shared_ptr<const Swapchain>    ptr_swapchain,
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     ) :
         _ptr_swapchain              (ptr_swapchain),
         _ptr_render_pass            (ptr_render_pass),
@@ -76,11 +74,11 @@ namespace pbrlib
     }
 
     Framebuffer::Framebuffer(
-        PtrAttachments&&        attachments,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+        PtrAttachments&&                    attachments,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     ) :
         _ptr_swapchain              (nullptr),
         _ptr_render_pass            (ptr_render_pass),
@@ -95,11 +93,11 @@ namespace pbrlib
     }
 
     Framebuffer::Framebuffer(
-        const PtrAttachments&   attachments,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+        const PtrAttachments&               attachments,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     ) :
         _ptr_swapchain              (nullptr),
         _ptr_render_pass            (ptr_render_pass),
@@ -123,7 +121,7 @@ namespace pbrlib
         _height                     (framebuffer._height),
         _layers                     (framebuffer._layers)
     {
-        swap(_framebuffer_handle, framebuffer._framebuffer_handle);
+        std::swap(_framebuffer_handle, framebuffer._framebuffer_handle);
     }
 
     Framebuffer::~Framebuffer()
@@ -137,7 +135,7 @@ namespace pbrlib
     {
         assert(_width && _height && _layers && (_attachments != nullptr || isUsedSwapchain()));
 
-        vector<VkImageView> attachments;
+        std::vector<VkImageView> attachments;
 
         if (isUsedSwapchain()) {
             attachments.push_back(_ptr_swapchain->getImagesView()[_swapchain_attachment_indx].getImageViewHandle());
@@ -173,22 +171,12 @@ namespace pbrlib
         return _ptr_swapchain != nullptr;
     }
 
-    PtrSwapchain& Framebuffer::getSwapchain() noexcept
+    std::shared_ptr<const Swapchain> Framebuffer::getSwapchain() const noexcept
     {
         return _ptr_swapchain;
     }
 
-    const PtrSwapchain& Framebuffer::getSwapchain() const noexcept
-    {
-        return _ptr_swapchain;
-    }
-
-    PtrRenderPass& Framebuffer::getRenderPass() noexcept
-    {
-        return _ptr_render_pass;
-    }
-
-    const PtrRenderPass& Framebuffer::getRenderPass() const noexcept
+    std::shared_ptr<const RenderPass> Framebuffer::getRenderPass() const noexcept
     {
         return _ptr_render_pass;
     }
@@ -201,12 +189,6 @@ namespace pbrlib
     const PtrAttachments& Framebuffer::getAttachments() const noexcept
     {
         return _attachments;
-    }
-
-    ImageView& Framebuffer::getSwapchainAttachment() noexcept
-    {
-        assert(_ptr_swapchain != nullptr);
-        return _ptr_swapchain->getImagesView()[_swapchain_attachment_indx];
     }
 
     const ImageView& Framebuffer::getSwapchainAttachment() const noexcept
@@ -240,27 +222,22 @@ namespace pbrlib
         return _layers;
     }
 
-    PtrDevice&  Framebuffer::getDevice() noexcept
+    const Device* Framebuffer::getDevice() const noexcept
     {
         return _ptr_render_pass->getDevice();
     }
 
-    const PtrDevice& Framebuffer::getDevice() const noexcept
-    {
-        return _ptr_render_pass->getDevice();
-    }
-
-    PtrFramebuffer Framebuffer::make(
-        const PtrSwapchain&     ptr_swapchain,
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        PtrAttachments&&        attachments,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+    std::unique_ptr<Framebuffer> Framebuffer::make(
+        std::shared_ptr<const Swapchain>    ptr_swapchain,
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        PtrAttachments&&                    attachments,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     )
     {
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
             ptr_swapchain, 
             swapchain_attachment_indx, 
             ptr_render_pass, 
@@ -271,17 +248,17 @@ namespace pbrlib
         );
     }
 
-    PtrFramebuffer Framebuffer::make(
-        const PtrSwapchain&     ptr_swapchain,
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        const PtrAttachments&   attachments,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+    std::unique_ptr<Framebuffer> Framebuffer::make(
+        std::shared_ptr<const Swapchain>    ptr_swapchain,
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        const PtrAttachments&               attachments,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     )
     {
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
 
             ptr_swapchain,
             swapchain_attachment_indx,
@@ -293,16 +270,16 @@ namespace pbrlib
         );
     }
 
-    PtrFramebuffer Framebuffer::make(
-        const PtrSwapchain&     ptr_swapchain, 
-        uint32_t                swapchain_attachment_indx,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+    std::unique_ptr<Framebuffer> Framebuffer::make(
+        std::shared_ptr<const Swapchain>    ptr_swapchain, 
+        uint32_t                            swapchain_attachment_indx,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     )
     {
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
             ptr_swapchain,
             swapchain_attachment_indx,
             ptr_render_pass,
@@ -312,15 +289,15 @@ namespace pbrlib
         );
     }
 
-    PtrFramebuffer Framebuffer::make(
-        PtrAttachments&&        attachments,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+    std::unique_ptr<Framebuffer> Framebuffer::make(
+        PtrAttachments&&                    attachments,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     )
     {
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
             move(attachments),
             ptr_render_pass,
             width,
@@ -329,15 +306,15 @@ namespace pbrlib
         );
     }
 
-    PtrFramebuffer Framebuffer::make(
-        const PtrAttachments&   attachments,
-        const PtrRenderPass&    ptr_render_pass,
-        uint32_t                width,
-        uint32_t                height,
-        uint32_t                layers
+    std::unique_ptr<Framebuffer> Framebuffer::make(
+        const PtrAttachments&               attachments,
+        std::shared_ptr<const RenderPass>   ptr_render_pass,
+        uint32_t                            width,
+        uint32_t                            height,
+        uint32_t                            layers
     )
     {
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
             attachments,
             ptr_render_pass,
             width,
@@ -357,7 +334,7 @@ namespace pbrlib
         _layers                     (0)
     {}
 
-    void Framebuffer::Builder::setSwapchain(const PtrSwapchain& ptr_swapchain)
+    void Framebuffer::Builder::setSwapchain(std::shared_ptr<const Swapchain> ptr_swapchain)
     {
         _ptr_swapchain = ptr_swapchain;
     }
@@ -367,7 +344,7 @@ namespace pbrlib
         _swapchain_attachment_index = swapchain_attachment_index;
     }
 
-    void Framebuffer::Builder::setRenderPass(const PtrRenderPass& ptr_render_pass)
+    void Framebuffer::Builder::setRenderPass(std::shared_ptr<const RenderPass> ptr_render_pass)
     {
         _ptr_render_pass = ptr_render_pass;
     }
@@ -426,10 +403,10 @@ namespace pbrlib
         );
     }
 
-    PtrFramebuffer Framebuffer::Builder::buildPtr() const
+    std::unique_ptr<Framebuffer> Framebuffer::Builder::buildPtr() const
     {
         if (!_ptr_swapchain) {
-            return make_shared<Framebuffer>(
+            return make_unique<Framebuffer>(
                 _ptr_attachments,
                 _ptr_render_pass,
                 _width,
@@ -439,7 +416,7 @@ namespace pbrlib
         }
 
         if (!_ptr_attachments) {
-            return make_shared<Framebuffer>(
+            return make_unique<Framebuffer>(
                 _ptr_swapchain,
                 _swapchain_attachment_index,
                 _ptr_render_pass,
@@ -449,7 +426,7 @@ namespace pbrlib
             );
         }
 
-        return make_shared<Framebuffer>(
+        return make_unique<Framebuffer>(
             _ptr_swapchain,
             _swapchain_attachment_index,
             _ptr_render_pass,

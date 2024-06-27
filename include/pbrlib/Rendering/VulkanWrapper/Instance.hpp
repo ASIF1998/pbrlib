@@ -22,12 +22,11 @@
 
 namespace pbrlib
 {
-    struct  PhysicalDevice;
-    class   Instance;
-    
-    using PtrInstance       = std::shared_ptr<Instance>;
-    using PtrPhysicalDevice = std::shared_ptr<PhysicalDevice>;
+    struct PhysicalDevice;
+}
 
+namespace pbrlib
+{
     /**
      * @class VulkanInstanceExtensionSupported.
      * @brief 
@@ -110,8 +109,8 @@ namespace pbrlib
 
         const VkInstance& getHandle() const;
 
-        PtrPhysicalDevice               getPhysicalDevice(int type);
-        std::vector<PtrPhysicalDevice>  getAllPhysicalDevice(int type) const;
+        PhysicalDevice              getPhysicalDevice(int type)     const;
+        std::vector<PhysicalDevice> getAllPhysicalDevice(int type)  const;
 
         /**
          * @brief Статический метод проверяющий поддержку расширения.
@@ -136,7 +135,7 @@ namespace pbrlib
          * @param app_name      название приложения.
          * @param app_version   номер приложения.
         */
-        static PtrInstance make(const std::string_view app_name, uint32_t app_version);
+        static std::unique_ptr<Instance> make(const std::string_view app_name, uint32_t app_version);
 
         /**
          * @brief Статический метод создающий экземпляр Vulkan'а.
@@ -146,7 +145,7 @@ namespace pbrlib
          * @param layer_names       названия слоёв.
          * @param extension_names   названия расширений.
         */
-        static PtrInstance make(
+        static std::unique_ptr<Instance> make(
             const std::string_view  app_name,
             uint32_t                app_version,
             std::span<const char*>  layer_names,

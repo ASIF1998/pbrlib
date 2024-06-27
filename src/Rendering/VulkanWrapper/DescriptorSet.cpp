@@ -16,8 +16,8 @@
 namespace pbrlib
 {
     DescriptorSet::DescriptorSet(
-        const PtrDescriptorPool&        ptr_descriptor_pool, 
-        const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+        std::shared_ptr<const DescriptorPool>       ptr_descriptor_pool, 
+        std::shared_ptr<const DescriptorSetLayout>  ptr_descriptor_set_layout
     ) :
         _ptr_descriptor_pool        (ptr_descriptor_pool),
         _ptr_descriptor_set_layout  (ptr_descriptor_set_layout),
@@ -58,32 +58,17 @@ namespace pbrlib
         }
     }
 
-    PtrDevice& DescriptorSet::getDevice() noexcept
+    const Device* DescriptorSet::getDevice() const noexcept
     {
         return _ptr_descriptor_pool->getDevice();
     }
 
-    const PtrDevice& DescriptorSet::getDevice() const noexcept
-    {
-        return _ptr_descriptor_pool->getDevice();
-    }
-
-    PtrDescriptorPool& DescriptorSet::getDescriptorPool() noexcept
+    std::shared_ptr<const DescriptorPool> DescriptorSet::getDescriptorPool() const noexcept
     {
         return _ptr_descriptor_pool;
     }
 
-    const PtrDescriptorPool& DescriptorSet::getDescriptorPool() const noexcept
-    {
-        return _ptr_descriptor_pool;
-    }
-
-    PtrDescriptorSetLayout& DescriptorSet::getDescriptorSetLayout() noexcept
-    {
-        return _ptr_descriptor_set_layout;
-    }
-
-    const PtrDescriptorSetLayout& DescriptorSet::getDescriptorSetLayout() const noexcept
+    std::shared_ptr<const DescriptorSetLayout> DescriptorSet::getDescriptorSetLayout() const noexcept
     {
         return _ptr_descriptor_set_layout;
     }
@@ -179,11 +164,11 @@ namespace pbrlib
         );
     }
 
-    PtrDescriptorSet DescriptorSet::make(
-        const PtrDescriptorPool&        ptr_descriptor_pool,
-        const PtrDescriptorSetLayout&   ptr_descriptor_set_layout
+    std::unique_ptr<DescriptorSet> DescriptorSet::make(
+        std::shared_ptr<const DescriptorPool>       ptr_descriptor_pool,
+        std::shared_ptr<const DescriptorSetLayout>  ptr_descriptor_set_layout
     )
     {
-        return make_shared<DescriptorSet>(ptr_descriptor_pool, ptr_descriptor_set_layout);
+        return make_unique<DescriptorSet>(ptr_descriptor_pool, ptr_descriptor_set_layout);
     }
 }

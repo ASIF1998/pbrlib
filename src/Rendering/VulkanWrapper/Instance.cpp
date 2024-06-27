@@ -14,8 +14,6 @@
 #include <cassert>
 #include <stdexcept>
 
-using namespace std;
-
 namespace pbrlib
 {
     VulkanInstanceExtensionSupported    Instance::_supported_extensions = {};
@@ -27,16 +25,15 @@ namespace pbrlib
         uint32_t num_extension_supported = 0;
         assert(vkEnumerateInstanceExtensionProperties(nullptr, &num_extension_supported, nullptr) == VK_SUCCESS);
 
-        vector<VkExtensionProperties> extension_properties (num_extension_supported);
+        std::vector<VkExtensionProperties> extension_properties (num_extension_supported);
 
         assert(vkEnumerateInstanceExtensionProperties(nullptr, &num_extension_supported, extension_properties.data()) == VK_SUCCESS);
 
-        for (size_t i{0}; i < extension_properties.size(); i++) {
+        for (size_t i{0}; i < extension_properties.size(); i++)
             _extension_supported.insert(extension_properties[i].extensionName);
-        }
     }
 
-    bool VulkanInstanceExtensionSupported::check(const string& name) const
+    bool VulkanInstanceExtensionSupported::check(const std::string& name) const
     {
         return _extension_supported.find(name) != _extension_supported.end();
     }
@@ -48,32 +45,31 @@ namespace pbrlib
 
         assert(vkEnumerateInstanceLayerProperties(&num_layer_supported, nullptr) == VK_SUCCESS);
 
-        vector<VkLayerProperties> layer_properties (num_layer_supported);
+        std::vector<VkLayerProperties> layer_properties (num_layer_supported);
 
         assert(vkEnumerateInstanceLayerProperties(&num_layer_supported, layer_properties.data()) == VK_SUCCESS);
 
-        for (size_t i{0}; i < layer_properties.size(); i++) {
+        for (size_t i{0}; i < layer_properties.size(); i++)
             _layer_supported.insert(layer_properties[i].layerName);
-        }
     }
 
-    bool VulkanInstanceLayerSupported::check(const string& name) const
+    bool VulkanInstanceLayerSupported::check(const std::string& name) const
     {
         return _layer_supported.find(name) != _layer_supported.end();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Instance::Instance(const string_view app_name, uint32_t app_version) :
+    Instance::Instance(const std::string_view app_name, uint32_t app_version) :
         _instance_handle(VK_NULL_HANDLE)
     {
         _create(app_name, app_version, 0, nullptr, 0, nullptr);
     }
 
     Instance::Instance(
-        const string_view           app_name, 
+        const std::string_view      app_name, 
         uint32_t                    app_version, 
-        span<const char*>           layer_names, 
-        span<const char*>           extension_names
+        std::span<const char*>      layer_names, 
+        std::span<const char*>      extension_names
     ) :
         _instance_handle(VK_NULL_HANDLE)
     {
@@ -91,7 +87,7 @@ namespace pbrlib
         _instance_handle        (VK_NULL_HANDLE),
         _physical_device_handles(move(instance._physical_device_handles))
     {
-        swap(_instance_handle, instance._instance_handle);
+        std::swap(_instance_handle, instance._instance_handle);
     }
 
     Instance::~Instance()
@@ -102,12 +98,12 @@ namespace pbrlib
     }
 
     void Instance::_create(
-        const string_view   app_name,
-        uint32_t            app_version, 
-        uint32_t            enabled_layer_count,
-        const char* const*  ptr_enable_layers,
-        uint32_t            enabled_extension_count,
-        const char* const*  ptr_extensions
+        const std::string_view  app_name,
+        uint32_t                app_version, 
+        uint32_t                enabled_layer_count,
+        const char* const*      ptr_enable_layers,
+        uint32_t                enabled_extension_count,
+        const char* const*      ptr_extensions
     )
     {
         VkApplicationInfo app_info = { };
@@ -136,13 +132,12 @@ namespace pbrlib
         assert(num_physical_device_handles > 0);
         _physical_device_handles.reserve(num_physical_device_handles);
         
-        vector<VkPhysicalDevice> physical_device_handles(num_physical_device_handles);
+        std::vector<VkPhysicalDevice> physical_device_handles(num_physical_device_handles);
         
         assert(vkEnumeratePhysicalDevices(_instance_handle, &num_physical_device_handles, physical_device_handles.data()) == VK_SUCCESS);
         
-        for (size_t i{0}; i < physical_device_handles.size(); i++) {
+        for (size_t i{0}; i < physical_device_handles.size(); i++)
             _physical_device_handles.push_back(physical_device_handles[i]);
-        }
     }
 
     const VkInstance& Instance::getHandle() const
@@ -150,95 +145,91 @@ namespace pbrlib
         return _instance_handle;
     }
 
-    bool Instance::isExtensionSupported(const string& name)
+    bool Instance::isExtensionSupported(const std::string& name)
     {
         return _supported_extensions.check(name);
     }
 
-    bool Instance::isLayerSupported(const string& name)
+    bool Instance::isLayerSupported(const std::string& name)
     {
         return _supported_layers.check(name);
     }
 
-    PtrInstance Instance::make(const string_view app_name, uint32_t app_version)
+    std::unique_ptr<Instance> Instance::make(const std::string_view app_name, uint32_t app_version)
     {
-        return make_shared<Instance>(app_name, app_version);
+        return std::make_unique<Instance>(app_name, app_version);
     }
 
-    PtrInstance Instance::make(
-        const string_view           app_name,
-        uint32_t                    app_version,
-        span<const char*>           layer_names,
-        span<const char*>           extension_names
+    std::unique_ptr<Instance> Instance::make(
+        const std::string_view  app_name,
+        uint32_t                app_version,
+        std::span<const char*>  layer_names,
+        std::span<const char*>  extension_names
     )
     {
-        return make_shared<Instance>(app_name, app_version, layer_names, extension_names);
+        return make_unique<Instance>(app_name, app_version, layer_names, extension_names);
     }
 
-    PtrPhysicalDevice Instance::getPhysicalDevice(int type)
+    PhysicalDevice Instance::getPhysicalDevice(int type) const
     {
         VkPhysicalDeviceProperties physical_device_property;
 
-        for (size_t i{0}; i < _physical_device_handles.size(); i++) {
+        for (size_t i{0}; i < _physical_device_handles.size(); i++) 
+        {
             vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
-            if (physical_device_property.deviceType & type) {
-                return make_shared<PhysicalDevice>(_physical_device_handles[i]);
-            }
+            if (physical_device_property.deviceType & type)
+                return _physical_device_handles[i];
         }
 
-        throw invalid_argument ("Такого типа устройства нет.");
+        throw std::invalid_argument ("Такого типа устройства нет.");
     }
 
-    vector<PtrPhysicalDevice> Instance::getAllPhysicalDevice(int type) const
+    std::vector<PhysicalDevice> Instance::getAllPhysicalDevice(int type) const
     {
-        vector<PtrPhysicalDevice> handles;
+        std::vector<PhysicalDevice> handles;
         VkPhysicalDeviceProperties physical_device_property;
 
-        for (size_t i{0}; i < _physical_device_handles.size(); i++) {
+        for (size_t i{0}; i < _physical_device_handles.size(); i++) 
+        {
             vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
-            if (physical_device_property.deviceType & type) {
-                handles.push_back(make_shared<PhysicalDevice>(_physical_device_handles[i]));
-            }
+            if (physical_device_property.deviceType & type)
+                handles.push_back(_physical_device_handles[i]);
         }
-
-        handles.shrink_to_fit();
 
         return handles;
     }
 
-    vector<string> Instance::getExtensionNames()
+    std::vector<std::string> Instance::getExtensionNames()
     {
         uint32_t num_extension_supported = 0;
         assert(vkEnumerateInstanceExtensionProperties(nullptr, &num_extension_supported, nullptr) == VK_SUCCESS);
 
-        vector<VkExtensionProperties> extension_properties (num_extension_supported);
+        std::vector<VkExtensionProperties> extension_properties (num_extension_supported);
 
         assert(vkEnumerateInstanceExtensionProperties(nullptr, &num_extension_supported, extension_properties.data()) == VK_SUCCESS);
 
-        vector<string> extension_names (num_extension_supported);
+        std::vector<std::string> extension_names (num_extension_supported);
 
-        for (size_t i{0}; i < extension_properties.size(); i++) {
+        for (size_t i{0}; i < extension_properties.size(); i++)
             extension_names[i] = extension_properties[i].extensionName;
-        }
 
         return extension_names;
     }
 
-    vector<string> Instance::getLayerNames()
+    std::vector<std::string> Instance::getLayerNames()
     {
         uint32_t num_layer_supported = 0;
 
         assert(vkEnumerateInstanceLayerProperties(&num_layer_supported, nullptr) == VK_SUCCESS);
 
-        vector<VkLayerProperties> layer_properties (num_layer_supported);
+        std::vector<VkLayerProperties> layer_properties (num_layer_supported);
 
         assert(vkEnumerateInstanceLayerProperties(&num_layer_supported, layer_properties.data()) == VK_SUCCESS);
 
-        vector<string> layer_names (num_layer_supported);
+        std::vector<std::string> layer_names (num_layer_supported);
 
-        for (size_t i{0}; i < layer_properties.size(); i++) {
+        for (size_t i{0}; i < layer_properties.size(); i++)
             layer_names[i] = layer_properties[i].layerName;
-        }
 
         return layer_names;
     }

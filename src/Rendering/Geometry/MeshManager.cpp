@@ -8,67 +8,53 @@
 
 #include <pbrlib/Rendering/Geometry/MeshManager.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     MeshManager::MeshManager(
-        const PtrDevice&    ptr_device, 
-        uint32_t            queue_family_index, 
-        uint32_t            memory_type
+        const Device*   ptr_device, 
+        uint32_t        queue_family_index, 
+        uint32_t        memory_type
     ) :
         _assimp_mesh_loader(ptr_device, queue_family_index, memory_type)
     {}
 
-    optional<vector<PtrMesh>> MeshManager::load(const string_view path)
+    std::optional<std::vector<std::shared_ptr<Mesh>>> MeshManager::load(const std::string_view path)
     {
-        for (size_t i{0}; i < _loaded_files.size(); i++) {
-            if (_loaded_files[i] == path) {
-                ///  Этот файл уже загружен.
-                return nullopt;
-            }
+        for (size_t i{0}; i < _loaded_files.size(); i++) 
+        {
+            if (_loaded_files[i] == path)
+                return std::nullopt;
         }
 
         _loaded_files.push_back(path.data());
 
-        optional<vector<PtrMesh>> meshes = _assimp_mesh_loader.load(path);
+        std::optional<std::vector<std::shared_ptr<Mesh>>> meshes = _assimp_mesh_loader.load(path);
         
-        if (meshes.has_value()) {
+        if (meshes.has_value()) 
+        {
             auto& temp = meshes.value();
 
-            for (size_t i{0}; i < temp.size(); i++) {
-                _meshes.insert(make_pair(temp[i]->getName(), temp[i]));
-            }
+            for (size_t i{0}; i < temp.size(); i++)
+                _meshes.insert(std::make_pair(temp[i]->getName(), temp[i]));
         }
 
         return meshes;
     }
 
-    void MeshManager::addMesh(const PtrMesh& ptr_mesh)
+    void MeshManager::addMesh(std::shared_ptr<const Mesh> ptr_mesh)
     {
-        _meshes.insert(make_pair(ptr_mesh->getName(), ptr_mesh));
-    }
-
-    void MeshManager::addMesh(PtrMesh&& ptr_mesh)
-    {
-        _meshes.insert(make_pair(ptr_mesh->getName(), move(ptr_mesh)));
+        _meshes.insert(std::make_pair(ptr_mesh->getName(), ptr_mesh));
     }
 
     void MeshManager::addMesh(const Mesh::Builder& mesh_builder)
     {
-        PtrMesh ptr_mesh = mesh_builder.buildPtr();
-        _meshes.insert(make_pair(ptr_mesh->getName(), ptr_mesh));
+        std::shared_ptr ptr_mesh = mesh_builder.buildPtr();
+        _meshes.insert(std::make_pair(ptr_mesh->getName(), ptr_mesh));
     }
 
-    optional<PtrMesh> MeshManager::get(const string_view name)
+    std::shared_ptr<const Mesh> MeshManager::get(const std::string_view name)
     {
         auto it = _meshes.find(name.data());
-        return it != end(_meshes) ? make_optional(it->second) : nullopt;
-    }
-
-    optional<const PtrMesh> MeshManager::get(const string_view name) const
-    {
-        auto it = _meshes.find(name.data());
-        return it != end(_meshes) ? make_optional(it->second) : nullopt;
+        return it != std::end(_meshes) ? it->second : nullptr;
     }
 }

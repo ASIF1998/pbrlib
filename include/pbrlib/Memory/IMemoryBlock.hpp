@@ -29,8 +29,6 @@ namespace pbrlib
         virtual void setMemory(void* ptr_memory, size_t size, bool own) = 0;
         virtual void setNumUsers(uint32_t num_users)                    = 0;
     };
-
-    using PtrIMemoryBlock = shared_ptr<IMemoryBlock>;
 }
 
 #endif /* IMemoryBlock_hpp */

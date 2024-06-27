@@ -64,10 +64,9 @@ namespace pbrlib
          * @param queue_family_index    индекс семейства очередей.
          * @param memory_type           тип памяти на устройстве (ptr_device).
         */
-        MeshAssimp(const PtrDevice& ptr_device, uint32_t queue_family_index, uint32_t memory_type);
+        MeshAssimp(const Device* ptr_device, uint32_t queue_family_index, uint32_t memory_type);
 
-        PtrDevice&          getDevice() noexcept;
-        const PtrDevice&    getDevice() const noexcept;
+        const Device* getDevice() const noexcept;
 
         /**
          * @brief Метод необходимый для загрузки сеток.
@@ -75,12 +74,12 @@ namespace pbrlib
          * @param path путь до файла.
          * @return Указатели на сетки.
         */
-        std::optional<std::vector<PtrMesh>> load(const std::string_view path);
+        std::optional<std::vector<std::shared_ptr<pbrlib::Mesh>>> load(const std::string_view path);
 
     private:
-        PtrDevice _ptr_device;          //!< Указатель на устройство.
-        uint32_t  _queue_family_index;  //!< Индекс семейства очередей на устройстве.
-        uint32_t  _memory_type;         //!< Тип памяти на устройстве.
+        const Device*   _ptr_device;          //!< Указатель на устройство.
+        uint32_t        _queue_family_index;  //!< Индекс семейства очередей на устройстве.
+        uint32_t        _memory_type;         //!< Тип памяти на устройстве.
     };
 }
 

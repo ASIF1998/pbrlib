@@ -18,28 +18,26 @@
 
 #include <pbrlib/PBRLibResources.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
-    SceneView::SceneView(const string_view scene_name, const PtrPBRLibResources& ptr_pbrlib_resources, const PtrWindow& ptr_window) :
+    SceneView::SceneView(const std::string_view scene_name, std::shared_ptr<const PBRLibResources> ptr_pbrlib_resources, std::shared_ptr<Window> ptr_window) :
         _ptr_pbrlib_resources   (ptr_pbrlib_resources),
         _ptr_renderer           (nullptr),
         _ptr_window             (ptr_window),
         _scene                  (
             scene_name,
-            ptr_pbrlib_resources->_vk_resources._ptr_device,
-            ptr_pbrlib_resources->_vk_resources._ptr_device_queue,
-            ptr_pbrlib_resources->_vk_resources._ptr_command_pool,
+            ptr_pbrlib_resources->_vk_resources._ptr_device.get(),
+            ptr_pbrlib_resources->_vk_resources._ptr_device_queue.get(),
+            ptr_pbrlib_resources->_vk_resources._ptr_command_pool.get(),
             ptr_pbrlib_resources->_vk_resources._ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
             ptr_pbrlib_resources->_vk_resources._ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
         )
     {
         if (!_ptr_window->_hasVulkanResources()) {
             _ptr_window->_initVulkanResources(
-                _ptr_pbrlib_resources->_vk_resources._ptr_instance,
-                _ptr_pbrlib_resources->_vk_resources._ptr_physical_device,
-                _ptr_pbrlib_resources->_vk_resources._ptr_device,
+                _ptr_pbrlib_resources->_vk_resources._ptr_instance.get(),
+                _ptr_pbrlib_resources->_vk_resources._ptr_physical_device.get(),
+                _ptr_pbrlib_resources->_vk_resources._ptr_device.get(),
                 _ptr_pbrlib_resources->_vk_resources._ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
             );
         }
@@ -55,23 +53,18 @@ namespace pbrlib
         return _scene;
     }
 
-    PtrWindow& SceneView::getWindow() noexcept
+    std::shared_ptr<const Window> SceneView::getWindow() const noexcept
     {
         return _ptr_window;
     }
 
-    const PtrWindow& SceneView::getWindow() const noexcept
-    {
-        return _ptr_window;
-    }
-
-    void SceneView::setRenderer(const PtrIRenderer& ptr_renderer)
+    void SceneView::setRenderer(std::shared_ptr<IRenderer> ptr_renderer)
     {
         _ptr_renderer = ptr_renderer;
         _ptr_renderer->init(
             _ptr_window, 
-            _ptr_pbrlib_resources->_vk_resources._ptr_device, 
-            _ptr_pbrlib_resources->_vk_resources._ptr_physical_device
+            _ptr_pbrlib_resources->_vk_resources._ptr_device.get(), 
+            _ptr_pbrlib_resources->_vk_resources._ptr_physical_device.get()
         );
     }
 
@@ -86,7 +79,7 @@ namespace pbrlib
             _ptr_renderer->draw(
                 _scene._ptr_camera,
                 _scene.getVisibleList(),
-                _scene._point_lights,
+                std::span(_scene._point_lights),
                 _scene._spot_lights,
                 _scene._dir_lights,
                 delta_time

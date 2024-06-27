@@ -8,7 +8,6 @@
 
 #include <pbrlib/Rendering/Lights/DirectionLight.hpp>
 
-using namespace std;
 using namespace pbrlib::math;
 
 namespace pbrlib
@@ -25,10 +24,10 @@ namespace pbrlib
     {}
 
     DirectionLight::DirectionLight(
-        const string_view   name,
-        const Vec3<float>&  direction_to_light,
-        const Vec3<float>&  color,
-        float               intensity
+        const std::string_view  name,
+        const Vec3<float>&      direction_to_light,
+        const Vec3<float>&      color,
+        float                   intensity
     ) :
         Component       (name),
         _dir_to_lihght  (direction_to_light),
@@ -77,7 +76,7 @@ namespace pbrlib
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-    DirectionLight::Builder::Builder(const string_view name) :
+    DirectionLight::Builder::Builder(const std::string_view name) :
         _name(name)
     {}
 
@@ -96,7 +95,7 @@ namespace pbrlib
         _dir_to_light = direction;
     }
 
-    void DirectionLight::Builder::setName(const string_view name)
+    void DirectionLight::Builder::setName(const std::string_view name)
     {
         _name = name;
     }
@@ -106,8 +105,8 @@ namespace pbrlib
         return DirectionLight(_name, _dir_to_light, _color, _intensity);
     }
 
-    PtrDirectionLight DirectionLight::Builder::buildPtr() const
+    std::unique_ptr<DirectionLight> DirectionLight::Builder::buildPtr() const
     {
-        return make_shared<DirectionLight>(_name, _dir_to_light, _color, _intensity);
+        return make_unique<DirectionLight>(_name, _dir_to_light, _color, _intensity);
     }
 }

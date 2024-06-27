@@ -12,7 +12,7 @@
 
 namespace pbrlib
 {
-    CommandPool::CommandPool(const PtrDevice& ptr_device, uint32_t queue_family_index) :
+    CommandPool::CommandPool(const Device* ptr_device, uint32_t queue_family_index) :
         _ptr_device         (ptr_device),
         _command_pool_handle(VK_NULL_HANDLE),
         _queue_family_index (queue_family_index)
@@ -47,12 +47,7 @@ namespace pbrlib
         }
     }
 
-    PtrDevice& CommandPool::getDevice() noexcept
-    {
-        return _ptr_device;
-    }
-
-    const PtrDevice& CommandPool::getDevice() const noexcept
+    const Device* CommandPool::getDevice() const noexcept
     {
         return _ptr_device;
     }
@@ -67,11 +62,8 @@ namespace pbrlib
         return _command_pool_handle;
     }
 
-    PtrCommandPool CommandPool::make(
-        const PtrDevice&    ptr_device, 
-        uint32_t            queue_family_index
-    )
+    std::unique_ptr<CommandPool> CommandPool::make(const Device* ptr_device, uint32_t queue_family_index)
     {
-        return make_shared<CommandPool>(ptr_device, queue_family_index);
+        return std::make_unique<CommandPool>(ptr_device, queue_family_index);
     }
 }

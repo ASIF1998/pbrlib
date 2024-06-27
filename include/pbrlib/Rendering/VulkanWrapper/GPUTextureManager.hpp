@@ -20,12 +20,6 @@
 
 namespace pbrlib
 {
-    class PrimaryCommandBuffer;
-    class DeviceQueue;
-
-    using PtrPrimaryCommandBuffer   = std::shared_ptr<PrimaryCommandBuffer>;
-    using PtrDeviceQueue            = std::shared_ptr<DeviceQueue>;
-
     /**
      * @class GPUTextureManager.
      * @brief 
@@ -47,11 +41,11 @@ namespace pbrlib
          * @param num_samples                       количество образцов в изображении.
         */
         GPUTextureManager(
-            const PtrDevice&        ptr_device,
-            const PtrCommandPool&   ptr_command_pool,
+            const Device*           ptr_device,
+            const CommandPool*      ptr_command_pool,
             uint32_t                device_local_memory_type_index,
             uint32_t                host_local_memory_type_index,
-            PtrDeviceQueue          ptr_device_queue,
+            const DeviceQueue*      ptr_device_queue,
             VkImageTiling           image_tiling,
             VkSampleCountFlagBits   num_samples
         );
@@ -100,21 +94,20 @@ namespace pbrlib
         */
         bool loadRGBA(const std::string_view path, const std::string_view name);
 
-        bool add(const PtrImageView& ptr_image_view, const std::string_view name);
+        bool add(std::shared_ptr<const ImageView> ptr_image_view, const std::string_view name);
         bool has(const std::string_view name);
 
-        std::optional<PtrImageView>          get(const std::string_view name);
-        std::optional<const PtrImageView>    get(const std::string_view name) const;
+        std::shared_ptr<const ImageView> get(const std::string_view name) const;
 
     private:
-        std::unordered_map<std::string, PtrImageView>    _textures;                          //!< Текстуры.
-        PtrDevice                                       _ptr_device;                        //!< Указатель на устройство.
-        PtrPrimaryCommandBuffer                         _ptr_command_buffer;                //!< Указатель на командный буфер.
-        uint32_t                                        _device_local_memory_type_index;    //!< Тип памяти, являющийся локальной для устройства (GPU).
-        uint32_t                                        _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
-        PtrDeviceQueue                                  _ptr_device_queue;                  //!< Указатель на очередь устройства.
-        VkImageTiling                                   _image_tiling;                      //!< Способ размещения текстуры на устройстве.
-        VkSampleCountFlagBits                           _num_samples;                       //!< Количество выборок в текстуре на устройстве.
+        std::unordered_map<std::string, std::shared_ptr<const ImageView>>   _textures;                          //!< Текстуры.
+        const Device*                                                       _ptr_device;                        //!< Указатель на устройство.
+        std::shared_ptr<PrimaryCommandBuffer>                               _ptr_command_buffer;                //!< Указатель на командный буфер.
+        uint32_t                                                            _device_local_memory_type_index;    //!< Тип памяти, являющийся локальной для устройства (GPU).
+        uint32_t                                                            _host_local_memory_type_index;      //!< Тип памяти, который может быть отображена и читаться или записываться CPU.
+        const DeviceQueue*                                                  _ptr_device_queue;                  //!< Указатель на очередь устройства.
+        VkImageTiling                                                       _image_tiling;                      //!< Способ размещения текстуры на устройстве.
+        VkSampleCountFlagBits                                               _num_samples;                       //!< Количество выборок в текстуре на устройстве.
     };
 }
 

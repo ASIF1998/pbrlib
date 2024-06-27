@@ -8,16 +8,15 @@
 
 #include <pbrlib/Rendering/Material/MaterialManager.hpp>
 
-using namespace std;
-
 namespace pbrlib
 {
     bool MaterialManager::addMaterial(
-        const PtrMaterial&  ptr_material, 
-        const string_view   material_name
+        std::shared_ptr<const Material> ptr_material, 
+        const std::string_view          material_name
     )
     {
-        if (_materials.find(material_name.data()) == end(_materials)) {
+        if (_materials.find(material_name.data()) == end(_materials)) 
+        {
             _materials.insert(make_pair(material_name, ptr_material));
             return true;
         }
@@ -26,26 +25,16 @@ namespace pbrlib
     }
 
     bool MaterialManager::addMaterial(
-        Material::Builder&  material_builder, 
-        const string_view   material_name
+        Material::Builder&      material_builder, 
+        const std::string_view  material_name
     )
     {
-        if (_materials.find(material_name.data()) == end(_materials)) {
-            _materials.insert(make_pair(material_name, material_builder.buildPtr()));
-        }
-        
-        return false;
+        return addMaterial(material_builder.buildPtr(), material_name);
     }
 
-    optional<PtrMaterial> MaterialManager::getMaterial(const string_view material_name)
+    std::shared_ptr<const Material> MaterialManager::getMaterial(const std::string_view material_name) const
     {
         auto it = _materials.find(material_name.data());
-        return it != end(_materials) ? make_optional(it->second) : nullopt;
-    }
-
-    optional<const PtrMaterial> MaterialManager::getMaterial(const string_view material_name) const
-    {
-        auto it = _materials.find(material_name.data());
-        return it != end(_materials) ? make_optional(it->second) : nullopt;
+        return it != end(_materials) ? it->second : nullptr;
     }
 }
