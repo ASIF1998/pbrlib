@@ -16,7 +16,8 @@
 
 namespace pbrlib
 {
-    class SceneItem;
+    class   SceneItem;
+    struct  InputStay;
 }
 
 namespace pbrlib
@@ -32,7 +33,7 @@ namespace pbrlib
 
         virtual std::type_index getType() const = 0;
 
-        virtual void update(SceneItem* ptr_node, float delta_time) 
+        virtual void update(const InputStay* ptr_input_stay, SceneItem* ptr_node, float delta_time) 
         { }
 
     protected:

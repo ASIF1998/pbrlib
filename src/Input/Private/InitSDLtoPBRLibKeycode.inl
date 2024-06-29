@@ -1,0 +1,83 @@
+namespace pbrlib
+{
+    const std::unordered_map<SDL_Keycode, Keycode> KeyboardStay::SDLtoPBRLibKeycode
+    {
+        {SDLK_a, Keycode::A},
+        {SDLK_b, Keycode::B},
+        {SDLK_c, Keycode::C},
+        {SDLK_d, Keycode::D},
+        {SDLK_e, Keycode::E},
+        {SDLK_f, Keycode::F},
+        {SDLK_g, Keycode::G},
+        {SDLK_h, Keycode::H},
+        {SDLK_i, Keycode::I},
+        {SDLK_j, Keycode::J},
+        {SDLK_k, Keycode::K},
+        {SDLK_l, Keycode::L},
+        {SDLK_m, Keycode::M},
+        {SDLK_n, Keycode::N},
+        {SDLK_o, Keycode::O},
+        {SDLK_p, Keycode::P},
+        {SDLK_q, Keycode::Q},
+        {SDLK_r, Keycode::R},
+        {SDLK_s, Keycode::S},
+        {SDLK_t, Keycode::T},
+        {SDLK_u, Keycode::U},
+        {SDLK_v, Keycode::V},
+        {SDLK_w, Keycode::W},
+        {SDLK_x, Keycode::X},
+        {SDLK_y, Keycode::Y},
+        {SDLK_z, Keycode::Z},
+
+        {SDLK_0, Keycode::N0},
+        {SDLK_1, Keycode::N1},
+        {SDLK_2, Keycode::N2},
+        {SDLK_3, Keycode::N3},
+        {SDLK_4, Keycode::N4},
+        {SDLK_5, Keycode::N5},
+        {SDLK_6, Keycode::N6},
+        {SDLK_7, Keycode::N7},
+        {SDLK_8, Keycode::N8},
+        {SDLK_9, Keycode::N9},
+
+        {SDLK_F1, Keycode::F1},
+        {SDLK_F2, Keycode::F2},
+        {SDLK_F3, Keycode::F3},
+        {SDLK_F4, Keycode::F4},
+        {SDLK_F5, Keycode::F5},
+        {SDLK_F6, Keycode::F6},
+        {SDLK_F7, Keycode::F7},
+        {SDLK_F8, Keycode::F8},
+        {SDLK_F9, Keycode::F9},
+        {SDLK_F10, Keycode::F10},
+        {SDLK_F11, Keycode::F11},
+        {SDLK_F12, Keycode::F12},
+
+        {SDLK_SPACE, Keycode::Space},
+        {SDLK_RETURN, Keycode::Enter},
+        {SDLK_LSHIFT, Keycode::ShiftLeft},
+        {SDLK_RSHIFT, Keycode::ShiftRight},
+        {SDLK_ESCAPE, Keycode::Escape},
+
+        {SDLK_TAB, Keycode::Tab},
+        {SDLK_QUOTE, Keycode::Quote},
+        {SDLK_SLASH, Keycode::Slash},
+        {SDLK_CAPSLOCK, Keycode::Capslock},
+
+        {SDLK_PLUS, Keycode::Plus},
+        {SDLK_MINUS, Keycode::Minus},
+
+        {SDLK_LALT, Keycode::AltLeft},
+        {SDLK_RALT, Keycode::AltRight},
+
+        {SDLK_LCTRL, Keycode::CtrlLeft},
+        {SDLK_RCTRL, Keycode::CtrlRight},
+
+        {SDLK_BACKSPACE, Keycode::Backspace},
+
+        {SDLK_UP, Keycode::Up},
+        {SDLK_DOWN, Keycode::Down},
+        {SDLK_RIGHT, Keycode::Right},
+        {SDLK_LEFT, Keycode::Left},
+    };
+}

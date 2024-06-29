@@ -42,9 +42,9 @@ namespace pbrlib
         return _ptr_mesh;
     }
 
-    void MeshNode::update(float delta_time, const Transform& world_transform)
+    void MeshNode::update(const InputStay* ptr_input_stay, float delta_time, const Transform& world_transform)
     {
-        SceneItem::update(delta_time, world_transform);
+        SceneItem::update(ptr_input_stay, delta_time, world_transform);
 
         /// Если мировой ограничивающий объём не является корректным и
         /// есть меш, то дополняем мировой ограничивающий объём объёмом

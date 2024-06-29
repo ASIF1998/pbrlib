@@ -183,7 +183,6 @@ namespace pbrlib
         }
     }
 
-
     void SceneItem::detachChild(const std::string_view name)
     {
         for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) 
@@ -193,10 +192,10 @@ namespace pbrlib
         }
     }
 
-    void SceneItem::update(float delta_time, const Transform& transform)
+    void SceneItem::update(const InputStay* ptr_input_stay, float delta_time, const Transform& transform)
     {
         for (auto [_, ptr_component]: _components)
-            ptr_component->update(this, delta_time);
+            ptr_component->update(ptr_input_stay, this, delta_time);
 
         if (!_world_transform_is_current)
             _world_transform = transform;
@@ -205,7 +204,7 @@ namespace pbrlib
             Transform children_world_transform = _world_transform * _local_transform;
 
             for (size_t i{0}, size{_ptr_children.size()}; i < size; i++)
-                _ptr_children[i]->update(delta_time, children_world_transform);
+                _ptr_children[i]->update(ptr_input_stay, delta_time, children_world_transform);
 
             if (!_world_aabb_is_current) {
                 _world_bbox = _ptr_children[0]->getWorldAABB();
@@ -389,11 +388,14 @@ namespace pbrlib
         return _ptr_camera;
     }
 
-    void Scene::update(float delta_time)
+    void Scene::update(const InputStay* ptr_input_stay, float delta_time)
     {
         const Transform t;
 
+        if (_ptr_camera)
+            _ptr_camera->update(ptr_input_stay, delta_time, t);
+
         if (_ptr_root)
-            _ptr_root->update(delta_time, t);
+            _ptr_root->update(ptr_input_stay, delta_time, t);
     }
 }

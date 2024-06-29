@@ -27,7 +27,7 @@ namespace pbrlib
 
         std::shared_ptr<const Mesh> getMesh() const noexcept;
 
-        virtual void update(float delta_time, const Transform& world_transform) override;
+        virtual void update(const InputStay* ptr_input_stay, float delta_time, const Transform& world_transform) override;
 
         static std::unique_ptr<MeshNode> make(const std::string_view name = "Mesh Node");
         static std::unique_ptr<MeshNode> make(const std::string_view name, std::shared_ptr<Mesh> ptr_mesh);

@@ -13,6 +13,8 @@
 #include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
 #include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
+#include <pbrlib/Input/InputStay.hpp>
+
 #include "Scene.hpp"
 
 namespace pbrlib
@@ -25,6 +27,8 @@ namespace pbrlib
 {
     class SceneView
     {
+        bool updateInputStay();
+
     public:
         SceneView(const std::string_view scene_name, std::shared_ptr<const PBRLibResources> ptr_pbrlib_resources, std::shared_ptr<Window> ptr_window);
 
@@ -33,13 +37,14 @@ namespace pbrlib
         std::shared_ptr<const Window>   getWindow() const noexcept;
 
         void setRenderer(std::shared_ptr<IRenderer> ptr_renderer);
-        void drawScene(float delta_time);
+        bool drawScene(float delta_time);
 
     private:
         std::shared_ptr<const PBRLibResources>  _ptr_pbrlib_resources;
         std::shared_ptr<IRenderer>              _ptr_renderer;          //!< Указатель на визуализатор.
         std::shared_ptr<Window>                 _ptr_window;            //!< Указатель на окно.
         Scene                                   _scene;                 //!< Сцена.
+        InputStay                               _input_stay;
     };
 }
 

@@ -10,6 +10,8 @@
 
 #include <pbrlib/Rendering/Renderers/PBR.hpp>
 
+#include <pbrlib/Input/InputStay.hpp>
+
 #include <iostream>
 #include <thread>
 
@@ -40,7 +42,7 @@ public:
         _frame = 0;
     }
 
-    void update(SceneItem* ptr_node, float delta_time) override
+    void update(const InputStay* ptr_input_stay, SceneItem* ptr_node, float delta_time) override
     {
 		_rotate = Transform::rotateY(static_cast<float>(++_frame));
 		ptr_node->getLocalTransform() = Transform::scale(0.7f) * _rotate;
@@ -56,31 +58,35 @@ private:
     size_t _frame;
 };
 
-class CameraTest
-    : public Component<CameraTest>
+class CameraController
+    : public Component<CameraController>
 {
 public:
-    CameraTest() = default;
+    CameraController() = default;
 
-    virtual void update(SceneItem* ptr_node, float delta_time)
+    void update(const InputStay* ptr_input_stay, SceneItem* ptr_node, float delta_time) override
     {
-        auto ptr_camera = ptr_node->getComponent<PerspectiveCamera>();
+        auto& camera = ptr_node->getComponent<CameraBase>();
 
-        // camera_builder.setEye({-0.9f, 1.0f, 0.1f});
-    // camera_builder.setEye({0, 0, -1});
-    // camera_builder.setPosition({0.0f, 0.0f, 2.1f});
-    // camera_builder.setPosition({0, 0, -2.0});
+        constexpr Vec3<float> eye (0, 1, 0);
+        constexpr Vec3<float> up (0, 1, 0);
 
-        Vec3<float> pos (0, 0, 2);
-        Vec3<float> eye (-0.9f, static_cast<float>(sin(t += 0.1)), 0.1f);
-        Vec3<float> up (0, 1, 0);
+        auto pos = camera.getPosition();
 
+        if (ptr_input_stay->keyboard.isDown(Keycode::W))
+            ++pos.z;
 
-        ptr_camera.setLookAt(eye, pos, up);
+        if (ptr_input_stay->keyboard.isDown(Keycode::S))
+            --pos.z;
+
+        if (ptr_input_stay->keyboard.isDown(Keycode::Space))
+            ++pos.y;
+
+        if (ptr_input_stay->keyboard.isDown(Keycode::ShiftLeft))
+            --pos.y;
+            
+        camera.setLookAt(eye, pos, up);
     }
-
-private:
-    double t = 0.0;
 };
 
 auto getModelResourcesReferences() 
@@ -131,8 +137,6 @@ auto makeCamera(Scene& scene)
     camera_builder.setName("Camera");
     camera_builder.setAspect(800, 600);
     camera_builder.setEye({-0.9f, 0.5f, 0.5f});
-    // camera_builder.setEye({0, 0, -1});
-    // camera_builder.setPosition({0.0f, 0.0f, 2.1f});
     camera_builder.setPosition({0, 0, -2.0});
     camera_builder.setFarClipp(10.0f);
     camera_builder.setFovy(60.78f);
@@ -156,37 +160,12 @@ auto makePointLight(Scene& scene)
     return scene.makePointLight(light_builder);
 }
 
-bool eventHandling(SDL_Event& event)
-{
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-			case SDL_EVENT_QUIT:
-				return false;
-			case SDL_EVENT_KEY_DOWN:
-			{
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-					return false;
-			}
-		}
-	}
-
-	return true;
-}
-
 int main(int argc, char* argv[])  
 {
-#if 0
-    auto ptr_resources = pbrlib::PBRLibResources::init();
-    std::cout << "Hello world !!!" << std::endl;
-    return 0;
-#else
 	std::shared_ptr engine_resources = PBRLibResources::init();
     auto window = makeWindow();
 
     SceneView scene_view ("Scene", engine_resources, window);
-
 
 	auto model = getModelResourcesReferences();
     std::shared_ptr<SceneItem> ptr_point_light = nullptr;
@@ -206,7 +185,8 @@ int main(int argc, char* argv[])
     // Регестрируем модель в сцене.
     scene.setRoot(mesh_node);
 
-    auto ptr_camer = makeCamera(scene);
+    auto ptr_camera = makeCamera(scene);
+    ptr_camera->addComponent(std::make_shared<CameraController>());
     
     auto light    = makePointLight(scene);
 
@@ -218,26 +198,7 @@ int main(int argc, char* argv[])
     std::shared_ptr renderer = PBR::make(pbr_optionals);
     scene_view.setRenderer(renderer);
 
-    SDL_Event event;
-    float htimer = 0.0;
-
-    std::cout << "Runing !!!" << std::endl;
-
-    while (eventHandling(event)) 
-	{
-        htimer += 0.01f;
-
-        /*camera->setLookAt(
-            { 0, 0, -1 },
-            {0, 0, 10.0f * std::cos(htimer)},
-            {0, 1, 0}
-        );*/
-
-        this_thread::sleep_for(10ms);
-        scene_view.drawScene(1323);
-
-    }
+    while (scene_view.drawScene(1323));
 
     return 0;
-#endif
 }

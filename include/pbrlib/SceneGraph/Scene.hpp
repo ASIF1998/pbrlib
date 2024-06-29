@@ -33,7 +33,8 @@
 
 namespace pbrlib
 {
-    class SceneItem;
+    class   SceneItem;
+    struct  InputStay;
 
     using VisibleList = std::vector<std::shared_ptr<const SceneItem>>;
 
@@ -108,7 +109,7 @@ namespace pbrlib
         void detachChild(std::shared_ptr<const SceneItem> ptr_item);
         void detachChild(const std::string_view name);
 
-        virtual void update(float delta_time, const Transform& world_transform);
+        virtual void update(const InputStay* ptr_input_stay, float delta_time, const Transform& world_transform);
 
         static std::unique_ptr<SceneItem> make(
             const std::string_view  name        = "No name",
@@ -232,7 +233,7 @@ namespace pbrlib
             const std::string_view              name = "Camera"
         );
         
-        void update(float delta_time);
+        void update(const InputStay* ptr_input_stay, float delta_time);
 
     private:
         std::shared_ptr<SceneItem>              _ptr_root;          //!< Корневой узел сцены.

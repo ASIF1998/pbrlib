@@ -33,7 +33,8 @@ namespace pbrlib
             ptr_pbrlib_resources->_vk_resources._ptr_physical_device->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
         )
     {
-        if (!_ptr_window->_hasVulkanResources()) {
+        if (!_ptr_window->_hasVulkanResources()) 
+        {
             _ptr_window->_initVulkanResources(
                 _ptr_pbrlib_resources->_vk_resources._ptr_instance.get(),
                 _ptr_pbrlib_resources->_vk_resources._ptr_physical_device.get(),
@@ -41,6 +42,8 @@ namespace pbrlib
                 _ptr_pbrlib_resources->_vk_resources._ptr_device->getDeviceQueueInfo()[0].queueFamilyIndex
             );
         }
+
+        _input_stay.reset();
     }
 
     Scene& SceneView::getScene() noexcept
@@ -68,22 +71,47 @@ namespace pbrlib
         );
     }
 
-    void SceneView::drawScene(float delta_time)
+    bool SceneView::updateInputStay()
+    {
+        SDL_Event event = { };
+
+        while (SDL_PollEvent(&event))
+        {
+            _input_stay.add(&event);
+
+            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
+                return false;
+        }
+
+        return true;
+    }
+
+    bool SceneView::drawScene(float delta_time)
     {
         assert(_ptr_renderer);
 
         if (_scene._ptr_camera)
         {
-            _scene.update(delta_time);
+            auto is_close = updateInputStay();
+            _scene.update(&_input_stay, delta_time);
 
-            _ptr_renderer->draw(
-                _scene._ptr_camera,
-                _scene.getVisibleList(),
-                std::span(_scene._point_lights),
-                _scene._spot_lights,
-                _scene._dir_lights,
-                delta_time
-            );
+            if (is_close)
+            {
+                _ptr_renderer->draw(
+                    _scene._ptr_camera,
+                    _scene.getVisibleList(),
+                    std::span(_scene._point_lights),
+                    _scene._spot_lights,
+                    _scene._dir_lights,
+                    delta_time
+                );
+
+                _input_stay.reset();
+
+                return true;
+            }
         }
+        
+        return false;
     }
 }
