@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.27)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQURED ON)
@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQURED ON)
 project(PBRLib)
 
 option(PBRLIB_ENABLE_TESTS "" OFF)
-option(PBRLIB_TEST_CONSOLE "" OFF)
+option(PBRLIB_TEST_CONSOLE "" ON)
 
 set(PRLIB_ENGINE_VERSION_MAJOR 0)
 set(PRLIB_ENGINE_VERSION_MINOR 0)
@@ -15,6 +15,12 @@ set(PRLIB_ENGINE_VERSION_PATCH 1)
 set(PRLIB_VULKAN_VERSION_MAJOR 1)
 set(PRLIB_VULKAN_VERSION_MINOR 3)
 set(PRLIB_VULKAN_VERSION_PATCH 0)
+
+set(PRLIB_PATH_TO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
+endif()
 
 configure_file(include/pbrlib/core.hpp.in ../include/pbrlib/core.hpp)
 
@@ -28,11 +34,12 @@ add_library(PBRLib STATIC ${PBRLIB_SOURCES} ${PBRLIB_HEADERS})
 source_group(TREE  ${CMAKE_CURRENT_SOURCE_DIR}
     PREFIX ""
     FILES ${PBRLIB_SOURCES} ${PBRLIB_HEADERS}
-)           
+)
 
 include_directories(third_party/assimp/include)
 include_directories(third_party/SDL/include)
 include_directories(third_party/stb)
+# include_directories(third_party/glslang/include)
 
 add_subdirectory(third_party/assimp)
 add_subdirectory(third_party/SDL)
@@ -53,14 +60,65 @@ else()
     find_package(Vulkan REQUIRED)
 endif()
 
-target_link_libraries(PBRLib PUBLIC
-    ${Vulkan_LIBRARIES}
-    assimp
-    SDL3::SDL3
-)
+#####################################################
+#   glslang
+#####################################################
+set(glslang_ROOT ${CMAKE_CURRENT_SOURCE_DIR}"/third_party/glslang")
 
+set(glslang_INCLUDE_DIRS ${glslang_ROOT}/include)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(glslang_LIBS_DIR ${glslang_ROOT}/Windows/Debug)
+
+    set(GLSLANG_LIBS_NAME 
+            GenericCodeGend.lib
+            glslang-default-resource-limitsd.lib
+            glslangd.lib
+            MachineIndependentd.lib
+            OSDependentd.lib
+            SPIRV-Tools-optd.lib
+            SPIRV-Toolsd.lib
+            SPIRVd.lib
+            SPVRemapperd.lib
+    )
+else()
+    set(glslang_LIBS_DIR ${glslang_ROOT}/Windows/Release)
+
+    set(GLSLANG_LIBS_NAME 
+            GenericCodeGen.lib
+            glslang-default-resource-limits.lib
+            glslang.lib
+            MachineIndependent.lib
+            OSDependent.lib
+            SPIRV-Tools-opt.lib
+            SPIRV-Tools.lib
+            SPIRV.lib
+            SPVRemapper.lib
+    )
+endif()
+
+foreach(library ${GLSLANG_LIBS_NAME})
+    set(GLSLANG_LIBS ${GLSLANG_LIBS} ${glslang_LIBS_DIR}/${library})
+endforeach()
+
+# foreach(name ${GLSLANG_LIBS})
+#     message(${name})   
+# endforeach()
+
+
+#####################################################
+#   add libs
+#####################################################
 target_include_directories(PBRLib PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
+    ${glslang_INCLUDE_DIRS}
+)
+
+target_link_libraries(PBRLib PUBLIC
+    ${Vulkan_LIBRARIES}
+    ${GLSLANG_LIBS}
+    assimp
+    SDL3::SDL3
 )
 
 if (APPLE)

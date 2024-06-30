@@ -1,0 +1,269 @@
+#include <glslang/Public/resource_limits_c.h>
+#include <glslang/Include/glslang_c_interface.h>
+
+#include <pbrlib/Rendering/Compiler/Compiler.hpp>
+
+#include <pbrlib/core.hpp>
+
+#include <exception>
+
+#include <string_view>
+#include <format>
+
+#include <fstream>
+
+#include <memory>
+
+#include <map>
+
+#define CHECK(fn, log_fn, log_fn_arg)                                                               \
+    do                                                                                              \
+    {                                                                                               \
+        if(!fn)                                                                                     \
+            throw std::runtime_error(std::format("[Shader::Compiler]: {}", log_fn(log_fn_arg)));    \
+    } while (false)
+
+#define CHECK_SHADER(fn)    CHECK(fn, glslang_shader_get_info_log, ptr_shader)
+#define CHECK_PROGRAM(fn)   CHECK(fn, glslang_program_get_info_log, ptr_program)
+
+namespace pbrlib::shader
+{
+    auto getSource(const std::filesystem::path filename)
+    {
+        std::ifstream file(filename.string());
+
+        if (!file)
+            throw std::runtime_error(std::format("Failed open file: {}", filename.string()));
+
+        std::ostringstream contents;
+        contents << file.rdbuf();
+
+        return contents.str();
+    }
+}
+
+namespace pbrlib::shader
+{
+    const auto source_direcrtory = path_to_root / "include/pbrlib/Rendering/Renderers/Shaders";
+}
+
+namespace pbrlib::shader
+{
+    struct IncludeProcessData
+    {
+        std::string                             header_data;
+        std::unique_ptr<glsl_include_result_t>  ptr_include_result;
+    };
+
+    class Includer
+    {
+    public:
+        static glsl_include_result_t* localInclude (
+            void*       ctx, 
+            const char* header_name, 
+            const char* includer_name,
+            size_t      include_depth
+        )
+        {
+            throw std::runtime_error(std::format("You must specify all path to the file: {}", header_name));
+        }
+
+        static glsl_include_result_t* systemInclude (
+            void*       ctx, 
+            const char* header_name, 
+            const char* includer_name,
+            size_t      include_depth
+        )
+        {
+            if (!header_name)
+                return nullptr;
+
+            if (auto return_value = _includes_data.find(header_name); return_value != std::end(_includes_data))
+                return return_value->second.ptr_include_result.get();
+
+            std::string key     = header_name;
+            std::string code    = getSource(source_direcrtory / header_name);
+
+            auto ptr_include_data = std::make_unique<glsl_include_result_t>();
+            ptr_include_data->header_name   = key.data();
+            ptr_include_data->header_data   = code.data();
+            ptr_include_data->header_length = code.size();
+
+            auto return_value = ptr_include_data.get();
+
+            _includes_data.insert(
+                std::make_pair(
+                    std::move(key), 
+                    IncludeProcessData 
+                    {
+                        std::move(code), 
+                        std::move(ptr_include_data)
+                    }
+                )
+            );
+
+            return return_value;
+        }
+
+        static int freeInclude(void* ctx, glsl_include_result_t* ptr_result)
+        {
+            if (ptr_result)
+            {
+                if (auto include_data = _includes_data.find(ptr_result->header_data); include_data != std::end(_includes_data))
+                    _includes_data.erase(include_data);
+            }
+
+            return 0;
+        }
+
+    private:
+        static std::map<std::string, IncludeProcessData> _includes_data;
+    };
+    
+    std::map<std::string, IncludeProcessData> Includer::_includes_data;
+}
+
+namespace pbrlib::shader
+{
+    auto getStage(const std::filesystem::path& filename)
+    {
+        constexpr auto undefined_stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
+
+        auto extension = filename.extension().string();
+
+#define RETURN_STAGE(ext, vulkan_stage) if (std::strcmp(extension.data(), ext) == 0) return vulkan_stage
+
+        RETURN_STAGE(".vert", VK_SHADER_STAGE_VERTEX_BIT);
+        RETURN_STAGE(".tesc", VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT);
+        RETURN_STAGE(".tesc", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
+        RETURN_STAGE(".geom", VK_SHADER_STAGE_GEOMETRY_BIT);
+        RETURN_STAGE(".frag", VK_SHADER_STAGE_FRAGMENT_BIT);
+
+        RETURN_STAGE(".task", VK_SHADER_STAGE_TASK_BIT_EXT);
+        RETURN_STAGE(".mesh", VK_SHADER_STAGE_MESH_BIT_EXT);
+        
+        RETURN_STAGE(".comp", VK_SHADER_STAGE_COMPUTE_BIT);
+        
+        RETURN_STAGE(".rgen", VK_SHADER_STAGE_RAYGEN_BIT_KHR);
+        RETURN_STAGE(".rint", VK_SHADER_STAGE_INTERSECTION_BIT_KHR);
+        RETURN_STAGE(".rahit", VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
+        RETURN_STAGE(".rchit", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR);
+        RETURN_STAGE(".rmiss", VK_SHADER_STAGE_MISS_BIT_KHR);
+        RETURN_STAGE(".rcall", VK_SHADER_STAGE_CALLABLE_BIT_KHR);
+
+#undef RETURN_STAGE
+
+        return undefined_stage;
+    }
+
+    auto toGlslangStage(VkShaderStageFlagBits stage)
+    {
+        constexpr auto undefined_stage = GLSLANG_STAGE_COUNT;
+
+        switch(stage)
+        {
+            case VK_SHADER_STAGE_VERTEX_BIT:
+                return GLSLANG_STAGE_VERTEX;
+            case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
+                return GLSLANG_STAGE_TESSCONTROL;
+            case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
+                return GLSLANG_STAGE_TESSEVALUATION;
+            case VK_SHADER_STAGE_GEOMETRY_BIT:
+                return GLSLANG_STAGE_GEOMETRY;
+            case VK_SHADER_STAGE_FRAGMENT_BIT:
+                return GLSLANG_STAGE_FRAGMENT;
+            
+            case VK_SHADER_STAGE_TASK_BIT_EXT:
+                return GLSLANG_STAGE_TASK;
+            case VK_SHADER_STAGE_MESH_BIT_EXT:
+                return GLSLANG_STAGE_MESH;
+            
+            case VK_SHADER_STAGE_COMPUTE_BIT:
+                return GLSLANG_STAGE_COMPUTE;
+            
+            case VK_SHADER_STAGE_RAYGEN_BIT_KHR:
+                return GLSLANG_STAGE_RAYGEN;
+            case VK_SHADER_STAGE_INTERSECTION_BIT_KHR:
+                return GLSLANG_STAGE_INTERSECT;
+            case VK_SHADER_STAGE_ANY_HIT_BIT_KHR:
+                return GLSLANG_STAGE_ANYHIT;
+            case VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR:
+                return GLSLANG_STAGE_CLOSESTHIT;
+            case VK_SHADER_STAGE_MISS_BIT_KHR:
+                return GLSLANG_STAGE_MISS;
+            case VK_SHADER_STAGE_CALLABLE_BIT_KHR:
+                return GLSLANG_STAGE_CALLABLE;
+        }
+
+        return undefined_stage;
+    }
+
+    auto compile(const std::filesystem::path& filename, VkShaderStageFlagBits stage)
+    {
+        auto source = getSource(filename);
+
+        glsl_include_callbacks_t includer = { };
+
+        includer.include_local          = Includer::localInclude;
+        includer.include_system         = Includer::systemInclude;
+        includer.free_include_result    = Includer::freeInclude;
+
+        auto glslang_stage = toGlslangStage(stage);
+
+        glslang_input_t input = { };
+        input.language                          = GLSLANG_SOURCE_GLSL;
+        input.stage                             = glslang_stage;
+        input.client                            = GLSLANG_CLIENT_VULKAN;
+        input.client_version                    = GLSLANG_TARGET_VULKAN_1_3;
+        input.target_language                   = GLSLANG_TARGET_SPV;
+        input.target_language_version           = GLSLANG_TARGET_SPV_1_6;
+        input.code                              = source.c_str();
+        input.default_version                   = 100;
+        input.default_profile                   = GLSLANG_NO_PROFILE;
+        input.force_default_version_and_profile = false;
+        input.forward_compatible                = false;
+        input.messages                          = GLSLANG_MSG_DEFAULT_BIT;
+        input.resource                          = glslang_default_resource();
+        input.callbacks                         = includer;
+
+        auto ptr_shader = glslang_shader_create(&input);
+
+        CHECK_SHADER(glslang_shader_preprocess(ptr_shader, &input));
+        CHECK_SHADER(glslang_shader_parse(ptr_shader, &input));
+
+        auto ptr_program = glslang_program_create();
+        glslang_program_add_shader(ptr_program, ptr_shader);
+
+        CHECK_PROGRAM(glslang_program_link(ptr_program, GLSLANG_MSG_SPV_RULES_BIT | GLSLANG_MSG_VULKAN_RULES_BIT));
+
+        glslang_program_SPIRV_generate(ptr_program, glslang_stage);
+
+        if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program))
+           throw std::runtime_error(std::format("[Sahder Compiler]: {}", spirv_message));
+
+        std::vector<uint32_t> IL(glslang_program_SPIRV_get_size(ptr_program));
+
+        glslang_program_SPIRV_get(ptr_program, IL.data());
+
+        glslang_program_delete(ptr_program);
+        glslang_shader_delete(ptr_shader);
+
+        return IL;
+    }
+}
+
+namespace pbrlib::shader
+{
+    CompileResult GLSLCompiler::compile(std::filesystem::path filename)
+    {
+        filename = source_direcrtory / filename; 
+
+        if (!std::filesystem::exists(filename) || std::filesystem::is_directory(filename))
+            throw std::invalid_argument("filename");
+
+        auto stage  = getStage(filename);
+        auto IL     = pbrlib::shader::compile(filename, stage);
+
+        return { std::move(IL), stage };
+    }
+}

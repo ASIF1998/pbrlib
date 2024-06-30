@@ -13,6 +13,8 @@
 
 #include <cmath>
 
+#include <filesystem>
+
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846
 #endif
@@ -30,6 +32,11 @@ namespace pbrlib
         @PRLIB_VULKAN_VERSION_MINOR@,
         @PRLIB_VULKAN_VERSION_PATCH@
     );
+}
+
+namespace pbrlib
+{
+    const std::filesystem::path path_to_root = "@PRLIB_PATH_TO_ROOT@";
 }
 
 #endif /* core_h */

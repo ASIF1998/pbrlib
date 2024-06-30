@@ -27,8 +27,7 @@
 
 #include <pbrlib/Rendering/Renderers/Shaders/MaterialData.h>
 
-#include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.vert.spv.h>
-#include <pbrlib/Rendering/Renderers/SubPasses/spv/GBuffer.glsl.frag.spv.h>
+#include <pbrlib/Rendering/Compiler/Compiler.hpp>
 
 using namespace pbrlib::math;
 
@@ -324,12 +323,15 @@ namespace pbrlib
 
         _ptr_descriptor_set = DescriptorSet::make(ptr_descriptor_pool, ptr_descriptor_set_layout);
 
+        auto vertex_shader_bin      = shader::GLSLCompiler::compile("GBuffer.glsl.vert");
+        auto fragment_shader_bin    = shader::GLSLCompiler::compile("GBuffer.glsl.frag");
+
         build_vert_shader.setDevice(ptr_device);
-        build_vert_shader.setShaderCode(reinterpret_cast<const uint32_t*>(gbuffer_vert_spirv), sizeof(gbuffer_vert_spirv));
+        build_vert_shader.setShaderCode(vertex_shader_bin.IL.data(), vertex_shader_bin.IL.size() * sizeof(uint32_t));
         build_vert_shader.setShaderType(VK_SHADER_STAGE_VERTEX_BIT);
         
         build_frag_shader.setDevice(ptr_device);
-        build_frag_shader.setShaderCode(reinterpret_cast<const uint32_t*>(gbuffer_frag_spirv), sizeof(gbuffer_frag_spirv));
+        build_frag_shader.setShaderCode(fragment_shader_bin.IL.data(), fragment_shader_bin.IL.size() * sizeof(uint32_t));
         build_frag_shader.setShaderType(VK_SHADER_STAGE_FRAGMENT_BIT);
 
         build_uniform_matrices_data_buffer.setDevice(ptr_device);

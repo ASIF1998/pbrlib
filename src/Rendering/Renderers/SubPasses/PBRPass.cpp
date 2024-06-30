@@ -31,7 +31,7 @@
 
 #include <pbrlib/Util/enumCast.hpp>
 
-#include <pbrlib/Rendering/Renderers/SubPasses/spv/PBRPass.glsl.comp.spv.h>
+#include <pbrlib/Rendering/Compiler/Compiler.hpp>
 
 #include <algorithm>
 
@@ -91,8 +91,10 @@ namespace pbrlib
 
         DescriptorSetLayoutBindings bindings (ptr_device, 0);
 
+        auto compute_shader_bin = shader::GLSLCompiler::compile("PBR.glsl.comp");
+
         build_shader.setDevice(ptr_device);
-        build_shader.setShaderCode(reinterpret_cast<const uint32_t*>(pbrpass_comp_spirv), sizeof(pbrpass_comp_spirv));
+        build_shader.setShaderCode(compute_shader_bin.IL.data(), compute_shader_bin.IL.size() * sizeof(uint32_t));
         build_shader.setShaderType(VK_SHADER_STAGE_COMPUTE_BIT);
         build_shader.setSpecializationInfoSizeData(sizeof(Optionals));
         build_shader.setSpecializationInfoNumMapEntries(utils::enumCast(ConstantID::Num));

@@ -5,6 +5,8 @@
 //  Created by Асиф Мамедов on 16.09.2021.
 //
 
+#include <glslang/Include/glslang_c_interface.h>
+
 #include <stdexcept>
 
 namespace pbrlib
@@ -14,10 +16,14 @@ namespace pbrlib
     {
         if (SDL_Init(SDL_INIT_VIDEO))
             throw std::runtime_error(SDL_GetError());
+
+        if (!glslang_initialize_process())
+            throw std::runtime_error("Failed initialize glslang library");
     }
 
     inline PBRLibResources::~PBRLibResources()
     {
+        glslang_finalize_process();
         SDL_Quit();
     }
 

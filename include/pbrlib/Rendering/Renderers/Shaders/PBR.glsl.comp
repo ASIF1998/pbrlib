@@ -2,15 +2,15 @@
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "PointLightData.h"
-#include "SpotLightData.h"
-#include "DirectionLightData.h"
+#include <PointLightData.h>
+#include <SpotLightData.h>
+#include <DirectionLightData.h>
 
-#include "NumLights.h"
+#include <NumLights.h>
 
-#include "CameraData.h"
+#include <CameraData.h>
 
-#include "brdf.h"
+#include <brdf.h>
 
 #define USE_BENT_NORMAL_TANGENT_BTANGENT(Options)   Options == 1
 #define E(d, n_dot_l)                               n_dot_l / max(d * d, 0.000001f)

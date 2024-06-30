@@ -2,7 +2,7 @@
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "MaterialData.h"
+#include <MaterialData.h>
 
 layout(location = 0) in highp       vec3 FPosition;
 layout(location = 1) in mediump     vec2 FTextureCoord;

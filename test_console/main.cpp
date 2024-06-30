@@ -162,43 +162,54 @@ auto makePointLight(Scene& scene)
 
 int main(int argc, char* argv[])  
 {
-	std::shared_ptr engine_resources = PBRLibResources::init();
-    auto window = makeWindow();
+    try
+    {
+        std::shared_ptr engine_resources = PBRLibResources::init();
+        auto window = makeWindow(); 
 
-    SceneView scene_view ("Scene", engine_resources, window);
+        SceneView scene_view ("Scene", engine_resources, window);
 
-	auto model = getModelResourcesReferences();
-    std::shared_ptr<SceneItem> ptr_point_light = nullptr;
+        auto model = getModelResourcesReferences();
+        std::shared_ptr<SceneItem> ptr_point_light = nullptr;
 
-    Scene&              scene               = scene_view.getScene();
-    MeshManager&        mesh_manager        = scene.getMeshManager();
-    MaterialManager&    material_manager    = scene.getMaterialManager();
-    GPUTextureManager&  texture_manager     = scene.getTextureManager();
+        auto& scene               = scene_view.getScene();
+        auto& mesh_manager        = scene.getMeshManager();
+        auto& material_manager    = scene.getMaterialManager();
+        auto& texture_manager     = scene.getTextureManager();
 
-    auto model_meshes   = mesh_manager.load(model.path_to_mesh.string()).value();
-    auto material       = getMaterial(model, texture_manager, material_manager);
-    model_meshes[0]->setMaterial(material);
+        auto model_meshes   = mesh_manager.load(model.path_to_mesh.string()).value();
+        auto material       = getMaterial(model, texture_manager, material_manager);
+        model_meshes[0]->setMaterial(material);
 
-    std::shared_ptr mesh_node = MeshNode::make("Floor", model_meshes[0]);
-    mesh_node->addComponent(Rotate::make());
+        std::shared_ptr mesh_node = MeshNode::make("Floor", model_meshes[0]);
+        mesh_node->addComponent(Rotate::make());
 
-    // Регестрируем модель в сцене.
-    scene.setRoot(mesh_node);
+        // Регестрируем модель в сцене.
+        scene.setRoot(mesh_node);
 
-    auto ptr_camera = makeCamera(scene);
-    ptr_camera->addComponent(std::make_shared<CameraController>());
-    
-    auto light    = makePointLight(scene);
+        auto ptr_camera = makeCamera(scene);
+        ptr_camera->addComponent(std::make_shared<CameraController>());
+        
+        auto light    = makePointLight(scene);
 
-    PBRPass::Optionals pbr_optionals;
-    pbr_optionals.setDistributionFunction(PBRPass::DistributionFunction::GGX);
-    pbr_optionals.setGeometryFunction(PBRPass::GeometryFunction::Kelemen);
-    pbr_optionals.setFresnelApproximation(PBRPass::FresnelApproximation::Schlick);
+        PBRPass::Optionals pbr_optionals;
+        pbr_optionals.setDistributionFunction(PBRPass::DistributionFunction::GGX);
+        pbr_optionals.setGeometryFunction(PBRPass::GeometryFunction::Kelemen);
+        pbr_optionals.setFresnelApproximation(PBRPass::FresnelApproximation::Schlick);
 
-    std::shared_ptr renderer = PBR::make(pbr_optionals);
-    scene_view.setRenderer(renderer);
+        std::shared_ptr renderer = PBR::make(pbr_optionals);
+        scene_view.setRenderer(renderer);
 
-    while (scene_view.drawScene(1323));
+        while (scene_view.drawScene(1323));
+    } 
+    catch (std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "error" << std::endl;
+    }
 
     return 0;
 }
