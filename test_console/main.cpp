@@ -12,6 +12,8 @@
 
 #include <pbrlib/Input/InputStay.hpp>
 
+#include <pbrlib/Logger/Logger.hpp>
+
 #include <iostream>
 #include <thread>
 
@@ -165,6 +167,9 @@ int main(int argc, char* argv[])
     try
     {
         std::shared_ptr engine_resources = PBRLibResources::init();
+
+        log::info("Demo scene.");
+
         auto window = makeWindow(); 
 
         SceneView scene_view ("Scene", engine_resources, window);

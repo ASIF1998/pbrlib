@@ -5,6 +5,8 @@
 //  Created by Асиф Мамедов on 16.09.2021.
 //
 
+#include <pbrlib/Logger/Private/Console.hpp>
+
 #include <glslang/Include/glslang_c_interface.h>
 
 #include <stdexcept>
@@ -19,6 +21,9 @@ namespace pbrlib
 
         if (!glslang_initialize_process())
             throw std::runtime_error("Failed initialize glslang library");
+
+        log::priv::AppLogger::init();
+        log::priv::EngineLogger::init();
     }
 
     inline PBRLibResources::~PBRLibResources()

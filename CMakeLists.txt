@@ -114,6 +114,11 @@ foreach(library ${glslang_LIBS_NAME})
 endforeach()
 
 #####################################################
+#   spdlog
+#####################################################
+add_subdirectory(third_party/spdlog)
+
+#####################################################
 #   add libs
 #####################################################
 target_include_directories(PBRLib PUBLIC 
@@ -126,6 +131,7 @@ target_link_libraries(PBRLib PUBLIC
     ${glslang_LIBS}
     assimp
     SDL3::SDL3
+    spdlog::spdlog_header_only
 )
 
 if (APPLE)
