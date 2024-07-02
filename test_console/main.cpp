@@ -86,6 +86,12 @@ public:
 
         if (ptr_input_stay->keyboard.isDown(Keycode::ShiftLeft))
             --pos.y;
+
+        if (ptr_input_stay->keyboard.isDown(Keycode::A))
+            --pos.x;
+        
+        if (ptr_input_stay->keyboard.isDown(Keycode::D))
+            ++pos.x;
             
         camera.setLookAt(eye, pos, up);
     }

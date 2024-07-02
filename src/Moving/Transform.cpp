@@ -208,16 +208,26 @@ namespace pbrlib
         const Vec3<float>& up
     )
     {
-        Vec3<float> d = normalize(pos - eye);
-        Vec3<float> r = normalize(cross(d, up));
-        Vec3<float> u = cross(r, d);
+        auto f = pbrlib::math::normalize(pos - eye);
+        auto s = pbrlib::math::normalize(pbrlib::math::cross(f, up));
+        auto u = pbrlib::math::cross(s, f);
 
-        return Transform(Matrix4x4<float>(
-           r.x,            u.x,            -d.x,            0.0f,
-           r.y,            u.y,            -d.y,            0.0f,
-           r.z,            u.z,            -d.z,            0.0f,
-           -dot(r, eye),   -dot(u, eye),   dot(d, eye),     1.0f
-       ));
+        Matrix4x4<float> mat;
+
+        mat[0][0] = s.x;
+		mat[1][0] = s.y;
+		mat[2][0] = s.z;
+		mat[0][1] = u.x;
+		mat[1][1] = u.y;
+		mat[2][1] = u.z;
+		mat[0][2] =-f.x;
+		mat[1][2] =-f.y;
+		mat[2][2] =-f.z;
+        mat[3][0] =-pbrlib::math::dot(s, eye);
+		mat[3][1] =-pbrlib::math::dot(u, eye);
+		mat[3][2] = pbrlib::math::dot(f, eye);
+
+        return Transform(mat);
     }
 
     Transform Transform::perspective(
@@ -227,14 +237,16 @@ namespace pbrlib
         float z_far
     )
     {
-        float a = tan(fovy / 2.0f);
+        auto tan_half_fovy = std::tan(fovy * 0.5f);
 
-        return Transform(Matrix4x4<float>(
-           1.0f / (aspect * a),    0.0f,       0.0f,                                            0.0f,
-           0.0f,                   -1.0f / a,  0.0f,                                            0.0f,
-           0.0f,                   0.0f,       z_far / (z_near - z_far),                        -1.0f,
-           0.0f,                   0.0f,       -(z_far * z_near) / (z_far - z_near),            0.0f
-       ));
+        Matrix4x4<float> mat;
+        mat[0][0] = 1.0f / (aspect * tan_half_fovy);
+		mat[1][1] = 1.0f / (tan_half_fovy);
+		mat[2][2] = z_far / (z_near - z_far);
+		mat[2][3] = -1.0f;
+		mat[3][2] = -(z_far * z_near) / (z_far - z_near);
+
+        return Transform(mat);
     }
 
     std::ostream& operator << (std::ostream& print, const Transform& t)
