@@ -119,6 +119,11 @@ endforeach()
 add_subdirectory(third_party/spdlog)
 
 #####################################################
+#   VulkanMemoryAllocator
+#####################################################
+add_subdirectory(third_party/VulkanMemoryAllocator)
+
+#####################################################
 #   add libs
 #####################################################
 target_include_directories(PBRLib PUBLIC 
@@ -132,6 +137,7 @@ target_link_libraries(PBRLib PUBLIC
     assimp
     SDL3::SDL3
     spdlog::spdlog_header_only
+    VulkanMemoryAllocator
 )
 
 if (APPLE)
