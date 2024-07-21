@@ -55,6 +55,8 @@ else()
     find_package(Vulkan REQUIRED)
 endif()
 
+set(Vulkan_SDK_LIBS ${Vulkan_INCLUDE_DIRS}/../Lib)
+
 #####################################################
 #   assimp
 #####################################################
@@ -77,13 +79,7 @@ include_directories(third_party/stb)
 #####################################################
 #   glslang
 #####################################################
-set(glslang_ROOT ${CMAKE_CURRENT_SOURCE_DIR}"/third_party/glslang")
-
-set(glslang_INCLUDE_DIRS ${glslang_ROOT}/include)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(glslang_LIBS_DIR ${glslang_ROOT}/Windows/Debug)
-
     set(glslang_LIBS_NAME 
             GenericCodeGend.lib
             glslang-default-resource-limitsd.lib
@@ -96,8 +92,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             SPVRemapperd.lib
     )
 else()
-    set(glslang_LIBS_DIR ${glslang_ROOT}/Windows/Release)
-
     set(glslang_LIBS_NAME 
             GenericCodeGen.lib
             glslang-default-resource-limits.lib
@@ -112,7 +106,7 @@ else()
 endif()
 
 foreach(library ${glslang_LIBS_NAME})
-    set(glslang_LIBS ${glslang_LIBS} ${glslang_LIBS_DIR}/${library})
+    set(glslang_LIBS ${glslang_LIBS} ${Vulkan_SDK_LIBS}/${library})
 endforeach()
 
 #####################################################
@@ -130,7 +124,6 @@ add_subdirectory(third_party/VulkanMemoryAllocator)
 #####################################################
 target_include_directories(PBRLib PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
-    ${glslang_INCLUDE_DIRS}
 )
 
 target_link_libraries(PBRLib PUBLIC
