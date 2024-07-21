@@ -8,7 +8,7 @@
 
 #include "../../utils.hpp"
 
-#include "../../../src/Rendering/Lights/SpotLight.hpp"
+#include <pbrlib/Rendering/Lights/SpotLight.hpp>
 
 using namespace pbrlib;
 using namespace pbrlib::math;

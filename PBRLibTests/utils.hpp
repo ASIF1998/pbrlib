@@ -13,13 +13,15 @@
 
 #include <string_view>
 
-#include "../../src/math/vec2.hpp"
-#include "../../src/math/vec3.hpp"
-#include "../../src/math/vec4.hpp"
-#include "../../src/math/matrix2x2.hpp"
-#include "../../src/math/matrix3x3.hpp"
-#include "../../src/math/matrix4x4.hpp"
-#include "../../src/math/quaternion.hpp"
+#include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec4.hpp>
+
+#include <pbrlib/math/matrix2x2.hpp>
+#include <pbrlib/math/matrix3x3.hpp>
+#include <pbrlib/math/matrix4x4.hpp>
+
+#include <pbrlib/math/quaternion.hpp>
 
 using namespace pbrlib::math;
 using namespace testing;

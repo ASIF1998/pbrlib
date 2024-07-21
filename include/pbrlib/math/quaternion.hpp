@@ -46,7 +46,7 @@ namespace pbrlib::math
         inline float    operator [] (size_t i) const noexcept;
         inline float&   operator [] (size_t i) noexcept;
 
-        friend inline ostream& operator << (ostream& print, const Quaternion& q);
+        friend inline std::ostream& operator << (std::ostream& print, const Quaternion& q);
         
         inline float lengthSquared()    const noexcept;
         inline float length()           const noexcept;

@@ -17,13 +17,13 @@ namespace pbrlib
     class STLAlignedAllocator
     {
     public:
-        using value_type                = Type;
-        using pointer                   = value_type*;
-        using const_poiner              = const value_type*;
-        using reference                 = value_type&;
-        using const_reference           = const value_type&;
-        using size_type                 = size_t;
-        using difference_type           = ptrdiff_t;
+        using value_type        = Type;
+        using pointer           = value_type*;
+        using const_poiner      = const value_type*;
+        using reference         = value_type&;
+        using const_reference   = const value_type&;
+        using size_type         = size_t;
+        using difference_type   = ptrdiff_t;
 
     public:
         template<typename U>

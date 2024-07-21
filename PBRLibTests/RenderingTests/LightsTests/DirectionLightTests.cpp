@@ -9,7 +9,7 @@
 
 #include "../../utils.hpp"
 
-#include "../../../src/Rendering/Lights/DirectionLight.hpp"
+#include <pbrlib/Rendering/Lights/DirectionLight.hpp>
 
 using namespace pbrlib;
 using namespace pbrlib::math;

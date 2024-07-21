@@ -47,7 +47,8 @@ namespace pbrlib
 
     std::shared_ptr<const SceneItem> SceneItem::getChild(size_t i) const
     {
-        return _ptr_children[i];
+        assert(i < _children.size());
+        return _children[i];
     }
 
     Transform& SceneItem::getLocalTransform() noexcept
@@ -80,6 +81,11 @@ namespace pbrlib
         return _name;
     }
 
+    size_t SceneItem::getChildrenCount() const
+    {
+        return _children.size();
+    }
+
     void SceneItem::setParent(SceneItem* ptr_parent) noexcept
     {
         _ptr_parent = ptr_parent;
@@ -87,7 +93,7 @@ namespace pbrlib
 
     void SceneItem::setChildren(std::span<std::shared_ptr<SceneItem>> children)
     {
-        _ptr_children = std::vector(std::begin(children), std::end(children));
+        _children = std::vector(std::begin(children), std::end(children));
     }
 
     void SceneItem::setLocalTransform(const Transform& transform)
@@ -147,48 +153,49 @@ namespace pbrlib
     {
         child->setParent(this);
 
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
-            if (!_ptr_children[i]) {
-                _ptr_children[i] = child;
+        for (size_t i = 0, size = _children.size(); i < size; i++) 
+        {
+            if (!_children[i]) 
+            {
+                _children[i] = child;
                 return;
             }
         }
 
-        _ptr_children.push_back(child);
+        _children.push_back(child);
     }
 
-    std::shared_ptr<const SceneItem> SceneItem::addChild(const std::string_view name)
+    std::shared_ptr<SceneItem> SceneItem::addChild(const std::string_view name)
     {
         auto child = std::make_shared<SceneItem>(name, this);
 
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) 
+        for (size_t i = 0, size = _children.size(); i < size; i++) 
         {
-            if (!_ptr_children[i]) 
+            if (!_children[i]) 
             {
-                _ptr_children[i] = child;
-                return _ptr_children[i];
+                _children[i] = child;
+                return _children[i];
             }
         }
 
-        _ptr_children.push_back(child);
-        return _ptr_children.back();
+        _children.push_back(child);
+        return _children.back();
     }
 
     void SceneItem::detachChild(std::shared_ptr<const SceneItem> ptr_item)
     {
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) {
-            if (_ptr_children[i] == ptr_item) {
-                _ptr_children[i] = nullptr;
-            }
+        for (size_t i = 0, size = _children.size(); i < size; i++) {
+            if (_children[i] == ptr_item)
+                _children[i] = nullptr;
         }
     }
 
     void SceneItem::detachChild(const std::string_view name)
     {
-        for (size_t i{0}, size{_ptr_children.size()}; i < size; i++) 
+        for (size_t i = 0, size = _children.size(); i < size; i++) 
         {
-            if (_ptr_children[i]->_name == name)
-                _ptr_children[i] = nullptr;
+            if (_children[i]->_name == name)
+                _children[i] = nullptr;
         }
     }
 
@@ -200,17 +207,19 @@ namespace pbrlib
         if (!_world_transform_is_current)
             _world_transform = transform;
 
-        if (!_ptr_children.empty()) {
+        if (!_children.empty()) 
+        {
             Transform children_world_transform = _world_transform * _local_transform;
 
-            for (size_t i{0}, size{_ptr_children.size()}; i < size; i++)
-                _ptr_children[i]->update(ptr_input_stay, delta_time, children_world_transform);
+            for (size_t i = 0, size = _children.size(); i < size; i++)
+                _children[i]->update(ptr_input_stay, delta_time, children_world_transform);
 
-            if (!_world_aabb_is_current) {
-                _world_bbox = _ptr_children[0]->getWorldAABB();
+            if (!_world_aabb_is_current) 
+            {
+                _world_bbox = _children[0]->getWorldAABB();
 
-                for (size_t i{1}, size{_ptr_children.size()}; i < size; i++)
-                    _world_bbox = AABB::aabbUnion(_world_bbox, _ptr_children[i]->getWorldAABB());
+                for (size_t i = 1, size = _children.size(); i < size; i++)
+                    _world_bbox = AABB::aabbUnion(_world_bbox, _children[i]->getWorldAABB());
             }
         }
     }
@@ -221,9 +230,10 @@ namespace pbrlib
          * TODO: Добавить отсечение по усечённому конусу.
         */
 
-        for (size_t i{0}, num_child{_ptr_children.size()}; i < num_child; i++) {
-            out_visible_list.push_back(_ptr_children[i]);
-            _ptr_children[i]->_getVisibleList(out_visible_list);
+        for (size_t i = 0, num_child = _children.size(); i < num_child; i++) 
+        {
+            out_visible_list.push_back(_children[i]);
+            _children[i]->_getVisibleList(out_visible_list);
         }
     }
 

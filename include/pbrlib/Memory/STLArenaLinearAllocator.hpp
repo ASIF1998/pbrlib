@@ -37,12 +37,12 @@ namespace pbrlib
 
     public:
         inline STLArenaLinearAllocator(
-            const PtrMemoryArena<MemoryBlockType>&  ptr_memory_arena, 
+            std::shared_ptr<MemoryArena<MemoryBlockType>>  ptr_memory_arena, 
             size_t                                  size
         );
 
         template<typename U>
-        inline STLArenaLinearAllocator(const STLArenaLinearAllocator<U>& linear_allocator);
+        inline STLArenaLinearAllocator(STLArenaLinearAllocator<U>& linear_allocator);
 
         inline STLArenaLinearAllocator(STLArenaLinearAllocator&& linear_allocator);
         inline STLArenaLinearAllocator(const STLArenaLinearAllocator& linear_allocator);
@@ -59,16 +59,16 @@ namespace pbrlib
 
         inline void destroy(pointer p);
 
-        inline PtrIMemoryBlock&                         getMemoryBlock();
-        inline const PtrIMemoryBlock&                   getMemoryBlock()    const;
-        inline PtrMemoryArena<MemoryBlockType>&         getMemoryArena();
-        inline const PtrMemoryArena<MemoryBlockType>&   getMemoryArena()    const;
+        inline std::shared_ptr<IMemoryBlock>                         getMemoryBlock();
+        inline std::shared_ptr<const IMemoryBlock>                   getMemoryBlock()    const;
+        inline std::shared_ptr<MemoryArena<MemoryBlockType>>         getMemoryArena();
+        inline std::shared_ptr<const MemoryArena<MemoryBlockType>>   getMemoryArena()    const;
         inline pointer                                  getPtrMemory();
         inline const_poiner                             getPtrMemory()      const;
 
     private:
-        PtrIMemoryBlock                 _ptr_memory_block;
-        PtrMemoryArena<MemoryBlockType> _ptr_memory_arena;
+        std::shared_ptr<IMemoryBlock>                 _ptr_memory_block;
+        std::shared_ptr<MemoryArena<MemoryBlockType>> _ptr_memory_arena;
 
         pointer _ptr_memory;
         size_t  _memory_size;

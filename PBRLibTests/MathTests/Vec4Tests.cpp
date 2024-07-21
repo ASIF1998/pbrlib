@@ -8,7 +8,7 @@
 
 #include "../utils.hpp"
 
-#include "../../src/math/vec4.hpp"
+#include <pbrlib/math/vec4.hpp>
 
 using namespace pbrlib::math;
 

@@ -10,7 +10,7 @@ namespace pbrlib
 {
     template<typename Type>
     inline STLArenaLinearAllocator<Type>::STLArenaLinearAllocator(
-        const PtrMemoryArena<MemoryBlockType>&  ptr_memory_arena, 
+        std::shared_ptr<MemoryArena<MemoryBlockType>>  ptr_memory_arena, 
         size_t                                  size
     ) :
         _ptr_memory_arena   (ptr_memory_arena),
@@ -25,7 +25,7 @@ namespace pbrlib
 
     template<typename Type>
     template<typename U>
-    inline STLArenaLinearAllocator<Type>::STLArenaLinearAllocator(const STLArenaLinearAllocator<U>& linear_allocator) :
+    inline STLArenaLinearAllocator<Type>::STLArenaLinearAllocator(STLArenaLinearAllocator<U>& linear_allocator) :
         _ptr_memory_arena   (linear_allocator.getMemoryArena()),
         _ptr_memory_block   (nullptr),
         _memory_size        (linear_allocator.max_size()),
@@ -115,25 +115,25 @@ namespace pbrlib
     }
 
     template<typename Type>
-    inline PtrIMemoryBlock& STLArenaLinearAllocator<Type>::getMemoryBlock()
+    inline std::shared_ptr<IMemoryBlock> STLArenaLinearAllocator<Type>::getMemoryBlock()
     {
         return _ptr_memory_block;
     }
 
     template<typename Type>
-    inline const PtrIMemoryBlock& STLArenaLinearAllocator<Type>::getMemoryBlock() const
+    inline std::shared_ptr<const IMemoryBlock> STLArenaLinearAllocator<Type>::getMemoryBlock() const
     {
         return _ptr_memory_block;
     }
 
     template<typename Type>
-    inline PtrMemoryArena<MemoryBlock>& STLArenaLinearAllocator<Type>::getMemoryArena()
+    inline std::shared_ptr<MemoryArena<MemoryBlock>> STLArenaLinearAllocator<Type>::getMemoryArena()
     {
         return _ptr_memory_arena;
     }
 
     template<typename Type>
-    inline const PtrMemoryArena<MemoryBlock>& STLArenaLinearAllocator<Type>::getMemoryArena() const
+    inline std::shared_ptr<const MemoryArena<MemoryBlock>> STLArenaLinearAllocator<Type>::getMemoryArena() const
     {
         return _ptr_memory_arena;
     }

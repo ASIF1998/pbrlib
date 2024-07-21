@@ -8,29 +8,27 @@
 
 #include "../utils.hpp"
 
-#include "../../src/Memory/STLAlignedAllocator.hpp"
+#include <pbrlib/Memory/STLAlignedAllocator.hpp>
 
 #include <vector>
 
 using namespace pbrlib;
-using namespace std;
 
 TEST(MemorySTLAlignedAllocator, AllTests)
 {
-    vector<float, STLAlignedAllocator<float>> tvec(12);
+    std::vector<float, STLAlignedAllocator<float>> vec(12);
 
-    pbrlib::testing::utils::equality(12, tvec.size());
+    pbrlib::testing::utils::equality(12, vec.size());
 
-    tvec.reserve(1000);
+    vec.reserve(1000);
 
-    for (size_t i{0}; i < 1000; i++) {
-        tvec.push_back(1.0f);
-    }
+    for (size_t i{0}; i < 1000; i++)
+        vec.push_back(1.0f);
 
-    pbrlib::testing::utils::equality(1012, tvec.size());
+    pbrlib::testing::utils::equality(1012, vec.size());
 
-    tvec.resize(tvec.size() * 10000);
-    tvec.resize(1);
+    vec.resize(vec.size() * 10000);
+    vec.resize(1);
 
-    pbrlib::testing::utils::equality(1, tvec.size());
+    pbrlib::testing::utils::equality(1, vec.size());
 }

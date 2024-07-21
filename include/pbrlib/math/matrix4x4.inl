@@ -248,12 +248,12 @@ namespace pbrlib::math
     template<typename Type>
     inline void Matrix4x4<Type>::transpose()
     {
-        swap(_array4x4[0][1], _array4x4[1][0]);
-        swap(_array4x4[0][2], _array4x4[2][0]);
-        swap(_array4x4[0][3], _array4x4[3][0]);
-        swap(_array4x4[1][2], _array4x4[2][1]);
-        swap(_array4x4[1][3], _array4x4[3][1]);
-        swap(_array4x4[2][3], _array4x4[3][2]);
+        std::swap(_array4x4[0][1], _array4x4[1][0]);
+        std::swap(_array4x4[0][2], _array4x4[2][0]);
+        std::swap(_array4x4[0][3], _array4x4[3][0]);
+        std::swap(_array4x4[1][2], _array4x4[2][1]);
+        std::swap(_array4x4[1][3], _array4x4[3][1]);
+        std::swap(_array4x4[2][3], _array4x4[3][2]);
     }
 
     template<typename Type>

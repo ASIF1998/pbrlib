@@ -54,8 +54,6 @@ namespace pbrlib
         
         inline virtual void setNumUsers(uint32_t num_users) override;
 
-        inline static PtrIMemoryBlock make(size_t size);
-
     private:
         void*       _ptr_memory;
         size_t      _size;

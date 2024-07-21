@@ -10,8 +10,8 @@
 
 #include "../../utils.hpp"
 
-#include "../../../src/Rendering/Geometry/AABB.hpp"
-#include "../../../src/math/vec3.hpp"
+#include <pbrlib/Rendering/Geometry/AABB.hpp>
+#include <pbrlib/math/vec3.hpp>
 
 using namespace pbrlib;
 using namespace pbrlib::math;

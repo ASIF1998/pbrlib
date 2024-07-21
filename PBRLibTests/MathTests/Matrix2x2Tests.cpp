@@ -8,7 +8,7 @@
 
 #include "../utils.hpp"
 
-#include "../../src/math/matrix2x2.hpp"
+#include <pbrlib/math/matrix2x2.hpp>
 
 using namespace pbrlib::math;
 

@@ -8,7 +8,7 @@
 
 #include "../../utils.hpp"
 
-#include "../../../src/Rendering/Cameras/PerspectiveCamera.hpp"
+#include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
 using namespace pbrlib;
 using namespace pbrlib::math;

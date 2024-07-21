@@ -450,10 +450,10 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix2x2<Type>& mat)
+    inline std::ostream& operator << (std::ostream& print, const Matrix2x2<Type>& mat)
     {
         for (size_t i{0}; i < 2; i++) {
-            print << mat[i][0] << ' ' << mat[i][1] << endl;
+            print << mat[i][0] << ' ' << mat[i][1] << std::endl;
         }
 
         return print;

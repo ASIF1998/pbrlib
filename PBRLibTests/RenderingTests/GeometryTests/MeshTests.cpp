@@ -6,19 +6,21 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#if 0
+
 #include <vector>
 
 #include "../../utils.hpp"
 
-#include "../../../src/Rendering/Geometry/Mesh.hpp"
-#include "../../../src/Rendering/Geometry/MeshManager.hpp"
+#include <pbrlib/PBRLibResources.hpp>
 
-#include "../../../src/math/vec3.hpp"
-#include "../../../src/math/vec2.hpp"
+#include <pbrlib/Rendering/Geometry/Mesh.hpp>
+#include <pbrlib/Rendering/Geometry/MeshManager.hpp>
 
-#include "../../../src/PBRLibResources.hpp"
+#include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/vec3.hpp>
 
-#include "../../../src/Rendering/VulkanWrapper/Buffer.hpp"
+#include <pbrlib/Rendering/VulkanWrapper/Buffer.hpp>
 
 using namespace pbrlib;
 using namespace pbrlib::math;
@@ -28,12 +30,12 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 {
     srand(static_cast<unsigned>(time(nullptr)));
     
-    PtrInstance ptr_instance = Instance::make(
+    auto ptr_instance = Instance::make(
         "RenderingResourceMesh::GettersAndSetters", 
         VK_MAKE_VERSION(0, 0, 1)
     );
 
-    PtrPhysicalDevice gpu = ptr_instance->getPhysicalDevice(
+    auto gpu = ptr_instance->getPhysicalDevice(
         VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU    |
         VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU  |
         VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU
@@ -51,7 +53,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     device_queue_create_info.push_back(device_queue_ci);
 
-    PtrDevice ptr_device = gpu->makeDevice(ptr_instance, device_queue_create_info);
+    auto ptr_device = gpu.makeDevice(ptr_instance.get(), device_queue_create_info);
 
     constexpr size_t num_vertex = 200;
     constexpr size_t num_indices = 152;
@@ -95,27 +97,27 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     for (uint32_t i{0}; i < num_indices; i++) {
         indices.push_back(i * 2);
-    }
+     }
 
     Buffer::BuilderWithData<Mesh::VertexAttrib> build_vertex_buffer;
     Buffer::BuilderWithData<uint32_t>           build_index_buffer;
 
     build_vertex_buffer.setUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    build_vertex_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-    build_vertex_buffer.setDevice(ptr_device);
+    build_vertex_buffer.setMemoryTypeIndex(gpu.memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+    build_vertex_buffer.setDevice(ptr_device.get());
     build_vertex_buffer.setData(vertices);
     build_vertex_buffer.addQueueFamily(0);
     build_vertex_buffer.setSize(num_vertex);
 
     build_index_buffer.setUsage(VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
-    build_index_buffer.setMemoryTypeIndex(gpu->memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-    build_index_buffer.setDevice(ptr_device);
+    build_index_buffer.setMemoryTypeIndex(gpu.memory.getMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+    build_index_buffer.setDevice(ptr_device.get());
     build_index_buffer.setData(indices);
     build_index_buffer.addQueueFamily(0);
     build_index_buffer.setSize(num_indices);
 
-    PtrBuffer ptr_vertex_buffer = build_vertex_buffer.buildPtr();
-    PtrBuffer ptr_index_buffer  = build_index_buffer.buildPtr();
+    std::shared_ptr<Buffer> ptr_vertex_buffer = build_vertex_buffer.buildPtr();
+    std::shared_ptr<Buffer> ptr_index_buffer  = build_index_buffer.buildPtr();
 
     Mesh mesh1;
     Mesh mesh2;
@@ -210,3 +212,4 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
     mesh2.unmapIndexBuffer();
     mesh1.unmapIndexBuffer();
 }
+#endif

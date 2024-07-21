@@ -58,6 +58,8 @@ endif()
 #####################################################
 #   assimp
 #####################################################
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    
 include_directories(third_party/assimp/include)
 add_subdirectory(third_party/assimp)
 

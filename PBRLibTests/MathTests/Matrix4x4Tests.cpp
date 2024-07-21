@@ -8,8 +8,8 @@
 
 #include "../utils.hpp"
 
-#include "../../src/math/matrix4x4.hpp"
-#include "../../src/math/vec4.hpp"
+#include <pbrlib/math/matrix4x4.hpp>
+#include <pbrlib/math/vec4.hpp>
 
 using namespace pbrlib::math;
 

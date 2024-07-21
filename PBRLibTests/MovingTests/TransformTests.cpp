@@ -8,8 +8,8 @@
 
 #include "../utils.hpp"
 
-#include "../../src/Moving/Transform.hpp"
-#include "../../src/math/vec3.hpp"
+#include <pbrlib/Moving/Transform.hpp>
+#include <pbrlib/math/vec3.hpp>
 
 using namespace pbrlib;
 
@@ -166,10 +166,10 @@ TEST(MovingTransform, LookAt)
 TEST(MovingTransform, PrespectiveProjection)
 {
     constexpr Matrix4x4<float> res (
-        -0.117089964f, 0.0000000000f, 0.00000000000f, 0.00f,
-        0.0000000000f, 0.156119958f,  0.00000000000f, 0.00f,
-        0.0000000000f, 0.0000000000f, -1.0000499500f, -1.0f,
-        0.0000000000f, 0.0000000000f, -0.0100004999f, 0.00f
+        -0.117089964f, 0.00000000f, 0.00000000f, 0.00000000f,
+        0.00000000f, -0.156119958f, 0.00000000f, 0.00000000f,
+        0.00000000f, 0.00000000f, -1.00004995f, -1.00000000f,
+        0.00000000f, 0.00000000f, -0.0100004999f, 1.00000000f
     );
 
     constexpr float fov       = 60.0f;

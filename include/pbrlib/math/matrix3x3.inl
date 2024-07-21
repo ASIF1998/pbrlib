@@ -218,9 +218,9 @@ namespace pbrlib::math
     template<typename Type>
     inline void Matrix3x3<Type>::transpose()
     {
-        swap(_array3x3[0][1], _array3x3[1][0]);
-        swap(_array3x3[0][2], _array3x3[2][0]);
-        swap(_array3x3[1][2], _array3x3[2][1]);
+        std::swap(_array3x3[0][1], _array3x3[1][0]);
+        std::swap(_array3x3[0][2], _array3x3[2][0]);
+        std::swap(_array3x3[1][2], _array3x3[2][1]);
     }
 
     template<typename Type>
@@ -270,10 +270,10 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix3x3<Type>& mat)
+    inline std::ostream& operator << (std::ostream& print, const Matrix3x3<Type>& mat)
     {
         for (size_t i{0}; i < 3; i++) {
-            print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << endl;
+            print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << std::endl;
         }
         
         return print;

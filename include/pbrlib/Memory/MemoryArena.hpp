@@ -24,9 +24,6 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    template<typename TMemoryBlock>
-    class MemoryArena;
-
     /**
      * @class MemoryArena.
      * @brief
@@ -55,31 +52,24 @@ namespace pbrlib
         MemoryArena(MemoryArena&&)      = delete;
         MemoryArena(const MemoryArena&) = delete;
 
-        inline pair<void*, PtrIMemoryBlock> allocate(size_t size);
+        inline pair<void*, std::shared_ptr<IMemoryBlock>> allocate(size_t size);
 
         template<typename Type>
-        inline pair<Type*, PtrIMemoryBlock> allocate(size_t n);
+        inline pair<Type*, std::shared_ptr<IMemoryBlock>> allocate(size_t n);
 
-        inline void deallocate(void* ptr, PtrIMemoryBlock ptr_memory_block);
+        inline void deallocate(void* ptr, std::shared_ptr<IMemoryBlock> ptr_memory_block);
 
         inline size_t getNumFreeBlocks()        const;
         inline size_t getNumAvailableBlocks()   const;
         inline size_t getNumBytes()             const;
 
-        inline static PtrMemoryArena<TMemoryBlock> make();
-
-        inline static PtrMemoryArena<TMemoryBlock> make(
-            size_t num_memory_blocks, 
-            size_t memory_block_size
-        );
-
     private:
-        multimap<size_t, PtrIMemoryBlock>   _free_blocks;
-        map<void*, PtrIMemoryBlock>         _available_blocks;
+        multimap<size_t, std::shared_ptr<IMemoryBlock>>   _free_blocks;
+        map<void*, std::shared_ptr<IMemoryBlock>>         _available_blocks;
 
-        PtrIMemoryBlock _current_memory_block;
-        size_t          _current_pos;
-        size_t          _current_memory_block_size;
+        std::shared_ptr<IMemoryBlock>   _current_memory_block;
+        size_t                          _current_pos;
+        size_t                          _current_memory_block_size;
 
         static constexpr size_t DefaultMemoryBlockSize = 262144;    /// 256 кб.
     };

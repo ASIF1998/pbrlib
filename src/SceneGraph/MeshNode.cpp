@@ -49,19 +49,22 @@ namespace pbrlib
         /// Если мировой ограничивающий объём не является корректным и
         /// есть меш, то дополняем мировой ограничивающий объём объёмом
         /// меша в мировом пространстве.
-        if (!_world_aabb_is_current && _ptr_mesh) {
+        if (!_world_aabb_is_current && _ptr_mesh) 
+        {
             Vec3<float> p;
             const AABB& bbox    = _ptr_mesh->getAABB();
 
             Transform   t       = _world_transform * _local_transform;
             size_t      i       = 0;
 
-            if (_ptr_children.empty()) {
+            if (_children.empty()) 
+            {
                 _world_bbox     = AABB(t(bbox.corner(0)));
                 i               = 1;
             }
 
-            for (; i < 8; i++) {
+            for (; i < 8; i++) 
+            {
                 p           = bbox.corner(i);
                 _world_bbox = AABB::aabbUnion(_world_bbox, t(p));
             }

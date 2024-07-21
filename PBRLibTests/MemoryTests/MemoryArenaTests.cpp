@@ -8,8 +8,8 @@
 
 #include "../utils.hpp"
 
-#include "../../src/Memory/MemoryBlock.hpp"
-#include "../../src/Memory/MemoryArena.hpp"
+#include <pbrlib/Memory/MemoryBlock.hpp>
+#include <pbrlib/Memory/MemoryArena.hpp>
 
 #include <type_traits>
 #include <cstdint>
@@ -23,16 +23,16 @@ TEST(MemoryMemoryArena, Constructor)
     constexpr size_t num_bytes2 = 1024;
     constexpr size_t num_blocks = 10;
 
-    PtrMemoryArena<MemoryBlock> ptr_memory_arena1 = MemoryArena<MemoryBlock>::make();
-    PtrMemoryArena<MemoryBlock> ptr_memory_arena2 = MemoryArena<MemoryBlock>::make(num_blocks, num_bytes2);
+    MemoryArena<MemoryBlock> memory_arena1;
+    MemoryArena<MemoryBlock> memory_arena2 (num_blocks, num_bytes2);
 
-    pbrlib::testing::utils::equality(0, ptr_memory_arena1->getNumFreeBlocks());
-    pbrlib::testing::utils::equality(0, ptr_memory_arena1->getNumAvailableBlocks());
-    pbrlib::testing::utils::equality(num_bytes1, ptr_memory_arena1->getNumBytes());
+    pbrlib::testing::utils::equality(0, memory_arena1.getNumFreeBlocks());
+    pbrlib::testing::utils::equality(0, memory_arena1.getNumAvailableBlocks());
+    pbrlib::testing::utils::equality(num_bytes1, memory_arena1.getNumBytes());
 
-    pbrlib::testing::utils::equality(num_blocks - 1, ptr_memory_arena2->getNumFreeBlocks());
-    pbrlib::testing::utils::equality(0, ptr_memory_arena2->getNumAvailableBlocks());
-    pbrlib::testing::utils::equality(num_bytes2 * num_blocks, ptr_memory_arena2->getNumBytes());
+    pbrlib::testing::utils::equality(num_blocks - 1, memory_arena2.getNumFreeBlocks());
+    pbrlib::testing::utils::equality(0, memory_arena2.getNumAvailableBlocks());
+    pbrlib::testing::utils::equality(num_bytes2 * num_blocks, memory_arena2.getNumBytes());
 }
 
 TEST(MemoryMemoryArena, AllocateAndDeallocate)

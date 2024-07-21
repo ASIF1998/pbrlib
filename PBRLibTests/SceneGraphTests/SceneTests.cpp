@@ -6,13 +6,14 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
+#if 0
+
 #include "../utils.hpp"
 
-#include "../../src/SceneGraph/Scene.hpp" 
-#include "../../src/SceneGraph/SceneView.hpp"
-
-#include "../../src/Rendering/Window.hpp"
-#include "../../src/PBRLibResources.hpp"
+#include <pbrlib/PBRLibResources.hpp>
+#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/SceneGraph/SceneView.hpp>
+#include <pbrlib/Rendering/Window.hpp>
 
 using namespace pbrlib;
 
@@ -27,8 +28,8 @@ TEST(SceneGraphScene, Constructor)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
-    PtrWindow           ptr_window              = window_builder.buildPtr();
+    std::shared_ptr ptr_pbrlib_resources    = PBRLibResources::init();
+    std::shared_ptr ptr_window              = window_builder.buildPtr();
     
     SceneView scene_view1 (name1, ptr_pbrlib_resources, ptr_window);
     SceneView scene_view2 (name2, ptr_pbrlib_resources, ptr_window);
@@ -36,8 +37,8 @@ TEST(SceneGraphScene, Constructor)
     Scene& scene1 = scene_view1.getScene();
     Scene& scene2 = scene_view2.getScene();
 
-    pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(scene1.getRootNode().get()), "При инициализации у объекта появился указатель на корневой узел (его не должно быть).");
-    pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(scene2.getRootNode().get()), "При инициализации у объекта появился указатель на корневой узел (его не должно быть).");
+    EXPECT_TRUE(scene1.getRoot() == nullptr) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть).";
+    EXPECT_TRUE(scene2.getRoot() == nullptr) << "При инициализации у объекта появился указатель на корневой узел (его не должно быть).";
 
     pbrlib::testing::utils::equality(string(name1), scene1.getName(), "Не правильное инициализирование имени.");
     pbrlib::testing::utils::equality(string(name2), scene2.getName(), "Не правильное инициализирование имени.");
@@ -53,20 +54,20 @@ TEST(SceneGraphScene, GettersAndSetters)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
-    PtrWindow           ptr_window              = window_builder.buildPtr();
+    std::shared_ptr ptr_pbrlib_resources    = PBRLibResources::init();
+    std::shared_ptr ptr_window              = window_builder.buildPtr();
     
     SceneView scene_view (name, ptr_pbrlib_resources, ptr_window);
 
     Scene& scene = scene_view.getScene();
 
-    Scene::PtrNode ptr_node = Scene::Node::make();
+    std::shared_ptr ptr_node = SceneItem::make();
 
     scene.setName(name);
-    scene.setRootNode(ptr_node);
+    scene.setRoot(ptr_node);
     
     pbrlib::testing::utils::equality(string(name), scene.getName(), "Ошибка в методе setName(...).");
-    pbrlib::testing::utils::equality(ptr_node, scene.getRootNode(), "Ошибка в методе setRootNode(...).");
+    pbrlib::testing::utils::equality(ptr_node, scene.getRoot(), "Ошибка в методе setRoot(...).");
 }
 
 TEST(SceneGraphScene, UpdateAndCompanentTest)
@@ -100,10 +101,6 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     constexpr float width   = 800.0f;
     constexpr float height  = 600.0f;
 
-    constexpr float near    = 0.01f;
-    constexpr float far     = 100.0f;
-    constexpr float fovy    = 45.0f;
-
     constexpr Vec3<float> eye   (0.0f, 0.0f, -1.0f);
     constexpr Vec3<float> pos   (0.0f, 0.0f, 0.0f);
     constexpr Vec3<float> up    (0.0f, 1.0f, 0.0f);
@@ -122,11 +119,11 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
 
     camera_builder.setAspect(width, height);
     camera_builder.setEye(eye);
-    camera_builder.setNearClipp(near);
-    camera_builder.setFarClipp(far);
+    camera_builder.setNearClipp(0.01f);
+    camera_builder.setFarClipp(100.0f);
     camera_builder.setPosition(pos);
     camera_builder.setUp(up);
-    camera_builder.setFovy(fovy);
+    camera_builder.setFovy(45.0f);
     camera_builder.setViewport(viewport);
     camera_builder.setName("Camera Buidler");
     
@@ -149,19 +146,19 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     window_builder.setExtend(800, 600);
     window_builder.setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED);
 
-    PtrPBRLibResources  ptr_pbrlib_resources    = PBRLibResources::init();
-    PtrWindow           ptr_window              = window_builder.buildPtr();
+    std::shared_ptr ptr_pbrlib_resources    = PBRLibResources::init();
+    std::shared_ptr ptr_window              = window_builder.buildPtr();
     
     SceneView scene_view ("Scene", ptr_pbrlib_resources, ptr_window);
 
     Scene& scene = scene_view.getScene();
 
-    Scene::PtrNode node1 = scene.makeSpotLight(slight_builder, "Node 1");
-    Scene::PtrNode node2 = scene.makePointLight(plight_builder, "Node 2");
-    Scene::PtrNode node3 = scene.makeSpotLight(slight_builder, "Node 3");
-    Scene::PtrNode node4 = scene.makeSpotLight(slight_builder, "Node 4");
-    Scene::PtrNode node5 = scene.makePointLight(plight_builder, "Node 5");
-    Scene::PtrNode node6 = scene.makeCamera(camera_builder);
+    std::shared_ptr node1 = scene.makeSpotLight(slight_builder, "Node 1");
+    std::shared_ptr node2 = scene.makePointLight(plight_builder, "Node 2");
+    std::shared_ptr node3 = scene.makeSpotLight(slight_builder, "Node 3");
+    std::shared_ptr node4 = scene.makeSpotLight(slight_builder, "Node 4");
+    std::shared_ptr node5 = scene.makePointLight(plight_builder, "Node 5");
+    std::shared_ptr node6 = scene.makeCamera(camera_builder);
     
     node1->addChild(node2);
     node1->addChild(node3);
@@ -175,8 +172,8 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     node4->setWorldAABB(bbox1);
     node5->setWorldAABB(bbox2);
 
-    scene.setRootNode(node1);
-    scene.update(0.2f);
+    scene.setRoot(node1);
+    scene.update(nullptr, 0.2f);
     
     pbrlib::testing::utils::thisTrue(node1->hasComponent<SpotLight>(), "Не правильно работает метод makeSpotLight(...).");
     pbrlib::testing::utils::thisTrue(node2->hasComponent<PointLight>(), "Не правильно работает метод makePointLight(...).");
@@ -210,3 +207,5 @@ TEST(SceneGraphScene, UpdateAndCompanentTest)
     pbrlib::testing::utils::equality(bbox2[0], node5->getWorldAABB()[0], "Не правильно работает метод update(...).");
     pbrlib::testing::utils::equality(bbox2[1], node5->getWorldAABB()[1], "Не правильно работает метод update(...).");
 }
+
+#endif

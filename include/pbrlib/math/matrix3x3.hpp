@@ -109,7 +109,7 @@ namespace pbrlib::math
     inline Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat);
 
     template<typename Type>
-    inline ostream& operator << (ostream& print, const Matrix3x3<Type>& mat);
+    inline std::ostream& operator << (std::ostream& print, const Matrix3x3<Type>& mat);
 }
 
 #include "matrix3x3.inl"

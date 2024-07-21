@@ -8,9 +8,9 @@
 
 #include "../utils.hpp"
 
-#include "../../src/Memory/MemoryBlock.hpp"
-#include "../../src/Memory/MemoryArena.hpp"
-#include "../../src/Memory/STLArenaLinearAllocator.hpp" 
+#include <pbrlib/Memory/MemoryBlock.hpp>
+#include <pbrlib/Memory/MemoryArena.hpp>
+#include <pbrlib/Memory/STLArenaLinearAllocator.hpp>
 
 #include <vector>
 
@@ -19,13 +19,13 @@ using namespace std;
 
 using TMemoryBlock = STLArenaLinearAllocator<int>::MemoryBlockType;
 using TMemoryArena = MemoryArena<TMemoryBlock>;
-using PMemoryArena = PtrMemoryArena<TMemoryBlock>;
+using PMemoryArena = std::shared_ptr<MemoryArena<TMemoryBlock>>;
 
 TEST(MemorySTLArenaLinearAllocator, Constructor)
 {
     constexpr size_t size = 1024;
 
-    PMemoryArena                    ptr_memory_arena = TMemoryArena::make();
+    PMemoryArena                    ptr_memory_arena = std::make_shared<TMemoryArena>();
     STLArenaLinearAllocator<int>    linear_allocator1 (ptr_memory_arena, size);
     STLArenaLinearAllocator<int>    linear_allocator2 (ptr_memory_arena, size);
 
@@ -45,7 +45,7 @@ TEST(MemorySTLArenaLinearAllocator, AllocateAndDeallocate)
 {
     constexpr size_t size = 1024;
 
-    PMemoryArena                    ptr_memory_arena = TMemoryArena::make();
+    PMemoryArena                    ptr_memory_arena = std::make_shared<TMemoryArena>();
     STLArenaLinearAllocator<int>    linear_allocator (ptr_memory_arena, size);
 
     int* ptr = linear_allocator.allocate(size);
@@ -64,7 +64,7 @@ TEST(MemorySTLArenaLinearAllocator, UsingInSTLVector)
 
     constexpr size_t size = 1024 * 1024;
 
-    PMemoryArena                    ptr_memory_arena    = TMemoryArena::make();
+    PMemoryArena                    ptr_memory_arena    = std::make_shared<TMemoryArena>();
     vector<Type, TLinearAllocator>  tvec                (TLinearAllocator (ptr_memory_arena, size));
 
     tvec.reserve(size);

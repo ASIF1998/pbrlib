@@ -159,7 +159,7 @@ namespace pbrlib::math
         return xyzw[i];
     }
 
-    inline ostream& operator << (ostream& print, const Quaternion& q)
+    inline std::ostream& operator << (std::ostream& print, const Quaternion& q)
     {
         print << q.v << ' ' << q.w;
         return print;

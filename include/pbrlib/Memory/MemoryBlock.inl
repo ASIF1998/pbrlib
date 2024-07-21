@@ -19,9 +19,8 @@ namespace pbrlib
 
     inline MemoryBlock::~MemoryBlock()
     {
-        if (_owns) {
+        if (_owns)
             freeAligned(_ptr_memory);
-        }
     }
 
     inline void* MemoryBlock::getPtrMemory()
@@ -46,9 +45,8 @@ namespace pbrlib
 
     inline void MemoryBlock::setMemory(void* ptr_memory, size_t size, bool owns)
     {
-        if (_owns) {
+        if (_owns)
             freeAligned(_ptr_memory);
-        }
 
         _ptr_memory = ptr_memory;
         _size       = size;
@@ -58,10 +56,5 @@ namespace pbrlib
     inline void MemoryBlock::setNumUsers(uint32_t num_users)
     {
         _num_users = num_users;
-    }
-
-    inline PtrIMemoryBlock MemoryBlock::make(size_t size)
-    {
-        return make_shared<MemoryBlock>(size);
     }
 }

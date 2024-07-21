@@ -8,9 +8,8 @@
 
 #include "../utils.hpp"
 
-#include "../../src/SceneGraph/Scene.hpp"
-#include "../../src/SceneGraph/Component.hpp"
-#include "../../src/SceneGraph/Script.hpp"
+#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/SceneGraph/Component.hpp>
 
 #include <string>
 #include <string_view>
@@ -19,36 +18,11 @@ using namespace pbrlib;
 using namespace std;
 
 struct TestNodeComponent :
-    public Component
+    public Component<TestNodeComponent>
 {
     TestNodeComponent() :
         Component("Test Node Component")
     {}
-    
-    virtual type_index getType() const override
-    {
-        return ComponentUtil::getTypeIndex<TestNodeComponent>();
-    }
-    
-    int i;
-};
-
-struct TestNodeScript :
-    public Script
-{
-    TestNodeScript() :
-        Script("Test Node Component")
-    {}
-    
-    virtual type_index getType() const override
-    {
-        return ComponentUtil::getTypeIndex<TestNodeScript>();
-    }
-    
-    virtual void update(Scene::Node* ptr_node, float delta_time) override
-    {
-        i = static_cast<int>(delta_time);
-    }
     
     int i;
 };
@@ -60,8 +34,8 @@ TEST(SceneGraphNode, Constructor)
 
     AABB raabb;
 
-    Scene::Node node1;
-    Scene::Node node2(name2);
+    SceneItem node1;
+    SceneItem node2(name2);
 
     constexpr Matrix4x4<float> rm;
 
@@ -74,15 +48,15 @@ TEST(SceneGraphNode, Constructor)
     pbrlib::testing::utils::equality(raabb[0], node1.getWorldAABB()[0], "Не правильная инициализация мирового ограничивающего объёма."); 
     pbrlib::testing::utils::equality(raabb[1], node1.getWorldAABB()[1], "Не правильная инициализация мирового ограничивающего объёма.");
 
-    // EXPECT_EQ(raabb, node2.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl;
+    EXPECT_EQ(raabb, node2.getWorldAABB()) << "Не правильная инициализация мирового ограничивающего объёма." << endl;
     pbrlib::testing::utils::equality(raabb[0], node2.getWorldAABB()[0], "Не правильная инициализация мирового ограничивающего объёма."); 
     pbrlib::testing::utils::equality(raabb[1], node2.getWorldAABB()[1], "Не правильная инициализация мирового ограничивающего объёма.");
 
     pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(node1.getParent()), "При инициализации у объекта появился указатель на родителя (его не должно быть).");
     pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(node2.getParent()), "При инициализации у объекта появился указатель на родителя (его не должно быть).");
     
-    pbrlib::testing::utils::thisTrue(node1.getChildren().empty(), "При инициализирование появились дочерние узлы.");
-    pbrlib::testing::utils::thisTrue(node2.getChildren().empty(), "При инициализирование появились дочерние узлы.");
+    pbrlib::testing::utils::thisTrue(node1.getChildrenCount() == 0, "При инициализирование появились дочерние узлы.");
+    pbrlib::testing::utils::thisTrue(node2.getChildrenCount() == 0, "При инициализирование появились дочерние узлы.");
 
     pbrlib::testing::utils::equality(rm, node1.getWorldTransform().getMatrix(), "Не правильное инициализирование мирового преобразования.");
     pbrlib::testing::utils::equality(rm, node2.getWorldTransform().getMatrix(), "Не правильное инициализирование мирового преобразования.");
@@ -113,10 +87,11 @@ TEST(SceneGraphNode, GettersAndSetters)
     constexpr string_view node3_name    = "Node 3";
     constexpr string_view node4_name    = "Node 4";
 
-    Scene::Node     node1   (node1_name);
-    Scene::Node     node2   ("No name");
-    Scene::PtrNode  node3   (Scene::Node::make(node3_name));
-    Scene::PtrNode  node4   (node2.addChild(node4_name));
+    SceneItem node1   (node1_name);
+    SceneItem node2   ("No name");
+
+    std::shared_ptr node3 = SceneItem::make(node3_name);
+    std::shared_ptr node4 = node2.addChild(node4_name);
 
     node2.setParent(&node1);
     node2.addChild(node3);
@@ -128,8 +103,8 @@ TEST(SceneGraphNode, GettersAndSetters)
     pbrlib::testing::utils::equality(reinterpret_cast<size_t>(&node1), reinterpret_cast<size_t>(node2.getParent()), "Не правильно работает метод setParent(...) в классе Scene::Node.");
 
     pbrlib::testing::utils::equality(
-        node4, 
-        node2.getChildren().front(), 
+        std::static_pointer_cast<const SceneItem>(node4), 
+        node2.getChild(0), 
         "Не правильно работает метод addChild(const string_view).\n"
         "Дочерний узел node4 должен быть первым." 
     );
@@ -142,7 +117,7 @@ TEST(SceneGraphNode, GettersAndSetters)
     );
 
     pbrlib::testing::utils::equality(
-        node3, 
+        std::static_pointer_cast<const SceneItem>(node3), 
         node2.getChild(1),
         "Не правильно работает метод addChild(const PtrNode&).\n"
         "Узел node3 должен быть вторым."
@@ -165,16 +140,12 @@ TEST(SceneGraphNode, GettersAndSetters)
     pbrlib::testing::utils::equality(string(node2_name), node2.getName(), "Не правильно работает метод setName(...).");
     
     node2.addComponent(make_shared<TestNodeComponent>());
-    node2.addScript(make_shared<TestNodeScript>());
     
     pbrlib::testing::utils::thisTrue(node2.hasComponent<TestNodeComponent>(), "Ошибка в addComponent(...) или в hasComponent()");
-    pbrlib::testing::utils::thisTrue(node2.hasScript<TestNodeScript>(), "Ошибка в addScript(...) или в hasScript()");
     
     node2.getComponent<TestNodeComponent>().i = rval;
-    node2.getScript<TestNodeScript>().update(&node2, rval);
     
     pbrlib::testing::utils::equality(rval, node2.getComponent<TestNodeComponent>().i, "Ошибка в getComponent(...). Не правильно инициализирована переменная.");
-    pbrlib::testing::utils::equality(rval, node2.getScript<TestNodeScript>().i, "Ошибка в getScript(...). Не правильно инициализирована переменная.");
 }
 
 TEST(SceneGraphNode, UpdateDetachAndMakesTest)
@@ -198,11 +169,12 @@ TEST(SceneGraphNode, UpdateDetachAndMakesTest)
         Vec3<float>(-1.0f)
     );
 
-    Scene::Node     node1;
-    Scene::PtrNode  node2 (node1.addChild("Node 2"));
-    Scene::PtrNode  node3 (node1.addChild("Node 3"));
-    Scene::PtrNode  node4 (node2->addChild("Node 4"));
-    Scene::PtrNode  node5 (node3->addChild("Node 5"));
+    SceneItem node1;
+
+    auto node2 = node1.addChild("Node 2");
+    auto node3 = node1.addChild("Node 3");
+    auto node4 = node2->addChild("Node 4");
+    auto node5 = node3->addChild("Node 5");
 
     node1.setLocalTransform(t1);
     node2->setLocalTransform(t2);
@@ -211,7 +183,7 @@ TEST(SceneGraphNode, UpdateDetachAndMakesTest)
     node4->setWorldAABB(bbox1);
     node5->setWorldAABB(bbox2);
 
-    node1.update(0.2f, Transform());
+    node1.update(nullptr, 0.2f, Transform());
 
     pbrlib::testing::utils::equality(t1.getMatrix(), node1.getLocalTransform().getMatrix(), "Не правильно работает метод update(...).");
     pbrlib::testing::utils::equality(t1.getMatrix(), node2->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");

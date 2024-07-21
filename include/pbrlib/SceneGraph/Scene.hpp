@@ -62,6 +62,8 @@ namespace pbrlib
         std::string&                        getName()           noexcept;
         const std::string&                  getName()           const noexcept;
 
+        size_t getChildrenCount() const;
+
         template<typename TComponent>
         inline TComponent& getComponent();
 
@@ -101,10 +103,10 @@ namespace pbrlib
          *      При добавлении дочернего узла указатель на родителя
          *      устанавливается автоматически.
          *
-         * @param SceneItem_name название дочернего узла.
+         * @param name название дочернего узла.
          * @return Указатель на дочерний узел.
         */
-        std::shared_ptr<const SceneItem> addChild(const std::string_view name);
+        std::shared_ptr<SceneItem> addChild(const std::string_view name);
 
         void detachChild(std::shared_ptr<const SceneItem> ptr_item);
         void detachChild(const std::string_view name);
@@ -121,7 +123,7 @@ namespace pbrlib
 
         protected:
             SceneItem*                                                          _ptr_parent;
-            std::vector<std::shared_ptr<SceneItem>>                             _ptr_children;
+            std::vector<std::shared_ptr<SceneItem>>                             _children;
             Transform                                                           _local_transform;
             Transform                                                           _world_transform;
             bool                                                                _world_transform_is_current;

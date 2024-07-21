@@ -10,7 +10,7 @@
 
 #include "../utils.hpp"
 
-#include "../../src/SceneGraph/MeshNode.hpp"
+#include <pbrlib/SceneGraph/MeshNode.hpp>
 
 using namespace pbrlib;
 using namespace std;
@@ -22,7 +22,7 @@ TEST(SceneGraphMeshNode, Constructor)
 
     AABB raabb;
 
-    PtrMesh ptr_mesh = Mesh::make();
+    std::shared_ptr ptr_mesh = Mesh::make();
 
     MeshNode node1;
     MeshNode node2(name2, ptr_mesh);
@@ -41,8 +41,8 @@ TEST(SceneGraphMeshNode, Constructor)
     pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(node1.getParent()), "При инициализации у объекта появился указатель на родителя (его не должно быть).");
     pbrlib::testing::utils::equality(static_cast<size_t>(0), reinterpret_cast<size_t>(node2.getParent()), "При инициализации у объекта появился указатель на родителя (его не должно быть).");
 
-    pbrlib::testing::utils::thisTrue(node1.getChildren().empty(), "При инициализирование появились дочерние узлы.");
-    pbrlib::testing::utils::thisTrue(node2.getChildren().empty(), "При инициализирование появились дочерние узлы.");
+    pbrlib::testing::utils::thisTrue(node1.getChildrenCount() == 0, "При инициализирование появились дочерние узлы.");
+    pbrlib::testing::utils::thisTrue(node2.getChildrenCount() == 0, "При инициализирование появились дочерние узлы.");
 
     pbrlib::testing::utils::equality(rm, node1.getWorldTransform().getMatrix(), "Не правильное инициализирование мирового преобразования.");
     pbrlib::testing::utils::equality(rm, node2.getWorldTransform().getMatrix(), "Не правильное инициализирование мирового преобразования.");
@@ -63,12 +63,12 @@ TEST(SceneGraphMeshNode, GettersAndSetters)
 {
     srand(static_cast<unsigned>(time(nullptr)));
 
-    PtrMesh     ptr_mesh = Mesh::make();
+    std::shared_ptr<Mesh> ptr_mesh = Mesh::make();
     MeshNode    node;
 
     node.setMesh(ptr_mesh);
 
-    pbrlib::testing::utils::equality(ptr_mesh, node.getMesh());
+    pbrlib::testing::utils::equality(std::static_pointer_cast<const Mesh>(ptr_mesh), node.getMesh());
     pbrlib::testing::utils::thisTrue(node.hasComponent<Mesh>());
     pbrlib::testing::utils::equality(reinterpret_cast<size_t>(ptr_mesh.get()), reinterpret_cast<size_t>(&node.getComponent<Mesh>()));
 }
@@ -95,10 +95,10 @@ TEST(SceneGraphMeshNode, UpdateTest)
     );
     
     MeshNode     node1;
-    PtrMeshNode  node2 = MeshNode::make("Node 2");
-    PtrMeshNode  node3 = MeshNode::make("Node 3");
-    PtrMeshNode  node4 = MeshNode::make("Node 4");
-    PtrMeshNode  node5 = MeshNode::make("Node 5");
+    std::shared_ptr node2 = MeshNode::make("Node 2");
+    std::shared_ptr node3 = MeshNode::make("Node 3");
+    std::shared_ptr node4 = MeshNode::make("Node 4");
+    std::shared_ptr node5 = MeshNode::make("Node 5");
     
     node1.addChild(node2);
     node1.addChild(node3);
@@ -112,7 +112,7 @@ TEST(SceneGraphMeshNode, UpdateTest)
     node4->setWorldAABB(bbox1);
     node5->setWorldAABB(bbox2);
 
-    node1.update(0.2f, Transform());
+    node1.update(nullptr, 0.2f, Transform());
 
     pbrlib::testing::utils::equality(t1.getMatrix(), node1.getLocalTransform().getMatrix(), "Не правильно работает метод update(...).");
     pbrlib::testing::utils::equality(t1.getMatrix(), node2->getWorldTransform().getMatrix(), "Не правильно работает метод update(...).");

@@ -8,8 +8,8 @@
 
 #include "../utils.hpp"
 
-#include "../../src/math/quaternion.hpp"
-#include "../../src/math/vec3.hpp"
+#include <pbrlib/math/quaternion.hpp>
+#include <pbrlib/math/vec3.hpp>
 
 using namespace pbrlib::math;
 
