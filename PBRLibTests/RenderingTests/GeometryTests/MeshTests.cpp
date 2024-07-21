@@ -97,7 +97,7 @@ TEST(RenderingGeometryMesh, GettersAndSetters)
 
     for (uint32_t i{0}; i < num_indices; i++) {
         indices.push_back(i * 2);
-     }
+    }
 
     Buffer::BuilderWithData<Mesh::VertexAttrib> build_vertex_buffer;
     Buffer::BuilderWithData<uint32_t>           build_index_buffer;

@@ -25,7 +25,7 @@ TEST(MemorySTLArenaLinearAllocator, Constructor)
 {
     constexpr size_t size = 1024;
 
-    PMemoryArena                    ptr_memory_arena = std::make_shared<TMemoryArena>();
+    PMemoryArena                    ptr_memory_arena = std::make_shared<TMemoryArena>(); 85eaf9a023daf36c2cc18cf1baef815b065826ad
     STLArenaLinearAllocator<int>    linear_allocator1 (ptr_memory_arena, size);
     STLArenaLinearAllocator<int>    linear_allocator2 (ptr_memory_arena, size);
 
