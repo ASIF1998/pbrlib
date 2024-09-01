@@ -177,7 +177,7 @@ namespace pbrlib
         for (size_t i{0}; i < _physical_device_handles.size(); i++) 
         {
             vkGetPhysicalDeviceProperties(_physical_device_handles[i].physical_device_handle, &physical_device_property);
-            if (physical_device_property.deviceType & type)
+            if (physical_device_property.deviceType & type && VulkanVersion <= physical_device_property.apiVersion)
                 return _physical_device_handles[i];
         }
 
