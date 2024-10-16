@@ -10,7 +10,7 @@
 
 #include "../utils.hpp"
 
-#include <pbrlib/SceneGraph/MeshNode.hpp>
+#include <pbrlib/scene/MeshNode.hpp>
 
 using namespace pbrlib;
 using namespace std;

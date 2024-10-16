@@ -4,7 +4,7 @@
 file(GLOB_RECURSE PBRLIB_TESTS_SOURCES CONFIGURE_DEPENDS *.cpp)
 file(GLOB_RECURSE PBRLIB_TESTS_HEADERS CONFIGURE_DEPENDS *.hpp)
 
-add_executable(PBRLibTests ${PBRLIB_TESTS_SOURCES} ${PBRLIB_TESTS_HEADERS})
+add_executable(pbrlib-tests ${PBRLIB_TESTS_SOURCES} ${PBRLIB_TESTS_HEADERS})
 
 #####################################################
 #   link gtest
@@ -17,4 +17,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/googletest third_party/google
 enable_testing()
 include_directories(../third_party/googletest/googletest/include ${gtest_SOURCE_DIR})
 
-target_link_libraries(PBRLibTests PRIVATE PBRLib gtest)
+target_link_libraries(pbrlib-tests PRIVATE pbrlib gtest)

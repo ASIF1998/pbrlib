@@ -8,8 +8,8 @@
 
 #include "../utils.hpp"
 
-#include <pbrlib/SceneGraph/Scene.hpp>
-#include <pbrlib/SceneGraph/Component.hpp>
+#include <pbrlib/scene/Scene.hpp>
+#include <pbrlib/scene/Component.hpp>
 
 #include <string>
 #include <string_view>
