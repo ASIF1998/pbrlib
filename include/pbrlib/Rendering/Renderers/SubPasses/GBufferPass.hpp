@@ -9,7 +9,7 @@
 #ifndef GBufferPass_hpp
 #define GBufferPass_hpp
 
-#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/scene/Scene.hpp>
 
 #include "Pass.hpp"
 

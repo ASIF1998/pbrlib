@@ -11,7 +11,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include <pbrlib/SceneGraph/Component.hpp>
+#include <pbrlib/scene/Component.hpp>
 
 #include <memory>
 

@@ -9,7 +9,7 @@
 #ifndef PBRPass_hpp
 #define PBRPass_hpp
 
-#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/scene/Scene.hpp>
 #include <pbrlib/Rendering/Renderers/SubPasses/Pass.hpp>
 
 #include <memory>

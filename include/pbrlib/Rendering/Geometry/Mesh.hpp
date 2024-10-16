@@ -13,7 +13,7 @@
 #include <pbrlib/Rendering/Geometry/AABB.hpp>
 #include <pbrlib/Rendering/Material/Material.hpp>
 
-#include <pbrlib/SceneGraph/Component.hpp>
+#include <pbrlib/scene/Component.hpp>
 
 #include <pbrlib/math/vec3.hpp>
 

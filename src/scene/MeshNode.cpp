@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <pbrlib/SceneGraph/MeshNode.hpp>
+#include <pbrlib/scene/MeshNode.hpp>
 
 using namespace pbrlib::math;
 

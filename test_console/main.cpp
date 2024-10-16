@@ -1,18 +1,18 @@
 #include <pbrlib/Rendering/Window.hpp>
 #include <pbrlib/PBRLibResources.hpp>
-#include <pbrlib/SceneGraph/SceneView.hpp>
-#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/scene/SceneView.hpp>
+#include <pbrlib/scene/Scene.hpp>
 
 #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
 
 #include <pbrlib/Rendering/Geometry/Mesh.hpp>
-#include <pbrlib/SceneGraph/MeshNode.hpp>
+#include <pbrlib/scene/MeshNode.hpp>
 
 #include <pbrlib/Rendering/Renderers/PBR.hpp>
 
-#include <pbrlib/Input/InputStay.hpp>
+#include <pbrlib/input/InputStay.hpp>
 
-#include <pbrlib/Logger/Logger.hpp>
+#include <pbrlib/logger/Logger.hpp>
 
 #include <iostream>
 #include <thread>

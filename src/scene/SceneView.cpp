@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <pbrlib/SceneGraph/SceneView.hpp>
+#include <pbrlib/scene/SceneView.hpp>
 
 #include <pbrlib/Rendering/Renderers/IRenderer.h>
 

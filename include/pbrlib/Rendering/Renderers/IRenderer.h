@@ -9,7 +9,7 @@
 #ifndef IRenderer_h
 #define IRenderer_h
 
-#include <pbrlib/SceneGraph/Scene.hpp>
+#include <pbrlib/scene/Scene.hpp>
 
 #include <span>
 
