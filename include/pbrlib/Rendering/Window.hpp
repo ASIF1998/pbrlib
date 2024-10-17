@@ -66,22 +66,22 @@ namespace pbrlib
             Builder& operator = (Builder&&)      = delete;
             Builder& operator = (const Builder&) = delete;
 
-            void setTitle(const std::string_view title);
+            Builder& setTitle(const std::string_view title);
 
-            void setWidth(int width)                noexcept;
-            void setHeight(int height)              noexcept;
-            void setExtend(int width, int height)   noexcept;
+            Builder& setWidth(int width)                noexcept;
+            Builder& setHeight(int height)              noexcept;
+            Builder& setExtend(int width, int height)   noexcept;
 
-            void setPositionX(int pos_x)            noexcept;
-            void setPositionY(int pos_y)            noexcept;
-            void setPosition(int pos_x, int pos_y)  noexcept;
+            Builder& setPositionX(int pos_x)            noexcept;
+            Builder& setPositionY(int pos_y)            noexcept;
+            Builder& setPosition(int pos_x, int pos_y)  noexcept;
 
             /**
              * @brief Метод устанавливающий параметр, указывающий возможность изменения размера окна.
              * 
              * @param resizable параметр, указывающий возможность изменения размера окна.
             */
-            void setResizableWindow(Resizable resizable) noexcept;
+            Builder& setResizableWindow(Resizable resizable) noexcept;
 
             Window                  build()     const;
             std::unique_ptr<Window> buildPtr()  const;
@@ -120,8 +120,8 @@ namespace pbrlib
 
         ~Window();
 
-        Window& operator = (const Window&)  = delete;
-        Window& operator = (Window&&)       = delete;
+        Window& operator = (Window&&);
+        Window& operator = (const Window&) = delete;
 
         std::tuple<int, int> getExtent()         const;
         std::tuple<int, int> getDrawableExtent() const;

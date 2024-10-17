@@ -46,11 +46,22 @@ namespace pbrlib
     Window::Window(Window&& window) 
     {
         std::swap(_ptr_window, window._ptr_window);
+        std::swap(_ptr_swapchain, window._ptr_swapchain);
+        std::swap(_title, window._title);
     }
 
     Window::~Window()
     {
         SDL_DestroyWindow(_ptr_window);
+    }
+
+    Window& Window::operator = (Window&& window)
+    {
+        std::swap(_ptr_window, window._ptr_window);
+        std::swap(_ptr_swapchain, window._ptr_swapchain);
+        std::swap(_title, window._title);
+
+        return *this;
     }
 
     std::tuple<int, int> Window::getExtent() const
@@ -195,46 +206,54 @@ namespace pbrlib
         _resizable  (Resizable::STATIC)
     {}
 
-    void Window::Builder::setTitle(const std::string_view title)
+    Window::Builder& Window::Builder::setTitle(const std::string_view title)
     {
         _title = title;
+        return *this;
     }
 
-    void Window::Builder::setWidth(int width) noexcept
+    Window::Builder& Window::Builder::setWidth(int width) noexcept
     {
         _width = width;
+        return *this;
     }
 
-    void Window::Builder::setHeight(int height) noexcept
+    Window::Builder& Window::Builder::setHeight(int height) noexcept
     {
         _height = height;
+        return *this;
     }
 
-    void Window::Builder::setExtend(int width, int height) noexcept
+    Window::Builder& Window::Builder::setExtend(int width, int height) noexcept
     {
         _width  = width; 
         _height = height;
+        return *this;
     }
 
-    void Window::Builder::setPositionX(int pos_x) noexcept
+    Window::Builder& Window::Builder::setPositionX(int pos_x) noexcept
     {
         _pos_x = pos_x;
+        return *this;
     }
 
-    void Window::Builder::setPositionY(int pos_y) noexcept
+    Window::Builder& Window::Builder::setPositionY(int pos_y) noexcept
     {
         _pos_y = pos_y;
+        return *this;
     }
 
-    void Window::Builder::setPosition(int pos_x, int pos_y) noexcept
+    Window::Builder& Window::Builder::setPosition(int pos_x, int pos_y) noexcept
     {
         _pos_x = pos_x;
         _pos_y = pos_y;
+        return *this;
     }
 
-    void Window::Builder::setResizableWindow(Window::Resizable resizable) noexcept
+    Window::Builder& Window::Builder::setResizableWindow(Window::Resizable resizable) noexcept
     {
         _resizable = resizable;
+        return *this;
     }
 
     Window Window::Builder::build() const
