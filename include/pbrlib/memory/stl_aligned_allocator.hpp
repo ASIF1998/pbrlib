@@ -9,7 +9,7 @@
 #ifndef STLAlignedAllocator_hpp
 #define STLAlignedAllocator_hpp
 
-#include "MemoryUtils.hpp"
+#include "memory_utils.hpp"
 
 namespace pbrlib
 {
@@ -66,6 +66,6 @@ namespace pbrlib
     };
 }
 
-#include "STLAlignedAllocator.inl"
+#include "stl_aligned_allocator.inl"
 
 #endif /* STLAlignedAllocator_hpp */

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Private/Console.hpp"
+#include "private/console.hpp"
 
 #include <format>
 

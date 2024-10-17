@@ -6,7 +6,7 @@
 
 #include <pbrlib/math/vec2.hpp>
 
-#include "KeyCode.hpp"
+#include "key_code.hpp"
 
 #include <array>
 #include <unordered_map>

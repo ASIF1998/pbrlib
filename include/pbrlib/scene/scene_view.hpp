@@ -13,7 +13,7 @@
 #include <pbrlib/Rendering/VulkanWrapper/Device.hpp>
 #include <pbrlib/Rendering/VulkanWrapper/CommandBuffer.hpp>
 
-#include <pbrlib/Input/InputStay.hpp>
+#include <pbrlib/Input/input_stay.hpp>
 
 #include "Scene.hpp"
 

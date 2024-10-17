@@ -6,8 +6,8 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <pbrlib/scene/Scene.hpp>
-#include <pbrlib/scene/Component.hpp>
+#include <pbrlib/scene/scene.hpp>
+#include <pbrlib/scene/component.hpp>
 
 namespace pbrlib
 {

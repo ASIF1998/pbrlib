@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <pbrlib/Moving/Transform.hpp>
+#include <pbrlib/moving/transform.hpp>
 
 #include <pbrlib/math/matrix4x4.hpp>
 

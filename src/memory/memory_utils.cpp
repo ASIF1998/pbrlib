@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include <pbrlib/Memory/MemoryUtils.hpp>
+#include <pbrlib/memory/memory_utils.hpp>
 
 #include <cassert>
 #include <cstdlib>

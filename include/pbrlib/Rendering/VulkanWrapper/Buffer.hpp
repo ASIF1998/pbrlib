@@ -10,7 +10,7 @@
 #define Buffer_hpp
 
 #include "DeviceMemory.hpp"
-#include <pbrlib/Memory/STLAlignedAllocator.hpp>
+#include <pbrlib/memory/stl_aligned_allocator.hpp>
 
 #include <vector>
 #include <span>

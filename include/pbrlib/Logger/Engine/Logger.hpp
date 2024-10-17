@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pbrlib/Logger/Private/Console.hpp>
+#include <pbrlib/logger/private/console.hpp>
 
 #include <format>
 

@@ -15,7 +15,7 @@
 #include <span>
 #include <memory>
 
-#include <pbrlib/Memory/STLAlignedAllocator.hpp>
+#include <pbrlib/memory/stl_aligned_allocator.hpp>
 
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/vec3.hpp>
