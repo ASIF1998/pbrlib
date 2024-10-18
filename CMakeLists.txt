@@ -33,8 +33,8 @@ configure_file(include/pbrlib/core.hpp.in ../include/pbrlib/core.hpp)
 file(GLOB_RECURSE PBRLIB_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE PBRLIB_HEADERS CONFIGURE_DEPENDS include/*.hpp)
 
-add_library(PBRLib STATIC ${PBRLIB_SOURCES} ${PBRLIB_HEADERS})
-target_include_directories(PBRLib PUBLIC include)
+add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_HEADERS})
+target_include_directories(pbrlib PUBLIC include)
 
 #####################################################
 #   Vulkan
@@ -122,11 +122,11 @@ add_subdirectory(third_party/VulkanMemoryAllocator)
 #####################################################
 #   add libs
 #####################################################
-target_include_directories(PBRLib PUBLIC 
+target_include_directories(pbrlib PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
 )
 
-target_link_libraries(PBRLib PUBLIC
+target_link_libraries(pbrlib PUBLIC
     ${Vulkan_LIBRARIES}
     ${glslang_LIBS}
     assimp
@@ -148,13 +148,13 @@ endif()
 #   tests
 #####################################################
 if (PBRLIB_ENABLE_TESTS) 
-    add_subdirectory(PBRLibTests)
+    add_subdirectory(pbrlib-tests)
 endif()
 
 #####################################################
 #   test console
 #####################################################
 if (PBRLIB_TEST_CONSOLE)
-    add_executable(test_console "test_console/main.cpp")
-    target_link_libraries(test_console PRIVATE PBRLib)
+    add_executable(test-console "test-console/main.cpp")
+    target_link_libraries(test-console PRIVATE pbrlib)
 endif()
