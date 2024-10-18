@@ -36,6 +36,10 @@ file(GLOB_RECURSE PBRLIB_HEADERS CONFIGURE_DEPENDS include/*.hpp)
 add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_HEADERS})
 target_include_directories(pbrlib PUBLIC include)
 
+if (MSVC)
+    target_compile_options(pbrlib PRIVATE /W3 /WX /MP)
+endif()
+
 #####################################################
 #   Vulkan
 #####################################################

@@ -9,7 +9,7 @@
 #ifndef MemoryArena_hpp
 #define MemoryArena_hpp
 
-#include "IMemoryBlock.hpp"
+#include "imemory_block.hpp"
 
 #include <map>
 
@@ -75,6 +75,6 @@ namespace pbrlib
     };
 }
 
-#include "MemoryArena.inl"
+#include "memory_arena.inl"
 
 #endif /* MemoryArena_hpp */

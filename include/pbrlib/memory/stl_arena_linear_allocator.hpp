@@ -9,8 +9,8 @@
 #ifndef STLArenaLinearAllocator_hpp
 #define STLArenaLinearAllocator_hpp
 
-#include "MemoryArena.hpp"
-#include "MemoryBlock.hpp"
+#include "memory_arena.hpp"
+#include "memory_block.hpp"
 
 namespace pbrlib
 {
@@ -76,6 +76,6 @@ namespace pbrlib
     };
 }
 
-#include "STLArenaLinearAllocator.inl"
+#include "stl_arena_linear_allocator.inl"
 
 #endif /* STLArenaLinearAllocator_hpp */

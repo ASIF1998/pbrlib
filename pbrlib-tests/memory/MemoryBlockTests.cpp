@@ -8,7 +8,7 @@
 
 #include "../utils.hpp"
 
-#include <pbrlib/Memory/MemoryBlock.hpp>
+#include <pbrlib/memory/memory_block.hpp>
 
 using namespace pbrlib;
 

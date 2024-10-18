@@ -6,7 +6,7 @@
 //  Copyright © 2020 Асиф Мамедов. All rights reserved.
 //
 
-#include "MemoryUtils.hpp"
+#include "memory_utils.hpp"
 
 namespace pbrlib
 {

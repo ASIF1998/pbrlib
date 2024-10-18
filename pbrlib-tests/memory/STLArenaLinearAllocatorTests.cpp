@@ -8,9 +8,9 @@
 
 #include "../utils.hpp"
 
-#include <pbrlib/Memory/MemoryBlock.hpp>
-#include <pbrlib/Memory/MemoryArena.hpp>
-#include <pbrlib/Memory/STLArenaLinearAllocator.hpp>
+#include <pbrlib/memory/memory_block.hpp>
+#include <pbrlib/memory/memory_arena.hpp>
+#include <pbrlib/memory/stl_arena_linear_allocator.hpp>
 
 #include <vector>
 

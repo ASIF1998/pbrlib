@@ -9,7 +9,7 @@
 #ifndef MemoryBlock_hpp
 #define MemoryBlock_hpp
 
-#include "IMemoryBlock.hpp"
+#include "imemory_block.hpp"
 
 namespace pbrlib
 {
@@ -62,6 +62,6 @@ namespace pbrlib
     };
 }
 
-#include "MemoryBlock.inl"
+#include "memory_block.inl"
 
 #endif /* MemoryBlock_hpp */
