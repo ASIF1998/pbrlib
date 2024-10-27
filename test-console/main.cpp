@@ -7,7 +7,9 @@
 #include <pbrlib/scene/component.hpp>
 
 #include <pbrlib/Rendering/Lights/PointLight.hpp>
-#include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
+// #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
+
+#include <pbrlib/new-renderer/camera.hpp>
 
 #include <pbrlib/logger/logger.hpp>
 
@@ -42,7 +44,7 @@ int main()
 
         /// @todo Написать ещё часть, где будет работа с компанентами.
 
-        engine.setupCallback([](const pbrlib::Engine* ptr_engine, pbrlib::Scene* ptr_scene)
+        engine.setupCallback([](pbrlib::Engine* ptr_engine, pbrlib::Scene* ptr_scene)
         {
             const auto filename = pbrlib::path_to_root / "pbrlib-tests/content/Blender 2.glb";
             pbrlib::log::info("Path to content: {}", filename.string());
@@ -58,17 +60,7 @@ int main()
             //         .build()
             // );
 
-            // auto ptr_camera = ptr_engine->camera(
-            //     pbrlib::Camera::Builder()
-            //         .setAspect(800.0 / 600)
-            //         .setEye(pbrlib::math::vec3(0, 0, 0))
-            //         .setPosition(pbrlib::math::vec3(0, 0, -10))
-            //         .setUp(pbrlib::math::vec3(0, 1, 0))
-            //         .setFar(100.0)
-            //         .setNear(0.01)
-            //         .setViewport(0, 0, 800.0f, 600.0f, 0.01, 100.0f)
-            //         .build()
-            // );
+            auto& camera = ptr_engine->camera();
         });
 
         engine.run();

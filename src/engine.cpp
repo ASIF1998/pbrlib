@@ -45,7 +45,7 @@ namespace pbrlib
         is_init = true;
     }
 
-    void Engine::setTitle(std::string_view title)
+    void Engine::title(std::string_view title)
     {
         _window->setTitle(title);
     }
@@ -65,5 +65,10 @@ namespace pbrlib
         /// @todo add ptr to scene
         if (_setup_callback)
             _setup_callback(this, nullptr);        
+    }
+
+    Camera& Engine::camera() noexcept
+    {
+        return _camera;
     }
 }

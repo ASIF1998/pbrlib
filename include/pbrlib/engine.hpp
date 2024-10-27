@@ -2,6 +2,8 @@
 
 #include <pbrlib/Rendering/Window.hpp>
 
+#include <pbrlib/new-renderer/camera.hpp>
+
 #include <string_view>
 #include <functional>
 #include <optional>
@@ -32,8 +34,10 @@ namespace pbrlib
 
         ~Engine();
 
-        void setTitle(std::string_view title);
+        void title(std::string_view title);
         void resize(uint32_t width, uint32_t height);
+
+        [[nodiscard]] Camera& camera() noexcept;
 
         void setupCallback(SetupCallback setup_callback);
 
@@ -42,13 +46,13 @@ namespace pbrlib
         void postRenderCallback(PostRenderCallback callback);
 #endif
 
-    
-
     void run();
 
     private:
         std::optional<Window> _window;
 
         SetupCallback _setup_callback;
+
+        Camera _camera;
     };
 }
