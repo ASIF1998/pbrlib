@@ -176,7 +176,7 @@ namespace pbrlib
         std::shared_ptr<Swapchain>      _getVulkanSwapchain()   noexcept;
 
     private:
-        SDL_Window*                 _ptr_window;
+        SDL_Window*                 _ptr_window = nullptr;
         std::shared_ptr<Swapchain>  _ptr_swapchain;
         std::string                 _title;
     };

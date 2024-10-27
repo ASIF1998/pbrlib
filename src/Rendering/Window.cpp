@@ -34,8 +34,6 @@ namespace pbrlib
         int                     pos_y, 
         Window::Resizable       resizable
     ) :
-        _ptr_window     (nullptr),
-        _ptr_swapchain  (nullptr),
         _title          (title)
     {
         _ptr_window = SDL_CreateWindow(title.data(), width, height, SDL_WINDOW_VULKAN | utils::enumCast(resizable));
@@ -52,7 +50,8 @@ namespace pbrlib
 
     Window::~Window()
     {
-        SDL_DestroyWindow(_ptr_window);
+        if (!_ptr_window)
+            SDL_DestroyWindow(_ptr_window);
     }
 
     Window& Window::operator = (Window&& window)
