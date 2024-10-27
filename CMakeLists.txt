@@ -124,6 +124,11 @@ add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/VulkanMemoryAllocator)
 
 #####################################################
+#   entt
+#####################################################
+add_subdirectory(third_party/entt)
+
+#####################################################
 #   add libs
 #####################################################
 target_include_directories(pbrlib PUBLIC 
@@ -137,6 +142,7 @@ target_link_libraries(pbrlib PUBLIC
     SDL3::SDL3
     spdlog::spdlog_header_only
     VulkanMemoryAllocator
+    EnTT::EnTT
 )
 
 if (APPLE)
