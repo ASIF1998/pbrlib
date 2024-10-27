@@ -198,6 +198,12 @@ namespace pbrlib::math
     inline std::ostream& operator << (std::ostream& print, const Matrix4x4<Type>& mat);
 }
 
+namespace pbrlib::math
+{
+    using mat4 = Matrix4x4<float>;
+}
+
+
 #include "matrix4x4.inl"
 
 #endif /* matrix4x4_hpp */

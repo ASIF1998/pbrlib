@@ -111,6 +111,11 @@ namespace pbrlib::math
     std::ostream& operator << (std::ostream& print, const Vec3<Type>& vec);
 }
 
+namespace pbrlib::math
+{
+    using vec3 = Vec3<float>;
+}
+
 #include "vec3.inl"
 
 #endif /* vec3_hpp */

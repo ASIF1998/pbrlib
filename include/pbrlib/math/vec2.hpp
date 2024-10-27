@@ -87,6 +87,11 @@ namespace pbrlib::math
     std::ostream& operator << (std::ostream& print, const Vec2<Type>& vec);
 }
 
+namespace pbrlib::math
+{
+    using vec2 = Vec2<float>;
+}
+
 #include "vec2.inl"
 
 #endif /* vec2_hpp */

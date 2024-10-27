@@ -134,6 +134,12 @@ namespace pbrlib::math
     inline Quaternion slerp(float t, const Quaternion& q1, const Quaternion& q2);
 }
 
+namespace pbrlib::math
+{
+    using quat = Quaternion;
+}
+
+
 #include "quaternion.inl"
 
 #endif /* quaternion_hpp */

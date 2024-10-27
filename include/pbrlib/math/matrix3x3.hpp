@@ -112,6 +112,12 @@ namespace pbrlib::math
     inline std::ostream& operator << (std::ostream& print, const Matrix3x3<Type>& mat);
 }
 
+namespace pbrlib::math
+{
+    using mat3 = Matrix3x3<float>;
+}
+
+
 #include "matrix3x3.inl"
 
 #endif /* matrix3x3_hpp */

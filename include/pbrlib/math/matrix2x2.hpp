@@ -191,6 +191,11 @@ namespace pbrlib::math
     inline std::ostream& operator << (std::ostream& print, const Matrix2x2<Type>& mat);
 }
 
+namespace pbrlib::math
+{
+    using mat2 = Matrix2x2<float>;
+}
+
 #include "matrix2x2.inl"
 
 #endif /* matrix2x2_hpp */
