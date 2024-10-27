@@ -6,23 +6,31 @@
 #include <functional>
 #include <optional>
 
+/// @todo remove
+#include <pbrlib/core.hpp>
+
 namespace pbrlib
 {
     struct  Config;
     class   Engine;
+    class   Scene;
 }
 
 namespace pbrlib
 {
-    using SetupCallback = std::function<void(Engine* ptr_engine)>;
+    using SetupCallback = std::function<void(Engine* ptr_engine, Scene* ptr_scene)>;
 }
 
 namespace pbrlib
 {
-    class Engine
+    class Engine final
     {
+        void init();
+
     public:
         explicit Engine(const Config& config);
+
+        ~Engine();
 
         void setTitle(std::string_view title);
         void resize(uint32_t width, uint32_t height);
@@ -34,7 +42,13 @@ namespace pbrlib
         void postRenderCallback(PostRenderCallback callback);
 #endif
 
+    
+
+    void run();
+
     private:
         std::optional<Window> _window;
+
+        SetupCallback _setup_callback;
     };
 }
