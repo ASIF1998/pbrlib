@@ -13,17 +13,17 @@ namespace pbrlib
     {
         init();
 
-        _window = Window::Builder()
-            .setExtend(config.width, config.height)
-            .setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED)
-            .setResizableWindow(Window::Resizable::STATIC)
-            .setTitle(config.title)
-            .build();
+        // _window = Window::Builder()
+        //     .setExtend(config.width, config.height)
+        //     .setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED)
+        //     .setResizableWindow(Window::Resizable::STATIC)
+        //     .setTitle(config.title)
+        //     .build();
     }
 
     Engine::~Engine()
     {
-        SDL_Quit();
+        // SDL_Quit();
     }
 
     void Engine::init()
@@ -33,21 +33,21 @@ namespace pbrlib
         if (is_init)
             return ;
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
-        {
-            std::string error_msg = SDL_GetError();
-            SDL_ClearError();
-            pbrlib::log::engine::error("Failed initialize SDL3: {}", error_msg);
+        // if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
+        // {
+        //     std::string error_msg = SDL_GetError();
+        //     SDL_ClearError();
+        //     pbrlib::log::engine::error("Failed initialize SDL3: {}", error_msg);
 
-            std::runtime_error("Failed initialize");
-        }
+        //     std::runtime_error("Failed initialize");
+        // }
 
         is_init = true;
     }
 
     void Engine::title(std::string_view title)
     {
-        _window->setTitle(title);
+        // _window->setTitle(title);
     }
 
     void Engine::resize(uint32_t width, uint32_t height)

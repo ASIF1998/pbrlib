@@ -9,6 +9,9 @@
 #ifndef Scene_hpp
 #define Scene_hpp
 
+#include <pbrlib/moving/transform.hpp>
+#include <pbrlib/scene/component.hpp>
+
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -18,18 +21,7 @@
 
 #include <typeindex>
 
-#include <pbrlib/Moving/Transform.hpp>
-#include <pbrlib/Rendering/Geometry/AABB.hpp>
-
-#include <pbrlib/Rendering/Lights/PointLight.hpp>
-#include <pbrlib/Rendering/Lights/SpotLight.hpp>
-#include <pbrlib/Rendering/Lights/DirectionLight.hpp>
-
-#include <pbrlib/Rendering/Material/MaterialManager.hpp>
-#include <pbrlib/Rendering/VulkanWrapper/GPUTextureManager.hpp>
-#include <pbrlib/Rendering/Geometry/MeshManager.hpp>
-
-#include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
+#include <span>
 
 namespace pbrlib
 {
@@ -128,7 +120,7 @@ namespace pbrlib
             Transform                                                           _world_transform;
             bool                                                                _world_transform_is_current;
             bool                                                                _world_aabb_is_current;
-            AABB                                                                _world_bbox;
+            // AABB                                                                _world_bbox;
             std::unordered_map<std::type_index, std::shared_ptr<ComponentBase>> _components;
             std::string                                                         _name;
         };
@@ -148,14 +140,14 @@ namespace pbrlib
          * @param device_local_memory_type_index    тип памяти, являющаяся локальной для устройства (GPU).
          * @param host_local_memory_type_index      тип памяти, которая может быть отображена и читаться или записываться CPU.
         */
-        Scene(
-            const std::string_view  name, 
-            const Device*           ptr_device,
-            const DeviceQueue*      ptr_device_queue,
-            const CommandPool*      ptr_command_pool,    
-            uint32_t                device_local_memory_type_index,
-            uint32_t                host_local_memory_type_index
-        );
+        // Scene(
+        //     const std::string_view  name, 
+        //     const Device*           ptr_device,
+        //     const DeviceQueue*      ptr_device_queue,
+        //     const CommandPool*      ptr_command_pool,    
+        //     uint32_t                device_local_memory_type_index,
+        //     uint32_t                host_local_memory_type_index
+        // );
         
         void setRoot(std::shared_ptr<SceneItem> ptr_root);
         void setName(const std::string_view name);
@@ -164,12 +156,12 @@ namespace pbrlib
         std::shared_ptr<const SceneItem>    getRoot()               const noexcept;
         std::string&                        getName()               noexcept;
         const std::string&                  getName()               const noexcept;
-        MaterialManager&                    getMaterialManager()    noexcept;
-        const MaterialManager&              getMaterialManager()    const noexcept;
-        GPUTextureManager&                  getTextureManager()     noexcept;
-        const GPUTextureManager&            getTextureManager()     const noexcept;
-        MeshManager&                        getMeshManager()        noexcept;
-        const MeshManager&                  getMeshManager()        const noexcept;
+        // MaterialManager&                    getMaterialManager()    noexcept;
+        // const MaterialManager&              getMaterialManager()    const noexcept;
+        // GPUTextureManager&                  getTextureManager()     noexcept;
+        // const GPUTextureManager&            getTextureManager()     const noexcept;
+        // MeshManager&                        getMeshManager()        noexcept;
+        // const MeshManager&                  getMeshManager()        const noexcept;
         VisibleList                         getVisibleList();
         const VisibleList                   getVisibleList()        const;
 
@@ -183,10 +175,10 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        std::shared_ptr<SceneItem> makePointLight(
-            const PointLight::Builder&  light_builder,
-            const std::string_view      name = "Point Light"
-        );
+        // std::shared_ptr<SceneItem> makePointLight(
+        //     const PointLight::Builder&  light_builder,
+        //     const std::string_view      name = "Point Light"
+        // );
 
         /**
          * @brief Метод создающий узел для прожекторного источника света.
@@ -198,10 +190,10 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        std::shared_ptr<SceneItem> makeSpotLight(
-            const SpotLight::Builder&   light_builder,
-            const std::string_view      name = "Spot Light"
-        );
+        // std::shared_ptr<SceneItem> makeSpotLight(
+        //     const SpotLight::Builder&   light_builder,
+        //     const std::string_view      name = "Spot Light"
+        // );
 
         /**
          * @brief Метод создающий узел для направленного источника света.
@@ -213,10 +205,10 @@ namespace pbrlib
          * @param name          название узла.
          * @return Указатель на узел.
         */
-        std::shared_ptr<SceneItem> makeDirectionLight(
-            const DirectionLight::Builder&  light_builder,
-            const std::string_view          name = "Spot Light"
-        );
+        // std::shared_ptr<SceneItem> makeDirectionLight(
+        //     const DirectionLight::Builder&  light_builder,
+        //     const std::string_view          name = "Spot Light"
+        // );
 
         /**
          * @brief Метод создающий узел для камеры.
@@ -230,10 +222,10 @@ namespace pbrlib
          * @param name              название узла.
          * @return Указатель на узел.
         */
-        std::shared_ptr<SceneItem> makeCamera(
-            const PerspectiveCamera::Builder&   camera_builder,
-            const std::string_view              name = "Camera"
-        );
+        // std::shared_ptr<SceneItem> makeCamera(
+        //     const PerspectiveCamera::Builder&   camera_builder,
+        //     const std::string_view              name = "Camera"
+        // );
         
         void update(const InputStay* ptr_input_stay, float delta_time);
 
@@ -243,9 +235,9 @@ namespace pbrlib
         std::vector<std::shared_ptr<SceneItem>> _dir_lights;        //!< Направленные источники света.
         std::vector<std::shared_ptr<SceneItem>> _spot_lights;       //!< Прожекторные источники света.
         std::vector<std::shared_ptr<SceneItem>> _point_lights;      //!< Точечные источники света.
-        MaterialManager                         _material_manager;  //!< Менеджер материалов.
-        GPUTextureManager                       _texture_manager;   //!< Менеджер текстур.
-        MeshManager                             _mesh_manager;      //!< Менеджер сеток.
+        // MaterialManager                         _material_manager;  //!< Менеджер материалов.
+        // GPUTextureManager                       _texture_manager;   //!< Менеджер текстур.
+        // MeshManager                             _mesh_manager;      //!< Менеджер сеток.
         std::string                             _name;              //!< Имя сцены.
     };
 }

@@ -24,15 +24,15 @@ namespace pbrlib
     SceneItem::~SceneItem()
     {}
 
-    AABB& SceneItem::getWorldAABB() noexcept
-    {
-        return _world_bbox;
-    }
+    // AABB& SceneItem::getWorldAABB() noexcept
+    // {
+    //     return _world_bbox;
+    // }
 
-    const AABB& SceneItem::getWorldAABB() const noexcept
-    {
-        return _world_bbox;
-    }
+    // const AABB& SceneItem::getWorldAABB() const noexcept
+    // {
+    //     return _world_bbox;
+    // }
 
     SceneItem* SceneItem::getParent() noexcept
     {
@@ -106,11 +106,11 @@ namespace pbrlib
         _world_transform            = transform;
     }
 
-    void SceneItem::setWorldAABB(const AABB& bbox)
-    {
-        _world_aabb_is_current  = true;
-        _world_bbox             = bbox;
-    }
+    // void SceneItem::setWorldAABB(const AABB& bbox)
+    // {
+    //     _world_aabb_is_current  = true;
+    //     _world_bbox             = bbox;
+    // }
 
     void SceneItem::setName(const std::string_view name)
     {
@@ -213,13 +213,13 @@ namespace pbrlib
             for (size_t i = 0, size = _children.size(); i < size; i++)
                 _children[i]->update(ptr_input_stay, delta_time, children_world_transform);
 
-            if (!_world_aabb_is_current) 
-            {
-                _world_bbox = _children[0]->getWorldAABB();
+            // if (!_world_aabb_is_current) 
+            // {
+            //     _world_bbox = _children[0]->getWorldAABB();
 
-                for (size_t i = 1, size = _children.size(); i < size; i++)
-                    _world_bbox = AABB::aabbUnion(_world_bbox, _children[i]->getWorldAABB());
-            }
+            //     for (size_t i = 1, size = _children.size(); i < size; i++)
+            //         _world_bbox = AABB::aabbUnion(_world_bbox, _children[i]->getWorldAABB());
+            // }
         }
     }
 
@@ -242,28 +242,28 @@ namespace pbrlib
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Scene::Scene(
-        const std::string_view  name, 
-        const Device*           ptr_device,
-        const DeviceQueue*      ptr_device_queue,
-        const CommandPool*      ptr_command_pool,    
-        uint32_t                device_local_memory_type_index,
-        uint32_t                host_local_memory_type_index
-    ) :
-        _ptr_root           (nullptr),
-        _ptr_camera         (nullptr),
-        _texture_manager    (
-            ptr_device, 
-            ptr_command_pool,
-            device_local_memory_type_index, 
-            host_local_memory_type_index, 
-            ptr_device_queue,
-            VK_IMAGE_TILING_OPTIMAL, 
-            VK_SAMPLE_COUNT_1_BIT
-        ),
-        _mesh_manager       (ptr_device, ptr_device_queue->getFamilyIndex(), host_local_memory_type_index),
-        _name               (name)
-    {}
+    // Scene::Scene(
+    //     const std::string_view  name, 
+    //     const Device*           ptr_device,
+    //     const DeviceQueue*      ptr_device_queue,
+    //     const CommandPool*      ptr_command_pool,    
+    //     uint32_t                device_local_memory_type_index,
+    //     uint32_t                host_local_memory_type_index
+    // ) :
+    //     _ptr_root           (nullptr),
+    //     _ptr_camera         (nullptr),
+    //     _texture_manager    (
+    //         ptr_device, 
+    //         ptr_command_pool,
+    //         device_local_memory_type_index, 
+    //         host_local_memory_type_index, 
+    //         ptr_device_queue,
+    //         VK_IMAGE_TILING_OPTIMAL, 
+    //         VK_SAMPLE_COUNT_1_BIT
+    //     ),
+    //     _mesh_manager       (ptr_device, ptr_device_queue->getFamilyIndex(), host_local_memory_type_index),
+    //     _name               (name)
+    // {}
 
     void Scene::setRoot(std::shared_ptr<SceneItem> ptr_root)
     {
@@ -295,35 +295,35 @@ namespace pbrlib
         return _name;
     }
 
-    MaterialManager& Scene::getMaterialManager() noexcept
-    {
-        return _material_manager;
-    }
+    // MaterialManager& Scene::getMaterialManager() noexcept
+    // {
+    //     return _material_manager;
+    // }
 
-    const MaterialManager& Scene::getMaterialManager() const noexcept
-    {
-        return _material_manager;
-    }
+    // const MaterialManager& Scene::getMaterialManager() const noexcept
+    // {
+    //     return _material_manager;
+    // }
 
-    GPUTextureManager& Scene::getTextureManager() noexcept
-    {
-        return _texture_manager;
-    }
+    // GPUTextureManager& Scene::getTextureManager() noexcept
+    // {
+    //     return _texture_manager;
+    // }
 
-    const GPUTextureManager& Scene::getTextureManager() const noexcept 
-    {
-        return _texture_manager;
-    }
+    // const GPUTextureManager& Scene::getTextureManager() const noexcept 
+    // {
+    //     return _texture_manager;
+    // }
 
-    MeshManager& Scene::getMeshManager() noexcept
-    {
-        return _mesh_manager;
-    }
+    // MeshManager& Scene::getMeshManager() noexcept
+    // {
+    //     return _mesh_manager;
+    // }
 
-    const MeshManager& Scene::getMeshManager() const noexcept
-    {
-        return _mesh_manager;
-    }
+    // const MeshManager& Scene::getMeshManager() const noexcept
+    // {
+    //     return _mesh_manager;
+    // }
 
     VisibleList Scene::getVisibleList()
     {
@@ -351,51 +351,51 @@ namespace pbrlib
         return visible_list;
     }
 
-    std::shared_ptr<SceneItem> Scene::makePointLight(
-        const PointLight::Builder&  light_builder,
-        const std::string_view      name
-    )
-    {
-        std::shared_ptr ptr_item = SceneItem::make(name);
+    // std::shared_ptr<SceneItem> Scene::makePointLight(
+    //     const PointLight::Builder&  light_builder,
+    //     const std::string_view      name
+    // )
+    // {
+    //     std::shared_ptr ptr_item = SceneItem::make(name);
 
-        ptr_item->addComponent(light_builder.buildPtr());
-        _point_lights.push_back(ptr_item);
-        return _point_lights.back();
-    }
+    //     ptr_item->addComponent(light_builder.buildPtr());
+    //     _point_lights.push_back(ptr_item);
+    //     return _point_lights.back();
+    // }
 
-    std::shared_ptr<SceneItem> Scene::makeSpotLight(
-        const SpotLight::Builder&   light_builder,
-        const std::string_view      name
-    )
-    {
-        std::shared_ptr ptr_item = SceneItem::make(name);
+    // std::shared_ptr<SceneItem> Scene::makeSpotLight(
+    //     const SpotLight::Builder&   light_builder,
+    //     const std::string_view      name
+    // )
+    // {
+    //     std::shared_ptr ptr_item = SceneItem::make(name);
 
-        ptr_item->addComponent(light_builder.buildPtr());
-        _spot_lights.push_back(ptr_item);
-        return _spot_lights.back();
-    }
+    //     ptr_item->addComponent(light_builder.buildPtr());
+    //     _spot_lights.push_back(ptr_item);
+    //     return _spot_lights.back();
+    // }
 
-    std::shared_ptr<SceneItem> Scene::makeDirectionLight(
-        const DirectionLight::Builder&  light_builder,
-        const std::string_view          name
-    )
-    {
-        std::shared_ptr ptr_item = SceneItem::make(name);
+    // std::shared_ptr<SceneItem> Scene::makeDirectionLight(
+    //     const DirectionLight::Builder&  light_builder,
+    //     const std::string_view          name
+    // )
+    // {
+    //     std::shared_ptr ptr_item = SceneItem::make(name);
 
-        ptr_item->addComponent(light_builder.buildPtr());
-        _dir_lights.push_back(ptr_item);
-        return _dir_lights.back();
-    }
+    //     ptr_item->addComponent(light_builder.buildPtr());
+    //     _dir_lights.push_back(ptr_item);
+    //     return _dir_lights.back();
+    // }
 
-    std::shared_ptr<SceneItem> Scene::makeCamera(
-        const PerspectiveCamera::Builder&   camera_builder,
-        const std::string_view              name
-    )    
-    {
-        _ptr_camera = SceneItem::make(name);
-        _ptr_camera->addComponent(camera_builder.buildPtr());
-        return _ptr_camera;
-    }
+    // std::shared_ptr<SceneItem> Scene::makeCamera(
+    //     const PerspectiveCamera::Builder&   camera_builder,
+    //     const std::string_view              name
+    // )    
+    // {
+    //     _ptr_camera = SceneItem::make(name);
+    //     _ptr_camera->addComponent(camera_builder.buildPtr());
+    //     return _ptr_camera;
+    // }
 
     void Scene::update(const InputStay* ptr_input_stay, float delta_time)
     {

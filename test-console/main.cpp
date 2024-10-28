@@ -6,9 +6,6 @@
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/scene/component.hpp>
 
-#include <pbrlib/Rendering/Lights/PointLight.hpp>
-// #include <pbrlib/Rendering/Cameras/PerspectiveCamera.hpp>
-
 #include <pbrlib/new-renderer/camera.hpp>
 
 #include <pbrlib/logger/logger.hpp>
