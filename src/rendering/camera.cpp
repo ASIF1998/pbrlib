@@ -1,4 +1,4 @@
-#include <pbrlib/new-renderer/camera.hpp>
+#include <pbrlib/rendering/camera.hpp>
 
 #include <pbrlib/moving/transform.hpp>
 

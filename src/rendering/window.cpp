@@ -1,4 +1,4 @@
-#include <pbrlib/new-renderer/window.hpp>
+#include <pbrlib/rendering/window.hpp>
 
 #include <SDL3/SDL.h>
 

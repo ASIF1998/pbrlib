@@ -1,8 +1,8 @@
 #pragma once
 
-#include <pbrlib/new-renderer/window.hpp>
+#include <pbrlib/rendering/window.hpp>
 
-#include <pbrlib/new-renderer/camera.hpp>
+#include <pbrlib/rendering/camera.hpp>
 
 #include <string_view>
 #include <functional>
