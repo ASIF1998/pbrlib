@@ -6,7 +6,7 @@
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/scene/component.hpp>
 
-#include <pbrlib/new-renderer/camera.hpp>
+#include <pbrlib/rendering/camera.hpp>
 
 #include <pbrlib/logger/logger.hpp>
 
