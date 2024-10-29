@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <pbrlib/Rendering/Window.hpp>
+#include <pbrlib/new-renderer/window.hpp>
 
 #include <pbrlib/new-renderer/camera.hpp>
 
@@ -34,10 +34,10 @@ namespace pbrlib
 
         ~Engine();
 
-        void title(std::string_view title);
         void resize(uint32_t width, uint32_t height);
 
         [[nodiscard]] Camera& camera() noexcept;
+        [[nodiscard]] Window& window() noexcept;
 
         void setupCallback(SetupCallback setup_callback);
 
@@ -49,7 +49,7 @@ namespace pbrlib
     void run();
 
     private:
-        // std::optional<Window> _window;
+        std::optional<Window> _window;
 
         SetupCallback _setup_callback;
 

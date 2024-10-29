@@ -10,8 +10,6 @@
 
 #include <pbrlib/math/matrix4x4.hpp>
 
-#include <pbrlib/Rendering/Geometry/AABB.hpp>
-
 #include <pbrlib/core.hpp>
 
 using namespace pbrlib::math;
@@ -53,7 +51,7 @@ namespace pbrlib
         };
     }
 
-    AABB Transform::operator () (const AABB& bbox) const
+    /*AABB Transform::operator () (const AABB& bbox) const
     {
         AABB new_bbox ((*this)(bbox.corner(0)));
 
@@ -66,7 +64,7 @@ namespace pbrlib
         new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(7)));
 
         return new_bbox;
-    }
+    }*/
 
     Transform Transform::operator * (const Transform& t) const
     {

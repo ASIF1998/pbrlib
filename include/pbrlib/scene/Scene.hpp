@@ -42,8 +42,8 @@ namespace pbrlib
 
         virtual ~SceneItem();
 
-        AABB&                               getWorldAABB()      noexcept;
-        const AABB&                         getWorldAABB()      const noexcept;
+        //AABB&                               getWorldAABB()      noexcept;
+        //const AABB&                         getWorldAABB()      const noexcept;
         SceneItem*                          getParent()         noexcept;
         const SceneItem*                    getParent()         const noexcept;
         std::shared_ptr<const SceneItem>    getChild(size_t i)  const;
@@ -69,7 +69,7 @@ namespace pbrlib
         void setChildren(std::span<std::shared_ptr<SceneItem>> children);
         void setLocalTransform(const Transform& transform);
         void setWorldTransform(const Transform& transform);
-        void setWorldAABB(const AABB& bbox);
+        // void setWorldAABB(const AABB& bbox);
         void setName(const std::string_view name);
 
         bool worldTransformIsCurrent()              const noexcept;
@@ -242,6 +242,6 @@ namespace pbrlib
     };
 }
 
-#include "Scene.inl"
+#include "scene.inl"
 
 #endif /* Scene_hpp */

@@ -16,8 +16,6 @@
 
 namespace pbrlib
 {
-    class AABB;
-
     class Transform
     {
     public:
@@ -28,7 +26,7 @@ namespace pbrlib
 		bool operator != (const Transform& t) const;
 
 		math::Vec3<float>   operator () (const math::Vec3<float>& v)    const;
-		AABB                operator () (const AABB& bbox)              const;
+		//AABB                operator () (const AABB& bbox)              const;
 		Transform           operator *  (const Transform& t)            const;
 
 		bool identity() const;

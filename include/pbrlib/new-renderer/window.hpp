@@ -1,0 +1,64 @@
+#pragma once
+
+#include <string>
+#include <string_view>
+
+#include <cstdint>
+
+namespace pbrlib
+{
+    class Window final
+    {
+        explicit Window(void* ptr_window);
+
+    public:
+        class Builder;
+
+    public:
+        Window(Window&& window);
+        Window(const Window& window) = delete;
+
+        ~Window();
+
+        Window& operator = (Window&& window);
+        Window& operator = (const Window& window) = delete;
+
+        [[nodiscard]] std::string title() const; 
+        void title(std::string_view title);
+
+        [[nodiscard]] std::pair<int32_t, int32_t> size() const;
+
+        void messageBox(std::string_view title, std::string_view msg) const;
+
+    private:
+        void* _ptr_window = nullptr;
+    };
+
+    class Window::Builder
+    {
+        void validate();
+
+    public:
+        Builder() = default;
+
+        Builder(Builder&& builder)      = delete;
+        Builder(const Builder& builder) = delete;
+
+        Builder& operator = (Builder&& builder)         = delete;
+        Builder& operator = (const Builder& builder)    = delete;
+
+        Builder& title(std::string_view title);
+        Builder& size(uint32_t width, uint32_t height);
+        Builder& resizable(bool is_resizable);
+
+        Window build();
+
+    private:
+        std::string _title;
+
+        uint32_t _width     = 0;
+        uint32_t _height    = 0;
+
+        bool _is_resizable = false;
+    };
+}
