@@ -22,9 +22,26 @@ namespace pbrlib
             .build();
     }
 
+    Engine::Engine(Engine&& engine) :
+        _setup_callback (engine._setup_callback),
+        _camera         (engine._camera)
+    {
+        std::swap(_window, engine._window);
+    }
+
     Engine::~Engine()
     {
         SDL_Quit();
+    }
+
+    Engine& Engine::operator = (Engine&& engine)
+    {
+        std::swap(_window, engine._window);
+
+        _setup_callback = engine._setup_callback;
+        _camera         = engine._camera;
+
+        return *this;
     }
 
     void Engine::init()

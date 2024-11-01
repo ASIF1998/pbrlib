@@ -32,7 +32,13 @@ namespace pbrlib
     public:
         explicit Engine(const Config& config);
 
+        Engine(Engine&& engine);
+        Engine(const Engine& engine) = delete;
+
         ~Engine();
+
+        Engine& operator = (Engine&& engine);
+        Engine& operator = (const Engine&& engine) = delete;
 
         void resize(uint32_t width, uint32_t height);
 
