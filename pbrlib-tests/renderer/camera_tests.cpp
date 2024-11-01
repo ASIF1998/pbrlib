@@ -11,7 +11,7 @@ TEST(CameraTests, Ctor)
     pbrlib::testing::utils::equality(camera.up(), pbrlib::math::vec3(0, 1, 0));
 
     EXPECT_NEAR(camera.range().near, 0.0f, 0.0001f);
-    EXPECT_NEAR(camera.range().far, std::numeric_limits<float>::infinity(), 0.0001f);
+    EXPECT_TRUE(std::isinf(camera.range().far));
     
     EXPECT_NEAR(camera.fovY(), 0.0f, 0.0001f);
     EXPECT_NEAR(camera.aspect(), 0.0f, 0.0001f);
