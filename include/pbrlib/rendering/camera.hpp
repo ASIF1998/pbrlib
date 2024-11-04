@@ -3,14 +3,11 @@
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
-#include <pbrlib/scene/component.hpp>
-
 #include <numeric>
 
 namespace pbrlib
 {
-    class Camera final :
-        public Component<Camera>
+    class Camera final
     {
     public:
         struct Range

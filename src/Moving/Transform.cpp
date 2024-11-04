@@ -51,21 +51,6 @@ namespace pbrlib
         };
     }
 
-    /*AABB Transform::operator () (const AABB& bbox) const
-    {
-        AABB new_bbox ((*this)(bbox.corner(0)));
-
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(1)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(2)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(3)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(4)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(5)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(6)));
-        new_bbox = AABB::aabbUnion(new_bbox, (*this)(bbox.corner(7)));
-
-        return new_bbox;
-    }*/
-
     Transform Transform::operator * (const Transform& t) const
     {
         return Transform(_m * t._m);
@@ -245,11 +230,5 @@ namespace pbrlib
 		mat[3][2] = -(z_far * z_near) / (z_far - z_near);
 
         return Transform(mat);
-    }
-
-    std::ostream& operator << (std::ostream& print, const Transform& t)
-    {
-        print << t._m;
-        return print;
     }
 }

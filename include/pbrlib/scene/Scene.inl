@@ -1,30 +1,26 @@
-//
-//  Scene.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 15/05/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 namespace pbrlib
 {
-    template<typename TComponent>
-    inline TComponent& SceneItem::getComponent()
+    template<typename Component, typename ...Args>
+    void SceneItem::addComponent(Args... args)
     {
-        return *dynamic_cast<TComponent*>(_components.at(typeid(TComponent)).get());
+        _ptr_scene->_registry.emplace_or_replace<Component>(_handle, std::forward<Args>(args)...);
     }
 
-    template<typename TComponent>
-    inline const TComponent& SceneItem::getComponent() const
+    template<typename Component>
+    Component& SceneItem::getComponent()
     {
-        return *dynamic_cast<TComponent*>(_components.at(typeid(TComponent)).get());
+        return _ptr_scene->_registry.get<Component>(_handle);
     }
 
-    template<typename TComponent>
+    template<typename Component>
+    const Component& SceneItem::getComponent() const
+    {
+        return _ptr_scene->_registry.get<Component>(_handle);
+    }
+
+    template<typename Component>
     bool SceneItem::hasComponent() const
     {
-        auto it = _components.find(typeid(TComponent));
-        return it != end(_components);
+        return _ptr_scene->_registry.any_of<Component>(_handle);
     }
 }
-

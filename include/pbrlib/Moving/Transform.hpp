@@ -9,8 +9,6 @@
 #ifndef Transform_hpp
 #define Transform_hpp
 
-#include <iostream>
-
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/vec3.hpp>
 
@@ -26,7 +24,6 @@ namespace pbrlib
 		bool operator != (const Transform& t) const;
 
 		math::Vec3<float>   operator () (const math::Vec3<float>& v)    const;
-		//AABB                operator () (const AABB& bbox)              const;
 		Transform           operator *  (const Transform& t)            const;
 
 		bool identity() const;
@@ -126,8 +123,6 @@ namespace pbrlib
 
     Transform inverse(const Transform& t);
     Transform transpose(const Transform& t);
-
-    std::ostream& operator << (std::ostream& print, const Transform& t);
 }
 
 #endif /* Transform_hpp */

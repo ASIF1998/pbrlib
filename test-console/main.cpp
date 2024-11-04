@@ -1,33 +1,16 @@
 #include <pbrlib/engine.hpp>
 #include <pbrlib/config.hpp>
 
-#include <pbrlib/moving/transform.hpp>
-
 #include <pbrlib/scene/scene.hpp>
-#include <pbrlib/scene/component.hpp>
-
+#include <pbrlib/moving/transform.hpp>
 #include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/input/input_stay.hpp>
 
 #include <pbrlib/logger/logger.hpp>
 
-#include <pbrlib/input/input_stay.hpp>
-
-class RotateComponent :
-    public pbrlib::Component<RotateComponent>
+struct RotateComponent
 {
-    void update(const pbrlib::InputStay* ptr_input_stay, pbrlib::SceneItem* ptr_node, float delta_time) override
-    {
-        if (ptr_input_stay->keyboard.isDown(pbrlib::Keycode::Enter)) 
-            _rotate_angle += 0.1f;
-    }
-
-public:
-    RotateComponent() :
-        Component("rotate-compnent")
-    { }
-
-private:
-    float _rotate_angle = 0.0f;
+    float angle = 0.0f;
 };
 
 int main()
@@ -39,12 +22,23 @@ int main()
         
         pbrlib::Engine engine (config);
 
-        /// @todo Написать ещё часть, где будет работа с компанентами.
-
         engine.setupCallback([](pbrlib::Engine* ptr_engine, pbrlib::Scene* ptr_scene)
         {
             const auto filename = pbrlib::path_to_root / "pbrlib-tests/content/Blender 2.glb";
             pbrlib::log::info("Path to content: {}", filename.string());
+
+            auto& item = ptr_scene->addItem("rotation-item");
+            item.addComponent<RotateComponent>();
+            item.setUpdateCallback([](
+                pbrlib::SceneItem*          ptr_item, 
+                const pbrlib::InputStay*    ptr_input_stay, 
+                float                       delta_time, 
+                const pbrlib::Transform&    world_transform
+            )
+            {
+                auto& rotate_component = ptr_item->getComponent<RotateComponent>();
+                /// some manipulations related to turning
+            });
 
             // ptr_scene->addModel(filename, pbrlib::Transform::translate(pbrlib::math::vec3(0, 0, 0)));
 
