@@ -48,15 +48,23 @@ namespace pbrlib
 
     public:
         using UpdateCallback = std::function<void (
-            SceneItem*          ptr_scene_item, 
+            SceneItem*          ptr_item, 
             const InputStay*    ptr_input_stay, 
             float               delta_time, 
             const Transform&    world_transform
         )>;
 
     public:
+        SceneItem(SceneItem&& item);
+        SceneItem(const SceneItem& item) = delete;
+
+        ~SceneItem();
+
+        SceneItem& operator = (SceneItem&& item);
+        SceneItem& operator = (const SceneItem& item) = delete;
+
         template<typename Component, typename ...Args>
-        void addComponent(Args... args);
+        Component& addComponent(Args... args);
 
         template<typename Component>
         [[nodiscard]] Component& getComponent();
@@ -67,7 +75,7 @@ namespace pbrlib
         template<typename Component>
         [[nodiscard]] bool hasComponent() const;
 
-        void setUpdateCallback(const UpdateCallback& callback);
+        void updateCallback(const UpdateCallback& callback);
 
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
@@ -86,6 +94,12 @@ namespace pbrlib
     public:
         explicit Scene(std::string_view name);
 
+        Scene(Scene&& scene);
+        Scene(const Scene& scene) = delete;
+
+        Scene& operator = (Scene&& scene);
+        Scene& operator = (const Scene& scene) = delete;
+
         [[nodiscard]] std::string_view name() const;
         
         [[nodiscard]] SceneItem& addItem(std::string_view name);
@@ -93,8 +107,8 @@ namespace pbrlib
         void update(const InputStay* ptr_input_stay, float delta_time);
 
     private:
-        SceneItem       _root;
-        entt::registry  _registry;
+        entt::registry              _registry;
+        std::optional<SceneItem>    _root;
     };
 }
 

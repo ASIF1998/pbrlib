@@ -29,7 +29,7 @@ int main()
 
             auto& item = ptr_scene->addItem("rotation-item");
             item.addComponent<RotateComponent>();
-            item.setUpdateCallback([](
+            item.updateCallback([](
                 pbrlib::SceneItem*          ptr_item, 
                 const pbrlib::InputStay*    ptr_input_stay, 
                 float                       delta_time, 

@@ -22,7 +22,33 @@ namespace pbrlib
         addComponent<TransformComponent>();
     }
 
-    void SceneItem::setUpdateCallback(const UpdateCallback& callback)
+    SceneItem::SceneItem(SceneItem&& item) :
+        _ptr_scene          (item._ptr_scene),
+        _update_callback    (item._update_callback),
+        _children           (std::move(item._children))
+    {
+        std::swap(_handle, item._handle);
+    }
+
+    SceneItem::~SceneItem()
+    {
+        if (_handle != entt::null) 
+        {
+            _ptr_scene->_registry.destroy(_handle);
+        }
+    }
+
+    SceneItem& SceneItem::operator = (SceneItem&& item)
+    {
+        _ptr_scene          = item._ptr_scene;
+        _update_callback    = item._update_callback;
+        _children           = std::move(item._children);
+
+        std::swap(_handle, item._handle);
+        return *this;
+    }
+
+    void SceneItem::updateCallback(const UpdateCallback& callback)
     {
         _update_callback = callback;
     }
@@ -48,22 +74,37 @@ namespace pbrlib
 
 namespace pbrlib 
 {
-    Scene::Scene(std::string_view name) :
-        _root (name, this)
-    { }
+    Scene::Scene(std::string_view name)
+    { 
+        _root = SceneItem(name, this);
+    }
+
+    Scene::Scene(Scene&& scene)
+    {
+        std::swap(_root, scene._root);
+        std::swap(_registry, scene._registry);
+    }
+
+    Scene& Scene::operator = (Scene&& scene)
+    {
+        std::swap(_root, scene._root);
+        std::swap(_registry, scene._registry);
+
+        return *this;
+    }
 
     std::string_view Scene::name() const
     {
-        return _root.getComponent<TagComponent>().name;
+        return _root->getComponent<TagComponent>().name;
     }
 
     void Scene::update(const InputStay* ptr_input_stay, float delta_time)
     {
-        _root.update(ptr_input_stay, delta_time, Transform());
+        _root->update(ptr_input_stay, delta_time, Transform());
     }
 
     SceneItem& Scene::addItem(std::string_view name)
     {
-        return _root.addItem(name);
+        return _root->addItem(name);
     }
 }

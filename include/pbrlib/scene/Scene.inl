@@ -1,9 +1,9 @@
 namespace pbrlib
 {
     template<typename Component, typename ...Args>
-    void SceneItem::addComponent(Args... args)
+    Component& SceneItem::addComponent(Args... args)
     {
-        _ptr_scene->_registry.emplace_or_replace<Component>(_handle, std::forward<Args>(args)...);
+        return _ptr_scene->_registry.emplace_or_replace<Component>(_handle, std::forward<Args>(args)...);
     }
 
     template<typename Component>
