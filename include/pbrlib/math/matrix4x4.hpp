@@ -1,15 +1,4 @@
-//
-//  matrix4x4.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 22/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef matrix4x4_hpp
-#define matrix4x4_hpp
-
-#include <iostream>
+#pragma once
 
 #if defined(__AVX2__)
 #   include <immintrin.h>
@@ -193,9 +182,6 @@ namespace pbrlib::math
     */
     template<typename Type>
     inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat);
-
-    template<typename Type>
-    inline std::ostream& operator << (std::ostream& print, const Matrix4x4<Type>& mat);
 }
 
 namespace pbrlib::math
@@ -205,5 +191,3 @@ namespace pbrlib::math
 
 
 #include "matrix4x4.inl"
-
-#endif /* matrix4x4_hpp */

@@ -1,11 +1,3 @@
-//
-//  MemoryUtils.cpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <pbrlib/memory/memory_utils.hpp>
 
 #include <cassert>

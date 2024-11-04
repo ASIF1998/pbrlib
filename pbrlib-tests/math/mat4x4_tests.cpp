@@ -1,11 +1,3 @@
-//
-//  Matrix4x4Tests.cpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 13/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../utils.hpp"
 
 #include <pbrlib/math/matrix4x4.hpp>
@@ -13,7 +5,7 @@
 
 using namespace pbrlib::math;
 
-TEST(MathMatrix4x4, Constructor)
+TEST(Mat4Tests, Constructor)
 {
     constexpr Matrix4x4<int> m1;
     constexpr Matrix4x4<int> m2 (23);
@@ -51,12 +43,12 @@ TEST(MathMatrix4x4, Constructor)
     pbrlib::testing::utils::equality(m3, r3);
 }
 
-TEST(MathMatrix4x4, ConstructorTypeFloat)
+TEST(Mat4Tests, ConstructorTypeFloat)
 {
-    constexpr Matrix4x4<float> m1;
-    constexpr Matrix4x4<float> m2 (2.3f);
+    constexpr mat4 m1;
+    constexpr mat4 m2 (2.3f);
 
-    constexpr Matrix4x4<float> m3 {
+    constexpr mat4 m3 {
         1.23f, 3.32f, 34.5f, 4.43f,
         4.32f, 23.3f, 4.52f, 3.51f,
         43.0f, 5.03f, 0.06f, 7.23f,
@@ -89,7 +81,7 @@ TEST(MathMatrix4x4, ConstructorTypeFloat)
     pbrlib::testing::utils::equality(m3, r3);
 }
 
-TEST(MathMatrix4x4, EqualAndNotEqual)
+TEST(Mat4Tests, EqualAndNotEqual)
 {
     constexpr Matrix4x4<int> m1 {
         1, 2, 3, 4,
@@ -112,16 +104,16 @@ TEST(MathMatrix4x4, EqualAndNotEqual)
     pbrlib::testing::utils::thisTrue(m1 != m2);
 }
 
-TEST(MathMatrix4x4, EqualAndNotEqualTypeFloat)
+TEST(Mat4Tests, EqualAndNotEqualTypeFloat)
 {
-    constexpr Matrix4x4<float> m1 {
+    constexpr mat4 m1 {
         1.23f, 3.32f, 34.5f, 4.43f,
         4.32f, 23.3f, 4.52f, 3.51f,
         43.0f, 5.03f, 0.06f, 7.23f,
         23.8f, 2.46f, 3.53f, 13.4f
     };
 
-    Matrix4x4<float> m2 {
+    mat4 m2 {
         1.23f, 3.32f, 34.5f, 4.43f,
         4.32f, 23.3f, 4.52f, 3.51f,
         43.0f, 5.03f, 0.06f, 7.23f,
@@ -135,7 +127,7 @@ TEST(MathMatrix4x4, EqualAndNotEqualTypeFloat)
     pbrlib::testing::utils::thisTrue(m1 != m2);
 }
 
-TEST(MathMatrix4x4, AdditionAndSubtraction)
+TEST(Mat4Tests, AdditionAndSubtraction)
 {
     constexpr Matrix4x4<short> m1 (23);
     constexpr Matrix4x4<short> m2 (37);
@@ -158,30 +150,30 @@ TEST(MathMatrix4x4, AdditionAndSubtraction)
     pbrlib::testing::utils::equality(Matrix4x4<short>(23), res);
 }
 
-TEST(MathMatrix4x4, AdditionAndSubtractionTypeFloat)
+TEST(Mat4Tests, AdditionAndSubtractionTypeFloat)
 {
-    constexpr Matrix4x4<float> m1 (23.0f);
-    constexpr Matrix4x4<float> m2 (37.0f);
+    constexpr mat4 m1 (23.0f);
+    constexpr mat4 m2 (37.0f);
 
-    Matrix4x4<float> res = m1 + m2;
+    mat4 res = m1 + m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(60.0f), res);
+    pbrlib::testing::utils::equality(mat4(60.0f), res);
 
     res = m1 - m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(-14.0f), res);
+    pbrlib::testing::utils::equality(mat4(-14.0f), res);
 
     res =   m1;
     res +=  m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(60.0f), res);
+    pbrlib::testing::utils::equality(mat4(60.0f), res);
 
     res -= m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(23.0f), res);
+    pbrlib::testing::utils::equality(mat4(23.0f), res);
 }
 
-TEST(MathMatrix4x4, ScalarMultiplication)
+TEST(Mat4Tests, ScalarMultiplication)
 {
     constexpr Matrix4x4<int>    m (16);
     constexpr int               s (2);
@@ -195,21 +187,21 @@ TEST(MathMatrix4x4, ScalarMultiplication)
     pbrlib::testing::utils::equality(Matrix4x4<int>(64), res);
 }
 
-TEST(MathMatrix4x4, ScalarMultiplicationTypeFloat)
+TEST(Mat4Tests, ScalarMultiplicationTypeFloat)
 {
-    constexpr Matrix4x4<float>    m (16.5f);
+    constexpr mat4    m (16.5f);
     constexpr float               s (2.0f);
 
-    Matrix4x4<float> res = m * s;
+    mat4 res = m * s;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(33.0f), res);
+    pbrlib::testing::utils::equality(mat4(33.0f), res);
 
     res *= s;
 
-    pbrlib::testing::utils::equality(Matrix4x4<float>(66.0f), res);
+    pbrlib::testing::utils::equality(mat4(66.0f), res);
 }
 
-TEST(MathMatrix4x4, MatrixMultiplication)
+TEST(Mat4Tests, MatrixMultiplication)
 {
     constexpr Matrix4x4<int> m1 {
         6, 4, 5, 3, 
@@ -242,25 +234,25 @@ TEST(MathMatrix4x4, MatrixMultiplication)
     pbrlib::testing::utils::equality(r1, r2);
 }
 
-TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
+TEST(Mat4Tests, MatrixMultiplicationTypeFloat)
 {
-    constexpr Matrix4x4<float> m1 {
+    constexpr mat4 m1 {
         1.0f, 2.0f, 3.0f, 4.0f,
         5.0f, 4.0f, 6.0f, 3.0f,
         5.0f, 4.0f, 6.0f, 2.0f,
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    constexpr Matrix4x4<float> m2 {
+    constexpr mat4 m2 {
         6.0f, 4.00f, 5.0f, 3.3f, 
         5.3f, 0.05f, 2.0f, 5.0f,
         7.0f, 5.00f, 3.0f, 2.0f,
         3.0f, 5.00f, 2.0f, 1.0f
     };
 
-    Matrix4x4<float> r1 = m1 * m2;
+    mat4 r1 = m1 * m2;
 
-    constexpr Matrix4x4<float> r2 {
+    constexpr mat4 r2 {
         74.0999985f, 67.8000030f, 85.1999969f, 52.5999985f,
         50.5499992f, 48.7999992f, 48.2000008f, 35.3499985f,
         61.0000000f, 58.0000000f, 77.0000000f, 53.0000000f,
@@ -275,7 +267,7 @@ TEST(MathMatrix4x4, MatrixMultiplicationTypeFloat)
     pbrlib::testing::utils::equality(r1, r2);
 }
 
-TEST(MathMatrix4x4, MatrixAndVectorMultiplication)
+TEST(Mat4Tests, MatrixAndVectorMultiplication)
 {
     constexpr Matrix4x4<int> m {
         1, 2, 3, 4,
@@ -292,9 +284,9 @@ TEST(MathMatrix4x4, MatrixAndVectorMultiplication)
     pbrlib::testing::utils::equality(r1, r2);
 }
 
-TEST(MathMatrix4x4, MatrixAndVectorMultiplicationTypeFloat)
+TEST(Mat4Tests, MatrixAndVectorMultiplicationTypeFloat)
 {
-    constexpr Matrix4x4<float> m {
+    constexpr mat4 m {
         1.0f, 2.0f, 3.0f, 4.0f,
         5.0f, 4.0f, 6.0f, 3.0f,
         5.0f, 4.0f, 6.0f, 2.0f,
@@ -309,7 +301,7 @@ TEST(MathMatrix4x4, MatrixAndVectorMultiplicationTypeFloat)
     pbrlib::testing::utils::equality(r1, r2);
 }
 
-TEST(MathMatrix4x4, AccessToElement)
+TEST(Mat4Tests, AccessToElement)
 {
     constexpr Matrix4x4<int> m {
         1, 2, 3, 4,
@@ -338,9 +330,9 @@ TEST(MathMatrix4x4, AccessToElement)
     }
 }
 
-TEST(MathMatrix4x4, AccessToElementTypeFloat)
+TEST(Mat4Tests, AccessToElementTypeFloat)
 {
-    constexpr Matrix4x4<float> m {
+    constexpr mat4 m {
         1.0f, 2.0f, 3.0f, 4.0f,
         5.0f, 4.0f, 6.0f, 3.0f,
         5.0f, 4.0f, 6.0f, 2.0f,
@@ -367,7 +359,7 @@ TEST(MathMatrix4x4, AccessToElementTypeFloat)
     }
 }
 
-TEST(MathMatrix4x4, Determinant)
+TEST(Mat4Tests, Determinant)
 {
     constexpr Matrix4x4<int> m {
         1, 2, 3, 4,
@@ -381,9 +373,9 @@ TEST(MathMatrix4x4, Determinant)
     pbrlib::testing::utils::equality(r, m.det());
 }
 
-TEST(MathMatrix4x4, DeterminantTypeFloat)
+TEST(Mat4Tests, DeterminantTypeFloat)
 {
-    constexpr Matrix4x4<float> m {
+    constexpr mat4 m {
         1.0f, 2.00f, 3.3f, 4.0f,
         5.0f, 4.00f, 6.0f, 3.0f,
         5.0f, 34.4f, 6.6f, 2.0f,
@@ -395,7 +387,7 @@ TEST(MathMatrix4x4, DeterminantTypeFloat)
     pbrlib::testing::utils::equality(r, m.det());
 }
 
-TEST(MathMatrix4x4, Transpose)
+TEST(Mat4Tests, Transpose)
 {
     Matrix4x4<int> m {
         1, 2, 3, 4,
@@ -418,16 +410,16 @@ TEST(MathMatrix4x4, Transpose)
     pbrlib::testing::utils::equality(r, m);
 }
 
-TEST(MathMatrix4x4, TransposeTypeFloat)
+TEST(Mat4Tests, TransposeTypeFloat)
 {
-    Matrix4x4<float> m {
+    mat4 m {
         1.0f, 2.0f, 3.0f, 4.0f,
         5.0f, 4.0f, 6.0f, 3.0f,
         5.0f, 4.0f, 6.0f, 2.0f,
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    constexpr Matrix4x4<float> r {
+    constexpr mat4 r {
         1.0f, 5.0f, 5.0f, 7.0f, 
         2.0f, 4.0f, 4.0f, 6.0f, 
         3.0f, 6.0f, 6.0f, 4.0f, 
@@ -441,7 +433,7 @@ TEST(MathMatrix4x4, TransposeTypeFloat)
     pbrlib::testing::utils::equality(r, m);
 }
 
-TEST(MathMatrix4x4, Inverse)
+TEST(Mat4Tests, Inverse)
 {
     constexpr Matrix4x4<int> m {
         1, 3, 3, 4,
@@ -460,16 +452,16 @@ TEST(MathMatrix4x4, Inverse)
     pbrlib::testing::utils::equality(r, inverse(m));
 }
 
-TEST(MathMatrix4x4, InverseTypeFloat)
+TEST(Mat4Tests, InverseTypeFloat)
 {
-    constexpr Matrix4x4<float> m {
+    constexpr mat4 m {
         1.0f, 3.0f, 3.0f, 4.0f,
         5.0f, 6.0f, 7.0f, 8.0f,
         8.0f, 7.0f, 6.0f, 5.0f,
         5.0f, 5.0f, 2.0f, 1.0f
     };
 
-    constexpr Matrix4x4<float> r {
+    constexpr mat4 r {
         -2.00000000f, 1.6923077100f, -1.30769229f, 1.000000000f,
         1.000000000f, -0.692307711f, 0.307692289f, 0.000000000f,
         3.999994280f, -4.076917650f, 3.923071620f, -2.99999619f,

@@ -1,21 +1,13 @@
-//
-//  Vec4Tests.cpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 13/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../utils.hpp"
 
 #include <pbrlib/math/vec4.hpp>
 
 using namespace pbrlib::math;
 
-TEST(MathVec4, EqualAndNotEqual)
+TEST(Vec4Tests, EqualAndNotEqual)
 {
-    Vec4<float> v1 (3.5f, 23.43f, 343.54f, 233.5f);
-    Vec4<float> v2 (3.5f, 23.43f, 343.54f, 233.5f);
+    vec4 v1 (3.5f, 23.43f, 343.54f, 233.5f);
+    vec4 v2 (3.5f, 23.43f, 343.54f, 233.5f);
 
     Vec4<int> v3 (1, 2, 3, 5);
     Vec4<int> v4 (1, 2, 3, 5);
@@ -30,21 +22,21 @@ TEST(MathVec4, EqualAndNotEqual)
     pbrlib::testing::utils::thisTrue(v3 != v4);
 }
 
-TEST(MathVec4, AdditionAndSubtraction)
+TEST(Vec4Tests, AdditionAndSubtraction)
 {
-    constexpr Vec4<float> res1 (2.0f, 5.0f, 2.4f, 7.0f);
-    constexpr Vec4<float> res2 (0.0f, 0.0f, 0.0f, 0.0f);
+    constexpr vec4 res1 (2.0f, 5.0f, 2.4f, 7.0f);
+    constexpr vec4 res2 (0.0f, 0.0f, 0.0f, 0.0f);
 
     constexpr Vec4<int> res3 (2, 4, 6, 8);
     constexpr Vec4<int> res4 (0, 0, 0, 0);
 
-    Vec4<float> v1 (1.0f, 2.5f, 1.2f, 3.5f);
-    Vec4<float> v2 (1.0f, 2.5f, 1.2f, 3.5f);
+    vec4 v1 (1.0f, 2.5f, 1.2f, 3.5f);
+    vec4 v2 (1.0f, 2.5f, 1.2f, 3.5f);
 
     Vec4<int> v3 (1, 2, 3, 4);
     Vec4<int> v4 (1, 2, 3, 4);
 
-    Vec4<float> res5 = v1 + v2;
+    vec4 res5 = v1 + v2;
 
     pbrlib::testing::utils::equality(res1, res5);
 
@@ -67,18 +59,18 @@ TEST(MathVec4, AdditionAndSubtraction)
     pbrlib::testing::utils::equality(res4, v3);
 }
 
-TEST(MathVec4, Multiplication)
+TEST(Vec4Tests, Multiplication)
 {
-    constexpr Vec4<float>   res1 (11.0f, 9.0f, 24.8f, 7.2f);
+    constexpr vec4   res1 (11.0f, 9.0f, 24.8f, 7.2f);
     constexpr Vec4<int>     res2 (6, 9, 12 ,15);
 
-    Vec4<float> v1 (5.5f, 4.5f, 12.4f, 3.6f);
+    vec4 v1 (5.5f, 4.5f, 12.4f, 3.6f);
     Vec4<int>   v2 (2, 3, 4, 5);
 
     float   s1  = 2.0f;
     int     s2  = 3;
 
-    Vec4<float> res3 = v1 * s1;
+    vec4 res3 = v1 * s1;
 
 
     pbrlib::testing::utils::equality(res1, res3);
@@ -97,9 +89,9 @@ TEST(MathVec4, Multiplication)
     pbrlib::testing::utils::equality(v2.lengthSquared(), dot(v2, v2));
 }
 
-TEST(MathVec4, AccessToElement)
+TEST(Vec4Tests, AccessToElement)
 {
-    constexpr Vec4<float>   v1 (2.2f, 4.3f, 54.4f, 0.0005f);
+    constexpr vec4   v1 (2.2f, 4.3f, 54.4f, 0.0005f);
     constexpr Vec4<int>     v2 (1, 2, 3, 7);
 
     pbrlib::testing::utils::equality(2.2000f, v1[0]);
@@ -123,21 +115,21 @@ TEST(MathVec4, AccessToElement)
     pbrlib::testing::utils::equality(7, v2.w);
 }
 
-TEST(MathVec4, Length)
+TEST(Vec4Tests, Length)
 {
-    constexpr Vec4<float>   v1 (1.2f, 3.3f, 0.32f, 10.4f);
+    constexpr vec4   v1 (1.2f, 3.3f, 0.32f, 10.4f);
     constexpr Vec4<int>     v2 (1, 2, 3, 4);
 
     pbrlib::testing::utils::equality(10.9814568f, v1.length());
     pbrlib::testing::utils::equality(5, v2.length());
 }
 
-TEST(MathVec4, Normalize)
+TEST(Vec4Tests, Normalize)
 {
-    constexpr Vec4<float>   v1 (1.2f, 3.3f, 0.32f, 10.4f);
+    constexpr vec4   v1 (1.2f, 3.3f, 0.32f, 10.4f);
     constexpr Vec4<int>     v2 (1, 2, 3, 4);
 
-    constexpr Vec4<float>   res1 (0.109275125f, 0.300506569437f, 0.0291400309757f, 0.947051006709f);
+    constexpr vec4   res1 (0.109275125f, 0.300506569437f, 0.0291400309757f, 0.947051006709f);
     constexpr Vec4<int>     res2 (0, 0, 0, 0);
 
     pbrlib::testing::utils::equality(res1, normalize(v1));

@@ -21,7 +21,7 @@
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
-#include <pbrlib/math/quaternion.hpp>
+#include <pbrlib/math/quat.hpp>
 
 using namespace pbrlib::math;
 using namespace testing;

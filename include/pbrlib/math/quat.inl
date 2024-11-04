@@ -1,11 +1,3 @@
-//
-//  quaternion.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 15/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../core.hpp"
 
 namespace pbrlib::math
@@ -157,12 +149,6 @@ namespace pbrlib::math
     {
         assert(i < 4);
         return xyzw[i];
-    }
-
-    inline std::ostream& operator << (std::ostream& print, const Quaternion& q)
-    {
-        print << q.v << ' ' << q.w;
-        return print;
     }
 
     inline float Quaternion::lengthSquared() const noexcept

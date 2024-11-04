@@ -1,13 +1,4 @@
-//
-//  IMemoryBlock.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef IMemoryBlock_hpp
-#define IMemoryBlock_hpp
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -30,5 +21,3 @@ namespace pbrlib
         virtual void setNumUsers(uint32_t num_users)                    = 0;
     };
 }
-
-#endif /* IMemoryBlock_hpp */

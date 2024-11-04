@@ -1,13 +1,4 @@
-//
-//  core.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 02/02/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef core_h
-#define core_h
+#pragma once
 
 #include <vulkan/vulkan.h>
 
@@ -38,5 +29,3 @@ namespace pbrlib
 {
     const std::filesystem::path path_to_root = "@PRLIB_PATH_TO_ROOT@";
 }
-
-#endif /* core_h */

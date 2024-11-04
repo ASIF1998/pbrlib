@@ -1,15 +1,4 @@
-//
-//  matrix2x2.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 30/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef matrix2x2_hpp
-#define matrix2x2_hpp
-
-#include <iostream>
+#pragma once
 
 #if (defined(__SSE__) || defined(__AVX2__))
 #   include <xmmintrin.h>
@@ -186,9 +175,6 @@ namespace pbrlib::math
     */
     template<typename Type>
     Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat);
-
-    template<typename Type>
-    inline std::ostream& operator << (std::ostream& print, const Matrix2x2<Type>& mat);
 }
 
 namespace pbrlib::math
@@ -197,5 +183,3 @@ namespace pbrlib::math
 }
 
 #include "matrix2x2.inl"
-
-#endif /* matrix2x2_hpp */

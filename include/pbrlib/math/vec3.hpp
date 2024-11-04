@@ -1,15 +1,4 @@
-//
-//  vec3.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 22/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef vec3_hpp
-#define vec3_hpp
-
-#include <iostream>
+#pragma once
 
 #include "vec2.hpp"
 
@@ -106,9 +95,6 @@ namespace pbrlib::math
     */
     template<typename Type>
     Vec3<Type> normalize(const Vec3<Type>& v);
-
-    template<typename Type>
-    std::ostream& operator << (std::ostream& print, const Vec3<Type>& vec);
 }
 
 namespace pbrlib::math
@@ -117,5 +103,3 @@ namespace pbrlib::math
 }
 
 #include "vec3.inl"
-
-#endif /* vec3_hpp */

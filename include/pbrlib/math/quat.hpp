@@ -1,15 +1,4 @@
-//
-//  quaternion.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 15/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef quaternion_hpp
-#define quaternion_hpp
-
-#include <iostream>
+#pragma once
 
 #if (defined(__SSE__) || defined(__AVX2__))
 #   include <xmmintrin.h>
@@ -46,8 +35,6 @@ namespace pbrlib::math
         inline float    operator [] (size_t i) const noexcept;
         inline float&   operator [] (size_t i) noexcept;
 
-        friend inline std::ostream& operator << (std::ostream& print, const Quaternion& q);
-        
         inline float lengthSquared()    const noexcept;
         inline float length()           const noexcept;
 
@@ -140,6 +127,4 @@ namespace pbrlib::math
 }
 
 
-#include "quaternion.inl"
-
-#endif /* quaternion_hpp */
+#include "quat.inl"

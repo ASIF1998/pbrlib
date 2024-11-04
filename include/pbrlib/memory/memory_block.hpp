@@ -1,13 +1,4 @@
-//
-//  MemoryBlock.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef MemoryBlock_hpp
-#define MemoryBlock_hpp
+#pragma once
 
 #include "imemory_block.hpp"
 
@@ -63,5 +54,3 @@ namespace pbrlib
 }
 
 #include "memory_block.inl"
-
-#endif /* MemoryBlock_hpp */

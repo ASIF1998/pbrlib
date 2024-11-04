@@ -1,15 +1,4 @@
-//
-//  vec4.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 29/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef vec4_hpp
-#define vec4_hpp
-
-#include <iostream>
+#pragma once
 
 #if (defined(__SSE__) || defined(__AVX2__))
 #   include <xmmintrin.h>
@@ -181,9 +170,6 @@ namespace pbrlib::math
     */
     template<typename Type>
     inline Vec4<Type> normalize(const Vec4<Type>& v);
-
-    template<typename Type>
-    std::ostream& operator << (std::ostream& print, const Vec4<Type>& vec);
 }
 
 namespace pbrlib::math
@@ -192,5 +178,3 @@ namespace pbrlib::math
 }
 
 #include "vec4.inl"
-
-#endif /* vec4_hpp */

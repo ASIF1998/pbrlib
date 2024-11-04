@@ -1,11 +1,3 @@
-//
-//  Transform.cpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 17/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <pbrlib/moving/transform.hpp>
 
 #include <pbrlib/math/matrix4x4.hpp>

@@ -1,13 +1,4 @@
-//
-//  Transform.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 17/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef Transform_hpp
-#define Transform_hpp
+#pragma once
 
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/vec3.hpp>
@@ -124,5 +115,3 @@ namespace pbrlib
     Transform inverse(const Transform& t);
     Transform transpose(const Transform& t);
 }
-
-#endif /* Transform_hpp */

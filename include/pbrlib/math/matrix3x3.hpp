@@ -1,15 +1,4 @@
-//
-//  matrix3x3.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 30/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef matrix3x3_hpp
-#define matrix3x3_hpp
-
-#include <iostream>
+#pragma once
 
 namespace pbrlib::math
 {
@@ -107,9 +96,6 @@ namespace pbrlib::math
     */
     template<typename Type>
     inline Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat);
-
-    template<typename Type>
-    inline std::ostream& operator << (std::ostream& print, const Matrix3x3<Type>& mat);
 }
 
 namespace pbrlib::math
@@ -119,5 +105,3 @@ namespace pbrlib::math
 
 
 #include "matrix3x3.inl"
-
-#endif /* matrix3x3_hpp */

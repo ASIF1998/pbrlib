@@ -1,11 +1,3 @@
-//
-//  Matrix3x3Tests.cpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 13/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../utils.hpp"
 
 #include <pbrlib/math/matrix3x3.hpp>
@@ -13,7 +5,7 @@
 
 using namespace pbrlib::math;
 
-TEST(MathMatrix3x3, Constructor)
+TEST(Mat3Tests, Constructor)
 {
     constexpr Matrix3x3<int> m1;
     constexpr Matrix3x3<int> m2 (23);
@@ -47,7 +39,7 @@ TEST(MathMatrix3x3, Constructor)
     pbrlib::testing::utils::equality(m3, r3);
 }
 
-TEST(MathMatrix3x3, EqualAndNotEqual)
+TEST(Mat3Tests, EqualAndNotEqual)
 {
     constexpr Matrix3x3<int> m1 (
         1, 2, 3,
@@ -68,7 +60,7 @@ TEST(MathMatrix3x3, EqualAndNotEqual)
     pbrlib::testing::utils::thisTrue(m1 != m2);
 }
 
-TEST(MathMatrix3x3, AdditionAndSubtraction)
+TEST(Mat3Tests, AdditionAndSubtraction)
 {
     constexpr Matrix3x3<short> m1 (23);
     constexpr Matrix3x3<short> m2 (37);
@@ -91,7 +83,7 @@ TEST(MathMatrix3x3, AdditionAndSubtraction)
     pbrlib::testing::utils::equality(Matrix3x3<short>(23), res);
 }
 
-TEST(MathMatrix3x3, ScalarMultiplication)
+TEST(Mat3Tests, ScalarMultiplication)
 {
     constexpr Matrix3x3<int>    m (16);
     constexpr int               s (2);
@@ -105,23 +97,23 @@ TEST(MathMatrix3x3, ScalarMultiplication)
     pbrlib::testing::utils::equality(Matrix3x3<int>(64), res);
 }
 
-TEST(MathMatrix3x3, MatrixMultiplication)
+TEST(Mat3Tests, MatrixMultiplication)
 {
-    constexpr Matrix3x3<float> m1 {
+    constexpr mat3 m1 {
         10.125f, 23.3f, 0.250f,
         4.3500f, 3.20f, 0.450f,
         2.5340f, 8.59f, 33.43f
     };
 
-    constexpr Matrix3x3<float> m2 {
+    constexpr mat3 m2 {
         1.200f, 3.400f, 0.0500f,
         4.300f, 34.00f, 4.4500f,
         23.54f, 82.59f, 323.43f
     };
 
-    Matrix3x3<float> r = m1 * m2;
+    mat3 r = m1 * m2;
 
-    constexpr Matrix3x3<float> res {
+    constexpr mat3 res {
         27.0667000f, 39.269500f, 3.50150013f,
         202.713800f, 247.21550f, 165.138489f,
         1417.18062f, 3591.0337f, 10855.3154f  
@@ -135,7 +127,7 @@ TEST(MathMatrix3x3, MatrixMultiplication)
     pbrlib::testing::utils::equality(r, res);
 }
 
-TEST(MathMatrix3x3, MatrixAndVectorMultiplication)
+TEST(Mat3Tests, MatrixAndVectorMultiplication)
 {
     constexpr Matrix3x3<int> m {
         1, 2, 3, 
@@ -150,7 +142,7 @@ TEST(MathMatrix3x3, MatrixAndVectorMultiplication)
     pbrlib::testing::utils::equality(res, m * v);
 }   
 
-TEST(MathMatrix3x3, AccessToElement)
+TEST(Mat3Tests, AccessToElement)
 {
     constexpr Matrix3x3<int> m {
         1, 2, 3, 
@@ -177,9 +169,9 @@ TEST(MathMatrix3x3, AccessToElement)
     }
 }
 
-TEST(MathMatrix3x3, Determinant)
+TEST(Mat3Tests, Determinant)
 {
-    constexpr Matrix3x3<float> m {
+    constexpr mat3 m {
         1.0f, 2.0f, 3.50f,
         2.2f, 3.0f, 1.20f,
         8.5f, 2.6f, 12.3f
@@ -190,15 +182,15 @@ TEST(MathMatrix3x3, Determinant)
     pbrlib::testing::utils::equality(r, m.det());
 }
 
-TEST(MathMatrix3x3, Transpose)
+TEST(Mat3Tests, Transpose)
 {
-    constexpr Matrix3x3<float> res {
+    constexpr mat3 res {
         1.0f, 2.0f, 3.5f,
         2.2f, 3.0f, 1.2f,
         8.5f, 2.6f, 12.3f
     };
 
-    Matrix3x3<float> m {
+    mat3 m {
         1.0f, 2.2f, 8.50f,
         2.0f, 3.0f, 2.60f,
         3.5f, 1.2f, 12.3f
@@ -211,15 +203,15 @@ TEST(MathMatrix3x3, Transpose)
     pbrlib::testing::utils::equality(res, m);
 }
 
-TEST(MathMatrix3x3, Inverse)
+TEST(Mat3Tests, Inverse)
 {
-    constexpr Matrix3x3<float> res {
+    constexpr mat3 res {
         1.0f, 2.0f, 3.5f,
         2.2f, 3.0f, 1.2f,
         8.5f, 2.6f, 12.3f
     };
 
-    Matrix3x3<float> m {
+    mat3 m {
         -0.488362006f, 0.224085586236808f, 0.117102790226977f,
         0.2437472790f, 0.252276998698858f, -0.09397136420000f,
         0.2859621050f, -0.20818272200000f, 0.020239988300000f
