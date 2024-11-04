@@ -5,6 +5,8 @@
 
 #include <pbrlib/logger/engine/logger.hpp>
 
+#include <SDL3/SDL.h>
+
 #include <stdexcept>
 
 namespace pbrlib
@@ -14,16 +16,32 @@ namespace pbrlib
         init();
 
         _window = Window::Builder()
-            .setExtend(config.width, config.height)
-            .setPosition(Window::WINDOW_POSITION_CENTERED, Window::WINDOW_POSITION_CENTERED)
-            .setResizableWindow(Window::Resizable::STATIC)
-            .setTitle(config.title)
+            .title(config.title)
+            .size(config.width, config.height)
+            .resizable(false)
             .build();
+    }
+
+    Engine::Engine(Engine&& engine) :
+        _setup_callback (engine._setup_callback),
+        _camera         (engine._camera)
+    {
+        std::swap(_window, engine._window);
     }
 
     Engine::~Engine()
     {
         SDL_Quit();
+    }
+
+    Engine& Engine::operator = (Engine&& engine)
+    {
+        std::swap(_window, engine._window);
+
+        _setup_callback = engine._setup_callback;
+        _camera         = engine._camera;
+
+        return *this;
     }
 
     void Engine::init()
@@ -37,17 +55,11 @@ namespace pbrlib
         {
             std::string error_msg = SDL_GetError();
             SDL_ClearError();
-            pbrlib::log::engine::error("Failed initialize SDL3: {}", error_msg);
 
-            std::runtime_error("Failed initialize");
+            throw std::runtime_error(std::format("Failed initialize SDL: {}", error_msg));
         }
 
         is_init = true;
-    }
-
-    void Engine::title(std::string_view title)
-    {
-        _window->setTitle(title);
     }
 
     void Engine::resize(uint32_t width, uint32_t height)
@@ -70,5 +82,10 @@ namespace pbrlib
     Camera& Engine::camera() noexcept
     {
         return _camera;
+    }
+
+    Window& Engine::window() noexcept
+    {
+        return *_window;
     }
 }

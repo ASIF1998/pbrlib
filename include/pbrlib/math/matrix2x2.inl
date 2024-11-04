@@ -1,11 +1,3 @@
-//
-//  matrix2x2.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 30/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <memory>
 #include <cassert>
 
@@ -224,8 +216,10 @@ namespace pbrlib::math
             }
         }
     }
+}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace pbrlib::math 
+{
 #if (defined(__SSE__) || defined(__AVX2__))
     inline constexpr Matrix2x2<float>::Matrix2x2() :
         _array4 {
@@ -447,15 +441,5 @@ namespace pbrlib::math
         Matrix2x2<Type> res (mat);
         res.inverse();
         return res;
-    }
-
-    template<typename Type>
-    inline std::ostream& operator << (std::ostream& print, const Matrix2x2<Type>& mat)
-    {
-        for (size_t i{0}; i < 2; i++) {
-            print << mat[i][0] << ' ' << mat[i][1] << std::endl;
-        }
-
-        return print;
     }
 }

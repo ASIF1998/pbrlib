@@ -2,7 +2,7 @@
 
 #include <SDL3/SDL_events.h>
 
-#include <pbrlib/Util/enumCast.hpp>
+#include <pbrlib/util/enum_cast.hpp>
 
 #include <pbrlib/math/vec2.hpp>
 

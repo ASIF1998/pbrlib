@@ -1,13 +1,4 @@
-//
-//  STLAlignedAllocator.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 05/05/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef STLAlignedAllocator_hpp
-#define STLAlignedAllocator_hpp
+#pragma once
 
 #include "memory_utils.hpp"
 
@@ -67,5 +58,3 @@ namespace pbrlib
 }
 
 #include "stl_aligned_allocator.inl"
-
-#endif /* STLAlignedAllocator_hpp */

@@ -1,13 +1,4 @@
-//
-//  MemoryUtils.hpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef MemoryUtils_hpp
-#define MemoryUtils_hpp
+#pragma once
 
 #include <cstddef>
 
@@ -40,5 +31,3 @@ namespace pbrlib
 
     size_t getAlignSize(size_t size);
 }
-
-#endif /* MemoryUtils_hpp */

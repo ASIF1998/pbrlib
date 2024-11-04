@@ -1,11 +1,3 @@
-//
-//  matrix4x4.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 22/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <memory>
 #include <cassert>
 
@@ -308,8 +300,10 @@ namespace pbrlib::math
             }
         }
     }
+}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace pbrlib::math
+{
 #if defined(__AVX2__)
     inline constexpr Matrix4x4<float>::Matrix4x4() :
         _array16 {
@@ -681,8 +675,10 @@ namespace pbrlib::math
         }
     }
 #endif
+}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace pbrlib::math
+{
     template<typename Type>
     inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat)
     {
@@ -700,14 +696,5 @@ namespace pbrlib::math
         Matrix4x4<Type> res (mat);
         res.inverse();
         return res;
-    }
-
-    template<typename Type>
-    inline std::ostream& operator << (std::ostream& print, const Matrix4x4<Type>& mat)
-    {
-        for (size_t i{0}; i < 4; i++)
-            print << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << std::endl;
-        
-        return print;
     }
 }

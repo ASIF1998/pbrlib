@@ -1,11 +1,3 @@
-//
-//  vec4.cpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 29/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../core.hpp"
 
 #include <cassert>
@@ -151,8 +143,9 @@ namespace pbrlib::math
         z /= l;
         w /= l;
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+namespace pbrlib::math
+{
 #if (defined(__SSE__) || defined(__AVX2__))
     inline Vec4<float>::Vec4(float xyzw) noexcept :
         xyzw_simd(_mm_set1_ps(xyzw))
@@ -264,8 +257,10 @@ namespace pbrlib::math
         xyzw_simd = _mm_div_ps(xyzw_simd, _mm_set1_ps(l));
     }
 #endif
+}
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace pbrlib::math
+{
     template<typename Type>
     inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2)
     {
@@ -289,12 +284,5 @@ namespace pbrlib::math
         Vec4<Type> res (v);
         res.normalize();
         return res;
-    }
-
-    template<typename Type>
-    std::ostream& operator << (std::ostream& print, const Vec4<Type>& vec)
-    {
-        print << vec.x << ' ' << vec.y << ' ' << vec.z << ' ' << vec.w;
-        return print;
     }
 }

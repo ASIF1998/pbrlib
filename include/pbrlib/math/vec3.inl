@@ -1,11 +1,3 @@
-//
-//  vec3.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 22/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <pbrlib/core.hpp>
 
 #include <cassert>
@@ -152,12 +144,5 @@ namespace pbrlib::math
         assert(l != static_cast<Type>(0));
 
         return Vec3<Type>(v.x / l, v.y / l, v.z / l);
-    }
-
-    template<typename Type>
-    std::ostream& operator << (std::ostream& print, const Vec3<Type>& vec)
-    {
-        print << vec.x << ' ' << vec.y << ' ' << vec.z;
-        return print;
     }
 }

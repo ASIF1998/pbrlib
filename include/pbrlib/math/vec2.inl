@@ -1,11 +1,3 @@
-//
-//  vec2.inl
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 21/01/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include <pbrlib/core.hpp>
 
 namespace pbrlib::math
@@ -127,12 +119,5 @@ namespace pbrlib::math
         assert(l != static_cast<Type>(0));
 
         return Vec2<Type>(v.x / l, v.y / l);
-    }
-
-    template<typename Type>
-    std::ostream& operator << (std::ostream& print, const Vec2<Type>& vec)
-    {
-        print << vec.x << ' ' << vec.y;
-        return print;
     }
 }

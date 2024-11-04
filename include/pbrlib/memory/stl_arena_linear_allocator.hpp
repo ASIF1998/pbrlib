@@ -1,13 +1,4 @@
-//
-//  STLArenaLinearAllocator.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef STLArenaLinearAllocator_hpp
-#define STLArenaLinearAllocator_hpp
+#pragma once
 
 #include "memory_arena.hpp"
 #include "memory_block.hpp"
@@ -77,5 +68,3 @@ namespace pbrlib
 }
 
 #include "stl_arena_linear_allocator.inl"
-
-#endif /* STLArenaLinearAllocator_hpp */

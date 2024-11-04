@@ -1,13 +1,4 @@
-//
-//  MemoryArena.hpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 26/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
-#ifndef MemoryArena_hpp
-#define MemoryArena_hpp
+#pragma once
 
 #include "imemory_block.hpp"
 
@@ -76,5 +67,3 @@ namespace pbrlib
 }
 
 #include "memory_arena.inl"
-
-#endif /* MemoryArena_hpp */

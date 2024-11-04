@@ -1,11 +1,3 @@
-//
-//  STLAlignedAllocator.cpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 05/05/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 namespace pbrlib
 {
     template<typename Type>
