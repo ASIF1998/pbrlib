@@ -228,6 +228,7 @@ namespace pbrlib
 		mat[2][2] = z_far / (z_near - z_far);
 		mat[2][3] = -1.0f;
 		mat[3][2] = -(z_far * z_near) / (z_far - z_near);
+		mat[3][3] = 0.0f;
 
         return Transform(mat);
     }
