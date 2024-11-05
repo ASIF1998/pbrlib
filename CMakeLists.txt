@@ -25,6 +25,10 @@ set(PRLIB_VULKAN_VERSION_MAJOR 1)
 set(PRLIB_VULKAN_VERSION_MINOR 3)
 set(PRLIB_VULKAN_VERSION_PATCH 0)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 configure_file(include/pbrlib/core.hpp.in ../include/pbrlib/core.hpp)
 
 #####################################################
@@ -129,6 +133,13 @@ add_subdirectory(third_party/VulkanMemoryAllocator)
 add_subdirectory(third_party/entt)
 
 #####################################################
+#   tracy
+#####################################################
+option(TRACY_ENABLE "" ON)
+option(TRACY_ON_DEMAND "" ON)
+add_subdirectory(third_party/tracy)
+
+#####################################################
 #   add libs
 #####################################################
 target_include_directories(pbrlib PUBLIC 
@@ -143,6 +154,7 @@ target_link_libraries(pbrlib PUBLIC
     spdlog::spdlog_header_only
     VulkanMemoryAllocator
     EnTT::EnTT
+    Tracy::TracyClient
 )
 
 if (APPLE)
