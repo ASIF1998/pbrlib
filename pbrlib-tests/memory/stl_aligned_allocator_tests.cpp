@@ -1,14 +1,6 @@
-//
-//  STLAlignedAllocatorTests.cpp
-//  PBRLibTests
-//
-//  Created by Асиф Мамедов on 05/05/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../utils.hpp"
 
-#include <pbrlib/memory/stl_aligned_allocator.hpp>
+#include <backend/memory/stl_aligned_allocator.hpp>
 
 #include <vector>
 

@@ -6,6 +6,8 @@ file(GLOB_RECURSE PBRLIB_TESTS_HEADERS CONFIGURE_DEPENDS *.hpp)
 
 add_executable(pbrlib-tests ${PBRLIB_TESTS_SOURCES} ${PBRLIB_TESTS_HEADERS})
 
+target_include_directories(pbrlib-tests PRIVATE ../backend/include)
+
 #####################################################
 #   link gtest
 #####################################################

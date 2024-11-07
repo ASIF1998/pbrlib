@@ -2,11 +2,10 @@
 
 #include <SDL3/SDL_events.h>
 
-#include <pbrlib/util/enum_cast.hpp>
+#include <backend/utils/enum_cast.hpp>
 
 #include <pbrlib/math/vec2.hpp>
-
-#include "key_code.hpp"
+#include <pbrlib/input/key_code.hpp>
 
 #include <array>
 #include <unordered_map>

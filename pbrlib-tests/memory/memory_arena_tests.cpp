@@ -1,15 +1,7 @@
-//
-//  MemoryArenaTests.cpp
-//  PBRLib
-//
-//  Created by Асиф Мамедов on 27/04/2020.
-//  Copyright © 2020 Асиф Мамедов. All rights reserved.
-//
-
 #include "../utils.hpp"
 
-#include <pbrlib/memory/memory_block.hpp>
-#include <pbrlib/memory/memory_arena.hpp>
+#include <backend/memory/memory_block.hpp>
+#include <backend/memory/memory_arena.hpp>
 
 #include <type_traits>
 #include <cstdint>

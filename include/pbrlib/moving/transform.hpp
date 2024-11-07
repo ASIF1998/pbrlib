@@ -7,6 +7,9 @@ namespace pbrlib
 {
     class Transform
     {
+        friend Transform inverse(const Transform& t);
+        friend Transform transpose(const Transform& t);
+
     public:
         Transform();
         Transform(const math::Matrix4x4<float>& m);
@@ -104,12 +107,6 @@ namespace pbrlib
 
 	private:
         math::Matrix4x4<float> _m;
-
-	private:
-        friend Transform inverse(const Transform& t);
-        friend Transform transpose(const Transform& t);
-
-        friend std::ostream& operator << (std::ostream& print, const Transform& t);
     };
 
     Transform inverse(const Transform& t);

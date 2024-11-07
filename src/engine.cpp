@@ -3,7 +3,7 @@
 
 #include <pbrlib/scene/scene.hpp>
 
-#include <pbrlib/logger/engine/logger.hpp>
+#include <backend/logger/logger.hpp>
 
 #include <SDL3/SDL.h>
 

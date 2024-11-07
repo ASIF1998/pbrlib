@@ -1,6 +1,6 @@
 #pragma once
 
-#include "private/console.hpp"
+#include <backend/logger/console.hpp>
 
 #include <format>
 

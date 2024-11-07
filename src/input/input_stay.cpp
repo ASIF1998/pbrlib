@@ -1,10 +1,8 @@
 #include <pbrlib/input/input_stay.hpp>
 
-#include <iostream>
-
 #include <SDL3/SDL_keyboard.h>
 
-#include "private/sdl_keycode_map.inl"
+#include <backend/input/sdl_keycode_map.hpp>
 
 using namespace pbrlib::math;
 

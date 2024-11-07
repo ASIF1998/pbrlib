@@ -35,13 +35,15 @@ configure_file(include/pbrlib/core.hpp.in ../include/pbrlib/core.hpp)
 #   Create PBRLib library
 #####################################################
 file(GLOB_RECURSE PBRLIB_SOURCES CONFIGURE_DEPENDS src/*.cpp)
-file(GLOB_RECURSE PBRLIB_HEADERS CONFIGURE_DEPENDS include/*.hpp)
+file(GLOB_RECURSE PBRLIB_BACKEND_SOURCES CONFIGURE_DEPENDS backend/src/*.cpp)
 
-add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_HEADERS})
+add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_BACKEND_SOURCES})
+
 target_include_directories(pbrlib PUBLIC include)
+target_include_directories(pbrlib PUBLIC backend/include)
 
 if (MSVC)
-    target_compile_options(pbrlib PRIVATE /W3 /WX /MP)
+    target_compile_options(pbrlib PRIVATE /W3 /WX /MP /showIncludes)
 endif()
 
 #####################################################

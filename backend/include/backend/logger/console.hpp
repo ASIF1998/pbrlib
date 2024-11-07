@@ -3,7 +3,6 @@
 #include <spdlog/spdlog.h>
 
 #include <string_view>
-
 #include <memory>
 
 namespace spdlog::sinks
