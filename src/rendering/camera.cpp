@@ -1,5 +1,5 @@
 #include <pbrlib/rendering/camera.hpp>
-#include <pbrlib/moving/transform.hpp>
+#include <pbrlib/transform.hpp>
 
 namespace pbrlib
 {

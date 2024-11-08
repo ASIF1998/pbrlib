@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pbrlib/moving/transform.hpp>
+#include <pbrlib/transform.hpp>
 
 #include <entt/entt.hpp>
 

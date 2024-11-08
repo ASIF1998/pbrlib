@@ -1,7 +1,5 @@
-#include <pbrlib/moving/transform.hpp>
-
+#include <pbrlib/transform.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
-
 #include <pbrlib/core.hpp>
 
 using namespace pbrlib::math;
