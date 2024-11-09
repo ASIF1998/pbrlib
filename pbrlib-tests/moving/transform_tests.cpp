@@ -1,6 +1,6 @@
 #include "../utils.hpp"
 
-#include <pbrlib/Moving/Transform.hpp>
+#include <pbrlib/transform.hpp>
 #include <pbrlib/math/vec3.hpp>
 
 using namespace pbrlib;
