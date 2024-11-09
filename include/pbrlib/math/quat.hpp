@@ -6,7 +6,7 @@
 
 #include "vec3.hpp"
 
-#include <pbrlib/Moving/Transform.hpp>
+#include <pbrlib/transform.hpp>
 
 namespace pbrlib::math
 {

@@ -1,0 +1,40 @@
+name: windows-continuous
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [master, new-renderer]
+
+jobs:
+  build-windows:
+    name: build-windows
+    runs-on: windows-latest
+    steps:
+      - name: Install Vulkan SDK
+        uses: jakoch/install-vulkan-sdk-action@v1.0.0
+        with:
+          vulkan_version: 1.3.236.0
+          optional_components: com.lunarg.vulkan.vma
+          install_runtime: true
+          cache: true
+          stripdown: true
+      - name: Checkout project
+        uses: actions/checkout@v4.2.1
+        with:
+          submodules: recursive
+      - name: Remove SDL_build_config.h
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: third_party\SDL\include\build_config\SDL_build_config.h
+      - name: Build tests
+        run: |
+          mkdir build 
+          cd build 
+          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON ..
+          cmake --build . --config Release
+      - name: Run tests
+        run: |
+          pwd
+          cd build/bin/Release
+          ./pbrlib-tests.exe

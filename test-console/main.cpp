@@ -2,7 +2,7 @@
 #include <pbrlib/config.hpp>
 
 #include <pbrlib/scene/scene.hpp>
-#include <pbrlib/moving/transform.hpp>
+#include <pbrlib/transform.hpp>
 #include <pbrlib/rendering/camera.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
