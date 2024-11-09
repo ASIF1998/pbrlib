@@ -8,9 +8,6 @@
 #include <functional>
 #include <optional>
 
-/// @todo remove
-#include <pbrlib/core.hpp>
-
 namespace pbrlib
 {
     struct  Config;

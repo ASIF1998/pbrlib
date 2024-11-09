@@ -29,7 +29,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-configure_file(include/pbrlib/core.hpp.in ../include/pbrlib/core.hpp)
+configure_file(backend/include/backend/utils/private/info.hpp.in ../backend/include/backend/utils/private/info.hpp)
 
 #####################################################
 #   Create PBRLib library

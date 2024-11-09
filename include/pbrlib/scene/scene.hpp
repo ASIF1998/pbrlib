@@ -12,6 +12,8 @@
 
 #include <functional>
 
+#include <optional>
+
 namespace pbrlib
 {
     struct  InputStay;

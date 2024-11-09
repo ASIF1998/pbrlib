@@ -1,5 +1,5 @@
-#include <pbrlib/engine.hpp>
 #include <pbrlib/config.hpp>
+#include <pbrlib/engine.hpp>
 
 #include <pbrlib/scene/scene.hpp>
 

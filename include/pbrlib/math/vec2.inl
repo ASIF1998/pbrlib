@@ -1,5 +1,3 @@
-#include <pbrlib/core.hpp>
-
 namespace pbrlib::math
 {
     template<typename Type>

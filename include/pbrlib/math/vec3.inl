@@ -1,6 +1,5 @@
-#include <pbrlib/core.hpp>
-
 #include <cassert>
+#include <cmath>
 
 namespace pbrlib::math
 {
@@ -106,7 +105,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type Vec3<Type>::length() const
     {
-        return sqrt(x * x + y * y + z * z);
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     template<typename Type>

@@ -1,5 +1,3 @@
-#include "../core.hpp"
-
 namespace pbrlib::math
 {
     inline constexpr Quaternion::Quaternion() :

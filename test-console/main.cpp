@@ -24,9 +24,6 @@ int main()
 
         engine.setupCallback([](pbrlib::Engine* ptr_engine, pbrlib::Scene* ptr_scene)
         {
-            const auto filename = pbrlib::path_to_root / "pbrlib-tests/content/Blender 2.glb";
-            pbrlib::log::info("Path to content: {}", filename.string());
-
             auto& item = ptr_scene->addItem("rotation-item");
             item.addComponent<RotateComponent>();
             item.updateCallback([](

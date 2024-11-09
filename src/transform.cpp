@@ -1,6 +1,8 @@
 #include <pbrlib/transform.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
-#include <pbrlib/core.hpp>
+
+#include <cmath>
+#include <numbers>
 
 using namespace pbrlib::math;
 
@@ -8,7 +10,7 @@ namespace pbrlib
 {
     float getRadians(float angle)
     {
-        constexpr float p = static_cast<float>(M_PI) / 180.0f;
+        constexpr float p = static_cast<float>(std::numbers::pi_v<float>) / 180.0f;
         return angle * p;
     }
 

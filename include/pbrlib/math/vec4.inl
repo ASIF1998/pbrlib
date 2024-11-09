@@ -1,5 +1,3 @@
-#include "../core.hpp"
-
 #include <cassert>
 
 namespace pbrlib::math

@@ -2,15 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
-#include <cmath>
-
 #include <filesystem>
 
-#ifndef M_PI
-#   define M_PI 3.14159265358979323846
-#endif
-
-namespace pbrlib
+namespace pbrlib::priv
 {
     constexpr uint32_t EngineVersion = VK_MAKE_VERSION(
         @PRLIB_ENGINE_VERSION_MAJOR@,
@@ -25,7 +19,7 @@ namespace pbrlib
     );
 }
 
-namespace pbrlib
+namespace pbrlib::priv
 {
-    const std::filesystem::path path_to_root = "@PRLIB_PATH_TO_ROOT@";
+    const std::filesystem::path PathToRoot = "@PRLIB_PATH_TO_ROOT@";
 }
