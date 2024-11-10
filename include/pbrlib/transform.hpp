@@ -12,24 +12,24 @@ namespace pbrlib
 
     public:
         Transform();
-        Transform(const math::Matrix4x4<float>& m);
+        Transform(const math::mat4& m);
 
 		bool operator == (const Transform& t) const;
 		bool operator != (const Transform& t) const;
 
-		math::Vec3<float>   operator () (const math::Vec3<float>& v)    const;
-		Transform           operator *  (const Transform& t)            const;
+		math::vec3  operator () (const math::vec3& v)   const;
+		Transform   operator *  (const Transform& t)    const;
 
 		bool identity() const;
 
-		math::Matrix4x4<float>&		    getMatrix()         noexcept;
-		const math::Matrix4x4<float>&   getMatrix()         const noexcept;
-		math::Matrix4x4<float>          getInverseMatrix()  const noexcept;
+		math::mat4&         getMatrix()         noexcept;
+		const math::mat4&   getMatrix()         const noexcept;
+		math::mat4          getInverseMatrix()  const noexcept;
 
-		void setMatrix(const math::Matrix4x4<float>& m);
+		void setMatrix(const math::mat4& m);
 
-		static Transform translate(const math::Vec3<float>& t);
-		static Transform scale(const math::Vec3<float>& s);
+		static Transform translate(const math::vec3& t);
+		static Transform scale(const math::vec3& s);
 
         /**
          * @brief 
@@ -70,7 +70,7 @@ namespace pbrlib
          * @param theta угол в градусах.
          * @return Трансформацию, осуществляющую поворот вокруг оси OX.
         */
-        static Transform rotate(const math::Vec3<float>& axis, float theta);
+        static Transform rotate(const math::vec3& axis, float theta);
 
         /**
          * @brief 
@@ -83,9 +83,9 @@ namespace pbrlib
          * @return трансформация, которая осуществляет перевод в пространства вида.
         */
         static Transform lookAt(
-            const math::Vec3<float>& pos, 
-            const math::Vec3<float>& eye, 
-            const math::Vec3<float>& up
+            const math::vec3& pos, 
+            const math::vec3& eye, 
+            const math::vec3& up
         );
 
         /**
@@ -106,7 +106,7 @@ namespace pbrlib
         );
 
 	private:
-        math::Matrix4x4<float> _m;
+        math::mat4 _m;
     };
 
     Transform inverse(const Transform& t);

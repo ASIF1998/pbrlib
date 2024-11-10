@@ -135,9 +135,9 @@ TEST(Mat3Tests, MatrixAndVectorMultiplication)
         9, 7, 3
     };
 
-    constexpr Vec3<int> v (1, 3, 23);
+    constexpr ivec3 v (1, 3, 23);
 
-    Vec3<int> res (226, 175, 81);
+    ivec3 res (226, 175, 81);
 
     pbrlib::testing::utils::equality(res, m * v);
 }   

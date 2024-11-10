@@ -217,24 +217,24 @@ TEST(Mat2Tests, MatrixMultiplicationTypeFloat)
 
 TEST(Mat2Tests, MatrixAndVectorMultiplication)
 {
-    constexpr Vec2<int> res1 (13, 14);
+    constexpr ivec2 res1 (13, 14);
 
     constexpr Matrix2x2<int>    m (2, 1, 3, 4);
-    constexpr Vec2<int>         v (2, 3);
+    constexpr ivec2             v (2, 3);
 
-    Vec2<int> res2 = m * v;
+    ivec2 res2 = m * v;
 
     pbrlib::testing::utils::equality(res1, res2);
 }
 
 TEST(Mat2Tests, MatrixAndVectorMultiplicationTypeFloat)
 {
-    constexpr Vec2<float> res1 (43.0760002f, 11.8300009f);
+    constexpr vec2 res1 (43.0760002f, 11.8300009f);
 
-    constexpr mat2  m (1.5f, 4.65f, 12.43f, 0.5f);
-    constexpr Vec2<float>       v (2.2f, 3.2f);
+    constexpr mat2 m (1.5f, 4.65f, 12.43f, 0.5f);
+    constexpr vec2 v (2.2f, 3.2f);
 
-    Vec2<float> res2 = m * v;
+    vec2 res2 = m * v;
 
     pbrlib::testing::utils::equality(res1, res2);
 }

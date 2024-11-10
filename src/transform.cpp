@@ -20,7 +20,7 @@ namespace pbrlib
         _m(1.0)
     {}
 
-    Transform::Transform(const Matrix4x4<float>& m) :
+    Transform::Transform(const mat4& m) :
         _m(m)
     {}
 
@@ -34,7 +34,7 @@ namespace pbrlib
         return _m != t._m;
     }
 
-    Vec3<float> Transform::operator () (const Vec3<float>& v) const
+    vec3 Transform::operator () (const vec3& v) const
     {
         return {
             _m[0][0] * v.x + _m[0][1] * v.y + _m[0][2] * v.z,
@@ -50,26 +50,26 @@ namespace pbrlib
 
     bool Transform::identity() const
     {
-        constexpr Matrix4x4<float> identity_mat (1.0f);
+        constexpr mat4 identity_mat (1.0f);
         return _m == identity_mat;
     }
 
-    Matrix4x4<float>& Transform::getMatrix() noexcept
+    mat4& Transform::getMatrix() noexcept
     {
         return _m;
     }
 
-    const Matrix4x4<float>& Transform::getMatrix() const noexcept
+    const mat4& Transform::getMatrix() const noexcept
     {
         return _m;
     }
 
-    Matrix4x4<float> Transform::getInverseMatrix() const noexcept
+    mat4 Transform::getInverseMatrix() const noexcept
     {
         return inverse(_m);
     }
 
-    void Transform::setMatrix(const Matrix4x4<float>& m)
+    void Transform::setMatrix(const mat4& m)
     {
         _m = m;
     }
@@ -84,9 +84,9 @@ namespace pbrlib
         return Transform(transpose(t._m));
     }
 
-    Transform Transform::translate(const Vec3<float>& t)
+    Transform Transform::translate(const vec3& t)
     {
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
            1.0f, 0.0f, 0.0f, 0.0f,
            0.0f, 1.0f, 0.0f, 0.0f,
            0.0f, 0.0f, 1.0f, 0.0f,
@@ -94,9 +94,9 @@ namespace pbrlib
        ));
     }
 
-    Transform Transform::scale(const Vec3<float>& s)
+    Transform Transform::scale(const vec3& s)
     {
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             s.x,  0.0f, 0.0f, 0.0f,
             0.0f, s.y,  0.0f, 0.0f,
             0.0f, 0.0f, s.z,  0.0f,
@@ -109,7 +109,7 @@ namespace pbrlib
         float sin_theta = sin(getRadians(theta));
         float cos_theta = cos(getRadians(theta));
 
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             1.0f, 0.0f,         0.0f,       0.0f,
             0.0f, cos_theta,    -sin_theta, 0.0f,
             0.0f, sin_theta,    cos_theta,  0.0f,
@@ -122,7 +122,7 @@ namespace pbrlib
         float sin_theta = sin(getRadians(theta));
         float cos_theta = cos(getRadians(theta));
 
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             cos_theta,  0.0f, sin_theta,    0.0f,
             0.0f,       1.0f, 0.0f,         0.0f,
             -sin_theta, 0.0f, cos_theta,    0.0f,
@@ -135,7 +135,7 @@ namespace pbrlib
         float sin_theta = sin(getRadians(theta));
         float cos_theta = cos(getRadians(theta));
 
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             cos_theta,  -sin_theta, 0.0f, 0.0f,
             sin_theta,  cos_theta,  0.0f, 0.0f,
             0.0f,       0.0f,       1.0f, 0.0f,
@@ -143,9 +143,9 @@ namespace pbrlib
         ));
     }
 
-    Transform Transform::rotate(const Vec3<float>& axis, float theta)
+    Transform Transform::rotate(const vec3& axis, float theta)
     {
-        Vec3<float> r = normalize(axis);
+        vec3 r = normalize(axis);
 
         float theta_in_radians = getRadians(theta);
 
@@ -169,7 +169,7 @@ namespace pbrlib
         float m32 = ryrz * one_minus_cos_theta + r.x * sin_theta;
         float m33 = r.z * r.z * one_minus_cos_theta + cos_theta;
 
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             m11,    m12,    m13,    0.0f,
             m21,    m22,    m23,    0.0f,
             m31,    m32,    m33,    0.0f,
@@ -178,16 +178,16 @@ namespace pbrlib
     }
 
     Transform Transform::lookAt(
-        const Vec3<float>& pos, 
-        const Vec3<float>& eye, 
-        const Vec3<float>& up
+        const vec3& pos, 
+        const vec3& eye, 
+        const vec3& up
     )
     {
-        auto f = pbrlib::math::normalize(pos - eye);
-        auto s = pbrlib::math::normalize(pbrlib::math::cross(f, up));
-        auto u = pbrlib::math::cross(s, f);
+        auto f = normalize(pos - eye);
+        auto s = normalize(cross(f, up));
+        auto u = cross(s, f);
 
-        Matrix4x4<float> mat;
+        mat4 mat;
 
         mat[0][0] = s.x;
 		mat[1][0] = s.y;
@@ -198,9 +198,9 @@ namespace pbrlib
 		mat[0][2] =-f.x;
 		mat[1][2] =-f.y;
 		mat[2][2] =-f.z;
-        mat[3][0] =-pbrlib::math::dot(s, eye);
-		mat[3][1] =-pbrlib::math::dot(u, eye);
-		mat[3][2] = pbrlib::math::dot(f, eye);
+        mat[3][0] =-dot(s, eye);
+		mat[3][1] =-dot(u, eye);
+		mat[3][2] = dot(f, eye);
 
         return Transform(mat);
     }
@@ -214,7 +214,7 @@ namespace pbrlib
     {
         auto tan_half_fovy = std::tan(fovy * 0.5f);
 
-        Matrix4x4<float> mat;
+        mat4 mat;
         mat[0][0] = 1.0f / (aspect * tan_half_fovy);
 		mat[1][1] = 1.0f / (tan_half_fovy);
 		mat[2][2] = z_far / (z_near - z_far);

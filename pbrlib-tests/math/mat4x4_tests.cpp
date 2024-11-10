@@ -276,10 +276,10 @@ TEST(Mat4Tests, MatrixAndVectorMultiplication)
         7, 6, 4, 2
     };
 
-    constexpr Vec4<int> v   (2, 1, 3, 4);
-    constexpr Vec4<int> r1  (50, 44, 46, 25);
+    constexpr ivec4 v   (2, 1, 3, 4);
+    constexpr ivec4 r1  (50, 44, 46, 25);
 
-    Vec4<int> r2 = m * v;
+    ivec4 r2 = m * v;
 
     pbrlib::testing::utils::equality(r1, r2);
 }
@@ -293,10 +293,10 @@ TEST(Mat4Tests, MatrixAndVectorMultiplicationTypeFloat)
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    constexpr Vec4<float> v     (2.2f, 23.14f, 3.34f, 4.04f);
-    constexpr Vec4<float> r1    (162.879990f, 134.559998f, 181.639999f, 92.9800034f);
+    constexpr vec4 v    (2.2f, 23.14f, 3.34f, 4.04f);
+    constexpr vec4 r1   (162.879990f, 134.559998f, 181.639999f, 92.9800034f);
 
-    Vec4<float> r2 = m * v;
+    vec4 r2 = m * v;
 
     pbrlib::testing::utils::equality(r1, r2);
 }

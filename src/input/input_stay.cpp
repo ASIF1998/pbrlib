@@ -110,12 +110,12 @@ namespace pbrlib
 		_is_motion = false;
 	}
 
-	Vec2<float> MouseMotionStay::getCurrentCoord() const
+	vec2 MouseMotionStay::getCurrentCoord() const
 	{
 		return _current_coord;
 	}
 
-	Vec2<float> MouseMotionStay::getRelativeMotion() const
+	vec2 MouseMotionStay::getRelativeMotion() const
 	{
 		return _relative_motion;
 	}

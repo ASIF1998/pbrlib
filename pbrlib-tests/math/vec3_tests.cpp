@@ -9,8 +9,8 @@ TEST(Vec3Tests, EqualAndNotEqual)
     vec3 v1 (1.0f);
     vec3 v2 (1.0f);
     
-    Vec3<int> v3 (1, 3, 23);
-    Vec3<int> v4 (1, 3, 23);
+    ivec3 v3 (1, 3, 23);
+    ivec3 v4 (1, 3, 23);
 
     pbrlib::testing::utils::equality(v1, v2);
 
@@ -71,7 +71,7 @@ TEST(Vec3Tests, Multiplication)
 
 TEST(Vec3Tests, AccessToElement)
 {
-    Vec3<int> v (1, 2, 3);
+    ivec3 v (1, 2, 3);
 
     pbrlib::testing::utils::equality(1, v[0]);
     pbrlib::testing::utils::equality(2, v[1]);

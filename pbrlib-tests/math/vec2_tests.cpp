@@ -9,8 +9,8 @@ TEST(Vec2Tests, EqualAndNotEqual)
     vec2 v1 (1.0f);
     vec2 v2 (1.0f);
     
-    Vec2<int> v3 (1, 3);
-    Vec2<int> v4 (1, 3);
+    ivec2 v3 (1, 3);
+    ivec2 v4 (1, 3);
 
     pbrlib::testing::utils::equality(v1, v2);
     pbrlib::testing::utils::equality(v3, v4);
@@ -68,7 +68,7 @@ TEST(Vec2Tests, Multiplication)
 
 TEST(Vec2Tests, AccessToElement)
 {
-    constexpr Vec2<int> v (4, 1232);
+    constexpr ivec2 v (4, 1232);
 
     pbrlib::testing::utils::equality(4, v.x);
     pbrlib::testing::utils::equality(1232, v.y);

@@ -7,17 +7,17 @@ using namespace pbrlib::math;
 
 TEST(QuatTests, Constructor)
 {
-    constexpr Vec3<float>   v (12.32f, 323.43f, 21.21f);
-    constexpr float         w (22.22f);
+    constexpr vec3  v (12.32f, 323.43f, 21.21f);
+    constexpr float w (22.22f);
 
     constexpr quat q1;
     constexpr quat q2 (1.0f, 2.2f, 4.255f, 123.321f);
     constexpr quat q3 (v, w);
 
-    pbrlib::testing::utils::equality(Vec3<float>(0.0f), q1.v);
+    pbrlib::testing::utils::equality(vec3(0.0f), q1.v);
     pbrlib::testing::utils::equality(1.0f, q1.w);
 
-    pbrlib::testing::utils::equality(Vec3<float>(1.00000f, 2.20000f, 4.25500f), q2.v);
+    pbrlib::testing::utils::equality(vec3(1.00000f, 2.20000f, 4.25500f), q2.v);
     pbrlib::testing::utils::equality(123.321f, q2.w);
 
     pbrlib::testing::utils::equality(v, q3.v);
@@ -180,7 +180,7 @@ TEST(QuatTests, Slerp)
 
 TEST(QuatTests, ToTransform)
 {
-    constexpr Matrix4x4<float> res (
+    constexpr mat4 res (
         1.0f, 0.00f, 0.00f, 0.0f,
         0.0f, -1.0f, 0.00f, 0.0f,
         0.0f, 0.00f, -1.0f, 0.0f,

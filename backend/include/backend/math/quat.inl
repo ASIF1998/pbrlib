@@ -10,7 +10,7 @@ namespace pbrlib::math
         w(w)
     {}
 
-    inline constexpr Quaternion::Quaternion(const Vec3<float>& v, float w) :
+    inline constexpr Quaternion::Quaternion(const vec3& v, float w) :
         v(v),
         w(w)
     {}
@@ -106,7 +106,7 @@ namespace pbrlib::math
 
     inline Quaternion& Quaternion::operator *= (const Quaternion& q) noexcept
     {
-        Vec3<float> temp (v);
+        vec3 temp (v);
         v = q.v * w + temp * q.w + cross(temp, q.v);
         w = w * q.w - dot(temp, q.v);
         return *this;
@@ -210,7 +210,7 @@ namespace pbrlib::math
         float wy = w * v.y;
         float wz = w * v.z;
 
-        return Transform(Matrix4x4<float>(
+        return Transform(mat4(
             1.0f - 2.0f * (yy + zz),    2.0f * (xy + wz),           2.0f * (xz - wy),           0.0f,
             2.0f * (xy - wz),           1.0f - 2.0f * (xx +  zz),   2.0f * (yz + wx),           0.0f,
             2.0f * (xz + wy),           2.0f * (yz - wx),           1.0f - 2.0f * (xx +  yy),   0.0f,

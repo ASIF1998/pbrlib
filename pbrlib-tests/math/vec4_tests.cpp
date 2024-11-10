@@ -9,8 +9,8 @@ TEST(Vec4Tests, EqualAndNotEqual)
     vec4 v1 (3.5f, 23.43f, 343.54f, 233.5f);
     vec4 v2 (3.5f, 23.43f, 343.54f, 233.5f);
 
-    Vec4<int> v3 (1, 2, 3, 5);
-    Vec4<int> v4 (1, 2, 3, 5);
+    ivec4 v3 (1, 2, 3, 5);
+    ivec4 v4 (1, 2, 3, 5);
 
     pbrlib::testing::utils::thisTrue(v1 == v2);
     pbrlib::testing::utils::thisTrue(v3 == v4);
@@ -27,14 +27,14 @@ TEST(Vec4Tests, AdditionAndSubtraction)
     constexpr vec4 res1 (2.0f, 5.0f, 2.4f, 7.0f);
     constexpr vec4 res2 (0.0f, 0.0f, 0.0f, 0.0f);
 
-    constexpr Vec4<int> res3 (2, 4, 6, 8);
-    constexpr Vec4<int> res4 (0, 0, 0, 0);
+    constexpr ivec4 res3 (2, 4, 6, 8);
+    constexpr ivec4 res4 (0, 0, 0, 0);
 
     vec4 v1 (1.0f, 2.5f, 1.2f, 3.5f);
     vec4 v2 (1.0f, 2.5f, 1.2f, 3.5f);
 
-    Vec4<int> v3 (1, 2, 3, 4);
-    Vec4<int> v4 (1, 2, 3, 4);
+    ivec4 v3 (1, 2, 3, 4);
+    ivec4 v4 (1, 2, 3, 4);
 
     vec4 res5 = v1 + v2;
 
@@ -61,11 +61,11 @@ TEST(Vec4Tests, AdditionAndSubtraction)
 
 TEST(Vec4Tests, Multiplication)
 {
-    constexpr vec4   res1 (11.0f, 9.0f, 24.8f, 7.2f);
-    constexpr Vec4<int>     res2 (6, 9, 12 ,15);
+    constexpr vec4  res1 (11.0f, 9.0f, 24.8f, 7.2f);
+    constexpr ivec4 res2 (6, 9, 12 ,15);
 
-    vec4 v1 (5.5f, 4.5f, 12.4f, 3.6f);
-    Vec4<int>   v2 (2, 3, 4, 5);
+    vec4    v1 (5.5f, 4.5f, 12.4f, 3.6f);
+    ivec4   v2 (2, 3, 4, 5);
 
     float   s1  = 2.0f;
     int     s2  = 3;
@@ -91,8 +91,8 @@ TEST(Vec4Tests, Multiplication)
 
 TEST(Vec4Tests, AccessToElement)
 {
-    constexpr vec4   v1 (2.2f, 4.3f, 54.4f, 0.0005f);
-    constexpr Vec4<int>     v2 (1, 2, 3, 7);
+    constexpr vec4  v1 (2.2f, 4.3f, 54.4f, 0.0005f);
+    constexpr ivec4 v2 (1, 2, 3, 7);
 
     pbrlib::testing::utils::equality(2.2000f, v1[0]);
     pbrlib::testing::utils::equality(4.3000f, v1[1]);
@@ -117,8 +117,8 @@ TEST(Vec4Tests, AccessToElement)
 
 TEST(Vec4Tests, Length)
 {
-    constexpr vec4   v1 (1.2f, 3.3f, 0.32f, 10.4f);
-    constexpr Vec4<int>     v2 (1, 2, 3, 4);
+    constexpr vec4  v1 (1.2f, 3.3f, 0.32f, 10.4f);
+    constexpr ivec4 v2 (1, 2, 3, 4);
 
     pbrlib::testing::utils::equality(10.9814568f, v1.length());
     pbrlib::testing::utils::equality(5, v2.length());
@@ -126,11 +126,11 @@ TEST(Vec4Tests, Length)
 
 TEST(Vec4Tests, Normalize)
 {
-    constexpr vec4   v1 (1.2f, 3.3f, 0.32f, 10.4f);
-    constexpr Vec4<int>     v2 (1, 2, 3, 4);
+    constexpr vec4  v1 (1.2f, 3.3f, 0.32f, 10.4f);
+    constexpr ivec4 v2 (1, 2, 3, 4);
 
-    constexpr vec4   res1 (0.109275125f, 0.300506569437f, 0.0291400309757f, 0.947051006709f);
-    constexpr Vec4<int>     res2 (0, 0, 0, 0);
+    constexpr vec4  res1 (0.109275125f, 0.300506569437f, 0.0291400309757f, 0.947051006709f);
+    constexpr ivec4 res2 (0, 0, 0, 0);
 
     pbrlib::testing::utils::equality(res1, normalize(v1));
     pbrlib::testing::utils::equality(res2, normalize(v2));

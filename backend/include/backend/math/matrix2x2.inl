@@ -311,7 +311,7 @@ namespace pbrlib::math
         return (_mm_mul_ps(_m128_simd, _mm_set1_ps(scal)));
     }
 
-    inline Vec2<float> Matrix2x2<float>::operator * (const Vec2<float>& v) const
+    inline vec2 Matrix2x2<float>::operator * (const vec2& v) const
     {
         return {
             _array2x2[0][0] * v[0] + _array2x2[1][0] * v[1],

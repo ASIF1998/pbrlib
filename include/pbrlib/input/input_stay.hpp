@@ -96,14 +96,14 @@ namespace pbrlib
 		void reset();
 
 	public:
-		math::Vec2<float> getCurrentCoord()		const;
-		math::Vec2<float> getRelativeMotion() 	const;
+		math::vec2 getCurrentCoord()	const;
+		math::vec2 getRelativeMotion() 	const;
 
 		bool isMotion() const noexcept;
 
 	private:
-		math::Vec2<float> _current_coord;
-		math::Vec2<float> _relative_motion;
+		math::vec2 _current_coord;
+		math::vec2 _relative_motion;
 
 		bool _is_motion = false;
 	};

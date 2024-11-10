@@ -160,21 +160,21 @@ namespace pbrlib::math
         w{w}
     {}
 
-    inline constexpr Vec4<float>::Vec4(const Vec3<float>& vec3, float w) noexcept :
+    inline constexpr Vec4<float>::Vec4(const vec3& vec3, float w) noexcept :
         x{vec3.x},
         y{vec3.y},
         z{vec3.z},
         w{w}
     {}
 
-    inline constexpr Vec4<float>::Vec4(const Vec2<float>& v1, const Vec2<float>& v2) noexcept :
+    inline constexpr Vec4<float>::Vec4(const vec2& v1, const vec2& v2) noexcept :
         x{v1.x},
         y{v1.y},
         z{v2.x},
         w{v2.y}
     {}
 
-    inline constexpr Vec4<float>::Vec4(const Vec2<float>& vec2) noexcept :
+    inline constexpr Vec4<float>::Vec4(const vec2& vec2) noexcept :
         x{vec2.x},
         y{vec2.y},
         z{0.0f},
