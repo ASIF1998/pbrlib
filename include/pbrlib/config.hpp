@@ -13,6 +13,7 @@ namespace pbrlib
         uint32_t width  = 800;
         uint32_t height = 600;
 
-        bool resible = false;
+        bool resible        = false;
+        bool drawInWindow   = true;
     };
 }

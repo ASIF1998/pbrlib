@@ -7,12 +7,14 @@
 #include <string_view>
 #include <functional>
 #include <optional>
+#include <memory>
 
 namespace pbrlib
 {
     struct  Config;
     class   Engine;
     class   Scene;
+    class   FrameGraph;
 }
 
 namespace pbrlib
@@ -57,5 +59,7 @@ namespace pbrlib
         SetupCallback _setup_callback;
 
         Camera _camera;
+
+        std::unique_ptr<FrameGraph> _ptr_frame_graph;
     };
 }

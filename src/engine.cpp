@@ -5,6 +5,8 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <backend/renderer/frame_graph.hpp>
+
 #include <SDL3/SDL.h>
 
 #include <stdexcept>
@@ -13,13 +15,17 @@ namespace pbrlib
 {
     Engine::Engine(const Config& config)
     {
-        init();
+        if (config.drawInWindow) {
+            init();
 
-        _window = Window::Builder()
-            .title(config.title)
-            .size(config.width, config.height)
-            .resizable(false)
-            .build();
+            _window = Window::Builder()
+                .title(config.title)
+                .size(config.width, config.height)
+                .resizable(false)
+                .build();
+        }
+
+        _ptr_frame_graph = std::make_unique<FrameGraph>(config.width, config.height);
     }
 
     Engine::Engine(Engine&& engine) :
