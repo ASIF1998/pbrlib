@@ -10,7 +10,7 @@
 #   define PBRLIB_L1_CACHE_LINE_SIZE 64
 #endif
 
-namespace pbrlib
+namespace pbrlib::utils
 {
     /**
      * @brief Функция, необходимая для выделения выровненной памяти.

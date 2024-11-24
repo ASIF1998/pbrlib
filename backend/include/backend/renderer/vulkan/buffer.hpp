@@ -1,0 +1,75 @@
+#pragma once
+
+#include <vma/vk_mem_alloc.h>
+#include <vulkan/vulkan.h>
+
+#include <vector>
+
+#include <string>
+#include <string_view>
+
+namespace pbrlib::vk
+{
+    class Device;
+}
+
+namespace pbrlib::vk
+{
+    class Buffer final
+    {
+        explicit Buffer(const Device* ptr_device);
+
+    public:
+        class Builder;
+
+    public:
+        Buffer(Buffer&& buffer);
+        Buffer(const Buffer& buffer) = delete;
+
+        ~Buffer();
+
+        Buffer& operator = (Buffer&& buffer);
+        Buffer& operator = (const Buffer& buffer) = delete;
+
+        VkBuffer        handle;
+        VkDeviceSize    size;
+
+    private:
+        const Device* _ptr_device;
+        VmaAllocation _allocation = VK_NULL_HANDLE;
+    };
+
+    class Buffer::Builder final
+    {
+        void validate();
+
+        VkSharingMode sharingMode() const;
+
+    public:
+        explicit Builder(const Device* ptr_device);
+
+        Builder(Builder&& builder)      = delete;
+        Builder(const Builder& builder) = delete;
+
+        Builder& operator = (Builder&& builder)         = delete;
+        Builder& operator = (const Builder& builder)    = delete;
+
+        Builder& addQueueFamilyIndex(uint32_t index);
+        Builder& size(VkDeviceSize size)                noexcept;
+        Builder& usage(VkImageUsageFlags usage)         noexcept;
+
+        [[maybe_unused]] Builder& name(std::string_view buffer_name);
+
+        Buffer build();
+
+    private:
+        const Device* _ptr_device;
+
+        std::vector<uint32_t> _queues;
+
+        VkDeviceSize        _size   = 0;
+        VkImageUsageFlags   _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+
+        std::string _name;
+    };
+}

@@ -7,12 +7,14 @@ namespace pbrlib
     { 
         _size.width     = width;
         _size.height    = height;
+
+        _device.init();
     }
 
-    void FrameGraph::render(VkCommandBuffer command_buffer_handle)
-    {
-        /// @todo
-    }
+    // vk::Image FrameGraph::render()
+    // {
+    //     /// @todo
+    // }
 
     const Size& FrameGraph::size() const noexcept
     {

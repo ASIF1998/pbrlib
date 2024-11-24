@@ -1,8 +1,9 @@
 #pragma once
 
-#include <pbrlib/math/vec3.hpp>
+#include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/image.hpp>
 
-#include <vulkan/vulkan.h>
+#include <pbrlib/math/vec3.hpp>
 
 #include <string>
 #include <string_view>
@@ -18,13 +19,13 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    struct Size
+    struct Size final
     {
         uint32_t width  = 0;
         uint32_t height = 0;
     };
 
-    class FrameGraph
+    class FrameGraph final
     {
     public:
         explicit FrameGraph(uint32_t width, uint32_t height);
@@ -35,12 +36,14 @@ namespace pbrlib
         FrameGraph& operator = (FrameGraph&& frame_graph)       = delete;
         FrameGraph& operator = (const FrameGraph& frame_graph)  = delete;
 
-        void render(VkCommandBuffer command_buffer_handle);
+        // vk::Image render();
 
         [[nodiscard]]
         const Size& size() const noexcept;
 
     private:
+        vk::Device _device;
+        
         Size _size;
     };
 }

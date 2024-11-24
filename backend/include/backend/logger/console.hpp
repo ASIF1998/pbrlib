@@ -70,7 +70,7 @@ namespace pbrlib::log::priv
     public:
         static const char* getPattern()
         {
-            return "[%H:%M:%S %z] [%^engine%$] %v";
+            return "[%H:%M:%S %z] [%^pbrlib%$] %v";
         }
     };
 

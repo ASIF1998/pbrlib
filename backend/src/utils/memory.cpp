@@ -1,9 +1,9 @@
-#include <backend/memory/memory_utils.hpp>
+#include <backend/utils/memory.hpp>
 
 #include <cassert>
 #include <cstdlib>
 
-namespace pbrlib
+namespace pbrlib::utils
 {
     void* allocAligned(size_t size)
     {

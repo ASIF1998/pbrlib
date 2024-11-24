@@ -65,6 +65,9 @@ namespace pbrlib
             throw std::runtime_error(std::format("Failed initialize SDL: {}", error_msg));
         }
 
+        pbrlib::log::priv::EngineLogger::init();
+        pbrlib::log::priv::AppLogger::init();
+
         is_init = true;
     }
 
