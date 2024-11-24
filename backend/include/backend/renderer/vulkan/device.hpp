@@ -60,7 +60,7 @@ namespace pbrlib::vk
 
         [[nodiscard]] VmaAllocator vmaAllocator() const noexcept;
 
-        [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(const Queue& queue);
+        [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(const Queue& queue, std::string_view name = "");
 
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 

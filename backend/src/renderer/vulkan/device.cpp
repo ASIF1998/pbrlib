@@ -318,7 +318,7 @@ namespace pbrlib::vk
         }
     }
 
-    CommandBuffer Device::oneTimeSubmitCommandBuffer(const Queue& queue)
+    CommandBuffer Device::oneTimeSubmitCommandBuffer(const Queue& queue, std::string_view name)
     {
         VkCommandBufferAllocateInfo alloc_info = { };
         alloc_info.sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -331,6 +331,17 @@ namespace pbrlib::vk
         VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer._handle));
 
         command_buffer._level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+        if (!name.empty())
+        {
+            VkDebugUtilsObjectNameInfoEXT name_info = { };
+            name_info.sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer._handle);
+            name_info.objectType    = VK_OBJECT_TYPE_COMMAND_BUFFER;
+            name_info.pObjectName   = name.data();
+
+            setName(name_info);
+        }
 
         return command_buffer;
     }
