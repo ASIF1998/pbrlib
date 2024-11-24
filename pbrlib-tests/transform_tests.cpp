@@ -1,9 +1,7 @@
-#include "../utils.hpp"
+#include "utils.hpp"
 
 #include <pbrlib/transform.hpp>
 #include <pbrlib/math/vec3.hpp>
-
-// using namespace pbrlib;
 
 TEST(MovingTransform, Constructor)
 {
