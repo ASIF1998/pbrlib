@@ -43,7 +43,7 @@ namespace pbrlib
         explicit SceneItem(std::string_view name, Scene* ptr_scene);
 
         void update(
-            const InputStay*    ptr_input_stay, 
+            const InputStay&    input_stay, 
             float               delta_time, 
             const Transform&    world_transform
         );
@@ -51,7 +51,7 @@ namespace pbrlib
     public:
         using UpdateCallback = std::function<void (
             SceneItem*          ptr_item, 
-            const InputStay*    ptr_input_stay, 
+            const InputStay&    input_stay, 
             float               delta_time, 
             const Transform&    world_transform
         )>;
@@ -106,7 +106,7 @@ namespace pbrlib
         
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
-        void update(const InputStay* ptr_input_stay, float delta_time);
+        void update(const InputStay& input_stay, float delta_time);
 
     private:
         entt::registry              _registry;

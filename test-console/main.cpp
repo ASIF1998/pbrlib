@@ -28,7 +28,7 @@ int main()
             item.addComponent<RotateComponent>();
             item.updateCallback([](
                 pbrlib::SceneItem*          ptr_item, 
-                const pbrlib::InputStay*    ptr_input_stay, 
+                const pbrlib::InputStay&    input_stay, 
                 float                       delta_time, 
                 const pbrlib::Transform&    world_transform
             )

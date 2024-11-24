@@ -59,16 +59,16 @@ namespace pbrlib
         return _children.back();
     }
 
-    void SceneItem::update(const InputStay* ptr_input_stay, float delta_time, const Transform& world_transform)
+    void SceneItem::update(const InputStay& input_stay, float delta_time, const Transform& world_transform)
     {
         if (_update_callback)
-            _update_callback(this, ptr_input_stay, delta_time, world_transform);
+            _update_callback(this, input_stay, delta_time, world_transform);
 
         const auto& local_transform = getComponent<TransformComponent>().transform;
         const auto  transform       = world_transform * local_transform;
 
         for (auto& child: _children)
-            child.update(ptr_input_stay, delta_time, transform);
+            child.update(input_stay, delta_time, transform);
     }
 }
 
@@ -98,9 +98,9 @@ namespace pbrlib
         return _root->getComponent<TagComponent>().name;
     }
 
-    void Scene::update(const InputStay* ptr_input_stay, float delta_time)
+    void Scene::update(const InputStay& input_stay, float delta_time)
     {
-        _root->update(ptr_input_stay, delta_time, Transform());
+        _root->update(input_stay, delta_time, Transform());
     }
 
     SceneItem& Scene::addItem(std::string_view name)

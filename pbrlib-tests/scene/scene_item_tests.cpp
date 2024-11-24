@@ -1,6 +1,7 @@
 #include "../utils.hpp"
 
-#include <pbrlib/scene/Scene.hpp>
+#include <pbrlib/scene/scene.hpp>
+#include <pbrlib/input/input_stay.hpp>
 
 TEST(SceneItemTests, Ctor)
 {
@@ -26,6 +27,8 @@ TEST(SceneItemTests, UpdateCallback)
         int num = 0;
     };
 
+    pbrlib::InputStay input_stay;
+
     constexpr int test_component_num_value = 213;
 
     pbrlib::Scene scene("scene");
@@ -34,7 +37,7 @@ TEST(SceneItemTests, UpdateCallback)
 
     item.updateCallback([](
         pbrlib::SceneItem*          ptr_item, 
-        const pbrlib::InputStay*    ptr_input_stay, 
+        const pbrlib::InputStay&    input_stay, 
         float                       delta_time, 
         const pbrlib::Transform&    world_transform
     )
@@ -45,7 +48,7 @@ TEST(SceneItemTests, UpdateCallback)
     });
 
     item.addComponent<TestComponent>();
-    scene.update(nullptr, 0.0f);
+    scene.update(input_stay, 0.0f);
 
     ASSERT_TRUE(item.hasComponent<TestComponent>());
 
