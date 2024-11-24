@@ -26,7 +26,7 @@ namespace pbrlib
 {
     class Engine final
     {
-        void init();
+        void init(const Config& config);
 
     public:
         explicit Engine(const Config& config);

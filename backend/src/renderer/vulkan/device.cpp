@@ -1,3 +1,5 @@
+#include <pbrlib/rendering/window.hpp>
+
 #include <backend/utils/versions.hpp>
 #include <backend/logger/logger.hpp>
 
@@ -22,6 +24,8 @@ namespace pbrlib::vk
 {
     Device::~Device()
     {
+        _surface = std::nullopt;
+
         for (const auto [_, command_pool_handle]: _command_pools_handles) 
             vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
 
@@ -35,11 +39,14 @@ namespace pbrlib::vk
            vkDestroyInstance(_instance_handle, nullptr);
     }
 
-    void Device::init()
+    void Device::init(const Window* ptr_window)
     {
         initInstance(false);
         getPhysicalDevice();
         initDevice();
+
+        if (ptr_window)
+            _surface = std::make_optional<Surface>(this, ptr_window);
 
         loadFunctions();
 
@@ -231,10 +238,16 @@ namespace pbrlib::vk
             }
         }
 
+        std::array extensions {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
+
         VkDeviceCreateInfo device_info = { };
         device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         device_info.pQueueCreateInfos       = queues_info.data();
         device_info.queueCreateInfoCount    = static_cast<uint32_t>(queues_info.size());
+        device_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
+        device_info.ppEnabledExtensionNames = extensions.data();
 
         VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle));
 

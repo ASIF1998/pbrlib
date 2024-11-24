@@ -5,10 +5,17 @@
 
 #include <cstdint>
 
+namespace pbrlib::vk
+{
+    class Surface;
+}
+
 namespace pbrlib
 {
     class Window final
     {
+        friend class vk::Surface;
+
         explicit Window(void* ptr_window);
 
     public:

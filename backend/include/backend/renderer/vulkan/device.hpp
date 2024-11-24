@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/command_buffer.hpp>
+#include <backend/renderer/vulkan/surface.hpp>
 
 #include <vma/vk_mem_alloc.h>
 
@@ -8,6 +9,12 @@
 #include <numeric>
 #include <vector>
 #include <unordered_map>
+#include <optional>
+
+namespace pbrlib
+{
+    class Window;
+}
 
 namespace pbrlib::vk
 {
@@ -46,7 +53,7 @@ namespace pbrlib::vk
         Device& operator = (Device&& device)         = delete;
         Device& operator = (const Device& device)    = delete;
 
-        void init();
+        void init(const Window* ptr_window);
 
         [[nodiscard]] VkInstance        instance()          const noexcept;
         [[nodiscard]] VkPhysicalDevice  physicalDevice()    const noexcept;
@@ -80,5 +87,7 @@ namespace pbrlib::vk
         std::unordered_map<uint32_t, VkCommandPool> _command_pools_handles;
 
         VulkanFunctions _functions;
+
+        std::optional<Surface> _surface;
     };
 }

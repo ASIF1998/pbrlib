@@ -14,7 +14,8 @@
 
 namespace pbrlib
 {
-    struct IRenderPass;
+    struct  IRenderPass;
+    class   Window;
 }
 
 namespace pbrlib
@@ -28,7 +29,11 @@ namespace pbrlib
     class FrameGraph final
     {
     public:
+        [[maybe_unused]]
         explicit FrameGraph(uint32_t width, uint32_t height);
+
+        [[maybe_unused]]
+        explicit FrameGraph(const Window* ptr_window);
 
         FrameGraph(FrameGraph&& frame_graph)        = delete;
         FrameGraph(const FrameGraph& frame_graph)   = delete;

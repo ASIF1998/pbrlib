@@ -8,7 +8,7 @@ TEST(VulkanDeviceTests, Initialize)
 {
     pbrlib::vk::Device device;
 
-    ASSERT_NO_THROW(device.init());
+    ASSERT_NO_THROW(device.init(nullptr));
 
     ASSERT_NE(device.instance(), VK_NULL_HANDLE);
     ASSERT_NE(device.physicalDevice(), VK_NULL_HANDLE);
@@ -45,7 +45,7 @@ TEST(VulkanDeviceTests, BuildImage)
     constexpr auto usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     pbrlib::vk::Device device;
-    device.init();
+    device.init(nullptr);
 
     auto image = pbrlib::vk::Image::Builder(&device)
         .size(width, height)
@@ -75,7 +75,7 @@ TEST(VulkanDeviceTests, BuildBuffer)
     constexpr auto usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
     pbrlib::vk::Device device;
-    device.init();
+    device.init(nullptr);
 
     auto buffer = pbrlib::vk::Buffer::Builder(&device)
         .size(size)
@@ -91,7 +91,7 @@ TEST(VulkanDeviceTests, BuildBuffer)
 TEST(VulkanDeviceTests, CmdBuffer)
 {
     pbrlib::vk::Device device;
-    device.init();
+    device.init(nullptr);
 
     const auto& graphics_queue  = device.graphicsQueue();
     const auto& compute_queue   = device.computeQueue();

@@ -15,17 +15,19 @@ namespace pbrlib
 {
     Engine::Engine(const Config& config)
     {
-        if (config.drawInWindow) {
-            init();
+        init(config);
 
+        if (config.drawInWindow) {
             _window = Window::Builder()
                 .title(config.title)
                 .size(config.width, config.height)
                 .resizable(false)
                 .build();
+            
+            _ptr_frame_graph = std::make_unique<FrameGraph>(&_window.value());
         }
-
-        _ptr_frame_graph = std::make_unique<FrameGraph>(config.width, config.height);
+        else
+            _ptr_frame_graph = std::make_unique<FrameGraph>(config.width, config.height);
     }
 
     Engine::Engine(Engine&& engine) :
@@ -50,14 +52,14 @@ namespace pbrlib
         return *this;
     }
 
-    void Engine::init()
+    void Engine::init(const Config& config)
     {
         static bool is_init = false;
 
         if (is_init)
             return ;
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
+        if (config.drawInWindow && SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
         {
             std::string error_msg = SDL_GetError();
             SDL_ClearError();
