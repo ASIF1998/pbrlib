@@ -11,7 +11,7 @@ namespace pbrlib::utils
     }
     
     [[nodiscard]]
-    uint32_t vulkanVersion()
+    constexpr uint32_t vulkanVersion()
     {
         return pbrlib::priv::VulkanVersion;
     }

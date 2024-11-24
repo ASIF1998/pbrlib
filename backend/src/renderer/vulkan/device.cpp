@@ -4,14 +4,14 @@
 #include <backend/utils/vulkan.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
-#include <stdexcept>
-
-#include <array>
-
 #include <SDL3/SDL_vulkan.h>
 
 #define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.h>
+
+#include <stdexcept>
+#include <array>
+#include <format>
 
 namespace pbrlib::vk::settings
 {   
@@ -119,12 +119,21 @@ namespace pbrlib::vk
             VkPhysicalDeviceProperties props = { };
             vkGetPhysicalDeviceProperties(handle, &props);
 
-            if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && props.apiVersion >= utils::vulkanVersion())
             {
                 _physical_device_handle = handle;
                 _gpu_properties         = props;
                 break;
             }
+        }
+
+        if (_gpu_properties.apiVersion < utils::vulkanVersion())
+        {
+            constexpr auto major = VK_VERSION_MAJOR(utils::vulkanVersion());
+            constexpr auto minor = VK_VERSION_MINOR(utils::vulkanVersion());
+            constexpr auto patch = VK_VERSION_PATCH(utils::vulkanVersion());
+
+            throw std::runtime_error(std::format("[Vulkan] Vulkan API version less {}.{}.{}", major, minor, patch));
         }
 
         switch(_gpu_properties.deviceType)
