@@ -60,7 +60,7 @@ namespace pbrlib::vk
 
         [[maybe_unused]] Builder& name(std::string_view buffer_name);
 
-        Buffer build();
+        [[nodiscard]] Buffer build();
 
     private:
         const Device* _ptr_device;

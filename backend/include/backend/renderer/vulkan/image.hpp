@@ -73,7 +73,7 @@ namespace pbrlib::vk
         [[maybe_unused]] Builder& fillColor(const pbrlib::math::vec3& fill_color);
         [[maybe_unused]] Builder& name(std::string_view image_name);
 
-        Image build();
+        [[nodiscard]] Image build();
 
     private:
         const Device* _ptr_device;
