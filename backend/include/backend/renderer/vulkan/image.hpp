@@ -38,8 +38,8 @@ namespace pbrlib::vk
         uint32_t height = 0;
         VkFormat format = VK_FORMAT_UNDEFINED;
 
-        uint32_t level_count = 1;
-        uint32_t layer_count = 1;
+        uint8_t     level_count = 1;
+        uint16_t    layer_count = 1;
 
     private:
         const Device* _ptr_device;
