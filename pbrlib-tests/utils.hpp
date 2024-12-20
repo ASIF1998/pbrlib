@@ -14,6 +14,8 @@
 
 #include <pbrlib/math/quat.hpp>
 
+#include <vulkan/vulkan.h>
+
 using namespace testing;
 
 namespace pbrlib::testing::utils
@@ -335,5 +337,13 @@ namespace pbrlib::testing::utils
     inline void thisFalse(bool t, const std::string_view err_msg)
     {
         EXPECT_FALSE(t) << err_msg << std::endl;
+    }
+}
+
+namespace pbrlib::testing::vk::utils
+{
+    inline void isSuccess(VkResult result)
+    {
+        ASSERT_EQ(result, VK_SUCCESS);
     }
 }

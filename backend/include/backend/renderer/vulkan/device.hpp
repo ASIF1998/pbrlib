@@ -2,6 +2,7 @@
 
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
+#include <backend/renderer/vulkan/descriptor_set.hpp>
 
 #include <vma/vk_mem_alloc.h>
 
@@ -42,6 +43,8 @@ namespace pbrlib::vk
 
         void loadFunctions();
 
+        void createDescriptorPool();
+
     public:
         Device() = default;
 
@@ -59,6 +62,8 @@ namespace pbrlib::vk
         [[nodiscard]] VkPhysicalDevice  physicalDevice()    const noexcept;
         [[nodiscard]] VkDevice          device()            const noexcept;
 
+        [[nodiscard]] VkDescriptorPool descriptorPool() const noexcept;
+
         [[nodiscard]] const VkPhysicalDeviceProperties& gpuProperties() const noexcept;
 
         [[nodiscard]] const Queue& graphicsQueue()  const noexcept; 
@@ -68,6 +73,8 @@ namespace pbrlib::vk
         [[nodiscard]] VmaAllocator vmaAllocator() const noexcept;
 
         [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(const Queue& queue, std::string_view name = "");
+
+        [[nodiscard]] DescriptorSet allocate(VkDescriptorSetLayout set_layout_handle);
 
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 
@@ -89,5 +96,7 @@ namespace pbrlib::vk
         VulkanFunctions _functions;
 
         std::optional<Surface> _surface;
+
+        VkDescriptorPool _descriptor_pool_handle = VK_NULL_HANDLE;
     };
 }

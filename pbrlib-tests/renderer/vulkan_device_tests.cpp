@@ -4,6 +4,8 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 
+#include <array>
+
 TEST(VulkanDeviceTests, Initialize)
 {
     pbrlib::vk::Device device;
@@ -123,4 +125,49 @@ TEST(VulkanDeviceTests, CmdBuffer)
     {
         EXPECT_NE(handle, VK_NULL_HANDLE);
     });
+}
+
+TEST(VulkanDeviceTests, AllocateDescriptorSet)
+{
+    pbrlib::vk::Device device;
+    device.init(nullptr);
+
+    constexpr uint32_t descriptor_count = 100;
+
+    constexpr std::array descriptors_type
+    {
+        VK_DESCRIPTOR_TYPE_SAMPLER,
+        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+        VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+        VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
+        VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+        VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT
+    };
+
+    std::array<VkDescriptorSetLayoutBinding, descriptors_type.size()> bindings = { };
+    for (size_t i = 0; i < bindings.size(); ++i)
+    {
+        bindings[i].binding         = static_cast<uint32_t>(i);
+        bindings[i].descriptorCount = descriptor_count;
+        bindings[i].descriptorType  = descriptors_type[i];
+        bindings[i].stageFlags      = VK_SHADER_STAGE_ALL;
+    }
+
+    VkDescriptorSetLayout descriptor_set_layout = VK_NULL_HANDLE;
+    VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info = { };
+    descriptor_set_layout_info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptor_set_layout_info.pBindings    = bindings.data();
+    descriptor_set_layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+
+    pbrlib::testing::vk::utils::isSuccess(vkCreateDescriptorSetLayout(device.device(), &descriptor_set_layout_info, nullptr, &descriptor_set_layout));
+
+    auto descriptor_set = device.allocate(descriptor_set_layout);
+    EXPECT_NE(descriptor_set.handle, VK_NULL_HANDLE);
+
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }

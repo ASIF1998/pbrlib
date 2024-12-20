@@ -24,6 +24,9 @@ namespace pbrlib::vk
 {
     Device::~Device()
     {
+        if (_descriptor_pool_handle != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(_device_handle, _descriptor_pool_handle, nullptr);
+
         _surface = std::nullopt;
 
         for (const auto [_, command_pool_handle]: _command_pools_handles) 
@@ -53,6 +56,8 @@ namespace pbrlib::vk
         initGpuAllocator();
 
         initCommandPools();
+
+        createDescriptorPool();
     }
 }
 
@@ -393,5 +398,54 @@ namespace pbrlib::vk
     {
         if (_functions.vkSetDebugUtilsObjectNameEXT)
             _functions.vkSetDebugUtilsObjectNameEXT(_device_handle, &name_info);
+    }
+}
+
+namespace pbrlib::vk
+{
+    void Device::createDescriptorPool()
+    {
+        constexpr std::array pool_sizes 
+        {
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, .descriptorCount = 1000}
+        };
+
+        VkDescriptorPoolCreateInfo pool_info = { };
+        pool_info.sType             = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags             = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        pool_info.maxSets           = 1000;
+        pool_info.poolSizeCount     = static_cast<uint32_t>(pool_sizes.size());
+        pool_info.pPoolSizes        = pool_sizes.data();
+
+        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle));
+    }
+
+    VkDescriptorPool Device::descriptorPool() const noexcept
+    {
+        return _descriptor_pool_handle;
+    }
+
+    DescriptorSet Device::allocate(VkDescriptorSetLayout set_layout_handle)
+    {
+        DescriptorSet descriptor_set (this);
+
+        VkDescriptorSetAllocateInfo allocate_info = { };
+        allocate_info.sType                 = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocate_info.descriptorPool        = _descriptor_pool_handle;
+        allocate_info.descriptorSetCount    = 1;
+        allocate_info.pSetLayouts           = &set_layout_handle;
+        
+        VK_CHECK(vkAllocateDescriptorSets(_device_handle, &allocate_info, &descriptor_set.handle));
+
+        return descriptor_set;
     }
 }
