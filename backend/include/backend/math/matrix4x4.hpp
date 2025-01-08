@@ -120,7 +120,7 @@ namespace pbrlib::math
         inline Matrix4x4    operator - (const Matrix4x4& mat)   const;
         inline Matrix4x4    operator * (const Matrix4x4& mat)   const;
         inline Matrix4x4    operator * (float scal)             const;
-        inline vec4         operator * (const vec4& v)   const;
+        inline Vec4<float>  operator * (const Vec4<float>& v)   const;
 
         inline Matrix4x4& operator += (const Matrix4x4& mat);
         inline Matrix4x4& operator -= (const Matrix4x4& mat);

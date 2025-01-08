@@ -78,15 +78,15 @@ namespace pbrlib::math
 
 #if (defined(__SSE__) || defined(__AVX2__))
     template<>
-    struct vec4
+    struct Vec4<float>
     {
     public:
         inline              Vec4(float xyzw = 0.0f)                                 noexcept;
         inline constexpr    Vec4(__m128 xyzw)                                       noexcept;
         inline constexpr    Vec4(float x, float y, float z = 0.0f, float w = 0.0f)  noexcept;
-        inline constexpr    Vec4(const vec3& vec3, float w = 0.0f)                  noexcept; 
-        inline constexpr    Vec4(const vec2& v1, const vec2& v2)                    noexcept;
-        inline constexpr    Vec4(const vec2& vec2)                                  noexcept;
+        inline constexpr    Vec4(const Vec3<float>& vec3, float w = 0.0f)                  noexcept; 
+        inline constexpr    Vec4(const Vec2<float>& v1, const Vec2<float>& v2)                    noexcept;
+        inline constexpr    Vec4(const Vec2<float>& vec2)                                  noexcept;
 
         inline bool operator == (const Vec4& v) const noexcept;
         inline bool operator != (const Vec4& v) const noexcept;
@@ -159,7 +159,7 @@ namespace pbrlib::math
 
 #if (defined(__SSE__) || defined(__AVX2__))
     template<>
-    inline float dot<float>(const vec4& v1, const vec4& v2);
+    inline float dot<float>(const Vec4<float> v1, const Vec4<float>& v2);
 #endif
 
     /**

@@ -422,9 +422,9 @@ namespace pbrlib::math
         };
     }
 
-    inline vec4 Matrix4x4<float>::operator * (const vec4& v) const
+    inline Vec4<float> Matrix4x4<float>::operator * (const Vec4<float>& v) const
     {
-        vec4 res;
+        Vec4<float> res;
 
         res.xyzw_simd = _mm_mul_ps(
             _mm_setr_ps(
