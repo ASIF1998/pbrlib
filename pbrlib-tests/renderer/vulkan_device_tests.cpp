@@ -6,12 +6,20 @@
 
 #include <array>
 
-TEST(VulkanDeviceTests, Initialize)
+class VulkanDeviceTests :
+    public ::testing::Test
 {
+public:
+    VulkanDeviceTests()
+    {
+        device.init(nullptr);
+    }
+    
     pbrlib::vk::Device device;
+};
 
-    ASSERT_NO_THROW(device.init(nullptr));
-
+TEST_F(VulkanDeviceTests, Initialize)
+{
     ASSERT_NE(device.instance(), VK_NULL_HANDLE);
     ASSERT_NE(device.physicalDevice(), VK_NULL_HANDLE);
     ASSERT_NE(device.device(), VK_NULL_HANDLE);
@@ -34,7 +42,7 @@ TEST(VulkanDeviceTests, Initialize)
     EXPECT_NE(transfer_queue.handle, VK_NULL_HANDLE);
 }
 
-TEST(VulkanDeviceTests, BuildImage)
+TEST_F(VulkanDeviceTests, BuildImage)
 {
     constexpr uint32_t width = 300;
     constexpr uint32_t height = 100;
@@ -44,10 +52,9 @@ TEST(VulkanDeviceTests, BuildImage)
 
     constexpr auto fill_color = pbrlib::math::vec3(0.54, 0.12, 0.43);
     
-    constexpr auto usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-
-    pbrlib::vk::Device device;
-    device.init(nullptr);
+    constexpr auto usage =  VK_IMAGE_USAGE_STORAGE_BIT          | 
+                            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
+                            VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     auto image = pbrlib::vk::Image::Builder(&device)
         .size(width, height)
@@ -71,13 +78,10 @@ TEST(VulkanDeviceTests, BuildImage)
     EXPECT_EQ(image.layer_count, 1);
 }
 
-TEST(VulkanDeviceTests, BuildBuffer)
+TEST_F(VulkanDeviceTests, BuildBuffer)
 {
     constexpr size_t size = 12342;
     constexpr auto usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-
-    pbrlib::vk::Device device;
-    device.init(nullptr);
 
     auto buffer = pbrlib::vk::Buffer::Builder(&device)
         .size(size)
@@ -90,11 +94,8 @@ TEST(VulkanDeviceTests, BuildBuffer)
     ASSERT_EQ(buffer.size, size);
 }
 
-TEST(VulkanDeviceTests, CmdBuffer)
+TEST_F(VulkanDeviceTests, CmdBuffer)
 {
-    pbrlib::vk::Device device;
-    device.init(nullptr);
-
     const auto& graphics_queue  = device.graphicsQueue();
     const auto& compute_queue   = device.computeQueue();
     const auto& transfer_queue  = device.transferQueue();
@@ -127,11 +128,8 @@ TEST(VulkanDeviceTests, CmdBuffer)
     });
 }
 
-TEST(VulkanDeviceTests, AllocateDescriptorSet)
+TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 {
-    pbrlib::vk::Device device;
-    device.init(nullptr);
-
     constexpr uint32_t descriptor_count = 100;
 
     constexpr std::array descriptors_type

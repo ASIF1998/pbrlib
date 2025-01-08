@@ -436,6 +436,9 @@ namespace pbrlib::vk
 
     DescriptorSet Device::allocate(VkDescriptorSetLayout set_layout_handle)
     {
+        if (set_layout_handle == VK_NULL_HANDLE)
+            throw std::invalid_argument("[Device] set_layout_handle is null");
+
         DescriptorSet descriptor_set (this);
 
         VkDescriptorSetAllocateInfo allocate_info = { };
