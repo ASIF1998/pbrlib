@@ -183,7 +183,7 @@ namespace pbrlib::vk
 
         const auto [width, height] = ptr_window->size();
         
-        const auto family_index = _ptr_device->graphicsQueue().family_index;
+        const auto family_index = _ptr_device->queue().family_index;
 
         VkSwapchainCreateInfoKHR swapchain_info = { };
         swapchain_info.sType                    = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;

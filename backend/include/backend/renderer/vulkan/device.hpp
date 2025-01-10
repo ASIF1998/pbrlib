@@ -33,7 +33,7 @@ namespace pbrlib::vk
 
     class Device final
     {
-        std::vector<uint32_t> initQueuesIndices();
+        void getGeneralQueueIndex();
 
         void initInstance(bool is_debug);
         void getPhysicalDevice();
@@ -66,9 +66,7 @@ namespace pbrlib::vk
 
         [[nodiscard]] const VkPhysicalDeviceProperties& gpuProperties() const noexcept;
 
-        [[nodiscard]] const Queue& graphicsQueue()  const noexcept; 
-        [[nodiscard]] const Queue& computeQueue()   const noexcept; 
-        [[nodiscard]] const Queue& transferQueue()  const noexcept;
+        [[nodiscard]] const Queue& queue()  const noexcept;
 
         [[nodiscard]] VmaAllocator vmaAllocator() const noexcept;
 
@@ -85,13 +83,10 @@ namespace pbrlib::vk
 
         VkPhysicalDeviceProperties _gpu_properties = { };
 
-        Queue _graphics_queue;
-        Queue _compute_queue;
-        Queue _transfer_queue;
+        Queue           _general_queue;
+        VkCommandPool   _command_pool_for_general_queue = VK_NULL_HANDLE;
 
         VmaAllocator _vma_allocator_handle = VK_NULL_HANDLE;
-
-        std::unordered_map<uint32_t, VkCommandPool> _command_pools_handles;
 
         VulkanFunctions _functions;
 

@@ -26,26 +26,16 @@ TEST_F(VulkanDeviceTests, Initialize)
 
     constexpr auto invalied_queue_index_value = std::numeric_limits<uint32_t>::max();
 
-    const auto& graphics_queue = device.graphicsQueue();
-    EXPECT_NE(graphics_queue.index, invalied_queue_index_value);
-    EXPECT_NE(graphics_queue.family_index, invalied_queue_index_value);
-    EXPECT_NE(graphics_queue.handle, VK_NULL_HANDLE);
-    
-    const auto& compute_queue = device.computeQueue();
-    EXPECT_NE(compute_queue.index, invalied_queue_index_value);
-    EXPECT_NE(compute_queue.family_index, invalied_queue_index_value);
-    EXPECT_NE(compute_queue.handle, VK_NULL_HANDLE);
-    
-    const auto& transfer_queue = device.transferQueue();
-    EXPECT_NE(transfer_queue.index, invalied_queue_index_value);
-    EXPECT_NE(transfer_queue.family_index, invalied_queue_index_value);
-    EXPECT_NE(transfer_queue.handle, VK_NULL_HANDLE);
+    const auto& queue = device.queue();
+    EXPECT_NE(queue.index, invalied_queue_index_value);
+    EXPECT_NE(queue.family_index, invalied_queue_index_value);
+    EXPECT_NE(queue.handle, VK_NULL_HANDLE);
 }
 
 TEST_F(VulkanDeviceTests, BuildImage)
 {
-    constexpr uint32_t width = 300;
-    constexpr uint32_t height = 100;
+    constexpr uint32_t width    = 300;
+    constexpr uint32_t height   = 100;
 
     constexpr auto format = VK_FORMAT_R32_SFLOAT;
     constexpr auto filter = VK_FILTER_LINEAR;
@@ -61,9 +51,7 @@ TEST_F(VulkanDeviceTests, BuildImage)
         .format(format)
         .filter(filter)
         .fillColor(fill_color)
-        .addQueueFamilyIndex(device.graphicsQueue().family_index)
-        .addQueueFamilyIndex(device.transferQueue().family_index)
-        .addQueueFamilyIndex(device.computeQueue().family_index)
+        .addQueueFamilyIndex(device.queue().family_index)
         .usage(usage)
         .build();
 
@@ -86,8 +74,7 @@ TEST_F(VulkanDeviceTests, BuildBuffer)
     auto buffer = pbrlib::vk::Buffer::Builder(&device)
         .size(size)
         .usage(usage)
-        .addQueueFamilyIndex(device.graphicsQueue().family_index)
-        .addQueueFamilyIndex(device.transferQueue().family_index)
+        .addQueueFamilyIndex(device.queue().family_index)
         .build();
 
     ASSERT_NE(buffer.handle, VK_NULL_HANDLE);
@@ -96,33 +83,13 @@ TEST_F(VulkanDeviceTests, BuildBuffer)
 
 TEST_F(VulkanDeviceTests, CmdBuffer)
 {
-    const auto& graphics_queue  = device.graphicsQueue();
-    const auto& compute_queue   = device.computeQueue();
-    const auto& transfer_queue  = device.transferQueue();
+    const auto& queue  = device.queue();
+    ASSERT_NE(queue.handle, VK_NULL_HANDLE);
 
-    ASSERT_NE(graphics_queue.handle, VK_NULL_HANDLE);
-    ASSERT_NE(compute_queue.handle, VK_NULL_HANDLE);
-    ASSERT_NE(transfer_queue.handle, VK_NULL_HANDLE);
+    auto cmd_buffer = device.oneTimeSubmitCommandBuffer(queue);
+    EXPECT_EQ(cmd_buffer.level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-    auto cmd_buffer_1 = device.oneTimeSubmitCommandBuffer(graphics_queue);
-    auto cmd_buffer_2 = device.oneTimeSubmitCommandBuffer(compute_queue);
-    auto cmd_buffer_3 = device.oneTimeSubmitCommandBuffer(transfer_queue);
-
-    EXPECT_EQ(cmd_buffer_1.level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-    EXPECT_EQ(cmd_buffer_2.level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-    EXPECT_EQ(cmd_buffer_3.level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-    cmd_buffer_1.write([](VkCommandBuffer handle)
-    {
-        EXPECT_NE(handle, VK_NULL_HANDLE);
-    });
-    
-    cmd_buffer_2.write([](VkCommandBuffer handle)
-    {
-        EXPECT_NE(handle, VK_NULL_HANDLE);
-    });
-    
-    cmd_buffer_3.write([](VkCommandBuffer handle)
+    cmd_buffer.write([](VkCommandBuffer handle)
     {
         EXPECT_NE(handle, VK_NULL_HANDLE);
     });
