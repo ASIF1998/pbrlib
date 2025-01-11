@@ -1,7 +1,7 @@
 #pragma once
 
 #include <pbrlib/rendering/window.hpp>
-
+#include <pbrlib/scene/scene.hpp>
 #include <pbrlib/rendering/camera.hpp>
 
 #include <string_view>
@@ -13,7 +13,6 @@ namespace pbrlib
 {
     struct  Config;
     class   Engine;
-    class   Scene;
     class   FrameGraph;
 }
 
@@ -31,13 +30,13 @@ namespace pbrlib
     public:
         explicit Engine(const Config& config);
 
-        Engine(Engine&& engine);
-        Engine(const Engine& engine) = delete;
+        Engine(Engine&& engine)         = default;
+        Engine(const Engine& engine)    = delete;
 
         ~Engine();
 
-        Engine& operator = (Engine&& engine);
-        Engine& operator = (const Engine&& engine) = delete;
+        Engine& operator = (Engine&& engine)        = default;
+        Engine& operator = (const Engine&& engine)  = delete;
 
         void resize(uint32_t width, uint32_t height);
 
@@ -59,6 +58,8 @@ namespace pbrlib
         SetupCallback _setup_callback;
 
         Camera _camera;
+
+        Scene _scene;
 
         std::unique_ptr<FrameGraph> _ptr_frame_graph;
     };

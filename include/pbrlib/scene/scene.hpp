@@ -87,7 +87,7 @@ namespace pbrlib
             UpdateCallback      _update_callback;
             
             SceneItems _children;  
-        };
+    };
 
     class Scene final
     {

@@ -13,7 +13,8 @@
 
 namespace pbrlib
 {
-    Engine::Engine(const Config& config)
+    Engine::Engine(const Config& config) :
+        _scene (config.title)
     {
         init(config);
 
@@ -30,26 +31,9 @@ namespace pbrlib
             _ptr_frame_graph = std::make_unique<FrameGraph>(config.width, config.height);
     }
 
-    Engine::Engine(Engine&& engine) :
-        _setup_callback (engine._setup_callback),
-        _camera         (engine._camera)
-    {
-        std::swap(_window, engine._window);
-    }
-
     Engine::~Engine()
     {
         SDL_Quit();
-    }
-
-    Engine& Engine::operator = (Engine&& engine)
-    {
-        std::swap(_window, engine._window);
-
-        _setup_callback = engine._setup_callback;
-        _camera         = engine._camera;
-
-        return *this;
     }
 
     void Engine::init(const Config& config)
@@ -85,9 +69,8 @@ namespace pbrlib
 
     void Engine::run()
     {
-        /// @todo add ptr to scene
         if (_setup_callback)
-            _setup_callback(this, nullptr);        
+            _setup_callback(this, &_scene);        
     }
 
     Camera& Engine::camera() noexcept
