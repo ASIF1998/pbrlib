@@ -2,9 +2,12 @@
 
 #include <filesystem>
 
+#include <assimp/scene.h>
+
 namespace pbrlib
 {
     class Scene;
+    class SceneItem;
 }
 
 namespace pbrlib::vk
@@ -16,6 +19,8 @@ namespace pbrlib
 {
     class AssimpImporter
     {
+        void processNode(const aiScene* ptr_scene, const aiNode* ptr_node);
+
     public:
         AssimpImporter() = default;
 
@@ -33,8 +38,10 @@ namespace pbrlib
 
     private:
         vk::Device* _ptr_device = nullptr;
-        Scene*  _ptr_scene  = nullptr;
+        Scene*      _ptr_scene  = nullptr;
 
         std::filesystem::path _filename;
+
+        SceneItem* ptr_root_item = nullptr;
     };
 }

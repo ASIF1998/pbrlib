@@ -9,6 +9,8 @@
 
 #include <pbrlib/logger/logger.hpp>
 
+#include <backend/utils/paths.hpp>
+
 struct RotateComponent
 {
     float angle = 0.0f;
@@ -38,7 +40,7 @@ int main()
                 /// some manipulations related to turning
             });
 
-            ptr_scene->import("", ptr_engine);
+            ptr_scene->import(pbrlib::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb", ptr_engine);
 
             // auto ptr_light = ptr_scene->addLight(
             //     pbrlib::PointLight::Builder()
