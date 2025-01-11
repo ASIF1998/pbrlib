@@ -25,6 +25,8 @@ namespace pbrlib
 {
     class Engine final
     {
+        friend class Scene;
+
         void init(const Config& config);
 
     public:
@@ -45,12 +47,7 @@ namespace pbrlib
 
         void setupCallback(SetupCallback setup_callback);
 
-#if 0
-        void preRenderCallback(PreRenderCallback callback);
-        void postRenderCallback(PostRenderCallback callback);
-#endif
-
-    void run();
+        void run();
 
     private:
         std::optional<Window> _window;

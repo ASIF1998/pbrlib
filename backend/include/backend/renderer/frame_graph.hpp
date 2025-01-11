@@ -41,6 +41,7 @@ namespace pbrlib
         FrameGraph& operator = (FrameGraph&& frame_graph)       = delete;
         FrameGraph& operator = (const FrameGraph& frame_graph)  = delete;
 
+        [[nodiscard]] vk::Device& device() noexcept;
         // vk::Image render();
 
         [[nodiscard]]

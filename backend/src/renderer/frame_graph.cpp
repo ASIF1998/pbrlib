@@ -32,4 +32,9 @@ namespace pbrlib
     {
         return _size;
     }
+
+    vk::Device& FrameGraph::device() noexcept
+    {
+        return _device;
+    }
 }

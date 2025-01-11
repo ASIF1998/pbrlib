@@ -1,6 +1,13 @@
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
+#include <pbrlib/engine.hpp>
+
+#include <backend/renderer/frame_graph.hpp>
+#include <backend/scene/assimp_importer.hpp>
+
+#include <backend/logger/logger.hpp>
+
 namespace pbrlib
 {
     TagComponent::TagComponent(std::string_view name) :
@@ -107,4 +114,19 @@ namespace pbrlib
     {
         return _root->addItem(name);
     }
+
+    bool Scene::import(const std::filesystem::path& filename, Engine* ptr_engine)
+    {
+        if (!ptr_engine)
+        {
+            log::engine::error("[Importer] Pointer to engine is null");
+            return false;
+        }
+
+        return AssimpImporter()
+            .device(&ptr_engine->_ptr_frame_graph->device())
+            .scene(this)
+            .filename(filename)
+            .import();
+    }    
 }

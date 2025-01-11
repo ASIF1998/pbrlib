@@ -2,6 +2,7 @@
 #include <pbrlib/config.hpp>
 
 #include <pbrlib/scene/scene.hpp>
+
 #include <pbrlib/transform.hpp>
 #include <pbrlib/rendering/camera.hpp>
 #include <pbrlib/input/input_stay.hpp>
@@ -37,7 +38,7 @@ int main()
                 /// some manipulations related to turning
             });
 
-            // ptr_scene->addModel(filename, pbrlib::Transform::translate(pbrlib::math::vec3(0, 0, 0)));
+            ptr_scene->import("", ptr_engine);
 
             // auto ptr_light = ptr_scene->addLight(
             //     pbrlib::PointLight::Builder()
