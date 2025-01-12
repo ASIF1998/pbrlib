@@ -1,8 +1,13 @@
 #pragma once
 
-#include <filesystem>
+#include <backend/scene/mesh_component.hpp>
+
+#include <pbrlib/math/matrix4x4.hpp>
 
 #include <assimp/scene.h>
+
+#include <filesystem>
+#include <span>
 
 namespace pbrlib
 {
@@ -19,7 +24,15 @@ namespace pbrlib
 {
     class AssimpImporter
     {
+        friend class ScopedTransform;
+
         void processNode(const aiScene* ptr_scene, const aiNode* ptr_node);
+
+        void add(
+            std::string_view                    name,
+            std::span<const VertexAttribute>    attributes, 
+            std::span<const uint32_t>           indices
+        );
 
     public:
         AssimpImporter() = default;
@@ -43,5 +56,10 @@ namespace pbrlib
         std::filesystem::path _filename;
 
         SceneItem* ptr_root_item = nullptr;
+
+        struct 
+        {
+            pbrlib::math::mat4 transform;
+        } _current_state;
     };
 }

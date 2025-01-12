@@ -7,7 +7,7 @@
 
 namespace pbrlib
 {
-    class VertexAttribute
+    struct VertexAttribute
     {
         pbrlib::math::vec3 pos;
         pbrlib::math::vec3 normal;
@@ -15,7 +15,7 @@ namespace pbrlib
         pbrlib::math::vec2 uv;
     };
 
-    class MeshComponent
+    struct MeshComponent
     {
         vk::Buffer  vertex_buffer;
         uint32_t    vertex_count = 0;

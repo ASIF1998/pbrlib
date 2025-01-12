@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 
 #include <vector>
+#include <span>
 
 #include <string>
 #include <string_view>
@@ -31,8 +32,15 @@ namespace pbrlib::vk
         Buffer& operator = (Buffer&& buffer);
         Buffer& operator = (const Buffer& buffer) = delete;
 
-        VkBuffer        handle;
-        VkDeviceSize    size;
+        template<typename T>
+        bool write(std::span<const T> data, VkDeviceSize offset)
+        {
+            /// @todo
+            return true;            
+        }
+
+        VkBuffer        handle  = VK_NULL_HANDLE;
+        VkDeviceSize    size    = 0;
 
     private:
         const Device* _ptr_device;

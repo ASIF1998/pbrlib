@@ -56,8 +56,8 @@ namespace pbrlib
 
         Camera _camera;
 
-        Scene _scene;
-
         std::unique_ptr<FrameGraph> _ptr_frame_graph;
+
+        Scene _scene;
     };
 }

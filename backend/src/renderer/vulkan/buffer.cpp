@@ -12,9 +12,9 @@ namespace pbrlib::vk
     { }
 
     Buffer::Buffer(Buffer&& buffer) :
-        _ptr_device (buffer._ptr_device),
-        size        (buffer.size)
+        _ptr_device (buffer._ptr_device)
     {
+        std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
     }
@@ -28,8 +28,8 @@ namespace pbrlib::vk
     Buffer& Buffer::operator = (Buffer&& buffer)
     {
         _ptr_device = buffer._ptr_device;
-        size        = buffer.size;
 
+        std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
 
