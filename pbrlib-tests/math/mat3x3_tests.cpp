@@ -34,9 +34,9 @@ TEST(Mat3Tests, Constructor)
         3, 4, 5
     };
 
-    pbrlib::testing::utils::equality(m1, r1);
-    pbrlib::testing::utils::equality(m2, r2);
-    pbrlib::testing::utils::equality(m3, r3);
+    pbrlib::testing::equality(m1, r1);
+    pbrlib::testing::equality(m2, r2);
+    pbrlib::testing::equality(m3, r3);
 }
 
 TEST(Mat3Tests, EqualAndNotEqual)
@@ -53,11 +53,11 @@ TEST(Mat3Tests, EqualAndNotEqual)
         3, 4, 5
     );
 
-    pbrlib::testing::utils::thisTrue(m1 == m2);
+    pbrlib::testing::thisTrue(m1 == m2);
 
     m2.at(1, 2) = 60;
 
-    pbrlib::testing::utils::thisTrue(m1 != m2);
+    pbrlib::testing::thisTrue(m1 != m2);
 }
 
 TEST(Mat3Tests, AdditionAndSubtraction)
@@ -67,20 +67,20 @@ TEST(Mat3Tests, AdditionAndSubtraction)
 
     Matrix3x3<short> res = m1 + m2;
 
-    pbrlib::testing::utils::equality(Matrix3x3<short>(60), res);
+    pbrlib::testing::equality(Matrix3x3<short>(60), res);
 
     res = m1 - m2;
 
-    pbrlib::testing::utils::equality(Matrix3x3<short>(-14), res);
+    pbrlib::testing::equality(Matrix3x3<short>(-14), res);
 
     res =   m1;
     res +=  m2;
 
-    pbrlib::testing::utils::equality(Matrix3x3<short>(60), res);
+    pbrlib::testing::equality(Matrix3x3<short>(60), res);
 
     res -= m2;
 
-    pbrlib::testing::utils::equality(Matrix3x3<short>(23), res);
+    pbrlib::testing::equality(Matrix3x3<short>(23), res);
 }
 
 TEST(Mat3Tests, ScalarMultiplication)
@@ -90,11 +90,11 @@ TEST(Mat3Tests, ScalarMultiplication)
 
     Matrix3x3<int> res = m * s;
 
-    pbrlib::testing::utils::equality(Matrix3x3<int>(32), res);
+    pbrlib::testing::equality(Matrix3x3<int>(32), res);
     
     res *= s;
 
-    pbrlib::testing::utils::equality(Matrix3x3<int>(64), res);
+    pbrlib::testing::equality(Matrix3x3<int>(64), res);
 }
 
 TEST(Mat3Tests, MatrixMultiplication)
@@ -119,12 +119,12 @@ TEST(Mat3Tests, MatrixMultiplication)
         1417.18062f, 3591.0337f, 10855.3154f  
     };
 
-    pbrlib::testing::utils::equality(r, res);
+    pbrlib::testing::equality(r, res);
 
     r =     m1;
     r *=    m2;
 
-    pbrlib::testing::utils::equality(r, res);
+    pbrlib::testing::equality(r, res);
 }
 
 TEST(Mat3Tests, MatrixAndVectorMultiplication)
@@ -139,7 +139,7 @@ TEST(Mat3Tests, MatrixAndVectorMultiplication)
 
     ivec3 res (226, 175, 81);
 
-    pbrlib::testing::utils::equality(res, m * v);
+    pbrlib::testing::equality(res, m * v);
 }   
 
 TEST(Mat3Tests, AccessToElement)
@@ -158,13 +158,13 @@ TEST(Mat3Tests, AccessToElement)
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            pbrlib::testing::utils::equality(r[i * 3 + j], m[i][j]);
+            pbrlib::testing::equality(r[i * 3 + j], m[i][j]);
         }
     }
 
     for (size_t i{0}; i < 3; i++) {
         for (size_t j{0}; j < 3; j++) {
-            pbrlib::testing::utils::equality(r[i * 3 + j], m.at(i, j));
+            pbrlib::testing::equality(r[i * 3 + j], m.at(i, j));
         }
     }
 }
@@ -179,7 +179,7 @@ TEST(Mat3Tests, Determinant)
     
     constexpr float r = -69.1700058f;
 
-    pbrlib::testing::utils::equality(r, m.det());
+    pbrlib::testing::equality(r, m.det());
 }
 
 TEST(Mat3Tests, Transpose)
@@ -196,11 +196,11 @@ TEST(Mat3Tests, Transpose)
         3.5f, 1.2f, 12.3f
     };
 
-    pbrlib::testing::utils::equality(res, transpose(m));
+    pbrlib::testing::equality(res, transpose(m));
 
     m.transpose();
 
-    pbrlib::testing::utils::equality(res, m);
+    pbrlib::testing::equality(res, m);
 }
 
 TEST(Mat3Tests, Inverse)
@@ -217,5 +217,5 @@ TEST(Mat3Tests, Inverse)
         0.2859621050f, -0.20818272200000f, 0.020239988300000f
     };
 
-    pbrlib::testing::utils::equality(res, inverse(m));
+    pbrlib::testing::equality(res, inverse(m));
 }

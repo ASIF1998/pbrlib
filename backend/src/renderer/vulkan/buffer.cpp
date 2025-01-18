@@ -7,7 +7,7 @@
 
 namespace pbrlib::vk
 {
-    Buffer::Buffer(const Device* ptr_device) :
+    Buffer::Buffer(Device* ptr_device) :
         _ptr_device (ptr_device)
     { }
 
@@ -35,11 +35,64 @@ namespace pbrlib::vk
 
         return *this;
     }
+
+    void Buffer::write(const uint8_t* ptr_data, size_t size, VkDeviceSize offset)
+    {
+        auto temp_buffer = Buffer::Builder(_ptr_device)
+            .size(size)
+            .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .build();
+
+        uint8_t* ptr_dst = nullptr;
+
+        VK_CHECK(
+            vmaMapMemory(
+                _ptr_device->vmaAllocator(),
+                temp_buffer._allocation,
+                reinterpret_cast<void**>(&ptr_dst)
+            )
+        );
+
+        memcpy(ptr_dst, ptr_data, size);
+
+        vmaUnmapMemory(_ptr_device->vmaAllocator(), temp_buffer._allocation);
+
+        auto command_buffer = _ptr_device->oneTimeSubmitCommandBuffer(_ptr_device->queue(), "Copy data");
+        command_buffer.write([offset, size, &temp_buffer, this](VkCommandBuffer command_buffer_handle)
+        {
+            VkBufferCopy copy = { };
+            copy.dstOffset  = offset;
+            copy.srcOffset  = 0;
+            copy.size       = static_cast<VkDeviceSize>(size);
+
+            vkCmdCopyBuffer(command_buffer_handle, temp_buffer.handle, handle, 1, &copy);
+        });
+
+        VkCommandBufferSubmitInfo buffer_submit_info = { };
+        buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+        buffer_submit_info.commandBuffer    = command_buffer.handle;
+
+        VkSubmitInfo2 submit_info = { };
+        submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+        submit_info.pCommandBufferInfos     = &buffer_submit_info;
+        submit_info.commandBufferInfoCount  = 1;
+
+        VK_CHECK(
+            vkQueueSubmit2(
+                _ptr_device->queue().handle,
+                1, &submit_info,
+                VK_NULL_HANDLE
+            )
+        );
+
+        VK_CHECK(vkDeviceWaitIdle(_ptr_device->device()));
+    }
 }
 
 namespace pbrlib::vk
 {
-    Buffer::Builder::Builder(const Device* ptr_device) :
+    Buffer::Builder::Builder(Device* ptr_device) :
         _ptr_device(ptr_device)
     { }
 

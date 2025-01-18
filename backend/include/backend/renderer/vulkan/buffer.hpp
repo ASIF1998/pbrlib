@@ -18,7 +18,9 @@ namespace pbrlib::vk
 {
     class Buffer final
     {
-        explicit Buffer(const Device* ptr_device);
+        explicit Buffer(Device* ptr_device);
+
+        void write(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
 
     public:
         class Builder;
@@ -33,18 +35,23 @@ namespace pbrlib::vk
         Buffer& operator = (const Buffer& buffer) = delete;
 
         template<typename T>
-        bool write(std::span<const T> data, VkDeviceSize offset)
+        void write(std::span<const T> data, VkDeviceSize offset)
         {
-            /// @todo
-            return true;            
+            write(reinterpret_cast<const uint8_t*>(data.data()), data.size_bytes(), offset);
+        }
+
+        template<typename T>
+        void write(const T& obj, VkDeviceSize offset)
+        {
+            write(reinterpret_cast<const uint8_t*>(&obj), sizeof(T), offset);
         }
 
         VkBuffer        handle  = VK_NULL_HANDLE;
         VkDeviceSize    size    = 0;
 
     private:
-        const Device* _ptr_device;
-        VmaAllocation _allocation = VK_NULL_HANDLE;
+        Device*         _ptr_device;
+        VmaAllocation   _allocation = VK_NULL_HANDLE;
     };
 
     class Buffer::Builder final
@@ -54,7 +61,7 @@ namespace pbrlib::vk
         VkSharingMode sharingMode() const;
 
     public:
-        explicit Builder(const Device* ptr_device);
+        explicit Builder(Device* ptr_device);
 
         Builder(Builder&& builder)      = delete;
         Builder(const Builder& builder) = delete;
@@ -71,7 +78,7 @@ namespace pbrlib::vk
         [[nodiscard]] Buffer build();
 
     private:
-        const Device* _ptr_device;
+        Device* _ptr_device;
 
         std::vector<uint32_t> _queues;
 

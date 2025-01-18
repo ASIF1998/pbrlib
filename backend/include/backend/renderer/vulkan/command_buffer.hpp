@@ -6,7 +6,8 @@
 
 namespace pbrlib::vk
 {
-    class Device;
+    class   Device;
+    struct  Queue;
 }
 
 namespace pbrlib::vk
@@ -24,12 +25,9 @@ namespace pbrlib::vk
         CommandBuffer& operator = (CommandBuffer&& command_buffer);
         CommandBuffer& operator = (const CommandBuffer& command_buffer) = delete;
 
-        [[maybe_unused]] [[nodiscard]] VkCommandBufferLevel level() const noexcept;
-
         void write(const std::function<void (VkCommandBuffer command_buffer)>& callback);
 
-    private:
-        VkCommandBuffer         _handle = VK_NULL_HANDLE;
-        VkCommandBufferLevel    _level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
+        VkCommandBuffer         handle  = VK_NULL_HANDLE;
+        VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
     };
 }

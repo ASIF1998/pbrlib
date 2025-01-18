@@ -18,7 +18,7 @@
 
 using namespace testing;
 
-namespace pbrlib::testing::utils
+namespace pbrlib::testing
 {
     template<typename Type>
     inline void notEquality(const Type& v1, const Type& v2)
@@ -340,7 +340,7 @@ namespace pbrlib::testing::utils
     }
 }
 
-namespace pbrlib::testing::vk::utils
+namespace pbrlib::testing::vk
 {
     inline void isSuccess(VkResult result)
     {

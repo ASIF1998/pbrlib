@@ -12,20 +12,20 @@ TEST(Vec2Tests, EqualAndNotEqual)
     ivec2 v3 (1, 3);
     ivec2 v4 (1, 3);
 
-    pbrlib::testing::utils::equality(v1, v2);
-    pbrlib::testing::utils::equality(v3, v4);
+    pbrlib::testing::equality(v1, v2);
+    pbrlib::testing::equality(v3, v4);
 
-    pbrlib::testing::utils::thisTrue(v1 == v2);
-    pbrlib::testing::utils::thisTrue(v3 == v4);
+    pbrlib::testing::thisTrue(v1 == v2);
+    pbrlib::testing::thisTrue(v3 == v4);
 
     v1[0] = 4.0f;
     v3[0] = 4;
 
-    pbrlib::testing::utils::notEquality(v1, v2);
-    pbrlib::testing::utils::notEquality(v3, v4);
+    pbrlib::testing::notEquality(v1, v2);
+    pbrlib::testing::notEquality(v3, v4);
 
-    pbrlib::testing::utils::thisTrue(v1 != v2);
-    pbrlib::testing::utils::thisTrue(v3 != v4);
+    pbrlib::testing::thisTrue(v1 != v2);
+    pbrlib::testing::thisTrue(v3 != v4);
 }
 
 TEST(Vec2Tests, AdditionAndSubtraction)
@@ -37,20 +37,20 @@ TEST(Vec2Tests, AdditionAndSubtraction)
 
     vec2 res3 = v1 + v2;
 
-    pbrlib::testing::utils::equality(res1, res3);
+    pbrlib::testing::equality(res1, res3);
 
     v1 += v2;
 
-    pbrlib::testing::utils::equality(res1, v1);
+    pbrlib::testing::equality(res1, v1);
 
     v1 -= v2;
 
-    pbrlib::testing::utils::equality(res2, v1);
+    pbrlib::testing::equality(res2, v1);
 
     res2 -= v2;
     res3 =  v1 - v2;
 
-    pbrlib::testing::utils::equality(res2, res3);
+    pbrlib::testing::equality(res2, res3);
 }
 
 TEST(Vec2Tests, Multiplication)
@@ -59,22 +59,22 @@ TEST(Vec2Tests, Multiplication)
     constexpr vec2   res     (4.0f, 6.0f);
     constexpr float         s       (2.0f);
 
-    pbrlib::testing::utils::equality(res, v * s);
+    pbrlib::testing::equality(res, v * s);
 
     v *= s;
 
-    pbrlib::testing::utils::equality(res, v);
+    pbrlib::testing::equality(res, v);
 }
 
 TEST(Vec2Tests, AccessToElement)
 {
     constexpr ivec2 v (4, 1232);
 
-    pbrlib::testing::utils::equality(4, v.x);
-    pbrlib::testing::utils::equality(1232, v.y);
+    pbrlib::testing::equality(4, v.x);
+    pbrlib::testing::equality(1232, v.y);
 
-    pbrlib::testing::utils::equality(4, v[0]);
-    pbrlib::testing::utils::equality(1232, v[1]);
+    pbrlib::testing::equality(4, v[0]);
+    pbrlib::testing::equality(1232, v[1]);
 }
 
 TEST(Vec2Tests, Length)
@@ -82,8 +82,8 @@ TEST(Vec2Tests, Length)
     constexpr vec2 v1 (3434.323f, 121.5454f);
     constexpr vec2 v2 (0.132323f, 76.43400f);
 
-    pbrlib::testing::utils::equality(3436.473156098f, v1.length());
-    pbrlib::testing::utils::equality(76.43411453f, v2.length());
+    pbrlib::testing::equality(3436.473156098f, v1.length());
+    pbrlib::testing::equality(76.43411453f, v2.length());
 }
 
 TEST(Vec2Tests, Normalize)
@@ -94,6 +94,6 @@ TEST(Vec2Tests, Normalize)
     constexpr vec2 r1 (0.9949848650f, 0.100025222f);
     constexpr vec2 r2 (0.0017312034f, 0.999998509f);
     
-    pbrlib::testing::utils::equality(r1, normalize(v1));
-    pbrlib::testing::utils::equality(r2, normalize(v2));
+    pbrlib::testing::equality(r1, normalize(v1));
+    pbrlib::testing::equality(r2, normalize(v2));
 }

@@ -293,15 +293,15 @@ namespace pbrlib::vk
 
         CommandBuffer command_buffer;
 
-        VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer._handle));
+        VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer.handle));
 
-        command_buffer._level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        command_buffer.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
         if (!name.empty())
         {
             VkDebugUtilsObjectNameInfoEXT name_info = { };
             name_info.sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer._handle);
+            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer.handle);
             name_info.objectType    = VK_OBJECT_TYPE_COMMAND_BUFFER;
             name_info.pObjectName   = name.data();
 

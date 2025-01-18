@@ -9,18 +9,13 @@ namespace pbrlib::vk
 {
     CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer)
     {
-        std::swap(command_buffer._handle, _handle);
+        std::swap(command_buffer.handle, handle);
     }
 
     CommandBuffer& CommandBuffer::operator = (CommandBuffer&& command_buffer)
     {
-        std::swap(_handle, command_buffer._handle);
+        std::swap(handle, command_buffer.handle);
         return *this;
-    }
-
-    VkCommandBufferLevel CommandBuffer::level() const noexcept
-    {
-        return _level;
     }
 
     void CommandBuffer::write(const std::function<void (VkCommandBuffer command_buffer)>& callback)
@@ -32,8 +27,8 @@ namespace pbrlib::vk
         begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-        VK_CHECK(vkBeginCommandBuffer(_handle, &begin_info));
-        callback(_handle);
-        vkEndCommandBuffer(_handle);
+        VK_CHECK(vkBeginCommandBuffer(handle, &begin_info));
+        callback(handle);
+        vkEndCommandBuffer(handle);
     }
 }

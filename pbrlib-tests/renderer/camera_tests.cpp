@@ -6,9 +6,9 @@ TEST(CameraTests, Ctor)
 {
     pbrlib::Camera camera;
 
-    pbrlib::testing::utils::equality(camera.pos(), pbrlib::math::vec3(0, 0, -1));
-    pbrlib::testing::utils::equality(camera.eye(), pbrlib::math::vec3(0, 0, 0));
-    pbrlib::testing::utils::equality(camera.up(), pbrlib::math::vec3(0, 1, 0));
+    pbrlib::testing::equality(camera.pos(), pbrlib::math::vec3(0, 0, -1));
+    pbrlib::testing::equality(camera.eye(), pbrlib::math::vec3(0, 0, 0));
+    pbrlib::testing::equality(camera.up(), pbrlib::math::vec3(0, 1, 0));
 
     EXPECT_NEAR(camera.range().near, 0.0f, 0.0001f);
     EXPECT_TRUE(std::isinf(camera.range().far));
@@ -38,9 +38,9 @@ TEST(CameraTests, SettersAndGetters)
     camera.fovY(fov_y);
     camera.aspect(aspect);
 
-    pbrlib::testing::utils::equality(camera.pos(), pos);
-    pbrlib::testing::utils::equality(camera.eye(), eye);
-    pbrlib::testing::utils::equality(camera.up(), up);
+    pbrlib::testing::equality(camera.pos(), pos);
+    pbrlib::testing::equality(camera.eye(), eye);
+    pbrlib::testing::equality(camera.up(), up);
 
     EXPECT_NEAR(camera.range().near, near, 0.0001f);
     EXPECT_NEAR(camera.range().far, far, 0.0001f);
@@ -63,7 +63,7 @@ TEST(CameraTests, ViewMatrix)
         29.1380f, -81.1443f, -25.7985f, 1.0000f
     };
 
-    pbrlib::testing::utils::equality(camera.view(), view_matrix);
+    pbrlib::testing::equality(camera.view(), view_matrix);
 }
 
 TEST(CameraTests, ProjectionMatrix)
@@ -80,5 +80,5 @@ TEST(CameraTests, ProjectionMatrix)
         0.0000f, 0.0000f, -0.0032f, 0.0000f
     };
 
-    pbrlib::testing::utils::equality(camera.projection(), projection_matrix);
+    pbrlib::testing::equality(camera.projection(), projection_matrix);
 }

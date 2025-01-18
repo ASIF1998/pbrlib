@@ -38,9 +38,9 @@ TEST(Mat4Tests, Constructor)
         8, 6, 3, 1
     };
 
-    pbrlib::testing::utils::equality(m1, r1);
-    pbrlib::testing::utils::equality(m2, r2);
-    pbrlib::testing::utils::equality(m3, r3);
+    pbrlib::testing::equality(m1, r1);
+    pbrlib::testing::equality(m2, r2);
+    pbrlib::testing::equality(m3, r3);
 }
 
 TEST(Mat4Tests, ConstructorTypeFloat)
@@ -76,9 +76,9 @@ TEST(Mat4Tests, ConstructorTypeFloat)
         23.8f, 2.46f, 3.53f, 13.4f
     };
 
-    pbrlib::testing::utils::equality(m1, r1);
-    pbrlib::testing::utils::equality(m2, r2);
-    pbrlib::testing::utils::equality(m3, r3);
+    pbrlib::testing::equality(m1, r1);
+    pbrlib::testing::equality(m2, r2);
+    pbrlib::testing::equality(m3, r3);
 }
 
 TEST(Mat4Tests, EqualAndNotEqual)
@@ -97,11 +97,11 @@ TEST(Mat4Tests, EqualAndNotEqual)
         1, 5, 6, 4
     };
 
-    pbrlib::testing::utils::thisTrue(m1 == m2);
+    pbrlib::testing::thisTrue(m1 == m2);
 
     m2.at(2, 3) = 23;
 
-    pbrlib::testing::utils::thisTrue(m1 != m2);
+    pbrlib::testing::thisTrue(m1 != m2);
 }
 
 TEST(Mat4Tests, EqualAndNotEqualTypeFloat)
@@ -120,11 +120,11 @@ TEST(Mat4Tests, EqualAndNotEqualTypeFloat)
         23.8f, 2.46f, 3.53f, 13.4f
     };
 
-    pbrlib::testing::utils::thisTrue(m1 == m2);
+    pbrlib::testing::thisTrue(m1 == m2);
 
     m2.at(2, 3) = 23.23f;
 
-    pbrlib::testing::utils::thisTrue(m1 != m2);
+    pbrlib::testing::thisTrue(m1 != m2);
 }
 
 TEST(Mat4Tests, AdditionAndSubtraction)
@@ -134,20 +134,20 @@ TEST(Mat4Tests, AdditionAndSubtraction)
 
     Matrix4x4<short> res = m1 + m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<short>(60), res);
+    pbrlib::testing::equality(Matrix4x4<short>(60), res);
 
     res = m1 - m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<short>(-14), res);
+    pbrlib::testing::equality(Matrix4x4<short>(-14), res);
 
     res =   m1;
     res +=  m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<short>(60), res);
+    pbrlib::testing::equality(Matrix4x4<short>(60), res);
 
     res -= m2;
 
-    pbrlib::testing::utils::equality(Matrix4x4<short>(23), res);
+    pbrlib::testing::equality(Matrix4x4<short>(23), res);
 }
 
 TEST(Mat4Tests, AdditionAndSubtractionTypeFloat)
@@ -157,20 +157,20 @@ TEST(Mat4Tests, AdditionAndSubtractionTypeFloat)
 
     mat4 res = m1 + m2;
 
-    pbrlib::testing::utils::equality(mat4(60.0f), res);
+    pbrlib::testing::equality(mat4(60.0f), res);
 
     res = m1 - m2;
 
-    pbrlib::testing::utils::equality(mat4(-14.0f), res);
+    pbrlib::testing::equality(mat4(-14.0f), res);
 
     res =   m1;
     res +=  m2;
 
-    pbrlib::testing::utils::equality(mat4(60.0f), res);
+    pbrlib::testing::equality(mat4(60.0f), res);
 
     res -= m2;
 
-    pbrlib::testing::utils::equality(mat4(23.0f), res);
+    pbrlib::testing::equality(mat4(23.0f), res);
 }
 
 TEST(Mat4Tests, ScalarMultiplication)
@@ -180,11 +180,11 @@ TEST(Mat4Tests, ScalarMultiplication)
 
     Matrix4x4<int> res = m * s;
 
-    pbrlib::testing::utils::equality(Matrix4x4<int>(32), res);
+    pbrlib::testing::equality(Matrix4x4<int>(32), res);
 
     res *= s;
 
-    pbrlib::testing::utils::equality(Matrix4x4<int>(64), res);
+    pbrlib::testing::equality(Matrix4x4<int>(64), res);
 }
 
 TEST(Mat4Tests, ScalarMultiplicationTypeFloat)
@@ -194,11 +194,11 @@ TEST(Mat4Tests, ScalarMultiplicationTypeFloat)
 
     mat4 res = m * s;
 
-    pbrlib::testing::utils::equality(mat4(33.0f), res);
+    pbrlib::testing::equality(mat4(33.0f), res);
 
     res *= s;
 
-    pbrlib::testing::utils::equality(mat4(66.0f), res);
+    pbrlib::testing::equality(mat4(66.0f), res);
 }
 
 TEST(Mat4Tests, MatrixMultiplication)
@@ -226,12 +226,12 @@ TEST(Mat4Tests, MatrixMultiplication)
         106, 76, 63, 61
     };
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 
     r1 =     m1;
     r1 *=    m2;
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 }
 
 TEST(Mat4Tests, MatrixMultiplicationTypeFloat)
@@ -259,12 +259,12 @@ TEST(Mat4Tests, MatrixMultiplicationTypeFloat)
         45.0000000f, 40.0000000f, 55.0000000f, 33.0000000f
     };
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 
     r1 =     m1;
     r1 *=    m2;
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 }
 
 TEST(Mat4Tests, MatrixAndVectorMultiplication)
@@ -281,7 +281,7 @@ TEST(Mat4Tests, MatrixAndVectorMultiplication)
 
     ivec4 r2 = m * v;
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 }
 
 TEST(Mat4Tests, MatrixAndVectorMultiplicationTypeFloat)
@@ -298,7 +298,7 @@ TEST(Mat4Tests, MatrixAndVectorMultiplicationTypeFloat)
 
     vec4 r2 = m * v;
 
-    pbrlib::testing::utils::equality(r1, r2);
+    pbrlib::testing::equality(r1, r2);
 }
 
 TEST(Mat4Tests, AccessToElement)
@@ -319,13 +319,13 @@ TEST(Mat4Tests, AccessToElement)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            pbrlib::testing::utils::equality(r[i * 4 + j], m[i][j]);
+            pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
         }
     }
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            pbrlib::testing::utils::equality(r[i * 4 + j], m.at(i, j));
+            pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
         }
     }
 }
@@ -348,13 +348,13 @@ TEST(Mat4Tests, AccessToElementTypeFloat)
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            pbrlib::testing::utils::equality(r[i * 4 + j], m[i][j]);
+            pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
         }
     }
 
     for (size_t i{0}; i < 4; i++) {
         for (size_t j{0}; j < 4; j++) {
-            pbrlib::testing::utils::equality(r[i * 4 + j], m.at(i, j));
+            pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
         }
     }
 }
@@ -370,7 +370,7 @@ TEST(Mat4Tests, Determinant)
 
     constexpr int r = 30;
 
-    pbrlib::testing::utils::equality(r, m.det());
+    pbrlib::testing::equality(r, m.det());
 }
 
 TEST(Mat4Tests, DeterminantTypeFloat)
@@ -384,7 +384,7 @@ TEST(Mat4Tests, DeterminantTypeFloat)
 
     constexpr float r = 1614.28f;
 
-    pbrlib::testing::utils::equality(r, m.det());
+    pbrlib::testing::equality(r, m.det());
 }
 
 TEST(Mat4Tests, Transpose)
@@ -403,11 +403,11 @@ TEST(Mat4Tests, Transpose)
         4, 3, 2, 2
     };
 
-    pbrlib::testing::utils::equality(r, transpose(m));
+    pbrlib::testing::equality(r, transpose(m));
 
     m.transpose();
 
-    pbrlib::testing::utils::equality(r, m);
+    pbrlib::testing::equality(r, m);
 }
 
 TEST(Mat4Tests, TransposeTypeFloat)
@@ -426,11 +426,11 @@ TEST(Mat4Tests, TransposeTypeFloat)
         4.0f, 3.0f, 2.0f, 2.0f
     };
 
-    pbrlib::testing::utils::equality(r, transpose(m));
+    pbrlib::testing::equality(r, transpose(m));
 
     m.transpose();
 
-    pbrlib::testing::utils::equality(r, m);
+    pbrlib::testing::equality(r, m);
 }
 
 TEST(Mat4Tests, Inverse)
@@ -449,7 +449,7 @@ TEST(Mat4Tests, Inverse)
         -3, 3, -2, 2
     };
 
-    pbrlib::testing::utils::equality(r, inverse(m));
+    pbrlib::testing::equality(r, inverse(m));
 }
 
 TEST(Mat4Tests, InverseTypeFloat)
@@ -468,5 +468,5 @@ TEST(Mat4Tests, InverseTypeFloat)
         -2.99999619f, 3.1538419700f, -2.84615016f, 1.999997380f
     };
 
-    pbrlib::testing::utils::equality(r, inverse(m));
+    pbrlib::testing::equality(r, inverse(m));
 }

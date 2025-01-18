@@ -87,7 +87,7 @@ TEST_F(VulkanDeviceTests, CmdBuffer)
     ASSERT_NE(queue.handle, VK_NULL_HANDLE);
 
     auto cmd_buffer = device.oneTimeSubmitCommandBuffer(queue);
-    EXPECT_EQ(cmd_buffer.level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+    EXPECT_EQ(cmd_buffer.level, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
     cmd_buffer.write([](VkCommandBuffer handle)
     {
@@ -129,7 +129,7 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
     descriptor_set_layout_info.pBindings    = bindings.data();
     descriptor_set_layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
 
-    pbrlib::testing::vk::utils::isSuccess(vkCreateDescriptorSetLayout(device.device(), &descriptor_set_layout_info, nullptr, &descriptor_set_layout));
+    pbrlib::testing::vk::isSuccess(vkCreateDescriptorSetLayout(device.device(), &descriptor_set_layout_info, nullptr, &descriptor_set_layout));
 
     auto descriptor_set = device.allocate(descriptor_set_layout);
     EXPECT_NE(descriptor_set.handle, VK_NULL_HANDLE);
