@@ -6,6 +6,7 @@
 #include <backend/logger/logger.hpp>
 
 #include <backend/renderer/frame_graph.hpp>
+#include <backend/renderer/vulkan/device.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -13,35 +14,21 @@
 
 namespace pbrlib
 {
+    uint8_t Engine::num_engine_instances = 0;
+}
+
+namespace pbrlib
+{
     Engine::Engine(const Config& config) :
         _scene (config.title)
     {
-        init(config);
+        if (num_engine_instances > 0)
+            throw std::runtime_error("The Engine class must exist in a single instance");
 
-        if (config.drawInWindow) {
-            _window = Window::Builder()
-                .title(config.title)
-                .size(config.width, config.height)
-                .resizable(false)
-                .build();
-            
-            _ptr_frame_graph = std::make_unique<FrameGraph>(&_window.value());
-        }
-        else
-            _ptr_frame_graph = std::make_unique<FrameGraph>(config.width, config.height);
-    }
+        ++num_engine_instances;
 
-    Engine::~Engine()
-    {
-        SDL_Quit();
-    }
-
-    void Engine::init(const Config& config)
-    {
-        static bool is_init = false;
-
-        if (is_init)
-            return ;
+        pbrlib::log::priv::EngineLogger::init();
+        pbrlib::log::priv::AppLogger::init();
 
         if (config.drawInWindow && SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
         {
@@ -51,10 +38,32 @@ namespace pbrlib
             throw std::runtime_error(std::format("Failed initialize SDL: {}", error_msg));
         }
 
-        pbrlib::log::priv::EngineLogger::init();
-        pbrlib::log::priv::AppLogger::init();
+        _ptr_device = std::make_unique<vk::Device>();
 
-        is_init = true;
+        if (config.drawInWindow) {
+            _window = Window::Builder()
+                .title(config.title)
+                .size(config.width, config.height)
+                .resizable(false)
+                .build();
+            
+            _ptr_device->init(&_window.value());
+            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), &_window.value());
+        }
+        else
+        {
+            _ptr_device->init(nullptr);
+            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), config.width, config.height);
+        }
+    }
+
+    Engine::~Engine()
+    {
+        log::engine::info("Destroy engine");
+
+        SDL_Quit();
+
+        --num_engine_instances;
     }
 
     void Engine::resize(uint32_t width, uint32_t height)

@@ -9,6 +9,11 @@
 #include <optional>
 #include <memory>
 
+namespace pbrlib::vk
+{
+    class Device;
+}
+
 namespace pbrlib
 {
     struct  Config;
@@ -26,8 +31,6 @@ namespace pbrlib
     class Engine final
     {
         friend class Scene;
-
-        void init(const Config& config);
 
     public:
         explicit Engine(const Config& config);
@@ -57,7 +60,10 @@ namespace pbrlib
         Camera _camera;
 
         std::unique_ptr<FrameGraph> _ptr_frame_graph;
+        std::unique_ptr<vk::Device> _ptr_device;
 
         Scene _scene;
+
+        static uint8_t num_engine_instances;
     };
 }

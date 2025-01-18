@@ -1,6 +1,5 @@
 #pragma once
 
-#include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <pbrlib/math/vec3.hpp>
@@ -30,10 +29,10 @@ namespace pbrlib
     {
     public:
         [[maybe_unused]]
-        explicit FrameGraph(uint32_t width, uint32_t height);
+        explicit FrameGraph(vk::Device* ptr_device, uint32_t width, uint32_t height);
 
         [[maybe_unused]]
-        explicit FrameGraph(const Window* ptr_window);
+        explicit FrameGraph(vk::Device* ptr_device, const Window* ptr_window);
 
         FrameGraph(FrameGraph&& frame_graph)        = delete;
         FrameGraph(const FrameGraph& frame_graph)   = delete;
@@ -41,14 +40,13 @@ namespace pbrlib
         FrameGraph& operator = (FrameGraph&& frame_graph)       = delete;
         FrameGraph& operator = (const FrameGraph& frame_graph)  = delete;
 
-        [[nodiscard]] vk::Device& device() noexcept;
         // vk::Image render();
 
         [[nodiscard]]
         const Size& size() const noexcept;
 
     private:
-        vk::Device _device;
+        vk::Device* _ptr_device;
         
         Size _size;
     };

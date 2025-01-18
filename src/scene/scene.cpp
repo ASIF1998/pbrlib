@@ -126,7 +126,7 @@ namespace pbrlib
         log::engine::info("[Importer] Load model: '{}'", filename.string());
 
         return AssimpImporter()
-            .device(&ptr_engine->_ptr_frame_graph->device())
+            .device(ptr_engine->_ptr_device.get())
             .scene(this)
             .filename(filename)
             .import();
