@@ -77,6 +77,11 @@ namespace pbrlib
         for (auto& child: _children)
             child.update(input_stay, delta_time, transform);
     }
+
+    void SceneItem::visit(SceneVisitor* ptr_visitor)
+    {
+        /// @todo
+    }
 }
 
 namespace pbrlib 

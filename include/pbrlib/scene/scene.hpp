@@ -2,6 +2,8 @@
 
 #include <pbrlib/transform.hpp>
 
+#include <pbrlib/scene/visitor.hpp>
+
 #include <entt/entt.hpp>
 
 #include <memory>
@@ -51,6 +53,8 @@ namespace pbrlib
             const Transform&    world_transform
         );
 
+        void visit(SceneVisitor* ptr_visitor);
+
     public:
         using UpdateCallback = std::function<void (
             SceneItem*          ptr_item, 
@@ -84,12 +88,12 @@ namespace pbrlib
 
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
-        protected:
-            entt::entity        _handle     = entt::null;
-            Scene*              _ptr_scene  = nullptr;
-            UpdateCallback      _update_callback;
-            
-            SceneItems _children;  
+    protected:
+        entt::entity        _handle     = entt::null;
+        Scene*              _ptr_scene  = nullptr;
+        UpdateCallback      _update_callback;
+        
+        SceneItems _children;  
     };
 
     class Scene final
@@ -112,6 +116,13 @@ namespace pbrlib
         [[maybe_unused]] bool import(const std::filesystem::path& filename, Engine* ptr_engine);
 
         void update(const InputStay& input_stay, float delta_time);
+
+        template<IsSceneVisitor T>
+        void visit(const std::unique_ptr<T>& ptr_visitor)
+        {
+            if (ptr_visitor && _root)
+                _root->visit(ptr_visitor.get());
+        }
 
     private:
         entt::registry              _registry;
