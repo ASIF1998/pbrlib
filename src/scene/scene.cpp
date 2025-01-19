@@ -80,7 +80,9 @@ namespace pbrlib
 
     void SceneItem::visit(SceneVisitor* ptr_visitor)
     {
-        /// @todo
+        ptr_visitor->process(this);
+        for (auto& child: _children)
+            child.visit(ptr_visitor);
     }
 }
 

@@ -1,4 +1,4 @@
-#include "../utils.hpp"
+#include "../utils/assertions.hpp"
 
 #include <pbrlib/rendering/camera.hpp>
 

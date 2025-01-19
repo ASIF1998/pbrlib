@@ -88,6 +88,11 @@ namespace pbrlib
 
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
+        const SceneItems& sceneItems() const noexcept
+        {
+            return _children;
+        }
+
     protected:
         entt::entity        _handle     = entt::null;
         Scene*              _ptr_scene  = nullptr;

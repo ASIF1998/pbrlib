@@ -1,4 +1,4 @@
-#include "../utils.hpp"
+#include "../utils/assertions.hpp"
 
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/vec3.hpp>

@@ -1,4 +1,4 @@
-#include "../utils.hpp"
+#include "../utils/assertions.hpp"
 
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/input/input_stay.hpp>
