@@ -15,9 +15,17 @@ namespace pbrlib::vk
 
 namespace pbrlib::vk
 {
+    struct ImageWriteData
+    {
+        uint8_t*        ptr_data    = nullptr;
+        int             width       = 0;
+        int             height      = 0;
+        VkFormat        format      = VK_FORMAT_UNDEFINED;
+    };
+
     class Image final
     {
-        explicit Image(const Device* ptr_device);
+        explicit Image(Device* ptr_device);
 
     public:
         class Builder;
@@ -31,6 +39,8 @@ namespace pbrlib::vk
         Image& operator = (Image&& image);
         Image& operator = (const Image& image) = delete;
 
+        void write(const ImageWriteData& data);
+
         VkImage     handle      = VK_NULL_HANDLE;
         VkImageView view_handle = VK_NULL_HANDLE;
         
@@ -42,8 +52,8 @@ namespace pbrlib::vk
         uint16_t    layer_count = 1;
 
     private:
-        const Device* _ptr_device;
-        VmaAllocation _allocation = VK_NULL_HANDLE;
+        Device*         _ptr_device;
+        VmaAllocation   _allocation = VK_NULL_HANDLE;
     };
 
     class Image::Builder final
@@ -54,7 +64,7 @@ namespace pbrlib::vk
         VkSharingMode sharingMode();
 
     public:
-        explicit Builder(const Device* ptr_device);
+        explicit Builder(Device* ptr_device);
 
         Builder(Builder&& builder)      = delete;
         Builder(const Builder& builder) = delete;
@@ -76,7 +86,7 @@ namespace pbrlib::vk
         [[nodiscard]] Image build();
 
     private:
-        const Device* _ptr_device;
+        Device* _ptr_device;
 
         uint32_t _width     = 0;
         uint32_t _height    = 0;

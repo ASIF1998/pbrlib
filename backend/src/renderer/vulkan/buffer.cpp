@@ -44,17 +44,17 @@ namespace pbrlib::vk
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
             .build();
 
-        uint8_t* ptr_dst = nullptr;
+        void* ptr_temp_buffer_memory = nullptr;
 
         VK_CHECK(
             vmaMapMemory(
                 _ptr_device->vmaAllocator(),
                 temp_buffer._allocation,
-                reinterpret_cast<void**>(&ptr_dst)
+                &ptr_temp_buffer_memory
             )
         );
 
-        memcpy(ptr_dst, ptr_data, size);
+        memcpy(ptr_temp_buffer_memory, ptr_data, size);
 
         vmaUnmapMemory(_ptr_device->vmaAllocator(), temp_buffer._allocation);
 
