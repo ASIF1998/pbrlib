@@ -89,6 +89,7 @@ namespace pbrlib::vk
             .size(image_size)
             .usage(temp_buffer_usage_flag)
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .type(BufferType::staging)
             .build();
 
         std::span<const uint8_t> image_data (data.ptr_data, image_size);
