@@ -8,7 +8,8 @@ namespace pbrlib::testing
 {
     GraphvizGenerator::GraphvizGenerator()
     {
-        _src << "digraph G {" << std::endl;
+        _src << "digraph {" << std::endl;
+        // _src << "layout=\"fdp\"" << std::endl;
     }
 
     void GraphvizGenerator::process(SceneItem* ptr_item)
@@ -22,7 +23,7 @@ namespace pbrlib::testing
         {
             const auto& child_tag = child.getComponent<TagComponent>();
 
-            _src << std::format("\"{}\" -> \"{}\"\n", tag.name, child_tag.name);
+            _src << std::format("\"{}\" -> \"{}\" [constraint=false];\n", tag.name, child_tag.name);
         }
 
         if (_ptr_root_item == ptr_item)
