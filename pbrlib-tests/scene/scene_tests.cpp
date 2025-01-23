@@ -10,6 +10,8 @@
 
 #include <optional>
 
+#include <fstream>
+
 TEST(SceneTests, Ctor)
 {
     pbrlib::Scene scene ("scene-tests");
@@ -37,4 +39,10 @@ TEST(SceneTests, JunkShopImport)
     scene.visit(ptr_graphviz_generator);
 
     auto graph = ptr_graphviz_generator->source();
+
+    std::ofstream file (pbrlib::utils::projectRoot() / "pbrlib-tests/content/graph.dot");
+    if (file)
+        file << ptr_graphviz_generator->source();
+
+    file.close();
 }
