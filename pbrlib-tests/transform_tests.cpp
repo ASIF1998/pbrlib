@@ -25,8 +25,8 @@ TEST(MovingTransform, Constructor)
     pbrlib::math::mat4 mt1 = t1.getMatrix();
     pbrlib::math::mat4 mt2 = t2.getMatrix();
 
-    pbrlib::testing::utils::equality(tm1, mt1);
-    pbrlib::testing::utils::equality(tm2, mt2);
+    pbrlib::testing::equality(tm1, mt1);
+    pbrlib::testing::equality(tm2, mt2);
 }
 
 TEST(MovingTransform, EqualAndNotEqual)
@@ -41,11 +41,11 @@ TEST(MovingTransform, EqualAndNotEqual)
     pbrlib::Transform t1;
     pbrlib::Transform t2;
 
-    pbrlib::testing::utils::thisTrue(t1 == t2);
+    pbrlib::testing::thisTrue(t1 == t2);
 
     t2.setMatrix(tm);
 
-    pbrlib::testing::utils::thisTrue(t1 != t2);
+    pbrlib::testing::thisTrue(t1 != t2);
 }
 
 TEST(MovingTransform, GetMatrixAndInverseMatrix)
@@ -61,12 +61,12 @@ TEST(MovingTransform, GetMatrixAndInverseMatrix)
 
     pbrlib::math::mat4 mt = t.getMatrix();
 
-    pbrlib::testing::utils::equality(tm, mt);
+    pbrlib::testing::equality(tm, mt);
 
     tm = inverse(tm);
     mt = t.getInverseMatrix();
 
-    pbrlib::testing::utils::equality(tm, mt);
+    pbrlib::testing::equality(tm, mt);
 }
 
 TEST(MovingTransform, Translate)
@@ -82,7 +82,7 @@ TEST(MovingTransform, Translate)
         0.5f, 0.5f, 0.5f, 1.0f
     );
 
-    pbrlib::testing::utils::equality(r, transform.getMatrix());
+    pbrlib::testing::equality(r, transform.getMatrix());
 }
 
 TEST(MovingTransform, Scale)
@@ -98,7 +98,7 @@ TEST(MovingTransform, Scale)
         0.0f, 0.0f, 0.0f, 1.0f
     );
 
-    pbrlib::testing::utils::equality(r, transform.getMatrix());
+    pbrlib::testing::equality(r, transform.getMatrix());
 }
 
 TEST(MovingTransform, Rotates)
@@ -128,12 +128,12 @@ TEST(MovingTransform, Rotates)
     auto res5 = ra2(v);
     auto res6 = ra3(v);
 
-    pbrlib::testing::utils::equality(r1, res1);
-    pbrlib::testing::utils::equality(r2, res2);
-    pbrlib::testing::utils::equality(r3, res3);
-    pbrlib::testing::utils::equality(r1, res4);
-    pbrlib::testing::utils::equality(r2, res5);
-    pbrlib::testing::utils::equality(r3, res6);
+    pbrlib::testing::equality(r1, res1);
+    pbrlib::testing::equality(r2, res2);
+    pbrlib::testing::equality(r3, res3);
+    pbrlib::testing::equality(r1, res4);
+    pbrlib::testing::equality(r2, res5);
+    pbrlib::testing::equality(r3, res6);
 }
 
 TEST(MovingTransform, LookAt)
@@ -151,7 +151,7 @@ TEST(MovingTransform, LookAt)
 
     auto look_at = pbrlib::Transform::lookAt(pos, eye, up);
 
-    pbrlib::testing::utils::equality(res, look_at.getMatrix());
+    pbrlib::testing::equality(res, look_at.getMatrix());
 }
 
 TEST(MovingTransform, PrespectiveProjection)
@@ -170,5 +170,5 @@ TEST(MovingTransform, PrespectiveProjection)
 
     auto perspective_projection = pbrlib::Transform::perspective(fov, aspect, z_near, z_far);
 
-    pbrlib::testing::utils::equality(res, perspective_projection.getMatrix());
+    pbrlib::testing::equality(res, perspective_projection.getMatrix());
 }

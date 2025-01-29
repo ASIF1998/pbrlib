@@ -1,7 +1,7 @@
 #pragma once
 
 #include <pbrlib/rendering/window.hpp>
-
+#include <pbrlib/scene/scene.hpp>
 #include <pbrlib/rendering/camera.hpp>
 
 #include <string_view>
@@ -9,11 +9,15 @@
 #include <optional>
 #include <memory>
 
+namespace pbrlib::vk
+{
+    class Device;
+}
+
 namespace pbrlib
 {
     struct  Config;
     class   Engine;
-    class   Scene;
     class   FrameGraph;
 }
 
@@ -26,18 +30,18 @@ namespace pbrlib
 {
     class Engine final
     {
-        void init(const Config& config);
+        friend class Scene;
 
     public:
         explicit Engine(const Config& config);
 
-        Engine(Engine&& engine);
-        Engine(const Engine& engine) = delete;
+        Engine(Engine&& engine)         = default;
+        Engine(const Engine& engine)    = delete;
 
         ~Engine();
 
-        Engine& operator = (Engine&& engine);
-        Engine& operator = (const Engine&& engine) = delete;
+        Engine& operator = (Engine&& engine)        = default;
+        Engine& operator = (const Engine&& engine)  = delete;
 
         void resize(uint32_t width, uint32_t height);
 
@@ -46,12 +50,7 @@ namespace pbrlib
 
         void setupCallback(SetupCallback setup_callback);
 
-#if 0
-        void preRenderCallback(PreRenderCallback callback);
-        void postRenderCallback(PostRenderCallback callback);
-#endif
-
-    void run();
+        void run();
 
     private:
         std::optional<Window> _window;
@@ -61,5 +60,10 @@ namespace pbrlib
         Camera _camera;
 
         std::unique_ptr<FrameGraph> _ptr_frame_graph;
+        std::unique_ptr<vk::Device> _ptr_device;
+
+        Scene _scene;
+
+        static uint8_t num_engine_instances;
     };
 }

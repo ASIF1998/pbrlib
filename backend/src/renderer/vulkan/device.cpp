@@ -8,7 +8,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#define VMA_IMPLEMENTATION
 #include <vma/vk_mem_alloc.h>
 
 #include <stdexcept>
@@ -17,7 +16,8 @@
 
 namespace pbrlib::vk::settings
 {   
-    constexpr bool vulkan_set_obj_name = false;
+    constexpr bool enable_vulkan_set_obj_name   = false;
+    constexpr bool enable_vulkan_debug_mode     = false;
 }
 
 namespace pbrlib::vk
@@ -43,7 +43,7 @@ namespace pbrlib::vk
 
     void Device::init(const Window* ptr_window)
     {
-        initInstance(false);
+        initInstance(settings::enable_vulkan_debug_mode);
         getPhysicalDevice();
         initDevice();
 
@@ -293,15 +293,15 @@ namespace pbrlib::vk
 
         CommandBuffer command_buffer;
 
-        VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer._handle));
+        VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer.handle));
 
-        command_buffer._level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        command_buffer.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
         if (!name.empty())
         {
             VkDebugUtilsObjectNameInfoEXT name_info = { };
             name_info.sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer._handle);
+            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer.handle);
             name_info.objectType    = VK_OBJECT_TYPE_COMMAND_BUFFER;
             name_info.pObjectName   = name.data();
 
@@ -334,7 +334,7 @@ namespace pbrlib::vk
 
     void Device::loadFunctions()
     {
-        if (settings::vulkan_set_obj_name)
+        if (settings::enable_vulkan_set_obj_name)
             _functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
     }
 }

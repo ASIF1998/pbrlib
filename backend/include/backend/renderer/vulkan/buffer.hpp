@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 
 #include <vector>
+#include <span>
 
 #include <string>
 #include <string_view>
@@ -15,9 +16,18 @@ namespace pbrlib::vk
 
 namespace pbrlib::vk
 {
+    enum class BufferType
+    {
+        device_only,    //!< Any resources that you frequently write and read on GPU.
+        staging,        //!< A "staging" buffer than you want to map and fill from CPU code, then use as a source of transfer to some GPU resource.
+        readback        //!< Buffers for data written by or transferred from the GPU that you want to read back on the CPU.
+    };
+
     class Buffer final
     {
-        explicit Buffer(const Device* ptr_device);
+        explicit Buffer(Device* ptr_device);
+
+        void write(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
 
     public:
         class Builder;
@@ -31,12 +41,26 @@ namespace pbrlib::vk
         Buffer& operator = (Buffer&& buffer);
         Buffer& operator = (const Buffer& buffer) = delete;
 
-        VkBuffer        handle;
-        VkDeviceSize    size;
+        template<typename T>
+        void write(std::span<const T> data, VkDeviceSize offset)
+        {
+            write(reinterpret_cast<const uint8_t*>(data.data()), data.size_bytes(), offset);
+        }
+
+        template<typename T>
+        void write(const T& obj, VkDeviceSize offset)
+        {
+            write(reinterpret_cast<const uint8_t*>(&obj), sizeof(T), offset);
+        }
+
+        VkBuffer        handle  = VK_NULL_HANDLE;
+        VkDeviceSize    size    = 0;
+
+        BufferType type;
 
     private:
-        const Device* _ptr_device;
-        VmaAllocation _allocation = VK_NULL_HANDLE;
+        Device*         _ptr_device;
+        VmaAllocation   _allocation = VK_NULL_HANDLE;
     };
 
     class Buffer::Builder final
@@ -46,7 +70,7 @@ namespace pbrlib::vk
         VkSharingMode sharingMode() const;
 
     public:
-        explicit Builder(const Device* ptr_device);
+        explicit Builder(Device* ptr_device);
 
         Builder(Builder&& builder)      = delete;
         Builder(const Builder& builder) = delete;
@@ -57,18 +81,21 @@ namespace pbrlib::vk
         Builder& addQueueFamilyIndex(uint32_t index);
         Builder& size(VkDeviceSize size)                noexcept;
         Builder& usage(VkImageUsageFlags usage)         noexcept;
+        Builder& type(BufferType buffer_type)           noexcept;
 
         [[maybe_unused]] Builder& name(std::string_view buffer_name);
 
         [[nodiscard]] Buffer build();
 
     private:
-        const Device* _ptr_device;
+        Device* _ptr_device;
 
         std::vector<uint32_t> _queues;
 
         VkDeviceSize        _size   = 0;
         VkImageUsageFlags   _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+
+        BufferType _type = BufferType::device_only;
 
         std::string _name;
     };

@@ -2,11 +2,14 @@
 #include <pbrlib/config.hpp>
 
 #include <pbrlib/scene/scene.hpp>
+
 #include <pbrlib/transform.hpp>
 #include <pbrlib/rendering/camera.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
 #include <pbrlib/logger/logger.hpp>
+
+#include <backend/utils/paths.hpp>
 
 struct RotateComponent
 {
@@ -37,7 +40,7 @@ int main()
                 /// some manipulations related to turning
             });
 
-            // ptr_scene->addModel(filename, pbrlib::Transform::translate(pbrlib::math::vec3(0, 0, 0)));
+            ptr_scene->import(pbrlib::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb", ptr_engine);
 
             // auto ptr_light = ptr_scene->addLight(
             //     pbrlib::PointLight::Builder()

@@ -1,15 +1,47 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/utils/vulkan.hpp>
+
+#include <backend/logger/logger.hpp>
 
 #include <stdexcept>
 
 #include <algorithm>
 #include <unordered_set>
 
+#include <vulkan/vulkan_format_traits.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
+#define STBI_NO_GIF
+#include <stb_image.h>
+
+namespace utils
+{
+    constexpr uint8_t formatSize(VkFormat format)
+    {
+        switch (format)
+        {
+            case VK_FORMAT_R8_UNORM:
+                return 1;
+            case VK_FORMAT_R8G8_UNORM:
+                return 2;
+            case VK_FORMAT_R8G8B8_UNORM:
+                return 3;
+            case VK_FORMAT_R8G8B8A8_UNORM:
+                return 4;
+            default:
+                throw std::runtime_error("[Image] Undefined pixel format");
+        }
+
+        return std::numeric_limits<uint8_t>::max();
+    }
+}
+
 namespace pbrlib::vk
 {
-    Image::Image(const Device* ptr_device) :
+    Image::Image(Device* ptr_device) :
         _ptr_device(ptr_device)
     { }
 
@@ -52,11 +84,84 @@ namespace pbrlib::vk
 
         return *this;
     }
+
+    void Image::write(const ImageWriteData& data)
+    {
+        const auto format_size      = utils::formatSize(data.format);
+        const auto scanline_size    = data.width * format_size;
+        const auto image_size       = scanline_size * data.height;
+
+        constexpr auto temp_buffer_usage_flag = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+        auto temp_buffer = Buffer::Builder(_ptr_device)
+            .name("Temp buffer for fill image")
+            .size(image_size)
+            .usage(temp_buffer_usage_flag)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .type(BufferType::staging)
+            .build();
+
+        std::span<const uint8_t> image_data (data.ptr_data, image_size);
+        
+        temp_buffer.write(image_data, 0);
+
+        auto command_buffer = _ptr_device->oneTimeSubmitCommandBuffer(
+            _ptr_device->queue(),
+            "[Image] Copy buffer to image"
+        );
+
+        command_buffer.write([&data, &temp_buffer, this] (VkCommandBuffer command_buffer_handle)
+        {
+            VkImageSubresourceLayers subresource = { };
+            subresource.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            subresource.baseArrayLayer  = 0;
+            subresource.layerCount      = 1;
+            subresource.mipLevel        = 0;
+
+            VkBufferImageCopy2 region = { };
+            region.sType                = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2;
+            region.bufferImageHeight    = static_cast<uint32_t>(data.height);
+            region.bufferOffset         = 0;
+            region.bufferRowLength      = static_cast<uint32_t>(data.width); // scanline_size;
+            region.imageExtent          = {static_cast<uint32_t>(data.width), static_cast<uint32_t>(data.height), 1};
+            region.imageOffset          = { };
+            region.imageSubresource     = subresource;
+
+            VkCopyBufferToImageInfo2 copy_info = { };
+            copy_info.sType             = VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2;
+            copy_info.srcBuffer         = temp_buffer.handle;
+            copy_info.dstImage          = handle;
+            copy_info.dstImageLayout    = VK_IMAGE_LAYOUT_GENERAL;
+            copy_info.regionCount       = 1;
+            copy_info.pRegions          = &region;
+
+            vkCmdCopyBufferToImage2(command_buffer_handle, &copy_info);
+        });
+
+        VkCommandBufferSubmitInfo buffer_submit_info = { };
+        buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+        buffer_submit_info.commandBuffer    = command_buffer.handle;
+
+        VkSubmitInfo2 submit_info = { };
+        submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+        submit_info.pCommandBufferInfos     = &buffer_submit_info;
+        submit_info.commandBufferInfoCount  = 1;
+
+        VK_CHECK(
+            vkQueueSubmit2(
+                _ptr_device->queue().handle,
+                1, &submit_info,
+                VK_NULL_HANDLE
+            )
+        );
+
+        VK_CHECK(vkDeviceWaitIdle(_ptr_device->device()));
+    }
 }
 
 namespace pbrlib::vk
 {
-    Image::Builder::Builder(const Device* ptr_device) :
+    Image::Builder::Builder(Device* ptr_device) :
         _ptr_device (ptr_device)
     { }
 
@@ -165,7 +270,7 @@ namespace pbrlib::vk
         image_info.sharingMode              = sharingMode();
 
         VmaAllocationCreateInfo alloc_info = { };
-        alloc_info.usage    = VMA_MEMORY_USAGE_AUTO;
+        alloc_info.usage    = VMA_MEMORY_USAGE_GPU_ONLY;
         alloc_info.flags    = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
         alloc_info.priority = 1.0f;
 
@@ -221,6 +326,82 @@ namespace pbrlib::vk
 
             _ptr_device->setName(name_info);
         }
+
+        return image;
+    }
+}
+
+namespace pbrlib::vk
+{
+    Image::Decoder::Decoder(Device* ptr_device) :
+        _ptr_device(ptr_device)
+    { }
+
+    Image::Decoder& Image::Decoder::name(std::string_view image_name)
+    {
+        _name = image_name;
+        return *this;
+    }
+
+    Image::Decoder& Image::Decoder::channelsPerPixel(int32_t channels_per_pixel)
+    {
+        _channels_per_pixel = channels_per_pixel;
+        return *this;
+    }
+
+    Image::Decoder& Image::Decoder::compressedImage(const uint8_t* ptr_data, size_t size)
+    {
+        _compressed_image.ptr_data  = ptr_data;
+        _compressed_image.size      = size;
+
+        return *this;
+    }
+
+    void Image::Decoder::validate()
+    {
+        if (_channels_per_pixel < 1 && _channels_per_pixel > 4) 
+            throw std::runtime_error("[Vulkan::Image::Decoder] Invalid count channels per pixel");
+
+        if (!_compressed_image.ptr_data || !_compressed_image.size)
+            throw std::runtime_error("[Vulkan::Image::Decoder] Compressed image data is empty");
+    }
+
+    Image Image::Decoder::decode()
+    {
+        validate();
+
+        constexpr std::array formats
+        {
+            VK_FORMAT_R8_UNORM,
+            VK_FORMAT_R8G8_UNORM,
+            VK_FORMAT_R8G8B8_UNORM,
+            VK_FORMAT_R8G8B8A8_UNORM
+        };
+
+        ImageWriteData write_data = 
+        {
+            .format = formats[_channels_per_pixel - 1]
+        };
+
+        write_data.ptr_data = stbi_load_from_memory(
+            _compressed_image.ptr_data, 
+            static_cast<int>(_compressed_image.size), 
+            &write_data.width, &write_data.height,
+            &_channels_per_pixel,
+            _channels_per_pixel
+        );
+
+        auto image = Image::Builder(_ptr_device)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .format(write_data.format)
+            .name(_name)
+            .size(static_cast<uint32_t>(write_data.width), static_cast<uint32_t>(write_data.height))
+            .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
+            .build();
+
+        image.write(write_data);
+
+        stbi_image_free(write_data.ptr_data);
 
         return image;
     }

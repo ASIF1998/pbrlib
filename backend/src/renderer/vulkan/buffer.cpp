@@ -7,14 +7,14 @@
 
 namespace pbrlib::vk
 {
-    Buffer::Buffer(const Device* ptr_device) :
+    Buffer::Buffer(Device* ptr_device) :
         _ptr_device (ptr_device)
     { }
 
     Buffer::Buffer(Buffer&& buffer) :
-        _ptr_device (buffer._ptr_device),
-        size        (buffer.size)
+        _ptr_device (buffer._ptr_device)
     {
+        std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
     }
@@ -28,18 +28,72 @@ namespace pbrlib::vk
     Buffer& Buffer::operator = (Buffer&& buffer)
     {
         _ptr_device = buffer._ptr_device;
-        size        = buffer.size;
 
+        std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
 
         return *this;
     }
+
+    void Buffer::write(const uint8_t* ptr_data, size_t size, VkDeviceSize offset)
+    {
+        auto temp_buffer = Buffer::Builder(_ptr_device)
+            .size(size)
+            .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .type(BufferType::staging)
+            .build();
+
+        void* ptr_temp_buffer_memory = nullptr;
+
+        VK_CHECK(
+            vmaMapMemory(
+                _ptr_device->vmaAllocator(),
+                temp_buffer._allocation,
+                &ptr_temp_buffer_memory
+            )
+        );
+
+        memcpy(ptr_temp_buffer_memory, ptr_data, size);
+
+        vmaUnmapMemory(_ptr_device->vmaAllocator(), temp_buffer._allocation);
+
+        auto command_buffer = _ptr_device->oneTimeSubmitCommandBuffer(_ptr_device->queue(), "Copy data");
+        command_buffer.write([offset, size, &temp_buffer, this](VkCommandBuffer command_buffer_handle)
+        {
+            VkBufferCopy copy = { };
+            copy.dstOffset  = offset;
+            copy.srcOffset  = 0;
+            copy.size       = static_cast<VkDeviceSize>(size);
+
+            vkCmdCopyBuffer(command_buffer_handle, temp_buffer.handle, handle, 1, &copy);
+        });
+
+        VkCommandBufferSubmitInfo buffer_submit_info = { };
+        buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+        buffer_submit_info.commandBuffer    = command_buffer.handle;
+
+        VkSubmitInfo2 submit_info = { };
+        submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+        submit_info.pCommandBufferInfos     = &buffer_submit_info;
+        submit_info.commandBufferInfoCount  = 1;
+
+        VK_CHECK(
+            vkQueueSubmit2(
+                _ptr_device->queue().handle,
+                1, &submit_info,
+                VK_NULL_HANDLE
+            )
+        );
+
+        VK_CHECK(vkDeviceWaitIdle(_ptr_device->device()));
+    }
 }
 
 namespace pbrlib::vk
 {
-    Buffer::Builder::Builder(const Device* ptr_device) :
+    Buffer::Builder::Builder(Device* ptr_device) :
         _ptr_device(ptr_device)
     { }
 
@@ -64,6 +118,12 @@ namespace pbrlib::vk
     Buffer::Builder& Buffer::Builder::name(std::string_view buffer_name)
     {
         _name = buffer_name;
+        return *this;
+    }
+
+    Buffer::Builder& Buffer::Builder::type(BufferType buffer_type)  noexcept
+    {
+        _type = buffer_type;
         return *this;
     }
 
@@ -106,8 +166,14 @@ namespace pbrlib::vk
 
         VmaAllocationCreateInfo alloc_info = { };
         alloc_info.usage    = VMA_MEMORY_USAGE_AUTO;
-        alloc_info.flags    = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
         alloc_info.priority = 1.0f;
+
+        if (_type == BufferType::device_only)
+            alloc_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+        else if (_type == BufferType::staging)
+            alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        else 
+            alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
         VK_CHECK(vmaCreateBuffer(
             _ptr_device->vmaAllocator(),

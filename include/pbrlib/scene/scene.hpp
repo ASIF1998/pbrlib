@@ -14,10 +14,13 @@
 
 #include <optional>
 
+#include <filesystem>
+
 namespace pbrlib
 {
     struct  InputStay;
     class   Scene;
+    class   Engine;
 }
 
 namespace pbrlib
@@ -87,7 +90,7 @@ namespace pbrlib
             UpdateCallback      _update_callback;
             
             SceneItems _children;  
-        };
+    };
 
     class Scene final
     {
@@ -105,6 +108,8 @@ namespace pbrlib
         [[nodiscard]] std::string_view name() const;
         
         [[nodiscard]] SceneItem& addItem(std::string_view name);
+
+        [[maybe_unused]] bool import(const std::filesystem::path& filename, Engine* ptr_engine);
 
         void update(const InputStay& input_stay, float delta_time);
 
