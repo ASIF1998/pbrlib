@@ -29,6 +29,9 @@ namespace pbrlib::vk
     struct VulkanFunctions final
     {
         PFN_vkSetDebugUtilsObjectNameEXT vkSetDebugUtilsObjectNameEXT = VK_NULL_HANDLE;
+
+        PFN_vkCmdDebugMarkerBeginEXT    vkCmdDebugMarkerBeginEXT    = VK_NULL_HANDLE;
+        PFN_vkCmdDebugMarkerEndEXT      vkCmdDebugMarkerEndEXT      = VK_NULL_HANDLE;
     };
 
     class Device final
@@ -73,6 +76,8 @@ namespace pbrlib::vk
         [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(const Queue& queue, std::string_view name = "");
 
         [[nodiscard]] DescriptorSet allocate(VkDescriptorSetLayout set_layout_handle);
+
+        [[nodiscard]] const VulkanFunctions& vulkanFunctions() const noexcept;
 
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 

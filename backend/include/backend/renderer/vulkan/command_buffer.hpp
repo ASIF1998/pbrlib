@@ -1,8 +1,12 @@
 #pragma once
 
+#include <pbrlib/math/vec3.hpp>
+
 #include <vulkan/vulkan.h>
 
 #include <functional>
+
+#include <string_view>
 
 namespace pbrlib::vk
 {
@@ -16,7 +20,9 @@ namespace pbrlib::vk
     {
         friend class Device;
 
-        CommandBuffer() = default;
+        CommandBuffer(const Device* ptr_device);
+
+        using WriteFunctionType = std::function<void (VkCommandBuffer command_buffer)>;
 
     public:
         CommandBuffer(CommandBuffer&& command_buffer);
@@ -25,9 +31,16 @@ namespace pbrlib::vk
         CommandBuffer& operator = (CommandBuffer&& command_buffer);
         CommandBuffer& operator = (const CommandBuffer& command_buffer) = delete;
 
-        void write(const std::function<void (VkCommandBuffer command_buffer)>& callback);
+        void write(
+            const WriteFunctionType&    callback,
+            std::string_view            name    = "",
+            const pbrlib::math::vec3&   col     = pbrlib::math::vec3(0)
+        );
 
         VkCommandBuffer         handle  = VK_NULL_HANDLE;
         VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
+
+    private:
+        const Device* _ptr_device;
     };
 }

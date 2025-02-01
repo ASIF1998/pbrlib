@@ -1,6 +1,7 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/utils/vulkan.hpp>
 
 #include <backend/logger/logger.hpp>
@@ -87,7 +88,7 @@ namespace pbrlib::vk
 
     void Image::write(const ImageWriteData& data)
     {
-        const auto format_size      = utils::formatSize(data.format);
+        const auto format_size      = ::utils::formatSize(data.format);
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
@@ -136,7 +137,7 @@ namespace pbrlib::vk
             copy_info.pRegions          = &region;
 
             vkCmdCopyBufferToImage2(command_buffer_handle, &copy_info);
-        });
+        }, "Write data in image", GpuMarkerColors::write_data_in_image);
 
         VkCommandBufferSubmitInfo buffer_submit_info = { };
         buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;

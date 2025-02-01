@@ -3,6 +3,8 @@
 
 #include <backend/utils/vulkan.hpp>
 
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+
 #include <unordered_set>
 
 namespace pbrlib::vk
@@ -68,7 +70,7 @@ namespace pbrlib::vk
             copy.size       = static_cast<VkDeviceSize>(size);
 
             vkCmdCopyBuffer(command_buffer_handle, temp_buffer.handle, handle, 1, &copy);
-        });
+        }, "Write data in buffer", GpuMarkerColors::write_data_in_buffer);
 
         VkCommandBufferSubmitInfo buffer_submit_info = { };
         buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;

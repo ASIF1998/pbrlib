@@ -5,6 +5,7 @@
 
 #include <backend/utils/vulkan.hpp>
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/config.hpp>
 
 #include <SDL3/SDL_vulkan.h>
 
@@ -13,12 +14,6 @@
 #include <stdexcept>
 #include <array>
 #include <format>
-
-namespace pbrlib::vk::settings
-{   
-    constexpr bool enable_vulkan_set_obj_name   = false;
-    constexpr bool enable_vulkan_debug_mode     = false;
-}
 
 namespace pbrlib::vk
 {
@@ -43,7 +38,7 @@ namespace pbrlib::vk
 
     void Device::init(const Window* ptr_window)
     {
-        initInstance(settings::enable_vulkan_debug_mode);
+        initInstance(config::enable_vulkan_debug_mode);
         getPhysicalDevice();
         initDevice();
 
@@ -218,9 +213,13 @@ namespace pbrlib::vk
         queue_info.queueCount       = 1;
         queue_info.queueFamilyIndex = _general_queue.family_index;
 
-        std::array extensions {
+        std::vector extensions 
+        {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
+
+        if (config::enable_vulkan_debug_marker)
+            extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 
         VkDeviceCreateInfo device_info = { };
         device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -291,7 +290,7 @@ namespace pbrlib::vk
         alloc_info.commandPool          = _command_pool_for_general_queue;
         alloc_info.level                = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-        CommandBuffer command_buffer;
+        CommandBuffer command_buffer (this);
 
         VK_CHECK(vkAllocateCommandBuffers(_device_handle, &alloc_info, &command_buffer.handle));
 
@@ -334,8 +333,19 @@ namespace pbrlib::vk
 
     void Device::loadFunctions()
     {
-        if (settings::enable_vulkan_set_obj_name)
+        if (config::enable_vulkan_set_obj_name)
             _functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
+
+        if (config::enable_vulkan_debug_marker)
+        {
+            _functions.vkCmdDebugMarkerBeginEXT = loadFunction<PFN_vkCmdDebugMarkerBeginEXT>(_device_handle, "vkCmdDebugMarkerBeginEXT");
+            _functions.vkCmdDebugMarkerEndEXT   = loadFunction<PFN_vkCmdDebugMarkerEndEXT>(_device_handle, "vkCmdDebugMarkerEndEXT");
+        }
+    }
+
+    const VulkanFunctions& Device::vulkanFunctions() const noexcept
+    {
+        return _functions;
     }
 }
 
