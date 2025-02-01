@@ -35,6 +35,8 @@ namespace pbrlib::vk
 
         Surface& operator = (Surface&& surface);
         Surface& operator = (const Surface& surface) = delete;
+
+        [[nodiscard]] uint32_t nextImage() const;
         
     private:
         VkSurfaceKHR    _surface_handle     = VK_NULL_HANDLE;
@@ -46,5 +48,7 @@ namespace pbrlib::vk
         VkSurfaceFormatKHR _surface_format = { };
 
         const Device* _ptr_device = nullptr;
+
+        mutable uint32_t _current_image_index = 0; 
     };
 }

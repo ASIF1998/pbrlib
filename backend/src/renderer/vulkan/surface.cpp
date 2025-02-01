@@ -286,4 +286,35 @@ namespace pbrlib::vk
             VK_CHECK(vkCreateImageView(_ptr_device->device(), &image_view_info, nullptr, &_image_view_handles[i]));
         }
     }
+
+    uint32_t Surface::nextImage() const
+    {
+        VkFenceCreateInfo fence_create_info = { };
+        fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+        VkAcquireNextImageInfoKHR acquire_next_image_info = { }; 
+        acquire_next_image_info.sType       = VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR;
+        acquire_next_image_info.swapchain   = _swapchain_handle;
+
+        VK_CHECK(
+            vkCreateFence(
+                _ptr_device->device(), 
+                &fence_create_info, 
+                nullptr, 
+                &acquire_next_image_info.fence
+            )
+        );
+
+        VK_CHECK(
+            vkAcquireNextImage2KHR(
+                _ptr_device->device(),
+                &acquire_next_image_info,
+                &_current_image_index
+            )
+        );
+
+        vkDestroyFence(_ptr_device->device(), acquire_next_image_info.fence, nullptr);
+
+        return _current_image_index;
+    }   
 }

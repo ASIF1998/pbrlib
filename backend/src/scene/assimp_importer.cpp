@@ -140,7 +140,7 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    static auto getVertexAndIndexCount(const aiScene* ptr_scene, const aiNode* ptr_node)
+    static auto vertexCount(const aiScene* ptr_scene, const aiNode* ptr_node)
         -> std::pair<size_t, size_t>
     {
         constexpr size_t num_indices_per_face = 3;
@@ -159,7 +159,7 @@ namespace pbrlib
             index_count     += ptr_mesh->mNumFaces * num_indices_per_face;
         }
 
-        return std::make_pair(index_count, vertex_count);
+        return std::make_pair(vertex_count, index_count);
     }
 
     void AssimpImporter::processNode(const aiScene* ptr_scene, const aiNode* ptr_node)
@@ -168,9 +168,7 @@ namespace pbrlib
 
         ScopedTransform scoped_transform (this, utils::cast(ptr_node->mTransformation));
 
-        auto [index_count, vertex_count] = getVertexAndIndexCount(ptr_scene, ptr_node);
-
-        if (index_count && vertex_count)
+        if (auto [vertex_count, index_count] = vertexCount(ptr_scene, ptr_node); index_count && vertex_count)
         {
             log::engine::info("[Importer]\t\t - Index count: {}", index_count);
             log::engine::info("[Importer]\t\t - Vertex count: {}", vertex_count);
@@ -204,8 +202,8 @@ namespace pbrlib
                     attributes.push_back(attribute);
                 }
 
-                std::span<const aiFace> faces (ptr_mesh->mFaces, ptr_mesh->mNumFaces);
-                for (auto& face: faces)
+                std::span faces (ptr_mesh->mFaces, ptr_mesh->mNumFaces);
+                for (const auto& face: faces)
                 {
                     indices.push_back(face.mIndices[0]);
                     indices.push_back(face.mIndices[1]);
@@ -260,6 +258,7 @@ namespace pbrlib
                 .usage(shared_buffer_usage | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT)
                 .build(),
             .vertex_count = static_cast<uint32_t>(attributes.size()),
+
             .index_buffer = vk::Buffer::Builder(_ptr_device)
                 .name(std::format("[IndexBuffer] {}", name))
                 .addQueueFamilyIndex(_ptr_device->queue().family_index)
