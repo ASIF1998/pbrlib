@@ -117,15 +117,22 @@ namespace pbrlib::vk
             &count, handles.data()
         ));
 
+        VkPhysicalDeviceDriverProperties driver_properties = { };
+        driver_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES;
+
         _physical_device_handle = handles[0];
-        vkGetPhysicalDeviceProperties(handles[0], &_gpu_properties);
+        _gpu_properties.sType   = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        vkGetPhysicalDeviceProperties2(handles[0], &_gpu_properties);
 
         for (auto handle: handles) 
         {
-            VkPhysicalDeviceProperties props = { };
-            vkGetPhysicalDeviceProperties(handle, &props);
+            VkPhysicalDeviceProperties2 props = { };
+            props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+            props.pNext = &driver_properties;
 
-            if (props.apiVersion >= utils::vulkanVersion())
+            vkGetPhysicalDeviceProperties2(handle, &props);
+
+            if (props.properties.apiVersion >= utils::vulkanVersion())
             {
                 _physical_device_handle = handle;
                 _gpu_properties         = props;
@@ -133,7 +140,7 @@ namespace pbrlib::vk
             }
         }
 
-        if (_gpu_properties.apiVersion < utils::vulkanVersion())
+        if (_gpu_properties.properties.apiVersion < utils::vulkanVersion())
         {
             constexpr auto major = VK_VERSION_MAJOR(utils::vulkanVersion());
             constexpr auto minor = VK_VERSION_MINOR(utils::vulkanVersion());
@@ -142,7 +149,7 @@ namespace pbrlib::vk
             throw std::runtime_error(std::format("[Vulkan] Vulkan API version less {}.{}.{}", major, minor, patch));
         }
 
-        switch(_gpu_properties.deviceType)
+        switch(_gpu_properties.properties.deviceType)
         {
             case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
                 pbrlib::log::engine::info("Device type: Discrete GPU");
@@ -160,7 +167,37 @@ namespace pbrlib::vk
                 throw std::runtime_error("[Vulkan] Couldn't find gpu");
         }
 
-        pbrlib::log::engine::info("Device name: {}", _gpu_properties.deviceName);
+        pbrlib::log::engine::info("Device name: {}", _gpu_properties.properties.deviceName);
+        pbrlib::log::engine::info("Driver name: {}", driver_properties.driverName);
+        pbrlib::log::engine::info("Driver info: {}", driver_properties.driverInfo);
+
+        switch (driver_properties.driverID)
+        {
+            case VK_DRIVER_ID_AMD_PROPRIETARY:
+                pbrlib::log::engine::info("Driver ID: AMD proprietary");
+                break;
+            case VK_DRIVER_ID_AMD_OPEN_SOURCE: 
+                pbrlib::log::engine::info("Driver ID: AMD open source");
+                break;
+            case VK_DRIVER_ID_MESA_RADV:
+                pbrlib::log::engine::info("Driver ID: Mesa RADV");
+                break;
+            case VK_DRIVER_ID_NVIDIA_PROPRIETARY :
+                pbrlib::log::engine::info("Driver ID: NVIDIA proprietary");
+                break;
+            case VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS  :
+                pbrlib::log::engine::info("Driver ID: INTEL proprietary Windows");
+                break;
+            case VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA   :
+                pbrlib::log::engine::info("Driver ID: INTEL open source Mesa");
+                break;
+            case VK_DRIVER_ID_IMAGINATION_PROPRIETARY    :
+                pbrlib::log::engine::info("Driver ID: Imagination proprietary");
+                break;
+            default:
+                pbrlib::log::engine::info("Driver ID: Undefined");
+                break;
+        }
     }
 
     VkPhysicalDevice Device::physicalDevice() const noexcept
@@ -243,7 +280,7 @@ namespace pbrlib::vk
         return _general_queue;
     }
 
-    const VkPhysicalDeviceProperties& Device::gpuProperties() const noexcept
+    const VkPhysicalDeviceProperties2& Device::gpuProperties() const noexcept
     {
         return _gpu_properties;
     }

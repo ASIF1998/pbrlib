@@ -67,7 +67,7 @@ namespace pbrlib::vk
 
         [[nodiscard]] VkDescriptorPool descriptorPool() const noexcept;
 
-        [[nodiscard]] const VkPhysicalDeviceProperties& gpuProperties() const noexcept;
+        [[nodiscard]] const VkPhysicalDeviceProperties2& gpuProperties() const noexcept;
 
         [[nodiscard]] const Queue& queue()  const noexcept;
 
@@ -86,7 +86,7 @@ namespace pbrlib::vk
         VkPhysicalDevice    _physical_device_handle = VK_NULL_HANDLE;
         VkDevice            _device_handle          = VK_NULL_HANDLE;
 
-        VkPhysicalDeviceProperties _gpu_properties = { };
+        VkPhysicalDeviceProperties2 _gpu_properties = { };
 
         Queue           _general_queue;
         VkCommandPool   _command_pool_for_general_queue = VK_NULL_HANDLE;

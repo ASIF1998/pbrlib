@@ -4,7 +4,7 @@
 
 namespace pbrlib
 {
-    struct MaterialComponent
+    struct PbrMaterialComponent
     {
         vk::Image albedo;
         vk::Image normal_map;

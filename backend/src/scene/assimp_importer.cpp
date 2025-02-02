@@ -11,7 +11,7 @@
 #include <pbrlib/math/quat.hpp>
 
 #include <backend/scene/mesh_component.hpp>
-#include <backend/scene/material_component.hpp>
+#include <backend/scene/material_components.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -227,7 +227,7 @@ namespace pbrlib
         SceneItem*          ptr_item
     )
     {
-        MaterialComponent material_component
+        PbrMaterialComponent material_component
         {
             .albedo     = getTexture(ptr_scene, ptr_material, aiTextureType_DIFFUSE, 4),
             .normal_map = getTexture(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
@@ -235,7 +235,7 @@ namespace pbrlib
             .roughness  = getTexture(ptr_scene, ptr_material, aiTextureType_DIFFUSE_ROUGHNESS, 1)
         };
 
-        ptr_item->addComponent<MaterialComponent>(std::move(material_component));
+        ptr_item->addComponent<PbrMaterialComponent>(std::move(material_component));
     }
 
     void AssimpImporter::add (
