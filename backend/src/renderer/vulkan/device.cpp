@@ -140,6 +140,8 @@ namespace pbrlib::vk
             }
         }
 
+        _gpu_properties.pNext = nullptr;
+
         if (_gpu_properties.properties.apiVersion < utils::vulkanVersion())
         {
             constexpr auto major = VK_VERSION_MAJOR(utils::vulkanVersion());
