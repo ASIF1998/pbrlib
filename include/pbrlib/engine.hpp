@@ -59,8 +59,8 @@ namespace pbrlib
 
         Camera _camera;
 
-        std::unique_ptr<FrameGraph> _ptr_frame_graph;
         std::unique_ptr<vk::Device> _ptr_device;
+        std::unique_ptr<FrameGraph> _ptr_frame_graph;
 
         Scene _scene;
 

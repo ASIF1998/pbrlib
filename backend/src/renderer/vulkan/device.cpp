@@ -38,7 +38,7 @@ namespace pbrlib::vk
 
     void Device::init(const Window* ptr_window)
     {
-        initInstance(config::enable_vulkan_debug_mode);
+        initInstance(config::enable_vulkan_debug_print);
         getPhysicalDevice();
         initDevice();
 

@@ -3,7 +3,7 @@
 
 #include <pbrlib/engine.hpp>
 
-#include <backend/renderer/frame_graph.hpp>
+#include <backend/renderer/frame_graph/frame_graph.hpp>
 #include <backend/scene/assimp_importer.hpp>
 
 #include <backend/logger/logger.hpp>

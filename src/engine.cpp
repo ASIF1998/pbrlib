@@ -5,7 +5,7 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/renderer/frame_graph.hpp>
+#include <backend/renderer/frame_graph/frame_graph.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
 #include <SDL3/SDL.h>

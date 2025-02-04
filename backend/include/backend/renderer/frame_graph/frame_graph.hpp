@@ -1,5 +1,7 @@
 #pragma once
 
+#include <backend/renderer/frame_graph/compound_render_pass.hpp>
+
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <pbrlib/math/vec3.hpp>
@@ -11,10 +13,11 @@
 #include <vector>
 #include <map>
 
+#include <optional>
+
 namespace pbrlib
 {
-    struct  IRenderPass;
-    class   Window;
+    class Window;
 }
 
 namespace pbrlib
@@ -40,14 +43,16 @@ namespace pbrlib
         FrameGraph& operator = (FrameGraph&& frame_graph)       = delete;
         FrameGraph& operator = (const FrameGraph& frame_graph)  = delete;
 
-        // vk::Image render();
+        const vk::Image& draw();
 
         [[nodiscard]]
-        const Size& size() const noexcept;
+        const Size size() const;
 
     private:
-        vk::Device* _ptr_device;
+        vk::Device* _ptr_device = nullptr;
         
-        Size _size;
+        std::optional<vk::Image> _image;
+
+        CompoundRenderPass _render_pass;
     };
 }
