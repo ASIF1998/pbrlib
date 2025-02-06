@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir build 
           cd build 
-          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=OFF ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
           cmake --build . --config Release --target pbrlib-tests
 
       - name: Setup SwiftShader

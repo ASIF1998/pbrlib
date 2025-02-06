@@ -7,6 +7,7 @@ project(PBRLib)
 
 option(PBRLIB_ENABLE_TESTS "" OFF)
 option(PBRLIB_TEST_CONSOLE "" OFF)
+option(PBRLIB_SETUP_CI "" OFF)
 
 set(PRLIB_PATH_TO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -44,6 +45,10 @@ target_include_directories(pbrlib PUBLIC backend/include)
 
 if (MSVC)
     target_compile_options(pbrlib PRIVATE /W3 /WX /MP /showIncludes)
+endif()
+
+if (PBRLIB_SETUP_CI AND MSVC)
+    target_compile_options(pbrlib PRIVATE /W3 /WX /MP)
 endif()
 
 #####################################################
