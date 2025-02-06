@@ -331,13 +331,43 @@ namespace pbrlib
             VK_FORMAT_R8G8B8A8_UNORM
         };
 
+        constexpr auto usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+
+        auto pixel_format = formats[channels_per_pixel - 1];
+
+        const VkPhysicalDeviceImageFormatInfo2 pixel_format_info 
+        {
+            .sType  = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2,
+            .format = pixel_format,
+            .type   = VK_IMAGE_TYPE_2D,
+            .tiling = VK_IMAGE_TILING_OPTIMAL,
+            .usage  = usage
+        };
+
+        VkImageFormatProperties2 pixel_format_properties
+        {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2
+        };
+
+        if (
+            vkGetPhysicalDeviceImageFormatProperties2(
+                _ptr_device->physicalDevice(), 
+                &pixel_format_info, 
+                &pixel_format_properties
+            ) == VK_ERROR_FORMAT_NOT_SUPPORTED
+        )
+        {
+            log::engine::warning("[Importer] Pixel format is not supported");
+            pixel_format = formats[3];
+        }
+
         return vk::Image::Builder(_ptr_device)
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
             .fillColor(pbrlib::math::vec3(0))
             .format(formats[channels_per_pixel - 1])
             .name("Default image")
             .size(1, 1)
-            .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_STORAGE_BIT)
+            .usage(usage)
             .build();
     }
 }

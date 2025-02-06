@@ -120,7 +120,11 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
         bindings[i].binding         = static_cast<uint32_t>(i);
         bindings[i].descriptorCount = descriptor_count;
         bindings[i].descriptorType  = descriptors_type[i];
-        bindings[i].stageFlags      = VK_SHADER_STAGE_ALL;
+
+        if (descriptors_type[i] == VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT)
+            bindings[i].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        else 
+            bindings[i].stageFlags = VK_SHADER_STAGE_ALL;
     }
 
     VkDescriptorSetLayout descriptor_set_layout = VK_NULL_HANDLE;

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <backend/renderer/frame_graph/compound_render_pass.hpp>
-
+#include <backend/renderer/frame_graph/render_pass.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <pbrlib/math/vec3.hpp>
@@ -17,7 +16,7 @@
 
 namespace pbrlib
 {
-    class Window;
+    struct Config;
 }
 
 namespace pbrlib
@@ -31,11 +30,7 @@ namespace pbrlib
     class FrameGraph final
     {
     public:
-        [[maybe_unused]]
-        explicit FrameGraph(vk::Device* ptr_device, uint32_t width, uint32_t height);
-
-        [[maybe_unused]]
-        explicit FrameGraph(vk::Device* ptr_device, const Window* ptr_window);
+        explicit FrameGraph(vk::Device* ptr_device, const Config& config);
 
         FrameGraph(FrameGraph&& frame_graph)        = delete;
         FrameGraph(const FrameGraph& frame_graph)   = delete;
@@ -53,6 +48,6 @@ namespace pbrlib
         
         std::optional<vk::Image> _image;
 
-        CompoundRenderPass _render_pass;
+        std::unique_ptr<IRenderPass> _ptr_render_pass;
     };
 }

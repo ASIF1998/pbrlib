@@ -30,31 +30,27 @@ namespace pbrlib
         pbrlib::log::priv::EngineLogger::init();
         pbrlib::log::priv::AppLogger::init();
 
-        if (config.drawInWindow && SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) 
+        if (config.drawInWindow) 
         {
-            std::string error_msg = SDL_GetError();
-            SDL_ClearError();
+            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
+            {
+                std::string error_msg = SDL_GetError();
+                SDL_ClearError();
 
-            throw std::runtime_error(std::format("Failed initialize SDL: {}", error_msg));
-        }
+                throw std::runtime_error(std::format("Failed initialize SDL: {}", error_msg));
+            }
 
-        _ptr_device = std::make_unique<vk::Device>();
-
-        if (config.drawInWindow) {
             _window = Window::Builder()
                 .title(config.title)
                 .size(config.width, config.height)
                 .resizable(false)
                 .build();
-            
-            _ptr_device->init(&_window.value());
-            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), &_window.value());
         }
-        else
-        {
-            _ptr_device->init(nullptr);
-            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), config.width, config.height);
-        }
+
+        _ptr_device = std::make_unique<vk::Device>();
+        _ptr_device->init(_window ? &_window.value() : nullptr);
+
+        _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), config);
     }
 
     Engine::~Engine()
