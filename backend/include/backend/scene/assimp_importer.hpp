@@ -78,8 +78,8 @@ namespace pbrlib
 
         struct 
         {
-            pbrlib::math::mat4  transform;
-            SceneItem*          ptr_scene_item = nullptr;
+            math::mat4 transform;
+            SceneItem* ptr_scene_item = nullptr;
         } _current_state;
     };
 }

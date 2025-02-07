@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL3/SDL_events.h>
-
 #include <backend/utils/enum_cast.hpp>
 
 #include <pbrlib/math/vec2.hpp>
@@ -9,6 +7,11 @@
 
 #include <array>
 #include <unordered_map>
+
+namespace pbrlib
+{
+	using EventHandle = const void*;
+}
 
 namespace pbrlib
 {
@@ -23,7 +26,7 @@ namespace pbrlib
 			None
 		};
 
-		void add(const SDL_Event* ptr_event);
+		void add(EventHandle event_handle);
 		void reset();
 
 	public:
@@ -32,8 +35,6 @@ namespace pbrlib
 
 	private:
 		std::array<KeyStay, utils::enumCast(Keycode::Count)> _pressed_map;
-
-		static const std::unordered_map<SDL_Keycode, Keycode> SDLtoPBRLibKeycode;
 	};
 }
 
@@ -43,7 +44,7 @@ namespace pbrlib
 	{
 		friend struct InputStay;
 
-		void add(const SDL_Event* ptr_event);
+		void add(EventHandle event_handle);
 		void reset();
 
 	public:
@@ -67,7 +68,7 @@ namespace pbrlib
 	{
 		friend struct InputStay;
 
-		void add(const SDL_Event* ptr_event);
+		void add(EventHandle event_handle);
 		void reset();
 
 		enum class ButtonStay
@@ -92,7 +93,7 @@ namespace pbrlib
 	{
 		friend struct InputStay;
 
-		void update(const SDL_Event* ptr_event);
+		void update(EventHandle event_handle);
 		void reset();
 
 	public:
@@ -114,9 +115,9 @@ namespace pbrlib
 	struct InputStay
 	{
 	private:
-		friend class SceneView;
+		friend class Engine;
 
-		void add(const SDL_Event* ptr_event);
+		void add(EventHandle event_handle);
 		void reset();
 
 	public:

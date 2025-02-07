@@ -17,31 +17,31 @@ namespace pbrlib
         };
 
     public:
-        void pos(const pbrlib::math::vec3& pos);
-        void eye(const pbrlib::math::vec3& eye);
-        void up(const pbrlib::math::vec3& up);
+        void pos(const math::vec3& pos);
+        void eye(const math::vec3& eye);
+        void up(const math::vec3& up);
 
         void range(float near, float far);
 
         void fovY(float fov_y);
         void aspect(float aspect);
 
-        [[nodiscard]] const pbrlib::math::vec3& pos()   const noexcept;
-        [[nodiscard]] const pbrlib::math::vec3& eye()   const noexcept;
-        [[nodiscard]] const pbrlib::math::vec3& up()    const noexcept;
+        [[nodiscard]] const math::vec3& pos()   const noexcept;
+        [[nodiscard]] const math::vec3& eye()   const noexcept;
+        [[nodiscard]] const math::vec3& up()    const noexcept;
 
         [[nodiscard]] const Range& range() const noexcept;
 
         [[nodiscard]] float fovY()      const noexcept;
         [[nodiscard]] float aspect()    const noexcept;
 
-        [[nodiscard]] pbrlib::math::mat4 view()         const;
-        [[nodiscard]] pbrlib::math::mat4 projection()   const;
+        [[nodiscard]] math::mat4 view()         const;
+        [[nodiscard]] math::mat4 projection()   const;
 
     private:
-        pbrlib::math::vec3 _pos = pbrlib::math::vec3(0, 0, -1);
-        pbrlib::math::vec3 _eye = pbrlib::math::vec3(0, 0, 0);
-        pbrlib::math::vec3 _up  = pbrlib::math::vec3(0, 1, 0);
+        math::vec3 _pos = math::vec3(0, 0, -1);
+        math::vec3 _eye = math::vec3(0, 0, 0);
+        math::vec3 _up  = math::vec3(0, 1, 0);
         
         Range _range;
 

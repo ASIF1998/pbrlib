@@ -8,6 +8,8 @@
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
+#include <pbrlib/input/input_stay.hpp>
+
 #include <SDL3/SDL.h>
 
 #include <stdexcept>
@@ -75,7 +77,22 @@ namespace pbrlib
     void Engine::run()
     {
         if (_setup_callback)
-            _setup_callback(this, &_scene);        
+            _setup_callback(this, &_scene);
+
+        InputStay input_stay;
+
+        bool is_close = true;
+
+        do 
+        {
+            updateInputState(input_stay);
+            if (_window)
+                is_close = input_stay.window.isClsoe();
+
+            const auto& result = _ptr_frame_graph->draw();
+
+            /// @todo present result image
+        } while (!is_close);
     }
 
     Camera& Engine::camera() noexcept
@@ -86,5 +103,14 @@ namespace pbrlib
     Window& Engine::window() noexcept
     {
         return *_window;
+    }
+
+    void Engine::updateInputState(InputStay& input_stay)
+    {
+        input_stay.reset();
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+            input_stay.add(&event);
     }
 }

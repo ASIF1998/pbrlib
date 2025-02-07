@@ -1,6 +1,6 @@
-namespace pbrlib
+namespace pbrlib::utils
 {
-    const std::unordered_map<SDL_Keycode, Keycode> KeyboardStay::SDLtoPBRLibKeycode
+    const std::unordered_map<SDL_Keycode, Keycode> sdl_to_pbrlib_keycode
     {
         {SDLK_a, Keycode::A},
         {SDLK_b, Keycode::B},

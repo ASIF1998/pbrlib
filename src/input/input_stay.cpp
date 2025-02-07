@@ -1,10 +1,17 @@
 #include <pbrlib/input/input_stay.hpp>
 
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_keyboard.h>
 
 #include <backend/input/sdl_keycode_map.hpp>
 
-using namespace pbrlib::math;
+namespace pbrlib::utils
+{
+	const SDL_Event* cast(EventHandle event_handle)
+	{
+		return reinterpret_cast<const SDL_Event*>(event_handle);
+	}
+}
 
 namespace pbrlib
 {
@@ -13,9 +20,10 @@ namespace pbrlib
 		_pressed_map.fill(KeyboardStay::KeyStay::None);
 	}
 
-	void KeyboardStay::add(const SDL_Event* ptr_event)
+	void KeyboardStay::add(EventHandle event_handle)
 	{
-		if (auto keycode = SDLtoPBRLibKeycode.find(ptr_event->key.keysym.sym); keycode != std::end(SDLtoPBRLibKeycode))
+		auto ptr_event = utils::cast(event_handle);
+		if (auto keycode = utils::sdl_to_pbrlib_keycode.find(ptr_event->key.keysym.sym); keycode != std::end(utils::sdl_to_pbrlib_keycode))
 		{
 			auto keycode_index = utils::enumCast(keycode->second);
 
@@ -39,8 +47,10 @@ namespace pbrlib
 
 namespace pbrlib
 {
-	void WindowStay::add(const SDL_Event* ptr_event)
+	void WindowStay::add(EventHandle event_handle)
 	{
+		auto ptr_event = utils::cast(event_handle);
+		
 		if (ptr_event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
 			_is_close = true;
 	}
@@ -58,8 +68,10 @@ namespace pbrlib
 
 namespace pbrlib
 {
-	void MouseButtonsStay::add(const SDL_Event* ptr_event)
+	void MouseButtonsStay::add(EventHandle event_handle)
 	{
+		auto ptr_event = utils::cast(event_handle);
+		
 		size_t button_index = ptr_event->button.button;
 
 		if (button_index < SDL_BUTTON_LEFT || button_index > SDL_BUTTON_RIGHT)
@@ -91,8 +103,10 @@ namespace pbrlib
 
 namespace pbrlib
 {
-	void MouseMotionStay::update(const SDL_Event* ptr_event)
+	void MouseMotionStay::update(EventHandle event_handle)
 	{
+		auto ptr_event = utils::cast(event_handle);
+
 		if (ptr_event->type == SDL_EVENT_MOUSE_MOTION)
 		{
 			_current_coord.x = ptr_event->motion.x;
@@ -110,12 +124,12 @@ namespace pbrlib
 		_is_motion = false;
 	}
 
-	vec2 MouseMotionStay::getCurrentCoord() const
+	math::vec2 MouseMotionStay::getCurrentCoord() const
 	{
 		return _current_coord;
 	}
 
-	vec2 MouseMotionStay::getRelativeMotion() const
+	math::vec2 MouseMotionStay::getRelativeMotion() const
 	{
 		return _relative_motion;
 	}
@@ -128,8 +142,10 @@ namespace pbrlib
 
 namespace pbrlib
 {
-	void InputStay::add(const SDL_Event* ptr_event)
+	void InputStay::add(EventHandle event_handle)
 	{
+		auto ptr_event = utils::cast(event_handle);
+
 		switch (ptr_event->type)
 		{
 		case SDL_EVENT_KEY_DOWN:

@@ -19,6 +19,7 @@ namespace pbrlib
     struct  Config;
     class   Engine;
     class   FrameGraph;
+    struct  InputStay;
 }
 
 namespace pbrlib
@@ -31,6 +32,8 @@ namespace pbrlib
     class Engine final
     {
         friend class Scene;
+
+        static void updateInputState(InputStay& input_stay);
 
     public:
         explicit Engine(const Config& config);

@@ -13,7 +13,7 @@ namespace pbrlib
     {
         _image = vk::Image::Builder(_ptr_device)
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
-            .fillColor(pbrlib::math::vec3(0))
+            .fillColor(math::vec3(0))
             .format(VK_FORMAT_R8G8B8A8_UNORM)
             .name("FrameGraph result image")
             .size(config.width, config.height)

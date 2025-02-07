@@ -56,7 +56,7 @@ namespace pbrlib
     class ScopedTransform
     {
     public:
-        explicit ScopedTransform(AssimpImporter* ptr_importer, const pbrlib::math::mat4& transform) :
+        explicit ScopedTransform(AssimpImporter* ptr_importer, const math::mat4& transform) :
             _ptr_importer           (ptr_importer),
             _prev_transform         (ptr_importer->_current_state.transform)
         {
@@ -69,8 +69,8 @@ namespace pbrlib
         }
 
     private:
-        AssimpImporter*     _ptr_importer;
-        pbrlib::math::mat4  _prev_transform;
+        AssimpImporter* _ptr_importer;
+        math::mat4      _prev_transform;
     };
 }
 
@@ -197,7 +197,7 @@ namespace pbrlib
                     attribute.pos       = utils::cast(ptr_mesh->mVertices[j]);
                     attribute.normal    = utils::cast(ptr_mesh->mNormals[j]);
                     attribute.tangent   = utils::cast(ptr_mesh->mTangents[j]);
-                    attribute.uv        = pbrlib::math::vec2(uv.x, uv.y);
+                    attribute.uv        = math::vec2(uv.x, uv.y);
 
                     attributes.push_back(attribute);
                 }
@@ -363,7 +363,7 @@ namespace pbrlib
 
         return vk::Image::Builder(_ptr_device)
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
-            .fillColor(pbrlib::math::vec3(0))
+            .fillColor(math::vec3(0))
             .format(formats[channels_per_pixel - 1])
             .name("Default image")
             .size(1, 1)
