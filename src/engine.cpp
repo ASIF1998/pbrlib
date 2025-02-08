@@ -50,9 +50,12 @@ namespace pbrlib
         }
 
         _ptr_device = std::make_unique<vk::Device>();
-        _ptr_device->init(_window ? &_window.value() : nullptr);
+        _ptr_device->init();
 
-        _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), config);
+        if (_window)
+            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), &_window.value());
+        else 
+            _ptr_frame_graph = std::make_unique<FrameGraph>(_ptr_device.get(), config);
     }
 
     Engine::~Engine()
@@ -86,12 +89,13 @@ namespace pbrlib
         do 
         {
             updateInputState(input_stay);
+
             if (_window)
                 is_close = input_stay.window.isClsoe();
 
-            const auto& result = _ptr_frame_graph->draw();
+            if (!_ptr_frame_graph->draw())
+                is_close = true;
 
-            /// @todo present result image
         } while (!is_close);
     }
 

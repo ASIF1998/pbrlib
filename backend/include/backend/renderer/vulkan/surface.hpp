@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 
 #include <vector>
+#include <numeric>
 
 namespace pbrlib::vk
 {
@@ -12,12 +13,21 @@ namespace pbrlib::vk
 namespace pbrlib
 {
     class Window;
+    class FrameGraph;
 }
 
 namespace pbrlib::vk
 {
+    struct NextImageInfo
+    {
+        VkImage     image   = VK_NULL_HANDLE;
+        uint32_t    index   = std::numeric_limits<uint32_t>::max();
+    };
+
     class Surface
     {
+        friend class FrameGraph;
+
         std::vector<VkSurfaceFormatKHR> getSurfaceFormats();
 
         void createSurface(const Window* ptr_window);
@@ -36,7 +46,7 @@ namespace pbrlib::vk
         Surface& operator = (Surface&& surface);
         Surface& operator = (const Surface& surface) = delete;
 
-        [[nodiscard]] uint32_t nextImage() const;
+        [[nodiscard]] NextImageInfo nextImage() const;
         
     private:
         VkSurfaceKHR    _surface_handle     = VK_NULL_HANDLE;

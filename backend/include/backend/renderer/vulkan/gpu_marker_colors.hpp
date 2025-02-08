@@ -2,11 +2,10 @@
 
 #include <backend/utils/generate_color.hpp>
 
-namespace pbrlib
+namespace pbrlib::vk::marker_colors
 {
-    struct GpuMarkerColors final
-    {
-        constexpr static auto write_data_in_buffer  = utils::generateColor(1);
-        constexpr static auto write_data_in_image   = utils::generateColor(2);
-    };
+    constexpr auto write_data_in_buffer = generateColor(1);
+    constexpr auto write_data_in_image  = generateColor(2);
+    
+    constexpr auto present_image = generateColor(3);
 }

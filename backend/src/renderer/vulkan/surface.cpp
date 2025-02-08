@@ -287,34 +287,41 @@ namespace pbrlib::vk
         }
     }
 
-    uint32_t Surface::nextImage() const
+    NextImageInfo Surface::nextImage() const
     {
+        VkFence fence_handle = VK_NULL_HANDLE;
         VkFenceCreateInfo fence_create_info = { };
         fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-
-        VkAcquireNextImageInfoKHR acquire_next_image_info = { }; 
-        acquire_next_image_info.sType       = VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR;
-        acquire_next_image_info.swapchain   = _swapchain_handle;
 
         VK_CHECK(
             vkCreateFence(
                 _ptr_device->device(), 
                 &fence_create_info, 
                 nullptr, 
-                &acquire_next_image_info.fence
+                &fence_handle
             )
         );
 
-        VK_CHECK(
-            vkAcquireNextImage2KHR(
-                _ptr_device->device(),
-                &acquire_next_image_info,
-                &_current_image_index
-            )
-        );
+        VK_CHECK(vkAcquireNextImageKHR(
+            _ptr_device->device(),
+            _swapchain_handle,
+            std::numeric_limits<uint64_t>::max(),
+            VK_NULL_HANDLE, fence_handle, 
+            &_current_image_index
+        ));
 
-        vkDestroyFence(_ptr_device->device(), acquire_next_image_info.fence, nullptr);
+        VK_CHECK(vkWaitForFences(
+            _ptr_device->device(),
+            1, &fence_handle,
+            VK_TRUE, std::numeric_limits<uint64_t>::max()
+        ));
 
-        return _current_image_index;
+        vkDestroyFence(_ptr_device->device(), fence_handle, nullptr);
+
+        return NextImageInfo
+        {
+            .image = _image_handles[_current_image_index],
+            .index = _current_image_index
+        };
     }   
 }

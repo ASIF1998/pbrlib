@@ -18,15 +18,10 @@ TEST(FrameGraphTests, Ctor)
     };
 
     pbrlib::vk::Device device;
-    device.init(nullptr);
+    device.init();
 
     pbrlib::FrameGraph frame_graph (&device, config);
 
     EXPECT_EQ(width, frame_graph.size().width);
     EXPECT_EQ(height, frame_graph.size().height);
-
-    const auto& result_image = frame_graph.draw();
-
-    EXPECT_EQ(width, result_image.width);
-    EXPECT_EQ(height, result_image.height);
 }

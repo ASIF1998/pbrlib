@@ -12,7 +12,7 @@ class VulkanDeviceTests :
 public:
     VulkanDeviceTests()
     {
-        device.init(nullptr);
+        device.init();
     }
     
     pbrlib::vk::Device device;

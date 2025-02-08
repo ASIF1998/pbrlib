@@ -70,7 +70,7 @@ namespace pbrlib::vk
             copy.size       = static_cast<VkDeviceSize>(size);
 
             vkCmdCopyBuffer(command_buffer_handle, temp_buffer.handle, handle, 1, &copy);
-        }, "Write data in buffer", GpuMarkerColors::write_data_in_buffer);
+        }, "Write data in buffer", marker_colors::write_data_in_buffer);
 
         VkCommandBufferSubmitInfo buffer_submit_info = { };
         buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;

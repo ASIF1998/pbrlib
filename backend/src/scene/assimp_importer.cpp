@@ -30,6 +30,23 @@ namespace pbrlib::utils
         );
     }
 
+    std::string_view toStirng(aiTextureType type)
+    {
+        switch (type)
+        {
+            case aiTextureType_DIFFUSE:
+                return "diffuse";
+            case aiTextureType_NORMALS:
+                return "normal_map";
+            case aiTextureType_METALNESS:
+                return "metalness";
+            case aiTextureType_DIFFUSE_ROUGHNESS:
+                return "roughness";
+        }
+
+        return "udnefined";
+    }
+
     pbrlib::math::vec2 cast(const aiVector2D& vec)
     {
         return pbrlib::math::vec2(vec.x, vec.y);
@@ -299,7 +316,7 @@ namespace pbrlib
         return getImage (
             ptr_texture, 
             channels_per_pixel, 
-            std::format("[{}] - albedo", ptr_material->GetName().C_Str())
+            std::format("[{}] - {}", ptr_material->GetName().C_Str(), utils::toStirng(texuture_type))
         );
     }
 

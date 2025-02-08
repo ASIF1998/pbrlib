@@ -2,7 +2,9 @@
 
 #include <pbrlib/config.hpp>
 
+#include <backend/utils/vulkan.hpp>
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -22,14 +24,23 @@ namespace pbrlib
             .build();
     }
 
-    const vk::Image& FrameGraph::draw()
+    FrameGraph::FrameGraph(vk::Device* ptr_device, const Window* ptr_window) :
+        _ptr_device(ptr_device)
+    {
+        _surface.emplace(ptr_device, ptr_window);
+    }
+
+    const bool FrameGraph::draw()
     {
         if (_ptr_render_pass)
             _ptr_render_pass->render(*_image);
         else 
             log::engine::error("[FrameGraph] Failed draw scene because render pass is empty");
 
-        return *_image;
+        if (_surface)
+            present();
+
+        return true;
     }
 
     const Size FrameGraph::size() const
@@ -39,5 +50,67 @@ namespace pbrlib
             .width  = _image->width,
             .height = _image->height
         };
+    }
+
+    void FrameGraph::present() const
+    {
+        auto command_buffer = _ptr_device->oneTimeSubmitCommandBuffer(
+            _ptr_device->queue(),
+            "General command buffer"
+        );
+
+        auto [image_handle, image_index] = _surface->nextImage();
+
+        command_buffer.write([this, image_handle](auto command_buffer_handle)
+        {
+            VkImageMemoryBarrier image_barrier = { };
+            image_barrier.sType                             = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            image_barrier.oldLayout                         = VK_IMAGE_LAYOUT_UNDEFINED;
+            image_barrier.newLayout                         = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+            image_barrier.srcQueueFamilyIndex               = 0;
+            image_barrier.dstQueueFamilyIndex               = 0;
+            image_barrier.subresourceRange.aspectMask       = VK_IMAGE_ASPECT_COLOR_BIT;
+            image_barrier.subresourceRange.baseArrayLayer   = 0;
+            image_barrier.subresourceRange.layerCount       = 1;
+            image_barrier.subresourceRange.baseMipLevel     = 0;
+            image_barrier.subresourceRange.levelCount       = 1;
+            image_barrier.image                             = image_handle;
+
+            vkCmdPipelineBarrier(
+                command_buffer_handle,
+                VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_HOST_BIT, 0, 
+                0, nullptr,
+                0, nullptr,
+                1, &image_barrier 
+            );
+        }, "Present result image", vk::marker_colors::present_image);
+
+        VkCommandBufferSubmitInfo buffer_submit_info = { };
+        buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+        buffer_submit_info.commandBuffer    = command_buffer.handle;
+
+        VkSubmitInfo2 submit_info = { };
+        submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+        submit_info.pCommandBufferInfos     = &buffer_submit_info;
+        submit_info.commandBufferInfoCount  = 1;
+
+        VK_CHECK(
+            vkQueueSubmit2(
+                _ptr_device->queue().handle,
+                1, &submit_info,
+                VK_NULL_HANDLE
+            )
+        );
+
+        VkResult result = VK_SUCCESS;
+
+        VkPresentInfoKHR present_info = { };
+        present_info.sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.pResults       = &result;
+        present_info.pSwapchains    = &_surface->_swapchain_handle;
+        present_info.swapchainCount = 1;
+        present_info.pImageIndices = &image_index;
+
+        VK_CHECK(vkQueuePresentKHR(_ptr_device->queue().handle, &present_info));
     }
 }

@@ -23,7 +23,6 @@ namespace pbrlib
         IRenderPass& operator = (const IRenderPass& render_pass)    = delete;
 
         virtual bool init(const vk::Device* ptr_device) = 0;
-
-        virtual void render(vk::Image& result) = 0; 
+        virtual void render(vk::Image& result)          = 0; 
     };
 }

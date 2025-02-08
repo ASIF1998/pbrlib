@@ -59,7 +59,7 @@ namespace pbrlib::vk
         Device& operator = (Device&& device)         = delete;
         Device& operator = (const Device& device)    = delete;
 
-        void init(const Window* ptr_window);
+        void init();
 
         [[nodiscard]] VkInstance        instance()          const noexcept;
         [[nodiscard]] VkPhysicalDevice  physicalDevice()    const noexcept;
@@ -94,8 +94,6 @@ namespace pbrlib::vk
         VmaAllocator _vma_allocator_handle = VK_NULL_HANDLE;
 
         VulkanFunctions _functions;
-
-        std::optional<Surface> _surface;
 
         VkDescriptorPool _descriptor_pool_handle = VK_NULL_HANDLE;
     };

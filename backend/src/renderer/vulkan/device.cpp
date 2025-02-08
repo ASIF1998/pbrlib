@@ -22,8 +22,6 @@ namespace pbrlib::vk
         if (_descriptor_pool_handle != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(_device_handle, _descriptor_pool_handle, nullptr);
 
-        _surface = std::nullopt;
-
         vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
 
         if (_vma_allocator_handle != VK_NULL_HANDLE)
@@ -36,14 +34,11 @@ namespace pbrlib::vk
            vkDestroyInstance(_instance_handle, nullptr);
     }
 
-    void Device::init(const Window* ptr_window)
+    void Device::init()
     {
         initInstance(config::enable_vulkan_debug_print);
         getPhysicalDevice();
         initDevice();
-
-        if (ptr_window)
-            _surface = std::make_optional<Surface>(this, ptr_window);
 
         loadFunctions();
 
@@ -260,8 +255,13 @@ namespace pbrlib::vk
         if (config::enable_vulkan_debug_marker)
             extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 
+        VkPhysicalDeviceVulkan13Features vulkan_1_3_features = {};
+        vulkan_1_3_features.sType               = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        vulkan_1_3_features.synchronization2    = VK_TRUE;
+
         VkDeviceCreateInfo device_info = { };
         device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        device_info.pNext                   = &vulkan_1_3_features;
         device_info.pQueueCreateInfos       = &queue_info;
         device_info.queueCreateInfoCount    = 1;
         device_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());

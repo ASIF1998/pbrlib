@@ -1,4 +1,4 @@
-namespace pbrlib::utils
+namespace pbrlib::vk::marker_colors
 {
     /// from Chris Wellons https://nullprogram.com/blog/2018/07/31/
     constexpr uint32_t lowbias32(uint32_t x)

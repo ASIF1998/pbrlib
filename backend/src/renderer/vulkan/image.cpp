@@ -137,7 +137,7 @@ namespace pbrlib::vk
             copy_info.pRegions          = &region;
 
             vkCmdCopyBufferToImage2(command_buffer_handle, &copy_info);
-        }, "Write data in image", GpuMarkerColors::write_data_in_image);
+        }, "Write data in image", marker_colors::write_data_in_image);
 
         VkCommandBufferSubmitInfo buffer_submit_info = { };
         buffer_submit_info.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;

@@ -2,7 +2,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-namespace pbrlib::utils
+namespace pbrlib::vk::marker_colors
 {
     constexpr pbrlib::math::vec3 generateColor(uint32_t val);
 }
