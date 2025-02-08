@@ -44,11 +44,11 @@ target_include_directories(pbrlib PUBLIC include)
 target_include_directories(pbrlib PUBLIC backend/include)
 
 if (MSVC)
-    target_compile_options(pbrlib PRIVATE /W3 /WX /MP /showIncludes)
+    target_compile_options(pbrlib PRIVATE /W3 /WX /MP)
 endif()
 
 if (PBRLIB_SETUP_CI AND MSVC)
-    target_compile_options(pbrlib PRIVATE /W3 /WX /MP)
+    target_compile_options(pbrlib PRIVATE /showIncludes)
 endif()
 
 #####################################################
