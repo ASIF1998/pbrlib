@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pbrlib/scene/visitor.hpp>
+
 #include <pbrlib/transform.hpp>
 
 #include <entt/entt.hpp>
@@ -50,6 +52,8 @@ namespace pbrlib
             float               delta_time, 
             const Transform&    world_transform
         );
+
+        void visit(SceneVisitor* ptr_visitor);
 
     public:
         using UpdateCallback = std::function<void (
@@ -112,6 +116,13 @@ namespace pbrlib
         [[maybe_unused]] bool import(const std::filesystem::path& filename, Engine* ptr_engine);
 
         void update(const InputStay& input_stay, float delta_time);
+
+        template<IsSceneVisitor T>
+        void visit(const std::unique_ptr<T>& ptr_visitor)
+        {
+            if (ptr_visitor && _root)
+                _root->visit(ptr_visitor.get());
+        }
 
     private:
         entt::registry              _registry;
