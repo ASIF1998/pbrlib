@@ -35,6 +35,8 @@ namespace pbrlib
 
         static void updateInputState(InputStay& input_stay);
 
+        void draw();
+
     public:
         explicit Engine(const Config& config);
 

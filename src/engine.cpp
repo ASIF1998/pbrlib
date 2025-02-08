@@ -93,8 +93,7 @@ namespace pbrlib
             if (_window)
                 is_close = input_stay.window.isClsoe();
 
-            if (!_ptr_frame_graph->draw())
-                is_close = true;
+            draw();
 
         } while (!is_close);
     }
@@ -116,5 +115,10 @@ namespace pbrlib
         SDL_Event event;
         while (SDL_PollEvent(&event))
             input_stay.add(&event);
+    }
+
+    void Engine::draw()
+    {
+        _scene.visit(_ptr_frame_graph);
     }
 }

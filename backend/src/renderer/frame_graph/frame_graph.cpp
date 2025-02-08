@@ -1,12 +1,14 @@
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 
-#include <pbrlib/config.hpp>
-
 #include <backend/utils/vulkan.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/logger/logger.hpp>
+
+#include <pbrlib/config.hpp>
+
+#include <pbrlib/scene/scene.hpp>
 
 namespace pbrlib
 {
@@ -28,19 +30,6 @@ namespace pbrlib
         _ptr_device(ptr_device)
     {
         _surface.emplace(ptr_device, ptr_window);
-    }
-
-    const bool FrameGraph::draw()
-    {
-        if (_ptr_render_pass)
-            _ptr_render_pass->render(*_image);
-        else 
-            log::engine::error("[FrameGraph] Failed draw scene because render pass is empty");
-
-        if (_surface)
-            present();
-
-        return true;
     }
 
     const Size FrameGraph::size() const
@@ -112,5 +101,21 @@ namespace pbrlib
         present_info.pImageIndices = &image_index;
 
         VK_CHECK(vkQueuePresentKHR(_ptr_device->queue().handle, &present_info));
+    }
+}
+
+namespace pbrlib
+{
+    void FrameGraph::process(SceneItem* ptr_item)
+    {
+        if (_ptr_render_pass)
+        {
+            /// @todo
+        }
+        else
+            log::engine::error("[FrameGraph] Failed draw scene because render pass is empty");
+
+        if (_surface)
+            present();
     }
 }
