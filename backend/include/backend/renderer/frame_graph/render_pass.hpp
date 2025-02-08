@@ -10,6 +10,11 @@ namespace pbrlib::vk
 
 namespace pbrlib
 {
+    class SceneItem;
+}
+
+namespace pbrlib
+{
     struct IRenderPass
     {
         IRenderPass() = default;
@@ -23,6 +28,6 @@ namespace pbrlib
         IRenderPass& operator = (const IRenderPass& render_pass)    = delete;
 
         virtual bool init(const vk::Device* ptr_device) = 0;
-        virtual void render(vk::Image& result)          = 0; 
+        virtual void render(const SceneItem* ptr_item)  = 0; 
     };
 }

@@ -25,7 +25,7 @@ namespace pbrlib
 
         bool init(const vk::Device* ptr_device) override;
 
-        void render(vk::Image& result) override;
+        void render(const SceneItem* ptr_item) override;
 
     private:
         std::vector<std::unique_ptr<IRenderPass>> _subpasses;
