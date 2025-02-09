@@ -7,6 +7,12 @@ namespace pbrlib
 
 namespace pbrlib
 {
+    enum class TraversalCommand 
+    {
+        eContinue,
+        eTerminate
+    };
+
     struct SceneVisitor
     {
         SceneVisitor() = default;
@@ -19,7 +25,7 @@ namespace pbrlib
         SceneVisitor& operator = (SceneVisitor&& visitor)       = delete;
         SceneVisitor& operator = (const SceneVisitor& visitor)  = delete;
 
-        virtual void process(SceneItem* ptr_item) = 0;
+        virtual TraversalCommand process(SceneItem* ptr_item) = 0;
     };
 
     template<typename T>

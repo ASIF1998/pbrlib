@@ -37,7 +37,7 @@ namespace pbrlib
     {
         void present() const;
 
-        void process(SceneItem* ptr_item) override;
+        TraversalCommand process(SceneItem* ptr_item) override;
 
     public:
         explicit FrameGraph(vk::Device* ptr_device, const Config& config);

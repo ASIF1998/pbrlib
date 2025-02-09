@@ -21,9 +21,9 @@ namespace pbrlib
 
 		enum class KeyStay
 		{
-			Down,
-			Up, 
-			None
+			eDown,
+			eUp, 
+			eNone
 		};
 
 		void add(EventHandle event_handle);
@@ -59,9 +59,9 @@ namespace pbrlib
 {
 	enum class MouseButton
 	{
-		Left, 
-		Middle,
-		Right
+		eLeft, 
+		eMiddle,
+		eRight
 	};
 
 	class MouseButtonsStay
@@ -73,9 +73,9 @@ namespace pbrlib
 
 		enum class ButtonStay
 		{
-			Down,
-			Up,
-			None
+			eDown,
+			eUp,
+			eNone
 		};
 
 	public:

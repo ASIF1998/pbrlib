@@ -106,7 +106,7 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    void FrameGraph::process(SceneItem* ptr_item)
+    TraversalCommand FrameGraph::process(SceneItem* ptr_item)
     {
         if (_ptr_render_pass)
         {
@@ -117,5 +117,7 @@ namespace pbrlib
 
         if (_surface)
             present();
+
+        return TraversalCommand::eContinue;
     }
 }

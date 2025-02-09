@@ -44,7 +44,7 @@ namespace pbrlib::vk
             .size(size)
             .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
-            .type(BufferType::staging)
+            .type(BufferType::eStaging)
             .build();
 
         void* ptr_temp_buffer_memory = nullptr;
@@ -170,9 +170,9 @@ namespace pbrlib::vk
         alloc_info.usage    = VMA_MEMORY_USAGE_AUTO;
         alloc_info.priority = 1.0f;
 
-        if (_type == BufferType::device_only)
+        if (_type == BufferType::eDeviceOnly)
             alloc_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-        else if (_type == BufferType::staging)
+        else if (_type == BufferType::eStaging)
             alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
         else 
             alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;

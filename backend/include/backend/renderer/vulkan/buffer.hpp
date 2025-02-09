@@ -18,9 +18,9 @@ namespace pbrlib::vk
 {
     enum class BufferType
     {
-        device_only,    //!< Any resources that you frequently write and read on GPU.
-        staging,        //!< A "staging" buffer than you want to map and fill from CPU code, then use as a source of transfer to some GPU resource.
-        readback        //!< Buffers for data written by or transferred from the GPU that you want to read back on the CPU.
+        eDeviceOnly,    //!< Any resources that you frequently write and read on GPU.
+        eStaging,       //!< A "staging" buffer than you want to map and fill from CPU code, then use as a source of transfer to some GPU resource.
+        eReadback       //!< Buffers for data written by or transferred from the GPU that you want to read back on the CPU.
     };
 
     class Buffer final
@@ -95,7 +95,7 @@ namespace pbrlib::vk
         VkDeviceSize        _size   = 0;
         VkImageUsageFlags   _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
 
-        BufferType _type = BufferType::device_only;
+        BufferType _type = BufferType::eDeviceOnly;
 
         std::string _name;
     };

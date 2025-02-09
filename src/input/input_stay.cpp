@@ -17,7 +17,7 @@ namespace pbrlib
 {
 	void KeyboardStay::reset()
 	{
-		_pressed_map.fill(KeyboardStay::KeyStay::None);
+		_pressed_map.fill(KeyboardStay::KeyStay::eNone);
 	}
 
 	void KeyboardStay::add(EventHandle event_handle)
@@ -28,20 +28,20 @@ namespace pbrlib
 			auto keycode_index = utils::enumCast(keycode->second);
 
 			if (ptr_event->type == SDL_EVENT_KEY_DOWN)
-				_pressed_map[keycode_index] = KeyStay::Down;
+				_pressed_map[keycode_index] = KeyStay::eDown;
 			else if (ptr_event->type == SDL_EVENT_KEY_UP)
-				_pressed_map[keycode_index] = KeyStay::Up;
+				_pressed_map[keycode_index] = KeyStay::eUp;
 		}
 	}
 
 	bool KeyboardStay::isDown(Keycode key_code) const
 	{
-		return _pressed_map[utils::enumCast(key_code)] == KeyStay::Down;
+		return _pressed_map[utils::enumCast(key_code)] == KeyStay::eDown;
 	}
 	
     bool KeyboardStay::isUp(Keycode key_code) const
 	{
-		return _pressed_map[utils::enumCast(key_code)] == KeyStay::Up;
+		return _pressed_map[utils::enumCast(key_code)] == KeyStay::eUp;
 	}
 }
 
@@ -80,24 +80,24 @@ namespace pbrlib
 		--button_index;
 
 		if (ptr_event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
-			_pressed_map[button_index] = ButtonStay::Down;
+			_pressed_map[button_index] = ButtonStay::eDown;
 		else if (ptr_event->type == SDL_EVENT_MOUSE_BUTTON_UP)
-			_pressed_map[button_index] = ButtonStay::Up;
+			_pressed_map[button_index] = ButtonStay::eUp;
 	}
 	
 	void MouseButtonsStay::reset()
 	{
-		_pressed_map.fill(ButtonStay::None);	
+		_pressed_map.fill(ButtonStay::eNone);	
 	}
 
 	bool MouseButtonsStay::isDown(MouseButton button) const
 	{
-		return _pressed_map[utils::enumCast(button)] == ButtonStay::Down;
+		return _pressed_map[utils::enumCast(button)] == ButtonStay::eDown;
 	}
 	
 	bool MouseButtonsStay::isUp(MouseButton button) const
 	{
-		return _pressed_map[utils::enumCast(button)] == ButtonStay::Up;
+		return _pressed_map[utils::enumCast(button)] == ButtonStay::eUp;
 	}
 }
 
