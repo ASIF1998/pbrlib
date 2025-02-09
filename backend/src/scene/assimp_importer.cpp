@@ -12,6 +12,7 @@
 
 #include <backend/scene/mesh_component.hpp>
 #include <backend/scene/material_components.hpp>
+#include <backend/scene/renderable_component.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -203,6 +204,9 @@ namespace pbrlib
                 std::string_view name = ptr_mesh->mName.C_Str();
 
                 auto& item = _ptr_root_item->addItem(name);
+
+                auto& component = item.addComponent<RenderableComponent>();
+                component.ptr_item = &item;
 
                 processMaterial(ptr_scene, ptr_scene->mMaterials[ptr_mesh->mMaterialIndex], &item);
 

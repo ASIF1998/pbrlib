@@ -106,18 +106,20 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    TraversalCommand FrameGraph::process(SceneItem* ptr_item)
+    void FrameGraph::draw(std::span<const SceneItem*> items)
     {
         if (_ptr_render_pass)
         {
-            /// @todo
+            for (const auto ptr_item: items)
+                _ptr_render_pass->render(ptr_item);
         }
         else
+        {
             log::engine::error("[FrameGraph] Failed draw scene because render pass is empty");
+            return ;
+        }
 
         if (_surface)
             present();
-
-        return TraversalCommand::eContinue;
     }
 }

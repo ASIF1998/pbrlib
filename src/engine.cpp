@@ -2,6 +2,7 @@
 #include <pbrlib/engine.hpp>
 
 #include <pbrlib/scene/scene.hpp>
+#include <backend/scene/renderable_component.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -119,6 +120,15 @@ namespace pbrlib
 
     void Engine::draw()
     {
-        _scene.visit(_ptr_frame_graph);
+        /// @todo добавить сортировку по глублине в пространстве камеры
+        std::vector<const SceneItem*> items;
+
+        auto view = _scene._registry.view<RenderableComponent>();
+
+        for (auto entity: view)
+            items.push_back(view.get<RenderableComponent>(entity).ptr_item);
+
+        if (_ptr_frame_graph)
+            _ptr_frame_graph->draw(items);
     }
 }

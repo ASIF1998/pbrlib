@@ -22,6 +22,7 @@ namespace pbrlib
 {
     struct  InputStay;
     class   Scene;
+    class   SceneItem;
     class   Engine;
 }
 
@@ -99,6 +100,7 @@ namespace pbrlib
     class Scene final
     {
         friend class SceneItem;
+        friend class Engine;
 
     public:
         explicit Scene(std::string_view name);

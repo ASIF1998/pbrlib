@@ -5,8 +5,6 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
 
-#include <pbrlib/scene/visitor.hpp>
-
 #include <pbrlib/math/vec3.hpp>
 
 #include <string>
@@ -32,12 +30,9 @@ namespace pbrlib
         uint32_t height = 0;
     };
 
-    class FrameGraph final :
-        public SceneVisitor
+    class FrameGraph final
     {
         void present() const;
-
-        TraversalCommand process(SceneItem* ptr_item) override;
 
     public:
         explicit FrameGraph(vk::Device* ptr_device, const Config& config);
@@ -51,6 +46,8 @@ namespace pbrlib
 
         [[nodiscard]]
         const Size size() const;
+
+        void draw(std::span<const SceneItem*> items);
 
     private:
         vk::Device* _ptr_device = nullptr;
