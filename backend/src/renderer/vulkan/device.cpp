@@ -7,6 +7,8 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/config.hpp>
 
+#include <backend/renderer/vulkan/shader_compiler.hpp>
+
 #include <SDL3/SDL_vulkan.h>
 
 #include <vma/vk_mem_alloc.h>
@@ -32,6 +34,8 @@ namespace pbrlib::vk
 
         if (_instance_handle != VK_NULL_HANDLE) 
            vkDestroyInstance(_instance_handle, nullptr);
+
+        shader::finalizeCompiler();
     }
 
     void Device::init()
@@ -41,6 +45,8 @@ namespace pbrlib::vk
         initDevice();
 
         loadFunctions();
+
+        shader::initCompiler();
 
         initGpuAllocator();
 

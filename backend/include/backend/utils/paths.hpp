@@ -5,7 +5,7 @@
 namespace pbrlib::utils
 {
     [[nodiscard]]
-    std::filesystem::path projectRoot()
+    inline std::filesystem::path projectRoot()
     {
         return pbrlib::priv::PathToRoot;
     }
