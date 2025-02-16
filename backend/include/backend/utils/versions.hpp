@@ -5,7 +5,7 @@
 namespace pbrlib::utils
 {
     [[nodiscard]]
-    uint32_t engineVersion()
+    constexpr uint32_t engineVersion()
     {
         return pbrlib::priv::EngineVersion;
     }

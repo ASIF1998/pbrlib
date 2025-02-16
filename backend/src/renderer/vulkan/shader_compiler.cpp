@@ -200,7 +200,7 @@ namespace pbrlib::vk::shader
     {
         pbrlib::log::engine::info("[ShaderCompiler]: Compile shader: {}", filename.filename().string());
 
-        auto il = createIL(filename);
+        auto il = createIL(pbrlib::utils::projectRoot() / "backend" / filename);
 
         VkShaderModule              shader_module_handle        = VK_NULL_HANDLE;
         VkShaderModuleCreateInfo    shader_module_create_info   = {};

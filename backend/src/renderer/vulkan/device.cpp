@@ -60,16 +60,20 @@ namespace pbrlib::vk
 {
     void Device::initInstance(bool is_debug)
     {
-        VkApplicationInfo app_info = { };
-        app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        app_info.apiVersion         = utils::vulkanVersion();
-        app_info.applicationVersion = 0;
-        app_info.engineVersion      = utils::engineVersion();
-        app_info.pEngineName        = "pbrlib";
+        constexpr VkApplicationInfo app_info = 
+        { 
+            .sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .applicationVersion = 0,
+            .pEngineName        = "pbrlib",
+            .engineVersion      = utils::engineVersion(),
+            .apiVersion         = utils::vulkanVersion()
+        };
 
-        VkInstanceCreateInfo instance_info = { };
-        instance_info.sType             = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        instance_info.pApplicationInfo  = &app_info;
+        VkInstanceCreateInfo instance_info = 
+        { 
+            .sType             = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pApplicationInfo  = &app_info
+        };
 
         if (is_debug) 
         {
@@ -127,9 +131,11 @@ namespace pbrlib::vk
 
         for (auto handle: handles) 
         {
-            VkPhysicalDeviceProperties2 props = { };
-            props.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-            props.pNext = &driver_properties;
+            VkPhysicalDeviceProperties2 props = 
+            { 
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+                .pNext = &driver_properties
+            };
 
             vkGetPhysicalDeviceProperties2(handle, &props);
 
@@ -247,11 +253,13 @@ namespace pbrlib::vk
 
         constexpr float priority = 1.0f;
 
-        VkDeviceQueueCreateInfo queue_info = { };
-        queue_info.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_info.pQueuePriorities = &priority;
-        queue_info.queueCount       = 1;
-        queue_info.queueFamilyIndex = _general_queue.family_index;
+        const VkDeviceQueueCreateInfo queue_info = 
+        { 
+            .sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .queueFamilyIndex = _general_queue.family_index,
+            .queueCount       = 1,
+            .pQueuePriorities = &priority
+        };
 
         std::vector extensions 
         {
@@ -260,18 +268,31 @@ namespace pbrlib::vk
 
         if (config::enable_vulkan_debug_marker)
             extensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+        
+        VkPhysicalDeviceVulkan12Features vulkan_1_2_features = 
+        {
+            .sType                          = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+            .runtimeDescriptorArray         = VK_TRUE,
+            .separateDepthStencilLayouts    = VK_TRUE,
+            .bufferDeviceAddress            = VK_TRUE
+        }; 
 
-        VkPhysicalDeviceVulkan13Features vulkan_1_3_features = {};
-        vulkan_1_3_features.sType               = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-        vulkan_1_3_features.synchronization2    = VK_TRUE;
+        VkPhysicalDeviceVulkan13Features vulkan_1_3_features = 
+        {
+            .sType              = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
+            .pNext              = &vulkan_1_2_features,
+            .synchronization2   = VK_TRUE
+        };
 
-        VkDeviceCreateInfo device_info = { };
-        device_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        device_info.pNext                   = &vulkan_1_3_features;
-        device_info.pQueueCreateInfos       = &queue_info;
-        device_info.queueCreateInfoCount    = 1;
-        device_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
-        device_info.ppEnabledExtensionNames = extensions.data();
+        const VkDeviceCreateInfo device_info = 
+        { 
+            .sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .pNext                   = &vulkan_1_3_features,
+            .queueCreateInfoCount    = 1,
+            .pQueueCreateInfos       = &queue_info,
+            .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
+            .ppEnabledExtensionNames = extensions.data()
+        };
 
         VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle));
 
@@ -298,11 +319,13 @@ namespace pbrlib::vk
 {
     void Device::initGpuAllocator()
     {
-        VmaAllocatorCreateInfo allocator_info = { };
-        allocator_info.instance         = _instance_handle;
-        allocator_info.physicalDevice   = _physical_device_handle;
-        allocator_info.device           = _device_handle;
-        allocator_info.vulkanApiVersion = pbrlib::utils::vulkanVersion();
+        const VmaAllocatorCreateInfo allocator_info = 
+        { 
+            .physicalDevice   = _physical_device_handle,
+            .device           = _device_handle,
+            .instance         = _instance_handle,
+            .vulkanApiVersion = pbrlib::utils::vulkanVersion()
+        };
 
         VK_CHECK(vmaCreateAllocator(&allocator_info, &_vma_allocator_handle));
     }
@@ -320,20 +343,24 @@ namespace pbrlib::vk
 {
     void Device::initCommandPools()
     {
-        VkCommandPoolCreateInfo command_pool_info = { };
-        command_pool_info.sType             = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        command_pool_info.queueFamilyIndex  = _general_queue.family_index;
+        const VkCommandPoolCreateInfo command_pool_info = 
+        { 
+            .sType             = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+            .queueFamilyIndex  = _general_queue.family_index
+        };
 
         VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue));
     }
 
     CommandBuffer Device::oneTimeSubmitCommandBuffer(const Queue& queue, std::string_view name)
     {
-        VkCommandBufferAllocateInfo alloc_info = { };
-        alloc_info.sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        alloc_info.commandBufferCount   = 1;
-        alloc_info.commandPool          = _command_pool_for_general_queue;
-        alloc_info.level                = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        const VkCommandBufferAllocateInfo alloc_info = 
+        { 
+            .sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+            .commandPool          = _command_pool_for_general_queue,
+            .level                = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+            .commandBufferCount   = 1
+        };
 
         CommandBuffer command_buffer (this);
 
@@ -343,11 +370,13 @@ namespace pbrlib::vk
 
         if (!name.empty())
         {
-            VkDebugUtilsObjectNameInfoEXT name_info = { };
-            name_info.sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-            name_info.objectHandle  = reinterpret_cast<uint64_t>(command_buffer.handle);
-            name_info.objectType    = VK_OBJECT_TYPE_COMMAND_BUFFER;
-            name_info.pObjectName   = name.data();
+            const VkDebugUtilsObjectNameInfoEXT name_info = 
+            { 
+                .sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+                .objectType    = VK_OBJECT_TYPE_COMMAND_BUFFER,
+                .objectHandle  = reinterpret_cast<uint64_t>(command_buffer.handle),
+                .pObjectName   = name.data()
+            };
 
             setName(name_info);
         }
@@ -421,12 +450,14 @@ namespace pbrlib::vk
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, .descriptorCount = 1000}
         };
 
-        VkDescriptorPoolCreateInfo pool_info = { };
-        pool_info.sType             = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        pool_info.flags             = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        pool_info.maxSets           = 1000;
-        pool_info.poolSizeCount     = static_cast<uint32_t>(pool_sizes.size());
-        pool_info.pPoolSizes        = pool_sizes.data();
+        const VkDescriptorPoolCreateInfo pool_info = 
+        { 
+            .sType             = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+            .flags             = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+            .maxSets           = 1000,
+            .poolSizeCount     = static_cast<uint32_t>(pool_sizes.size()),
+            .pPoolSizes        = pool_sizes.data()
+        };
 
         VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle));
     }
@@ -443,11 +474,13 @@ namespace pbrlib::vk
 
         DescriptorSet descriptor_set (this);
 
-        VkDescriptorSetAllocateInfo allocate_info = { };
-        allocate_info.sType                 = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocate_info.descriptorPool        = _descriptor_pool_handle;
-        allocate_info.descriptorSetCount    = 1;
-        allocate_info.pSetLayouts           = &set_layout_handle;
+        VkDescriptorSetAllocateInfo allocate_info = 
+        { 
+            .sType                 = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+            .descriptorPool        = _descriptor_pool_handle,
+            .descriptorSetCount    = 1,
+            .pSetLayouts           = &set_layout_handle
+        };
         
         VK_CHECK(vkAllocateDescriptorSets(_device_handle, &allocate_info, &descriptor_set.handle));
 
