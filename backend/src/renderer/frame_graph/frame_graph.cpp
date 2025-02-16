@@ -4,6 +4,8 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
+#include <backend/renderer/frame_graph/gbuffer_generator.hpp>
+
 #include <backend/logger/logger.hpp>
 
 #include <pbrlib/config.hpp>
@@ -24,12 +26,15 @@ namespace pbrlib
             .tiling(VK_IMAGE_TILING_OPTIMAL)
             .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             .build();
+
+        build();
     }
 
     FrameGraph::FrameGraph(vk::Device* ptr_device, const Window* ptr_window) :
         _ptr_device(ptr_device)
     {
         _surface.emplace(ptr_device, ptr_window);
+        build();
     }
 
     const Size FrameGraph::size() const
@@ -101,6 +106,8 @@ namespace pbrlib
         present_info.pImageIndices = &image_index;
 
         VK_CHECK(vkQueuePresentKHR(_ptr_device->queue().handle, &present_info));
+
+        VK_CHECK(vkQueueWaitIdle(_ptr_device->queue().handle));
     }
 }
 
@@ -121,5 +128,14 @@ namespace pbrlib
 
         if (_surface)
             present();
+    }
+}
+
+namespace pbrlib
+{
+    void FrameGraph::build()
+    {
+        _ptr_render_pass = std::make_unique<GBufferGenerator>();
+        _ptr_render_pass->init(_ptr_device);
     }
 }

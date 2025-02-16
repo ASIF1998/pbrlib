@@ -34,6 +34,8 @@ namespace pbrlib
     {
         void present() const;
 
+        void build();
+
     public:
         explicit FrameGraph(vk::Device* ptr_device, const Config& config);
         explicit FrameGraph(vk::Device* ptr_device, const Window* ptr_window);
