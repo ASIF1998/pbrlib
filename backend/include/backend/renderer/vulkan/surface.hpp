@@ -1,14 +1,11 @@
 #pragma once
 
+#include <backend/renderer/vulkan/image.hpp>
+
 #include <vulkan/vulkan.h>
 
 #include <vector>
 #include <numeric>
-
-namespace pbrlib::vk
-{
-    class Device;
-}
 
 namespace pbrlib
 {
@@ -20,8 +17,8 @@ namespace pbrlib::vk
 {
     struct NextImageInfo
     {
-        VkImage     image   = VK_NULL_HANDLE;
-        uint32_t    index   = std::numeric_limits<uint32_t>::max();
+        const vk::Image*    ptr_image   = nullptr;
+        uint32_t            index       = std::numeric_limits<uint32_t>::max();
     };
 
     class Surface
@@ -32,7 +29,7 @@ namespace pbrlib::vk
 
         void createSurface(const Window* ptr_window);
         void createSwapchain(const Window* ptr_window);
-        void getImages();
+        void getImages(uint32_t width, uint32_t height);
         void createImageViews(uint32_t width, uint32_t height);
 
     public:
@@ -52,8 +49,7 @@ namespace pbrlib::vk
         VkSurfaceKHR    _surface_handle     = VK_NULL_HANDLE;
         VkSwapchainKHR  _swapchain_handle   = VK_NULL_HANDLE;
 
-        std::vector<VkImage>        _image_handles;
-        std::vector<VkImageView>    _image_view_handles;
+        std::vector<vk::Image> _images;
 
         VkSurfaceFormatKHR _surface_format = { };
 

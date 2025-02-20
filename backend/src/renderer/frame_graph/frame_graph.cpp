@@ -39,6 +39,16 @@ namespace pbrlib
 
     const Size FrameGraph::size() const
     {
+        if (_surface)
+        {
+            const auto& image = &_surface->_images[0];
+            return Size
+            {
+                .width  = image->width,
+                .height = image->height
+            };
+        }
+
         return Size
         {
             .width  = _image->width,
@@ -53,9 +63,7 @@ namespace pbrlib
             "General command buffer"
         );
 
-        auto [image_handle, image_index] = _surface->nextImage();
-
-        command_buffer.write([this, image_handle](auto command_buffer_handle)
+        command_buffer.write([this](auto command_buffer_handle)
         {
             VkImageMemoryBarrier image_barrier = { };
             image_barrier.sType                             = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -68,7 +76,7 @@ namespace pbrlib
             image_barrier.subresourceRange.layerCount       = 1;
             image_barrier.subresourceRange.baseMipLevel     = 0;
             image_barrier.subresourceRange.levelCount       = 1;
-            image_barrier.image                             = image_handle;
+            image_barrier.image                             = _ptr_output_image->handle;
 
             vkCmdPipelineBarrier(
                 command_buffer_handle,
@@ -103,7 +111,7 @@ namespace pbrlib
         present_info.pResults       = &result;
         present_info.pSwapchains    = &_surface->_swapchain_handle;
         present_info.swapchainCount = 1;
-        present_info.pImageIndices = &image_index;
+        present_info.pImageIndices = &_image_index;
 
         VK_CHECK(vkQueuePresentKHR(_ptr_device->queue().handle, &present_info));
 
@@ -128,6 +136,19 @@ namespace pbrlib
 
         if (_surface)
             present();
+
+        nextImage();
+    }
+
+    void FrameGraph::nextImage()
+    {
+        if (_surface)
+        {
+            auto [ptr_image, index] = _surface->nextImage();
+
+            _ptr_output_image   = ptr_image;
+            _image_index        = index;
+        }
     }
 }
 
@@ -135,7 +156,28 @@ namespace pbrlib
 {
     void FrameGraph::build()
     {
+        createResources();
+
         _ptr_render_pass = std::make_unique<GBufferGenerator>();
+
+        _ptr_render_pass->addColorOutput("result", _ptr_output_image);
+        _ptr_render_pass->depthStencil(&_depth_buffer.value());
+
         _ptr_render_pass->init(_ptr_device);
+    }
+
+    void FrameGraph::createResources()
+    {
+        const auto [width, height] = size();
+
+        _depth_buffer = vk::Image::Builder(_ptr_device)
+            .size(width, height)
+            .format(VK_FORMAT_D32_SFLOAT)
+            .usage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .name("Depth buffer")
+            .build();
+
+        nextImage();
     }
 }

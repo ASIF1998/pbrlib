@@ -10,11 +10,11 @@ namespace pbrlib
     template<typename T>
     concept IsRenderPass = requires(T render_pass)
     {
-        dynamic_cast<IRenderPass*>(&render_pass);
+        dynamic_cast<RenderPass*>(&render_pass);
     };
 
     class CompoundRenderPass :
-        public IRenderPass
+        public RenderPass
     {
     public:
         template<IsRenderPass T>
@@ -28,6 +28,6 @@ namespace pbrlib
         void render(const SceneItem* ptr_item) override;
 
     private:
-        std::vector<std::unique_ptr<IRenderPass>> _subpasses;
+        std::vector<std::unique_ptr<RenderPass>> _subpasses;
     };
 }   

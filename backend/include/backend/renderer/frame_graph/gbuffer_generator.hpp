@@ -10,7 +10,7 @@ namespace pbrlib::vk
 namespace pbrlib
 {
     class GBufferGenerator :
-        public IRenderPass
+        public RenderPass
     {
         bool init(const vk::Device* ptr_device) override;
         void render(const SceneItem* ptr_item)  override;
@@ -18,6 +18,7 @@ namespace pbrlib
         void createPipeline();
         void createPipelineLayout();
         void createRenderPass();
+        void createFramebuffer();
 
     public:
         ~GBufferGenerator();
@@ -28,5 +29,7 @@ namespace pbrlib
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
         VkRenderPass        _render_pass_handle     = VK_NULL_HANDLE;
+
+        VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
     };
 }

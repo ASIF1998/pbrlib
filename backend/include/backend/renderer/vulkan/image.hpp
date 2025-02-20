@@ -25,6 +25,8 @@ namespace pbrlib::vk
 
     class Image final
     {
+        friend class Surface;
+
         explicit Image(Device* ptr_device);
 
     public:

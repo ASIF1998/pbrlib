@@ -61,6 +61,9 @@ namespace pbrlib::vk
 
     Image::~Image()
     {
+        if (!_ptr_device)
+            return ;
+
         if (view_handle != VK_NULL_HANDLE)
             vkDestroyImageView(_ptr_device->device(), view_handle, nullptr);
 
@@ -113,8 +116,10 @@ namespace pbrlib::vk
 
         command_buffer.write([&data, &temp_buffer, this] (VkCommandBuffer command_buffer_handle)
         {
+            const auto aspect = data.format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+
             VkImageSubresourceLayers subresource = { };
-            subresource.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+            subresource.aspectMask      = aspect;
             subresource.baseArrayLayer  = 0;
             subresource.layerCount      = 1;
             subresource.mipLevel        = 0;
@@ -284,8 +289,10 @@ namespace pbrlib::vk
             nullptr
         ));
 
+        const auto aspect = _format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+
         VkImageSubresourceRange subresource_range = { };
-        subresource_range.aspectMask        = VK_IMAGE_ASPECT_COLOR_BIT;
+        subresource_range.aspectMask        = aspect;
         subresource_range.baseArrayLayer    = 0;
         subresource_range.baseMipLevel      = 0;
         subresource_range.layerCount        = image.layer_count;

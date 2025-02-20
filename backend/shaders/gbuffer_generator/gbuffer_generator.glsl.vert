@@ -42,9 +42,19 @@ layout(location = 4) out vec2 uv;
 
 void main()
 {
+#if 0
     uint        index       = index_buffers[globals.mesh_index].indices[gl_VertexIndex];
     Vertex      vertex      = vertex_buffers[globals.mesh_index].vertices[index];
     MeshDraw    mesh_draw   = mesh_draw_infos[globals.mesh_index];
 
     gl_Position = vec4(vertex.pos.xyz, 1.0);
+#else
+    material_index  = 0;
+    pos             = vec3(1);
+    normal          = vec3(1);
+    tangent         = vec3(1);
+    uv              = vec2(1);
+
+    gl_Position = vec4(1);
+#endif
 }

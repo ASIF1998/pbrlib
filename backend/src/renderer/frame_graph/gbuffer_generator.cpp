@@ -12,9 +12,13 @@ namespace pbrlib
 {
     GBufferGenerator::~GBufferGenerator()
     {
-        vkDestroyRenderPass(_ptr_device->device(), _render_pass_handle, nullptr);
-        vkDestroyPipelineLayout(_ptr_device->device(), _pipeline_layout_handle, nullptr);
-        vkDestroyPipeline(_ptr_device->device(), _pipeline_handle, nullptr);
+        const auto device_handle = _ptr_device->device();
+
+        vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
+
+        vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
+        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
+        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
     bool GBufferGenerator::init(const vk::Device* ptr_device)
@@ -22,6 +26,7 @@ namespace pbrlib
         _ptr_device = ptr_device;
 
         createPipeline();
+        createFramebuffer();
 
         return true;
     }
@@ -230,9 +235,11 @@ namespace pbrlib
     {
         std::array<VkAttachmentDescription, 2> attachments;
 
+        const auto* ptr_result_image = colorOutputAttach("result");
+
         attachments[0] = 
         {
-            .format         = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .format         = ptr_result_image->format,
             .samples        = VK_SAMPLE_COUNT_1_BIT,
             .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
@@ -242,7 +249,7 @@ namespace pbrlib
         
         attachments[1] = 
         {
-            .format         = VK_FORMAT_D32_SFLOAT,
+            .format         = _ptr_depth_stencil_image->format,
             .samples        = VK_SAMPLE_COUNT_1_BIT,
             .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
@@ -288,5 +295,36 @@ namespace pbrlib
                 &_render_pass_handle
             )
         );
+    }
+
+    void GBufferGenerator::createFramebuffer()
+    {
+        if (_color_output_images.empty())
+            throw std::runtime_error("[GBufferGenerator::::init] Color output attachment count is 0");
+
+        std::vector<VkImageView> attachments_handles;
+
+        const auto ptr_result_image = colorOutputAttach("result");
+
+        attachments_handles.push_back(ptr_result_image->view_handle);
+        attachments_handles.push_back(_ptr_depth_stencil_image->view_handle);
+
+        const VkFramebufferCreateInfo framebuffer_info = 
+        { 
+            .sType              = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .renderPass         = _render_pass_handle,
+            .attachmentCount    = static_cast<uint32_t>(attachments_handles.size()),
+            .pAttachments       = attachments_handles.data(),
+            .width              = ptr_result_image->width,
+            .height             = ptr_result_image->height,
+            .layers             = 1
+        };
+
+        VK_CHECK(vkCreateFramebuffer(
+            _ptr_device->device(),
+            &framebuffer_info,
+            nullptr,
+            &_framebuffer_handle
+        ));
     }
 }

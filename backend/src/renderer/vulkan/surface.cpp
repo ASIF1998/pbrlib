@@ -115,27 +115,24 @@ namespace pbrlib::vk
 
         createSwapchain(ptr_window);
 
-        getImages();
-
         const auto [width, height] = ptr_window->size();
+        getImages(width, height);
         createImageViews(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
     }
 
     Surface::Surface(Surface&& surface) :
         _surface_format (surface._surface_format),
-        _ptr_device     (surface._ptr_device)
+        _ptr_device     (surface._ptr_device),
+        _images         (std::move(surface._images))
     {
         std::swap(_surface_handle, surface._surface_handle);
         std::swap(_swapchain_handle, surface._swapchain_handle);
-
-        std::swap(_image_handles, surface._image_handles);
-        std::swap(_image_view_handles, surface._image_view_handles);
     }
 
     Surface::~Surface()
     {
-        for (const auto image_view_handle: _image_view_handles)
-            vkDestroyImageView(_ptr_device->device(), image_view_handle, nullptr);
+        for (const auto& image: _images)
+            vkDestroyImageView(_ptr_device->device(), image.view_handle, nullptr);
 
         if (_swapchain_handle != VK_NULL_HANDLE)
             vkDestroySwapchainKHR(_ptr_device->device(), _swapchain_handle, nullptr);
@@ -149,8 +146,7 @@ namespace pbrlib::vk
         std::swap(_surface_handle, surface._surface_handle);
         std::swap(_swapchain_handle, surface._swapchain_handle);
 
-        std::swap(_image_handles, surface._image_handles);
-        std::swap(_image_view_handles, surface._image_view_handles);
+        std::swap(_images, surface._images);
 
         _surface_format = surface._surface_format;
 
@@ -233,7 +229,7 @@ namespace pbrlib::vk
         return formats;
     }
 
-    void Surface::getImages()
+    void Surface::getImages(uint32_t width, uint32_t height)
     {
         uint32_t count = 0;
 
@@ -244,22 +240,31 @@ namespace pbrlib::vk
                 &count, nullptr
             )
         );
-        
-        _image_handles.resize(count);
+
+        std::vector<VkImage> handles (count);
         
         VK_CHECK(
             vkGetSwapchainImagesKHR(
                 _ptr_device->device(), 
                 _swapchain_handle, 
-                &count, _image_handles.data()
+                &count, handles.data()
             )
         );
+
+        for (auto handle: handles)
+        {
+            vk::Image image (nullptr);
+            image.handle    = handle;
+            image.width     = width; 
+            image.height    = height; 
+            image.format    = _surface_format.format;
+
+            _images.push_back(std::move(image));
+        }
     }
 
     void Surface::createImageViews(uint32_t width, uint32_t height)
     {
-        _image_view_handles.resize(_image_handles.size());
-
         VkImageSubresourceRange subresource = { };
         subresource.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
         subresource.baseArrayLayer  = 0;
@@ -280,10 +285,10 @@ namespace pbrlib::vk
         image_view_info.components          = component_mapping;
         image_view_info.viewType            = VK_IMAGE_VIEW_TYPE_2D;
 
-        for (uint32_t i = 0; i < _image_view_handles.size(); ++i) 
+        for (auto& image: _images)
         {
-            image_view_info.image = _image_handles[i];
-            VK_CHECK(vkCreateImageView(_ptr_device->device(), &image_view_info, nullptr, &_image_view_handles[i]));
+            image_view_info.image = image.handle;
+            VK_CHECK(vkCreateImageView(_ptr_device->device(), &image_view_info, nullptr, &image.view_handle));
         }
     }
 
@@ -320,8 +325,8 @@ namespace pbrlib::vk
 
         return NextImageInfo
         {
-            .image = _image_handles[_current_image_index],
-            .index = _current_image_index
+            .ptr_image  = &_images[_current_image_index],
+            .index      = _current_image_index
         };
     }   
 }
