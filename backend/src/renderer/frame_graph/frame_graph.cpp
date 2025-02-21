@@ -149,6 +149,8 @@ namespace pbrlib
             _ptr_output_image   = ptr_image;
             _image_index        = index;
         }
+        else 
+            _ptr_output_image = &_image.value();
     }
 }
 
