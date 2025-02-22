@@ -13,7 +13,7 @@ namespace pbrlib
         return true;
     }
 
-    void CompoundRenderPass::render(const SceneItem* ptr_item)
+    void CompoundRenderPass::render(const SceneItem* ptr_item, vk::CommandBuffer& command_buffer)
     {
         /// @todo 
     }

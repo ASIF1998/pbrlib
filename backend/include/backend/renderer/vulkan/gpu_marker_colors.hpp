@@ -8,4 +8,6 @@ namespace pbrlib::vk::marker_colors
     constexpr auto write_data_in_image  = generateColor(2);
     
     constexpr auto present_image = generateColor(3);
+
+    constexpr auto graphics_pipeline = generateColor(4);
 }

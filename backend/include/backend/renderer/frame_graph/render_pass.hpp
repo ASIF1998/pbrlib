@@ -11,6 +11,7 @@ namespace pbrlib::vk
 {
     class Device;
     class Image;
+    class CommandBuffer;
 }
 
 namespace pbrlib
@@ -33,8 +34,8 @@ namespace pbrlib
         RenderPass& operator = (RenderPass&& render_pass)       = delete;
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
-        virtual bool init(const vk::Device* ptr_device) = 0;
-        virtual void render(const SceneItem* ptr_item)  = 0; 
+        virtual bool init(const vk::Device* ptr_device)                                     = 0;
+        virtual void render(const SceneItem* ptr_item, vk::CommandBuffer& command_buffer)   = 0; 
 
         void addColorOutput(std::string_view name, const vk::Image* ptr_image);
         void depthStencil(const vk::Image* ptr_image);

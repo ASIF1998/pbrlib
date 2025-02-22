@@ -2,9 +2,14 @@
 
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/utils/vulkan.hpp>
 
+#include <backend/scene/mesh_component.hpp>
+
 #include <backend/utils/paths.hpp>
+
+#include <pbrlib/scene/scene.hpp>
 
 #include <array>
 
@@ -25,15 +30,67 @@ namespace pbrlib
     {
         _ptr_device = ptr_device;
 
+        const auto ptr_image = colorOutputAttach("gbuffer_0");
+
+        _width  = ptr_image->width;
+        _height = ptr_image->height;
+
         createPipeline();
         createFramebuffer();
 
         return true;
     }
     
-    void GBufferGenerator::render(const SceneItem* ptr_item)
+    void GBufferGenerator::render(const SceneItem* ptr_item, vk::CommandBuffer& command_buffer)
     {
-        /// @todo
+        if (!ptr_item->hasComponent<MeshComponent>())
+            return ;
+
+        const auto& tag = ptr_item->getComponent<TagComponent>();
+
+        command_buffer.write([this, ptr_item] (VkCommandBuffer command_buffer_handle)
+        {
+            const auto& mesh_component = ptr_item->getComponent<MeshComponent>();
+
+            constexpr VkClearValue gbuffer_0_clear_value 
+            {
+                .color = {0, 0, 0, 0}
+            };
+            
+            constexpr VkClearValue depth_clear_value 
+            {
+                .color = {0, 0, 0, 0}
+            };
+
+            const std::array clear_values = {gbuffer_0_clear_value, depth_clear_value};
+
+            const VkViewport viewport 
+            {
+                .width      = static_cast<float>(_width),
+                .height     = static_cast<float>(_height),
+                .minDepth   = 0.0f,
+                .maxDepth   = 1.0
+            };
+
+            const VkRect2D area = { 0, 0, _width, _height };
+
+            const VkRenderPassBeginInfo render_pass_begin_info
+            {
+                .sType              = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+                .renderPass         = _render_pass_handle,
+                .framebuffer        = _framebuffer_handle,
+                .renderArea         = area,
+                .clearValueCount    = static_cast<uint32_t>(clear_values.size()),
+                .pClearValues       = clear_values.data()
+            };
+
+            vkCmdBeginRenderPass(command_buffer_handle, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
+            vkCmdSetViewportWithCount(command_buffer_handle, 1, &viewport);
+            vkCmdSetScissorWithCount(command_buffer_handle, 1, &area);
+            vkCmdDraw(command_buffer_handle, mesh_component.index_count, 1, 0, 0);
+            vkCmdEndRenderPass(command_buffer_handle);
+        }, std::format("[gbuffer-pass] run pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
     }
 }
 
@@ -235,11 +292,11 @@ namespace pbrlib
     {
         std::array<VkAttachmentDescription, 2> attachments;
 
-        const auto* ptr_result_image = colorOutputAttach("result");
+        const auto* ptr_image = colorOutputAttach("gbuffer_0");
 
         attachments[0] = 
         {
-            .format         = ptr_result_image->format,
+            .format         = ptr_image->format,
             .samples        = VK_SAMPLE_COUNT_1_BIT,
             .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
@@ -304,9 +361,9 @@ namespace pbrlib
 
         std::vector<VkImageView> attachments_handles;
 
-        const auto ptr_result_image = colorOutputAttach("result");
+        const auto ptr_image = colorOutputAttach("gbuffer_0");
 
-        attachments_handles.push_back(ptr_result_image->view_handle);
+        attachments_handles.push_back(ptr_image->view_handle);
         attachments_handles.push_back(_ptr_depth_stencil_image->view_handle);
 
         const VkFramebufferCreateInfo framebuffer_info = 
@@ -315,8 +372,8 @@ namespace pbrlib
             .renderPass         = _render_pass_handle,
             .attachmentCount    = static_cast<uint32_t>(attachments_handles.size()),
             .pAttachments       = attachments_handles.data(),
-            .width              = ptr_result_image->width,
-            .height             = ptr_result_image->height,
+            .width              = _width,
+            .height             = _height,
             .layers             = 1
         };
 

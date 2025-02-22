@@ -125,8 +125,15 @@ namespace pbrlib
     {
         if (_ptr_render_pass)
         {
+            auto command_buffer = _ptr_device->oneTimeSubmitCommandBuffer(
+                _ptr_device->queue(),
+                "Draw frame command buffer"
+            );
+
             for (const auto ptr_item: items)
-                _ptr_render_pass->render(ptr_item);
+                _ptr_render_pass->render(ptr_item, command_buffer);
+
+            submit(command_buffer);
         }
         else
         {
@@ -152,6 +159,42 @@ namespace pbrlib
         else 
             _ptr_output_image = &_image.value();
     }
+
+    void FrameGraph::submit(const vk::CommandBuffer& command_buffer)
+    {
+        VkFence fence_handle  = VK_NULL_HANDLE;
+
+        const VkFenceCreateInfo fence_create_info 
+        {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
+        };
+
+        VK_CHECK(
+            vkCreateFence(
+                _ptr_device->device(), 
+                &fence_create_info, 
+                nullptr, 
+                &fence_handle
+            )
+        );
+
+        const VkSubmitInfo submit_info 
+        { 
+            .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .commandBufferCount = 1,
+            .pCommandBuffers    = &command_buffer.handle
+        };
+
+        VK_CHECK(vkQueueSubmit(
+            _ptr_device->queue().handle,
+            1, &submit_info, 
+            fence_handle 
+        ));
+
+        VK_CHECK(vkDeviceWaitIdle(_ptr_device->device()));
+
+        vkDestroyFence(_ptr_device->device(), fence_handle, nullptr);
+    }
 }
 
 namespace pbrlib
@@ -162,7 +205,7 @@ namespace pbrlib
 
         _ptr_render_pass = std::make_unique<GBufferGenerator>();
 
-        _ptr_render_pass->addColorOutput("result", _ptr_output_image);
+        _ptr_render_pass->addColorOutput("gbuffer_0", &_images.at("gbuffer_0"));
         _ptr_render_pass->depthStencil(&_depth_buffer.value());
 
         _ptr_render_pass->init(_ptr_device);
@@ -179,6 +222,17 @@ namespace pbrlib
             .addQueueFamilyIndex(_ptr_device->queue().family_index)
             .name("Depth buffer")
             .build();
+
+        _images.emplace(
+            "gbuffer_0",
+            vk::Image::Builder(_ptr_device)
+                .size(width, height)
+                .format(VK_FORMAT_R32G32B32A32_SFLOAT)
+                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
+                .addQueueFamilyIndex(_ptr_device->queue().family_index)
+                .name("gbuffer_0")
+                .build()
+        );
 
         nextImage();
     }

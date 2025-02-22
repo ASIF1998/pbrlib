@@ -37,6 +37,8 @@ namespace pbrlib
         void present() const;
         void nextImage();
 
+        void submit(const vk::CommandBuffer& command_buffer);
+
         void build();
 
     public:
@@ -64,6 +66,8 @@ namespace pbrlib
         uint32_t            _image_index        = 0;
 
         std::unique_ptr<RenderPass> _ptr_render_pass;
+
+        std::map<std::string, vk::Image, std::less<void>> _images;
 
         std::optional<vk::Image> _depth_buffer;
     };

@@ -12,8 +12,8 @@ namespace pbrlib
     class GBufferGenerator :
         public RenderPass
     {
-        bool init(const vk::Device* ptr_device) override;
-        void render(const SceneItem* ptr_item)  override;
+        bool init(const vk::Device* ptr_device)                                     override;
+        void render(const SceneItem* ptr_item, vk::CommandBuffer& command_buffer)   override;
         
         void createPipeline();
         void createPipelineLayout();
@@ -25,6 +25,9 @@ namespace pbrlib
 
     private:
         const vk::Device* _ptr_device = nullptr;
+
+        uint32_t _width     = 0;
+        uint32_t _height    = 0;
 
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
