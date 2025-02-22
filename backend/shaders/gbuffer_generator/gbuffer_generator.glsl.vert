@@ -1,8 +1,6 @@
 #version 450
 
-#extension GL_EXT_buffer_reference      : enable
-#extension GL_EXT_scalar_block_layout   : enable
-#extension GL_GOOGLE_include_directive  : enable
+#extension GL_GOOGLE_include_directive : enable
 
 #include <gbuffer_generator/mesh.glsl>
 
@@ -19,19 +17,14 @@ layout(push_constant) uniform Block
 	Globals globals;
 };
 
-layout(std430, set = PER_PASS_SET_ID, binding = 0) readonly buffer SceneIndexBuffers
+layout(set = PER_PASS_SET_ID, binding = 0) buffer readonly VBO
 {
-    IndexBuffer[] index_buffers;
+    Vertex[] vertices;
 };
 
-layout(std430, set = PER_PASS_SET_ID, binding = 1) readonly buffer SceneVertexBuffers
+layout(set = PER_PASS_SET_ID, binding = 1) uniform MeshDrawData
 {
-    VertexBuffer[] vertex_buffers;
-};
-
-layout(std430, set = PER_PASS_SET_ID, binding = 2) readonly buffer DrawData
-{
-    MeshDraw[] mesh_draw_infos;
+    MeshDraw mesh_draw;
 };
 
 layout(location = 0) out flat uint material_index;
@@ -42,9 +35,7 @@ layout(location = 4) out vec2 uv;
 
 void main()
 {
-    uint        index       = index_buffers[globals.mesh_index].indices[gl_VertexIndex];
-    Vertex      vertex      = vertex_buffers[globals.mesh_index].vertices[index];
-    MeshDraw    mesh_draw   = mesh_draw_infos[globals.mesh_index];
+    Vertex vertex = vertices[gl_VertexIndex];
 
     material_index  = 0;
     pos             = vec3(1);

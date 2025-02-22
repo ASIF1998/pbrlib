@@ -16,14 +16,4 @@ struct MeshDraw
     uint material_index;
 };
 
-layout(std430, scalar, buffer_reference, buffer_reference_align = 16) readonly buffer VertexBuffer
-{
-    Vertex[] vertices;
-};
-
-layout(std430, scalar, buffer_reference, buffer_reference_align = 16) readonly buffer IndexBuffer
-{
-    uint[] indices;
-};
-
 #endif

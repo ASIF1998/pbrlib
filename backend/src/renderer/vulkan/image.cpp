@@ -95,7 +95,7 @@ namespace pbrlib::vk
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
-        constexpr auto temp_buffer_usage_flag = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        constexpr auto temp_buffer_usage_flag = VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
         auto temp_buffer = Buffer::Builder(_ptr_device)
             .name("Temp buffer for fill image")

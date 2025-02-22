@@ -88,7 +88,8 @@ namespace pbrlib
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
             vkCmdSetViewportWithCount(command_buffer_handle, 1, &viewport);
             vkCmdSetScissorWithCount(command_buffer_handle, 1, &area);
-            vkCmdDraw(command_buffer_handle, mesh_component.index_count, 1, 0, 0);
+            vkCmdBindIndexBuffer(command_buffer_handle, mesh_component.index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdDrawIndexed(command_buffer_handle, mesh_component.index_count, 1, 0, 0, 0);
             vkCmdEndRenderPass(command_buffer_handle);
         }, std::format("[gbuffer-pass] run pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
     }
@@ -227,19 +228,26 @@ namespace pbrlib
 
     void GBufferGenerator::createPipelineLayout()
     {
-        std::array<VkDescriptorSetLayoutBinding, 3> bindings;
-        for (uint32_t i = 0; i < bindings.size(); ++i)
+        std::array<VkDescriptorSetLayoutBinding, 2> bindings;
+
+        bindings[0] = 
         {
-            bindings[i] = 
-            {
-                .binding            = i,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
-                .descriptorCount    = 1,
-                .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
-            };
-        }
+            .binding            = 0,
+            .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            .descriptorCount    = 1,
+            .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
+        };
+        
+        bindings[1] = 
+        {
+            .binding            = 1,
+            .descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount    = 1,
+            .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
+        };
 
         VkDescriptorSetLayout descriptor_set_layout_handle = VK_NULL_HANDLE;
+
         const VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info = 
         {
             .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
