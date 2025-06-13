@@ -1,0 +1,81 @@
+name: windows-continuous
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: 
+      - '**'
+jobs:
+  linting:
+    name: linter
+    runs-on: windows-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v4
+
+      - name: install and build cppcheck
+        run: |
+          git clone https://github.com/danmar/cppcheck.git  
+          cd cppcheck
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release --target cppcheck
+          cp "${{github.workspace}}/cppcheck/build/bin/Release/cppcheck.exe" "${{github.workspace}}/cppcheck.exe"
+          cp -r "${{github.workspace}}/cppcheck/build/bin/Release/cfg" "${{github.workspace}}/cfg"
+
+      - name: run cppcheck
+        run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
+
+  build-windows:
+    name: build-windows
+    runs-on: windows-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: remove SDL_build_config.h
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: third_party\SDL\include\build_config\SDL_build_config.h
+
+      - name: setup msvc
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: install vulkan sdk
+        uses: jakoch/install-vulkan-sdk-action@v1.0.0
+        with:
+          vulkan_version: 1.4.304.0
+          optional_components: com.lunarg.vulkan.vma
+          install_runtime: true
+          cache: true
+          stripdown: true
+
+      - name: build tests
+        run: |
+          mkdir build 
+          cd build 
+          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
+          cmake --build . --config Release --target pbrlib-tests
+
+      - name: setup swiftshader
+        run: |
+          mkdir CI
+          cd CI
+          git clone https://github.com/google/swiftshader.git
+          cd swiftshader
+          git submodule update --init --recursive
+          cd build
+          cmake .. -DREACTOR_BACKEND=Subzero -Thost=x64
+          cmake --build . --config Release --target vk_swiftshader
+          cp "${{github.workspace}}/CI/swiftshader/build/Windows/vk_swiftshader.dll" "${{github.workspace}}/build/bin/Release/vk_swiftshader.dll"
+          cp "${{github.workspace}}/CI/swiftshader/build/Windows/vk_swiftshader_icd.json" "${{github.workspace}}/build/bin/Release/vk_swiftshader_icd.json"
+          cp "${{github.workspace}}/CI/swiftshader/build/Windows/vulkan-1.dll" "${{github.workspace}}/build/bin/Release/vulkan-1.dll"
+
+      - name: run tests
+        run: |
+          cd build/bin/Release
+          ./pbrlib-tests.exe

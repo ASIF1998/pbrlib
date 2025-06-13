@@ -2,4 +2,4 @@ PBRLib.xcodeproj/
 .vscode/*
 gtest/
 build/
-include/pbrlib/core.hpp
+info.hpp

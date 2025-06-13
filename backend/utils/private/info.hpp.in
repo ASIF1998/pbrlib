@@ -1,0 +1,25 @@
+#pragma once
+
+#include <vulkan/vulkan.h>
+
+#include <filesystem>
+
+namespace pbrlib::backend::priv
+{
+    constexpr uint32_t EngineVersion = VK_MAKE_VERSION(
+        @PRLIB_ENGINE_VERSION_MAJOR@,
+        @PRLIB_ENGINE_VERSION_MINOR@,
+        @PRLIB_ENGINE_VERSION_PATCH@
+    );
+
+    constexpr uint32_t VulkanVersion = VK_MAKE_VERSION(
+        @PRLIB_VULKAN_VERSION_MAJOR@,
+        @PRLIB_VULKAN_VERSION_MINOR@,
+        @PRLIB_VULKAN_VERSION_PATCH@
+    );
+}
+
+namespace pbrlib::backend::priv
+{
+    const std::filesystem::path PathToRoot = "@PRLIB_PATH_TO_ROOT@";
+}
