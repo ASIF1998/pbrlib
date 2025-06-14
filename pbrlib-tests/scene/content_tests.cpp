@@ -39,22 +39,14 @@ public:
         _engine = std::nullopt;
     }
 
-    bool check(const std::filesystem::path& filename, size_t imageCount, size_t materialCount, size_t meshCount)
+    bool check(const std::filesystem::path& filename, size_t imageCount, size_t materialCount, size_t meshCount, const pbrlib::math::mat4 transform = pbrlib::math::mat4(1.0f))
     {
-        /**
-         * @todo
-         * В будущем нужно будет тестировать следующим образом:
-         *     1. добавить ещё один аргумент transform в метод check(), 
-         *      что бы можно было нормальным образом спозиционировать модельку 
-         *      в середине сцены
-         *     2. рендерить сцену с 6 сторон и сравнивать результаты с эталоном
-        */
         try 
         {
             bool result = false;
-            _engine->setupCallback([&filename, &result](pbrlib::Engine& engine, pbrlib::Scene& scene)
+            _engine->setupCallback([&filename, &result, &transform](pbrlib::Engine& engine, pbrlib::Scene& scene)
             {
-                result = scene.import(pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, engine);
+                result = scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
             });
 
             pbrlib::testing::FrameGraphResourcesGetter getter (_engine.value());

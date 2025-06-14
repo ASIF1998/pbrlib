@@ -34,7 +34,7 @@ namespace pbrlib::backend::vk
             VkImageLayout   final_layout
         );
 
-        VkRenderPass build();
+        [[nodiscard]] VkRenderPass build();
     
     private:
         Device& _device;

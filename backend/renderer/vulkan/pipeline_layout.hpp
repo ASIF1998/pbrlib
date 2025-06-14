@@ -57,7 +57,7 @@ namespace pbrlib::backend::vk
 
         Builder& pushConstant(const VkPushConstantRange& push_constant);
 
-        PipelineLayout build();
+        [[nodiscard]] PipelineLayout build();
         
     private:
         Device& _device;

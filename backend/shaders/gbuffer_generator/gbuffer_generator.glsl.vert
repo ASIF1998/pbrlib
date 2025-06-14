@@ -16,8 +16,8 @@ struct Globals
 };
 
 layout(push_constant) uniform Block
-{  
-	Globals globals;
+{
+    Globals globals;
 };
 
 layout(set = PER_PASS_SET_ID, binding = 0) buffer readonly VisibleVertexBuffers

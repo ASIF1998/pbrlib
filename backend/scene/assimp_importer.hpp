@@ -45,6 +45,7 @@ namespace pbrlib::backend
         AssimpImporter& filename(const std::filesystem::path& filename);
         AssimpImporter& materialManager(MaterialManager* ptr_material_manager);
         AssimpImporter& meshManager(MeshManager* ptr_mesh_manager);
+        AssimpImporter& transform(const math::mat4& matrix);
 
         bool import();
 
@@ -58,8 +59,8 @@ namespace pbrlib::backend
 
         struct 
         {
-            math::mat4 transform;
-            SceneItem* ptr_scene_item = nullptr;
+            math::mat4 transform        = math::mat4(1.0f);
+            SceneItem* ptr_scene_item   = nullptr;
         } _current_state;
 
         MaterialManager*    _ptr_material_manager   = nullptr;
