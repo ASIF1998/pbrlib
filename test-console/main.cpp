@@ -47,7 +47,9 @@ int main()
                 auto& rotate_component = item.getComponent<RotateComponent>();
             });
 
-            if (!scene.import(pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb", engine)) [[unlikely]]
+            const auto transform = pbrlib::transform::rotateZ(90.0f);
+
+            if (!scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb", transform)) [[unlikely]]
                 throw std::runtime_error("[test-console] failed load content");
 
             // auto ptr_light = ptr_scene->addLight(

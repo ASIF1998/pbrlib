@@ -151,6 +151,12 @@ namespace pbrlib::backend
         return *this;
     }
 
+    AssimpImporter& AssimpImporter::transform(const math::mat4& matrix)
+    {
+        _current_state.transform = matrix;
+        return *this;
+    }
+
     bool AssimpImporter::import()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;

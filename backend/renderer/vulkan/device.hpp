@@ -92,7 +92,7 @@ namespace pbrlib::backend::vk
         void submit(const CommandBuffer& command_buffer);
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-        auto tracyContext() const noexcept
+        [[nodiscard]] auto tracyContext() const noexcept
         {
             return _tracy_ctx;
         }

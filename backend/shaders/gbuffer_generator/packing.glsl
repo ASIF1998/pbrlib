@@ -1,3 +1,6 @@
+#ifndef PACKING_GLSL
+#define PACKING_GLSL
+
 struct GBufferData
 {
     vec3 pos;
@@ -91,3 +94,5 @@ GBufferData unpack(
         gbuffer_material_index
     );
 }
+
+#endif

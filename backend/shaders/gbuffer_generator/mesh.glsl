@@ -1,8 +1,8 @@
 #ifndef MESH_GLSL
 #define MESH_GLSL
 
-#extension GL_EXT_shader_16bit_storage:                     enable
-#extension GL_EXT_shader_explicit_arithmetic_types_float16: enable
+#extension GL_EXT_shader_16bit_storage                      : enable
+#extension GL_EXT_shader_explicit_arithmetic_types_float16  : enable
 
 struct Vertex
 {

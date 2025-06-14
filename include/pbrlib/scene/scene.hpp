@@ -102,7 +102,11 @@ namespace pbrlib
         
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
-        [[nodiscard]] bool import(const std::filesystem::path& filename, Engine& engine);
+        [[nodiscard]] bool import (
+            Engine&                         engine,
+            const std::filesystem::path&    filename,
+            const math::mat4&               transform = math::mat4(1.0f)
+        );
 
         void update(const InputStay& input_stay, float delta_time);
 

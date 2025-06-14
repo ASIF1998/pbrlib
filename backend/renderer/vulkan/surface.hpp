@@ -29,6 +29,7 @@ namespace pbrlib::backend::vk
     {
         friend class pbrlib::backend::Canvas;
 
+        [[nodiscard]]
         std::vector<VkSurfaceFormatKHR> getSurfaceFormats();
 
         void createSurface(const pbrlib::Window* ptr_window);

@@ -78,7 +78,8 @@ namespace pbrlib::backend::vk
         friend class Device;
 
         void validate();
-        VkSharingMode sharingMode();
+        
+        [[nodiscard]] VkSharingMode sharingMode();
 
     public:
         explicit Builder(Device& device);

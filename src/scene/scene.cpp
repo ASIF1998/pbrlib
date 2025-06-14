@@ -129,7 +129,11 @@ namespace pbrlib
         return _root->addItem(name);
     }
 
-    bool Scene::import(const std::filesystem::path& filename, Engine& engine)
+    bool Scene::import (
+        Engine&                         engine,
+        const std::filesystem::path&    filename,
+        const math::mat4&               transform
+    )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -141,6 +145,7 @@ namespace pbrlib
             .filename(filename)
             .materialManager(engine._ptr_material_manager.get())
             .meshManager(engine._ptr_mesh_manager.get())
+            .transform(transform)
             .import();
     }    
 }

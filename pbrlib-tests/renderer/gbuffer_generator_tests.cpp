@@ -56,7 +56,7 @@ public:
             camera.width(_config.width);
             camera.height(_config.height);
             
-            pbrlib::testing::thisTrue(scene.import(pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string(), engine));
+            pbrlib::testing::thisTrue(scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string()));
         });
     }
 
