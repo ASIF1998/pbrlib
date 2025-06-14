@@ -75,9 +75,10 @@ namespace pbrlib::backend
         const MeshDraw mesh_draw
         {
             .model  = transform.transform,
-            .normal = math::transpose(pbrlib::math::inverse(transform.transform))
+            .normal = math::transpose(math::inverse(transform.transform))
         };
 
+        _item_to_mesh_draw_info_index.emplace(ptr_item, _meshes_draw_info.size());
         _meshes_draw_info.push_back(mesh_draw);
 
         _descriptor_set_is_changed = true;
@@ -85,6 +86,8 @@ namespace pbrlib::backend
 
     void MeshManager::update()
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (_descriptor_set_is_changed)
         {
             if (_descriptor_set_handle == VK_NULL_HANDLE)
@@ -153,7 +156,6 @@ namespace pbrlib::backend
                 .build();
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
-            _meshes_draw_buffer->write(std::span<const MeshDraw>(_meshes_draw_info), 0);
 
             const VkDescriptorBufferInfo vbos_refs_info 
             { 
@@ -201,6 +203,8 @@ namespace pbrlib::backend
 
             _descriptor_set_is_changed = false;
         }
+
+        _meshes_draw_buffer->write(std::span<const MeshDraw>(_meshes_draw_info), 0);
     }
 
     VkDescriptorSet MeshManager::descriptorSet() const
@@ -227,5 +231,17 @@ namespace pbrlib::backend
     size_t MeshManager::meshCount() const
     {
         return _ibos.size();
+    }
+
+    void MeshManager::updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform)
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (auto index = _item_to_mesh_draw_info_index.find(ptr_item); index != std::end(_item_to_mesh_draw_info_index))
+        {
+            auto& draw_info = _meshes_draw_info[index->second];
+            draw_info.model     = transform;
+            draw_info.normal    = math::transpose(math::inverse(transform));        
+        }
     }
 }

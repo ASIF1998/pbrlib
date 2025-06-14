@@ -6,6 +6,7 @@
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 
 #include <backend/scene/material_manager.hpp>
+#include <backend/scene/mesh_manager.hpp>
 #include <backend/scene/assimp_importer.hpp>
 
 #include <backend/logger/logger.hpp>
@@ -79,6 +80,8 @@ namespace pbrlib
         const auto& local_transform = getComponent<component::Transform>().transform;
         const auto  transform       = world_transform * local_transform;
 
+        _ptr_scene->_ptr_mesh_manager->updateItemTransform(this, transform);
+
         for (auto& child: _children)
             child.update(input_stay, delta_time, transform);
     }
@@ -126,7 +129,25 @@ namespace pbrlib
 
     SceneItem& Scene::addItem(std::string_view name)
     {
-        return _root->addItem(name);
+        auto& item = _root->addItem(name);
+        _items.emplace(name, &item);
+        return item;
+    }
+
+    SceneItem* Scene::item(std::string_view name)
+    {
+        if (auto it = _items.find(name); it != std::end(_items)) [[likely]]
+            return it->second;
+        
+        return nullptr;
+    }
+    
+    const SceneItem* Scene::item(std::string_view name) const
+    {
+        if (auto it = _items.find(name); it != std::end(_items)) [[likely]]
+            return it->second;
+        
+        return nullptr;
     }
 
     bool Scene::import (
@@ -147,5 +168,10 @@ namespace pbrlib
             .meshManager(engine._ptr_mesh_manager.get())
             .transform(transform)
             .import();
-    }    
+    }
+
+    void Scene::meshManager(backend::MeshManager* ptr_mesh_manager) noexcept
+    {
+        _ptr_mesh_manager = ptr_mesh_manager;
+    }
 }

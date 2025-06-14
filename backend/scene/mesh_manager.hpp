@@ -10,6 +10,7 @@
 #include <optional>
 
 #include <vector>
+#include <unordered_map>
 
 #include <string_view>
 
@@ -67,6 +68,8 @@ namespace pbrlib::backend
             SceneItem*                          ptr_item
         );
 
+        void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
+
         [[nodiscard]] VkDescriptorSet descriptorSet() const;
 
         [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t mesh_id)   const;
@@ -89,5 +92,7 @@ namespace pbrlib::backend
         VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
 
         bool _descriptor_set_is_changed = true;
+
+        std::unordered_map<const SceneItem*, size_t> _item_to_mesh_draw_info_index;
     };
 }
