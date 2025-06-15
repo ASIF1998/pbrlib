@@ -80,7 +80,8 @@ namespace pbrlib
         const auto& local_transform = getComponent<component::Transform>().transform;
         const auto  transform       = world_transform * local_transform;
 
-        _ptr_scene->_ptr_mesh_manager->updateItemTransform(this, transform);
+        if (auto ptr_mesh_manager = _ptr_scene->_ptr_mesh_manager)
+            ptr_mesh_manager->updateItemTransform(this, transform);
 
         for (auto& child: _children)
             child.update(input_stay, delta_time, transform);
@@ -123,6 +124,9 @@ namespace pbrlib
     void Scene::update(const InputStay& input_stay, float delta_time)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (!_ptr_mesh_manager)
+            backend::log::warning("[scene] no mesh manager");
 
         _root->update(input_stay, delta_time, math::mat4(1.0f));
     }
