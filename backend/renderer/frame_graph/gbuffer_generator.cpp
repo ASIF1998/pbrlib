@@ -250,7 +250,7 @@ namespace pbrlib::backend
 
             const auto& renderable = ptr_item->getComponent<component::Renderable>();
 
-            _push_constant_block.mesh_index     = renderable.mesh_id;
+            _push_constant_block.instance_id    = renderable.instance_id;
             _push_constant_block.material_index = renderable.material_id;
 
             vkCmdPushConstants(
@@ -260,7 +260,7 @@ namespace pbrlib::backend
                 0, sizeof(GBufferPushConstantBlock), &_push_constant_block
             );
 
-            const auto& index_buffer = _ptr_context->ptr_mesh_manager->indexBuffer(renderable.mesh_id);
+            const auto& index_buffer = _ptr_context->ptr_mesh_manager->indexBuffer(renderable.instance_id);
 
             vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
             vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);

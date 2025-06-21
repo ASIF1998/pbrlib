@@ -54,8 +54,11 @@ int main()
                     auto& transform = item.getComponent<pbrlib::component::Transform>();
                     transform.transform = pbrlib::transform::rotateZ(rotate_component.angle);
                 });
-            }
 
+                const auto instance_transform = pbrlib::transform::translate(pbrlib::math::vec3(-2, 2, 3));
+
+                scene.createInstance("Extended", "Extended - 2", instance_transform);
+            }
 
             // auto ptr_light = ptr_scene->addLight(
             //     pbrlib::PointLight::Builder()

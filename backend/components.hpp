@@ -24,7 +24,7 @@ namespace pbrlib::backend::component
 
         uint32_t material_id = std::numeric_limits<uint32_t>::max();
 
-        uint32_t    mesh_id         = std::numeric_limits<uint32_t>::max();
+        uint32_t    instance_id     = std::numeric_limits<uint32_t>::max();
         size_t      vertex_count    = 0;
         size_t      index_count     = 0;
 

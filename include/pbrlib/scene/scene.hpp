@@ -39,7 +39,7 @@ namespace pbrlib
 
         using SceneItems = std::list<SceneItem>;
 
-        explicit SceneItem(std::string_view name, Scene* ptr_scene);
+        explicit SceneItem(std::string_view name, SceneItem* ptr_parent, Scene* ptr_scene);
 
         void update (
             const InputStay&    input_stay, 
@@ -86,6 +86,8 @@ namespace pbrlib
         entt::entity        _handle     = entt::null;
         Scene*              _ptr_scene  = nullptr;
         UpdateCallback      _update_callback;
+
+        SceneItem* _ptr_parent = nullptr;
         
         SceneItems _children;
     };
@@ -120,6 +122,12 @@ namespace pbrlib
 
         SceneItem*          item(std::string_view name);
         const SceneItem*    item(std::string_view name) const;
+
+        SceneItem* createInstance (
+            std::string_view    item_name, 
+            std::string_view    instance_name,
+            const math::mat4&   transform
+        );
 
         template<IsSceneVisitor T>
         void visit(const std::unique_ptr<T>& ptr_visitor)
