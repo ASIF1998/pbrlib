@@ -3,9 +3,12 @@ name: windows-continuous
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**.md'
   push:
-    branches: 
-      - '**'
+    branches: [master]
+    paths-ignore:
+      - '**.md'
 jobs:
   linting:
     name: linter

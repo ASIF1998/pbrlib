@@ -19,6 +19,7 @@ namespace pbrlib::backend
 
         return true;
     }
+
     void RenderPass::addColorOutput(std::string_view name, vk::Image* ptr_image)
     {
         _color_output_images.emplace(name, ptr_image);

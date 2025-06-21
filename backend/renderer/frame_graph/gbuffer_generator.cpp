@@ -53,19 +53,6 @@ namespace pbrlib::backend
         _width  = ptr_image->width;
         _height = ptr_image->height;
 
-        createPipeline();
-        createFramebuffer();
-
-        return true;
-    }
-}
-
-namespace pbrlib::backend
-{
-    void GBufferGenerator::createPipeline()
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
         createRenderPass();
 
         constexpr VkPushConstantRange push_constant_range =
@@ -82,22 +69,47 @@ namespace pbrlib::backend
                 .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
             .build();
 
+        createFramebuffer();
+
+        return rebuild(device, context);
+    }
+
+    bool GBufferGenerator::rebuild(vk::Device& device, const RenderContext& context)
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         constexpr auto vert_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.vert";
         constexpr auto frag_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.frag";
 
-        _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
-            .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
-            .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
-            .addAttachmentsState(false)
-            .addAttachmentsState(false)
-            .addAttachmentsState(false)
-            .depthStencilTest(true)
-            .pipelineLayoutHandle(_pipeline_layout->handle)
-            .renderPassHandle(_render_pass_handle)
-            .subpass(0)
-            .build();
-    }
+        auto prev_pipeline = _pipeline_handle;
 
+        try
+        {
+            _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
+                .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
+                .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
+                .addAttachmentsState(false)
+                .addAttachmentsState(false)
+                .addAttachmentsState(false)
+                .depthStencilTest(true)
+                .pipelineLayoutHandle(_pipeline_layout->handle)
+                .renderPassHandle(_render_pass_handle)
+                .subpass(0)
+                .build();
+
+            vkDestroyPipeline(_ptr_device->device(), prev_pipeline, nullptr);
+        } 
+        catch (std::exception& ex)
+        {
+            backend::log::error("[gbuffer-generate] failed rebuild: {}", ex.what());
+        }
+
+        return true;
+    }
+}
+
+namespace pbrlib::backend
+{
     void GBufferGenerator::createRenderPass()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
