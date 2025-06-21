@@ -25,7 +25,7 @@ int main()
         
         pbrlib::Engine engine (config);
 
-        engine.setupCallback([&config](pbrlib::Engine& engine, pbrlib::Scene& scene)
+        engine.setup([&config](pbrlib::Engine& engine, pbrlib::Scene& scene)
         {
             auto& camera = engine.camera();
             camera.up(pbrlib::math::vec3(0, -1, 0));
@@ -35,22 +35,30 @@ int main()
             camera.width(config.width);
             camera.height(config.height);
 
-            auto& item = scene.addItem("rotation-item");
-            item.addComponent<RotateComponent>();
-            item.updateCallback([](
-                pbrlib::SceneItem&          item, 
-                const pbrlib::InputStay&    input_stay, 
-                float                       delta_time, 
-                const pbrlib::math::mat4&   world_transform
-            )
-            {
-                auto& rotate_component = item.getComponent<RotateComponent>();
-            });
-
-            const auto transform = pbrlib::transform::rotateZ(90.0f);
-
-            if (!scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb", transform)) [[unlikely]]
+            if (!scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb")) [[unlikely]] 
                 throw std::runtime_error("[test-console] failed load content");
+
+            if (auto* ptr_root_item = scene.item("Extended")) [[likely]]
+            {
+                ptr_root_item->addComponent<RotateComponent>();
+                ptr_root_item->update([](
+                    pbrlib::SceneItem&          item, 
+                    const pbrlib::InputStay&    input_stay, 
+                    float                       delta_time, 
+                    const pbrlib::math::mat4&   world_transform
+                )
+                {
+                    auto& rotate_component = item.getComponent<RotateComponent>();
+                    rotate_component.angle += 0.5;
+
+                    auto& transform = item.getComponent<pbrlib::component::Transform>();
+                    transform.transform = pbrlib::transform::rotateZ(rotate_component.angle);
+                });
+
+                const auto instance_transform = pbrlib::transform::translate(pbrlib::math::vec3(-2, 2, 3));
+
+                scene.createInstance("Extended", "Extended - 2", instance_transform);
+            }
 
             // auto ptr_light = ptr_scene->addLight(
             //     pbrlib::PointLight::Builder()

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <list>
+#include <map>
 
 #include <string>
 #include <string_view>
@@ -25,6 +26,11 @@ namespace pbrlib
     class   Engine;
 }
 
+namespace pbrlib::backend
+{
+    class MeshManager;
+}
+
 namespace pbrlib
 {
     class SceneItem final
@@ -33,7 +39,7 @@ namespace pbrlib
 
         using SceneItems = std::list<SceneItem>;
 
-        explicit SceneItem(std::string_view name, Scene* ptr_scene);
+        explicit SceneItem(std::string_view name, SceneItem* ptr_parent, Scene* ptr_scene);
 
         void update (
             const InputStay&    input_stay, 
@@ -48,7 +54,7 @@ namespace pbrlib
             SceneItem&          item, 
             const InputStay&    input_stay, 
             float               delta_time, 
-            const math::mat4&    world_transform
+            const math::mat4&   world_transform
         )>;
 
     public:
@@ -72,7 +78,7 @@ namespace pbrlib
         template<typename Component>
         [[nodiscard]] bool hasComponent() const;
 
-        void updateCallback(const UpdateCallback& callback);
+        void update(const UpdateCallback& callback);
 
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
@@ -80,6 +86,8 @@ namespace pbrlib
         entt::entity        _handle     = entt::null;
         Scene*              _ptr_scene  = nullptr;
         UpdateCallback      _update_callback;
+
+        SceneItem* _ptr_parent = nullptr;
         
         SceneItems _children;
     };
@@ -88,6 +96,8 @@ namespace pbrlib
     {
         friend class SceneItem;
         friend class Engine;
+
+        void meshManager(backend::MeshManager* ptr_mesh_manager) noexcept;
 
     public:
         explicit Scene(std::string_view name);
@@ -110,6 +120,15 @@ namespace pbrlib
 
         void update(const InputStay& input_stay, float delta_time);
 
+        SceneItem*          item(std::string_view name);
+        const SceneItem*    item(std::string_view name) const;
+
+        SceneItem& createInstance (
+            std::string_view    item_name, 
+            std::string_view    instance_name,
+            const math::mat4&   transform
+        );
+
         template<IsSceneVisitor T>
         void visit(const std::unique_ptr<T>& ptr_visitor)
         {
@@ -120,6 +139,10 @@ namespace pbrlib
     private:
         entt::registry              _registry;
         std::optional<SceneItem>    _root;
+
+        std::map<std::string, SceneItem*, std::less<void>> _items;
+
+        backend::MeshManager* _ptr_mesh_manager = nullptr;
     };
 }
 

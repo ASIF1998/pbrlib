@@ -20,7 +20,7 @@ namespace pbrlib::backend
     struct GBufferPushConstantBlock final
     {
         math::mat4  projection_view;
-        uint32_t    mesh_index;
+        uint32_t    instance_id;
         uint32_t    material_index;
     };
 

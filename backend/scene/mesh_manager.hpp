@@ -10,6 +10,7 @@
 #include <optional>
 
 #include <vector>
+#include <unordered_map>
 
 #include <string_view>
 
@@ -20,7 +21,7 @@ namespace pbrlib
 
 namespace pbrlib::backend
 {
-    struct VertexAttribute final
+    struct alignas(16) VertexAttribute final
     {
         pbrlib::math::vec4      pos;
         pbrlib::math::u16vec3   normal;
@@ -28,10 +29,11 @@ namespace pbrlib::backend
         pbrlib::math::u16vec2   uv;
     };
 
-    struct MeshDraw final
+    struct alignas(16) Instance final
     {
         math::mat4  model;
         math::mat4  normal;
+        uint32_t    mesh_id = 0;
     };
 
     class MeshManager final
@@ -67,10 +69,14 @@ namespace pbrlib::backend
             SceneItem*                          ptr_item
         );
 
+        void addInstance(const SceneItem* ptr_src_item, SceneItem* ptr_dst_item);
+
+        void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
+
         [[nodiscard]] VkDescriptorSet descriptorSet() const;
 
-        [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t mesh_id)   const;
-        [[nodiscard]] const vk::Buffer& vertexBuffer(uint32_t mesh_id)  const;
+        [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t instance_id)   const;
+        [[nodiscard]] const vk::Buffer& vertexBuffer(uint32_t instance_id)  const;
 
         [[nodiscard]] size_t meshCount() const;        
 
@@ -82,12 +88,14 @@ namespace pbrlib::backend
 
         std::optional<vk::Buffer> _vbos_refs;
 
-        std::vector<MeshDraw>       _meshes_draw_info;
-        std::optional<vk::Buffer>   _meshes_draw_buffer;
+        std::vector<Instance>       _instances;
+        std::optional<vk::Buffer>   _instances_buffer;
 
         VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
         VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
 
         bool _descriptor_set_is_changed = true;
+
+        std::unordered_map<const SceneItem*, size_t> _item_to_instance_id;
     };
 }

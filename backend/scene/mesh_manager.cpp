@@ -41,7 +41,7 @@ namespace pbrlib::backend
 
         auto& renderable = ptr_item->getComponent<component::Renderable>();
 
-        renderable.mesh_id      = static_cast<uint32_t>(_vbos.size());
+        renderable.instance_id  = static_cast<uint32_t>(_instances.size());
         renderable.vertex_count = attributes.size();
         renderable.index_count  = indices.size();
 
@@ -72,19 +72,55 @@ namespace pbrlib::backend
 
         const auto& transform = ptr_item->getComponent<pbrlib::component::Transform>();
 
-        const MeshDraw mesh_draw
+        const Instance instance
         {
-            .model  = transform.transform,
-            .normal = math::transpose(pbrlib::math::inverse(transform.transform))
+            .model      = transform.transform,
+            .normal     = math::transpose(math::inverse(transform.transform)),
+            .mesh_id    = static_cast<uint32_t>(_vbos.size() - 1)
         };
 
-        _meshes_draw_info.push_back(mesh_draw);
+        _item_to_instance_id.emplace(ptr_item, _instances.size());
+        _instances.push_back(instance);
+
+        _descriptor_set_is_changed = true;
+    }
+
+    void MeshManager::addInstance(const SceneItem* ptr_src_item, SceneItem* ptr_dst_item)
+    {
+        if (!ptr_src_item || !ptr_dst_item)
+            throw exception::InvalidArgument("[mesh-manager] pointers to items is null");
+
+        auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
+
+        const auto& transform = ptr_dst_item->getComponent<pbrlib::component::Transform>();
+
+        const Instance dst_instance
+        {
+            .model      = transform.transform,
+            .normal     = math::transpose(math::inverse(transform.transform)),
+            .mesh_id    = mesh_id
+        };
+
+        const auto dst_instance_id = static_cast<uint32_t>(_instances.size());
+
+        _item_to_instance_id.emplace(ptr_dst_item, dst_instance_id);
+        _instances.push_back(dst_instance);
+
+        const auto& src_renderable = ptr_src_item->getComponent<component::Renderable>();
+        auto&       dst_renderable = ptr_dst_item->getComponent<component::Renderable>();
+
+        dst_renderable = src_renderable;
+
+        dst_renderable.instance_id  = dst_instance_id;
+        dst_renderable.ptr_item     = ptr_dst_item;
 
         _descriptor_set_is_changed = true;
     }
 
     void MeshManager::update()
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (_descriptor_set_is_changed)
         {
             if (_descriptor_set_handle == VK_NULL_HANDLE)
@@ -144,16 +180,15 @@ namespace pbrlib::backend
                 .usage(buffer_usage)
                 .build();
 
-            _meshes_draw_buffer = vk::Buffer::Builder(_device)
+            _instances_buffer = vk::Buffer::Builder(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
-                .name("mesh-draw-data")
-                .size(_meshes_draw_info.size() * sizeof(MeshDraw))
+                .name("instances")
+                .size(_instances.size() * sizeof(Instance))
                 .type(vk::BufferType::eDeviceOnly)
                 .usage(buffer_usage)
                 .build();
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
-            _meshes_draw_buffer->write(std::span<const MeshDraw>(_meshes_draw_info), 0);
 
             const VkDescriptorBufferInfo vbos_refs_info 
             { 
@@ -164,9 +199,9 @@ namespace pbrlib::backend
 
             const VkDescriptorBufferInfo meshes_draw_info 
             { 
-                .buffer = _meshes_draw_buffer->handle,
+                .buffer = _instances_buffer->handle,
                 .offset = 0,
-                .range  = _meshes_draw_buffer->size
+                .range  = _instances_buffer->size
             };
 
             const std::array write_infos 
@@ -201,6 +236,8 @@ namespace pbrlib::backend
 
             _descriptor_set_is_changed = false;
         }
+
+        _instances_buffer->write(std::span<const Instance>(_instances), 0);
     }
 
     VkDescriptorSet MeshManager::descriptorSet() const
@@ -208,24 +245,36 @@ namespace pbrlib::backend
         return _descriptor_set_handle;
     }
 
-    const vk::Buffer& MeshManager::indexBuffer(uint32_t mesh_id) const
+    const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const
     {
-        if (mesh_id >= _ibos.size())
-            throw exception::InvalidArgument("[mesh-manager] invalid mesh id");
+        if (instance_id >= _instances.size())
+            throw exception::InvalidArgument("[mesh-manager] invalid instance id");
 
-        return _ibos[mesh_id];
+        return _ibos[_instances[instance_id].mesh_id];
     }
 
-    const vk::Buffer& MeshManager::vertexBuffer(uint32_t mesh_id) const
+    const vk::Buffer& MeshManager::vertexBuffer(uint32_t instance_id) const
     {
-        if (mesh_id >= _vbos.size())
-            throw exception::InvalidArgument("[mesh-manager] invalid mesh id");
+        if (instance_id >= _instances.size())
+            throw exception::InvalidArgument("[mesh-manager] invalid instance id");
 
-        return _vbos[mesh_id];
+        return _vbos[_instances[instance_id].mesh_id];
     }
 
     size_t MeshManager::meshCount() const
     {
         return _ibos.size();
+    }
+
+    void MeshManager::updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform)
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (auto index = _item_to_instance_id.find(ptr_item); index != std::end(_item_to_instance_id))
+        {
+            auto& instance      = _instances[index->second];
+            instance.model     = transform;
+            instance.normal    = math::transpose(math::inverse(transform));        
+        }
     }
 }

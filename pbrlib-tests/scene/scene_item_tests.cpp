@@ -1,5 +1,7 @@
 #include "../utils.hpp"
 
+#include <backend/components.hpp>
+
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
@@ -35,7 +37,7 @@ TEST(SceneItemTests, UpdateCallback)
     
     auto& item = scene.addItem("scene-item");
 
-    item.updateCallback([](
+    item.update([](
         pbrlib::SceneItem&          item, 
         const pbrlib::InputStay&    input_stay, 
         float                       delta_time, 
@@ -55,4 +57,37 @@ TEST(SceneItemTests, UpdateCallback)
     const auto& test_component = item.getComponent<TestComponent>();
 
     pbrlib::testing::equality(test_component.num, test_component_num_value);
+}
+
+TEST(SceneItemTests, GetItem)
+{
+    pbrlib::Scene scene("scene");
+
+    constexpr std::string_view item_name = "new-item";
+
+    const auto& new_item = scene.addItem(item_name);
+
+    const auto ptr_item = scene.item(item_name);
+
+    const auto& tag_1 = new_item.getComponent<pbrlib::component::Tag>();
+    const auto& tag_2 = ptr_item->getComponent<pbrlib::component::Tag>();
+
+    pbrlib::testing::thisTrue(tag_1.name == tag_2.name);
+}
+
+TEST(SceneItemTests, CreateInstance)
+{
+    pbrlib::Scene scene("scene");
+
+    constexpr std::string_view item_name            = "new-item";
+    constexpr std::string_view instance_item_name   = "instance-item";
+
+    const pbrlib::math::mat4 transform = pbrlib::transform::translate(pbrlib::math::vec3(-3, -5, 10));
+    
+    const auto& new_item        = scene.addItem(item_name);
+    const auto& instance_item   = scene.createInstance(item_name, instance_item_name, transform);
+
+    const auto& instance_tag = instance_item.getComponent<pbrlib::component::Tag>();
+
+    pbrlib::testing::thisTrue(instance_tag.name == instance_item_name);
 }

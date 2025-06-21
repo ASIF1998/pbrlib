@@ -44,7 +44,7 @@ public:
         try 
         {
             bool result = false;
-            _engine->setupCallback([&filename, &result, &transform](pbrlib::Engine& engine, pbrlib::Scene& scene)
+            _engine->setup([&filename, &result, &transform](pbrlib::Engine& engine, pbrlib::Scene& scene)
             {
                 result = scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
             });
