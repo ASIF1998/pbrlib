@@ -79,6 +79,12 @@ namespace pbrlib::backend
             throw exception::InitializeError("[frame-graph] gbuffer-generator render pass");
     }
 
+    bool FrameGraph::rebuildPasses()
+    {
+        backend::log::info("[frame-graph] rebuild passes");
+        return _ptr_render_pass ? _ptr_render_pass->rebuild(_device, _render_context) : false;
+    }
+
     void FrameGraph::createResources()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;

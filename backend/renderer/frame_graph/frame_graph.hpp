@@ -53,6 +53,8 @@ namespace pbrlib::backend
 
         void draw(const Camera& camera, std::span<const SceneItem*> items);
 
+        bool rebuildPasses();
+
     private:
         vk::Device& _device;
         Canvas&     _canvas;

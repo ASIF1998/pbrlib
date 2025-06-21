@@ -58,8 +58,8 @@ namespace pbrlib::backend
         RenderPass& operator = (RenderPass&& render_pass)       = delete;
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
-        [[nodiscard]]
-        virtual bool init(vk::Device& device, const RenderContext& context);
+        virtual [[nodiscard]] bool init(vk::Device& device, const RenderContext& context);
+        virtual [[nodiscard]] bool rebuild(vk::Device& device, const RenderContext& context) = 0;
 
         virtual void draw(vk::CommandBuffer& command_buffer);
 
