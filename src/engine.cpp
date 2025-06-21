@@ -81,7 +81,7 @@ namespace pbrlib
         /// @todo impl
     }
 
-    void Engine::setupCallback(SetupCallback callback)
+    void Engine::setup(SetupCallback callback)
     {
         _setup_callback = callback;
     }

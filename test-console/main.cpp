@@ -25,7 +25,7 @@ int main()
         
         pbrlib::Engine engine (config);
 
-        engine.setupCallback([&config](pbrlib::Engine& engine, pbrlib::Scene& scene)
+        engine.setup([&config](pbrlib::Engine& engine, pbrlib::Scene& scene)
         {
             auto& camera = engine.camera();
             camera.up(pbrlib::math::vec3(0, -1, 0));
@@ -41,7 +41,7 @@ int main()
             if (auto* ptr_root_item = scene.item("Extended")) [[likely]]
             {
                 ptr_root_item->addComponent<RotateComponent>();
-                ptr_root_item->updateCallback([](
+                ptr_root_item->update([](
                     pbrlib::SceneItem&          item, 
                     const pbrlib::InputStay&    input_stay, 
                     float                       delta_time, 

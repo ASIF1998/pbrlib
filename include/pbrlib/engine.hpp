@@ -67,7 +67,7 @@ namespace pbrlib
         [[nodiscard]] Camera& camera() noexcept;
         [[nodiscard]] Window& window();
 
-        void setupCallback(SetupCallback setup_callback);
+        void setup(SetupCallback setup_callback);
 
         void run();
 

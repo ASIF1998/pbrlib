@@ -46,7 +46,7 @@ public:
 
     void setup(const std::filesystem::path& content)
     {
-        _engine->setupCallback([this, content] (pbrlib::Engine& engine, pbrlib::Scene& scene)
+        _engine->setup([this, content] (pbrlib::Engine& engine, pbrlib::Scene& scene)
         {
             auto& camera = engine.camera();
             camera.up(pbrlib::math::vec3(0, -1, 0));

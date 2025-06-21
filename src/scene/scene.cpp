@@ -60,7 +60,7 @@ namespace pbrlib
         return *this;
     }
 
-    void SceneItem::updateCallback(const UpdateCallback& callback)
+    void SceneItem::update(const UpdateCallback& callback)
     {
         _update_callback = callback;
     }
@@ -167,7 +167,7 @@ namespace pbrlib
         return nullptr;
     }
 
-    SceneItem* Scene::createInstance (
+    SceneItem& Scene::createInstance (
         std::string_view    item_name, 
         std::string_view    instance_name,
         const math::mat4&   transform
@@ -212,7 +212,7 @@ namespace pbrlib
 
         items.pop();
 
-        return &instance_node;
+        return instance_node;
     }
 
     bool Scene::import (

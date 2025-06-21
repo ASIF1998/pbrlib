@@ -78,7 +78,7 @@ namespace pbrlib
         template<typename Component>
         [[nodiscard]] bool hasComponent() const;
 
-        void updateCallback(const UpdateCallback& callback);
+        void update(const UpdateCallback& callback);
 
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
@@ -123,7 +123,7 @@ namespace pbrlib
         SceneItem*          item(std::string_view name);
         const SceneItem*    item(std::string_view name) const;
 
-        SceneItem* createInstance (
+        SceneItem& createInstance (
             std::string_view    item_name, 
             std::string_view    instance_name,
             const math::mat4&   transform
