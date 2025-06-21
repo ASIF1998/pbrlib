@@ -36,7 +36,8 @@ namespace pbrlib::testing
 
 namespace pbrlib
 {
-    using SetupCallback = std::function<void(Engine& engine, Scene& scene)>;
+    using SetupCallback     = std::function<void(Engine& engine, Scene& scene)>;
+    using UpdateCallback    = std::function<void (const InputStay& input_stay, float delta_time)>;
 }
 
 namespace pbrlib
@@ -68,6 +69,7 @@ namespace pbrlib
         [[nodiscard]] Window& window();
 
         void setup(SetupCallback setup_callback);
+        void update(UpdateCallback update_callback);
 
         void run();
 
@@ -75,7 +77,9 @@ namespace pbrlib
         std::optional<Window> _window;
 
         SetupCallback   _setup_callback;
-        Camera          _camera;
+        UpdateCallback  _update_callback;
+
+        Camera _camera;
 
         std::unique_ptr<backend::vk::Device> _ptr_device;
         std::unique_ptr<backend::FrameGraph> _ptr_frame_graph;
