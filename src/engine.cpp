@@ -110,7 +110,7 @@ namespace pbrlib
                 is_close = input_stay.window.isClsoe();
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
-            if (input_stay.keyboard.isDown(pbrlib::Keycode::F5))
+            if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]
                 _ptr_frame_graph->rebuildPasses();
 #endif
 
