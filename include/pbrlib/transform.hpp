@@ -15,8 +15,8 @@ namespace pbrlib::transform
     [[nodiscard]] math::mat4 rotate(const math::vec3& axis, float theta);
 
     [[nodiscard]] math::mat4 lookAt (
-        const math::vec3& pos, 
         const math::vec3& eye, 
+        const math::vec3& pos, 
         const math::vec3& up
     );
 
