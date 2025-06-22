@@ -53,7 +53,7 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(GBufferFinalAttachmentsName::pos_uv);
+        auto ptr_result = &_images.at(GBufferFinalAttachmentsName::normal_tangent);
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
