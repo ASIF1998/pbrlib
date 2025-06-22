@@ -65,8 +65,8 @@ namespace pbrlib::backend
         _pipeline_layout = vk::PipelineLayout::Builder(*_ptr_device)
             .pushConstant(push_constant_range)
             .addSet()
-                .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-                .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(MeshManager::Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
             .build();
 
         createFramebuffer();

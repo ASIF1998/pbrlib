@@ -17,6 +17,7 @@ endif()
 
 if (PBRLIB_TEST_CONSOLE)
     add_compile_definitions(PBRLIB_ENABLE_PROPFILING)
+    add_compile_definitions(PBRLIB_ENABLE_DEVELOPER_MODE)
 endif()
 
 if (PBRLIB_SETUP_CI)

@@ -129,14 +129,14 @@ namespace pbrlib::backend
                 {
                     VkDescriptorSetLayoutBinding
                     {
-                        .binding            = Bindings::eVertexBuffersReferences,
+                        .binding            = Bindings::eVertexBuffers,
                         .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
                         .descriptorCount    = 1,
                         .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
                     },
                     VkDescriptorSetLayoutBinding
                     {
-                        .binding            = Bindings::eMeshesDrawInfos,
+                        .binding            = Bindings::eInstances,
                         .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
                         .descriptorCount    = 1,
                         .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT

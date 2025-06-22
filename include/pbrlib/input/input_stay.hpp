@@ -69,7 +69,6 @@ namespace pbrlib
 		friend struct InputStay;
 
 		void add(EventHandle event_handle);
-		void reset();
 
 		enum class ButtonStay
 		{
