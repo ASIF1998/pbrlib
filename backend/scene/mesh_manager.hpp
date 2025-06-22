@@ -43,8 +43,8 @@ namespace pbrlib::backend
         {
             enum
             {
-                eVertexBuffersReferences,
-                eMeshesDrawInfos,
+                eVertexBuffers,
+                eInstances,
 
                 eCount
             }; 

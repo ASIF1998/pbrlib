@@ -86,6 +86,11 @@ namespace pbrlib
         _setup_callback = callback;
     }
 
+    void Engine::update(UpdateCallback update_callback)
+    {
+        _update_callback = update_callback;
+    }
+
     void Engine::run()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -115,6 +120,9 @@ namespace pbrlib
 #endif
 
             updateTime();
+
+            if (_update_callback) [[likely]]
+                _update_callback(input_stay, _delta_time);
 
             _ptr_scene->update(input_stay, _delta_time);
 

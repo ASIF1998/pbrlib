@@ -105,9 +105,9 @@ namespace pbrlib::transform
         );
     }
 
-    math::mat4 lookAt(
-        const math::vec3& pos, 
+    math::mat4 lookAt (
         const math::vec3& eye, 
+        const math::vec3& pos, 
         const math::vec3& up
     )
     {
@@ -133,7 +133,7 @@ namespace pbrlib::transform
         return mat;
     }
 
-    math::mat4 perspective(
+    math::mat4 perspective (
         float       fovy,
         uint32_t    width,
         uint32_t    height,

@@ -42,6 +42,9 @@ namespace pbrlib
         [[nodiscard]] math::mat4 view()         const;
         [[nodiscard]] math::mat4 projection()   const;
 
+        void translate(const math::vec3& t);
+        void moveEye(const math::vec3& t);
+
     private:
         math::vec3 _pos = math::vec3(0, 0, -1);
         math::vec3 _eye = math::vec3(0, 0, 0);

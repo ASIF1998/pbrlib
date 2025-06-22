@@ -85,11 +85,6 @@ namespace pbrlib
 			_pressed_map[button_index] = ButtonStay::eUp;
 	}
 	
-	void MouseButtonsStay::reset()
-	{
-		_pressed_map.fill(ButtonStay::eNone);	
-	}
-
 	bool MouseButtonsStay::isDown(MouseButton button) const
 	{
 		return _pressed_map[backend::utils::enumCast(button)] == ButtonStay::eDown;
@@ -148,18 +143,18 @@ namespace pbrlib
 
 		switch (ptr_event->type)
 		{
-		case SDL_EVENT_KEY_DOWN:
-		case SDL_EVENT_KEY_UP:
-			keyboard.add(ptr_event);
-			break;
-		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-		case SDL_EVENT_WINDOW_RESIZED:
-			window.add(ptr_event);
-			break;
-		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-		case SDL_EVENT_MOUSE_BUTTON_UP:
-			mouse_buttons.add(ptr_event);
-			break;
+			case SDL_EVENT_KEY_DOWN:
+			case SDL_EVENT_KEY_UP:
+				keyboard.add(ptr_event);
+				break;
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+			case SDL_EVENT_WINDOW_RESIZED:
+				window.add(ptr_event);
+				break;
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+				mouse_buttons.add(ptr_event);
+				break;
 		}
 
 		mouse_motion.update(ptr_event);
@@ -169,7 +164,6 @@ namespace pbrlib
 	{
 		keyboard.reset();
 		window.reset();
-		mouse_buttons.reset();
 		mouse_motion.reset();
 	}
 }

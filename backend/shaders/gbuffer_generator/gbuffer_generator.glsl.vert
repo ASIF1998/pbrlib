@@ -40,9 +40,9 @@ layout(push_constant) uniform Block
     Globals globals;
 };
 
-layout(set = PER_PASS_SET_ID, binding = 0) buffer readonly VisibleVertexBuffers
+layout(set = PER_PASS_SET_ID, binding = 0) buffer readonly VertexBuffers
 {
-    VertexBuffer visible_vertex_buffers[];
+    VertexBuffer vertex_buffers[];
 };
 
 layout(set = PER_PASS_SET_ID, binding = 1) buffer readonly InstanceData
@@ -59,7 +59,7 @@ layout(location = 4) out vec2       uv;
 void main()
 {
     Instance    instance    = instances[globals.instance_id];
-    Vertex      vertex      = visible_vertex_buffers[instance.mesh_id].vertices[gl_VertexIndex];
+    Vertex      vertex      = vertex_buffers[instance.mesh_id].vertices[gl_VertexIndex];
 
     material_index = globals.material_index;
 

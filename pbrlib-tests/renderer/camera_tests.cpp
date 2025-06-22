@@ -59,8 +59,8 @@ TEST(CameraTests, SettersAndGetters)
 TEST(CameraTests, ViewMatrix)
 {
     pbrlib::Camera camera;
-    camera.pos(pbrlib::math::vec3(123, 43, 91));
-    camera.eye(pbrlib::math::vec3(43, 65, -45));
+    camera.eye(pbrlib::math::vec3(123, 43, 91));
+    camera.pos(pbrlib::math::vec3(43, 65, -45));
     camera.up(pbrlib::math::vec3(0.43, 0.65, 0.12));
 
     constexpr pbrlib::math::mat4 view_matrix {

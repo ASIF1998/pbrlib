@@ -83,4 +83,15 @@ namespace pbrlib
     {
         return pbrlib::transform::perspective(_fov_y, _width, _height, _range.near_dist, _range.far_dist);
     }
+
+    void Camera::translate(const math::vec3& t)
+    {
+        _eye = _eye + t;
+        _pos = _pos + t;
+    }
+
+    void Camera::moveEye(const math::vec3& t)
+    {
+        _eye = _pos + t;
+    }
 }
