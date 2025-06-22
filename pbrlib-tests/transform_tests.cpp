@@ -72,8 +72,8 @@ TEST(MovingTransform, LookAt)
         0.49751859900f, -3.3854494100f, -3.7803716700f, 1.0f
     );
 
-    constexpr pbrlib::math::vec3 pos    (45.0f, 45.0f, 4.00f);
-    constexpr pbrlib::math::vec3 eye    (-5.0f, 0.00f, -1.0f);
+    constexpr pbrlib::math::vec3 eye    (45.0f, 45.0f, 4.00f);
+    constexpr pbrlib::math::vec3 pos    (-5.0f, 0.00f, -1.0f);
     constexpr pbrlib::math::vec3 up     (0.00f, 1.00f, 0.00f);
 
     auto look_at = pbrlib::transform::lookAt(pos, eye, up);
