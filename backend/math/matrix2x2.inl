@@ -176,7 +176,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type& Matrix2x2<Type>::at(size_t i, size_t j)
     {
-        if (i > 1 || j > 2)
+        if (i > 1 || j > 2) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
 
         return _array2x2[i][j];
@@ -185,7 +185,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type Matrix2x2<Type>::at(size_t i, size_t j) const
     {
-        if (i > 1 || j > 1)
+        if (i > 1 || j > 1) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
 
         return _array2x2[i][j];
@@ -211,7 +211,7 @@ namespace pbrlib::math
     {
         Type d = det();
 
-        if (d != Type(0)) 
+        if (d != Type(0)) [[likely]] 
         {
             Matrix2x2<Type> adj = 
             {

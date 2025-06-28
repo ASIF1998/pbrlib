@@ -181,7 +181,7 @@ namespace pbrlib::math
 #else
         float l = length();
 
-        if (constexpr auto eps = 0.001f; l < eps)
+        if (constexpr auto eps = 0.001f; l < eps) [[unlikely]] 
             throw exception::MathError("[quaternion] faield normalize because length is zerro");
 
         l = 1.0f / l;
@@ -195,7 +195,7 @@ namespace pbrlib::math
     {
         auto ls = lengthSquared();
 
-        if (constexpr auto eps = 0.001f; ls < eps)
+        if (constexpr auto eps = 0.001f; ls < eps) [[unlikely]]
             throw exception::MathError("[quaternion] faield inverse because length squared is zerro");
 
         *this = conjugate(*this) / ls;
@@ -285,13 +285,13 @@ namespace pbrlib::math
     {
         float cos_theta = dot(q1, q2);
 
-        if (cos_theta > 0.995f) {
+        if (cos_theta > 0.995f) [[unlikely]] 
             return lerp(t, q1, q2);
-        }
 
         Quaternion  q3 = q2;
 
-        if (cos_theta < static_cast<float>(0u)) {
+        if (cos_theta < static_cast<float>(0u)) [[unlikely]] 
+        {
             q3          *=  -1.0f;
             cos_theta   =   -cos_theta;
         }

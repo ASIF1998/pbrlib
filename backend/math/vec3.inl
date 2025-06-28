@@ -115,7 +115,7 @@ namespace pbrlib::math
     {
         auto l = length();
         
-        if (l == static_cast<Type>(0))
+        if (l == static_cast<Type>(0)) [[unlikely]]
             throw exception::MathError("[vec3] failed normalize");
 
         x /= l;
@@ -145,7 +145,7 @@ namespace pbrlib::math
     {
         auto l = v.length();
         
-        if (l == static_cast<Type>(0))
+        if (l == static_cast<Type>(0)) [[unlikely]]
             throw exception::MathError("[vec3] failed normalize");
 
         return Vec3<Type>(v.x / l, v.y / l, v.z / l);

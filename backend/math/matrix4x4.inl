@@ -183,7 +183,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type& Matrix4x4<Type>::at(size_t i, size_t j)
     {
-        if (i > 3 || j > 3)
+        if (i > 3 || j > 3) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat4] i = {}, j = {}", i, j));
 
         return _array4x4[i][j];
@@ -192,7 +192,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type Matrix4x4<Type>::at(size_t i, size_t j) const
     {
-        if (i > 3 || j > 3)
+        if (i > 3 || j > 3) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat4] i = {}, j = {}", i, j));
 
         return _array4x4[i][j];
@@ -251,7 +251,8 @@ namespace pbrlib::math
     {
         auto d = det();
 
-        if (d != Type(0)) {
+        if (d != Type(0)) [[likely]] 
+        {
             auto tmat = pbrlib::math::transpose(*this);
 
             auto a33444334 = tmat[2][2] * tmat[3][3] - tmat[3][2] * tmat[2][3];

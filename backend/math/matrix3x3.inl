@@ -178,7 +178,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type& Matrix3x3<Type>::at(size_t i, size_t j)
     {
-        if (i > 2 || j > 2)
+        if (i > 2 || j > 2) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat3] i = {}, j = {}", i, j)); 
 
         return _array3x3[i][j];
@@ -187,7 +187,7 @@ namespace pbrlib::math
     template<typename Type>
     inline Type Matrix3x3<Type>::at(size_t i, size_t j) const
     {
-        if (i > 2 || j > 2)
+        if (i > 2 || j > 2) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat3] i = {}, j = {}", i, j)); 
 
         return _array3x3[i][j];
@@ -218,7 +218,8 @@ namespace pbrlib::math
     {
         auto d = det();
 
-        if (d != Type(0)) {
+        if (d != Type(0)) [[likely]] 
+        {
             auto tmat (*this);
 
             tmat.transpose();

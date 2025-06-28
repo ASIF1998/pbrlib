@@ -134,7 +134,7 @@ namespace pbrlib::math
     {
         auto l = length();
 
-        if (l == static_cast<Type>(0))
+        if (l == static_cast<Type>(0)) [[unlikely]]
             throw exception::MathError("[vec4] failed normalize");
 
         x /= l;
