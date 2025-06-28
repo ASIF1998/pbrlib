@@ -180,7 +180,7 @@ namespace pbrlib
             const auto p1 = _camera.view() * transform_1.transform * ((bbox_1.p_min + bbox_1.p_max) * 0.5);
             const auto p2 = _camera.view() * transform_2.transform * ((bbox_2.p_min + bbox_2.p_max) * 0.5);
 
-            return p1.z < p1.z;
+            return p1.z < p2.z;
         });
 
         if (_ptr_frame_graph) [[likely]]
