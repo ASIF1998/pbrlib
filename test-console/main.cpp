@@ -36,7 +36,7 @@ int main()
         
         pbrlib::Engine engine (config);
 
-        engine.setup([&config](pbrlib::Engine& engine, pbrlib::Scene& scene)
+        engine.setup([&engine, &config] (pbrlib::Scene& scene)
         {
             auto& camera = engine.camera();
             camera.up(pbrlib::math::vec3(0, -1, 0));

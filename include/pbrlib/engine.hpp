@@ -36,7 +36,7 @@ namespace pbrlib::testing
 
 namespace pbrlib
 {
-    using SetupCallback     = std::function<void(Engine& engine, Scene& scene)>;
+    using SetupCallback     = std::function<void(Scene& scene)>;
     using UpdateCallback    = std::function<void (const InputStay& input_stay, float delta_time)>;
 }
 
@@ -55,12 +55,12 @@ namespace pbrlib
     public:
         explicit Engine(const Config& config);
 
-        Engine(Engine&& engine)         = default;
+        Engine(Engine&& engine)         = delete;
         Engine(const Engine& engine)    = delete;
 
         ~Engine();
 
-        Engine& operator = (Engine&& engine)        = default;
+        Engine& operator = (Engine&& engine)        = delete;
         Engine& operator = (const Engine&& engine)  = delete;
 
         void resize(uint32_t width, uint32_t height);

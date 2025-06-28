@@ -97,7 +97,7 @@ namespace pbrlib
 
         if (_setup_callback) [[likely]]
         {
-            _setup_callback(*this, *_ptr_scene);
+            _setup_callback(*_ptr_scene);
             _setup_callback = nullptr;
         }
 
