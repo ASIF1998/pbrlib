@@ -25,6 +25,45 @@ auto angleAxis(float angle, const pbrlib::math::vec3& axis)
     return pbrlib::math::quat(pbrlib::math::normalize(axis) * sin(angle * 0.5), cos(angle * 0.5));
 }
 
+auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir) 
+    -> pbrlib::math::vec3
+{
+    const auto move_dir = motion.getRelativeMotion();
+
+    const auto dx = move_dir.x / static_cast<float>(config.width);
+    const auto dy = move_dir.y / static_cast<float>(config.height);
+
+    const auto rotation = angleAxis(dx, pbrlib::math::vec3(0, 1, 0)) * angleAxis(dy, pbrlib::math::vec3(1, 0, 0));
+
+    const auto rdir = pbrlib::math::normalize(rotation.toMatrix() * pbrlib::math::vec4(dir, 0.0));
+
+    return pbrlib::math::vec3(rdir.x, rdir.y, rdir.z);
+}
+
+auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::vec3& dir, const pbrlib::math::vec3& up) noexcept
+    -> pbrlib::math::vec3
+{
+    if (keyboard.isDown(pbrlib::Keycode::W))
+        return dir;
+
+    if (keyboard.isDown(pbrlib::Keycode::S))
+        return dir * -1.0;
+
+    if (keyboard.isDown(pbrlib::Keycode::A))
+        return pbrlib::math::cross(up, dir);
+    
+    if (keyboard.isDown(pbrlib::Keycode::D))
+        return pbrlib::math::cross(dir, up);
+
+    if (keyboard.isDown(pbrlib::Keycode::Space))
+        return up * -1.0;
+
+    if (keyboard.isDown(pbrlib::Keycode::ShiftLeft))
+        return up;
+
+    return pbrlib::math::vec3(0);
+}
+
 int main()
 {
     try 
@@ -87,42 +126,10 @@ int main()
 
             const auto dir = pbrlib::math::normalize(camera.eye() - camera.pos());
 
-            const auto& motion          = input_stay.mouse_motion; 
-            const auto& mouse_buttons   = input_stay.mouse_buttons;
+            if (input_stay.mouse_buttons.isDown(pbrlib::MouseButton::eLeft) && input_stay.mouse_motion.isMotion())
+                camera.moveEye(mouseMotionPorcess(config, input_stay.mouse_motion, dir));
 
-            if (mouse_buttons.isDown(pbrlib::MouseButton::eLeft) && motion.isMotion())
-            {
-                const auto move_dir = motion.getRelativeMotion();
-
-                const auto dx = move_dir.x / static_cast<float>(config.width);
-                const auto dy = move_dir.y / static_cast<float>(config.height);
-
-                const auto rotation = angleAxis(dx, pbrlib::math::vec3(0, 1, 0)) * angleAxis(dy, pbrlib::math::vec3(1, 0, 0));
-
-                const auto rdir = pbrlib::math::normalize(rotation.toMatrix() * pbrlib::math::vec4(dir, 0.0));
-
-                camera.moveEye(pbrlib::math::vec3(rdir.x, rdir.y, rdir.z));
-            }
-
-            const auto& keyboard = input_stay.keyboard;
-
-            if (keyboard.isDown(pbrlib::Keycode::W))
-                camera.translate(dir);
-
-            if (keyboard.isDown(pbrlib::Keycode::S))
-                camera.translate(dir * -1.0);
-
-            if (keyboard.isDown(pbrlib::Keycode::A))
-                camera.translate(pbrlib::math::cross(camera.up(), dir));
-            
-            if (keyboard.isDown(pbrlib::Keycode::D))
-                camera.translate(pbrlib::math::cross(dir, camera.up()));
-
-            if (keyboard.isDown(pbrlib::Keycode::Space))
-                camera.translate(camera.up() * -1.0);
-
-            if (keyboard.isDown(pbrlib::Keycode::ShiftLeft))
-                camera.translate(camera.up());
+            camera.translate(keyboardProcess(input_stay.keyboard, dir, camera.up()));
         });
 
         engine.run();
