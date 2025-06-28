@@ -4,7 +4,9 @@
 
 #include <backend/renderer/vulkan/device.hpp>
 
+#include <backend/renderer/frame_graph/compound_render_pass.hpp>
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
+#include <backend/renderer/frame_graph/ssao.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -62,21 +64,38 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
+    std::unique_ptr<SSAO> FrameGraph::buildSSAOSubpass()
+    {
+        auto ptr_ssao = std::make_unique<SSAO>();
+        return ptr_ssao;
+    }
+
+    std::unique_ptr<GBufferGenerator> FrameGraph::buildGBufferGeneratorSubpass()
+    {
+        auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>();
+
+        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::pos_uv, &_images.at(GBufferFinalAttachmentsName::pos_uv));
+        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::normal_tangent, &_images.at(GBufferFinalAttachmentsName::normal_tangent));
+        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::material_index, &_images.at(GBufferFinalAttachmentsName::material_index));
+        ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
+
+        return ptr_gbuffer_generator;
+    }
+
     void FrameGraph::build()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         createResources();
 
-        _ptr_render_pass = std::make_unique<GBufferGenerator>();
+        auto ptr_render_pass = std::make_unique<CompoundRenderPass>();
+        
+        ptr_render_pass->add(buildGBufferGeneratorSubpass());
+        ptr_render_pass->add(buildSSAOSubpass());
 
-        _ptr_render_pass->addColorOutput(GBufferFinalAttachmentsName::pos_uv, &_images.at(GBufferFinalAttachmentsName::pos_uv));
-        _ptr_render_pass->addColorOutput(GBufferFinalAttachmentsName::normal_tangent, &_images.at(GBufferFinalAttachmentsName::normal_tangent));
-        _ptr_render_pass->addColorOutput(GBufferFinalAttachmentsName::material_index, &_images.at(GBufferFinalAttachmentsName::material_index));
-        _ptr_render_pass->depthStencil(&_depth_buffer.value());
+        _ptr_render_pass = std::move(ptr_render_pass);
 
-        if (!_ptr_render_pass->init(_device, _render_context))
-            throw exception::InitializeError("[frame-graph] gbuffer-generator render pass");
+        _ptr_render_pass->init(_device, _render_context);
     }
 
     bool FrameGraph::rebuildPasses()

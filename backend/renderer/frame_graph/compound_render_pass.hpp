@@ -19,6 +19,7 @@ namespace pbrlib::backend
         bool init(vk::Device& device, const RenderContext& context)     override;
         void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
         void draw(vk::CommandBuffer& command_buffer)                    override;
+        bool rebuild(vk::Device& device, const RenderContext& context)  override;
 
     public:
         template<IsRenderPass T>

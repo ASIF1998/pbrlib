@@ -23,6 +23,8 @@ namespace pbrlib::backend
     class   Canvas;
     class   MaterialManager;
     class   MeshManager;
+    class   GBufferGenerator;
+    class   SSAO;
 }
 
 namespace pbrlib::backend
@@ -34,6 +36,9 @@ namespace pbrlib::backend
         void createResources();
 
         void build();
+
+        std::unique_ptr<GBufferGenerator>   buildGBufferGeneratorSubpass();
+        std::unique_ptr<SSAO>               buildSSAOSubpass();
 
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);
 
