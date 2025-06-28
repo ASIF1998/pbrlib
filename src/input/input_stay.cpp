@@ -34,13 +34,19 @@ namespace pbrlib
 		}
 	}
 
-	bool KeyboardStay::isDown(Keycode key_code) const
+	bool KeyboardStay::isDown(Keycode key_code) const noexcept
 	{
+		if (key_code == Keycode::Count)
+			return false;
+
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eDown;
 	}
 	
-    bool KeyboardStay::isUp(Keycode key_code) const
+    bool KeyboardStay::isUp(Keycode key_code) const noexcept
 	{
+		if (key_code == Keycode::Count)
+			return false;
+
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eUp;
 	}
 }
@@ -55,7 +61,7 @@ namespace pbrlib
 			_is_close = true;
 	}
 	
-	void WindowStay::reset()
+	void WindowStay::reset() noexcept
 	{
 		_is_close = false;
 	}
@@ -85,12 +91,12 @@ namespace pbrlib
 			_pressed_map[button_index] = ButtonStay::eUp;
 	}
 	
-	bool MouseButtonsStay::isDown(MouseButton button) const
+	bool MouseButtonsStay::isDown(MouseButton button) const noexcept
 	{
 		return _pressed_map[backend::utils::enumCast(button)] == ButtonStay::eDown;
 	}
 	
-	bool MouseButtonsStay::isUp(MouseButton button) const
+	bool MouseButtonsStay::isUp(MouseButton button) const noexcept
 	{
 		return _pressed_map[backend::utils::enumCast(button)] == ButtonStay::eUp;
 	}
@@ -114,7 +120,7 @@ namespace pbrlib
 		}
 	}
 
-	void MouseMotionStay::reset()
+	void MouseMotionStay::reset() noexcept
 	{
 		_is_motion = false;
 	}

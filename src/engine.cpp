@@ -191,6 +191,8 @@ namespace pbrlib
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
+        using msFloat = std::chrono::duration<float, std::milli>;
+
         static constinit std::chrono::high_resolution_clock timer;
 
         constexpr auto seconds_per_milisceond = 0.001f;
@@ -200,7 +202,7 @@ namespace pbrlib
 
         end = timer.now();
 
-        _delta_time = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(end - begin).count() * seconds_per_milisceond;
+        _delta_time = std::chrono::duration_cast<msFloat>(end - begin).count() * seconds_per_milisceond;
 
         begin = end;
     }

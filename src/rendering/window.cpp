@@ -19,7 +19,7 @@ namespace utils
 
 namespace pbrlib
 {
-    Window::Window(void* ptr_window) :
+    Window::Window(void* ptr_window) noexcept :
         _ptr_window(ptr_window)
     { }
 
@@ -53,7 +53,7 @@ namespace pbrlib
         SDL_SetWindowTitle(utils::cast(_ptr_window), title.data());
     }
 
-    std::pair<int32_t, int32_t> Window::size() const
+    std::pair<int32_t, int32_t> Window::size() const noexcept
     {
         int width   = 0;
         int height  = 0;
@@ -77,7 +77,7 @@ namespace pbrlib
         return *this;
     }
 
-    Window::Builder& Window::Builder::size(uint32_t width, uint32_t height)
+    Window::Builder& Window::Builder::size(uint32_t width, uint32_t height) noexcept
     {
         _width  = width;
         _height = height;
@@ -85,7 +85,7 @@ namespace pbrlib
         return *this;
     }
 
-    Window::Builder& Window::Builder::resizable(bool is_resizable)
+    Window::Builder& Window::Builder::resizable(bool is_resizable) noexcept
     {
         _is_resizable = is_resizable;
         return *this;

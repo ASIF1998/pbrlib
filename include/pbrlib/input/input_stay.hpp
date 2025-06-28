@@ -30,8 +30,8 @@ namespace pbrlib
 		void reset();
 
 	public:
-		bool isDown(Keycode key_code) 	const;
-		bool isUp(Keycode key_code) 	const;
+		bool isDown(Keycode key_code) 	const noexcept;
+		bool isUp(Keycode key_code) 	const noexcept;
 
 	private:
 		std::array<KeyStay, backend::utils::enumCast(Keycode::Count)> _pressed_map;
@@ -45,7 +45,7 @@ namespace pbrlib
 		friend struct InputStay;
 
 		void add(EventHandle event_handle);
-		void reset();
+		void reset() noexcept;
 
 	public:
 		bool isClsoe() const noexcept;
@@ -78,8 +78,8 @@ namespace pbrlib
 		};
 
 	public:
-		bool isDown(MouseButton button) const;
-		bool isUp(MouseButton button)	const;
+		bool isDown(MouseButton button) const noexcept;
+		bool isUp(MouseButton button)	const noexcept;
 
 	private:
 		std::array<ButtonStay, 3> _pressed_map;
@@ -93,10 +93,10 @@ namespace pbrlib
 		friend struct InputStay;
 
 		void update(EventHandle event_handle);
-		void reset();
+		void reset() noexcept;
 
 	public:
-		math::vec2 getCurrentCoord()	const;
+		math::vec2 getCurrentCoord()	const; 
 		math::vec2 getRelativeMotion() 	const;
 
 		bool isMotion() const noexcept;

@@ -16,7 +16,7 @@ namespace pbrlib
     {
         friend class pbrlib::backend::vk::Surface;
 
-        explicit Window(void* ptr_window);
+        explicit Window(void* ptr_window) noexcept;
 
     public:
         class Builder;
@@ -35,7 +35,7 @@ namespace pbrlib
         void        title(std::string_view title);
 
         [[nodiscard]] 
-        std::pair<int32_t, int32_t> size() const;
+        std::pair<int32_t, int32_t> size() const noexcept;
 
         void messageBox(std::string_view title, std::string_view msg) const;
 
@@ -57,8 +57,8 @@ namespace pbrlib
         Builder& operator = (const Builder& builder)    = delete;
 
         Builder& title(std::string_view title);
-        Builder& size(uint32_t width, uint32_t height);
-        Builder& resizable(bool is_resizable);
+        Builder& size(uint32_t width, uint32_t height)  noexcept;
+        Builder& resizable(bool is_resizable)           noexcept;
 
         Window build();
 

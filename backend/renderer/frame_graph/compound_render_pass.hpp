@@ -16,11 +16,9 @@ namespace pbrlib::backend
     class CompoundRenderPass :
         public RenderPass
     {
-        bool init(vk::Device& device, const RenderContext& context) override;
-
-        void render(size_t item_id, vk::CommandBuffer& command_buffer) override;
-
-        void draw(vk::CommandBuffer& command_buffer) override;
+        bool init(vk::Device& device, const RenderContext& context)     override;
+        void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
+        void draw(vk::CommandBuffer& command_buffer)                    override;
 
     public:
         template<IsRenderPass T>

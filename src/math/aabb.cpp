@@ -38,7 +38,7 @@ namespace pbrlib::math
     float AABB::surfaceArea() const
     {
         const auto d = diagonal();
-        return 2.0f *   (d.x * d.y + d.x * d.z + d.y * d.z);
+        return 2.0f * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
 
     float AABB::volume() const

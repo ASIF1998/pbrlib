@@ -240,7 +240,7 @@ namespace pbrlib::backend
         _instances_buffer->write(std::span<const Instance>(_instances), 0);
     }
 
-    VkDescriptorSet MeshManager::descriptorSet() const
+    VkDescriptorSet MeshManager::descriptorSet() const noexcept
     {
         return _descriptor_set_handle;
     }
@@ -261,7 +261,7 @@ namespace pbrlib::backend
         return _vbos[_instances[instance_id].mesh_id];
     }
 
-    size_t MeshManager::meshCount() const
+    size_t MeshManager::meshCount() const noexcept
     {
         return _ibos.size();
     }

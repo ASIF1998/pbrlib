@@ -71,10 +71,10 @@ namespace pbrlib::backend
 
         void update();
 
-        [[nodiscard]] VkDescriptorSet descriptorSet() const;
+        [[nodiscard]] VkDescriptorSet descriptorSet() const noexcept;
 
-        [[nodiscard]] size_t imageCount()       const;
-        [[nodiscard]] size_t materialCount()    const;
+        [[nodiscard]] size_t imageCount()       const noexcept;
+        [[nodiscard]] size_t materialCount()    const noexcept;
 
     private:
         vk::Device& _device;

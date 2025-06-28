@@ -215,17 +215,17 @@ namespace pbrlib::backend
         }
     }
 
-    VkDescriptorSet MaterialManager::descriptorSet() const
+    VkDescriptorSet MaterialManager::descriptorSet() const noexcept
     {
         return _descriptor_set_handle;
     }
 
-    size_t MaterialManager::imageCount() const 
+    size_t MaterialManager::imageCount() const noexcept
     {
         return _images.size();
     }
 
-    size_t MaterialManager::materialCount() const
+    size_t MaterialManager::materialCount() const noexcept
     {
         return _materials.size();
     }
