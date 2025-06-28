@@ -73,12 +73,12 @@ namespace pbrlib::backend
 
         void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
 
-        [[nodiscard]] VkDescriptorSet descriptorSet() const;
+        [[nodiscard]] VkDescriptorSet descriptorSet() const noexcept;
 
         [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t instance_id)   const;
         [[nodiscard]] const vk::Buffer& vertexBuffer(uint32_t instance_id)  const;
 
-        [[nodiscard]] size_t meshCount() const;        
+        [[nodiscard]] size_t meshCount() const noexcept;
 
     private:
         vk::Device& _device;

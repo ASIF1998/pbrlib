@@ -54,4 +54,11 @@ namespace pbrlib::exception
     public:
         explicit FileOpen(std::string_view msg);
     };
+
+    class MathError final :
+        public Exception
+    {
+    public:
+        explicit MathError(std::string_view msg);
+    };
 }

@@ -97,3 +97,16 @@ TEST(Vec2Tests, Normalize)
     pbrlib::testing::equality(r1, normalize(v1));
     pbrlib::testing::equality(r2, normalize(v2));
 }
+
+TEST(Vec2Tests, NormalizeEdgeCase)
+{
+    vec2 v (0, 0);
+
+    EXPECT_THROW({
+        v.normalize();
+    }, pbrlib::exception::MathError);
+    
+    EXPECT_THROW({
+        [[maybe_unuse]] const auto res = normalize(v);
+    }, pbrlib::exception::MathError);
+}

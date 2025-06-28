@@ -470,3 +470,24 @@ TEST(Mat4Tests, InverseTypeFloat)
 
     pbrlib::testing::equality(r, inverse(m));
 }
+
+TEST(Mat4Tests, AtMethodEdgeCase)
+{
+    constexpr mat3 mat {
+        1.0f, 2.0f, 3.5f,
+        2.2f, 3.0f, 1.2f,
+        8.5f, 2.6f, 12.3f
+    };
+
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(4, 0);
+    }, pbrlib::exception::InvalidArgument);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(0, 4);
+    }, pbrlib::exception::InvalidArgument);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(4, 4);
+    }, pbrlib::exception::InvalidArgument);
+}

@@ -15,10 +15,10 @@ namespace pbrlib::math
 
         [[nodiscard]] vec3 corner(size_t i) const;
 
-        [[nodiscard]] vec3 diagonal() const;
+        [[nodiscard]] vec3 diagonal() const noexcept;
 
-        [[nodiscard]] float surfaceArea()   const;
-        [[nodiscard]] float volume()        const;
+        [[nodiscard]] float surfaceArea()   const noexcept;
+        [[nodiscard]] float volume()        const noexcept;
 
         [[nodiscard]] bool empty() const noexcept;
 

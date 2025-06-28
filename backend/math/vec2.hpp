@@ -8,26 +8,26 @@ namespace pbrlib::math
     struct Vec2
     {
     public:
-        inline constexpr Vec2();
-        inline constexpr Vec2(Type xy);
-        inline constexpr Vec2(Type x, Type y);
+        inline constexpr Vec2()                 noexcept;
+        inline constexpr Vec2(Type xy)          noexcept;
+        inline constexpr Vec2(Type x, Type y)   noexcept;
 
-        inline bool operator == (const Vec2& v) const;
-        inline bool operator != (const Vec2& v) const;
+        inline bool operator == (const Vec2& v) const noexcept;
+        inline bool operator != (const Vec2& v) const noexcept;
         
-        inline Vec2 operator + (const Vec2& v)  const;
-        inline Vec2 operator - (const Vec2& v)  const;
-        inline Vec2 operator * (Type s)         const;
+        inline Vec2 operator + (const Vec2& v)  const noexcept;
+        inline Vec2 operator - (const Vec2& v)  const noexcept;
+        inline Vec2 operator * (Type s)         const noexcept;
 
-        inline Vec2& operator += (const Vec2& v);
-        inline Vec2& operator -= (const Vec2& v);
-        inline Vec2& operator *= (Type s);
+        inline Vec2& operator += (const Vec2& v)    noexcept;
+        inline Vec2& operator -= (const Vec2& v)    noexcept;
+        inline Vec2& operator *= (Type s)           noexcept;
 
         inline Type& operator [] (size_t i) noexcept;
         inline Type operator [] (size_t i)  const noexcept;
 
-        inline Type lengthSquared() const;
-        inline Type length() const;
+        inline Type lengthSquared() const noexcept;
+        inline Type length()        const noexcept;
 
         void normalize();
 

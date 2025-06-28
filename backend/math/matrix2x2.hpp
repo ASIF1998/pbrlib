@@ -13,38 +13,38 @@ namespace pbrlib::math
     class Matrix2x2
     {
     public:
-        inline constexpr Matrix2x2();
-        inline constexpr Matrix2x2(Type init_value);
+        inline constexpr Matrix2x2()                noexcept;
+        inline constexpr Matrix2x2(Type init_value) noexcept;
 
         inline constexpr Matrix2x2(
             Type x0, Type y0,
             Type x1, Type y1
-        );
+        ) noexcept;
 
-        inline bool operator == (const Matrix2x2& mat) const;
-        inline bool operator != (const Matrix2x2& mat) const;
+        inline bool operator == (const Matrix2x2& mat) const noexcept;
+        inline bool operator != (const Matrix2x2& mat) const noexcept;
 
-        inline Matrix2x2    operator + (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator - (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator * (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator * (Type scal)              const;
-        inline Vec2<Type>   operator * (const Vec2<Type>& v)    const;
+        inline Matrix2x2    operator + (const Matrix2x2& mat)   const noexcept;
+        inline Matrix2x2    operator - (const Matrix2x2& mat)   const noexcept;
+        inline Matrix2x2    operator * (const Matrix2x2& mat)   const noexcept;
+        inline Matrix2x2    operator * (Type scal)              const noexcept;
+        inline Vec2<Type>   operator * (const Vec2<Type>& v)    const noexcept;
 
-        inline Matrix2x2& operator += (const Matrix2x2& mat);
-        inline Matrix2x2& operator -= (const Matrix2x2& mat);
-        inline Matrix2x2& operator *= (const Matrix2x2& mat);
-        inline Matrix2x2& operator *= (Type scal);
+        inline Matrix2x2& operator += (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator -= (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator *= (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator *= (Type scal)               noexcept;
 
-        inline Type*        operator [] (size_t i);
-        inline const Type*  operator [] (size_t i) const;
+        inline Type*        operator [] (size_t i) noexcept;
+        inline const Type*  operator [] (size_t i) const noexcept;
 
         inline Type&    at(size_t i, size_t j);
         inline Type     at(size_t i, size_t j) const;
 
-        inline Type det() const;
+        inline Type det() const noexcept;
 
-        inline void transpose();
-        inline void inverse();
+        inline void transpose() noexcept;
+        inline void inverse()   noexcept;
 
     private:
         union
@@ -106,10 +106,10 @@ namespace pbrlib::math
 #endif
 
     template<typename Type>
-    inline Matrix2x2<Type> transpose(const Matrix2x2<Type>& mat);
+    inline Matrix2x2<Type> transpose(const Matrix2x2<Type>& mat) noexcept;
 
     template<typename Type>
-    Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat);
+    Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat) noexcept;
 }
 
 #include "matrix2x2.inl"

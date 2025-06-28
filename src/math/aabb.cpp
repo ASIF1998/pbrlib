@@ -30,18 +30,18 @@ namespace pbrlib::math
         return vec3(x, y, z);
     }
 
-    vec3 AABB::diagonal() const
+    vec3 AABB::diagonal() const noexcept
     {
         return p_max - p_min;
     }
 
-    float AABB::surfaceArea() const
+    float AABB::surfaceArea() const noexcept
     {
         const auto d = diagonal();
-        return 2.0f *   (d.x * d.y + d.x * d.z + d.y * d.z);
+        return 2.0f * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
 
-    float AABB::volume() const
+    float AABB::volume() const noexcept
     {
         const auto d = diagonal();
         return d.x * d.y * d.z;

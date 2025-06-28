@@ -191,3 +191,21 @@ TEST(QuatTests, ToTransform)
 
     pbrlib::testing::equality(q.toMatrix(), res);
 }
+
+TEST(QuatTests, NormalizeEdgeCase)
+{
+    pbrlib::math::quat q (0, 0, 0, 0);
+
+    EXPECT_THROW({
+        q.normalize();
+    }, pbrlib::exception::MathError);
+}
+
+TEST(QuatTests, InverseEdgeCase)
+{
+    pbrlib::math::quat q (0, 0, 0, 0);
+
+    EXPECT_THROW({
+        q.inverse();
+    }, pbrlib::exception::MathError);
+}

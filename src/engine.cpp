@@ -112,7 +112,7 @@ namespace pbrlib
             updateInputState(input_stay);
 
             if (_window) [[likely]]
-                is_close = input_stay.window.isClsoe();
+                is_close = input_stay.window.isClose();
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
             if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]
@@ -180,7 +180,7 @@ namespace pbrlib
             const auto p1 = _camera.view() * transform_1.transform * ((bbox_1.p_min + bbox_1.p_max) * 0.5);
             const auto p2 = _camera.view() * transform_2.transform * ((bbox_2.p_min + bbox_2.p_max) * 0.5);
 
-            return p1.z < p1.z;
+            return p1.z < p2.z;
         });
 
         if (_ptr_frame_graph) [[likely]]
@@ -191,6 +191,8 @@ namespace pbrlib
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
+        using msFloat = std::chrono::duration<float, std::milli>;
+
         static constinit std::chrono::high_resolution_clock timer;
 
         constexpr auto seconds_per_milisceond = 0.001f;
@@ -200,7 +202,7 @@ namespace pbrlib
 
         end = timer.now();
 
-        _delta_time = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(end - begin).count() * seconds_per_milisceond;
+        _delta_time = std::chrono::duration_cast<msFloat>(end - begin).count() * seconds_per_milisceond;
 
         begin = end;
     }

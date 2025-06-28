@@ -340,3 +340,20 @@ TEST(Mat2Tests, InverseTypeFloat)
 
     pbrlib::testing::equality(res1, res2);
 }
+
+TEST(Mat2Tests, AtMethodEdgeCase)
+{
+    constexpr mat2 mat (-2.0f, 1.0f, 1.5f, -0.5f);
+
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(2, 0);
+    }, pbrlib::exception::InvalidArgument);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(0, 2);
+    }, pbrlib::exception::InvalidArgument);
+
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(2, 2);
+    }, pbrlib::exception::InvalidArgument);
+}
