@@ -30,10 +30,10 @@ namespace pbrlib::math
         inline Matrix2x2    operator * (Type scal)              const noexcept;
         inline Vec2<Type>   operator * (const Vec2<Type>& v)    const noexcept;
 
-        inline Matrix2x2& operator += (const Matrix2x2& mat) noexcept;
-        inline Matrix2x2& operator -= (const Matrix2x2& mat) noexcept;
-        inline Matrix2x2& operator *= (const Matrix2x2& mat) noexcept;
-        inline Matrix2x2& operator *= (Type scal);
+        inline Matrix2x2& operator += (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator -= (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator *= (const Matrix2x2& mat)    noexcept;
+        inline Matrix2x2& operator *= (Type scal)               noexcept;
 
         inline Type*        operator [] (size_t i) noexcept;
         inline const Type*  operator [] (size_t i) const noexcept;

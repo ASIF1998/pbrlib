@@ -219,3 +219,24 @@ TEST(Mat3Tests, Inverse)
 
     pbrlib::testing::equality(res, inverse(m));
 }
+
+TEST(Mat3Tests, AtMethodEdgeCase)
+{
+    constexpr mat3 mat {
+        1.0f, 2.0f, 3.5f,
+        2.2f, 3.0f, 1.2f,
+        8.5f, 2.6f, 12.3f
+    };
+
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(3, 0);
+    }, pbrlib::exception::InvalidArgument);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(0, 3);
+    }, pbrlib::exception::InvalidArgument);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = mat.at(3, 3);
+    }, pbrlib::exception::InvalidArgument);
+}

@@ -34,10 +34,6 @@ TEST(AABBTests, SubscriptOperator)
 
     pbrlib::testing::equality(aabb[0], aabb.p_min);
     pbrlib::testing::equality(aabb[1], aabb.p_max);
-
-    EXPECT_THROW({
-        [[maybe_unused]] const auto p = aabb[2];
-    }, pbrlib::exception::InvalidArgument);
 }
 
 TEST(AABBTests, Corner)
@@ -97,4 +93,28 @@ TEST(AABBTests, Volume)
     constexpr auto volume = 83263.5625f;
 
     pbrlib::testing::equality(aabb.volume(), volume);
+}
+
+TEST(AABBTests, SubscriptOperatorEdgeCase)
+{
+    constexpr pbrlib::math::vec3 p1 (1, 2, 3);
+    constexpr pbrlib::math::vec3 p2 (4, 5, 6);
+
+    constexpr pbrlib::math::AABB aabb (p1, p2);
+    
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = aabb[2];
+    }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(AABBTests, CornerEdgeCase)
+{
+    constexpr pbrlib::math::vec3 p1 (1, 2, 3);
+    constexpr pbrlib::math::vec3 p2 (4, 5, 6);
+
+    constexpr pbrlib::math::AABB aabb (p1, p2);
+
+    EXPECT_THROW({
+        [[maybe_unused]] const auto p = aabb.corner(8);
+    }, pbrlib::exception::InvalidArgument);
 }

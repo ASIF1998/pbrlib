@@ -135,3 +135,16 @@ TEST(Vec4Tests, Normalize)
     pbrlib::testing::equality(res1, normalize(v1));
     pbrlib::testing::equality(res2, normalize(v2));
 }
+
+TEST(Vec4Tests, NormalizeEdgeCase)
+{
+    vec4 v (0, 0, 0, 0);
+
+    EXPECT_THROW({
+        v.normalize();
+    }, pbrlib::exception::MathError);
+    
+    EXPECT_THROW({
+        [[maybe_unuse]] const auto res = normalize(v);
+    }, pbrlib::exception::MathError);
+}
