@@ -49,3 +49,10 @@ namespace pbrlib::exception
         Exception(std::format("[file-open] {}", msg))
     { }
 }
+
+namespace pbrlib::exception
+{
+    MathError::MathError(std::string_view msg) :
+        Exception(std::format("[math-error] {}", msg))
+    { }
+}

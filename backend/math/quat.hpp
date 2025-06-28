@@ -13,9 +13,9 @@ namespace pbrlib::math
     struct Quaternion
     {
     public:
-        inline constexpr Quaternion();
-        inline constexpr Quaternion(float x, float y, float z, float w);
-        inline constexpr Quaternion(const vec3& v, float w);
+        inline constexpr Quaternion()                                   noexcept;
+        inline constexpr Quaternion(float x, float y, float z, float w) noexcept;
+        inline constexpr Quaternion(const vec3& v, float w)             noexcept;
 
         inline bool operator == (const Quaternion& q) const noexcept;
         inline bool operator != (const Quaternion& q) const noexcept;
@@ -41,7 +41,7 @@ namespace pbrlib::math
         inline void normalize();
         inline void inverse();
 
-        inline mat4 toMatrix() const;
+        inline mat4 toMatrix() const noexcept;
 
         /**
          * @brief Статический метод, который создаёт следющий кватернион:
@@ -105,7 +105,7 @@ namespace pbrlib::math
         };
     };
 
-    inline float        dot(const Quaternion& q1, const Quaternion& q2);
+    inline float        dot(const Quaternion& q1, const Quaternion& q2) noexcept;
     inline Quaternion   normalize(const Quaternion& q);
     inline Quaternion   inverse(const Quaternion& q);
 

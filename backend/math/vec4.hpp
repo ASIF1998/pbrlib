@@ -13,28 +13,28 @@ namespace pbrlib::math
     struct Vec4
     {
     public:
-        inline constexpr Vec4(Type xyzw = static_cast<Type>(0));
-        inline constexpr Vec4(Type x, Type y, Type z = static_cast<Type>(0), Type w = static_cast<Type>(0));
-        inline constexpr Vec4(const Vec3<Type>& vec3, Type w = static_cast<Type>(0));
-        inline constexpr Vec4(const Vec2<Type>& v1, const Vec2<Type>& v2);
-        inline constexpr Vec4(const Vec2<Type>& vec2);
+        inline constexpr Vec4(Type xyzw = static_cast<Type>(0))                                             noexcept;
+        inline constexpr Vec4(Type x, Type y, Type z = static_cast<Type>(0), Type w = static_cast<Type>(0)) noexcept;
+        inline constexpr Vec4(const Vec3<Type>& vec3, Type w = static_cast<Type>(0))                        noexcept;
+        inline constexpr Vec4(const Vec2<Type>& v1, const Vec2<Type>& v2)                                   noexcept;
+        inline constexpr Vec4(const Vec2<Type>& vec2)                                                       noexcept;
 
-        inline bool operator == (const Vec4& v) const;
-        inline bool operator != (const Vec4& v) const;
+        inline bool operator == (const Vec4& v) const noexcept;
+        inline bool operator != (const Vec4& v) const noexcept;
 
-        inline Vec4 operator + (const Vec4& v)  const;
-        inline Vec4 operator - (const Vec4& v)  const;
-        inline Vec4 operator * (Type s)         const;
+        inline Vec4 operator + (const Vec4& v)  const noexcept;
+        inline Vec4 operator - (const Vec4& v)  const noexcept;
+        inline Vec4 operator * (Type s)         const noexcept;
 
-        inline Vec4& operator += (const Vec4& v);
-        inline Vec4& operator -= (const Vec4& v);
-        inline Vec4& operator *= (Type s);
+        inline Vec4& operator += (const Vec4& v)    noexcept;
+        inline Vec4& operator -= (const Vec4& v)    noexcept;
+        inline Vec4& operator *= (Type s)           noexcept;
 
         inline Type&    operator [] (size_t i) noexcept;
         inline Type     operator [] (size_t i) const noexcept;
 
-        inline Type lengthSquared() const;
-        inline Type length() const;
+        inline Type lengthSquared() const noexcept;
+        inline Type length()        const noexcept;
 
         inline void normalize();
 
@@ -120,7 +120,7 @@ namespace pbrlib::math
 #endif
 
     template<typename Type>
-    inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2);
+    inline Type dot(const Vec4<Type> v1, const Vec4<Type>& v2) noexcept;
 
 #if (defined(__SSE__) || defined(__AVX2__))
     template<>

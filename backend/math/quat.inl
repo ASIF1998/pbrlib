@@ -1,16 +1,16 @@
 namespace pbrlib::math
 {
-    inline constexpr Quaternion::Quaternion() :
+    inline constexpr Quaternion::Quaternion() noexcept :
         v(0),
         w(1)
     {}
 
-    inline constexpr Quaternion::Quaternion(float x, float y, float z, float w) :   
+    inline constexpr Quaternion::Quaternion(float x, float y, float z, float w) noexcept :
         v(x, y, z),
         w(w)
     {}
 
-    inline constexpr Quaternion::Quaternion(const vec3& v, float w) :
+    inline constexpr Quaternion::Quaternion(const vec3& v, float w) noexcept :
         v(v),
         w(w)
     {}
@@ -181,7 +181,8 @@ namespace pbrlib::math
 #else
         float l = length();
 
-        assert(l != static_cast<float>(0u));
+        if (constexpr auto eps = 0.001f; l < eps)
+            throw exception::MathError("[quaternion] faield normalize because length is zerro");
 
         l = 1.0f / l;
 
@@ -193,10 +194,14 @@ namespace pbrlib::math
     inline void Quaternion::inverse()
     {
         auto ls = lengthSquared();
+
+        if (constexpr auto eps = 0.001f; ls < eps)
+            throw exception::MathError("[quaternion] faield inverse because length squared is zerro");
+
         *this = conjugate(*this) / ls;
     }
 
-    inline mat4 Quaternion::toMatrix() const
+    inline mat4 Quaternion::toMatrix() const noexcept
     {
         float xx = v.x * v.x;
         float yy = v.y * v.y;
@@ -241,7 +246,7 @@ namespace pbrlib::math
         return Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    inline float dot(const Quaternion& q1, const Quaternion& q2)
+    inline float dot(const Quaternion& q1, const Quaternion& q2) noexcept
     {
 #if (defined(__SSE__) || defined(__AVX2__))
         float t[4];

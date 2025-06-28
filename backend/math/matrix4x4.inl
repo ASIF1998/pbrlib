@@ -8,7 +8,7 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    inline constexpr Matrix4x4<Type>::Matrix4x4() :
+    inline constexpr Matrix4x4<Type>::Matrix4x4() noexcept :
         _array16 
         {
             static_cast<Type>(1), static_cast<Type>(0), static_cast<Type>(0), static_cast<Type>(0),
@@ -19,7 +19,7 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline constexpr Matrix4x4<Type>::Matrix4x4(Type init_value) :
+    inline constexpr Matrix4x4<Type>::Matrix4x4(Type init_value) noexcept :
         _array16 
         {
             init_value, static_cast<Type>(0), static_cast<Type>(0), static_cast<Type>(0),
@@ -30,12 +30,12 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline constexpr Matrix4x4<Type>::Matrix4x4(
+    inline constexpr Matrix4x4<Type>::Matrix4x4 (
         Type x0, Type y0, Type z0, Type w0,
         Type x1, Type y1, Type z1, Type w1,
         Type x2, Type y2, Type z2, Type w2,
         Type x3, Type y3, Type z3, Type w3
-    ) :
+    ) noexcept :
         _array16 
         {
             x0, y0, z0, w0,
@@ -46,60 +46,60 @@ namespace pbrlib::math
     {}
 
     template<typename Type>
-    inline bool Matrix4x4<Type>::operator == (const Matrix4x4<Type>& mat) const
+    inline bool Matrix4x4<Type>::operator == (const Matrix4x4<Type>& mat) const noexcept
     {
         bool res = true;
 
-        for (size_t i{0}; i < 16; i++)
+        for (size_t i = 0; i < 16; i++)
             res &= _array16[i] == mat._array16[i];
 
         return res;
     }
 
     template<typename Type>
-    inline bool Matrix4x4<Type>::operator != (const Matrix4x4<Type>& mat) const
+    inline bool Matrix4x4<Type>::operator != (const Matrix4x4<Type>& mat) const noexcept
     {
         bool res = true;
 
-        for (size_t i{0}; i < 16; i++)
+        for (size_t i = 0; i < 16; i++)
             res |= _array16[i] != mat._array16[i];
 
         return res;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type> Matrix4x4<Type>::operator + (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator + (const Matrix4x4<Type>& mat) const noexcept
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 4; ++i)
+        for (size_t i = 0; i < 4; ++i)
             res._vec_array[i] = _vec_array[i] + mat._vec_array[i]; 
 
         return res;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type> Matrix4x4<Type>::operator - (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator - (const Matrix4x4<Type>& mat) const noexcept
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 4; ++i)
+        for (size_t i = 0; i < 4; ++i)
             res._vec_array[i] = _vec_array[i] - mat._vec_array[i]; 
 
         return res;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (const Matrix4x4<Type>& mat) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (const Matrix4x4<Type>& mat) const noexcept
     {
         Matrix4x4<Type> res (static_cast<Type>(0));
 
-        for (size_t i{0}; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++) 
         {
-            for (size_t k{0}; k < 4; k++) 
+            for (size_t k = 0; k < 4; k++) 
             {
                 auto v = mat._array4x4[i][k];
-                for (size_t j{0}; j < 4; j++) 
+                for (size_t j = 0; j < 4; j++) 
                     res._array4x4[i][j] += v * _array4x4[k][j];
             }
         }
@@ -108,22 +108,22 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (Type scal) const
+    inline Matrix4x4<Type> Matrix4x4<Type>::operator * (Type scal) const noexcept
     {
         Matrix4x4<Type> res;
 
-        for (size_t i{0}; i < 4; i++)
+        for (size_t i = 0; i < 4; i++)
             res._vec_array[i] = _vec_array[i] * scal;
 
         return res;
     }
 
     template<typename Type>
-    inline Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const
+    inline Vec4<Type> Matrix4x4<Type>::operator * (const Vec4<Type>& v) const noexcept
     {
         Vec4<Type> res;
 
-        for (size_t i{0}; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++) 
         {
             res.x += _array4x4[i][0] * v[i];
             res.y += _array4x4[i][1] * v[i];
@@ -135,47 +135,47 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator += (const Matrix4x4<Type>& mat) noexcept
     {
-        for (size_t i{0}; i < 4; ++i)
+        for (size_t i = 0; i < 4; ++i)
             _vec_array[i] += mat._vec_array[i];
 
         return *this;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type>& Matrix4x4<Type>::operator -= (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator -= (const Matrix4x4<Type>& mat) noexcept
     {
-        for (size_t i{0}; i < 4; ++i)
+        for (size_t i = 0; i < 4; ++i)
             _vec_array[i] -= mat._vec_array[i];
 
         return *this;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (const Matrix4x4<Type>& mat) noexcept
     {
         *this = *this * mat;
         return *this;
     }
 
     template<typename Type>
-    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (Type scal)
+    inline Matrix4x4<Type>& Matrix4x4<Type>::operator *= (Type scal) noexcept
     {
-        for (size_t i{0}; i < 4; i++)
+        for (size_t i = 0; i < 4; i++)
             _vec_array[i] *= scal;
 
         return *this;
     }
 
     template<typename Type>
-    inline Type* Matrix4x4<Type>::operator [] (size_t i)
+    inline Type* Matrix4x4<Type>::operator [] (size_t i) noexcept
     {
         return _array4x4[i];
     }
 
     template<typename Type>
-    inline const Type* Matrix4x4<Type>::operator [] (size_t i) const
+    inline const Type* Matrix4x4<Type>::operator [] (size_t i) const noexcept
     {
         return _array4x4[i];
     }
@@ -199,7 +199,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Type Matrix4x4<Type>::det() const
+    inline Type Matrix4x4<Type>::det() const noexcept
     {
         auto a33444334 = _array4x4[2][2] * _array4x4[3][3] - _array4x4[3][2] * _array4x4[2][3];
         auto a32443442 = _array4x4[2][1] * _array4x4[3][3] - _array4x4[2][3] * _array4x4[3][1];
@@ -236,7 +236,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline void Matrix4x4<Type>::transpose()
+    inline void Matrix4x4<Type>::transpose() noexcept
     {
         std::swap(_array4x4[0][1], _array4x4[1][0]);
         std::swap(_array4x4[0][2], _array4x4[2][0]);
@@ -247,7 +247,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline void Matrix4x4<Type>::inverse()
+    inline void Matrix4x4<Type>::inverse() noexcept
     {
         auto d = det();
 
@@ -293,7 +293,7 @@ namespace pbrlib::math
             _array4x4[3][2] = -(tmat[0][0] * a22342432 - tmat[0][1] * a21342431 + tmat[0][3] * a21322231);
             _array4x4[3][3] =   tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
 
-            for (size_t i{0}; i < 16; i++) 
+            for (size_t i = 0; i < 16; i++) 
                 _array16[i] /= d;
         }
     }
@@ -670,7 +670,7 @@ namespace pbrlib::math
 namespace pbrlib::math
 {
     template<typename Type>
-    inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat) noexcept
     {
         return 
         {
@@ -682,7 +682,7 @@ namespace pbrlib::math
     }
 
     template<typename Type>
-    inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat)
+    inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat) noexcept
     {
         Matrix4x4<Type> res (mat);
         res.inverse();

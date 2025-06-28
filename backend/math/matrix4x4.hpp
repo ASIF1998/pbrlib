@@ -12,41 +12,41 @@ namespace pbrlib::math
     class Matrix4x4
     {
     public:
-        inline constexpr Matrix4x4();
+        inline constexpr Matrix4x4() noexcept;
 
-        inline constexpr Matrix4x4(Type init_value);
+        inline constexpr Matrix4x4(Type init_value) noexcept;
 
-        inline constexpr Matrix4x4(
+        inline constexpr Matrix4x4 (
             Type x0, Type y0, Type z0, Type w0,
             Type x1, Type y1, Type z1, Type w1,
             Type x2, Type y2, Type z2, Type w2,
             Type x3, Type y3, Type z3, Type w3
-        );
+        ) noexcept;
 
-        inline bool operator == (const Matrix4x4& mat) const;
-        inline bool operator != (const Matrix4x4& mat) const;
+        inline bool operator == (const Matrix4x4& mat) const noexcept;
+        inline bool operator != (const Matrix4x4& mat) const noexcept;
 
-        inline Matrix4x4    operator + (const Matrix4x4& mat)   const;
-        inline Matrix4x4    operator - (const Matrix4x4& mat)   const;
-        inline Matrix4x4    operator * (const Matrix4x4& mat)   const;
-        inline Matrix4x4    operator * (Type scal)              const;
-        inline Vec4<Type>   operator * (const Vec4<Type>& v)    const;
+        inline Matrix4x4    operator + (const Matrix4x4& mat)   const noexcept;
+        inline Matrix4x4    operator - (const Matrix4x4& mat)   const noexcept;
+        inline Matrix4x4    operator * (const Matrix4x4& mat)   const noexcept;
+        inline Matrix4x4    operator * (Type scal)              const noexcept;
+        inline Vec4<Type>   operator * (const Vec4<Type>& v)    const noexcept;
 
-        inline Matrix4x4& operator += (const Matrix4x4& mat);
-        inline Matrix4x4& operator -= (const Matrix4x4& mat);
-        inline Matrix4x4& operator *= (const Matrix4x4& mat);
-        inline Matrix4x4& operator *= (Type scal);
+        inline Matrix4x4& operator += (const Matrix4x4& mat)    noexcept;
+        inline Matrix4x4& operator -= (const Matrix4x4& mat)    noexcept;
+        inline Matrix4x4& operator *= (const Matrix4x4& mat)    noexcept;
+        inline Matrix4x4& operator *= (Type scal)               noexcept;
 
-        inline Type*        operator [] (size_t i);
-        inline const Type*  operator [] (size_t i) const;
+        inline Type*        operator [] (size_t i) noexcept;
+        inline const Type*  operator [] (size_t i) const noexcept;
 
         inline Type&    at(size_t i, size_t j);
         inline Type     at(size_t i, size_t j) const;
 
-        inline Type det() const;
+        inline Type det() const noexcept;
 
-        inline void transpose();
-        inline void inverse();
+        inline void transpose() noexcept;
+        inline void inverse()   noexcept;
 
     private:
         union
@@ -112,10 +112,10 @@ namespace pbrlib::math
 #endif
 
     template<typename Type>
-    inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat);
+    inline Matrix4x4<Type> transpose(const Matrix4x4<Type>& mat) noexcept;
 
     template<typename Type>
-    inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat);
+    inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat) noexcept;
 }
 
 #include "matrix4x4.inl"
