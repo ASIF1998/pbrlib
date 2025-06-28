@@ -67,6 +67,9 @@ namespace pbrlib::backend
     std::unique_ptr<SSAO> FrameGraph::buildSSAOSubpass()
     {
         auto ptr_ssao = std::make_unique<SSAO>();
+
+        ptr_ssao->addColorOutput(SSAOAttachmentsName::result, &_images.at(SSAOAttachmentsName::result));
+
         return ptr_ssao;
     }
 

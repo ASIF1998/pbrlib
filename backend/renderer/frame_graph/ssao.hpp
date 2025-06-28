@@ -2,6 +2,10 @@
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
+#include <backend/renderer/vulkan/pipeline_layout.hpp>
+
+#include <optional>
+
 namespace pbrlib::backend
 {
     struct SSAOAttachmentsName final
@@ -18,5 +22,16 @@ namespace pbrlib::backend
         void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
         void prePass(vk::CommandBuffer& command_buffer)                 override;
         void postPass(vk::CommandBuffer& command_buffer)                override;
+
+    public:
+        ~SSAO();
+
+    private:
+        VkRenderPass    _render_pass_handle = VK_NULL_HANDLE;
+        VkFramebuffer   _framebuffer_handle = VK_NULL_HANDLE;
+
+        std::optional<vk::PipelineLayout> _pipeline_layout;
+
+        static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };
 }
