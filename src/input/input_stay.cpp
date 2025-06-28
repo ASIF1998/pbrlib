@@ -66,7 +66,7 @@ namespace pbrlib
 		_is_close = false;
 	}
 
-	bool WindowStay::isClsoe() const noexcept
+	bool WindowStay::isClose() const noexcept
 	{
 		return _is_close;
 	}

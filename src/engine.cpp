@@ -112,7 +112,7 @@ namespace pbrlib
             updateInputState(input_stay);
 
             if (_window) [[likely]]
-                is_close = input_stay.window.isClsoe();
+                is_close = input_stay.window.isClose();
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
             if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]

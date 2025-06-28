@@ -48,7 +48,7 @@ namespace pbrlib
 		void reset() noexcept;
 
 	public:
-		bool isClsoe() const noexcept;
+		bool isClose() const noexcept;
 
 	private:
 		bool _is_close = false;
