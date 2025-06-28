@@ -4,6 +4,11 @@
 
 namespace pbrlib::backend
 {
+    struct SSAOAttachmentsName final
+    {
+        constexpr static auto result = "ssao-result";
+    };
+    
     class SSAO final :
         public RenderPass
     {

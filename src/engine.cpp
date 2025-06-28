@@ -169,20 +169,6 @@ namespace pbrlib
         for (auto entity: view)
             items.push_back(view.get<backend::component::Renderable>(entity).ptr_item);
 
-        std::sort(std::begin(items), std::end(items), [this] (const SceneItem* item_1, const SceneItem* item_2)
-        {
-            const auto& bbox_1 = item_1->getComponent<backend::component::Renderable>().bbox;
-            const auto& bbox_2 = item_2->getComponent<backend::component::Renderable>().bbox;
-
-            const auto transform_1 = item_1->getComponent<component::Transform>();
-            const auto transform_2 = item_2->getComponent<component::Transform>();
-
-            const auto p1 = _camera.view() * transform_1.transform * ((bbox_1.p_min + bbox_1.p_max) * 0.5);
-            const auto p2 = _camera.view() * transform_2.transform * ((bbox_2.p_min + bbox_2.p_max) * 0.5);
-
-            return p1.z < p2.z;
-        });
-
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->draw(_camera, items);
     }

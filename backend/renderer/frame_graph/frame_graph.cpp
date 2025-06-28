@@ -55,7 +55,7 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(GBufferFinalAttachmentsName::normal_tangent);
+        auto ptr_result = &_images.at(GBufferAttachmentsName::normal_tangent);
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
@@ -74,9 +74,9 @@ namespace pbrlib::backend
     {
         auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>();
 
-        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::pos_uv, &_images.at(GBufferFinalAttachmentsName::pos_uv));
-        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::normal_tangent, &_images.at(GBufferFinalAttachmentsName::normal_tangent));
-        ptr_gbuffer_generator->addColorOutput(GBufferFinalAttachmentsName::material_index, &_images.at(GBufferFinalAttachmentsName::material_index));
+        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::pos_uv, &_images.at(GBufferAttachmentsName::pos_uv));
+        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::normal_tangent, &_images.at(GBufferAttachmentsName::normal_tangent));
+        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::material_index, &_images.at(GBufferAttachmentsName::material_index));
         ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
 
         return ptr_gbuffer_generator;
@@ -119,35 +119,46 @@ namespace pbrlib::backend
             .build();
 
         _images.emplace(
-            GBufferFinalAttachmentsName::pos_uv,
+            GBufferAttachmentsName::pos_uv,
             vk::Image::Builder(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
                 .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferFinalAttachmentsName::pos_uv)
+                .name(GBufferAttachmentsName::pos_uv)
                 .build()
         );
         
         _images.emplace(
-            GBufferFinalAttachmentsName::normal_tangent,
+            GBufferAttachmentsName::normal_tangent,
             vk::Image::Builder(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
                 .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferFinalAttachmentsName::normal_tangent)
+                .name(GBufferAttachmentsName::normal_tangent)
                 .build()
         );
         
         _images.emplace(
-            GBufferFinalAttachmentsName::material_index,
+            GBufferAttachmentsName::material_index,
             vk::Image::Builder(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R16_UINT )
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
                 .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferFinalAttachmentsName::material_index)
+                .name(GBufferAttachmentsName::material_index)
+                .build()
+        );
+        
+        _images.emplace(
+            SSAOAttachmentsName::result,
+            vk::Image::Builder(_device)
+                .size(width, height)
+                .format(VK_FORMAT_R16_SFLOAT)
+                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+                .addQueueFamilyIndex(_device.queue().family_index)
+                .name(SSAOAttachmentsName::result)
                 .build()
         );
     }

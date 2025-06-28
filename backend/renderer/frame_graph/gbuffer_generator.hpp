@@ -10,7 +10,7 @@
 
 namespace pbrlib::backend
 {
-    struct GBufferFinalAttachmentsName final
+    struct GBufferAttachmentsName final
     {
         constexpr static auto pos_uv            = "gbuffer-pos-uv";
         constexpr static auto normal_tangent    = "gbuffer-normal-tangent";

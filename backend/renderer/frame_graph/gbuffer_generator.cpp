@@ -47,7 +47,7 @@ namespace pbrlib::backend
             return false;
         }
 
-        const auto ptr_image = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
+        const auto ptr_image = colorOutputAttach(GBufferAttachmentsName::pos_uv);
 
         /// @todo думаю это тоже стоит перенсти в RenderPass и инициализировать там
         _width  = ptr_image->width;
@@ -114,9 +114,9 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto* ptr_pos_uv_attach   = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
-        const auto* ptr_nor_tan_attach  = colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent);
-        const auto* ptr_mat_idx_attach  = colorOutputAttach(GBufferFinalAttachmentsName::material_index);
+        const auto* ptr_pos_uv_attach   = colorOutputAttach(GBufferAttachmentsName::pos_uv);
+        const auto* ptr_nor_tan_attach  = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
+        const auto* ptr_mat_idx_attach  = colorOutputAttach(GBufferAttachmentsName::material_index);
 
         _render_pass_handle = vk::RenderPassBuilder(*_ptr_device)
             .addColorAttachment(ptr_pos_uv_attach, final_attachments_layout)
@@ -130,9 +130,9 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto ptr_pos_uv_attach    = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
-        const auto ptr_nor_tan_attach   = colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent);
-        const auto ptr_mat_idx_attach   = colorOutputAttach(GBufferFinalAttachmentsName::material_index);
+        const auto ptr_pos_uv_attach    = colorOutputAttach(GBufferAttachmentsName::pos_uv);
+        const auto ptr_nor_tan_attach   = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
+        const auto ptr_mat_idx_attach   = colorOutputAttach(GBufferAttachmentsName::material_index);
 
         _framebuffer_handle = vk::FramebufferBuild(*_ptr_device)
             .size(_width, _height)
@@ -150,9 +150,9 @@ namespace pbrlib::backend
 {
     void GBufferGenerator::setupColorAttachmentsLayout()
     {
-        colorOutputAttach(GBufferFinalAttachmentsName::pos_uv)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(GBufferFinalAttachmentsName::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(GBufferAttachmentsName::pos_uv)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(GBufferAttachmentsName::normal_tangent)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(GBufferAttachmentsName::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     }
 
     void GBufferGenerator::prePass(vk::CommandBuffer& command_buffer)
@@ -292,8 +292,8 @@ namespace pbrlib::backend
             vkCmdEndRenderPass(command_buffer_handle);
         }, "[gbuffer-generator] post-pass", vk::marker_colors::graphics_pipeline);
 
-        colorOutputAttach(GBufferFinalAttachmentsName::pos_uv)->layout          = final_attachments_layout;
-        colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent)->layout  = final_attachments_layout;
-        colorOutputAttach(GBufferFinalAttachmentsName::material_index)->layout  = final_attachments_layout;
+        colorOutputAttach(GBufferAttachmentsName::pos_uv)->layout          = final_attachments_layout;
+        colorOutputAttach(GBufferAttachmentsName::normal_tangent)->layout  = final_attachments_layout;
+        colorOutputAttach(GBufferAttachmentsName::material_index)->layout  = final_attachments_layout;
     }
 }
