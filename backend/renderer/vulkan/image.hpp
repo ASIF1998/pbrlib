@@ -21,11 +21,6 @@ namespace pbrlib::backend::vk::builders
     class Image;
 }
 
-namespace pbrlib::backend::vk::decoders
-{
-    class Image;
-}
-
 namespace pbrlib::backend::vk
 {
     struct ImageWriteData final
@@ -40,7 +35,6 @@ namespace pbrlib::backend::vk
     {
         friend class Surface;
         friend class builders::Image;
-        friend class decoders::Image;
 
         explicit Image(Device& device, bool from_swapchain = false);
 
@@ -89,29 +83,6 @@ namespace pbrlib::backend::vk
         VmaAllocation   _allocation = VK_NULL_HANDLE;
 
         bool _from_swapchain;
-    };
-
-    class Image::Loader final
-    {
-        void validate();
-
-    public:
-        explicit Loader(Device& device) noexcept;
-
-        Loader(Loader&& loader)         = delete;
-        Loader(const Loader& loader)    = delete;
-
-        Loader& operator = (Loader&& loader)        = delete;
-        Loader& operator = (const Loader& loader)   = delete;
-
-        Loader& filename(const std::filesystem::path& filename);
-
-        [[nodiscard]] Image load();
-
-    private:
-        Device& _device;
-
-        std::filesystem::path _filename;
     };
 
     class Image::Exporter final
@@ -201,7 +172,7 @@ namespace pbrlib::backend::vk::decoders
         void validate();
 
     public:
-        explicit Image(Device& device);
+        explicit Image(Device& device) noexcept;
 
         Image(Image&& decoder)      = delete;
         Image(const Image& decoder) = delete;
@@ -227,5 +198,31 @@ namespace pbrlib::backend::vk::decoders
             const uint8_t* ptr_data = nullptr;
             size_t size             = 0;
         } _compressed_image;
+    };
+}
+
+namespace pbrlib::backend::vk::loaders
+{
+    class Image final
+    {
+        void validate();
+
+    public:
+        explicit Image(Device& device) noexcept;
+
+        Image(Image&& loader)         = delete;
+        Image(const Image& loader)    = delete;
+
+        Image& operator = (Image&& loader)        = delete;
+        Image& operator = (const Image& loader)   = delete;
+
+        Image& filename(const std::filesystem::path& filename);
+
+        [[nodiscard]] vk::Image load();
+
+    private:
+        Device& _device;
+
+        std::filesystem::path _filename;
     };
 }

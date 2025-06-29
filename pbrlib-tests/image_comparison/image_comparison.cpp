@@ -196,7 +196,7 @@ namespace pbrlib::testing
 
         return compare(
             image_1, 
-            backend::vk::Image::Loader(_device)
+            backend::vk::loaders::Image(_device)
                 .filename(path_to_reference)
                 .load()
         );

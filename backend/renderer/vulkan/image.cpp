@@ -421,7 +421,7 @@ namespace pbrlib::backend::vk::builders
 
 namespace pbrlib::backend::vk::decoders
 {
-    Image::Image(Device& device) :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
@@ -499,25 +499,25 @@ namespace pbrlib::backend::vk::decoders
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::loaders
 {
-    Image::Loader::Loader(Device& device) noexcept :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    Image::Loader& Image::Loader::filename(const std::filesystem::path& filename)
+    Image& Image::filename(const std::filesystem::path& filename)
     {
         _filename = filename;
         return *this;
     }
 
-    void Image::Loader::validate()
+    void Image::validate()
     {
         if (!std::filesystem::exists(_filename))
             throw exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
     }
 
-    Image Image::Loader::load()
+    vk::Image Image::load()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
