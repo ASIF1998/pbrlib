@@ -224,13 +224,13 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    Image::Builder::Builder(Device& device) :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    void Image::Builder::validate()
+    void Image::validate()
     {
         if (_width == 0 || _height == 0)
             throw exception::InvalidState("[vk-image::builder] size is zero");
@@ -245,72 +245,72 @@ namespace pbrlib::backend::vk
             throw exception::InvalidState("[vk-image::builder] invalid usage");
     }
 
-    Image::Builder& Image::Builder::size(uint32_t width, uint32_t height) noexcept
+    Image& Image::size(uint32_t width, uint32_t height) noexcept
     {
         _width  = width;
         _height = height;
         return *this;
     }
 
-    Image::Builder& Image::Builder::format(VkFormat format) noexcept
+    Image& Image::format(VkFormat format) noexcept
     {
         _format = format;
         return *this;
     }
 
-    Image::Builder& Image::Builder::filter(VkFilter filter) noexcept
+    Image& Image::filter(VkFilter filter) noexcept
     {
         _filter = filter;
         return *this;
     }
 
-    Image::Builder& Image::Builder::fillColor(const pbrlib::math::vec4& fill_color)
+    Image& Image::fillColor(const pbrlib::math::vec4& fill_color)
     {
         _fill_color = fill_color;
         return *this;
     }
 
-    Image::Builder& Image::Builder::addQueueFamilyIndex(uint32_t index)
+    Image& Image::addQueueFamilyIndex(uint32_t index)
     {
         _queues.push_back(index);
         return *this;
     }
 
-    Image::Builder& Image::Builder::sampleCount(VkSampleCountFlagBits sample_count) noexcept
+    Image& Image::sampleCount(VkSampleCountFlagBits sample_count) noexcept
     {
         _sample_count = sample_count;
         return *this;
     }
 
-    Image::Builder& Image::Builder::tiling(VkImageTiling tiling) noexcept
+    Image& Image::tiling(VkImageTiling tiling) noexcept
     {
         _tiling = tiling;
         return *this;
     }
     
-    Image::Builder& Image::Builder::usage(VkImageUsageFlags usage) noexcept
+    Image& Image::usage(VkImageUsageFlags usage) noexcept
     {
         _usage = usage;
         return *this;
     }
 
-    Image::Builder& Image::Builder::name(std::string_view image_name)
+    Image& Image::name(std::string_view image_name)
     {
         _name = image_name;
         return *this;
     }
 
-    VkSharingMode Image::Builder::sharingMode()
+    VkSharingMode Image::sharingMode()
     {
         std::unordered_set<uint32_t> families (std::begin(_queues), std::end(_queues));
         return families.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
     }
 
-    Image Image::Builder::build()
+    vk::Image Image::build()
     {
         validate();
 
-        Image image (_device);
+        vk::Image image (_device);
 
         image.width     = _width;
         image.height    = _height;
@@ -481,7 +481,7 @@ namespace pbrlib::backend::vk
             _channels_per_pixel
         );
 
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .format(write_data.format)
             .name(_name)
@@ -540,7 +540,7 @@ namespace pbrlib::backend::vk
         if (data.width < 1 || data.height < 1 || !data.ptr_data)
             throw exception::RuntimeError(std::format("[image-loader] failed load image '{}'", _filename.string()));
 
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .name(_filename.filename().string())
             .addQueueFamilyIndex(_device.queue().family_index)
             .format(data.format)
@@ -595,7 +595,7 @@ namespace pbrlib::backend::vk
         auto width  = static_cast<int>(_ptr_image->width);
         auto height = static_cast<int>(_ptr_image->height);
         
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .size(_ptr_image->width, _ptr_image->height)
             .format(VK_FORMAT_R8G8B8A8_UNORM)
             .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT)

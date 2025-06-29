@@ -51,7 +51,7 @@ TEST_F(VulkanDeviceTests, BuildImage)
                             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
                             VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    auto image = pbrlib::backend::vk::Image::Builder(device)
+    auto image = pbrlib::backend::vk::builders::Image(device)
         .size(width, height)
         .format(format)
         .filter(filter)

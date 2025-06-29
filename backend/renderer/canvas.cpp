@@ -24,7 +24,7 @@ namespace pbrlib::backend
             _surface.vk_surface.emplace(_device, ptr_window);
         else [[unlikely]]
         {
-            _image = vk::Image::Builder(_device)
+            _image = vk::builders::Image(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .fillColor(math::vec3(0))
                 .format(VK_FORMAT_R8G8B8A8_UNORM)

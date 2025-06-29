@@ -33,7 +33,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    Framebuffer& Framebuffer::addAttachment(const Image& attachment)
+    Framebuffer& Framebuffer::addAttachment(const vk::Image& attachment)
     {
         _attachments.push_back(attachment.view_handle);
         return *this;

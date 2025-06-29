@@ -29,7 +29,7 @@ namespace pbrlib::backend::vk::builders
         Framebuffer& size(uint32_t width, uint32_t height)          noexcept;
         Framebuffer& layers(uint32_t layerCount)                    noexcept;
         
-        Framebuffer& addAttachment(const Image& attachment);
+        Framebuffer& addAttachment(const vk::Image& attachment);
 
         [[nodiscard]] VkFramebuffer build();
         

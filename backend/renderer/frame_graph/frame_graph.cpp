@@ -136,7 +136,7 @@ namespace pbrlib::backend
 
         const auto [width, height] = _canvas.size();
 
-        _depth_buffer = vk::Image::Builder(_device)
+        _depth_buffer = vk::builders::Image(_device)
             .size(width, height)
             .format(VK_FORMAT_D32_SFLOAT)
             .usage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT)
@@ -146,7 +146,7 @@ namespace pbrlib::backend
 
         _images.emplace(
             GBufferAttachmentsName::pos_uv,
-            vk::Image::Builder(_device)
+            vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
@@ -157,7 +157,7 @@ namespace pbrlib::backend
         
         _images.emplace(
             GBufferAttachmentsName::normal_tangent,
-            vk::Image::Builder(_device)
+            vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
@@ -168,7 +168,7 @@ namespace pbrlib::backend
         
         _images.emplace(
             GBufferAttachmentsName::material_index,
-            vk::Image::Builder(_device)
+            vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R16_UINT )
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
@@ -179,7 +179,7 @@ namespace pbrlib::backend
         
         _images.emplace(
             SSAOAttachmentsName::result,
-            vk::Image::Builder(_device)
+            vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R16_SFLOAT)
                 .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)

@@ -26,7 +26,7 @@ namespace pbrlib::backend
         constexpr auto usage    = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
         _images.push_back (
-            vk::Image::Builder(_device)
+            vk::builders::Image(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .fillColor(math::vec3(0))
                 .format(format)
