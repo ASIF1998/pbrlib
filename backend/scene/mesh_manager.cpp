@@ -50,7 +50,7 @@ namespace pbrlib::backend
             |   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
         _vbos.push_back (
-            vk::Buffer::Builder(_device)
+            vk::builders::Buffer(_device)
                 .name(std::format("[vertex-buffer] {}", name))
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .size(attributes.size_bytes())
@@ -59,7 +59,7 @@ namespace pbrlib::backend
         );
 
         _ibos.push_back (
-            vk::Buffer::Builder(_device)
+            vk::builders::Buffer(_device)
                 .name(std::format("[index-buffer] {}", name))
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .size(indices.size_bytes())
@@ -172,7 +172,7 @@ namespace pbrlib::backend
                     VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
                 |   VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-            _vbos_refs = vk::Buffer::Builder(_device)
+            _vbos_refs = vk::builders::Buffer(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name("[mesh-manager] vertex-buffers-refs")
                 .size(_vbos.size() * sizeof(VkDeviceAddress))
@@ -180,7 +180,7 @@ namespace pbrlib::backend
                 .usage(buffer_usage)
                 .build();
 
-            _instances_buffer = vk::Buffer::Builder(_device)
+            _instances_buffer = vk::builders::Buffer(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name("instances")
                 .size(_instances.size() * sizeof(Instance))

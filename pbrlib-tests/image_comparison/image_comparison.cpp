@@ -69,7 +69,7 @@ namespace pbrlib::testing
 
         VK_CHECK(vkCreateSampler(device_handle, &sampler_create_info, nullptr, &_sampler_handle));
 
-        _count_changed_pixels_buffer = pbrlib::backend::vk::Buffer::Builder(_device)
+        _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .size(sizeof(uint32_t))
             .type(pbrlib::backend::vk::BufferType::eReadback)

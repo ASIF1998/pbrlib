@@ -99,7 +99,7 @@ namespace pbrlib::backend::vk
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
-        auto staging_buffer = Buffer::Builder(_device)
+        auto staging_buffer = builders::Buffer(_device)
             .name("staging-buffer")
             .size(image_size)
             .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)

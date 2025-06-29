@@ -76,7 +76,7 @@ TEST_F(VulkanDeviceTests, BuildBuffer)
     constexpr size_t size = 12342;
     constexpr auto usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-    auto buffer = pbrlib::backend::vk::Buffer::Builder(device)
+    auto buffer = pbrlib::backend::vk::builders::Buffer(device)
         .size(size)
         .usage(usage)
         .addQueueFamilyIndex(device.queue().family_index)

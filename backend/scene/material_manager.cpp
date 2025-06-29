@@ -155,7 +155,7 @@ namespace pbrlib::backend
                 _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
             }
 
-            _materials_indices_buffer = vk::Buffer::Builder(_device)
+            _materials_indices_buffer = vk::builders::Buffer(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name("[material-system] material-indices")
                 .size(_materials.size() * sizeof(PbrMaterial))
