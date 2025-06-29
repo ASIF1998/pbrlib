@@ -29,7 +29,7 @@ namespace pbrlib::backend
 
         const auto* ptr_result_attachment = colorOutputAttach(SSAOAttachmentsName::result);
 
-        _pipeline_layout = vk::PipelineLayout::Builder(*_ptr_device)
+        _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
             .build();
 
         return rebuild();

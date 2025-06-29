@@ -21,7 +21,7 @@ namespace pbrlib::testing
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        _pipeline_layout = pbrlib::backend::vk::PipelineLayout::Builder(_device)
+        _pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(_device)
             .addSet()
                 .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
                 .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)

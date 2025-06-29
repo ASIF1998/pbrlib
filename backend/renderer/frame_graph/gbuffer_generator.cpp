@@ -62,7 +62,7 @@ namespace pbrlib::backend
             .size       = sizeof(GBufferPushConstantBlock)
         };
 
-        _pipeline_layout = vk::PipelineLayout::Builder(*_ptr_device)
+        _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
             .pushConstant(push_constant_range)
             .addSet()
                 .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)

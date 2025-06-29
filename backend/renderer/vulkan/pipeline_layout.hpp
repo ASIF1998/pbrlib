@@ -10,15 +10,20 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
+namespace pbrlib::backend::vk::builders
+{
+    class PipelineLayout;
+}
+
 namespace pbrlib::backend::vk
 {
     class PipelineLayout final
     {
         explicit PipelineLayout(Device& device);
 
-    public:
-        class Builder;
+        friend class builders::PipelineLayout;
 
+    public:
         PipelineLayout(PipelineLayout&& layout);
         PipelineLayout(const PipelineLayout& layout) = delete;
 
@@ -34,30 +39,33 @@ namespace pbrlib::backend::vk
     private:
         Device& _device;
     };
+}
 
-    class PipelineLayout::Builder final
+namespace pbrlib::backend::vk::builders
+{
+    class PipelineLayout final
     {
     public:
-        explicit Builder(Device& device);
+        explicit PipelineLayout(Device& device) noexcept;
 
-        Builder(Builder&& builder)      = delete;
-        Builder(const Builder& builder) = delete;
+        PipelineLayout(PipelineLayout&& builder)      = delete;
+        PipelineLayout(const PipelineLayout& builder) = delete;
 
-        Builder& operator = (Builder&& builder)         = delete;
-        Builder& operator = (const Builder& builder)    = delete;
+        PipelineLayout& operator = (PipelineLayout&& builder)         = delete;
+        PipelineLayout& operator = (const PipelineLayout& builder)    = delete;
 
-        Builder& addSet();
+        PipelineLayout& addSet();
         
-        Builder& addBinding (
+        PipelineLayout& addBinding (
             uint32_t            binding, 
             VkDescriptorType    desc_type, 
             uint32_t            count, 
             VkShaderStageFlags  stages
         );
 
-        Builder& pushConstant(const VkPushConstantRange& push_constant);
+        PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        [[nodiscard]] PipelineLayout build();
+        [[nodiscard]] vk::PipelineLayout build();
         
     private:
         Device& _device;

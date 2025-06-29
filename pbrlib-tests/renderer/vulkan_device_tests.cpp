@@ -101,7 +101,7 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 {
     constexpr uint32_t descriptor_count = 100;
 
-    auto pipeline_layout = pbrlib::backend::vk::PipelineLayout::Builder(device)
+    auto pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(device)
         .addSet()
             .addBinding(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)   
             .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)

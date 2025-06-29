@@ -39,19 +39,19 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    PipelineLayout::Builder::Builder(Device& device) :
+    PipelineLayout::PipelineLayout(Device& device) noexcept :
         _device (device)
     { }
 
-    PipelineLayout::Builder& PipelineLayout::Builder::addSet()
+    PipelineLayout& PipelineLayout::addSet()
     {
         _sets.emplace_back();
         return *this;
     }
 
-    PipelineLayout::Builder& PipelineLayout::Builder::addBinding (
+    PipelineLayout& PipelineLayout::addBinding (
         uint32_t            binding, 
         VkDescriptorType    desc_type, 
         uint32_t            count, 
@@ -72,15 +72,15 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    PipelineLayout::Builder& PipelineLayout::Builder::pushConstant(const VkPushConstantRange& push_constant)
+    PipelineLayout& PipelineLayout::pushConstant(const VkPushConstantRange& push_constant)
     {
         _push_constant.emplace(push_constant);
         return *this;
     }
 
-    PipelineLayout PipelineLayout::Builder::build()
+    vk::PipelineLayout PipelineLayout::build()
     {
-        PipelineLayout layout (_device);
+        vk::PipelineLayout layout (_device);
 
         VkPipelineLayoutCreateInfo pipeline_layout_create_info
         {
