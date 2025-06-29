@@ -1,6 +1,6 @@
 #include <pbrlib/components.hpp>
 
-namespace pbrlib::component
+namespace pbrlib::components
 {
     Tag::Tag(std::string_view name) :
         name(name)

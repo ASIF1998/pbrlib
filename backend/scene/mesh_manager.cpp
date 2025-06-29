@@ -36,10 +36,10 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!ptr_item || !ptr_item->hasComponent<component::Renderable>())
+        if (!ptr_item || !ptr_item->hasComponent<components::Renderable>())
             throw exception::InvalidArgument("[mesh-manager] ptr_item");
 
-        auto& renderable = ptr_item->getComponent<component::Renderable>();
+        auto& renderable = ptr_item->getComponent<components::Renderable>();
 
         renderable.instance_id  = static_cast<uint32_t>(_instances.size());
         renderable.vertex_count = attributes.size();
@@ -70,7 +70,7 @@ namespace pbrlib::backend
         _vbos.back().write(attributes, 0);
         _ibos.back().write(indices, 0);
 
-        const auto& transform = ptr_item->getComponent<pbrlib::component::Transform>();
+        const auto& transform = ptr_item->getComponent<pbrlib::components::Transform>();
 
         const Instance instance
         {
@@ -92,7 +92,7 @@ namespace pbrlib::backend
 
         auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
 
-        const auto& transform = ptr_dst_item->getComponent<pbrlib::component::Transform>();
+        const auto& transform = ptr_dst_item->getComponent<pbrlib::components::Transform>();
 
         const Instance dst_instance
         {
@@ -106,8 +106,8 @@ namespace pbrlib::backend
         _item_to_instance_id.emplace(ptr_dst_item, dst_instance_id);
         _instances.push_back(dst_instance);
 
-        const auto& src_renderable = ptr_src_item->getComponent<component::Renderable>();
-        auto&       dst_renderable = ptr_dst_item->getComponent<component::Renderable>();
+        const auto& src_renderable = ptr_src_item->getComponent<components::Renderable>();
+        auto&       dst_renderable = ptr_dst_item->getComponent<components::Renderable>();
 
         dst_renderable = src_renderable;
 

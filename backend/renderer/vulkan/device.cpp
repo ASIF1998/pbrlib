@@ -481,9 +481,9 @@ namespace pbrlib::backend::vk
         );
 
         if (ptr_function)
-            log::info("[vulkan-function-loader] {}", function_name);
+            log::info("[vk-function-loader] {}", function_name);
         else 
-            log::error("[vulkan-function-loader] {}", function_name);
+            log::error("[vk-function-loader] {}", function_name);
 
         return ptr_function;
     }

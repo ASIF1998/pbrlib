@@ -14,7 +14,7 @@ namespace pbrlib
     class SceneItem;
 }
 
-namespace pbrlib::backend::component
+namespace pbrlib::backend::components
 {
     struct Renderable final
     {

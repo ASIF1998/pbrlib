@@ -164,10 +164,10 @@ namespace pbrlib
 
         std::vector<const SceneItem*> items;
 
-        auto view = _ptr_scene->_registry.view<backend::component::Renderable>();
+        auto view = _ptr_scene->_registry.view<backend::components::Renderable>();
 
         for (auto entity: view)
-            items.push_back(view.get<backend::component::Renderable>(entity).ptr_item);
+            items.push_back(view.get<backend::components::Renderable>(entity).ptr_item);
 
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->draw(_camera, items);

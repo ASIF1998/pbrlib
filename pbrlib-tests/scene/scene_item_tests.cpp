@@ -12,13 +12,13 @@ TEST(SceneItemTests, Ctor)
 
     const auto& item = scene.addItem("scene-item");
 
-    pbrlib::testing::thisTrue(item.hasComponent<pbrlib::component::Tag>());
-    pbrlib::testing::thisTrue(item.hasComponent<pbrlib::component::Transform>());
+    pbrlib::testing::thisTrue(item.hasComponent<pbrlib::components::Tag>());
+    pbrlib::testing::thisTrue(item.hasComponent<pbrlib::components::Transform>());
 
-    const auto& tag_component = item.getComponent<pbrlib::component::Tag>();
+    const auto& tag_component = item.getComponent<pbrlib::components::Tag>();
     pbrlib::testing::equality<std::string_view>(tag_component.name, "scene-item");
 
-    const auto& transform_component = item.getComponent<pbrlib::component::Transform>();
+    const auto& transform_component = item.getComponent<pbrlib::components::Transform>();
     pbrlib::testing::equality(transform_component.transform, transform);
 }
 
@@ -69,8 +69,8 @@ TEST(SceneItemTests, GetItem)
 
     const auto ptr_item = scene.item(item_name);
 
-    const auto& tag_1 = new_item.getComponent<pbrlib::component::Tag>();
-    const auto& tag_2 = ptr_item->getComponent<pbrlib::component::Tag>();
+    const auto& tag_1 = new_item.getComponent<pbrlib::components::Tag>();
+    const auto& tag_2 = ptr_item->getComponent<pbrlib::components::Tag>();
 
     pbrlib::testing::thisTrue(tag_1.name == tag_2.name);
 }
@@ -87,7 +87,7 @@ TEST(SceneItemTests, CreateInstance)
     const auto& new_item        = scene.addItem(item_name);
     const auto& instance_item   = scene.createInstance(item_name, instance_item_name, transform);
 
-    const auto& instance_tag = instance_item.getComponent<pbrlib::component::Tag>();
+    const auto& instance_tag = instance_item.getComponent<pbrlib::components::Tag>();
 
     pbrlib::testing::thisTrue(instance_tag.name == instance_item_name);
 }

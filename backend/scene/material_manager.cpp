@@ -75,9 +75,9 @@ namespace pbrlib::backend
 
         _descriptor_set_is_changed = true;
         
-        if (ptr_scene_item && ptr_scene_item->hasComponent<component::Renderable>()) [[likely]]
+        if (ptr_scene_item && ptr_scene_item->hasComponent<components::Renderable>()) [[likely]]
         {
-            auto& renderable = ptr_scene_item->getComponent<component::Renderable>();
+            auto& renderable = ptr_scene_item->getComponent<components::Renderable>();
             
             renderable.material_id = static_cast<uint32_t>(_materials.size());
         }

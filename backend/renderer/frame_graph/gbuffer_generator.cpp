@@ -247,13 +247,13 @@ namespace pbrlib::backend
 
         const auto ptr_item = _ptr_context->items[item_id];
 
-        const auto& tag = ptr_item->getComponent<pbrlib::component::Tag>();
+        const auto& tag = ptr_item->getComponent<pbrlib::components::Tag>();
 
         command_buffer.write([this, item_id, ptr_item] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] run-pipeline");
 
-            const auto& renderable = ptr_item->getComponent<component::Renderable>();
+            const auto& renderable = ptr_item->getComponent<components::Renderable>();
 
             _push_constant_block.instance_id    = renderable.instance_id;
             _push_constant_block.material_index = renderable.material_id;
