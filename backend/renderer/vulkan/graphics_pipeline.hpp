@@ -53,7 +53,7 @@ namespace pbrlib::backend::vk
     class GraphicsPipelineBuilder final
     {
     public:
-        explicit GraphicsPipelineBuilder(Device& device);
+        explicit GraphicsPipelineBuilder(Device& device) noexcept;
 
         GraphicsPipelineBuilder(GraphicsPipelineBuilder&& builder)      = delete;
         GraphicsPipelineBuilder(const GraphicsPipelineBuilder& builder) = delete;

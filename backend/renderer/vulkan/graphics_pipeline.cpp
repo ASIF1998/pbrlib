@@ -98,7 +98,7 @@ namespace pbrlib::backend::vk::utils
 
 namespace pbrlib::backend::vk
 {
-    GraphicsPipelineBuilder::GraphicsPipelineBuilder(Device& device) :
+    GraphicsPipelineBuilder::GraphicsPipelineBuilder(Device& device) noexcept :
         _device (device)
     { }
 

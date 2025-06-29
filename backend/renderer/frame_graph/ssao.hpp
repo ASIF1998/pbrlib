@@ -1,8 +1,8 @@
 #pragma once
 
-#include <backend/renderer/frame_graph/render_pass.hpp>
-
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+
+#include <backend/renderer/frame_graph/render_pass.hpp> 
 
 #include <optional>
 
@@ -30,10 +30,8 @@ namespace pbrlib::backend
         ~SSAO();
 
     private:
-        VkRenderPass    _render_pass_handle = VK_NULL_HANDLE;
-        VkFramebuffer   _framebuffer_handle = VK_NULL_HANDLE;
-
-        std::optional<vk::PipelineLayout> _pipeline_layout;
+        std::optional<vk::PipelineLayout>   _pipeline_layout;
+        VkPipeline                          _pipeline_handle = VK_NULL_HANDLE;
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };
