@@ -5,15 +5,15 @@
 
 #include <backend/utils/vulkan.hpp>
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    RenderPassBuilder::RenderPassBuilder(Device& device) :
+    RenderPass::RenderPass(Device& device) noexcept :
         _device (device)
     { }
 
-    RenderPassBuilder& RenderPassBuilder::addColorAttachment (
-        const Image*    ptr_image, 
-        VkImageLayout   final_layout
+    RenderPass& RenderPass::addColorAttachment (
+        const vk::Image*    ptr_image, 
+        VkImageLayout       final_layout
     )
     {
         _attachments.emplace_back
@@ -44,9 +44,9 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    RenderPassBuilder& RenderPassBuilder::depthAttachment (
-        const Image*    ptr_image, 
-        VkImageLayout   final_layout
+    RenderPass& RenderPass::depthAttachment (
+        const vk::Image*    ptr_image, 
+        VkImageLayout       final_layout
     )
     {
         _attachments.emplace_back
@@ -74,7 +74,7 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    VkRenderPass RenderPassBuilder::build()
+    VkRenderPass RenderPass::build()
     {
         if (_color_attachments_refs.empty())
             throw exception::InvalidState("[render-pass-builder] color attachment count is 0");

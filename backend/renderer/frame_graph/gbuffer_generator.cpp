@@ -111,7 +111,7 @@ namespace pbrlib::backend
         const auto* ptr_nor_tan_attach  = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
         const auto* ptr_mat_idx_attach  = colorOutputAttach(GBufferAttachmentsName::material_index);
 
-        _render_pass_handle = vk::RenderPassBuilder(*_ptr_device)
+        _render_pass_handle = vk::builders::RenderPass(*_ptr_device)
             .addColorAttachment(ptr_pos_uv_attach, final_attachments_layout)
             .addColorAttachment(ptr_nor_tan_attach, final_attachments_layout)
             .addColorAttachment(ptr_mat_idx_attach, final_attachments_layout)
