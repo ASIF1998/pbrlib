@@ -83,7 +83,7 @@ namespace pbrlib::backend
 
         auto prev_pipeline = _pipeline_handle;
 
-        _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
+        _pipeline_handle = vk::builders::GraphicsPipeline(*_ptr_device)
             .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
             .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
             .addAttachmentsState(false)
