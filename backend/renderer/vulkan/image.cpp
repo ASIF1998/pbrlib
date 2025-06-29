@@ -556,25 +556,25 @@ namespace pbrlib::backend::vk::loaders
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::exporters
 {
-    Image::Exporter::Exporter(Device& device) noexcept :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    Image::Exporter& Image::Exporter::image(const Image* ptr_image)
+    Image& Image::image(const vk::Image* ptr_image)
     {
         _ptr_image = ptr_image;
         return *this;
     }
 
-    Image::Exporter& Image::Exporter::filename(const std::filesystem::path& filename)
+    Image& Image::filename(const std::filesystem::path& filename)
     {
         _filename = filename;
         return *this;
     }
 
-    void Image::Exporter::validate()
+    void Image::validate()
     {
         if (!_ptr_image)
             throw exception::InvalidState("[vk-image::exporter] image is null");
@@ -586,7 +586,7 @@ namespace pbrlib::backend::vk
             throw exception::InvalidState("[vk-image::exporter] didn't set filename");
     }
 
-    void Image::Exporter::exoprt()
+    void Image::exoprt()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

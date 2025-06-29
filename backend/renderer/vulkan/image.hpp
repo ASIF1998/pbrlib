@@ -21,6 +21,11 @@ namespace pbrlib::backend::vk::builders
     class Image;
 }
 
+namespace pbrlib::backend::vk::exporters
+{
+    class Image;
+}
+
 namespace pbrlib::backend::vk
 {
     struct ImageWriteData final
@@ -35,12 +40,9 @@ namespace pbrlib::backend::vk
     {
         friend class Surface;
         friend class builders::Image;
+        friend class exporters::Image;
 
         explicit Image(Device& device, bool from_swapchain = false);
-
-    public:
-        class Loader;
-        class Exporter;
 
     public:
         Image(Image&& image);
@@ -83,32 +85,6 @@ namespace pbrlib::backend::vk
         VmaAllocation   _allocation = VK_NULL_HANDLE;
 
         bool _from_swapchain;
-    };
-
-    class Image::Exporter final
-    {
-        void validate();
-
-    public:
-        explicit Exporter(Device& device) noexcept;
-
-        Exporter(Exporter&& exporter)       = delete;
-        Exporter(const Exporter& exporter)  = delete;
-
-        Exporter& operator = (Exporter&& exporter)      = delete;
-        Exporter& operator = (const Exporter& exporter) = delete;
-
-        Exporter& image(const Image* ptr_image);
-        Exporter& filename(const std::filesystem::path& filename);
-
-        [[nodiscard]] void exoprt();
-
-    private:
-        Device& _device;
-
-        const Image* _ptr_image = nullptr;
-
-        std::filesystem::path _filename;
     };
 }
 
@@ -222,6 +198,35 @@ namespace pbrlib::backend::vk::loaders
 
     private:
         Device& _device;
+
+        std::filesystem::path _filename;
+    };
+}
+
+namespace pbrlib::backend::vk::exporters
+{
+    class Image final
+    {
+        void validate();
+
+    public:
+        explicit Image(Device& device) noexcept;
+
+        Image(Image&& exporter)         = delete;
+        Image(const Image& exporter)    = delete;
+
+        Image& operator = (Image&& exporter)        = delete;
+        Image& operator = (const Image& exporter)   = delete;
+
+        Image& image(const vk::Image* ptr_image);
+        Image& filename(const std::filesystem::path& filename);
+
+        [[nodiscard]] void exoprt();
+
+    private:
+        Device& _device;
+
+        const vk::Image* _ptr_image = nullptr;
 
         std::filesystem::path _filename;
     };

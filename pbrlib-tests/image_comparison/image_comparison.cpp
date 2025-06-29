@@ -186,7 +186,7 @@ namespace pbrlib::testing
 
         if constexpr (generate_image_reference)
         {
-            backend::vk::Image::Exporter(_device)
+            backend::vk::exporters::Image(_device)
                 .filename(path_to_reference)
                 .image(&image_1)
                 .exoprt();
