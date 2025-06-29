@@ -164,6 +164,19 @@ namespace pbrlib::backend::vk
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-change-image-layout");
 
+        changeLayout(command_buffer, new_layout, src_stage, dst_stage);
+        _device.submit(command_buffer);
+    }
+
+    void Image::changeLayout (
+        CommandBuffer&          command_buffer,
+        VkImageLayout           new_layout,
+        VkPipelineStageFlags2   src_stage, 
+        VkPipelineStageFlags2   dst_stage 
+    )
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         command_buffer.write([this, new_layout, src_stage, dst_stage] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image] changle-image-layout");
@@ -206,8 +219,6 @@ namespace pbrlib::backend::vk
 
             vkCmdPipelineBarrier2(command_buffer_handle, &dependency_info);
         }, "[vk-image] changle-image-layout", vk::marker_colors::change_layout);
-
-        _device.submit(command_buffer);
 
         layout = new_layout;
     }

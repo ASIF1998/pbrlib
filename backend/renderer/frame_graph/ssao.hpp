@@ -23,6 +23,9 @@ namespace pbrlib::backend
         void prePass(vk::CommandBuffer& command_buffer)                 override;
         void postPass(vk::CommandBuffer& command_buffer)                override;
 
+        VkPipelineStageFlags2 srcStage() const noexcept override;
+        VkPipelineStageFlags2 dstStage() const noexcept override;
+
     public:
         ~SSAO();
 

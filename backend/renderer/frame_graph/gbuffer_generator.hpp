@@ -39,6 +39,9 @@ namespace pbrlib::backend
 
         void setupColorAttachmentsLayout();
 
+        VkPipelineStageFlags2 srcStage() const noexcept override;
+        VkPipelineStageFlags2 dstStage() const noexcept override;
+
     public:
         ~GBufferGenerator();
 

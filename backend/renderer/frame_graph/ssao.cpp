@@ -68,4 +68,14 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
     }
+
+    VkPipelineStageFlags2 SSAO::srcStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+    }
+
+    VkPipelineStageFlags2 SSAO::dstStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+    }
 }

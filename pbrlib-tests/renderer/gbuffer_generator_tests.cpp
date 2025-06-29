@@ -46,9 +46,9 @@ public:
 
     void setup(const std::filesystem::path& content)
     {
-        _engine->setup([this, content] (pbrlib::Engine& engine, pbrlib::Scene& scene)
+        _engine->setup([this, content] (pbrlib::Scene& scene)
         {
-            auto& camera = engine.camera();
+            auto& camera = _engine->camera();
             camera.up(pbrlib::math::vec3(0, -1, 0));
             camera.eye(pbrlib::math::vec3(-5, 5, 16.0));
             camera.fovY(60.0f);
@@ -56,7 +56,7 @@ public:
             camera.width(_config.width);
             camera.height(_config.height);
             
-            pbrlib::testing::thisTrue(scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string()));
+            pbrlib::testing::thisTrue(scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string()));
         });
     }
 

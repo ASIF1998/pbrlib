@@ -10,11 +10,11 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (RenderPass::init(device, context)) 
+        if (RenderPass::init(device, context)) [[likely]]
         {
             for (auto& subpass: _subpasses)
             {
-                if (!subpass->init(device, context))
+                if (!subpass->init(device, context)) [[unlikely]]
                 {
                     log::error("[compound-render-pass] failed initialize");
                     return false;
@@ -30,10 +30,7 @@ namespace pbrlib::backend
     }
 
     void CompoundRenderPass::render(size_t item_id, vk::CommandBuffer& command_buffer)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-        /// @todo dont use
-    }
+    { }
 
     void CompoundRenderPass::draw(vk::CommandBuffer& command_buffer)
     {
@@ -50,5 +47,21 @@ namespace pbrlib::backend
             res &= subpass->rebuild(device, context);
 
         return res;
+    }
+
+    VkPipelineStageFlags2 CompoundRenderPass::srcStage() const noexcept
+    {
+        if (_subpasses.empty()) [[unlikely]]
+            return VK_PIPELINE_STAGE_2_NONE;
+        
+        return _subpasses.front()->srcStage();
+    }
+    
+    VkPipelineStageFlags2 CompoundRenderPass::dstStage() const noexcept
+    {
+        if (_subpasses.empty()) [[unlikely]]
+            return VK_PIPELINE_STAGE_2_NONE;
+        
+        return _subpasses.back()->dstStage();
     }
 }

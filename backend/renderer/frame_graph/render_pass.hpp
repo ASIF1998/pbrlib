@@ -1,7 +1,5 @@
 #pragma once
 
-#include <backend/renderer/vulkan/buffer.hpp>
-
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <vulkan/vulkan.h>
@@ -9,6 +7,7 @@
 #include <map>
 #include <span>
 #include <vector>
+#include <tuple>
 
 #include <string>
 #include <string_view>
@@ -28,6 +27,7 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend::vk
 {
+    class Device;
     class Image;
     class CommandBuffer;
 }
@@ -63,7 +63,11 @@ namespace pbrlib::backend
 
         virtual void draw(vk::CommandBuffer& command_buffer);
 
+        virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
+        virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
+
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
+        void addColorInput(vk::Image* ptr_image, VkImageLayout new_layout, VkPipelineStageFlags2 src_stage, VkPipelineStageFlags2 dst_stage);
         void depthStencil(const vk::Image* ptr_image);
         
         [[nodiscard]]
@@ -71,6 +75,8 @@ namespace pbrlib::backend
 
         [[nodiscard]]
         const vk::Image* depthStencil() const noexcept;
+        
+        void sync(vk::CommandBuffer& command_buffer);
 
     protected:
         virtual void prePass(vk::CommandBuffer& command_buffer);
@@ -78,7 +84,15 @@ namespace pbrlib::backend
         virtual void postPass(vk::CommandBuffer& command_buffer);
 
     protected:
-        std::map<std::string, vk::Image*, std::less<void>> _color_output_images;
+        using SynkData = std::tuple <
+            vk::Image*, 
+            VkImageLayout, 
+            VkPipelineStageFlags2, 
+            VkPipelineStageFlags2
+        >;
+
+        std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
+        std::vector<SynkData>                               _color_input_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;
 

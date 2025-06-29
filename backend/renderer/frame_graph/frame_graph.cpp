@@ -64,16 +64,7 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    std::unique_ptr<SSAO> FrameGraph::buildSSAOSubpass()
-    {
-        auto ptr_ssao = std::make_unique<SSAO>();
-
-        ptr_ssao->addColorOutput(SSAOAttachmentsName::result, &_images.at(SSAOAttachmentsName::result));
-
-        return ptr_ssao;
-    }
-
-    std::unique_ptr<GBufferGenerator> FrameGraph::buildGBufferGeneratorSubpass()
+    std::unique_ptr<RenderPass> FrameGraph::buildGBufferGeneratorSubpass()
     {
         auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>();
 
@@ -85,6 +76,22 @@ namespace pbrlib::backend
         return ptr_gbuffer_generator;
     }
 
+    std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
+        vk::Image*              ptr_pos_uv, 
+        vk::Image*              ptr_normal_tangent, 
+        VkPipelineStageFlags2   src_stage
+    )
+    {
+        std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<SSAO>();
+
+        ptr_ssao->addColorOutput(SSAOAttachmentsName::result, &_images.at(SSAOAttachmentsName::result));
+
+        ptr_ssao->addColorInput(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+        ptr_ssao->addColorInput(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+
+        return ptr_ssao;
+    }
+
     void FrameGraph::build()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -92,9 +99,16 @@ namespace pbrlib::backend
         createResources();
 
         auto ptr_render_pass = std::make_unique<CompoundRenderPass>();
+
+        auto ptr_gbuffer_generator = buildGBufferGeneratorSubpass();
+
+        auto ptr_pos_uv         = &_images.at(GBufferAttachmentsName::pos_uv);
+        auto ptr_normal_tangent = &_images.at(GBufferAttachmentsName::normal_tangent);
+
+        auto ptr_ssao = buildSSAOSubpass(ptr_pos_uv, ptr_normal_tangent, ptr_gbuffer_generator->dstStage());
         
-        ptr_render_pass->add(buildGBufferGeneratorSubpass());
-        ptr_render_pass->add(buildSSAOSubpass());
+        ptr_render_pass->add(std::move(ptr_gbuffer_generator));
+        ptr_render_pass->add(std::move(ptr_ssao));
 
         _ptr_render_pass = std::move(ptr_render_pass);
 

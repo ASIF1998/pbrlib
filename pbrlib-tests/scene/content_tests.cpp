@@ -44,9 +44,9 @@ public:
         try 
         {
             bool result = false;
-            _engine->setup([&filename, &result, &transform](pbrlib::Engine& engine, pbrlib::Scene& scene)
+            _engine->setup([this, &filename, &result, &transform](pbrlib::Scene& scene)
             {
-                result = scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
+                result = scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
             });
 
             pbrlib::testing::FrameGraphResourcesGetter getter (_engine.value());

@@ -296,4 +296,14 @@ namespace pbrlib::backend
         colorOutputAttach(GBufferAttachmentsName::normal_tangent)->layout  = final_attachments_layout;
         colorOutputAttach(GBufferAttachmentsName::material_index)->layout  = final_attachments_layout;
     }
+
+    VkPipelineStageFlags2 GBufferGenerator::srcStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT;
+    }
+
+    VkPipelineStageFlags2 GBufferGenerator::dstStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+    }
 }
