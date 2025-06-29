@@ -10,26 +10,26 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    class FramebufferBuild
+    class Framebuffer
     {
         void validate();
 
     public:
-        FramebufferBuild(Device& device);
+        Framebuffer(Device& device);
 
-        FramebufferBuild(FramebufferBuild&& builder)        = delete;
-        FramebufferBuild(const FramebufferBuild& builder)   = delete;
+        Framebuffer(Framebuffer&& builder)      = delete;
+        Framebuffer(const Framebuffer& builder) = delete;
 
-        FramebufferBuild& operator = (FramebufferBuild&& builder)       = delete;
-        FramebufferBuild& operator = (const FramebufferBuild& builder)  = delete;
+        Framebuffer& operator = (Framebuffer&& builder)         = delete;
+        Framebuffer& operator = (const Framebuffer& builder)    = delete;
 
-        FramebufferBuild& renderPass(VkRenderPass render_pass_handle)   noexcept;
-        FramebufferBuild& size(uint32_t width, uint32_t height)         noexcept;
-        FramebufferBuild& layers(uint32_t layerCount)                   noexcept;
+        Framebuffer& renderPass(VkRenderPass render_pass_handle)    noexcept;
+        Framebuffer& size(uint32_t width, uint32_t height)          noexcept;
+        Framebuffer& layers(uint32_t layerCount)                    noexcept;
         
-        FramebufferBuild& addAttachment(const Image& attachment);
+        Framebuffer& addAttachment(const Image& attachment);
 
         [[nodiscard]] VkFramebuffer build();
         

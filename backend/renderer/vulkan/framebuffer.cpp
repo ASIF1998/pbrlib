@@ -7,19 +7,19 @@
 
 #include <pbrlib/exceptions.hpp>
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    FramebufferBuild::FramebufferBuild(Device& device) :
+    Framebuffer::Framebuffer(Device& device) :
         _device (device)
     { }
 
-    FramebufferBuild& FramebufferBuild::renderPass(VkRenderPass render_pass_handle) noexcept
+    Framebuffer& Framebuffer::renderPass(VkRenderPass render_pass_handle) noexcept
     {
         _render_pass_handle = render_pass_handle;
         return *this;
     }
 
-    FramebufferBuild& FramebufferBuild::size(uint32_t width, uint32_t height) noexcept
+    Framebuffer& Framebuffer::size(uint32_t width, uint32_t height) noexcept
     {
         _width  = width;
         _height = height;
@@ -27,19 +27,19 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    FramebufferBuild& FramebufferBuild::layers(uint32_t layerCount) noexcept
+    Framebuffer& Framebuffer::layers(uint32_t layerCount) noexcept
     {
         _layerCount = layerCount;
         return *this;
     }
 
-    FramebufferBuild& FramebufferBuild::addAttachment(const Image& attachment)
+    Framebuffer& Framebuffer::addAttachment(const Image& attachment)
     {
         _attachments.push_back(attachment.view_handle);
         return *this;
     }
 
-    void FramebufferBuild::validate()
+    void Framebuffer::validate()
     {
         if (_render_pass_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-framebuffer::bulder] render pass handle is null");
@@ -54,7 +54,7 @@ namespace pbrlib::backend::vk
             throw exception::InvalidState("[vk-framebuffer::bulder] no attachments");
     }
 
-    VkFramebuffer FramebufferBuild::build()
+    VkFramebuffer Framebuffer::build()
     {
         validate();
 

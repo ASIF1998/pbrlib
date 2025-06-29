@@ -127,7 +127,7 @@ namespace pbrlib::backend
         const auto ptr_nor_tan_attach   = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
         const auto ptr_mat_idx_attach   = colorOutputAttach(GBufferAttachmentsName::material_index);
 
-        _framebuffer_handle = vk::FramebufferBuild(*_ptr_device)
+        _framebuffer_handle = vk::builders::Framebuffer(*_ptr_device)
             .size(_width, _height)
             .layers(1)
             .renderPass(_render_pass_handle)
