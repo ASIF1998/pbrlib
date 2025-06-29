@@ -419,25 +419,25 @@ namespace pbrlib::backend::vk::builders
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::decoders
 {
-    Image::Decoder::Decoder(Device& device) :
+    Image::Image(Device& device) :
         _device (device)
     { }
 
-    Image::Decoder& Image::Decoder::name(std::string_view image_name)
+    Image& Image::name(std::string_view image_name)
     {
         _name = image_name;
         return *this;
     }
 
-    Image::Decoder& Image::Decoder::channelsPerPixel(int32_t channels_per_pixel)
+    Image& Image::channelsPerPixel(int32_t channels_per_pixel)
     {
         _channels_per_pixel = channels_per_pixel;
         return *this;
     }
 
-    Image::Decoder& Image::Decoder::compressedImage(const uint8_t* ptr_data, size_t size)
+    Image& Image::compressedImage(const uint8_t* ptr_data, size_t size)
     {
         _compressed_image.ptr_data  = ptr_data;
         _compressed_image.size      = size;
@@ -445,7 +445,7 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    void Image::Decoder::validate()
+    void Image::validate()
     {
         if (_channels_per_pixel < 1 && _channels_per_pixel > 4) 
             throw exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
@@ -454,7 +454,7 @@ namespace pbrlib::backend::vk
             throw exception::InvalidState("[vk-image::decoder] compressed image data is empty");
     }
 
-    Image Image::Decoder::decode()
+    vk::Image Image::decode()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

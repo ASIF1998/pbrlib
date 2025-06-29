@@ -100,7 +100,7 @@ namespace pbrlib::backend
         const auto image_id = static_cast<uint32_t>(_images.size());
 
         _images.push_back (
-            vk::Image::Decoder(_device)
+            vk::decoders::Image(_device)
                 .name(name)
                 .channelsPerPixel(compressed_image.channels_per_pixel)
                 .compressedImage(compressed_image.ptr_data, compressed_image.size)

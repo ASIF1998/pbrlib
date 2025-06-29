@@ -21,6 +21,11 @@ namespace pbrlib::backend::vk::builders
     class Image;
 }
 
+namespace pbrlib::backend::vk::decoders
+{
+    class Image;
+}
+
 namespace pbrlib::backend::vk
 {
     struct ImageWriteData final
@@ -35,12 +40,11 @@ namespace pbrlib::backend::vk
     {
         friend class Surface;
         friend class builders::Image;
+        friend class decoders::Image;
 
         explicit Image(Device& device, bool from_swapchain = false);
 
     public:
-        // class Builder;
-        class Decoder;
         class Loader;
         class Exporter;
 
@@ -85,39 +89,6 @@ namespace pbrlib::backend::vk
         VmaAllocation   _allocation = VK_NULL_HANDLE;
 
         bool _from_swapchain;
-    };
-
-    class Image::Decoder final
-    {
-        void validate();
-
-    public:
-        explicit Decoder(Device& device);
-
-        Decoder(Decoder&& decoder)      = delete;
-        Decoder(const Decoder& decoder) = delete;
-
-        Decoder& operator = (Decoder&& decoder)         = delete;
-        Decoder& operator = (const Decoder& decoder)    = delete;
-
-        Decoder& name(std::string_view image_name);
-        Decoder& channelsPerPixel(int32_t channels_per_pixel);
-        Decoder& compressedImage(const uint8_t* ptr_data, size_t size);
-
-        [[nodiscard]] Image decode();
-
-    private:
-        Device& _device;
-
-        std::string _name;
-
-        int32_t _channels_per_pixel = 4;
-
-        struct
-        {
-            const uint8_t* ptr_data = nullptr;
-            size_t size             = 0;
-        } _compressed_image;
     };
 
     class Image::Loader final
@@ -220,5 +191,41 @@ namespace pbrlib::backend::vk::builders
         VkImageUsageFlags       _usage          = VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
 
         std::string _name;
+    };
+}
+
+namespace pbrlib::backend::vk::decoders
+{
+    class Image final
+    {
+        void validate();
+
+    public:
+        explicit Image(Device& device);
+
+        Image(Image&& decoder)      = delete;
+        Image(const Image& decoder) = delete;
+
+        Image& operator = (Image&& decoder)         = delete;
+        Image& operator = (const Image& decoder)    = delete;
+
+        Image& name(std::string_view image_name);
+        Image& channelsPerPixel(int32_t channels_per_pixel);
+        Image& compressedImage(const uint8_t* ptr_data, size_t size);
+
+        [[nodiscard]] vk::Image decode();
+
+    private:
+        Device& _device;
+
+        std::string _name;
+
+        int32_t _channels_per_pixel = 4;
+
+        struct
+        {
+            const uint8_t* ptr_data = nullptr;
+            size_t size             = 0;
+        } _compressed_image;
     };
 }
