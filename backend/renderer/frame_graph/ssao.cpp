@@ -41,7 +41,7 @@ namespace pbrlib::backend
 
         auto prev_handle = _pipeline_handle;
 
-        _pipeline_handle = vk::ComputePipelineBuilder(*_ptr_device)
+        _pipeline_handle = vk::builders::ComputePipeline(*_ptr_device)
             .shader(ssao_shader)
             .pipelineLayoutHandle(_pipeline_layout->handle)
             .build();

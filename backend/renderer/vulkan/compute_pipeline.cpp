@@ -6,25 +6,25 @@
 
 #include <pbrlib/exceptions.hpp>
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    ComputePipelineBuilder::ComputePipelineBuilder(Device& device) noexcept :
+    ComputePipeline::ComputePipeline(Device& device) noexcept :
         _device (device)
     { }
 
-    ComputePipelineBuilder& ComputePipelineBuilder::shader(const std::filesystem::path& shader_name)
+    ComputePipeline& ComputePipeline::shader(const std::filesystem::path& shader_name)
     {
         _shader_name = shader_name;
         return *this;
     }
 
-    ComputePipelineBuilder& ComputePipelineBuilder::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
+    ComputePipeline& ComputePipeline::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
     {
         _pipeline_layout_handle = layout_handle;
         return *this;
     }
 
-    VkPipeline ComputePipelineBuilder::build()
+    VkPipeline ComputePipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE)
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");

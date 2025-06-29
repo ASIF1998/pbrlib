@@ -9,21 +9,21 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    class ComputePipelineBuilder final
+    class ComputePipeline final
     {
     public:
-        explicit ComputePipelineBuilder(Device& device) noexcept;
+        explicit ComputePipeline(Device& device) noexcept;
 
-        ComputePipelineBuilder(ComputePipelineBuilder&& builder)        = delete;
-        ComputePipelineBuilder(const ComputePipelineBuilder& builder)   = delete;
+        ComputePipeline(ComputePipeline&& builder)      = delete;
+        ComputePipeline(const ComputePipeline& builder) = delete;
 
-        ComputePipelineBuilder& operator = (ComputePipelineBuilder&& builder)       = delete;
-        ComputePipelineBuilder& operator = (const ComputePipelineBuilder& builder)  = delete;
+        ComputePipeline& operator = (ComputePipeline&& builder)         = delete;
+        ComputePipeline& operator = (const ComputePipeline& builder)    = delete;
 
-        ComputePipelineBuilder& shader(const std::filesystem::path& shader_name);
-        ComputePipelineBuilder& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
+        ComputePipeline& shader(const std::filesystem::path& shader_name);
+        ComputePipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
 
         [[nodiscard]] VkPipeline build();
 
