@@ -40,11 +40,11 @@ namespace pbrlib::backend
             ptr_subpass->draw(command_buffer);
     }
 
-    bool CompoundRenderPass::rebuild(vk::Device& device, const RenderContext& context) 
+    bool CompoundRenderPass::rebuild() 
     {
         bool res = true;
         for (auto& subpass: _subpasses)
-            res &= subpass->rebuild(device, context);
+            res &= subpass->rebuild();
 
         return res;
     }

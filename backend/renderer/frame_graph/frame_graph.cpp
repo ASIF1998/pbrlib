@@ -117,8 +117,17 @@ namespace pbrlib::backend
 
     bool FrameGraph::rebuildPasses()
     {
-        backend::log::info("[frame-graph] rebuild passes");
-        return _ptr_render_pass ? _ptr_render_pass->rebuild(_device, _render_context) : false;
+        try
+        {
+            backend::log::info("[frame-graph] rebuild passes");
+            return _ptr_render_pass ? _ptr_render_pass->rebuild() : false;
+        } 
+        catch (std::exception& ex)
+        {
+            backend::log::error("[frame-graph] failed rebuild: {}", ex.what());
+        }
+
+        return false;
     }
 
     void FrameGraph::createResources()

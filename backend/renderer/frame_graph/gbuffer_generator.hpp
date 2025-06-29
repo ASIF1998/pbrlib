@@ -28,7 +28,7 @@ namespace pbrlib::backend
         public RenderPass
     {
         bool init(vk::Device& device, const RenderContext& context)     override;
-        bool rebuild(vk::Device& device, const RenderContext& context)  override;
+        bool rebuild()                                                  override;
 
         void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
         void prePass(vk::CommandBuffer& command_buffer)                 override;

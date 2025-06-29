@@ -46,10 +46,10 @@ namespace pbrlib::backend
             .addAttachment(*ptr_result_attachment)
             .build();
 
-        return rebuild(*_ptr_device, *_ptr_context);;
+        return rebuild();
     }
 
-    bool SSAO::rebuild(vk::Device& device, const RenderContext& context)
+    bool SSAO::rebuild()
     {
         return true;
     }

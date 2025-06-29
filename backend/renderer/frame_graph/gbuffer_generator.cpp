@@ -71,10 +71,10 @@ namespace pbrlib::backend
 
         createFramebuffer();
 
-        return rebuild(device, context);
+        return rebuild();
     }
 
-    bool GBufferGenerator::rebuild(vk::Device& device, const RenderContext& context)
+    bool GBufferGenerator::rebuild()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -83,26 +83,19 @@ namespace pbrlib::backend
 
         auto prev_pipeline = _pipeline_handle;
 
-        try
-        {
-            _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
-                .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
-                .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
-                .addAttachmentsState(false)
-                .addAttachmentsState(false)
-                .addAttachmentsState(false)
-                .depthStencilTest(true)
-                .pipelineLayoutHandle(_pipeline_layout->handle)
-                .renderPassHandle(_render_pass_handle)
-                .subpass(0)
-                .build();
-
-            vkDestroyPipeline(_ptr_device->device(), prev_pipeline, nullptr);
-        } 
-        catch (std::exception& ex)
-        {
-            backend::log::error("[gbuffer-generate] failed rebuild: {}", ex.what());
-        }
+        _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
+            .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
+            .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .addAttachmentsState(false)
+            .addAttachmentsState(false)
+            .addAttachmentsState(false)
+            .depthStencilTest(true)
+            .pipelineLayoutHandle(_pipeline_layout->handle)
+            .renderPassHandle(_render_pass_handle)
+            .subpass(0)
+            .build();
+        
+        vkDestroyPipeline(_ptr_device->device(), prev_pipeline, nullptr);
 
         return true;
     }
