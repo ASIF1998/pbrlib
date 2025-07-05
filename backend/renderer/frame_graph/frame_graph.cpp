@@ -29,10 +29,10 @@ namespace pbrlib::backend
         _device (device),
         _canvas (canvas)
     {
-        build();
-
         _render_context.ptr_material_manager    = &material_manager;
         _render_context.ptr_mesh_manager        = &mesh_manager;
+        
+        build();
     }
 }
 
@@ -84,10 +84,10 @@ namespace pbrlib::backend
     {
         std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<SSAO>();
 
-        ptr_ssao->addColorOutput(SSAOAttachmentsName::result, &_images.at(SSAOAttachmentsName::result));
+        ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
 
-        ptr_ssao->addColorInput(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
-        ptr_ssao->addColorInput(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+        ptr_ssao->addColorInput(SSAOInputAttachmentNames::pos_uv, ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+        ptr_ssao->addColorInput(SSAOInputAttachmentNames::normal_tangent, ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
 
         return ptr_ssao;
     }
@@ -136,6 +136,12 @@ namespace pbrlib::backend
 
         const auto [width, height] = _canvas.size();
 
+        constexpr auto shared_usage_flags = 
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
+            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
         _depth_buffer = vk::builders::Image(_device)
             .size(width, height)
             .format(VK_FORMAT_D32_SFLOAT)
@@ -149,7 +155,7 @@ namespace pbrlib::backend
             vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
-                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+                .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name(GBufferAttachmentsName::pos_uv)
                 .build()
@@ -160,7 +166,7 @@ namespace pbrlib::backend
             vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R32G32B32A32_SFLOAT)
-                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+                .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name(GBufferAttachmentsName::normal_tangent)
                 .build()
@@ -171,20 +177,20 @@ namespace pbrlib::backend
             vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R16_UINT )
-                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+                .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name(GBufferAttachmentsName::material_index)
                 .build()
         );
         
         _images.emplace(
-            SSAOAttachmentsName::result,
+            SSAOOutputAttachmentsNames::result,
             vk::builders::Image(_device)
                 .size(width, height)
                 .format(VK_FORMAT_R16_SFLOAT)
-                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT)
+                .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
-                .name(SSAOAttachmentsName::result)
+                .name(SSAOOutputAttachmentsNames::result)
                 .build()
         );
     }

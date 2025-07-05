@@ -45,12 +45,12 @@ namespace pbrlib::backend::vk
         explicit Image(Device& device, bool from_swapchain = false);
 
     public:
-        Image(Image&& image);
+        Image(Image&& image) noexcept;
         Image(const Image& image) = delete;
 
         ~Image();
 
-        Image& operator = (Image&& image);
+        Image& operator = (Image&& image) noexcept;
         Image& operator = (const Image& image) = delete;
 
         void write(const ImageWriteData& data);

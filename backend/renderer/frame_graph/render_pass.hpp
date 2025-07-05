@@ -67,12 +67,26 @@ namespace pbrlib::backend
         virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
         virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
 
+        // virtual void                            descriptorSet(uint32_t set_id, VkDescriptorSet set_handle);
+        // virtual [[nodiscard]] VkDescriptorSet   descriptorSet(uint32_t set_id) const;
+
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
-        void addColorInput(vk::Image* ptr_image, VkImageLayout new_layout, VkPipelineStageFlags2 src_stage, VkPipelineStageFlags2 dst_stage);
+
+        void addColorInput (
+            std::string_view        name, 
+            vk::Image*              ptr_image, 
+            VkImageLayout           new_layout, 
+            VkPipelineStageFlags2   src_stage, 
+            VkPipelineStageFlags2   dst_stage
+        );
+
         void depthStencil(const vk::Image* ptr_image);
         
         [[nodiscard]]
         vk::Image* colorOutputAttach(std::string_view name);
+        
+        [[nodiscard]]
+        const vk::Image* colorInputAttach(std::string_view name) const;
 
         [[nodiscard]]
         const vk::Image* depthStencil() const noexcept;
@@ -80,9 +94,7 @@ namespace pbrlib::backend
         void sync(vk::CommandBuffer& command_buffer);
 
     protected:
-        virtual void prePass(vk::CommandBuffer& command_buffer);
-        virtual void render(size_t item_id , vk::CommandBuffer& command_buffer) = 0; 
-        virtual void postPass(vk::CommandBuffer& command_buffer);
+        virtual void render(vk::CommandBuffer& command_buffer) = 0;
 
     protected:
         using SynkData = std::tuple <
@@ -93,7 +105,7 @@ namespace pbrlib::backend
         >;
 
         std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
-        std::vector<SynkData>                               _color_input_images;
+        std::map<std::string, SynkData, std::less<void>>    _color_input_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;
 

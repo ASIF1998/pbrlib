@@ -29,7 +29,7 @@ namespace pbrlib::backend
         return false;
     }
 
-    void CompoundRenderPass::render(size_t item_id, vk::CommandBuffer& command_buffer)
+    void CompoundRenderPass::render(vk::CommandBuffer& command_buffer)
     { }
 
     void CompoundRenderPass::draw(vk::CommandBuffer& command_buffer)

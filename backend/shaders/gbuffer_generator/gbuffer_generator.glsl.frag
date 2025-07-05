@@ -8,7 +8,7 @@ layout(location = 2) in vec3        normal;
 layout(location = 3) in vec3        tangent;
 layout(location = 4) in vec2        uv;
 
-layout(location = 0) out vec4 gbuffer_pos;
+layout(location = 0) out vec4 gbuffer_pos_uv;
 layout(location = 1) out vec4 gbuffer_normal_tangent;
 layout(location = 2) out uint gbuffer_material_index;
 
@@ -24,5 +24,5 @@ void main()
         material_index
     );
 
-    pack(data, gbuffer_pos, gbuffer_normal_tangent, gbuffer_material_index);
+    pack(data, gbuffer_pos_uv, gbuffer_normal_tangent, gbuffer_material_index);
 }

@@ -70,6 +70,7 @@ namespace pbrlib::backend
             .build();
 
         createFramebuffer();
+        createDescriptorSet();
 
         return rebuild();
     }
@@ -148,11 +149,9 @@ namespace pbrlib::backend
         colorOutputAttach(GBufferAttachmentsName::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     }
 
-    void GBufferGenerator::prePass(vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::beginPass(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
-
-        RenderPass::prePass(command_buffer);
 
         setupColorAttachmentsLayout();
 
@@ -238,52 +237,55 @@ namespace pbrlib::backend
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout->handle, 0, 1, &descriptor_set, 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);
-        }, "[gbuffer-generator] pre-pass", vk::marker_colors::graphics_pipeline);
+        }, "[gbuffer-generator] begin-pass", vk::marker_colors::graphics_pipeline);
     }
 
-    void GBufferGenerator::render(size_t item_id, vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto ptr_item = _ptr_context->items[item_id];
+        beginPass(command_buffer);
 
-        const auto& tag = ptr_item->getComponent<pbrlib::components::Tag>();
-
-        command_buffer.write([this, item_id, ptr_item] (VkCommandBuffer command_buffer_handle)
+        for (const auto ptr_item: _ptr_context->items)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] run-pipeline");
+            const auto& tag = ptr_item->getComponent<pbrlib::components::Tag>();
+    
+            command_buffer.write([this, ptr_item] (VkCommandBuffer command_buffer_handle)
+            {
+                PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] run-pipeline");
+    
+                const auto& renderable = ptr_item->getComponent<components::Renderable>();
+    
+                _push_constant_block.instance_id    = renderable.instance_id;
+                _push_constant_block.material_index = renderable.material_id;
+    
+                vkCmdPushConstants(
+                    command_buffer_handle, 
+                    _pipeline_layout->handle, 
+                    VK_SHADER_STAGE_VERTEX_BIT, 
+                    0, sizeof(GBufferPushConstantBlock), &_push_constant_block
+                );
+    
+                const auto& index_buffer = _ptr_context->ptr_mesh_manager->indexBuffer(renderable.instance_id);
+    
+                vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);
+            }, std::format("[gbuffer-pass] run-pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
+        }
 
-            const auto& renderable = ptr_item->getComponent<components::Renderable>();
-
-            _push_constant_block.instance_id    = renderable.instance_id;
-            _push_constant_block.material_index = renderable.material_id;
-
-            vkCmdPushConstants(
-                command_buffer_handle, 
-                _pipeline_layout->handle, 
-                VK_SHADER_STAGE_VERTEX_BIT, 
-                0, sizeof(GBufferPushConstantBlock), &_push_constant_block
-            );
-
-            const auto& index_buffer = _ptr_context->ptr_mesh_manager->indexBuffer(renderable.instance_id);
-
-            vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-            vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);
-        }, std::format("[gbuffer-pass] run-pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
+        endPass(command_buffer);
     }
 
-    void GBufferGenerator::postPass(vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::endPass(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
-
-        RenderPass::postPass(command_buffer);
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] post-pass");
 
             vkCmdEndRenderPass(command_buffer_handle);
-        }, "[gbuffer-generator] post-pass", vk::marker_colors::graphics_pipeline);
+        }, "[gbuffer-generator] end-pass", vk::marker_colors::graphics_pipeline);
 
         colorOutputAttach(GBufferAttachmentsName::pos_uv)->layout          = final_attachments_layout;
         colorOutputAttach(GBufferAttachmentsName::normal_tangent)->layout  = final_attachments_layout;
@@ -298,5 +300,25 @@ namespace pbrlib::backend
     VkPipelineStageFlags2 GBufferGenerator::dstStage() const noexcept
     {
         return VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+    }
+
+    void GBufferGenerator::createDescriptorSet()
+    {
+        /// @todo 
+        const auto ptr_pos_uv           = colorOutputAttach(GBufferAttachmentsName::pos_uv);
+        const auto ptr_normal_tangent   = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
+        // const auto ptr_material_index   = colorOutputAttach(GBufferAttachmentsName::material_index);
+
+        const VkDescriptorImageInfo pos_uv_info 
+        {
+            .imageView      = ptr_pos_uv->view_handle,
+            .imageLayout    = ptr_pos_uv->layout
+        };
+
+        const VkDescriptorImageInfo normal_tangent_info 
+        {
+            .imageView      = ptr_normal_tangent->view_handle,
+            .imageLayout    = ptr_normal_tangent->layout
+        };
     }
 }

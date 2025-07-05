@@ -90,7 +90,7 @@ namespace pbrlib::backend
         if (!ptr_src_item || !ptr_dst_item)
             throw exception::InvalidArgument("[mesh-manager] pointers to items is null");
 
-        auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
+        const auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
 
         const auto& transform = ptr_dst_item->getComponent<pbrlib::components::Transform>();
 

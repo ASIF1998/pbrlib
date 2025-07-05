@@ -1,6 +1,9 @@
 #ifndef PACKING_GLSL
 #define PACKING_GLSL
 
+// #define GBUFFER_GENERATOR_GEOMETRY_FORMAT   rgba32f
+// #define GBUFFER_GENERATOR_INDEX_FORMAT      r16ui
+
 struct GBufferData
 {
     vec3 pos;
@@ -66,7 +69,7 @@ vec2 unpack(uint value)
 
 void pack(
     in GBufferData  data,
-    out vec4        gbuffer_pos,
+    out vec4        gbuffer_pos_uv,
     out vec4        gbuffer_normal_tangent,
     out uint        gbuffer_material_index
 )
@@ -75,24 +78,36 @@ void pack(
     vec2    pack_tangent    = packUnitVec(data.tangent);
     float   pack_uv         = uintBitsToFloat(pack(data.uv));
 
-    gbuffer_pos             = vec4(pos, pack_uv);
+    gbuffer_pos_uv          = vec4(data.pos, pack_uv);
     gbuffer_normal_tangent  = vec4(pack_normal, pack_tangent);
     gbuffer_material_index  = data.material_index;
 }
 
 GBufferData unpack(
-    vec4 gbuffer_pos,
+    vec4 gbuffer_pos_uv,
     vec4 gbuffer_normal_tangent,
     uint gbuffer_material_index
 )
 {
     return GBufferData (
-        gbuffer_pos.xyz,
+        gbuffer_pos_uv.xyz,
         unpackUnitVec(gbuffer_normal_tangent.xy),
         unpackUnitVec(gbuffer_normal_tangent.zw),
-        unpack(floatBitsToUint(gbuffer_pos.w)),
+        unpack(floatBitsToUint(gbuffer_pos_uv.w)),
         gbuffer_material_index
     );
+}
+
+void unpackPosUv(in vec4 gbuffer_pos_uv, out vec3 pos, out vec2 uv)
+{
+    pos = gbuffer_pos_uv.xyz;
+    uv  = unpack(floatBitsToUint(gbuffer_pos_uv.w));
+}
+
+void unpackNormalTangent(in vec4 gbuffer_normal_tangent, out vec3 normal, out vec3 tangent)
+{
+    normal  = unpackUnitVec(gbuffer_normal_tangent.xy);
+    tangent = unpackUnitVec(gbuffer_normal_tangent.zw);
 }
 
 #endif

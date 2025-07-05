@@ -27,12 +27,14 @@ namespace pbrlib::backend
     class GBufferGenerator final :
         public RenderPass
     {
+        void createDescriptorSet();
+
         bool init(vk::Device& device, const RenderContext& context)     override;
         bool rebuild()                                                  override;
-
-        void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
-        void prePass(vk::CommandBuffer& command_buffer)                 override;
-        void postPass(vk::CommandBuffer& command_buffer)                override;
+        
+        void beginPass(vk::CommandBuffer& command_buffer);
+        void render(vk::CommandBuffer& command_buffer) override;
+        void endPass(vk::CommandBuffer& command_buffer);
         
         void createRenderPass();
         void createFramebuffer();
@@ -58,5 +60,7 @@ namespace pbrlib::backend
         VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
 
         GBufferPushConstantBlock _push_constant_block;
+
+        VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
     };
 }

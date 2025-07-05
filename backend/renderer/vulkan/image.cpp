@@ -52,13 +52,14 @@ namespace pbrlib::backend::vk
         _from_swapchain (from_swapchain)
     { }
 
-    Image::Image(Image&& image) :
+    Image::Image(Image&& image) noexcept :
         _device     (image._device),
         width       (image.width),
         height      (image.height),
         format      (image.format),
         level_count (image.level_count),
-        layer_count (image.layer_count)
+        layer_count (image.layer_count),
+        layout      (image.layout)
     {
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
@@ -74,7 +75,7 @@ namespace pbrlib::backend::vk
             vmaDestroyImage(_device.vmaAllocator(), handle, _allocation);
     }
 
-    Image& Image::operator = (Image&& image)
+    Image& Image::operator = (Image&& image) noexcept
     {
         width   = image.width;
         height  = image.height;
@@ -82,6 +83,8 @@ namespace pbrlib::backend::vk
 
         level_count = image.level_count;
         layer_count = image.layer_count;
+
+        layout = image.layout;
 
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
@@ -354,11 +357,11 @@ namespace pbrlib::backend::vk::builders
 
         if (_usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
-            
-        if (_usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+        else if (_usage & VK_IMAGE_USAGE_SAMPLED_BIT)
+            image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        else if (_usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-            
-        if (_usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+        else if (_usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         const auto aspect = _format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
