@@ -1,9 +1,6 @@
 #ifndef PACKING_GLSL
 #define PACKING_GLSL
 
-// #define GBUFFER_GENERATOR_GEOMETRY_FORMAT   rgba32f
-// #define GBUFFER_GENERATOR_INDEX_FORMAT      r16ui
-
 struct GBufferData
 {
     vec3 pos;
