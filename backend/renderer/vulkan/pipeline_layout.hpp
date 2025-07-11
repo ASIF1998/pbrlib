@@ -34,8 +34,6 @@ namespace pbrlib::backend::vk
 
         VkPipelineLayout handle = VK_NULL_HANDLE;
 
-        std::vector<VkDescriptorSetLayout> sets_layout;
-
     private:
         Device& _device;
     };
@@ -54,15 +52,7 @@ namespace pbrlib::backend::vk::builders
         PipelineLayout& operator = (PipelineLayout&& builder)         = delete;
         PipelineLayout& operator = (const PipelineLayout& builder)    = delete;
 
-        PipelineLayout& addSet();
-        
-        PipelineLayout& addBinding (
-            uint32_t            binding, 
-            VkDescriptorType    desc_type, 
-            uint32_t            count, 
-            VkShaderStageFlags  stages
-        );
-
+        PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
         PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
         [[nodiscard]] vk::PipelineLayout build();
@@ -72,6 +62,32 @@ namespace pbrlib::backend::vk::builders
 
         std::optional<VkPushConstantRange> _push_constant;
 
-        std::vector<std::vector<VkDescriptorSetLayoutBinding>> _sets;
+        std::vector<VkDescriptorSetLayout> _sets_layout;
+    };
+
+    class DescriptorSetLayout final
+    {
+    public:
+        explicit DescriptorSetLayout(Device& device) noexcept;
+
+        DescriptorSetLayout(DescriptorSetLayout&& layout)       = delete;
+        DescriptorSetLayout(const DescriptorSetLayout& layout)  = delete;
+
+        DescriptorSetLayout& operator = (DescriptorSetLayout&& layout)      = delete;
+        DescriptorSetLayout& operator = (const DescriptorSetLayout& layout) = delete;
+
+        DescriptorSetLayout& addBinding (
+            uint32_t            binding,
+            VkDescriptorType    desc_type,
+            uint32_t            count,
+            VkShaderStageFlags  stages
+        );
+
+        
+        VkDescriptorSetLayout build();
+    private:
+        Device& _device;
+
+        std::vector<VkDescriptorSetLayoutBinding> _bindings;
     };
 }

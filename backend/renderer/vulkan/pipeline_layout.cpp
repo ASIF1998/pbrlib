@@ -3,6 +3,8 @@
 
 #include <backend/utils/vulkan.hpp>
 
+#include <pbrlib/exceptions.hpp>
+
 #include <ranges>
 
 #include <stdexcept>
@@ -17,24 +19,17 @@ namespace pbrlib::backend::vk
         _device (layout._device)
     {
         std::swap(handle, layout.handle);
-        std::swap(sets_layout, layout.sets_layout);
     }
 
     PipelineLayout::~PipelineLayout()
     {
         const auto device_handle = _device.device();
-
-        for (const auto set_layout_handle : sets_layout)
-            vkDestroyDescriptorSetLayout(device_handle, set_layout_handle, nullptr);
-
         vkDestroyPipelineLayout(device_handle, handle, nullptr);
     }
 
     PipelineLayout& PipelineLayout::operator = (PipelineLayout&& layout)
     {
         std::swap(handle, layout.handle);
-        std::swap(sets_layout, layout.sets_layout);
-
         return *this;
     }
 }
@@ -45,30 +40,9 @@ namespace pbrlib::backend::vk::builders
         _device (device)
     { }
 
-    PipelineLayout& PipelineLayout::addSet()
+    PipelineLayout& PipelineLayout::addSetLayout(VkDescriptorSetLayout layout_handle)
     {
-        _sets.emplace_back();
-        return *this;
-    }
-
-    PipelineLayout& PipelineLayout::addBinding (
-        uint32_t            binding, 
-        VkDescriptorType    desc_type, 
-        uint32_t            count, 
-        VkShaderStageFlags  stages
-    )
-    {
-        _sets.back().emplace_back
-        (
-            VkDescriptorSetLayoutBinding
-            {
-                .binding            = binding,
-                .descriptorType     = desc_type,
-                .descriptorCount    = count,
-                .stageFlags         = stages
-            }
-        );
-
+        _sets_layout.emplace_back(layout_handle);
         return *this;
     }
 
@@ -87,30 +61,10 @@ namespace pbrlib::backend::vk::builders
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
         };
 
-        if (!_sets.empty())
+        if (!_sets_layout.empty())
         {
-            layout.sets_layout.resize(_sets.size());
-
-            VkDescriptorSetLayoutCreateInfo desc_set_create_info
-            {
-                .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
-            };
-
-            for (const auto i: std::views::iota(0u, _sets.size()))
-            {
-                desc_set_create_info.bindingCount   = static_cast<uint32_t>(_sets[i].size());
-                desc_set_create_info.pBindings      = _sets[i].data();
-
-                VK_CHECK(vkCreateDescriptorSetLayout(
-                    _device.device(),
-                    &desc_set_create_info,
-                    nullptr,
-                    &layout.sets_layout[i]
-                ));
-            }
-
-            pipeline_layout_create_info.setLayoutCount  = static_cast<uint32_t>(layout.sets_layout.size());
-            pipeline_layout_create_info.pSetLayouts     = layout.sets_layout.data();
+            pipeline_layout_create_info.setLayoutCount  = static_cast<uint32_t>(_sets_layout.size());
+            pipeline_layout_create_info.pSetLayouts     = _sets_layout.data();
         }
 
         if (_push_constant)
@@ -127,5 +81,57 @@ namespace pbrlib::backend::vk::builders
         ));
 
         return layout;
+    }
+}
+
+namespace pbrlib::backend::vk::builders
+{
+    DescriptorSetLayout::DescriptorSetLayout(Device& device) noexcept :
+        _device (device)
+    { }
+
+    DescriptorSetLayout& DescriptorSetLayout::addBinding (
+        uint32_t            binding, 
+        VkDescriptorType    desc_type, 
+        uint32_t            count, 
+        VkShaderStageFlags  stages
+    )
+    {
+        _bindings.emplace_back
+        (
+            VkDescriptorSetLayoutBinding
+            {
+                .binding            = binding,
+                .descriptorType     = desc_type,
+                .descriptorCount    = count,
+                .stageFlags         = stages
+            }
+        );
+
+        return *this;
+    }
+
+    VkDescriptorSetLayout DescriptorSetLayout::build()
+    {
+        if (_bindings.empty()) [[unlikely]]
+            throw exception::InvalidState("[descritor-set-layout-builder] bindings count is 0");
+
+        const VkDescriptorSetLayoutCreateInfo desc_set_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .bindingCount   = static_cast<uint32_t>(_bindings.size()),
+            .pBindings      = _bindings.data()
+        };
+
+        VkDescriptorSetLayout sets_layout = VK_NULL_HANDLE;
+
+        VK_CHECK(vkCreateDescriptorSetLayout(
+            _device.device(),
+            &desc_set_create_info,
+            nullptr,
+            &sets_layout
+        ));
+
+        return sets_layout;
     }
 }

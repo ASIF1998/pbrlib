@@ -12,9 +12,11 @@ layout (local_size_x = 1, local_size_y = 1) in;
 layout(set = 0, binding = 0) uniform sampler2D gbuffer_pos_uv; 
 layout(set = 0, binding = 1) uniform sampler2D gbuffer_normal_tangent; 
 
+layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
+
 void main()
 {
-    // ivec2 pixel_coord = ivec2(gl_WorkGroupID.xy);
+    ivec2 pixel_coord = ivec2(gl_WorkGroupID.xy);
 
     // vec3 pos        = vec3(0);
     // vec3 normal     = vec3(0);
@@ -23,4 +25,8 @@ void main()
 
     // unpackPosUv(imageLoad(gbuffer_pos_uv, pixel_coord), pos, uv);
     // unpackNormalTangent(imageLoad(gbuffer_normal_tangent, pixel_coord), normal, tangent);
+
+    vec3 color = vec3(1.0);
+
+    imageStore(result, pixel_coord, vec4(color, 0.0));
 }

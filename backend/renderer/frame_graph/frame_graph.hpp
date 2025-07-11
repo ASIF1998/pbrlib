@@ -39,8 +39,8 @@ namespace pbrlib::backend
 
         std::unique_ptr<RenderPass> buildSSAOSubpass (
             vk::Image*              ptr_pos_uv, 
-            vk::Image*              ptr_normal_tangent, 
-            VkPipelineStageFlags2   src_stage
+            vk::Image*              ptr_normal_tangent,
+            const RenderPass*       ptr_gbuffer
         );
 
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);

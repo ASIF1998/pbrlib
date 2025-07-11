@@ -66,7 +66,7 @@ namespace pbrlib::backend
 {
     std::unique_ptr<RenderPass> FrameGraph::buildGBufferGeneratorSubpass()
     {
-        auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>();
+        auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>(_device);
 
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::pos_uv, &_images.at(GBufferAttachmentsName::pos_uv));
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::normal_tangent, &_images.at(GBufferAttachmentsName::normal_tangent));
@@ -79,15 +79,23 @@ namespace pbrlib::backend
     std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
         vk::Image*              ptr_pos_uv, 
         vk::Image*              ptr_normal_tangent, 
-        VkPipelineStageFlags2   src_stage
+        const RenderPass*       ptr_gbuffer
     )
     {
-        std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<SSAO>();
+        std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<SSAO>(_device);
 
+        auto ptr_ssao_result = &_images.at(SSAOOutputAttachmentsNames::result);
+
+        ptr_ssao->addColorInput(SSAOOutputAttachmentsNames::result, ptr_ssao_result, VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT);
         ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
+
+        const auto src_stage = ptr_gbuffer->dstStage();
 
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::pos_uv, ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::normal_tangent, ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+
+        const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
+        ptr_ssao->descriptorSet(SSAOInputSetsId::eGBuffer, gbuffer_set_handle, gbuffer_set_layout_handle);
 
         return ptr_ssao;
     }
@@ -98,21 +106,26 @@ namespace pbrlib::backend
 
         createResources();
 
-        auto ptr_render_pass = std::make_unique<CompoundRenderPass>();
+        auto ptr_render_pass = std::make_unique<CompoundRenderPass>(_device);
 
         auto ptr_gbuffer_generator = buildGBufferGeneratorSubpass();
 
         auto ptr_pos_uv         = &_images.at(GBufferAttachmentsName::pos_uv);
         auto ptr_normal_tangent = &_images.at(GBufferAttachmentsName::normal_tangent);
 
-        auto ptr_ssao = buildSSAOSubpass(ptr_pos_uv, ptr_normal_tangent, ptr_gbuffer_generator->dstStage());
+        auto ptr_ssao = buildSSAOSubpass(
+            ptr_pos_uv, 
+            ptr_normal_tangent, 
+            ptr_gbuffer_generator.get()
+        );
         
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
 
         _ptr_render_pass = std::move(ptr_render_pass);
 
-        _ptr_render_pass->init(_device, _render_context);
+        const auto [width, height] = _canvas.size();
+        _ptr_render_pass->init(_render_context, width, height);
     }
 
     bool FrameGraph::rebuildPasses()
@@ -176,7 +189,7 @@ namespace pbrlib::backend
             GBufferAttachmentsName::material_index,
             vk::builders::Image(_device)
                 .size(width, height)
-                .format(VK_FORMAT_R16_UINT )
+                .format(VK_FORMAT_R16_UINT)
                 .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name(GBufferAttachmentsName::material_index)

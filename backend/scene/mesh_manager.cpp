@@ -1,5 +1,8 @@
 #include <backend/scene/mesh_manager.hpp>
+
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/pipeline_layout.hpp>
+
 #include <backend/utils/vulkan.hpp>
 
 #include <backend/profiling.hpp>
@@ -121,43 +124,14 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (_descriptor_set_is_changed)
+        if (_descriptor_set_is_changed) [[unlikely]]
         {
-            if (_descriptor_set_handle == VK_NULL_HANDLE)
+            if (_descriptor_set_handle == VK_NULL_HANDLE) [[unlikely]]
             {
-                constexpr std::array bindings 
-                {
-                    VkDescriptorSetLayoutBinding
-                    {
-                        .binding            = Bindings::eVertexBuffers,
-                        .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                        .descriptorCount    = 1,
-                        .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
-                    },
-                    VkDescriptorSetLayoutBinding
-                    {
-                        .binding            = Bindings::eInstances,
-                        .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                        .descriptorCount    = 1,
-                        .stageFlags         = VK_SHADER_STAGE_VERTEX_BIT
-                    }
-                };
-
-                const VkDescriptorSetLayoutCreateInfo desc_set_layout_create_info
-                {
-                    .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-                    .bindingCount   = static_cast<uint32_t>(bindings.size()),
-                    .pBindings      = bindings.data()
-                };
-
-                const auto device_handle = _device.device();
-    
-                VK_CHECK(vkCreateDescriptorSetLayout(
-                    device_handle,
-                    &desc_set_layout_create_info,
-                    nullptr,
-                    &_descriptor_set_layout_handle
-                ));
+                _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
+                    .addBinding(Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                    .addBinding(Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                    .build();
     
                 _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[mesh-manager] descriptor-set-layout");
             }
@@ -190,49 +164,19 @@ namespace pbrlib::backend
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
 
-            const VkDescriptorBufferInfo vbos_refs_info 
-            { 
-                .buffer = _vbos_refs->handle,
-                .offset = 0,
-                .range  = _vbos_refs->size
-            };
+            _device.writeDescriptorSet({
+                .buffer     = _vbos_refs.value(),
+                .set_handle = _descriptor_set_handle,
+                .size       = static_cast<uint32_t>(_vbos_refs->size),
+                .binding    = Bindings::eVertexBuffers
+            });
 
-            const VkDescriptorBufferInfo meshes_draw_info 
-            { 
-                .buffer = _instances_buffer->handle,
-                .offset = 0,
-                .range  = _instances_buffer->size
-            };
-
-            const std::array write_infos 
-            {
-                VkWriteDescriptorSet
-                { 
-                    .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet             = _descriptor_set_handle,
-                    .dstBinding         = 0,
-                    .dstArrayElement    = 0,
-                    .descriptorCount    = 1,
-                    .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                    .pBufferInfo        = &vbos_refs_info
-                },
-                VkWriteDescriptorSet 
-                { 
-                    .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet             = _descriptor_set_handle,
-                    .dstBinding         = 1,
-                    .dstArrayElement    = 0,
-                    .descriptorCount    = 1,
-                    .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                    .pBufferInfo        = &meshes_draw_info
-                }
-            };
-
-            vkUpdateDescriptorSets(
-                _device.device(),
-                static_cast<uint32_t>(write_infos.size()), write_infos.data(),
-                0, nullptr
-            );
+            _device.writeDescriptorSet({
+                .buffer     = _instances_buffer.value(),
+                .set_handle = _descriptor_set_handle,
+                .size       = static_cast<uint32_t>(_instances_buffer->size),
+                .binding    = Bindings::eInstances
+            });
 
             _descriptor_set_is_changed = false;
         }

@@ -23,6 +23,11 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend::vk
 {
+    class Buffer;
+}
+
+namespace pbrlib::backend::vk
+{
     struct Queue final
     {
         VkQueue     handle          = VK_NULL_HANDLE;
@@ -36,6 +41,26 @@ namespace pbrlib::backend::vk
 
         PFN_vkCmdDebugMarkerBeginEXT    vkCmdDebugMarkerBeginEXT    = VK_NULL_HANDLE;
         PFN_vkCmdDebugMarkerEndEXT      vkCmdDebugMarkerEndEXT      = VK_NULL_HANDLE;
+    };
+
+    struct DescriptorImageInfo final
+    {
+        VkImageView     view_handle             = VK_NULL_HANDLE;
+        VkSampler       sampler_handle          = VK_NULL_HANDLE;
+        VkDescriptorSet set_handle              = VK_NULL_HANDLE;
+        VkImageLayout   expected_image_layout   = VK_IMAGE_LAYOUT_UNDEFINED;
+        uint32_t        binding                 = 0;
+        uint32_t        array_element           = 0;
+    };
+
+    struct DescriptorBufferInfo final
+    {
+        const vk::Buffer&   buffer;
+        VkDescriptorSet     set_handle      = VK_NULL_HANDLE;
+        uint32_t            offset          = 0;
+        uint32_t            size            = 0;
+        uint32_t            binding         = 0;
+        uint32_t            array_element   = 0;
     };
 
     class Device final
@@ -90,6 +115,9 @@ namespace pbrlib::backend::vk
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 
         void submit(const CommandBuffer& command_buffer);
+
+        void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
+        void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;
 
 #ifdef PBRLIB_ENABLE_PROPFILING
         [[nodiscard]] auto tracyContext() const noexcept

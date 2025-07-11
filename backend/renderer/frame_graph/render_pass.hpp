@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <map>
+
 #include <optional>
 
 namespace pbrlib
@@ -48,7 +50,7 @@ namespace pbrlib::backend
     class RenderPass
     {
     public:
-        RenderPass() = default;
+        explicit RenderPass(vk::Device& device) noexcept;
 
         RenderPass(RenderPass&& render_pass)        = delete;
         RenderPass(const RenderPass& render_pass)   = delete;
@@ -58,7 +60,7 @@ namespace pbrlib::backend
         RenderPass& operator = (RenderPass&& render_pass)       = delete;
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
-        virtual [[nodiscard]] bool init(vk::Device& device, const RenderContext& context);
+        virtual [[nodiscard]] bool init(const RenderContext& context, uint32_t width, uint32_t height);
         
         virtual [[nodiscard]] bool rebuild() = 0;
 
@@ -67,8 +69,12 @@ namespace pbrlib::backend
         virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
         virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
 
-        // virtual void                            descriptorSet(uint32_t set_id, VkDescriptorSet set_handle);
-        // virtual [[nodiscard]] VkDescriptorSet   descriptorSet(uint32_t set_id) const;
+        void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
+
+        [[nodiscard]] 
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
+
+        virtual [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
 
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 
@@ -111,5 +117,10 @@ namespace pbrlib::backend
 
         const RenderContext*    _ptr_context    = nullptr;
         vk::Device*             _ptr_device     = nullptr;
+
+        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
+
+        uint32_t _width     = 0;
+        uint32_t _height    = 0;
     };
 }

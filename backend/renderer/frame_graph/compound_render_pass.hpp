@@ -16,15 +16,19 @@ namespace pbrlib::backend
     class CompoundRenderPass :
         public RenderPass
     {
-        bool init(vk::Device& device, const RenderContext& context)     override;
-        void render(vk::CommandBuffer& command_buffer)  override;
-        void draw(vk::CommandBuffer& command_buffer)                    override;
-        bool rebuild()                                                  override;
+        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
+        void render(vk::CommandBuffer& command_buffer)                              override;
+        void draw(vk::CommandBuffer& command_buffer)                                override;
+        bool rebuild()                                                              override;
         
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+
     public:
+        explicit CompoundRenderPass(vk::Device& device) noexcept;
+
         template<IsRenderPass T>
         void add(std::unique_ptr<T>&& subpass)
         {

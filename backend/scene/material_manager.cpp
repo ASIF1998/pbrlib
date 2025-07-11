@@ -2,6 +2,7 @@
 #include <backend/components.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/pipeline_layout.hpp>
 
 #include <backend/profiling.hpp>
 
@@ -114,45 +115,28 @@ namespace pbrlib::backend
     {
         if (_descriptor_set_is_changed) [[unlikely]]
         {
-            if (_descriptor_set_handle == VK_NULL_HANDLE)
+            if (_descriptor_set_handle == VK_NULL_HANDLE) [[unlikely]]
             {   
                 constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
             
-                const std::array bindings 
-                { 
-                    VkDescriptorSetLayoutBinding
-                    {
-                        .binding            = Bindings::eImages,
-                        .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                        .descriptorCount    = static_cast<uint32_t>(_images.size()),
-                        .stageFlags         = stages
-                    },
-                    VkDescriptorSetLayoutBinding
-                    {
-                        .binding            = Bindings::eMaterial,
-                        .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                        .descriptorCount    = 1,
-                        .stageFlags         = stages
-                    }
-                };
-
-                const VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info 
-                { 
-                    .sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-                    .bindingCount	= static_cast<uint32_t>(bindings.size()),
-                    .pBindings		= bindings.data()
-                };
-
-                VK_CHECK(
-                    vkCreateDescriptorSetLayout(
-                        _device.device(),
-                        &descriptor_set_layout_create_info,
-                        nullptr,
-                        &_descriptor_set_layout_handle
-                    )
-                );
+                _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
+                    .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(_images.size()), stages)
+                    .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
+                    .build();
 
                 _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
+            }
+
+            for (const auto i: std::views::iota(0u, _images.size()))
+            {
+                _device.writeDescriptorSet({
+                    .view_handle            = _images[i].view_handle,
+                    .sampler_handle         = _sampler_handle,
+                    .set_handle             = _descriptor_set_handle,
+                    .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    .binding                = Bindings::eImages,
+                    .array_element          = i
+                });
             }
 
             _materials_indices_buffer = vk::builders::Buffer(_device)
@@ -163,53 +147,12 @@ namespace pbrlib::backend
                 .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
                 .build();
 
-            VkDescriptorImageInfo image_info 
-            { 
-                .sampler		= _sampler_handle,
-                .imageLayout	= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            };
-
-            std::vector<VkDescriptorImageInfo> images_write_info (_images.size());
-            for (auto i: std::views::iota(0u, _images.size()))
-            {
-                image_info.imageView    = _images[i].view_handle;
-                images_write_info[i]    = image_info;
-            }
-
-            const VkDescriptorBufferInfo materials_indices_buffer_write_info
-            {
-                .buffer	= _materials_indices_buffer->handle,
-                .offset	= 0,
-                .range	= _materials_indices_buffer->size
-            };
-
-            const std::array descriptor_set_write_infos
-            {
-                VkWriteDescriptorSet
-                {
-                    .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet             = _descriptor_set_handle,
-                    .dstBinding         = Bindings::eImages,
-                    .descriptorCount    = static_cast<uint32_t>(images_write_info.size()),
-                    .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                    .pImageInfo         = images_write_info.data()
-                },
-                VkWriteDescriptorSet
-                {
-                    .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet             = _descriptor_set_handle,
-                    .dstBinding         = Bindings::eMaterial,
-                    .descriptorCount    = 1,
-                    .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                    .pBufferInfo        = &materials_indices_buffer_write_info
-                }
-            };
-
-            vkUpdateDescriptorSets(
-                _device.device(), 
-                static_cast<uint32_t>(descriptor_set_write_infos.size()), descriptor_set_write_infos.data(), 
-                0, nullptr
-            );
+            _device.writeDescriptorSet({
+                .buffer     = _materials_indices_buffer.value(),
+                .set_handle = _descriptor_set_handle,
+                .size       = static_cast<uint32_t>(_materials_indices_buffer->size),
+                .binding    = Bindings::eMaterial
+            });
 
             _descriptor_set_is_changed = false;
         }

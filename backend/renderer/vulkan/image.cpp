@@ -116,6 +116,8 @@ namespace pbrlib::backend::vk
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-copy-buffer-to-image");
 
+        changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
         command_buffer.write([&data, &staging_buffer, this] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image] write-data-in-image");

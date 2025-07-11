@@ -6,15 +6,19 @@
 
 namespace pbrlib::backend
 {
-    bool CompoundRenderPass::init(vk::Device& device, const RenderContext& context)
+    CompoundRenderPass::CompoundRenderPass(vk::Device& device) noexcept :
+        RenderPass(device)
+    { }
+
+    bool CompoundRenderPass::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (RenderPass::init(device, context)) [[likely]]
+        if (RenderPass::init(context, width, height)) [[likely]]
         {
             for (auto& subpass: _subpasses)
             {
-                if (!subpass->init(device, context)) [[unlikely]]
+                if (!subpass->init(context, width, height)) [[unlikely]]
                 {
                     log::error("[compound-render-pass] failed initialize");
                     return false;
@@ -63,5 +67,10 @@ namespace pbrlib::backend
             return VK_PIPELINE_STAGE_2_NONE;
         
         return _subpasses.back()->dstStage();
+    }
+
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> CompoundRenderPass::resultDescriptorSet() const noexcept
+    {
+        return std::make_pair(VK_NULL_HANDLE, VK_NULL_HANDLE);
     }
 }

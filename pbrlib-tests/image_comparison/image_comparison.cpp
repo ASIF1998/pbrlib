@@ -21,7 +21,7 @@ namespace pbrlib::testing
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        _pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(_device)
+        /*_pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(_device)
             .addSet()
                 .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
                 .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
@@ -31,7 +31,7 @@ namespace pbrlib::testing
         _descriptor_set_handle = _device.allocateDescriptorSet(
             _pipeline_layout->sets_layout[0], 
             "[vk-image-comparator] descriptor-set"
-        );
+        );*/
 
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
@@ -100,62 +100,28 @@ namespace pbrlib::testing
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
 
-        const VkDescriptorImageInfo image_1_info 
-        { 
-            .sampler        = _sampler_handle,
-            .imageView      = image_1.view_handle,
-            .imageLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
+        _device.writeDescriptorSet({
+            .view_handle            = image_1.view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+        
+        _device.writeDescriptorSet({
+            .view_handle            = image_2.view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 1
+        });
 
-        const VkDescriptorImageInfo image_2_info 
-        { 
-            .sampler        = _sampler_handle,
-            .imageView      = image_2.view_handle,
-            .imageLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        const VkDescriptorBufferInfo count_changed_pixels_buffer_info
-        {
-            .buffer = _count_changed_pixels_buffer->handle,
-            .range  = _count_changed_pixels_buffer->size
-        };
-
-        const std::array desc_write_info
-        {
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 0,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo         = &image_1_info
-            },
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 1,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo         = &image_2_info
-            },
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 2,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                .pBufferInfo        = &count_changed_pixels_buffer_info
-            }
-        };
-
-        vkUpdateDescriptorSets(
-            _device.device(),
-            static_cast<uint32_t>(desc_write_info.size()), desc_write_info.data(),
-            0, nullptr
-        );
+        _device.writeDescriptorSet({
+            .buffer     = _count_changed_pixels_buffer.value(),
+            .set_handle = _descriptor_set_handle,
+            .size       = static_cast<uint32_t>(_count_changed_pixels_buffer->size),
+            .binding    = 2
+        });
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-image-comparator");
 

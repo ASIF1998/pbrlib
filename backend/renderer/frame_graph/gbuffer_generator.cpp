@@ -27,31 +27,99 @@
 
 namespace pbrlib::backend
 {
+    GBufferGenerator::GBufferGenerator(vk::Device& device) :
+        RenderPass(device)
+    {
+        createResultDescriptorSet();
+    }
+
     GBufferGenerator::~GBufferGenerator()
     {
         const auto device_handle = _ptr_device->device();
 
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
 
+        if (vkFreeDescriptorSets(
+            device_handle, 
+            _ptr_device->descriptorPool(), 
+            1, &_result_descriptor_set_handle) != VK_SUCCESS
+        ) [[unlikely]]
+            log::error("[gbuffer-generator] failed free vulkan descriptor set");
+
+        vkDestroyDescriptorSetLayout(device_handle, _result_descriptor_set_layout_handle, nullptr);
+
+        vkDestroySampler(device_handle, _sampler_handle, nullptr);
+ 
         vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
-    bool GBufferGenerator::init(vk::Device& device, const RenderContext& context)
+    void GBufferGenerator::createSampler()
+    {
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_NEAREST,
+            .minFilter      = VK_FILTER_NEAREST,
+            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+        };
+
+        VK_CHECK(vkCreateSampler(
+            _ptr_device->device(),
+            &sampler_create_info,
+            nullptr, 
+            &_sampler_handle
+        ));
+    }
+
+    void GBufferGenerator::initResultDescriptorSet()
+    {
+        createSampler();
+
+        const auto ptr_pos_uv_image         = colorOutputAttach(GBufferAttachmentsName::pos_uv);
+        const auto ptr_normal_tangent_image = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
+        const auto ptr_material_index_image = colorOutputAttach(GBufferAttachmentsName::material_index);
+
+        constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = ptr_pos_uv_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::ePosUv
+        });
+
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = ptr_normal_tangent_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eNormalTangent
+        });
+        
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = ptr_material_index_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eMaterialIndices
+        });
+    }
+
+    bool GBufferGenerator::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!RenderPass::init(device, context))
+        if (!RenderPass::init(context, width, height)) [[unlikely]]
         {
             log::error("[gbuffer-generator] failed initialize");
             return false;
         }
 
         const auto ptr_image = colorOutputAttach(GBufferAttachmentsName::pos_uv);
-
-        /// @todo думаю это тоже стоит перенсти в RenderPass и инициализировать там
-        _width  = ptr_image->width;
-        _height = ptr_image->height;
 
         createRenderPass();
 
@@ -64,13 +132,16 @@ namespace pbrlib::backend
 
         _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
             .pushConstant(push_constant_range)
-            .addSet()
-                .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-                .addBinding(MeshManager::Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+            .addSetLayout(
+                vk::builders::DescriptorSetLayout(*_ptr_device)
+                    .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                    .addBinding(MeshManager::Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                    .build()
+            )
             .build();
 
         createFramebuffer();
-        createDescriptorSet();
+        initResultDescriptorSet();
 
         return rebuild();
     }
@@ -302,23 +373,22 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
     }
 
-    void GBufferGenerator::createDescriptorSet()
+    void GBufferGenerator::createResultDescriptorSet()
     {
-        /// @todo 
-        const auto ptr_pos_uv           = colorOutputAttach(GBufferAttachmentsName::pos_uv);
-        const auto ptr_normal_tangent   = colorOutputAttach(GBufferAttachmentsName::normal_tangent);
-        // const auto ptr_material_index   = colorOutputAttach(GBufferAttachmentsName::material_index);
+        _result_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(*_ptr_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
 
-        const VkDescriptorImageInfo pos_uv_info 
-        {
-            .imageView      = ptr_pos_uv->view_handle,
-            .imageLayout    = ptr_pos_uv->layout
-        };
+        _result_descriptor_set_handle = _ptr_device->allocateDescriptorSet(
+            _result_descriptor_set_layout_handle, 
+            "[gbuffer-generator] descritor set with results"
+        );
+    }
 
-        const VkDescriptorImageInfo normal_tangent_info 
-        {
-            .imageView      = ptr_normal_tangent->view_handle,
-            .imageLayout    = ptr_normal_tangent->layout
-        };
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
+    {
+        return std::make_pair(_result_descriptor_set_handle, _result_descriptor_set_layout_handle);
     }
 }

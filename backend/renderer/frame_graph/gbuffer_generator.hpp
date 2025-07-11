@@ -17,6 +17,16 @@ namespace pbrlib::backend
         constexpr static auto material_index    = "gbuffer-material-index";
     };
 
+    struct GBufferDescriptorSetBindings
+    {
+        enum 
+        {
+            ePosUv,
+            eNormalTangent,
+            eMaterialIndices
+        };
+    };
+
     struct GBufferPushConstantBlock final
     {
         math::mat4  projection_view;
@@ -27,10 +37,10 @@ namespace pbrlib::backend
     class GBufferGenerator final :
         public RenderPass
     {
-        void createDescriptorSet();
+        void createResultDescriptorSet();
 
-        bool init(vk::Device& device, const RenderContext& context)     override;
-        bool rebuild()                                                  override;
+        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
+        bool rebuild()                                                              override;
         
         void beginPass(vk::CommandBuffer& command_buffer);
         void render(vk::CommandBuffer& command_buffer) override;
@@ -39,20 +49,23 @@ namespace pbrlib::backend
         void createRenderPass();
         void createFramebuffer();
 
+        void createSampler();
+        void initResultDescriptorSet();
+
         void setupColorAttachmentsLayout();
 
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+
     public:
+        explicit GBufferGenerator(vk::Device& device);
         ~GBufferGenerator();
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
-        uint32_t _width     = 0;
-        uint32_t _height    = 0;
-
         VkPipeline                          _pipeline_handle    = VK_NULL_HANDLE;
         VkRenderPass                        _render_pass_handle = VK_NULL_HANDLE;
         std::optional<vk::PipelineLayout>   _pipeline_layout;
@@ -61,6 +74,9 @@ namespace pbrlib::backend
 
         GBufferPushConstantBlock _push_constant_block;
 
-        VkDescriptorSet _descriptor_set = VK_NULL_HANDLE;
+        VkDescriptorSet         _result_descriptor_set_handle           = VK_NULL_HANDLE;
+        VkDescriptorSetLayout   _result_descriptor_set_layout_handle    = VK_NULL_HANDLE;
+
+        VkSampler _sampler_handle = VK_NULL_HANDLE;
     };
 }

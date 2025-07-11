@@ -34,18 +34,18 @@ namespace pbrlib::backend::vk
     {
         friend class builders::Buffer;
 
-        explicit Buffer(Device& device);
+        explicit Buffer(Device& device) noexcept;
 
         void writeToVram(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
         void writeToRam(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
 
     public:
-        Buffer(Buffer&& buffer);
+        Buffer(Buffer&& buffer) noexcept;
         Buffer(const Buffer& buffer) = delete;
 
         ~Buffer();
 
-        Buffer& operator = (Buffer&& buffer);
+        Buffer& operator = (Buffer&& buffer) noexcept;
         Buffer& operator = (const Buffer& buffer) = delete;
 
         template<typename T>
@@ -88,6 +88,8 @@ namespace pbrlib::backend::vk
 
         BufferType type;
 
+        VkBufferUsageFlags usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+
     private:
         Device&         _device;
         VmaAllocation   _allocation = VK_NULL_HANDLE;
@@ -126,7 +128,7 @@ namespace pbrlib::backend::vk::builders
         std::vector<uint32_t> _queues;
 
         VkDeviceSize        _size   = 0;
-        VkImageUsageFlags   _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+        VkBufferUsageFlags  _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
 
         BufferType _type = BufferType::eDeviceOnly;
 

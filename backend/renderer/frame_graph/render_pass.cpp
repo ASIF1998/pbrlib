@@ -12,12 +12,18 @@
 
 namespace pbrlib::backend
 {
-    bool RenderPass::init(vk::Device& device, const RenderContext& context)
+    RenderPass::RenderPass(vk::Device& device) noexcept :
+        _ptr_device (&device)
+    { }
+
+    bool RenderPass::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        _ptr_device     = &device;
-        _ptr_context    = &context;
+        _ptr_context = &context;
+
+        _width  = width;
+        _height = height;
 
         return true;
     }
@@ -83,11 +89,16 @@ namespace pbrlib::backend
         }
     }
 
-    // void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle)
-    // { }
+    void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout)
+    { 
+        _input_descriptor_sets.emplace(set_id, std::make_pair(set_handle, set_layout));
+    }
 
-    // VkDescriptorSet RenderPass::descriptorSet(uint32_t set_id) const
-    // {
-    //     return VK_NULL_HANDLE;
-    // }
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> RenderPass::descriptorSet(uint32_t set_id) const
+    {
+        if (auto res = _input_descriptor_sets.find(set_id); res != std::end(_input_descriptor_sets))
+            return  res->second;
+
+        throw exception::RuntimeError("[render-pass] failed find input descriptor set");
+    }
 }

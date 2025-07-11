@@ -11,12 +11,13 @@
 
 namespace pbrlib::backend::vk
 {
-    Buffer::Buffer(Device& device) :
+    Buffer::Buffer(Device& device) noexcept :
         _device (device)
     { }
 
-    Buffer::Buffer(Buffer&& buffer) :
-        _device (buffer._device)
+    Buffer::Buffer(Buffer&& buffer) noexcept :
+        _device (buffer._device),
+        usage   (buffer.usage)
     {
         std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
@@ -30,12 +31,13 @@ namespace pbrlib::backend::vk
             vmaDestroyBuffer(_device.vmaAllocator(), handle, _allocation);
     }
 
-    Buffer& Buffer::operator = (Buffer&& buffer)
+    Buffer& Buffer::operator = (Buffer&& buffer) noexcept
     {
         std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
         std::swap(type, buffer.type);
+        std::swap(usage, buffer.usage);
 
         return *this;
     }
@@ -196,8 +198,9 @@ namespace pbrlib::backend::vk::builders
 
         vk::Buffer buffer (_device);
 
-        buffer.size = _size;
-        buffer.type = _type;
+        buffer.size     = _size;
+        buffer.type     = _type;
+        buffer.usage    = _usage;
 
         const VkBufferCreateInfo buffer_info 
         { 

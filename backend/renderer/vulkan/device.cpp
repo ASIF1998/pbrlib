@@ -9,6 +9,8 @@
 
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 
+#include <backend/renderer/vulkan/buffer.hpp>
+
 #include <SDL3/SDL_vulkan.h>
 
 #include <vma/vk_mem_alloc.h>
@@ -578,6 +580,83 @@ namespace pbrlib::backend::vk
         }
 
         return descriptor_set_handle;
+    }
+
+    void Device::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info) const
+    {
+        if (descriptor_image_info.view_handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[device] descriptor_image_info.view_handle is null");
+        
+        if (descriptor_image_info.set_handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[device] descriptor_image_info.set_handle is null");
+        
+        if (descriptor_image_info.expected_image_layout == VK_IMAGE_LAYOUT_UNDEFINED) [[unlikely]]
+            throw exception::InvalidArgument("[device] descriptor_image_info.expected_image_layout is undefined");
+
+        const auto descriptor_type = descriptor_image_info.sampler_handle == VK_NULL_HANDLE 
+            ?   VK_DESCRIPTOR_TYPE_STORAGE_IMAGE 
+            :   VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+
+        const VkDescriptorImageInfo image_info
+        {
+            .sampler        = descriptor_image_info.sampler_handle,
+            .imageView      = descriptor_image_info.view_handle,
+            .imageLayout    = descriptor_image_info.expected_image_layout 
+        };
+
+        const VkWriteDescriptorSet write_info 
+        {
+            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet             = descriptor_image_info.set_handle,
+            .dstBinding         = descriptor_image_info.binding,
+            .dstArrayElement    = descriptor_image_info.array_element,
+            .descriptorCount    = 1,
+            .descriptorType     = descriptor_type,
+            .pImageInfo         = &image_info
+        };
+
+        vkUpdateDescriptorSets(
+            _device_handle,
+            1, &write_info,
+            0, nullptr
+        );
+    }
+
+    void Device::writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const
+    {
+        if (descriptor_buffer_info.buffer.handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[device] descriptor_buffer_info.buffer.handle is null");
+        
+        if (descriptor_buffer_info.set_handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[device] descriptor_buffer_info.set_handle is null");
+
+        const VkDescriptorBufferInfo buffer_info
+        {
+            .buffer	= descriptor_buffer_info.buffer.handle,
+            .offset	= descriptor_buffer_info.offset,
+            .range	= descriptor_buffer_info.size
+        };
+
+        const auto descriptor_type = descriptor_buffer_info.buffer.usage & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+            ?   VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            :   VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+
+        const VkWriteDescriptorSet write_info
+        {
+            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet             = descriptor_buffer_info.set_handle,
+            .dstBinding         = descriptor_buffer_info.binding,
+            .dstArrayElement    = descriptor_buffer_info.array_element,
+            .descriptorCount    = 1,
+            .descriptorType     = descriptor_type,
+            .pBufferInfo        = &buffer_info
+        };
+
+        vkUpdateDescriptorSets(
+            _device_handle,
+            1, &write_info,
+            0, nullptr
+        );
     }
 }
 

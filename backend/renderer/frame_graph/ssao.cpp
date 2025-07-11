@@ -7,91 +7,57 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/render_pass.hpp>
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
+#include <backend/renderer/vulkan/command_buffer.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+
+#include <backend/utils/vulkan.hpp>
 
 namespace pbrlib::backend
 {
+    SSAO::SSAO(vk::Device& device) :
+        RenderPass(device)
+    { }
+
     SSAO::~SSAO()
     {
         const auto device_handle = _ptr_device->device();
 
+        if (vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_result_image_desc_set) != VK_SUCCESS) [[unlikely]]
+            log::error("[ssao] failed free descriptor set with result image");
+        
+        if (vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
+            log::error("[ssao] failed free descriptor set with data for compute");
+
+
+        vkDestroyDescriptorSetLayout(device_handle, _result_image_desc_set_layout, nullptr);
+        vkDestroyDescriptorSetLayout(device_handle, _ssao_desc_set_layout, nullptr);
+        
+        vkDestroySampler(device_handle, _result_image_sampler, nullptr);
+
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_descriptor_set_handle);
     }
 
-    bool SSAO::init(vk::Device& device, const RenderContext& context)
+    bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!RenderPass::init(device, context))
+        if (!RenderPass::init(context, width, height)) [[unlikely]]
         {
             log::error("[ssao] failed initialize");
             return false;
         }
 
-        const auto* ptr_result_attachment = colorOutputAttach(SSAOOutputAttachmentsNames::result);
+        createResultDescriptorSet();
+        createSSAODescriptorSet();
 
-        /// @todo
-        // _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
-        //     .addSet()
-        //         .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //         .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //     .build();
+        const auto [_, gbuffer_set_layout] = descriptorSet(SSAOInputSetsId::eGBuffer);
 
-        /// @todo
-        // _descriptor_set_handle = _ptr_device->allocateDescriptorSet(
-        //     _pipeline_layout->sets_layout[0], 
-        //     "[ssao] gbuffer-geometry"
-        // );
+        _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
+            .addSetLayout(gbuffer_set_layout)
+            .addSetLayout(_ssao_desc_set_layout)
+            .build();
 
-        // const auto ptr_gbuffer_pos_uv           = colorInputAttach(SSAOInputAttachmentNames::pos_uv);
-        // const auto ptr_gbuffer_normal_tangent   = colorInputAttach(SSAOInputAttachmentNames::normal_tangent);
-
-        // const VkDescriptorImageInfo gbuffer_pos_uv_image_info 
-        // {
-        //     .imageView      = ptr_gbuffer_pos_uv->view_handle,
-        //     .imageLayout    = ptr_gbuffer_pos_uv->layout
-        // };
-
-        // const VkWriteDescriptorSet write_gbuffer_pos_uv_image 
-        // {
-        //     .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        //     .dstSet             = _descriptor_set_handle,
-        //     .dstBinding         = 0,
-        //     .descriptorCount    = 1,
-        //     .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-        //     .pImageInfo         = &gbuffer_pos_uv_image_info
-        // };
-
-        // const VkDescriptorImageInfo gbuffer_normal_tangent_image_info 
-        // {
-        //     .imageView      = ptr_gbuffer_pos_uv->view_handle,
-        //     .imageLayout    = ptr_gbuffer_pos_uv->layout
-        // };
-
-        // const VkWriteDescriptorSet write_gbuffer_normal_tangent_image 
-        // {
-        //     .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        //     .dstSet             = _descriptor_set_handle,
-        //     .dstBinding         = 1,
-        //     .descriptorCount    = 1,
-        //     .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-        //     .pImageInfo         = &gbuffer_normal_tangent_image_info
-        // };
-
-        // vkUpdateDescriptorSets(
-        //     _ptr_device->device(),
-        //     1, &write_gbuffer_pos_uv_image,
-        //     0, nullptr
-        // );
-        
-        // vkUpdateDescriptorSets(
-        //     _ptr_device->device(),
-        //     1, &write_gbuffer_normal_tangent_image,
-        //     0, nullptr
-        // );
-
-        // return rebuild();
-        return true;
+        return rebuild();
     }
 
     bool SSAO::rebuild()
@@ -105,12 +71,24 @@ namespace pbrlib::backend
             .pipelineLayoutHandle(_pipeline_layout->handle)
             .build();
 
+        vkDestroyPipeline(_ptr_device->device(), prev_handle, nullptr);
+
         return true;
     }
 
     void SSAO::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
+        {
+            const auto [gbuffer_descriptor_set, _] = descriptorSet(SSAOInputSetsId::eGBuffer);
+
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 1, 1, &_ssao_desc_set, 0, nullptr);
+            vkCmdDispatch(command_buffer_handle, _width, _height, 1);
+        }, "[ssao] run-pipeline", vk::marker_colors::compute_pipeline);
     }
 
     VkPipelineStageFlags2 SSAO::srcStage() const noexcept
@@ -121,5 +99,69 @@ namespace pbrlib::backend
     VkPipelineStageFlags2 SSAO::dstStage() const noexcept
     {
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+    }
+
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
+    {
+        return std::make_pair(_result_image_desc_set, _result_image_desc_set_layout);
+    }
+
+    void SSAO::createSampler()
+    {
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_NEAREST,
+            .minFilter      = VK_FILTER_NEAREST,
+            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+        };
+
+        VK_CHECK(vkCreateSampler(
+            _ptr_device->device(),
+            &sampler_create_info,
+            nullptr, 
+            &_result_image_sampler
+        ));
+    }
+
+    void SSAO::createResultDescriptorSet()
+    {
+        _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
+
+        _result_image_desc_set = _ptr_device->allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
+
+        createSampler();
+
+        const auto ptr_result_image = colorOutputAttach(SSAOOutputAttachmentsNames::result);
+
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = ptr_result_image->view_handle,
+            .sampler_handle         = _result_image_sampler,
+            .set_handle             = _result_image_desc_set,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+    }
+    
+    void SSAO::createSSAODescriptorSet()
+    {
+        _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
+
+        _ssao_desc_set = _ptr_device->allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
+
+        const auto ptr_result_image = colorOutputAttach(SSAOOutputAttachmentsNames::result);
+
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = ptr_result_image->view_handle,
+            .set_handle             = _ssao_desc_set,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
+            .binding                = 0
+        });
     }
 }
