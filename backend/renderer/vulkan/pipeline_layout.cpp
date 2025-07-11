@@ -9,31 +9,6 @@
 
 #include <stdexcept>
 
-namespace pbrlib::backend::vk
-{
-    PipelineLayout::PipelineLayout(Device& device) : 
-        _device (device)
-    { }
-
-    PipelineLayout::PipelineLayout(PipelineLayout&& layout) :
-        _device (layout._device)
-    {
-        std::swap(handle, layout.handle);
-    }
-
-    PipelineLayout::~PipelineLayout()
-    {
-        const auto device_handle = _device.device();
-        vkDestroyPipelineLayout(device_handle, handle, nullptr);
-    }
-
-    PipelineLayout& PipelineLayout::operator = (PipelineLayout&& layout)
-    {
-        std::swap(handle, layout.handle);
-        return *this;
-    }
-}
-
 namespace pbrlib::backend::vk::builders
 {
     PipelineLayout::PipelineLayout(Device& device) noexcept :
@@ -52,10 +27,8 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    vk::PipelineLayout PipelineLayout::build()
+    VkPipelineLayout PipelineLayout::build()
     {
-        vk::PipelineLayout layout (_device);
-
         VkPipelineLayoutCreateInfo pipeline_layout_create_info
         {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
@@ -73,14 +46,16 @@ namespace pbrlib::backend::vk::builders
             pipeline_layout_create_info.pPushConstantRanges     = &_push_constant.value();
         }
 
+        VkPipelineLayout layout_handle = VK_NULL_HANDLE;
+
         VK_CHECK(vkCreatePipelineLayout(
             _device.device(),
             &pipeline_layout_create_info,
             nullptr,
-            &layout.handle
+            &layout_handle
         ));
 
-        return layout;
+        return layout_handle;
     }
 }
 

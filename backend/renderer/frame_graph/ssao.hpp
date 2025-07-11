@@ -50,9 +50,8 @@ namespace pbrlib::backend
         ~SSAO();
 
     private:
-        std::optional<vk::PipelineLayout>   _pipeline_layout;
-
-        VkPipeline _pipeline_handle = VK_NULL_HANDLE;
+        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
+        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkDescriptorSet         _result_image_desc_set          = VK_NULL_HANDLE;
         VkDescriptorSetLayout   _result_image_desc_set_layout   = VK_NULL_HANDLE;

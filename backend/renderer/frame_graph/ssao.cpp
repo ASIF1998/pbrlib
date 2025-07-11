@@ -34,6 +34,7 @@ namespace pbrlib::backend
         
         vkDestroySampler(device_handle, _result_image_sampler, nullptr);
 
+        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
@@ -52,7 +53,7 @@ namespace pbrlib::backend
 
         const auto [_, gbuffer_set_layout] = descriptorSet(SSAOInputSetsId::eGBuffer);
 
-        _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
+        _pipeline_layout_handle = vk::builders::PipelineLayout(*_ptr_device)
             .addSetLayout(gbuffer_set_layout)
             .addSetLayout(_ssao_desc_set_layout)
             .build();
@@ -68,7 +69,7 @@ namespace pbrlib::backend
 
         _pipeline_handle = vk::builders::ComputePipeline(*_ptr_device)
             .shader(ssao_shader)
-            .pipelineLayoutHandle(_pipeline_layout->handle)
+            .pipelineLayoutHandle(_pipeline_layout_handle)
             .build();
 
         vkDestroyPipeline(_ptr_device->device(), prev_handle, nullptr);
@@ -85,8 +86,8 @@ namespace pbrlib::backend
             const auto [gbuffer_descriptor_set, _] = descriptorSet(SSAOInputSetsId::eGBuffer);
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 1, 1, &_ssao_desc_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 1, 1, &_ssao_desc_set, 0, nullptr);
             vkCmdDispatch(command_buffer_handle, _width, _height, 1);
         }, "[ssao] run-pipeline", vk::marker_colors::compute_pipeline);
     }

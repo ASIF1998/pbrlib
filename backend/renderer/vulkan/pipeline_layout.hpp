@@ -12,35 +12,6 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk::builders
 {
-    class PipelineLayout;
-}
-
-namespace pbrlib::backend::vk
-{
-    class PipelineLayout final
-    {
-        explicit PipelineLayout(Device& device);
-
-        friend class builders::PipelineLayout;
-
-    public:
-        PipelineLayout(PipelineLayout&& layout);
-        PipelineLayout(const PipelineLayout& layout) = delete;
-
-        ~PipelineLayout();
-
-        PipelineLayout& operator = (PipelineLayout&& layout);
-        PipelineLayout& operator = (const PipelineLayout& layout) = delete;
-
-        VkPipelineLayout handle = VK_NULL_HANDLE;
-
-    private:
-        Device& _device;
-    };
-}
-
-namespace pbrlib::backend::vk::builders
-{
     class PipelineLayout final
     {
     public:
@@ -55,7 +26,7 @@ namespace pbrlib::backend::vk::builders
         PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
         PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        [[nodiscard]] vk::PipelineLayout build();
+        [[nodiscard]] VkPipelineLayout build();
         
     private:
         Device& _device;

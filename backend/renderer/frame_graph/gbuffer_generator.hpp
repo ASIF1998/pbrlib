@@ -66,9 +66,9 @@ namespace pbrlib::backend
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
-        VkPipeline                          _pipeline_handle    = VK_NULL_HANDLE;
-        VkRenderPass                        _render_pass_handle = VK_NULL_HANDLE;
-        std::optional<vk::PipelineLayout>   _pipeline_layout;
+        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
+        VkRenderPass                        _render_pass_handle     = VK_NULL_HANDLE;
+        VkPipelineLayout                    _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
 

@@ -51,6 +51,7 @@ namespace pbrlib::backend
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
  
         vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
+        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
@@ -130,7 +131,7 @@ namespace pbrlib::backend
             .size       = sizeof(GBufferPushConstantBlock)
         };
 
-        _pipeline_layout = vk::builders::PipelineLayout(*_ptr_device)
+        _pipeline_layout_handle = vk::builders::PipelineLayout(*_ptr_device)
             .pushConstant(push_constant_range)
             .addSetLayout(
                 vk::builders::DescriptorSetLayout(*_ptr_device)
@@ -162,7 +163,7 @@ namespace pbrlib::backend
             .addAttachmentsState(false)
             .addAttachmentsState(false)
             .depthStencilTest(true)
-            .pipelineLayoutHandle(_pipeline_layout->handle)
+            .pipelineLayoutHandle(_pipeline_layout_handle)
             .renderPassHandle(_render_pass_handle)
             .subpass(0)
             .build();
@@ -305,7 +306,7 @@ namespace pbrlib::backend
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout->handle, 0, 1, &descriptor_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &descriptor_set, 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);
         }, "[gbuffer-generator] begin-pass", vk::marker_colors::graphics_pipeline);
@@ -332,7 +333,7 @@ namespace pbrlib::backend
     
                 vkCmdPushConstants(
                     command_buffer_handle, 
-                    _pipeline_layout->handle, 
+                    _pipeline_layout_handle, 
                     VK_SHADER_STAGE_VERTEX_BIT, 
                     0, sizeof(GBufferPushConstantBlock), &_push_constant_block
                 );
