@@ -70,8 +70,8 @@ int main()
     {
         pbrlib::Config config;
         config.title    = "test-console";
-        config.width    = 1500;
-        config.height   = 1000;
+        config.width    = 800;
+        config.height   = 600;
         
         pbrlib::Engine engine (config);
 
@@ -81,7 +81,7 @@ int main()
             camera.up(pbrlib::math::vec3(0, -1, 0));
             camera.pos(pbrlib::math::vec3(-5, 5, 16.0));
             camera.fovY(60.0f);
-            camera.range(0.01f, 1000.0f);
+            camera.range(0.01f, 100.0f);
             camera.width(config.width);
             camera.height(config.height);
 

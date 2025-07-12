@@ -55,7 +55,7 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(GBufferAttachmentsName::normal_tangent);
+        auto ptr_result = &_images.at(SSAOOutputAttachmentsNames::result);
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
@@ -66,19 +66,27 @@ namespace pbrlib::backend
 {
     std::unique_ptr<RenderPass> FrameGraph::buildGBufferGeneratorSubpass()
     {
-        auto ptr_gbuffer_generator = std::make_unique<GBufferGenerator>(_device);
+        std::unique_ptr<RenderPass> ptr_gbuffer_generator = std::make_unique<GBufferGenerator>(_device);
 
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::pos_uv, &_images.at(GBufferAttachmentsName::pos_uv));
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::normal_tangent, &_images.at(GBufferAttachmentsName::normal_tangent));
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::material_index, &_images.at(GBufferAttachmentsName::material_index));
         ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
 
+        ptr_gbuffer_generator->addColorInput(
+            SSAOInputAttachmentNames::depth_buffer,
+            &_depth_buffer.value(), 
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 
+            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , ptr_gbuffer_generator->srcStage()
+        );
+
         return ptr_gbuffer_generator;
     }
 
     std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
         vk::Image*              ptr_pos_uv, 
-        vk::Image*              ptr_normal_tangent, 
+        vk::Image*              ptr_normal_tangent,
+        vk::Image*              ptr_depth_buffer,
         const RenderPass*       ptr_gbuffer
     )
     {
@@ -86,13 +94,26 @@ namespace pbrlib::backend
 
         auto ptr_ssao_result = &_images.at(SSAOOutputAttachmentsNames::result);
 
-        ptr_ssao->addColorInput(SSAOOutputAttachmentsNames::result, ptr_ssao_result, VK_IMAGE_LAYOUT_GENERAL, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT);
-        ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
+        ptr_ssao->addColorInput(
+            SSAOOutputAttachmentsNames::result, 
+            ptr_ssao_result, 
+            VK_IMAGE_LAYOUT_GENERAL, 
+            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
+        );
 
         const auto src_stage = ptr_gbuffer->dstStage();
+            
+        ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
 
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::pos_uv, ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::normal_tangent, ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+
+        ptr_ssao->addColorInput(
+            SSAOInputAttachmentNames::depth_buffer,
+            ptr_depth_buffer, 
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 
+            src_stage, ptr_ssao->srcStage()
+        );
 
         const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
         ptr_ssao->descriptorSet(SSAOInputSetsId::eGBuffer, gbuffer_set_handle, gbuffer_set_layout_handle);
@@ -116,6 +137,7 @@ namespace pbrlib::backend
         auto ptr_ssao = buildSSAOSubpass(
             ptr_pos_uv, 
             ptr_normal_tangent, 
+            &_depth_buffer.value(),
             ptr_gbuffer_generator.get()
         );
         

@@ -28,7 +28,6 @@ namespace pbrlib::backend
         if (vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
             log::error("[ssao] failed free descriptor set with data for compute");
 
-
         vkDestroyDescriptorSetLayout(device_handle, _result_image_desc_set_layout, nullptr);
         vkDestroyDescriptorSetLayout(device_handle, _ssao_desc_set_layout, nullptr);
         

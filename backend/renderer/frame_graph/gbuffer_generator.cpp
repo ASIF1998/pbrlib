@@ -108,6 +108,14 @@ namespace pbrlib::backend
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eMaterialIndices
         });
+        
+        _ptr_device->writeDescriptorSet({
+            .view_handle            = _ptr_depth_stencil_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            .binding                = GBufferDescriptorSetBindings::eDepthBuffer
+        });
     }
 
     bool GBufferGenerator::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -377,9 +385,10 @@ namespace pbrlib::backend
     void GBufferGenerator::createResultDescriptorSet()
     {
         _result_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(*_ptr_device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
         _result_descriptor_set_handle = _ptr_device->allocateDescriptorSet(

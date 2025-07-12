@@ -23,7 +23,8 @@ namespace pbrlib::backend
         {
             ePosUv,
             eNormalTangent,
-            eMaterialIndices
+            eMaterialIndices,
+            eDepthBuffer
         };
     };
 
