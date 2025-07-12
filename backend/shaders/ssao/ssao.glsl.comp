@@ -12,6 +12,11 @@ layout(set = 0, binding = 3) uniform sampler2D gbuffer_depth;
 
 layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
 
+layout(set = 1, binding = 1) uniform Params
+{
+    float radius;
+};
+
 void main()
 {
     ivec2 pixel_coord = ivec2(gl_WorkGroupID.xy);

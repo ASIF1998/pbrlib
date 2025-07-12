@@ -47,6 +47,16 @@ namespace pbrlib::backend
             return false;
         }
 
+        _params_buffer = vk::builders::Buffer(*_ptr_device)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .name("[ssao] params")
+            .size(sizeof(Params))
+            .type(vk::BufferType::eDeviceOnly)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+            .build();
+
+        _params_buffer->write(Params(), 0);
+
         createResultDescriptorSet();
         createSSAODescriptorSet();
 
@@ -151,6 +161,7 @@ namespace pbrlib::backend
     {
         _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
             .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
         _ssao_desc_set = _ptr_device->allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
@@ -162,6 +173,13 @@ namespace pbrlib::backend
             .set_handle             = _ssao_desc_set,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
+        });
+
+        _ptr_device->writeDescriptorSet({
+            .buffer     = _params_buffer.value(),
+            .set_handle = _ssao_desc_set,
+            .size       = static_cast<uint32_t>(_params_buffer->size),
+            .binding    = 1
         });
     }
 }

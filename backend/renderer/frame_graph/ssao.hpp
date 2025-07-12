@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/buffer.hpp>
 
 #include <backend/renderer/frame_graph/render_pass.hpp> 
 
@@ -47,6 +48,11 @@ namespace pbrlib::backend
         void createSSAODescriptorSet();
 
     public:
+        struct alignas(16) Params
+        {
+            float radius = 0.5;
+        };
+
         explicit SSAO(vk::Device& device);
         ~SSAO();
 
@@ -61,6 +67,8 @@ namespace pbrlib::backend
 
         VkDescriptorSet         _ssao_desc_set          = VK_NULL_HANDLE;
         VkDescriptorSetLayout   _ssao_desc_set_layout   = VK_NULL_HANDLE;
+
+        std::optional<vk::Buffer> _params_buffer;
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };
