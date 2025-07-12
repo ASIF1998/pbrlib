@@ -5,6 +5,8 @@
 
 #include <backend/renderer/frame_graph/render_pass.hpp> 
 
+#include <pbrlib/math/vec2.hpp>
+
 #include <optional>
 
 namespace pbrlib::backend
@@ -34,8 +36,9 @@ namespace pbrlib::backend
     {
         struct alignas(16) Params
         {
-            float       radius          = 0.5;
-            uint32_t    sample_count    = 0;
+            float               radius          = 0.5;
+            uint32_t            sample_count    = 0;
+            pbrlib::math::vec2  noise_scale;
         };
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;

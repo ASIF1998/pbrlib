@@ -2,6 +2,7 @@
 
 #extension GL_GOOGLE_include_directive : enable
 
+#include <noise.glsl>
 #include <gbuffer_generator/packing.glsl>
 
 layout (local_size_x = 1, local_size_y = 1) in;
@@ -17,6 +18,7 @@ layout(set = 1, binding = 1) uniform Params
 {
     float   radius;
     uint    sample_count;
+    vec2    noise_scale;
 };
 
 layout(set = 1, binding = 2) uniform Samples
@@ -38,9 +40,12 @@ void main()
     unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
     unpackNormalTangent(texture(gbuffer_normal_tangent, screen_uv), normal, tangent);
 
+    float noise_value = noise(screen_uv * noise_scale);
+
     float depth = texture(gbuffer_depth, screen_uv).r;
 
-    vec3 color = vec3(depth);
+    // vec3 color = vec3(depth);
+    vec3 color = vec3(noise_value);
 
     imageStore(result, pixel_coord, vec4(color, 1.0));
 }

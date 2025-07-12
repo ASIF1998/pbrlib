@@ -54,6 +54,12 @@ namespace pbrlib::backend
             return false;
         }
 
+        constexpr auto noise_width  = 4.0f;
+        constexpr auto noise_height = 4.0f;
+
+        _params.noise_scale.x = static_cast<float>(width) / noise_width;
+        _params.noise_scale.y = static_cast<float>(height) / noise_height;
+
         createSamplesBuffer();
         createParamsBuffer();
 
