@@ -12,6 +12,13 @@
 
 #include <backend/utils/vulkan.hpp>
 
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec4.hpp>
+
+#include <random>
+
+#include <array>
+
 namespace pbrlib::backend
 {
     SSAO::SSAO(vk::Device& device) :
@@ -47,15 +54,8 @@ namespace pbrlib::backend
             return false;
         }
 
-        _params_buffer = vk::builders::Buffer(*_ptr_device)
-            .addQueueFamilyIndex(_ptr_device->queue().family_index)
-            .name("[ssao] params")
-            .size(sizeof(Params))
-            .type(vk::BufferType::eDeviceOnly)
-            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-            .build();
-
-        _params_buffer->write(Params(), 0);
+        createSamplesBuffer();
+        createParamsBuffer();
 
         createResultDescriptorSet();
         createSSAODescriptorSet();
@@ -162,6 +162,7 @@ namespace pbrlib::backend
         _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
             .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
         _ssao_desc_set = _ptr_device->allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
@@ -181,5 +182,58 @@ namespace pbrlib::backend
             .size       = static_cast<uint32_t>(_params_buffer->size),
             .binding    = 1
         });
+
+        _ptr_device->writeDescriptorSet({
+            .buffer     = _samples_buffer.value(),
+            .set_handle = _ssao_desc_set,
+            .size       = static_cast<uint32_t>(_samples_buffer->size),
+            .binding    = 2
+        });
+    }
+
+    void SSAO::createParamsBuffer()
+    {
+        _params_buffer = vk::builders::Buffer(*_ptr_device)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .name("[ssao] params")
+            .size(sizeof(Params))
+            .type(vk::BufferType::eDeviceOnly)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+            .build();
+
+        _params_buffer->write(_params, 0);
+    }
+
+    void SSAO::createSamplesBuffer()
+    {
+        std::uniform_real_distribution<float>   random_floats (0.0f, 1.0f);
+        std::default_random_engine              generator;
+
+        const auto generate_vector = [&generator, &random_floats] ()
+        {
+            const auto x = random_floats(generator) * 2.0f - 1.0f;
+            const auto y = random_floats(generator) * 2.0f - 1.0f;
+            const auto z = random_floats(generator);
+
+            return pbrlib::math::normalize(pbrlib::math::vec3(x, y, z)) * random_floats(generator);
+        };
+
+        constexpr auto samples_count = 64;
+        std::array<pbrlib::math::vec4, samples_count> samples;
+
+        for (auto& sample: samples)
+            sample = generate_vector();
+
+        _samples_buffer = vk::builders::Buffer(*_ptr_device)
+            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+            .name("[ssao] samples")
+            .size(samples.size() * sizeof(pbrlib::math::vec4))
+            .type(vk::BufferType::eDeviceOnly)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+            .build();
+
+        _samples_buffer->write(std::span<const pbrlib::math::vec4>(samples), 0);
+
+        _params.sample_count = static_cast<uint32_t>(samples.size());
     }
 }

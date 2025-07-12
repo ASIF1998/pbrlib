@@ -32,6 +32,12 @@ namespace pbrlib::backend
     class SSAO final :
         public RenderPass
     {
+        struct alignas(16) Params
+        {
+            float       radius          = 0.5;
+            uint32_t    sample_count    = 0;
+        };
+
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
         bool rebuild()                                                              override;
 
@@ -47,12 +53,10 @@ namespace pbrlib::backend
 
         void createSSAODescriptorSet();
 
-    public:
-        struct alignas(16) Params
-        {
-            float radius = 0.5;
-        };
+        void createParamsBuffer();
+        void createSamplesBuffer();
 
+    public:
         explicit SSAO(vk::Device& device);
         ~SSAO();
 
@@ -68,7 +72,10 @@ namespace pbrlib::backend
         VkDescriptorSet         _ssao_desc_set          = VK_NULL_HANDLE;
         VkDescriptorSetLayout   _ssao_desc_set_layout   = VK_NULL_HANDLE;
 
-        std::optional<vk::Buffer> _params_buffer;
+        Params                      _params;
+        std::optional<vk::Buffer>   _params_buffer;
+        
+        std::optional<vk::Buffer> _samples_buffer;
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };

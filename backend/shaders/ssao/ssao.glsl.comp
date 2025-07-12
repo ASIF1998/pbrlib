@@ -12,9 +12,16 @@ layout(set = 0, binding = 3) uniform sampler2D gbuffer_depth;
 
 layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
 
+/// @todo maybe push_constant ?
 layout(set = 1, binding = 1) uniform Params
 {
-    float radius;
+    float   radius;
+    uint    sample_count;
+};
+
+layout(set = 1, binding = 2) uniform Samples
+{
+    vec4 samples[];
 };
 
 void main()
