@@ -152,10 +152,10 @@ namespace pbrlib::backend
         createFramebuffer();
         initResultDescriptorSet();
 
-        return rebuild();
+        return rebuild(width, height);
     }
 
-    bool GBufferGenerator::rebuild()
+    bool GBufferGenerator::rebuild([[maybe_unused]] uint32_t width, [[maybe_unused]] uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

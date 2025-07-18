@@ -41,7 +41,7 @@ namespace pbrlib::backend
         void createResultDescriptorSet();
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
-        bool rebuild()                                                              override;
+        bool rebuild(uint32_t width, uint32_t height)                               override;
         
         void beginPass(vk::CommandBuffer& command_buffer);
         void render(vk::CommandBuffer& command_buffer) override;

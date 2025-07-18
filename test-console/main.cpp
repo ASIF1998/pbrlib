@@ -70,8 +70,8 @@ int main()
     {
         pbrlib::Config config;
         config.title    = "test-console";
-        config.width    = 800;
-        config.height   = 600;
+        config.width    = 2000;
+        config.height   = 1100;
         
         pbrlib::Engine engine (config);
 

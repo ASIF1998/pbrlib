@@ -17,9 +17,9 @@ namespace pbrlib::backend
         public RenderPass
     {
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
+        bool rebuild(uint32_t width, uint32_t height)                               override;
         void render(vk::CommandBuffer& command_buffer)                              override;
         void draw(vk::CommandBuffer& command_buffer)                                override;
-        bool rebuild()                                                              override;
         
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;

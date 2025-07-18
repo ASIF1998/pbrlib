@@ -1,8 +1,9 @@
 #version 460
 
 #extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_nonuniform_qualifier : enable
 
-#include <noise.glsl>
+#include <generation.glsl>
 #include <gbuffer_generator/packing.glsl>
 
 layout (local_size_x = 1, local_size_y = 1) in;
@@ -13,7 +14,6 @@ layout(set = 0, binding = 3) uniform sampler2D gbuffer_depth;
 
 layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
 
-/// @todo maybe push_constant ?
 layout(set = 1, binding = 1) uniform Params
 {
     float   radius;
@@ -23,8 +23,53 @@ layout(set = 1, binding = 1) uniform Params
 
 layout(set = 1, binding = 2) uniform Samples
 {
-    vec4 samples[];
+    vec4 samples[64];
 };
+
+layout(push_constant) uniform PerFrameData
+{
+    mat4 projection_view;
+};
+
+vec2 getUV(vec3 pos)
+{
+    vec4 ndc = projection_view * vec4(pos, 1);
+    ndc.xyz /= ndc.w;
+    return ndc.xy * 0.5 + 0.5;
+}
+
+vec3 getGBufferPosition(vec2 screen_uv)
+{
+    vec3 pos    = vec3(0);
+    vec2 uv     = vec2(0);
+
+    unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
+
+    return pos;
+}
+
+float calcOcclution(vec3 pos, mat3 tbn, float depth)
+{
+    float occlusion = 0.0;
+
+    const float bias = 0.025;
+
+    for (uint i = 0; i < sample_count; ++i)
+    {
+        vec3 sample_pos = tbn * samples[i].xyz;
+        sample_pos = pos + sample_pos * radius;
+
+        vec2 sample_uv = getUV(pos);
+
+        float sample_depth = getGBufferPosition(sample_uv).z;
+
+        float range_check = smoothstep(0.0, 1.0, radius / abs(pos.z - sample_depth));
+
+        occlusion += (sample_depth >= sample_pos.z + bias ? 1.0 : 0.0) * range_check;  
+    }
+
+    return 1.0 - (occlusion / float(sample_count));
+}
 
 void main()
 {
@@ -40,12 +85,17 @@ void main()
     unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
     unpackNormalTangent(texture(gbuffer_normal_tangent, screen_uv), normal, tangent);
 
-    float noise_value = noise(screen_uv * noise_scale);
+    vec3 random_direction = randomVec(pos);
+
+    tangent = normalize(random_direction - normal * dot(random_direction, normal));
+
+    mat3 tbn = mat3(
+        tangent,
+        cross(normal, tangent),
+        normal
+    );
 
     float depth = texture(gbuffer_depth, screen_uv).r;
 
-    // vec3 color = vec3(depth);
-    vec3 color = vec3(noise_value);
-
-    imageStore(result, pixel_coord, vec4(color, 1.0));
+    imageStore(result, pixel_coord, vec4(vec3(calcOcclution(pos, tbn, depth)), 1.0));
 }

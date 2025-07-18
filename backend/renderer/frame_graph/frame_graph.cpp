@@ -94,7 +94,7 @@ namespace pbrlib::backend
 
         auto ptr_ssao_result = &_images.at(SSAOOutputAttachmentsNames::result);
 
-        ptr_ssao->addColorInput(
+        ptr_ssao->addColorInput (
             SSAOOutputAttachmentsNames::result, 
             ptr_ssao_result, 
             VK_IMAGE_LAYOUT_GENERAL, 
@@ -108,7 +108,7 @@ namespace pbrlib::backend
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::pos_uv, ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
         ptr_ssao->addColorInput(SSAOInputAttachmentNames::normal_tangent, ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
 
-        ptr_ssao->addColorInput(
+        ptr_ssao->addColorInput (
             SSAOInputAttachmentNames::depth_buffer,
             ptr_depth_buffer, 
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 
@@ -155,7 +155,10 @@ namespace pbrlib::backend
         try
         {
             backend::log::info("[frame-graph] rebuild passes");
-            return _ptr_render_pass ? _ptr_render_pass->rebuild() : false;
+            
+            const auto [width, height] = _canvas.size();
+
+            return _ptr_render_pass ? _ptr_render_pass->rebuild(width, height) : false;
         } 
         catch (std::exception& ex)
         {
@@ -222,7 +225,8 @@ namespace pbrlib::backend
             SSAOOutputAttachmentsNames::result,
             vk::builders::Image(_device)
                 .size(width, height)
-                .format(VK_FORMAT_R16_SFLOAT)
+                // .format(VK_FORMAT_R16_SFLOAT)
+                .format(VK_FORMAT_R32G32B32A32_SFLOAT)
                 .usage(shared_usage_flags)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name(SSAOOutputAttachmentsNames::result)

@@ -6,6 +6,7 @@
 #include <backend/renderer/frame_graph/render_pass.hpp> 
 
 #include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/matrix4x4.hpp>
 
 #include <optional>
 
@@ -42,7 +43,7 @@ namespace pbrlib::backend
         };
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
-        bool rebuild()                                                              override;
+        bool rebuild(uint32_t width, uint32_t height)                               override;
 
         void render(vk::CommandBuffer& command_buffer) override;
 
