@@ -37,8 +37,8 @@ namespace pbrlib::testing
     private:
         backend::vk::Device& _device;
 
-        VkPipeline                                  _pipeline_handle = VK_NULL_HANDLE;
-        std::optional<backend::vk::PipelineLayout>  _pipeline_layout;
+        VkPipeline          _pipeline_handle = VK_NULL_HANDLE;
+        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkDescriptorSet _descriptor_set_handle = VK_NULL_HANDLE;
 

@@ -156,16 +156,16 @@ TEST(Mat3Tests, AccessToElement)
         9, 7, 3
     };
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
+    for (size_t i{0}; i < 3; i++) 
+    {
+        for (size_t j{0}; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
+    for (size_t i{0}; i < 3; i++) 
+    {
+        for (size_t j{0}; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m.at(i, j));
-        }
     }
 }
 

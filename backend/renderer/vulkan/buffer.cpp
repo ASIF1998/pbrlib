@@ -188,7 +188,7 @@ namespace pbrlib::backend::vk::builders
 
     VkSharingMode Buffer::sharingMode() const
     {
-        std::unordered_set<uint32_t> family_indices (std::begin(_queues), std::end(_queues));
+        std::unordered_set<uint32_t> family_indices (std::cbegin(_queues), std::cend(_queues));
         return family_indices.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT; 
     }
 

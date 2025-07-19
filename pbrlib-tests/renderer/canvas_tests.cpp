@@ -19,13 +19,13 @@ protected:
         const pbrlib::Config config
         {
             .title          = "canvas-tests",
-            .width          = 100, 
-            .height         = 200,
+            .width          = 128, 
+            .height         = 256,
             .draw_in_window = false
         };
 
         _device.init();
-        _canvas.emplace(_device, nullptr, config);
+        _canvas.emplace(_device, config.width, config.height);
     }
 
     pbrlib::backend::vk::Device _device;

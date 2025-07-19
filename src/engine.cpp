@@ -45,21 +45,30 @@ namespace pbrlib
         backend::log::priv::EngineLogger::init();
         backend::log::priv::AppLogger::init();
 
+        _ptr_device = std::make_unique<backend::vk::Device>();
+        _ptr_device->init();
+
+        const auto align_up = [this] (auto size)
+        {
+            const auto align = _ptr_device->workGroupSize();
+            return ((size + align - 1) / align) * align;
+        };
+
+        uint32_t width  = align_up(config.width);
+        uint32_t height = align_up(config.height);
+
         if (config.draw_in_window) [[likely]]
         {
             _window = Window::Builder()
                 .title(config.title)
-                .size(config.width, config.height)
+                .size(width, height)
                 .resizable(false)
                 .build();
+
+            _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, &_window.value());
         }
-
-        _ptr_device = std::make_unique<backend::vk::Device>();
-        _ptr_device->init();
-
-        const auto ptr_window = _window ? &_window.value() : nullptr;
-
-        _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, ptr_window, config);
+        else 
+            _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, width, height);
 
         _ptr_material_manager   = std::make_unique<backend::MaterialManager>(*_ptr_device);
         _ptr_mesh_manager       = std::make_unique<backend::MeshManager>(*_ptr_device);

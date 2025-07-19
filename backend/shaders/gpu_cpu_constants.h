@@ -1,0 +1,6 @@
+#ifndef GPU_CPU_CONSTANTS
+#define GPU_CPU_CONSTANTS
+
+#define PBRLIB_WORK_GROUP_SIZE 32
+
+#endif

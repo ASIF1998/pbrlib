@@ -45,7 +45,7 @@ namespace pbrlib::testing
                 .module = backend::vk::shader::compile(_device, shader_name),
                 .pName  = "main"
             },
-            .layout = _pipeline_layout->handle
+            .layout = _pipeline_layout_handle
         };
 
         const auto device_handle = _device.device();
@@ -130,7 +130,7 @@ namespace pbrlib::testing
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 0, 1, &_descriptor_set_handle, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle, 0, nullptr);
             vkCmdDispatch(command_buffer_handle, image_1.width, image_1.height, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 

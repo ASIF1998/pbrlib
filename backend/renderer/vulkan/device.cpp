@@ -11,6 +11,8 @@
 
 #include <backend/renderer/vulkan/buffer.hpp>
 
+#include <backend/shaders/gpu_cpu_constants.h>
+
 #include <SDL3/SDL_vulkan.h>
 
 #include <vma/vk_mem_alloc.h>
@@ -224,6 +226,17 @@ namespace pbrlib::backend::vk
     VkPhysicalDevice Device::physicalDevice() const noexcept
     {
         return _physical_device_handle;
+    }
+
+    const VkPhysicalDeviceLimits& Device::limits() const noexcept
+    {
+        return _gpu_properties.properties.limits;
+    }
+
+    [[nodiscard]]
+    const uint8_t Device::workGroupSize() const noexcept
+    {
+        return PBRLIB_WORK_GROUP_SIZE;
     }
 }
 

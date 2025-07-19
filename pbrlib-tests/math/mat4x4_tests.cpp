@@ -317,16 +317,16 @@ TEST(Mat4Tests, AccessToElement)
         7, 6, 4, 2
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
-        }
     }
 }
 
@@ -346,16 +346,16 @@ TEST(Mat4Tests, AccessToElementTypeFloat)
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
-        }
     }
 }
 

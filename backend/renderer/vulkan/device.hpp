@@ -119,6 +119,12 @@ namespace pbrlib::backend::vk
         void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
         void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;
 
+        [[nodiscard]]
+        const VkPhysicalDeviceLimits& limits() const noexcept;
+
+        [[nodiscard]]
+        const uint8_t workGroupSize() const noexcept;
+
 #ifdef PBRLIB_ENABLE_PROPFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {
@@ -130,6 +136,8 @@ namespace pbrlib::backend::vk
         VkInstance          _instance_handle        = VK_NULL_HANDLE;
         VkPhysicalDevice    _physical_device_handle = VK_NULL_HANDLE;
         VkDevice            _device_handle          = VK_NULL_HANDLE;
+
+        VkPhysicalDeviceLimits _device_limits;
 
         VkPhysicalDeviceProperties2 _gpu_properties = { };
 

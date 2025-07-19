@@ -23,11 +23,8 @@ namespace pbrlib::backend
         void nextImage();
 
     public:
-        explicit Canvas (
-            vk::Device&             device, 
-            const pbrlib::Window*   ptr_window,
-            const pbrlib::Config&   config
-        );
+        explicit Canvas(vk::Device& device, const pbrlib::Window* ptr_window);
+        explicit Canvas(vk::Device& device, uint32_t width, uint32_t height);
 
         Canvas(Canvas&& canvas)         = default;
         Canvas(const Canvas& canvas)    = delete;

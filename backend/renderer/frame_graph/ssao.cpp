@@ -121,7 +121,10 @@ namespace pbrlib::backend
                 0, sizeof(pbrlib::math::mat4), &projection_view
             );
 
-            vkCmdDispatch(command_buffer_handle, _width, _height, 1);
+            const auto local_size_x = _width / _ptr_device->workGroupSize();
+            const auto local_size_y = _height / _ptr_device->workGroupSize();
+
+            vkCmdDispatch(command_buffer_handle, local_size_x, local_size_y, 1);
         }, "[ssao] run-pipeline", vk::marker_colors::compute_pipeline);
     }
 
