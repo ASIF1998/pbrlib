@@ -1,6 +1,6 @@
 #include "../utils.hpp"
 
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/camera.hpp>
 
 TEST(CameraTests, Ctor)
 {

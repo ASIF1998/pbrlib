@@ -4,7 +4,7 @@
 #include <pbrlib/scene/scene.hpp>
 
 #include <pbrlib/transform.hpp>
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/camera.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
 #include <pbrlib/logger/logger.hpp>

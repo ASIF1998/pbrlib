@@ -1,4 +1,4 @@
-#include <pbrlib/rendering/window.hpp>
+#include <pbrlib/window.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/surface.hpp>

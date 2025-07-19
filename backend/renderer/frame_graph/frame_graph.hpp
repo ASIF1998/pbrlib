@@ -4,7 +4,7 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/camera.hpp>
 
 #include <string>
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pbrlib/rendering/window.hpp>
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/window.hpp>
+#include <pbrlib/camera.hpp>
 
 #include <string_view>
 #include <functional>

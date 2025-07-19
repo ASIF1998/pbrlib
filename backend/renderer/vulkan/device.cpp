@@ -1,4 +1,4 @@
-#include <pbrlib/rendering/window.hpp>
+#include <pbrlib/window.hpp>
 
 #include <backend/utils/versions.hpp>
 #include <backend/logger/logger.hpp>

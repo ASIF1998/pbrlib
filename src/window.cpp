@@ -1,4 +1,4 @@
-#include <pbrlib/rendering/window.hpp>
+#include <pbrlib/window.hpp>
 
 #include <pbrlib/exceptions.hpp>
 
