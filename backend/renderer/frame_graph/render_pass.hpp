@@ -78,7 +78,7 @@ namespace pbrlib::backend
 
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 
-        void addColorInput (
+        void addSyncImage (
             std::string_view        name, 
             vk::Image*              ptr_image, 
             VkImageLayout           new_layout, 
@@ -91,9 +91,6 @@ namespace pbrlib::backend
         [[nodiscard]]
         vk::Image* colorOutputAttach(std::string_view name);
         
-        [[nodiscard]]
-        const vk::Image* colorInputAttach(std::string_view name) const;
-
         [[nodiscard]]
         const vk::Image* depthStencil() const noexcept;
         
@@ -111,7 +108,7 @@ namespace pbrlib::backend
         >;
 
         std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
-        std::map<std::string, SynkData, std::less<void>>    _color_input_images;
+        std::map<std::string, SynkData, std::less<void>>    _sync_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;
 

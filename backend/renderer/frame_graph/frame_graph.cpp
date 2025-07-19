@@ -73,7 +73,7 @@ namespace pbrlib::backend
         ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::material_index, &_images.at(GBufferAttachmentsName::material_index));
         ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
 
-        ptr_gbuffer_generator->addColorInput(
+        ptr_gbuffer_generator->addSyncImage (
             SSAOInputAttachmentNames::depth_buffer,
             &_depth_buffer.value(), 
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 
@@ -94,7 +94,7 @@ namespace pbrlib::backend
 
         auto ptr_ssao_result = &_images.at(SSAOOutputAttachmentsNames::result);
 
-        ptr_ssao->addColorInput (
+        ptr_ssao->addSyncImage (
             SSAOOutputAttachmentsNames::result, 
             ptr_ssao_result, 
             VK_IMAGE_LAYOUT_GENERAL, 
@@ -105,10 +105,23 @@ namespace pbrlib::backend
             
         ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
 
-        ptr_ssao->addColorInput(SSAOInputAttachmentNames::pos_uv, ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
-        ptr_ssao->addColorInput(SSAOInputAttachmentNames::normal_tangent, ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage, ptr_ssao->dstStage());
+        ptr_ssao->addSyncImage (
+            SSAOInputAttachmentNames::pos_uv, 
+            ptr_pos_uv, 
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+            src_stage, 
+            ptr_ssao->dstStage()
+        );
 
-        ptr_ssao->addColorInput (
+        ptr_ssao->addSyncImage (
+            SSAOInputAttachmentNames::normal_tangent,
+            ptr_normal_tangent, 
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+            src_stage, 
+            ptr_ssao->dstStage()
+        );
+
+        ptr_ssao->addSyncImage (
             SSAOInputAttachmentNames::depth_buffer,
             ptr_depth_buffer, 
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 

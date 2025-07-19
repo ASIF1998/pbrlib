@@ -28,7 +28,7 @@ namespace pbrlib::backend
         return true;
     }
 
-    void RenderPass::addColorInput (
+    void RenderPass::addSyncImage (
         std::string_view        name, 
         vk::Image*              ptr_image, 
         VkImageLayout           new_layout, 
@@ -36,16 +36,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2   dst_stage
     )
     {
-        _color_input_images.emplace(name, std::make_tuple(ptr_image, new_layout, src_stage, dst_stage));
-    }
-
-    const vk::Image* RenderPass::colorInputAttach(std::string_view name) const
-    {
-        auto it = _color_input_images.find(name);
-        if (it == std::end(_color_input_images))
-            throw exception::InvalidState(std::format("[render-pass] failed find color input '{}'", name));
-
-        return std::get<vk::Image*>(it->second);
+        _sync_images.emplace(name, std::make_tuple(ptr_image, new_layout, src_stage, dst_stage));
     }
 
     void RenderPass::addColorOutput(std::string_view name, vk::Image* ptr_image)
@@ -82,7 +73,7 @@ namespace pbrlib::backend
 
     void RenderPass::sync(vk::CommandBuffer& command_buffer)
     {
-        for (auto& [name, sync_data]: _color_input_images)
+        for (auto& [name, sync_data]: _sync_images)
         {
             auto [ptr_image, new_layout, src_stage, dst_stage] = sync_data;
             ptr_image->changeLayout(command_buffer, new_layout, src_stage, dst_stage);
