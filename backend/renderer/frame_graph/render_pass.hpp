@@ -79,7 +79,6 @@ namespace pbrlib::backend
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 
         void addSyncImage (
-            std::string_view        name, 
             vk::Image*              ptr_image, 
             VkImageLayout           new_layout, 
             VkPipelineStageFlags2   src_stage, 
@@ -100,7 +99,7 @@ namespace pbrlib::backend
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
 
     protected:
-        using SynkData = std::tuple <
+        using SyncData = std::tuple <
             vk::Image*, 
             VkImageLayout, 
             VkPipelineStageFlags2, 
@@ -108,7 +107,8 @@ namespace pbrlib::backend
         >;
 
         std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
-        std::map<std::string, SynkData, std::less<void>>    _sync_images;
+        
+        std::vector<SyncData> _sync_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;
 

@@ -29,14 +29,13 @@ namespace pbrlib::backend
     }
 
     void RenderPass::addSyncImage (
-        std::string_view        name, 
         vk::Image*              ptr_image, 
         VkImageLayout           new_layout, 
         VkPipelineStageFlags2   src_stage, 
         VkPipelineStageFlags2   dst_stage
     )
     {
-        _sync_images.emplace(name, std::make_tuple(ptr_image, new_layout, src_stage, dst_stage));
+        _sync_images.emplace_back(ptr_image, new_layout, src_stage, dst_stage);
     }
 
     void RenderPass::addColorOutput(std::string_view name, vk::Image* ptr_image)
@@ -73,11 +72,8 @@ namespace pbrlib::backend
 
     void RenderPass::sync(vk::CommandBuffer& command_buffer)
     {
-        for (auto& [name, sync_data]: _sync_images)
-        {
-            auto [ptr_image, new_layout, src_stage, dst_stage] = sync_data;
+        for (auto [ptr_image, new_layout, src_stage, dst_stage]: _sync_images)
             ptr_image->changeLayout(command_buffer, new_layout, src_stage, dst_stage);
-        }
     }
 
     void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout)

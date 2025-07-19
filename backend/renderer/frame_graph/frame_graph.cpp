@@ -8,6 +8,8 @@
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
 #include <backend/renderer/frame_graph/ssao.hpp>
 
+#include <backend/renderer/frame_graph/builders/ssao.hpp>
+
 #include <backend/logger/logger.hpp>
 
 #include <backend/profiling.hpp>
@@ -74,7 +76,6 @@ namespace pbrlib::backend
         ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
 
         ptr_gbuffer_generator->addSyncImage (
-            SSAOInputAttachmentNames::depth_buffer,
             &_depth_buffer.value(), 
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 
             VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , ptr_gbuffer_generator->srcStage()
@@ -90,48 +91,17 @@ namespace pbrlib::backend
         const RenderPass*       ptr_gbuffer
     )
     {
-        std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<SSAO>(_device);
-
-        auto ptr_ssao_result = &_images.at(SSAOOutputAttachmentsNames::result);
-
-        ptr_ssao->addSyncImage (
-            SSAOOutputAttachmentsNames::result, 
-            ptr_ssao_result, 
-            VK_IMAGE_LAYOUT_GENERAL, 
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-        );
-
         const auto src_stage = ptr_gbuffer->dstStage();
-            
-        ptr_ssao->addColorOutput(SSAOOutputAttachmentsNames::result, &_images.at(SSAOOutputAttachmentsNames::result));
-
-        ptr_ssao->addSyncImage (
-            SSAOInputAttachmentNames::pos_uv, 
-            ptr_pos_uv, 
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-            src_stage, 
-            ptr_ssao->dstStage()
-        );
-
-        ptr_ssao->addSyncImage (
-            SSAOInputAttachmentNames::normal_tangent,
-            ptr_normal_tangent, 
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-            src_stage, 
-            ptr_ssao->dstStage()
-        );
-
-        ptr_ssao->addSyncImage (
-            SSAOInputAttachmentNames::depth_buffer,
-            ptr_depth_buffer, 
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 
-            src_stage, ptr_ssao->srcStage()
-        );
 
         const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
-        ptr_ssao->descriptorSet(SSAOInputSetsId::eGBuffer, gbuffer_set_handle, gbuffer_set_layout_handle);
 
-        return ptr_ssao;
+        return builders::SSAO(_device)
+            .resultImage(&_images.at(SSAOOutputAttachmentsNames::result))
+            .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
+            .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
+            .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)   
+            .gbufferDescriptorSet(gbuffer_set_handle, gbuffer_set_layout_handle)
+            .build();
     }
 
     void FrameGraph::build()
