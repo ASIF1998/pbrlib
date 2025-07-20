@@ -3,16 +3,14 @@
 #extension GL_GOOGLE_include_directive : enable
 #extension GL_EXT_nonuniform_qualifier : enable
 
-#include <generation.glsl>
-#include <gbuffer_generator/packing.glsl>
-
 #include <gpu_cpu_constants.h>
-
 layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
 
-layout(set = 0, binding = 0) uniform sampler2D gbuffer_pos_uv;
-layout(set = 0, binding = 1) uniform sampler2D gbuffer_normal_tangent;
-layout(set = 0, binding = 3) uniform sampler2D gbuffer_depth;
+#include <generation.glsl>
+
+#define PBRLIB_GBUFFER_GENERATOR_EXPORTS_SET_ID 0
+#include <gbuffer_generator/exports.glsl>
+#include <gbuffer_generator/packing.glsl>
 
 layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
 

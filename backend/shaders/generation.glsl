@@ -1,5 +1,5 @@
-#ifndef GENERATION_GLSL
-#define GENERATION_GLSL
+#ifndef PBRLIB_GENERATION_GLSL
+#define PBRLIB_GENERATION_GLSL
 
 vec3 randomVec(vec3 v)
 {

@@ -1,5 +1,5 @@
-#ifndef PACKING_GLSL
-#define PACKING_GLSL
+#ifndef PBRLIB_PACKING_GLSL
+#define PBRLIB_PACKING_GLSL
 
 struct GBufferData
 {

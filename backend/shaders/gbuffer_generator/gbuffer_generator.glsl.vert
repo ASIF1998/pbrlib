@@ -1,27 +1,9 @@
 #version 460
 
-#extension GL_GOOGLE_include_directive                      : enable
-#extension GL_EXT_scalar_block_layout                       : enable
-#extension GL_EXT_buffer_reference2                         : enable
-#extension GL_EXT_shader_16bit_storage                      : enable
-#extension GL_EXT_shader_explicit_arithmetic_types_float16  : enable
+#extension GL_GOOGLE_include_directive : enable
 
-#define PER_PASS_SET_ID 0
-
-struct Vertex
-{
-    vec4        pos;
-    float16_t   nx, ny, nz;
-    float16_t   tx, ty, tz;
-    float16_t   uvx, uvy;
-};
-
-struct Instance
-{
-    mat4 model;
-    mat4 normal;
-    uint mesh_id;
-};
+#define PBRLIB_MESH_MANAGER_EXPORTS_SET_ID 0
+#include <mesh_manager/exports.glsl>
 
 struct Globals
 {
@@ -30,24 +12,9 @@ struct Globals
     uint material_index;
 };
 
-layout(std430, scalar, buffer_reference, buffer_reference_align = 16) readonly buffer VertexBuffer
-{
-    Vertex vertices[];
-};
-
 layout(push_constant) uniform Block
 {
     Globals globals;
-};
-
-layout(set = PER_PASS_SET_ID, binding = 0) buffer readonly VertexBuffers
-{
-    VertexBuffer vertex_buffers[];
-};
-
-layout(set = PER_PASS_SET_ID, binding = 1) buffer readonly InstanceData
-{
-    Instance[] instances;
 };
 
 layout(location = 0) out flat uint  material_index;
