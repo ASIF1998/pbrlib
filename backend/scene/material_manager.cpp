@@ -141,10 +141,12 @@ namespace pbrlib::backend
             _materials_indices_buffer = vk::builders::Buffer(_device)
                 .addQueueFamilyIndex(_device.queue().family_index)
                 .name("[material-system] material-indices")
-                .size(_materials.size() * sizeof(PbrMaterial))
+                .size(_materials.size() * sizeof(Material))
                 .type(vk::BufferType::eDeviceOnly)
                 .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
                 .build();
+
+            _materials_indices_buffer->write(std::span<const Material>(_materials), 0);
 
             _device.writeDescriptorSet({
                 .buffer     = _materials_indices_buffer.value(),
