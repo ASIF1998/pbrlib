@@ -17,13 +17,6 @@ namespace pbrlib::backend
         constexpr static auto result = "ssao-result";
     };
 
-    struct SSAOInputAttachmentNames final
-    {
-        constexpr static auto pos_uv            = "ssao-gbuffer-pos-uv";
-        constexpr static auto normal_tangent    = "ssao-gbuffer-normal-tangent";
-        constexpr static auto depth_buffer      = "ssao-gbuffer-depth-buffer";
-    };
-
     struct SSAOInputSetsId
     {
         enum
