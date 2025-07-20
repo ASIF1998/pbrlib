@@ -10,6 +10,8 @@
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
+#include  <backend/scene/material_manager.hpp>
+
 #include <backend/utils/vulkan.hpp>
 
 #include <pbrlib/math/vec3.hpp>
@@ -61,11 +63,21 @@ namespace pbrlib::backend
         createResultDescriptorSet();
         createSSAODescriptorSet();
 
-        const auto [_, gbuffer_set_layout] = descriptorSet(SSAOInputSetsId::eGBuffer);
+        const auto gbuffer_set_layout          = descriptorSet(SSAOInputSetsId::eGBuffer).second;
+        const auto material_manager_set_layout = _ptr_context->ptr_material_manager->descriptorSet().second;
+
+        constexpr VkPushConstantRange push_constant_range =
+        {
+            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+            .offset     = 0,
+            .size       = sizeof(pbrlib::math::mat4)
+        };
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(*_ptr_device)
             .addSetLayout(gbuffer_set_layout)
             .addSetLayout(_ssao_desc_set_layout)
+            .addSetLayout(material_manager_set_layout)
+            .pushConstant(push_constant_range)
             .build();
 
         return rebuild(width, height);
@@ -106,11 +118,15 @@ namespace pbrlib::backend
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
-            const auto [gbuffer_descriptor_set, _] = descriptorSet(SSAOInputSetsId::eGBuffer);
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[ssao] run-pipeline");
+
+            const auto gbuffer_descriptor_set   = descriptorSet(SSAOInputSetsId::eGBuffer).first;
+            const auto material_manager_set     = _ptr_context->ptr_material_manager->descriptorSet().first;
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 1, 1, &_ssao_desc_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 2, 1, &material_manager_set, 0, nullptr);
 
             const auto projection_view = _ptr_context->projection * _ptr_context->view;;
 

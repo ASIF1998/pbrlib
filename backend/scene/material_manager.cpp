@@ -50,6 +50,17 @@ namespace pbrlib::backend
             nullptr,
             &_sampler_handle
         ));
+
+        constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
+
+        constexpr auto max_image_count = 2500;
+            
+        _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
+            .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, max_image_count, stages)
+            .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
+            .build();
+
+        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
     }
 
     MaterialManager::~MaterialManager()
@@ -115,18 +126,6 @@ namespace pbrlib::backend
     {
         if (_descriptor_set_is_changed) [[unlikely]]
         {
-            if (_descriptor_set_handle == VK_NULL_HANDLE) [[unlikely]]
-            {   
-                constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
-            
-                _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
-                    .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(_images.size()), stages)
-                    .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
-                    .build();
-
-                _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
-            }
-
             for (const auto i: std::views::iota(0u, _images.size()))
             {
                 _device.writeDescriptorSet({
@@ -158,9 +157,9 @@ namespace pbrlib::backend
         }
     }
 
-    VkDescriptorSet MaterialManager::descriptorSet() const noexcept
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
     {
-        return _descriptor_set_handle;
+        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
     }
 
     size_t MaterialManager::imageCount() const noexcept

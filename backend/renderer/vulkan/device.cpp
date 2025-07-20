@@ -336,15 +336,19 @@ namespace pbrlib::backend::vk
         
         VkPhysicalDeviceVulkan12Features vulkan_1_2_features = 
         {
-            .sType                              = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-            .pNext                              = &physical_device_16_bit_storage_features,
-            .storageBuffer8BitAccess            = VK_TRUE,
-            .uniformAndStorageBuffer8BitAccess  = VK_TRUE,
-            .shaderFloat16                      = VK_TRUE,
-            .shaderInt8                         = VK_TRUE,
-            .runtimeDescriptorArray             = VK_TRUE,
-            .separateDepthStencilLayouts        = VK_TRUE,
-            .bufferDeviceAddress                = VK_TRUE
+            .sType                                          = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+            .pNext                                          = &physical_device_16_bit_storage_features,
+            .storageBuffer8BitAccess                        = VK_TRUE,
+            .uniformAndStorageBuffer8BitAccess              = VK_TRUE,
+            .shaderFloat16                                  = VK_TRUE,
+            .shaderInt8                                     = VK_TRUE,
+            .descriptorBindingUniformBufferUpdateAfterBind  = VK_TRUE,
+            .descriptorBindingSampledImageUpdateAfterBind   = VK_TRUE,
+            .descriptorBindingStorageImageUpdateAfterBind   = VK_TRUE,
+            .descriptorBindingStorageBufferUpdateAfterBind  = VK_TRUE,
+            .runtimeDescriptorArray                         = VK_TRUE,
+            .separateDepthStencilLayouts                    = VK_TRUE,
+            .bufferDeviceAddress                            = VK_TRUE
         }; 
 
         VkPhysicalDeviceVulkan13Features vulkan_1_3_features = 
@@ -534,12 +538,14 @@ namespace pbrlib::backend::vk
 {
     void Device::createDescriptorPool()
     {
+        constexpr uint32_t image_count = 10000;
+
         constexpr std::array pool_sizes 
         {
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_SAMPLER, .descriptorCount = 1000},
-            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1000},
-            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, .descriptorCount = 1000},
-            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 1000},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = image_count},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, .descriptorCount = image_count},
+            VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = image_count},
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, .descriptorCount = 1000},
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1000},
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1000},
@@ -548,10 +554,14 @@ namespace pbrlib::backend::vk
             VkDescriptorPoolSize {.type = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, .descriptorCount = 1000}
         };
 
+        constexpr auto flags = 
+                VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT
+            |   VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT_EXT;
+
         const VkDescriptorPoolCreateInfo pool_info = 
         { 
             .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-            .flags              = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+            .flags              = flags,
             .maxSets            = 1000,
             .poolSizeCount      = static_cast<uint32_t>(pool_sizes.size()),
             .pPoolSizes         = pool_sizes.data()

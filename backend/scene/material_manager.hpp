@@ -71,7 +71,7 @@ namespace pbrlib::backend
 
         void update();
 
-        [[nodiscard]] VkDescriptorSet descriptorSet() const noexcept;
+        [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet() const noexcept;
 
         [[nodiscard]] size_t imageCount()       const noexcept;
         [[nodiscard]] size_t materialCount()    const noexcept;

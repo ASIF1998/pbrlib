@@ -139,14 +139,11 @@ namespace pbrlib::backend
             .size       = sizeof(GBufferPushConstantBlock)
         };
 
+        const auto [_, mesh_manager_set_layout] = _ptr_context->ptr_mesh_manager->descriptorSet();
+
         _pipeline_layout_handle = vk::builders::PipelineLayout(*_ptr_device)
             .pushConstant(push_constant_range)
-            .addSetLayout(
-                vk::builders::DescriptorSetLayout(*_ptr_device)
-                    .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-                    .addBinding(MeshManager::Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-                    .build()
-            )
+            .addSetLayout(mesh_manager_set_layout)
             .build();
 
         createFramebuffer();
@@ -310,7 +307,7 @@ namespace pbrlib::backend
                 .maxDepth   = 1.0
             };
 
-            const auto descriptor_set = _ptr_context->ptr_mesh_manager->descriptorSet();
+            const auto [descriptor_set, _] = _ptr_context->ptr_mesh_manager->descriptorSet();
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
