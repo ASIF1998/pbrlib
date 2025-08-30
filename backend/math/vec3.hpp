@@ -5,7 +5,7 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    struct Vec3
+    struct Vec3 final
     {
     public:
         inline constexpr Vec3(Type xyz = static_cast<Type>(0))                          noexcept;

@@ -10,7 +10,9 @@
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
-#include  <backend/scene/material_manager.hpp>
+#include <backend/renderer/frame_graph/filters/bilateral_blur.hpp>
+
+#include <backend/scene/material_manager.hpp>
 
 #include <backend/utils/vulkan.hpp>
 
@@ -18,24 +20,36 @@
 #include <pbrlib/math/vec4.hpp>
 #include <pbrlib/math/lerp.hpp>
 
+#include <pbrlib/config.hpp>
+
 #include <random>
 
 #include <array>
 
 namespace pbrlib::backend
 {
-    SSAO::SSAO(vk::Device& device) :
-        RenderPass(device)
-    { }
+    SSAO::SSAO(vk::Device& device, BilateralBlur* ptr_blur) :
+        RenderPass(device),
+        _ptr_blur (ptr_blur)
+    { 
+        if (!ptr_blur) [[unlikely]]
+            throw exception::InvalidArgument("[ssao] pointer to blur is null");
+
+        _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
+
+        _result_image_desc_set = device.allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
+    }
 
     SSAO::~SSAO()
     {
-        const auto device_handle = _ptr_device->device();
+        const auto device_handle = device().device();
 
-        if (vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_result_image_desc_set) != VK_SUCCESS) [[unlikely]]
+        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_result_image_desc_set) != VK_SUCCESS) [[unlikely]]
             log::error("[ssao] failed free descriptor set with result image");
         
-        if (vkFreeDescriptorSets(device_handle, _ptr_device->descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
+        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
             log::error("[ssao] failed free descriptor set with data for compute");
 
         vkDestroyDescriptorSetLayout(device_handle, _result_image_desc_set_layout, nullptr);
@@ -60,11 +74,11 @@ namespace pbrlib::backend
         createSamplesBuffer();
         createParamsBuffer();
 
-        createResultDescriptorSet();
+        bindResultDescriptorSet();
         createSSAODescriptorSet();
 
-        const auto gbuffer_set_layout          = descriptorSet(SSAOInputSetsId::eGBuffer).second;
-        const auto material_manager_set_layout = _ptr_context->ptr_material_manager->descriptorSet().second;
+        const auto gbuffer_set_layout          = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).second;
+        const auto material_manager_set_layout = context.ptr_material_manager->descriptorSet().second;
 
         constexpr VkPushConstantRange push_constant_range =
         {
@@ -73,7 +87,7 @@ namespace pbrlib::backend
             .size       = sizeof(pbrlib::math::mat4)
         };
 
-        _pipeline_layout_handle = vk::builders::PipelineLayout(*_ptr_device)
+        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(gbuffer_set_layout)
             .addSetLayout(_ssao_desc_set_layout)
             .addSetLayout(material_manager_set_layout)
@@ -91,7 +105,7 @@ namespace pbrlib::backend
         _params.noise_scale.x = static_cast<float>(width) / noise_width;
         _params.noise_scale.y = static_cast<float>(height) / noise_height;
 
-        _ptr_device->writeDescriptorSet({
+        device().writeDescriptorSet({
             .buffer     = _params_buffer.value(),
             .set_handle = _ssao_desc_set,
             .size       = static_cast<uint32_t>(_params_buffer->size),
@@ -102,12 +116,12 @@ namespace pbrlib::backend
 
         auto prev_handle = _pipeline_handle;
 
-        _pipeline_handle = vk::builders::ComputePipeline(*_ptr_device)
+        _pipeline_handle = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .build();
 
-        vkDestroyPipeline(_ptr_device->device(), prev_handle, nullptr);
+        vkDestroyPipeline(device().device(), prev_handle, nullptr);
 
         return true;
     }
@@ -118,17 +132,17 @@ namespace pbrlib::backend
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[ssao] run-pipeline");
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[ssao] run-pipeline");
 
-            const auto gbuffer_descriptor_set   = descriptorSet(SSAOInputSetsId::eGBuffer).first;
-            const auto material_manager_set     = _ptr_context->ptr_material_manager->descriptorSet().first;
+            const auto gbuffer_descriptor_set   = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first;
+            const auto material_manager_set     = context().ptr_material_manager->descriptorSet().first;
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 1, 1, &_ssao_desc_set, 0, nullptr);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 2, 1, &material_manager_set, 0, nullptr);
 
-            const auto projection_view = _ptr_context->projection * _ptr_context->view;;
+            const auto projection_view = context().projection * context().view;
 
             vkCmdPushConstants(
                 command_buffer_handle, 
@@ -137,8 +151,10 @@ namespace pbrlib::backend
                 0, sizeof(pbrlib::math::mat4), &projection_view
             );
 
-            const auto local_size_x = _width / _ptr_device->workGroupSize();
-            const auto local_size_y = _height / _ptr_device->workGroupSize();
+            const auto [width, height] = size();
+
+            const auto local_size_x = width / device().workGroupSize();
+            const auto local_size_y = height / device().workGroupSize();
 
             vkCmdDispatch(command_buffer_handle, local_size_x, local_size_y, 1);
         }, "[ssao] run-pipeline", vk::marker_colors::compute_pipeline);
@@ -172,26 +188,20 @@ namespace pbrlib::backend
         };
 
         VK_CHECK(vkCreateSampler(
-            _ptr_device->device(),
+            device().device(),
             &sampler_create_info,
             nullptr, 
             &_result_image_sampler
         ));
     }
 
-    void SSAO::createResultDescriptorSet()
+    void SSAO::bindResultDescriptorSet()
     {
-        _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _result_image_desc_set = _ptr_device->allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
-
         createSampler();
 
-        const auto ptr_result_image = colorOutputAttach(SSAOOutputAttachmentsNames::result);
+        const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        _ptr_device->writeDescriptorSet({
+        device().writeDescriptorSet({
             .view_handle            = ptr_result_image->view_handle,
             .sampler_handle         = _result_image_sampler,
             .set_handle             = _result_image_desc_set,
@@ -202,24 +212,24 @@ namespace pbrlib::backend
     
     void SSAO::createSSAODescriptorSet()
     {
-        _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(*_ptr_device)
+        _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(device())
             .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _ssao_desc_set = _ptr_device->allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
+        _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
 
-        const auto ptr_result_image = colorOutputAttach(SSAOOutputAttachmentsNames::result);
+        const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        _ptr_device->writeDescriptorSet({
+        device().writeDescriptorSet({
             .view_handle            = ptr_result_image->view_handle,
             .set_handle             = _ssao_desc_set,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
-        _ptr_device->writeDescriptorSet({
+        device().writeDescriptorSet({
             .buffer     = _samples_buffer.value(),
             .set_handle = _ssao_desc_set,
             .size       = static_cast<uint32_t>(_samples_buffer->size),
@@ -229,8 +239,8 @@ namespace pbrlib::backend
 
     void SSAO::createParamsBuffer()
     {
-        _params_buffer = vk::builders::Buffer(*_ptr_device)
-            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+        _params_buffer = vk::builders::Buffer(device())
+            .addQueueFamilyIndex(device().queue().family_index)
             .name("[ssao] params")
             .size(sizeof(Params))
             .type(vk::BufferType::eDeviceOnly)
@@ -264,8 +274,8 @@ namespace pbrlib::backend
         for (auto& sample: samples)
             sample = generate_vector();
 
-        _samples_buffer = vk::builders::Buffer(*_ptr_device)
-            .addQueueFamilyIndex(_ptr_device->queue().family_index)
+        _samples_buffer = vk::builders::Buffer(device())
+            .addQueueFamilyIndex(device().queue().family_index)
             .name("[ssao] samples")
             .size(samples.size() * sizeof(pbrlib::math::vec4))
             .type(vk::BufferType::eDeviceOnly)
@@ -275,5 +285,15 @@ namespace pbrlib::backend
         _samples_buffer->write(std::span<const pbrlib::math::vec4>(samples), 0);
 
         _params.sample_count = static_cast<uint32_t>(samples.size());
+    }
+
+    void SSAO::update(const Config& config)
+    {
+        auto& blur_settings = _ptr_blur->settings();
+        auto& ssao_settings = config.ssao;
+
+        blur_settings.sample_count  = ssao_settings.blur_samples_count;
+        blur_settings.sigma_s       = ssao_settings.spatial_sigma;
+        blur_settings.sigma_l       = ssao_settings.luminance_sigma;
     }
 }

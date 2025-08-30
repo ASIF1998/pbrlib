@@ -76,6 +76,21 @@ namespace pbrlib::backend
             ptr_image->changeLayout(command_buffer, new_layout, src_stage, dst_stage);
     }
 
+    vk::Device& RenderPass::device() noexcept
+    {
+        return *_ptr_device;
+    }
+
+    const RenderContext& RenderPass::context() const noexcept
+    {
+        return *_ptr_context;
+    }
+
+    std::pair<uint32_t, uint32_t> RenderPass::size() const noexcept
+    {
+        return std::make_pair(_width, _height);
+    }
+
     void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout)
     { 
         _input_descriptor_sets.emplace(set_id, std::make_pair(set_handle, set_layout));
@@ -84,8 +99,11 @@ namespace pbrlib::backend
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> RenderPass::descriptorSet(uint32_t set_id) const
     {
         if (auto res = _input_descriptor_sets.find(set_id); res != std::end(_input_descriptor_sets))
-            return  res->second;
+            return res->second;
 
         throw exception::RuntimeError("[render-pass] failed find input descriptor set");
     }
+
+    void RenderPass::update(const Config& config)
+    { }
 }

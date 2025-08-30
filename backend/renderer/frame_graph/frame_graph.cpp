@@ -23,13 +23,15 @@
 namespace pbrlib::backend
 {
     FrameGraph::FrameGraph (
-        vk::Device&         device, 
-        Canvas&             canvas,
-        MaterialManager&    material_manager,
-        MeshManager&        mesh_manager
+        vk::Device&             device, 
+        const pbrlib::Config&   config,
+        Canvas&                 canvas,
+        MaterialManager&        material_manager,
+        MeshManager&            mesh_manager
     ) :
         _device (device),
-        _canvas (canvas)
+        _canvas (canvas),
+        _config (config)
     {
         _render_context.ptr_material_manager    = &material_manager;
         _render_context.ptr_mesh_manager        = &mesh_manager;
@@ -57,7 +59,7 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(SSAOOutputAttachmentsNames::result);
+        auto ptr_result = &_images.at(AttachmentsTraits<SSAO>::blur);
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
@@ -70,9 +72,13 @@ namespace pbrlib::backend
     {
         std::unique_ptr<RenderPass> ptr_gbuffer_generator = std::make_unique<GBufferGenerator>(_device);
 
-        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::pos_uv, &_images.at(GBufferAttachmentsName::pos_uv));
-        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::normal_tangent, &_images.at(GBufferAttachmentsName::normal_tangent));
-        ptr_gbuffer_generator->addColorOutput(GBufferAttachmentsName::material_index, &_images.at(GBufferAttachmentsName::material_index));
+        constexpr auto pos_uv           = AttachmentsTraits<GBufferGenerator>::pos_uv;
+        constexpr auto normal_tangent   = AttachmentsTraits<GBufferGenerator>::normal_tangent;
+        constexpr auto material_index   = AttachmentsTraits<GBufferGenerator>::material_index;
+
+        ptr_gbuffer_generator->addColorOutput(pos_uv, &_images.at(pos_uv));
+        ptr_gbuffer_generator->addColorOutput(normal_tangent, &_images.at(normal_tangent));
+        ptr_gbuffer_generator->addColorOutput(material_index, &_images.at(material_index));
         ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
 
         ptr_gbuffer_generator->addSyncImage (
@@ -96,7 +102,9 @@ namespace pbrlib::backend
         const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
 
         return builders::SSAO(_device)
-            .resultImage(&_images.at(SSAOOutputAttachmentsNames::result))
+            .ssaoImage(_images.at(AttachmentsTraits<SSAO>::ssao))
+            .blurImage(_images.at(AttachmentsTraits<SSAO>::blur))
+            .settings(_config.ssao)            
             .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
             .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
             .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)   
@@ -114,8 +122,8 @@ namespace pbrlib::backend
 
         auto ptr_gbuffer_generator = buildGBufferGeneratorSubpass();
 
-        auto ptr_pos_uv         = &_images.at(GBufferAttachmentsName::pos_uv);
-        auto ptr_normal_tangent = &_images.at(GBufferAttachmentsName::normal_tangent);
+        auto ptr_pos_uv         = &_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        auto ptr_normal_tangent = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
         auto ptr_ssao = buildSSAOSubpass(
             ptr_pos_uv, 
@@ -151,17 +159,29 @@ namespace pbrlib::backend
         return false;
     }
 
+    template<HasAttachments T>
+    void createRenderPassImages(vk::Device& device, auto& images, uint32_t width, uint32_t height)
+    {
+        for (const auto [name, format, usage]: AttachmentsTraits<T>::metadata())
+        {
+            images.emplace(
+                name,
+                vk::builders::Image(device)
+                    .size(width, height)
+                    .format(format)
+                    .usage(usage)
+                    .addQueueFamilyIndex(device.queue().family_index)
+                    .name(name)
+                    .build()
+            );
+        }
+    }
+
     void FrameGraph::createResources()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         const auto [width, height] = _canvas.size();
-
-        constexpr auto shared_usage_flags = 
-                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
-            |   VK_IMAGE_USAGE_SAMPLED_BIT 
-            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-            |   VK_IMAGE_USAGE_STORAGE_BIT;
 
         _depth_buffer = vk::builders::Image(_device)
             .size(width, height)
@@ -171,50 +191,8 @@ namespace pbrlib::backend
             .name("depth-buffer")
             .build();
 
-        _images.emplace(
-            GBufferAttachmentsName::pos_uv,
-            vk::builders::Image(_device)
-                .size(width, height)
-                .format(VK_FORMAT_R32G32B32A32_SFLOAT)
-                .usage(shared_usage_flags)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferAttachmentsName::pos_uv)
-                .build()
-        );
-        
-        _images.emplace(
-            GBufferAttachmentsName::normal_tangent,
-            vk::builders::Image(_device)
-                .size(width, height)
-                .format(VK_FORMAT_R32G32B32A32_SFLOAT)
-                .usage(shared_usage_flags)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferAttachmentsName::normal_tangent)
-                .build()
-        );
-        
-        _images.emplace(
-            GBufferAttachmentsName::material_index,
-            vk::builders::Image(_device)
-                .size(width, height)
-                .format(VK_FORMAT_R16_UINT)
-                .usage(shared_usage_flags)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .name(GBufferAttachmentsName::material_index)
-                .build()
-        );
-        
-        _images.emplace(
-            SSAOOutputAttachmentsNames::result,
-            vk::builders::Image(_device)
-                .size(width, height)
-                // .format(VK_FORMAT_R16_SFLOAT)
-                .format(VK_FORMAT_R32G32B32A32_SFLOAT)
-                .usage(shared_usage_flags)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .name(SSAOOutputAttachmentsNames::result)
-                .build()
-        );
+        createRenderPassImages<GBufferGenerator>(_device, _images, width, height);
+        createRenderPassImages<SSAO>(_device, _images, width, height);
     }
 }
 
@@ -227,5 +205,12 @@ namespace pbrlib::backend
         _render_context.items       = items;
         _render_context.projection  = camera.projection();
         _render_context.view        = camera.view();
+    }
+
+    void FrameGraph::update(const Config& config)
+    {
+        _config = config;
+        if (_ptr_render_pass) [[likely]]
+            _ptr_render_pass->update(config);
     }
 }

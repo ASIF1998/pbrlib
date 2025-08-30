@@ -10,7 +10,7 @@ namespace pbrlib::math
     struct Vec2;
 
     template<typename Type>
-    class Matrix2x2
+    class Matrix2x2 final
     {
     public:
         inline constexpr Matrix2x2()                noexcept;

@@ -4,6 +4,10 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/canvas.hpp>
 
+#include <backend/utils/align_size.hpp>
+
+#include <backend/shaders/gpu_cpu_constants.h>
+
 class CanvasTests :
     public ::testing::Test
 {
@@ -19,8 +23,8 @@ protected:
         const pbrlib::Config config
         {
             .title          = "canvas-tests",
-            .width          = 128, 
-            .height         = 256,
+            .width          = width, 
+            .height         = height,
             .draw_in_window = false
         };
 
@@ -42,6 +46,9 @@ TEST_F(CanvasTests, Ctor)
 
     const auto [width, height] = _canvas->size();
 
-    pbrlib::testing::equality(width, canvas_width);
-    pbrlib::testing::equality(height, canvas_height);
+    constexpr auto expected_width   = pbrlib::backend::utils::alignSize<uint32_t>(canvas_width, PBRLIB_WORK_GROUP_SIZE);
+    constexpr auto expected_height  = pbrlib::backend::utils::alignSize<uint32_t>(canvas_height, PBRLIB_WORK_GROUP_SIZE);
+
+    pbrlib::testing::equality(width, expected_width);
+    pbrlib::testing::equality(height, expected_height);
 }

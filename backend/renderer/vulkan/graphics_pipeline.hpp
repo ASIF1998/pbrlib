@@ -11,6 +11,11 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
+namespace pbrlib::backend::vk::shader
+{
+    class SpecializationInfoBase;
+}
+
 namespace pbrlib::backend::vk
 {
     enum class PrimitiveType
@@ -66,7 +71,7 @@ namespace pbrlib::backend::vk::builders
         GraphicsPipeline& operator = (GraphicsPipeline&& builder)       = delete;
         GraphicsPipeline& operator = (const GraphicsPipeline& builder)  = delete;
 
-        GraphicsPipeline& addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage);
+        GraphicsPipeline& addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info = nullptr);
         GraphicsPipeline& addAttachmentsState(bool blendEnable);
 
         GraphicsPipeline& primitiveType(PrimitiveType primitive_type)   noexcept;
@@ -103,5 +108,6 @@ namespace pbrlib::backend::vk::builders
 
         std::vector<VkPipelineShaderStageCreateInfo>        _stages;
         std::vector<VkPipelineColorBlendAttachmentState>    _attachments_state;
+        std::vector<VkSpecializationInfo>                   _specialization_infos;
     };
 }

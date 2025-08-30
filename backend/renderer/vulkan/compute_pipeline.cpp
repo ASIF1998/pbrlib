@@ -18,6 +18,22 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
+    ComputePipeline& ComputePipeline::specializationInfo(shader::SpecializationInfoBase& spec_info)
+    {
+        const auto entries  = spec_info.entries();
+        const auto data     = spec_info.data();
+
+        _specialization_info = 
+        {
+            .mapEntryCount  = static_cast<uint32_t>(entries.size()),
+            .pMapEntries    = entries.data(),
+            .dataSize       = static_cast<uint32_t>(data.size()),
+            .pData          = data.data()
+        };
+
+        return *this;
+    }
+
     ComputePipeline& ComputePipeline::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
     {
         _pipeline_layout_handle = layout_handle;
@@ -31,10 +47,11 @@ namespace pbrlib::backend::vk::builders
 
         const VkPipelineShaderStageCreateInfo stage 
         {
-            .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-            .stage  = VK_SHADER_STAGE_COMPUTE_BIT,
-            .module = shader::compile(_device, _shader_name),
-            .pName  = "main"
+            .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
+            .module                 = shader::compile(_device, _shader_name),
+            .pName                  = "main",
+            .pSpecializationInfo    = &_specialization_info
         };
 
         const VkComputePipelineCreateInfo pipeline_info 

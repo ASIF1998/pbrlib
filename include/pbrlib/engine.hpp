@@ -71,6 +71,8 @@ namespace pbrlib
         void setup(SetupCallback setup_callback);
         void update(UpdateCallback update_callback);
 
+        void update(const Config& config);
+
         void run();
 
     private:

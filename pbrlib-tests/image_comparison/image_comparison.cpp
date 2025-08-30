@@ -21,17 +21,14 @@ namespace pbrlib::testing
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        /*_pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(_device)
-            .addSet()
-                .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(
-            _pipeline_layout->sets_layout[0], 
-            "[vk-image-comparator] descriptor-set"
-        );*/
+        _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
+            .addSetLayout(_descriptor_set_layout_handle)
+            .build();
 
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
@@ -86,7 +83,8 @@ namespace pbrlib::testing
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
 
-        vkFreeDescriptorSets(_device.device(), _device.descriptorPool(), 1, &_descriptor_set_handle);
+        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
+        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
     }
 
     bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)

@@ -71,7 +71,7 @@ namespace pbrlib::backend::vk
     {
         vkDestroyImageView(_device.device(), view_handle, nullptr);
 
-        if (!_from_swapchain)
+        if (!_from_swapchain) [[likely]]
             vmaDestroyImage(_device.vmaAllocator(), handle, _allocation);
     }
 
@@ -237,16 +237,16 @@ namespace pbrlib::backend::vk::builders
 
     void Image::validate()
     {
-        if (_width == 0 || _height == 0)
+        if (_width == 0 || _height == 0) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] size is zero");
 
-        if (_format == VK_FORMAT_UNDEFINED)
+        if (_format == VK_FORMAT_UNDEFINED) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] format is undefined");
 
-        if (_queues.empty())
+        if (_queues.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] not queues");
 
-        if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM)
+        if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] invalid usage");
     }
 
@@ -402,7 +402,7 @@ namespace pbrlib::backend::vk::builders
             &image.view_handle
         ));
 
-        if (!_name.empty())
+        if (!_name.empty()) [[likely]]
         {
             VkDebugUtilsObjectNameInfoEXT name_info 
             { 
@@ -452,10 +452,10 @@ namespace pbrlib::backend::vk::decoders
 
     void Image::validate()
     {
-        if (_channels_per_pixel < 1 && _channels_per_pixel > 4) 
+        if (_channels_per_pixel < 1 && _channels_per_pixel > 4) [[unlikely]]
             throw exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
 
-        if (!_compressed_image.ptr_data || !_compressed_image.size)
+        if (!_compressed_image.ptr_data || !_compressed_image.size) [[unlikely]]
             throw exception::InvalidState("[vk-image::decoder] compressed image data is empty");
     }
 
@@ -518,7 +518,7 @@ namespace pbrlib::backend::vk::loaders
 
     void Image::validate()
     {
-        if (!std::filesystem::exists(_filename))
+        if (!std::filesystem::exists(_filename)) [[unlikely]]
             throw exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
     }
 
@@ -542,7 +542,7 @@ namespace pbrlib::backend::vk::loaders
             STBI_rgb_alpha
         );
 
-        if (data.width < 1 || data.height < 1 || !data.ptr_data)
+        if (data.width < 1 || data.height < 1 || !data.ptr_data) [[unlikely]]
             throw exception::RuntimeError(std::format("[image-loader] failed load image '{}'", _filename.string()));
 
         auto image = builders::Image(_device)
@@ -581,14 +581,20 @@ namespace pbrlib::backend::vk::exporters
 
     void Image::validate()
     {
-        if (!_ptr_image)
+        if (!_ptr_image) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] image is null");
 
-        if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+        if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] invalid image layout");
 
-        if (_filename.empty())
+        if (_filename.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] didn't set filename");
+
+        if (std::filesystem::is_directory(_filename)) [[unlikely]]
+            throw exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
+
+        if (const auto save_directory = _filename.parent_path(); !std::filesystem::exists(save_directory)) [[unlikely]]
+            std::filesystem::create_directory(save_directory);
     }
 
     void Image::exoprt()
@@ -658,6 +664,11 @@ namespace pbrlib::backend::vk::exporters
 
         _device.submit(command_buffer);
 
+        std::ofstream file (_filename, std::ios::out | std::ios::binary);
+
+        if (!file) [[unlikely]]
+            throw exception::FileOpen("[vk-image::exporter] failed create writer");
+
         const VkImageSubresource sub_resource 
         {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -680,11 +691,6 @@ namespace pbrlib::backend::vk::exporters
             image._allocation,
             reinterpret_cast<void**>(&ptr_data)
         ));
-
-        std::ofstream file (_filename, std::ios::out | std::ios::binary);
-
-        if (!file)
-            throw exception::FileOpen("[vk-image::exporter] failed create writer");
 
         std::function<void (void*, int)> writer = [this, &file] (void* data, int size)
         {

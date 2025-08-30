@@ -72,6 +72,11 @@ int main()
         config.title    = "test-console";
         config.width    = 2000;
         config.height   = 1100;
+
+        config.ssao = 
+        {
+            .blur_samples_count = 8
+        };
         
         pbrlib::Engine engine (config);
 

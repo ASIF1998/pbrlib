@@ -16,6 +16,8 @@
 
 #include <backend/profiling.hpp>
 
+#include <backend/utils/align_size.hpp>
+
 #include <pbrlib/input/input_stay.hpp>
 
 #include <pbrlib/scene/scene.hpp>
@@ -48,14 +50,9 @@ namespace pbrlib
         _ptr_device = std::make_unique<backend::vk::Device>();
         _ptr_device->init();
 
-        const auto align_up = [this] (auto size)
-        {
-            const auto align = _ptr_device->workGroupSize();
-            return ((size + align - 1) / align) * align;
-        };
-
-        uint32_t width  = align_up(config.width);
-        uint32_t height = align_up(config.height);
+        const uint32_t groupSize    = _ptr_device->workGroupSize();
+        const uint32_t width        = backend::utils::alignSize(config.width, groupSize);
+        const uint32_t height       = backend::utils::alignSize(config.height, groupSize);
 
         if (config.draw_in_window) [[likely]]
         {
@@ -73,7 +70,7 @@ namespace pbrlib
         _ptr_material_manager   = std::make_unique<backend::MaterialManager>(*_ptr_device);
         _ptr_mesh_manager       = std::make_unique<backend::MeshManager>(*_ptr_device);
         _ptr_scene              = std::make_unique<Scene>(config.title);
-        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
+        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, config, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
 
         _ptr_scene->meshManager(_ptr_mesh_manager.get());
     }
@@ -113,8 +110,6 @@ namespace pbrlib
         InputStay input_stay;
 
         bool is_close = true;
-
-        backend::log::info("[engine] initialize is done");
 
         do
         {
@@ -200,5 +195,11 @@ namespace pbrlib
         _delta_time = std::chrono::duration_cast<msFloat>(end - begin).count() * seconds_per_milisceond;
 
         begin = end;
+    }
+
+    void Engine::update(const Config& config)
+    {
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->update(config);
     }
 }

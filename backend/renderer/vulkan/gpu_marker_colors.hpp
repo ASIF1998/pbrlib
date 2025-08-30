@@ -15,4 +15,6 @@ namespace pbrlib::backend::vk::marker_colors
     constexpr auto change_layout = generateColor(6);
     
     constexpr auto blit_image = generateColor(7);
+
+    constexpr auto bilateral_blur = generateColor(8);
 }

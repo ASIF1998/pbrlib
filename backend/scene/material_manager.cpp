@@ -143,7 +143,7 @@ namespace pbrlib::backend
                 .name("[material-system] material-indices")
                 .size(_materials.size() * sizeof(Material))
                 .type(vk::BufferType::eDeviceOnly)
-                .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+                .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
                 .build();
 
             _materials_indices_buffer->write(std::span<const Material>(_materials), 0);

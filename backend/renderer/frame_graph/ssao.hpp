@@ -3,34 +3,64 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 
-#include <backend/renderer/frame_graph/render_pass.hpp> 
+#include <backend/renderer/frame_graph/render_pass.hpp>
 
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <optional>
+#include <array>
 
 namespace pbrlib::backend
 {
-    struct SSAOOutputAttachmentsNames final
+    class BilateralBlur;
+}
+
+namespace pbrlib::backend
+{
+    class SSAO;
+
+    template<>
+    struct AttachmentsTraits<SSAO> final
     {
-        constexpr static auto result = "ssao-result";
+        static constexpr auto metadata()
+        {
+            constexpr auto usage_flags = 
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
+            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
+            /// @todo VK_FORMAT_R16_SFLOAT
+
+            constexpr std::array metadata
+            {
+                AttachmentMetadata(ssao, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+                AttachmentMetadata(blur, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags)
+            };
+
+            return metadata;
+        };
+
+        constexpr static auto ssao = "ssao-result";
+        constexpr static auto blur = "ssao-blur";
     };
 
-    struct SSAOInputSetsId
-    {
-        enum
-        {
-            eGBuffer
-        };
+    template<>
+    struct InputDescriptorSetTraits<SSAO> final
+    { 
+        constexpr static uint8_t gbuffer = 0;
     };
-    
+}
+
+namespace pbrlib::backend
+{
     class SSAO final :
         public RenderPass
     {
-        struct alignas(16) Params
+        struct alignas(16) Params final
         {
-            float               radius          = 0.5;
+            float               radius          = 0.5f;
             uint32_t            sample_count    = 0;
             pbrlib::math::vec2  noise_scale;
         };
@@ -46,15 +76,17 @@ namespace pbrlib::backend
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
 
         void createSampler();
-        void createResultDescriptorSet();
+        void bindResultDescriptorSet();
 
         void createSSAODescriptorSet();
 
         void createParamsBuffer();
         void createSamplesBuffer();
 
+        void update(const Config& config) override;
+
     public:
-        explicit SSAO(vk::Device& device);
+        explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
         ~SSAO();
 
     private:
@@ -73,6 +105,8 @@ namespace pbrlib::backend
         std::optional<vk::Buffer>   _params_buffer;
         
         std::optional<vk::Buffer> _samples_buffer;
+
+        BilateralBlur* _ptr_blur = nullptr;
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };

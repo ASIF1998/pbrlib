@@ -62,7 +62,7 @@ float calcOcclution(vec3 pos, mat3 tbn, float depth)
         vec3 sample_pos = tbn * samples[i].xyz;
         sample_pos = pos + sample_pos * radius;
 
-        vec2 sample_uv = getUV(pos);
+        vec2 sample_uv = getUV(sample_pos);
 
         float sample_depth = getGBufferPosition(sample_uv).z;
 

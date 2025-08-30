@@ -6,7 +6,7 @@ namespace pbrlib::math
     struct Vec3;
 
     template<typename Type>
-    class Matrix3x3
+    class Matrix3x3 final
     {
     public:
         inline constexpr Matrix3x3()                noexcept;

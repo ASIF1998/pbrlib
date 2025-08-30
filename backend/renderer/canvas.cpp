@@ -7,6 +7,8 @@
 
 #include <backend/profiling.hpp>
 
+#include <backend/utils/align_size.hpp>
+
 #include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::backend
@@ -20,6 +22,11 @@ namespace pbrlib::backend
     Canvas::Canvas(vk::Device& device, uint32_t width, uint32_t height) :
         _device(device)
     {
+        const uint32_t groupSize = device.workGroupSize();
+
+        width   = backend::utils::alignSize(width, groupSize);
+        height  = backend::utils::alignSize(height, groupSize);
+
         _image = vk::builders::Image(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .fillColor(math::vec3(0))

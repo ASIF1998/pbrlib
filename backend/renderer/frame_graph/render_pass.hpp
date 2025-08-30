@@ -12,13 +12,12 @@
 #include <string>
 #include <string_view>
 
-#include <map>
-
 #include <optional>
 
 namespace pbrlib
 {
-    class SceneItem;
+    class   SceneItem;
+    struct  Config;
 }
 
 namespace pbrlib::backend
@@ -36,6 +35,30 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend
 {
+    template<typename T>
+    struct AttachmentsTraits final
+    { };
+
+    struct AttachmentMetadata final
+    {
+        std::string_view    name;
+        VkFormat            format  = VK_FORMAT_UNDEFINED;
+        VkImageUsageFlags   usage   = VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
+    };
+
+    template <typename RenderPass>
+    concept HasAttachments = requires()
+    {
+        {AttachmentsTraits<RenderPass>::metadata()} -> std::convertible_to<std::span<const AttachmentMetadata>>;
+    };
+
+    template<typename T>
+    struct InputDescriptorSetTraits final
+    { };
+}
+
+namespace pbrlib::backend
+{
     struct RenderContext final
     {
         std::span<const SceneItem*> items;
@@ -49,6 +72,8 @@ namespace pbrlib::backend
 
     class RenderPass
     {
+        void sync(vk::CommandBuffer& command_buffer);
+
     public:
         explicit RenderPass(vk::Device& device) noexcept;
 
@@ -69,13 +94,6 @@ namespace pbrlib::backend
         virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
         virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
 
-        void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
-
-        [[nodiscard]] 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
-
-        virtual [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
-
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 
         void addSyncImage (
@@ -92,13 +110,30 @@ namespace pbrlib::backend
         
         [[nodiscard]]
         const vk::Image* depthStencil() const noexcept;
-        
-        void sync(vk::CommandBuffer& command_buffer);
+
+        [[nodiscard]]
+        vk::Device& device() noexcept;
+
+        [[nodiscard]]
+        const RenderContext& context() const noexcept;
+
+        [[nodiscard]]
+        std::pair<uint32_t, uint32_t> size() const noexcept;
+
+        void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
+
+        [[nodiscard]] 
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
+
+        [[nodiscard]] 
+        virtual std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
+
+        virtual void update(const Config& config);
 
     protected:
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
 
-    protected:
+    private:
         using SyncData = std::tuple <
             vk::Image*, 
             VkImageLayout, 
@@ -115,9 +150,9 @@ namespace pbrlib::backend
         const RenderContext*    _ptr_context    = nullptr;
         vk::Device*             _ptr_device     = nullptr;
 
-        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
-
         uint32_t _width     = 0;
         uint32_t _height    = 0;
+
+        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
     };
 }

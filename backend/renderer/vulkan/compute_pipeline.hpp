@@ -9,6 +9,12 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
+namespace pbrlib::backend::vk::shader
+{
+    class SpecializationInfoBase;
+}
+
+
 namespace pbrlib::backend::vk::builders
 {
     class ComputePipeline final
@@ -23,6 +29,8 @@ namespace pbrlib::backend::vk::builders
         ComputePipeline& operator = (const ComputePipeline& builder)    = delete;
 
         ComputePipeline& shader(const std::filesystem::path& shader_name);
+        ComputePipeline& specializationInfo(shader::SpecializationInfoBase& spec_info);
+
         ComputePipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
 
         [[nodiscard]] VkPipeline build();
@@ -33,5 +41,7 @@ namespace pbrlib::backend::vk::builders
         std::filesystem::path _shader_name;
 
         VkPipelineLayout _pipeline_layout_handle = VK_NULL_HANDLE; 
+
+        VkSpecializationInfo _specialization_info = { };
     };
 }

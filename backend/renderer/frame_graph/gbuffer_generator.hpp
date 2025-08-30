@@ -7,27 +7,41 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 
 #include <optional>
+#include <array>
 
 namespace pbrlib::backend
 {
-    struct GBufferAttachmentsName final
+    class GBufferGenerator;
+
+    template<>
+    struct AttachmentsTraits<GBufferGenerator>
     {
+        static constexpr auto metadata()
+        {
+            constexpr auto usage_flags = 
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
+            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
+            constexpr std::array metadata
+            {
+                AttachmentMetadata(pos_uv, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+                AttachmentMetadata(normal_tangent, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+                AttachmentMetadata(material_index, VK_FORMAT_R16_UINT, usage_flags)
+            };
+
+            return metadata;
+        }
+
         constexpr static auto pos_uv            = "gbuffer-pos-uv";
         constexpr static auto normal_tangent    = "gbuffer-normal-tangent";
         constexpr static auto material_index    = "gbuffer-material-index";
     };
+}
 
-    struct GBufferDescriptorSetBindings
-    {
-        enum 
-        {
-            ePosUv,
-            eNormalTangent,
-            eMaterialIndices,
-            eDepthBuffer
-        };
-    };
-
+namespace pbrlib::backend
+{
     struct GBufferPushConstantBlock final
     {
         math::mat4  projection_view;

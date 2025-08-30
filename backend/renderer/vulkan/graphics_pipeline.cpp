@@ -108,15 +108,28 @@ namespace pbrlib::backend::vk::builders
             vkDestroyShaderModule(_device.device(), stage.module, nullptr);
     }
 
-    GraphicsPipeline& GraphicsPipeline::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage)
+    GraphicsPipeline& GraphicsPipeline::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info)
     {
-        const VkPipelineShaderStageCreateInfo pipeline_stage =
+        VkPipelineShaderStageCreateInfo pipeline_stage =
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
             .module = vk::shader::compile(_device, shader),
             .pName  = "main"
         };
+
+        if (ptr_spec_info)
+        {
+            const auto entries  = ptr_spec_info->entries();
+            const auto data     = ptr_spec_info->data();
+
+            _specialization_infos.emplace_back(
+                static_cast<uint32_t>(entries.size()), entries.data(), 
+                static_cast<uint32_t>(data.size()), data.data()
+            );
+
+            pipeline_stage.pSpecializationInfo = &_specialization_infos.back();
+        }
 
         _stages.push_back(pipeline_stage);
 

@@ -24,10 +24,4 @@ namespace pbrlib::backend::utils
         free(ptr);
 #endif
     }
-
-    size_t getAlignSize(size_t size)
-    {
-        constexpr size_t align = alignof(max_align_t);
-        return (size + align - 1) & ~(align - 1);
-    }
 }

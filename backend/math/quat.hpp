@@ -10,7 +10,7 @@
 
 namespace pbrlib::math
 {
-    struct Quaternion
+    struct Quaternion final
     {
     public:
         inline constexpr Quaternion()                                   noexcept;

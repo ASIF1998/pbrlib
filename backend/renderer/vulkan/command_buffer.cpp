@@ -28,7 +28,7 @@ namespace pbrlib::backend::vk
         VK_CHECK(vkAllocateCommandBuffers(_device.device(), &alloc_info, &handle));
     }
 
-    CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) :
+    CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) noexcept :
         level                   (command_buffer.level),
         _device                 (command_buffer._device),
         _is_recording_started   (command_buffer._is_recording_started)
@@ -46,7 +46,7 @@ namespace pbrlib::backend::vk
         );
     }
 
-    CommandBuffer& CommandBuffer::operator = (CommandBuffer&& command_buffer)
+    CommandBuffer& CommandBuffer::operator = (CommandBuffer&& command_buffer) noexcept
     {
         level                   = command_buffer.level;
         _is_recording_started   = command_buffer._is_recording_started;

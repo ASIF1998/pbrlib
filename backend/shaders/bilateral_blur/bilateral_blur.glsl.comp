@@ -1,0 +1,129 @@
+#version 460
+
+#extension GL_GOOGLE_include_directive : enable
+
+layout(set = 0, binding = 0) uniform sampler2D input_image;
+layout(set = 0, binding = 1) uniform writeonly image2D result;
+
+#include <math.glsl>
+
+#include <gpu_cpu_constants.h>
+layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
+
+struct Settings
+{
+    uint    sample_count;
+    float   sigma_s;
+    float   sigma_l;
+};
+
+layout(push_constant) uniform Configuration
+{
+    Settings settings;
+};
+
+float luma(vec4 color)
+{
+    return dot(color.rgb, vec3(0.299, 0.587, 0.114));
+}
+
+shared vec4 colors_cache[PBRLIB_WORK_GROUP_SIZE + 4][PBRLIB_WORK_GROUP_SIZE + 4];
+
+void initColorsCache(vec2 uv, vec2 scale)
+{
+    colors_cache[gl_LocalInvocationID.x + 2][gl_LocalInvocationID.y + 2] = texture(input_image, uv);
+
+    if (gl_LocalInvocationID.x == 0)
+    {
+        colors_cache[1][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(-1, 0));
+        colors_cache[0][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(-2, 0));
+    }
+    else if (gl_LocalInvocationID.x == PBRLIB_WORK_GROUP_SIZE - 1)
+    {
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(1, 0));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(2, 0));
+    }
+
+    if (gl_LocalInvocationID.y == 0)
+    {
+        colors_cache[gl_LocalInvocationID.x + 2][1] = texture(input_image, uv + scale * vec2(0, -1));
+        colors_cache[gl_LocalInvocationID.x + 2][0] = texture(input_image, uv + scale * vec2(0, -2));
+    }
+    else if (gl_LocalInvocationID.y == PBRLIB_WORK_GROUP_SIZE - 1)
+    {
+        colors_cache[gl_LocalInvocationID.x + 2][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(0, 1));
+        colors_cache[gl_LocalInvocationID.x + 2][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(0, 2));
+    }
+
+    if (all(equal(gl_LocalInvocationID.xy, uvec2(0))))
+    {
+        colors_cache[1][1] = texture(input_image, uv + scale * vec2(-1, -1));
+        colors_cache[0][1] = texture(input_image, uv + scale * vec2(-2, -1));
+        colors_cache[1][0] = texture(input_image, uv + scale * vec2(-1, -2));
+        colors_cache[0][0] = texture(input_image, uv + scale * vec2(-2, -2));
+    }
+    else if (all(equal(gl_LocalInvocationID.xy, uvec2(PBRLIB_WORK_GROUP_SIZE - 1, 0))))
+    {
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][1] = texture(input_image, uv + scale * vec2(1, -1));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][1] = texture(input_image, uv + scale * vec2(2, -1));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][0] = texture(input_image, uv + scale * vec2(1, -2));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][0] = texture(input_image, uv + scale * vec2(2, -2));
+    }
+    else if (all(equal(gl_LocalInvocationID.xy, uvec2(0, PBRLIB_WORK_GROUP_SIZE - 1))))
+    {
+        colors_cache[1][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(-1, 1));
+        colors_cache[0][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(-2, 1));
+        colors_cache[1][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(-1, 2));
+        colors_cache[0][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(-2, 2));
+    }
+    else if (any(equal(gl_LocalInvocationID.xy, uvec2(PBRLIB_WORK_GROUP_SIZE - 1))))
+    {
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(1, 1));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(2, 1));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(1, 2));
+        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(2, 2));
+    }
+
+    barrier();
+}
+
+void main()
+{
+    ivec2   pixel_coord = ivec2(gl_GlobalInvocationID.xy);
+    vec2    scale       = vec2(1.0) / vec2(textureSize(input_image, 0));
+    vec2    uv          = vec2(pixel_coord) * scale;
+
+    initColorsCache(uv, scale);
+
+    const float fac_s = -1.0 / (2.0 * settings.sigma_s * settings.sigma_s);
+    const float fac_l = -1.0 / (2.0 * settings.sigma_l * settings.sigma_l);
+
+    float l = luma(colors_cache[gl_LocalInvocationID.x + 2][gl_LocalInvocationID.y + 2]);
+
+    float total_weight = 0.0;
+    vec4 color = vec4(0);
+
+    for (int i = 0; i < settings.sample_count * settings.sample_count; ++i)
+    {
+        ivec2 offset = ivec2(i % settings.sample_count, i / settings.sample_count) - ivec2(settings.sample_count >> 1);
+
+        ivec2 local_coord = ivec2(gl_LocalInvocationID.xy) + offset + 2;
+
+        if (all(bvec4(greaterThan(local_coord, ivec2(-1)), lessThan(local_coord, ivec2(PBRLIB_WORK_GROUP_SIZE + 3)))))
+        {
+            vec4 offset_color = colors_cache[local_coord.x][local_coord.y];
+            
+            float dist_s = length(offset);
+            float dist_l = luma(offset_color) - l;
+            
+            float weight = exp(fac_s * dist_s * dist_s) * exp(fac_l * dist_l * dist_l);
+            
+            total_weight    += weight;
+            color           += offset_color * weight;
+        }
+    }
+
+    color /= max(total_weight, 0.001);
+
+    imageStore(result, pixel_coord, color);
+}

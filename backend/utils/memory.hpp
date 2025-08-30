@@ -28,6 +28,4 @@ namespace pbrlib::backend::utils
      * @param ptr указатель на освобождаемую память.
     */
     void freeAligned(void* ptr);
-
-    size_t getAlignSize(size_t size);
 }

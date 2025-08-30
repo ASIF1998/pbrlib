@@ -4,6 +4,17 @@
 
 #include <cstdint>
 
+namespace pbrlib::settings
+{
+    struct SSAO
+    {
+        uint32_t blur_samples_count = 8;
+
+        float spatial_sigma     = 1.5;
+        float luminance_sigma   = 1.5;
+    };
+}
+
 namespace pbrlib
 {
     struct Config final
@@ -15,5 +26,7 @@ namespace pbrlib
 
         bool resible        = false;
         bool draw_in_window = true;
+
+        settings::SSAO ssao;
     };
 }
