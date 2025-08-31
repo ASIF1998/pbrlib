@@ -2,6 +2,7 @@
 
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -239,4 +240,10 @@ TEST(Mat3Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(3, 3);
     }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(Mat3Tests, Lerp)
+{
+    constexpr mat3 result (0.75f);
+    pbrlib::testing::equality(result, lerp(mat3(0.0f), mat3(1.0f), 0.75f));
 }

@@ -116,9 +116,6 @@ namespace pbrlib::math
      * @return Следующий кватернион: (q.v * -1.0f, q.w).
     */
     inline Quaternion conjugate(const Quaternion& q);
-
-    inline Quaternion lerp(float t, const Quaternion& q1, const Quaternion& q2);
-    inline Quaternion slerp(float t, const Quaternion& q1, const Quaternion& q2);
 }
 
 #include "quat.inl"

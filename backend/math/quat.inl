@@ -275,29 +275,4 @@ namespace pbrlib::math
     {
         return Quaternion(q.v * -1.0f, q.w);
     }
-
-    inline Quaternion lerp(float t, const Quaternion& q1, const Quaternion& q2)
-    {
-        return q1 * (1.0f - t) + q2 * t;
-    }
-
-    inline Quaternion slerp(float t, const Quaternion& q1, const Quaternion& q2)
-    {
-        float cos_theta = dot(q1, q2);
-
-        if (cos_theta > 0.995f) [[unlikely]] 
-            return lerp(t, q1, q2);
-
-        Quaternion  q3 = q2;
-
-        if (cos_theta < static_cast<float>(0u)) [[unlikely]] 
-        {
-            q3          *=  -1.0f;
-            cos_theta   =   -cos_theta;
-        }
-        
-        float theta = acos(cos_theta);
-
-        return (q1 * sin((1.0f - t) * theta) + q3 * sin(t * theta)) / sin(theta);
-    }
 }

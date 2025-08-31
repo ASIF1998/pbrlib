@@ -265,7 +265,7 @@ namespace pbrlib::backend
 
             const auto scale = static_cast<float>(i++) / 64.0f;
 
-            return pbrlib::math::normalize(pbrlib::math::vec3(x, y, z)) * pbrlib::math::lepr(0.1f, 1.0f, scale * scale);
+            return pbrlib::math::normalize(pbrlib::math::vec3(x, y, z)) * pbrlib::math::lerp(0.1f, 1.0f, scale * scale);
         };
 
         constexpr auto samples_count = 64;

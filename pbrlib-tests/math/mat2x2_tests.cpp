@@ -1,6 +1,7 @@
 #include "../utils.hpp"
 
 #include <pbrlib/math/matrix2x2.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -357,4 +358,10 @@ TEST(Mat2Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(2, 2);
     }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(Mat2Tests, LPOVERLAPPED_ENTRY)
+{
+    constexpr mat2 result (0.75f);
+    pbrlib::testing::equality(result, lerp(mat2(0.0f), mat2(1.0f), 0.75f));
 }
