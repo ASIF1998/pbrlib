@@ -126,7 +126,7 @@ namespace pbrlib
             updateTime();
 
             if (_update_callback) [[likely]]
-                _update_callback(input_stay, _delta_time);
+                _update_callback(*this, input_stay, _delta_time);
 
             _ptr_scene->update(input_stay, _delta_time);
 

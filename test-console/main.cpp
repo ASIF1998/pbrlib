@@ -125,7 +125,7 @@ int main()
             // );
         });
 
-        engine.update([&engine, &config] (const pbrlib::InputStay& input_stay, float delta_time)
+        engine.update([&config] (pbrlib::Engine& engine, const pbrlib::InputStay& input_stay, float delta_time)
         {
             auto& camera = engine.camera();
 
