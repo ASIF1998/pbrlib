@@ -100,6 +100,7 @@ TEST_F(VulkanDeviceTests, CmdBuffer)
 TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 {
     constexpr uint32_t descriptor_count = 100;
+
     constexpr std::array bindings
     {
         std::make_tuple(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL),
@@ -124,6 +125,62 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 
     const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
     pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set, VK_NULL_HANDLE);
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
+}
+
+TEST_F(VulkanDeviceTests, WriteDescriptorSetImage)
+{
+    const auto descriptor_set_layout = pbrlib::backend::vk::builders::DescriptorSetLayout(device)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_ALL)
+        .build();
+
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
+
+    auto image = pbrlib::backend::vk::builders::Image(device)
+        .size(10, 10)
+        .format(VK_FORMAT_R32_SFLOAT)
+        .addQueueFamilyIndex(device.queue().family_index)
+        .usage(VK_IMAGE_USAGE_STORAGE_BIT)
+        .build();
+
+    EXPECT_NO_THROW({
+        device.writeDescriptorSet({
+            .view_handle            = image.view_handle,
+            .set_handle             = descriptor_set,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+    });
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
+}
+
+TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
+{
+    const auto descriptor_set_layout = pbrlib::backend::vk::builders::DescriptorSetLayout(device)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_ALL)
+        .build();
+
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
+
+    auto buffer = pbrlib::backend::vk::builders::Buffer(device)
+        .size(1024)
+        .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+        .addQueueFamilyIndex(device.queue().family_index)
+        .build();
+
+        
+    EXPECT_NO_THROW({
+        device.writeDescriptorSet({
+            .buffer     = buffer,
+            .set_handle = descriptor_set,
+            .size       = static_cast<uint32_t>(buffer.size),
+            .binding    = 0
+        });
+    });
 
     vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
     vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
