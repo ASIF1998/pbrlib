@@ -30,6 +30,8 @@ namespace pbrlib::testing
             .addSetLayout(_descriptor_set_layout_handle)
             .build();
 
+        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-image-comparator] descriptor-set");
+        
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
         const VkComputePipelineCreateInfo pipeline_create_info

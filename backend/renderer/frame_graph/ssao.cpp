@@ -218,7 +218,7 @@ namespace pbrlib::backend
             .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor set with data for compute");
+        _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor-set-with-data-for-compute");
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
