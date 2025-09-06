@@ -99,30 +99,32 @@ TEST_F(VulkanDeviceTests, CmdBuffer)
 
 TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 {
-    /*constexpr uint32_t descriptor_count = 100;
-
-    auto pipeline_layout = pbrlib::backend::vk::builders::PipelineLayout(device)
-        .addSet()
-            .addBinding(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)   
-            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(4, VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(5, VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(10, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, descriptor_count, VK_SHADER_STAGE_FRAGMENT_BIT)
-        .build();
-
-    for (const auto set_layout_handle: pipeline_layout.sets_layout)
+    constexpr uint32_t descriptor_count = 100;
+    constexpr std::array bindings
     {
-        auto descriptor_set_handle = device.allocateDescriptorSet(set_layout_handle);
+        std::make_tuple(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(2, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(4, VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(5, VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(10, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, descriptor_count, VK_SHADER_STAGE_FRAGMENT_BIT)
+    };
 
-        pbrlib::testing::notEquality<VkDescriptorSetLayout>(set_layout_handle, VK_NULL_HANDLE);
-        pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set_handle, VK_NULL_HANDLE);
+    pbrlib::backend::vk::builders::DescriptorSetLayout descriptor_set_layout_builder(device);
+    for (const auto [binding, descriptor_type, count, stage] : bindings)
+        descriptor_set_layout_builder.addBinding(binding, descriptor_type, count, stage);
 
-        vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set_handle);
-    }*/
+    const auto descriptor_set_layout = descriptor_set_layout_builder.build();
+    pbrlib::testing::notEquality<VkDescriptorSetLayout>(descriptor_set_layout, VK_NULL_HANDLE);
+
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
+    pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set, VK_NULL_HANDLE);
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }
