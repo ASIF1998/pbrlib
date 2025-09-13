@@ -95,16 +95,41 @@ GBufferData unpack(
     );
 }
 
-void unpackPosUv(in vec4 gbuffer_pos_uv, out vec3 pos, out vec2 uv)
+void unpackPos(in vec4 gbuffer_pos_uv, out vec3 pos)
 {
     pos = gbuffer_pos_uv.xyz;
+}
+
+void unpackUv(in vec4 gbuffer_pos_uv, out vec2 uv)
+{
     uv  = unpack(floatBitsToUint(gbuffer_pos_uv.w));
+}
+
+void unpackNormal(in vec4 gbuffer_normal_tangent, out vec3 normal)
+{
+    normal  = unpackUnitVec(gbuffer_normal_tangent.xy);
+}
+
+void unpackTangent(in vec4 gbuffer_normal_tangent, out vec3 tangent)
+{
+    tangent = unpackUnitVec(gbuffer_normal_tangent.zw);
+}
+
+void unpackMaterialIndex(in uint gbuffer_material_index, out uint material_index)
+{
+    material_index = gbuffer_material_index;
+}
+
+void unpackPosUv(in vec4 gbuffer_pos_uv, out vec3 pos, out vec2 uv)
+{
+    unpackPos(gbuffer_pos_uv, pos);
+    unpackUv(gbuffer_pos_uv, uv);
 }
 
 void unpackNormalTangent(in vec4 gbuffer_normal_tangent, out vec3 normal, out vec3 tangent)
 {
-    normal  = unpackUnitVec(gbuffer_normal_tangent.xy);
-    tangent = unpackUnitVec(gbuffer_normal_tangent.zw);
+    unpackNormal(gbuffer_normal_tangent, normal);
+    unpackTangent(gbuffer_normal_tangent, tangent);
 }
 
 #endif

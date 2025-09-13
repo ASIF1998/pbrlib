@@ -43,11 +43,8 @@ vec2 getUV(vec3 pos)
 
 vec3 getGBufferPosition(vec2 screen_uv)
 {
-    vec3 pos    = vec3(0);
-    vec2 uv     = vec2(0);
-
-    unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
-
+    vec3 pos;
+    unpackPos(texture(gbuffer_pos_uv, screen_uv), pos);
     return pos;
 }
 
@@ -87,6 +84,7 @@ void main()
 
     vec2 screen_uv = vec2(gl_GlobalInvocationID) / vec2(imageSize(result));
 
+    vec4 g_pos_uv = texture(gbuffer_pos_uv, screen_uv); 
     vec3 pos    = vec3(0);
     vec2 uv     = vec2(0);
 
