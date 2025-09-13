@@ -137,6 +137,8 @@ namespace pbrlib::backend
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[bilateral-blur] run-pipeline");
+
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
             vkCmdBindDescriptorSets(
