@@ -9,6 +9,7 @@
 #include <backend/renderer/frame_graph/ssao.hpp>
 
 #include <backend/renderer/frame_graph/builders/ssao.hpp>
+#include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -70,24 +71,17 @@ namespace pbrlib::backend
 {
     std::unique_ptr<RenderPass> FrameGraph::buildGBufferGeneratorSubpass()
     {
-        std::unique_ptr<RenderPass> ptr_gbuffer_generator = std::make_unique<GBufferGenerator>(_device);
+        auto ptr_pos_uv_image           = &_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        auto ptr_nor_tan_image          = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        auto ptr_mat_index_image        = &_images.at(AttachmentsTraits<GBufferGenerator>::material_index);
+        auto ptr_depth_stencil_image    = &_depth_buffer.value();
 
-        constexpr auto pos_uv           = AttachmentsTraits<GBufferGenerator>::pos_uv;
-        constexpr auto normal_tangent   = AttachmentsTraits<GBufferGenerator>::normal_tangent;
-        constexpr auto material_index   = AttachmentsTraits<GBufferGenerator>::material_index;
-
-        ptr_gbuffer_generator->addColorOutput(pos_uv, &_images.at(pos_uv));
-        ptr_gbuffer_generator->addColorOutput(normal_tangent, &_images.at(normal_tangent));
-        ptr_gbuffer_generator->addColorOutput(material_index, &_images.at(material_index));
-        ptr_gbuffer_generator->depthStencil(&_depth_buffer.value());
-
-        ptr_gbuffer_generator->addSyncImage (
-            &_depth_buffer.value(), 
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , ptr_gbuffer_generator->srcStage()
-        );
-
-        return ptr_gbuffer_generator;
+        return builders::GBufferGenerator(_device)
+            .posUvImage(*ptr_pos_uv_image)
+            .normalTangentImage(*ptr_nor_tan_image)
+            .materialIndexImage(*ptr_mat_index_image)
+            .depthStencilImage(*ptr_depth_stencil_image)
+            .build();
     }
 
     std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
