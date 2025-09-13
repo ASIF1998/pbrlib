@@ -307,8 +307,8 @@ namespace pbrlib::backend
                     _ptr_material_manager->add(
                         &item,
                         ptr_material->GetName().C_Str(),
-                        getComressedImage(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE, 4),
+                        getComressedImage(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_METALNESS, 1),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE_ROUGHNESS, 1)
                     );

@@ -478,6 +478,8 @@ namespace pbrlib::backend::vk::decoders
             .format = formats[_channels_per_pixel - 1]
         };
 
+        stbi_set_flip_vertically_on_load(true);
+
         write_data.ptr_data = stbi_load_from_memory(
             _compressed_image.ptr_data, 
             static_cast<int>(_compressed_image.size), 

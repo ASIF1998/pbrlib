@@ -134,13 +134,22 @@ namespace pbrlib::backend
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[ssao] run-pipeline");
 
-            const auto gbuffer_descriptor_set   = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first;
-            const auto material_manager_set     = context().ptr_material_manager->descriptorSet().first;
-
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &gbuffer_descriptor_set, 0, nullptr);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 1, 1, &_ssao_desc_set, 0, nullptr);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 2, 1, &material_manager_set, 0, nullptr);
+
+            const std::array sets_descriptors
+            {
+                descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
+                _ssao_desc_set,
+                context().ptr_material_manager->descriptorSet().first
+            };
+
+            vkCmdBindDescriptorSets(
+                command_buffer_handle, 
+                VK_PIPELINE_BIND_POINT_COMPUTE, 
+                _pipeline_layout_handle, 0, 
+                static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(), 
+                0, nullptr
+            );
 
             const auto projection_view = context().projection * context().view;
 
