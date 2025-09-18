@@ -261,27 +261,73 @@ namespace pbrlib::backend
 
     void SSAO::createSamplesBuffer()
     {
-        std::uniform_real_distribution<float>   random_floats (0.0f, 1.0f);
-        std::default_random_engine              generator;
-
-        uint32_t i = 0;
-
-        const auto generate_vector = [&generator, &random_floats, &i] ()
+        constexpr std::array samples
         {
-            const auto x = random_floats(generator) * 2.0f - 1.0f;
-            const auto y = random_floats(generator) * 2.0f - 1.0f;
-            const auto z = random_floats(generator);
-
-            const auto scale = static_cast<float>(i++) / 64.0f;
-
-            return pbrlib::math::normalize(pbrlib::math::vec3(x, y, z)) * pbrlib::math::lerp(0.1f, 1.0f, scale * scale);
+            pbrlib::math::vec4(0.62944734f, -0.7290461f, 0.9057919f, 0.0f),
+            pbrlib::math::vec4(0.6700171f, -0.7460264f, 0.9688677f, 0.0f),
+            pbrlib::math::vec4(0.8267517f, -0.557932f, 0.6323592f, 0.0f),
+            pbrlib::math::vec4(-0.38366592f, -0.80491924f, 0.5472206f, 0.0f),
+            pbrlib::math::vec4(-0.44300365f, -0.62323606f, 0.5468815f, 0.0f),
+            pbrlib::math::vec4(0.9857626f, 0.91501355f, 0.9964613f, 0.0f),
+            pbrlib::math::vec4(0.929777f, 0.93538976f, 0.15761304f, 0.0f),
+            pbrlib::math::vec4(0.45167792f, 0.9411855f, 0.9811097f, 0.0f),
+            pbrlib::math::vec4(0.9143338f, -0.78027654f, 0.48537564f, 0.0f),
+            pbrlib::math::vec4(0.5962117f, 0.6005609f, 0.29702944f, 0.0f),
+            pbrlib::math::vec4(-0.7162274f, -0.9904331f, 0.42176127f, 0.0f),
+            pbrlib::math::vec4(-0.775071f, 0.83147097f, 0.63976336f, 0.0f),
+            pbrlib::math::vec4(0.5844146f, 0.7568612f, 0.9594924f, 0.0f),
+            pbrlib::math::vec4(0.0073252916f, 0.31148136f, 0.7979286f, 0.0f),
+            pbrlib::math::vec4(-0.9285767f, -0.27741206f, 0.84912926f, 0.0f),
+            pbrlib::math::vec4(-0.5761514f, 0.86798644f, 0.6813595f, 0.0f),
+            pbrlib::math::vec4(0.35747027f, -0.202523f, 0.7577401f, 0.0f),
+            pbrlib::math::vec4(0.4812944f, 0.48626482f, 0.47475863f, 0.0f),
+            pbrlib::math::vec4(-0.21554601f, -0.15582466f, 0.6554779f, 0.0f),
+            pbrlib::math::vec4(-0.6522697f, -0.6576266f, 0.30191308f, 0.0f),
+            pbrlib::math::vec4(0.4120921f, 0.5945598f, 0.031832814f, 0.0f),
+            pbrlib::math::vec4(-0.36689913f, -0.44615412f, 0.8724288f, 0.0f),
+            pbrlib::math::vec4(-0.90765727f, -0.7017721f, 0.09713173f, 0.0f),
+            pbrlib::math::vec4(0.9881369f, 0.64691556f, 0.8219032f, 0.0f),
+            pbrlib::math::vec4(0.38965714f, -0.7496345f, 0.31709945f, 0.0f),
+            pbrlib::math::vec4(0.5274999f, 0.90044403f, 0.49058902f, 0.0f),
+            pbrlib::math::vec4(-0.9311079f, 0.32721102f, 0.4387443f, 0.0f),
+            pbrlib::math::vec4(-0.74820673f, -0.23688316f, 0.21020907f, 0.0f),
+            pbrlib::math::vec4(0.5310335f, -0.89756715f, 0.7951999f, 0.0f),
+            pbrlib::math::vec4(-0.9271176f, -0.6262548f, 0.4087311f, 0.0f),
+            pbrlib::math::vec4(-0.020471215f, -0.08402181f, 0.44558614f, 0.0f),
+            pbrlib::math::vec4(-0.02486217f, 0.2926259f, 0.79397494f, 0.0f),
+            pbrlib::math::vec4(0.41872954f, 0.84174955f, 0.75468665f, 0.0f),
+            pbrlib::math::vec4(0.615062f, -0.4479499f, 0.70577425f, 0.0f),
+            pbrlib::math::vec4(0.35940528f, -0.9943632f, 0.65509796f, 0.0f),
+            pbrlib::math::vec4(0.4214077f, -0.67477655f, 0.64396095f, 0.0f),
+            pbrlib::math::vec4(-0.76200473f, -0.087934375f, 0.49836403f, 0.0f),
+            pbrlib::math::vec4(0.54783416f, 0.91948783f, 0.5737546f, 0.0f),
+            pbrlib::math::vec4(-0.31922865f, 0.75351477f, 0.5852677f, 0.0f),
+            pbrlib::math::vec4(0.6163509f, -0.55237615f, 0.017773867f, 0.0f),
+            pbrlib::math::vec4(0.50253403f, 0.64249194f, 0.25509506f, 0.0f),
+            pbrlib::math::vec4(0.64168155f, 0.011914015f, 0.940074f, 0.0f),
+            pbrlib::math::vec4(0.39815342f, -0.174667f, 0.89090323f, 0.0f),
+            pbrlib::math::vec4(-0.15366983f, 0.9185828f, 0.58095664f, 0.0f),
+            pbrlib::math::vec4(0.09443104f, -0.68388486f, 0.13862443f, 0.0f),
+            pbrlib::math::vec4(0.5234624f, -0.7014121f, 0.23015606f, 0.0f),
+            pbrlib::math::vec4(-0.48498356f, 0.61946905f, 0.8407172f, 0.0f),
+            pbrlib::math::vec4(0.97704315f, -0.49143565f, 0.33244824f, 0.0f),
+            pbrlib::math::vec4(0.6285696f, -0.40033662f, 0.24352497f, 0.0f),
+            pbrlib::math::vec4(-0.97292185f, 0.8585272f, 0.21723783f, 0.0f),
+            pbrlib::math::vec4(-0.3000325f, 0.81472933f, 0.19659519f, 0.0f),
+            pbrlib::math::vec4(0.69693553f, -0.4978323f, 0.95501757f, 0.0f),
+            pbrlib::math::vec4(0.23208928f, 0.5577954f, 0.47328883f, 0.0f),
+            pbrlib::math::vec4(0.9749192f, -0.29668105f, 0.06759536f, 0.0f),
+            pbrlib::math::vec4(0.6616572f, 0.58719516f, 0.5852641f, 0.0f),
+            pbrlib::math::vec4(0.18900704f, 0.09944713f, 0.7327987f, 0.0f),
+            pbrlib::math::vec4(0.8343873f, 0.39046574f, 0.28583896f, 0.0f),
+            pbrlib::math::vec4(0.35963953f, 0.51440036f, 0.39232045f, 0.0f),
+            pbrlib::math::vec4(0.5074581f, 0.123114824f, 0.38044584f, 0.0f),
+            pbrlib::math::vec4(-0.583864f, 0.13564324f, 0.5273714f, 0.0f),
+            pbrlib::math::vec4(-0.8482915f, -0.19158304f, 0.05395007f, 0.0f),
+            pbrlib::math::vec4(-0.2944752f, 0.061595082f, 0.59282386f, 0.0f),
+            pbrlib::math::vec4(0.55833435f, -0.28730977f, 0.9340106f, 0.0f),
+            pbrlib::math::vec4(0.9299327f, -0.74018764f, 0.15443838f, 0.0f)
         };
-
-        constexpr auto samples_count = 64;
-        std::array<pbrlib::math::vec4, samples_count> samples;
-
-        for (auto& sample: samples)
-            sample = generate_vector();
 
         _samples_buffer = vk::builders::Buffer(device())
             .addQueueFamilyIndex(device().queue().family_index)

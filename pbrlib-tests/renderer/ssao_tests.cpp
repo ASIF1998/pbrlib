@@ -22,6 +22,19 @@ TEST_F(SSAOTests, JunkShopAttachments)
         .eye    = pbrlib::math::vec3(0)
     };
 
+    constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::SSAO>::ssao;
+    check("ssao/junk-shop-ssao-result.png", attahment_name);
+}
+
+TEST_F(SSAOTests, JunkShopAttachmentsWithBlur)
+{
+    constexpr pbrlib::testing::Settings settings
+    {
+        .up     = pbrlib::math::vec3(0, -1, 0),
+        .pos    = pbrlib::math::vec3(-3, 5, 16.0),
+        .eye    = pbrlib::math::vec3(0)
+    };
+
     constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::SSAO>::blur;
 
     setup("Blender 2.glb", settings);
@@ -36,7 +49,7 @@ TEST_F(SSAOTests, JunkShopAttachments)
                 config().ssao.luminance_sigma = luminance_sigma;
 
                 const auto filename = std::format(
-                    "ssao/junk-shop_sample-count={},spatial-sigma={},luminance-sigma={}.png", 
+                    "ssao/junk-shop-with-blur_sample-count={},spatial-sigma={},luminance-sigma={}.png", 
                     sample_count, 
                     spatial_sigma, 
                     luminance_sigma
