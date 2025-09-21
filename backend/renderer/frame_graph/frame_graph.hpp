@@ -47,6 +47,8 @@ namespace pbrlib::backend
 
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);
 
+        void clearImages(vk::CommandBuffer& command_buffer);
+
     public:
         explicit FrameGraph (
             vk::Device&             device, 

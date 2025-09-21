@@ -31,21 +31,14 @@ layout(set = 1, binding = 2) uniform Samples
 
 layout(push_constant) uniform PerFrameData
 {
-    mat4 projection_view;
+    mat4 projection;
+    mat4 view;
 };
 
-vec2 getUV(vec3 pos)
+vec2 getUV(vec4 pos_in_view_space)
 {
-    vec4 ndc = projection_view * vec4(pos, 1);
-    ndc.xyz /= ndc.w;
-    return ndc.xy * 0.5 + 0.5;
-}
-
-vec3 getGBufferPosition(vec2 screen_uv)
-{
-    vec3 pos;
-    unpackPos(texture(gbuffer_pos_uv, screen_uv), pos);
-    return pos;
+    vec4 ndc = projection * pos_in_view_space;
+    return (ndc.xy / ndc.w) * 0.5 + 0.5;
 }
 
 vec3 getNormal(vec2 screen_uv, vec2 geometry_uv)
@@ -53,26 +46,24 @@ vec3 getNormal(vec2 screen_uv, vec2 geometry_uv)
     uint mat_index  = texture(gbuffer_material_index, screen_uv).r;
     uint img_index  = materials[mat_index].normal_map;
 
-    return texture(materials_images[img_index], geometry_uv).xyz * 2.0 - 1.0;
+    return normalize(texture(materials_images[img_index], geometry_uv).xyz * 2.0 - 1.0);
 }
 
-float calcOcclution(vec3 pos, mat3 tbn, float depth)
+float calcOcclusion(vec3 pos, mat3 tbn)
 {
-    float occlusion = 0.0;
+    const float bias = 0.01;
 
-    const float bias = 0.03;
+    float occlusion     = 0.0;
+    float origin_depth  = length((view * vec4(pos, 1)).xyz);
 
     for (uint i = 0; i < sample_count; ++i)
     {
-        vec3 sample_pos = tbn * samples[i].xyz;
-        sample_pos = pos + sample_pos * radius;
+        vec4 sample_pos = view * vec4(pos + tbn * samples[i].xyz * radius, 1);
+        vec4 gbuff_pos  = view * vec4(unpackPos(texture(gbuffer_pos_uv, getUV(sample_pos))), 1);
 
-        vec2 sample_uv = getUV(sample_pos);
+        float range_check = smoothstep(1.0, 0.0, abs(length(sample_pos.xyz) - origin_depth) / radius);
 
-        float sample_depth  = getGBufferPosition(sample_uv).z;
-        float range_check   = smoothstep(0.0, 1.0, radius / abs(pos.z - sample_depth));
-
-        occlusion += (sample_depth >= sample_pos.z + bias ? 1.0 : 0.0) * range_check;  
+        occlusion += float(gbuff_pos.z >= (sample_pos.z + bias)) * range_check;  
     }
 
     return 1.0 - (occlusion / float(sample_count));
@@ -90,10 +81,10 @@ void main()
 
     unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
 
-    vec3 normal             = getNormal(screen_uv, uv);
-    vec3 random_direction   = randomVec(pos);
+    vec3 random_direction = randomVec(pos);
 
-    vec3 tangent = normalize(random_direction - normal * dot(random_direction, normal));
+     vec3 normal     = getNormal(screen_uv, uv);
+    vec3 tangent    = normalize(random_direction - normal * dot(random_direction, normal));
 
     mat3 tbn = mat3(
         tangent,
@@ -101,7 +92,5 @@ void main()
         normal
     );
 
-    float depth = texture(gbuffer_depth, screen_uv).r;
-
-    imageStore(result, pixel_coord, vec4(vec3(calcOcclution(pos, tbn, depth)), 1.0));
+    imageStore(result, pixel_coord, vec4(vec3(calcOcclusion(pos, tbn)), 1.0));
 }

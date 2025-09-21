@@ -11,6 +11,8 @@
 #include <backend/renderer/frame_graph/builders/ssao.hpp>
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+
 #include <backend/logger/logger.hpp>
 
 #include <backend/profiling.hpp>
@@ -56,6 +58,8 @@ namespace pbrlib::backend
         updatePerFrameData(camera, items);
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-draw");
+
+        clearImages(command_buffer);
 
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
@@ -206,5 +210,36 @@ namespace pbrlib::backend
         _config = config;
         if (_ptr_render_pass) [[likely]]
             _ptr_render_pass->update(config);
+    }
+}
+
+namespace pbrlib::backend
+{
+    void FrameGraph::clearImages(vk::CommandBuffer& command_buffer)
+    {
+        for (auto& [_, image]: _images)
+            image.changeLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
+        {
+            constexpr VkClearColorValue clear_color = {0.0, 0.0, 0.0, 0.0};
+
+            constexpr VkImageSubresourceRange range
+            {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .levelCount = 1,
+                .layerCount = 1
+            };
+
+            for (auto& [_, image]: _images)
+            {
+                vkCmdClearColorImage(
+                    command_buffer_handle, 
+                    image.handle, image.layout, 
+                    &clear_color, 
+                    1, &range
+                );
+            }
+        }, "[frame-graph] clear-images", vk::marker_colors::clear);
     }
 }

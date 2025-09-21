@@ -78,7 +78,8 @@ namespace pbrlib::backend
             .minFilter      = VK_FILTER_NEAREST,
             .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
             .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
         };
 
         VK_CHECK(vkCreateSampler(

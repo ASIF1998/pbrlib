@@ -84,7 +84,7 @@ namespace pbrlib::backend
         {
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
             .offset     = 0,
-            .size       = sizeof(pbrlib::math::mat4)
+            .size       = 2 * sizeof(pbrlib::math::mat4)
         };
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
@@ -151,13 +151,17 @@ namespace pbrlib::backend
                 0, nullptr
             );
 
-            const auto projection_view = context().projection * context().view;
+            const std::array matrices
+            {
+                context().projection,
+                context().view
+            };
 
             vkCmdPushConstants(
                 command_buffer_handle, 
                 _pipeline_layout_handle, 
                 VK_SHADER_STAGE_COMPUTE_BIT, 
-                0, sizeof(pbrlib::math::mat4), &projection_view
+                0, static_cast<uint32_t>(sizeof(pbrlib::math::mat4) * matrices.size()), matrices.data()
             );
 
             const auto [width, height] = size();

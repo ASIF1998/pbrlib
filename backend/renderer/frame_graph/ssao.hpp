@@ -60,7 +60,7 @@ namespace pbrlib::backend
     {
         struct alignas(16) Params final
         {
-            float               radius          = 0.5f;
+            float               radius          = 0.05f;
             uint32_t            sample_count    = 0;
             pbrlib::math::vec2  noise_scale;
         };
