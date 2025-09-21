@@ -41,14 +41,6 @@ vec2 getUV(vec4 pos_in_view_space)
     return (ndc.xy / ndc.w) * 0.5 + 0.5;
 }
 
-vec3 getNormal(vec2 screen_uv, vec2 geometry_uv)
-{
-    uint mat_index  = texture(gbuffer_material_index, screen_uv).r;
-    uint img_index  = materials[mat_index].normal_map;
-
-    return normalize(texture(materials_images[img_index], geometry_uv).xyz * 2.0 - 1.0);
-}
-
 float calcOcclusion(vec3 pos, mat3 tbn)
 {
     const float bias = 0.01;
@@ -83,7 +75,7 @@ void main()
 
     vec3 random_direction = randomVec(pos);
 
-     vec3 normal     = getNormal(screen_uv, uv);
+    vec3 normal     = unpackNormal(texture(gbuffer_normal_tangent, screen_uv));
     vec3 tangent    = normalize(random_direction - normal * dot(random_direction, normal));
 
     mat3 tbn = mat3(
