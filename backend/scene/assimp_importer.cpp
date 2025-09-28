@@ -277,7 +277,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        log::info("[importer]\t - porocess node: {}", ptr_node->mName.C_Str());
+        log::info("[importer]\t - process node: {}", ptr_node->mName.C_Str());
 
         ScopedTransform scoped_transform (this, utils::cast(ptr_node->mTransformation));
 

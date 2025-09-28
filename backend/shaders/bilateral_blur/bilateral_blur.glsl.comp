@@ -10,6 +10,8 @@ layout(set = 0, binding = 1) uniform writeonly image2D result;
 #include <gpu_cpu_constants.h>
 layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
 
+shared vec4 colors_cache[PBRLIB_WORK_GROUP_SIZE * 2][PBRLIB_WORK_GROUP_SIZE * 2];
+
 struct Settings
 {
     uint    sample_count;
@@ -27,61 +29,36 @@ float luma(vec4 color)
     return dot(color.rgb, vec3(0.299, 0.587, 0.114));
 }
 
-shared vec4 colors_cache[PBRLIB_WORK_GROUP_SIZE + 4][PBRLIB_WORK_GROUP_SIZE + 4];
+ivec2 csign(ivec2 v)
+{
+    return ivec2(step(0, vec2(v)) * 2.0 - 1.0);
+}
 
 void initColorsCache(vec2 uv, vec2 scale)
 {
-    colors_cache[gl_LocalInvocationID.x + 2][gl_LocalInvocationID.y + 2] = texture(input_image, uv);
+    const int   half_size   = PBRLIB_WORK_GROUP_SIZE >> 1;
+    const ivec2 half_size_2 = ivec2(half_size);
 
-    if (gl_LocalInvocationID.x == 0)
-    {
-        colors_cache[1][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(-1, 0));
-        colors_cache[0][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(-2, 0));
-    }
-    else if (gl_LocalInvocationID.x == PBRLIB_WORK_GROUP_SIZE - 1)
-    {
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(1, 0));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][gl_LocalInvocationID.y + 2] = texture(input_image, uv + scale * vec2(2, 0));
-    }
+    ivec2 local_pos = ivec2(gl_LocalInvocationID.xy);
 
-    if (gl_LocalInvocationID.y == 0)
-    {
-        colors_cache[gl_LocalInvocationID.x + 2][1] = texture(input_image, uv + scale * vec2(0, -1));
-        colors_cache[gl_LocalInvocationID.x + 2][0] = texture(input_image, uv + scale * vec2(0, -2));
-    }
-    else if (gl_LocalInvocationID.y == PBRLIB_WORK_GROUP_SIZE - 1)
-    {
-        colors_cache[gl_LocalInvocationID.x + 2][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(0, 1));
-        colors_cache[gl_LocalInvocationID.x + 2][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(0, 2));
-    }
+    ivec2 pos_1 = local_pos + half_size_2;
+    ivec2 pos_2 = pos_1 + csign(local_pos - half_size_2) * half_size_2;
 
-    if (all(equal(gl_LocalInvocationID.xy, uvec2(0))))
+    colors_cache[pos_1.x][pos_1.y] = texture(input_image, uv);
+    colors_cache[pos_2.x][pos_1.y] = texture(input_image, uv + scale * vec2(pos_2.x - pos_1.x, 1));
+    colors_cache[pos_1.x][pos_2.y] = texture(input_image, uv + scale * vec2(1, pos_2.y - pos_1.y));
+
+    bool corner_x = any(equal(local_pos.xx, ivec2(0, PBRLIB_WORK_GROUP_SIZE - 1)));
+    bool corner_y = any(equal(local_pos.yy, ivec2(0, PBRLIB_WORK_GROUP_SIZE - 1)));
+
+    if (corner_x && corner_y)
     {
-        colors_cache[1][1] = texture(input_image, uv + scale * vec2(-1, -1));
-        colors_cache[0][1] = texture(input_image, uv + scale * vec2(-2, -1));
-        colors_cache[1][0] = texture(input_image, uv + scale * vec2(-1, -2));
-        colors_cache[0][0] = texture(input_image, uv + scale * vec2(-2, -2));
-    }
-    else if (all(equal(gl_LocalInvocationID.xy, uvec2(PBRLIB_WORK_GROUP_SIZE - 1, 0))))
-    {
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][1] = texture(input_image, uv + scale * vec2(1, -1));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][1] = texture(input_image, uv + scale * vec2(2, -1));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][0] = texture(input_image, uv + scale * vec2(1, -2));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][0] = texture(input_image, uv + scale * vec2(2, -2));
-    }
-    else if (all(equal(gl_LocalInvocationID.xy, uvec2(0, PBRLIB_WORK_GROUP_SIZE - 1))))
-    {
-        colors_cache[1][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(-1, 1));
-        colors_cache[0][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(-2, 1));
-        colors_cache[1][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(-1, 2));
-        colors_cache[0][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(-2, 2));
-    }
-    else if (any(equal(gl_LocalInvocationID.xy, uvec2(PBRLIB_WORK_GROUP_SIZE - 1))))
-    {
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(1, 1));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][PBRLIB_WORK_GROUP_SIZE + 2] = texture(input_image, uv + scale * vec2(2, 1));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 2][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(1, 2));
-        colors_cache[PBRLIB_WORK_GROUP_SIZE + 3][PBRLIB_WORK_GROUP_SIZE + 3] = texture(input_image, uv + scale * vec2(2, 2));
+        ivec2 pos = local_pos + half_size_2 * ivec2(greaterThan(local_pos, ivec2(0)));
+        for (int i = 0; i < half_size; ++i)
+        {
+            for (int j = 0; j < half_size; ++j)
+                colors_cache[pos.x + i][pos.y + j] = texture(input_image, uv + scale * (vec2(i, j) - half_size_2));
+        }
     }
 
     barrier();
@@ -93,30 +70,30 @@ void main()
     vec2    scale       = vec2(1.0) / vec2(textureSize(input_image, 0));
     vec2    uv          = vec2(pixel_coord) * scale;
 
+    const int offset_in_sm = PBRLIB_WORK_GROUP_SIZE >> 1;
+
     initColorsCache(uv, scale);
 
     const float fac_s = -1.0 / (2.0 * settings.sigma_s * settings.sigma_s);
     const float fac_l = -1.0 / (2.0 * settings.sigma_l * settings.sigma_l);
 
-    float l = luma(colors_cache[gl_LocalInvocationID.x + 2][gl_LocalInvocationID.y + 2]);
+    float l = luma(colors_cache[gl_LocalInvocationID.x + offset_in_sm][gl_LocalInvocationID.y + offset_in_sm]);
 
-    float total_weight = 0.0;
-    vec4 color = vec4(0);
+    vec4    color           = vec4(0);
+    float   total_weight    = 0.0;
 
-    for (int i = 0; i < settings.sample_count * settings.sample_count; ++i)
+    int sample_count = int(settings.sample_count >> 1);
+    for (int i = -sample_count; i < sample_count; ++i)
     {
-        ivec2 offset = ivec2(i % settings.sample_count, i / settings.sample_count) - ivec2(settings.sample_count >> 1);
-
-        ivec2 local_coord = ivec2(gl_LocalInvocationID.xy) + offset + 2;
-
-        if (all(bvec4(greaterThan(local_coord, ivec2(-1)), lessThan(local_coord, ivec2(PBRLIB_WORK_GROUP_SIZE + 3)))))
+        for (int j = -sample_count; j < sample_count; ++j)
         {
-            vec4 offset_color = colors_cache[local_coord.x][local_coord.y];
-            
-            float dist_s = length(offset);
+            ivec2   offset          = ivec2(i, j) + ivec2(gl_LocalInvocationID.xy) + offset_in_sm;
+            vec4    offset_color    = colors_cache[offset.x][offset.y];
+
+            float dist_s = length(vec2(i, j));
             float dist_l = luma(offset_color) - l;
-            
-            float weight = exp(fac_s * dist_s * dist_s) * exp(fac_l * dist_l * dist_l);
+
+            float weight = exp(fac_s * dist_s * dist_s) * exp(fac_l * dist_l * dist_l);;
             
             total_weight    += weight;
             color           += offset_color * weight;
@@ -124,6 +101,5 @@ void main()
     }
 
     color /= max(total_weight, 0.001);
-
     imageStore(result, pixel_coord, color);
 }
