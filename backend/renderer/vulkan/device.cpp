@@ -638,7 +638,7 @@ namespace pbrlib::backend::vk
             .pImageInfo         = &image_info
         };
 
-        vkUpdateDescriptorSets(
+        vkUpdateDescriptorSets (
             _device_handle,
             1, &write_info,
             0, nullptr
@@ -675,7 +675,7 @@ namespace pbrlib::backend::vk
             .pBufferInfo        = &buffer_info
         };
 
-        vkUpdateDescriptorSets(
+        vkUpdateDescriptorSets (
             _device_handle,
             1, &write_info,
             0, nullptr

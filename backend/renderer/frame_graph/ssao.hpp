@@ -31,12 +31,10 @@ namespace pbrlib::backend
             |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
             |   VK_IMAGE_USAGE_STORAGE_BIT;
 
-            /// @todo VK_FORMAT_R16_SFLOAT
-
             constexpr std::array metadata
             {
-                AttachmentMetadata(ssao, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
-                AttachmentMetadata(blur, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags)
+                AttachmentMetadata(ssao, VK_FORMAT_R16_SFLOAT, usage_flags),
+                AttachmentMetadata(blur, VK_FORMAT_R16_SFLOAT, usage_flags)
             };
 
             return metadata;

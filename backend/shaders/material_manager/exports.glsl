@@ -9,7 +9,7 @@ struct Material
     uint roughness;
 };
 
-layout(set = PBRLIB_MATERIAL_MANAGER_SET_ID, binding = 0) uniform sampler2D[] materials_images;
+layout(set = PBRLIB_MATERIAL_MANAGER_SET_ID, binding = 0) uniform sampler2D materials_images[];
 
 layout(set = PBRLIB_MATERIAL_MANAGER_SET_ID, binding = 1) buffer readonly MaterialBuffer
 {

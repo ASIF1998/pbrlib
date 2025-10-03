@@ -29,8 +29,8 @@
 namespace pbrlib::backend
 {
     SSAO::SSAO(vk::Device& device, BilateralBlur* ptr_blur) :
-        RenderPass(device),
-        _ptr_blur (ptr_blur)
+        RenderPass  (device),
+        _ptr_blur   (ptr_blur)
     { 
         if (!ptr_blur) [[unlikely]]
             throw exception::InvalidArgument("[ssao] pointer to blur is null");
@@ -105,7 +105,7 @@ namespace pbrlib::backend
         _params.noise_scale.x = static_cast<float>(width) / noise_width;
         _params.noise_scale.y = static_cast<float>(height) / noise_height;
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .buffer     = _params_buffer.value(),
             .set_handle = _ssao_desc_set,
             .size       = static_cast<uint32_t>(_params_buffer->size),
@@ -214,7 +214,7 @@ namespace pbrlib::backend
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_result_image->view_handle,
             .sampler_handle         = _result_image_sampler,
             .set_handle             = _result_image_desc_set,
@@ -235,14 +235,14 @@ namespace pbrlib::backend
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_result_image->view_handle,
             .set_handle             = _ssao_desc_set,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .buffer     = _samples_buffer.value(),
             .set_handle = _ssao_desc_set,
             .size       = static_cast<uint32_t>(_samples_buffer->size),

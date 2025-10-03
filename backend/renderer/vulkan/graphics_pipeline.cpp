@@ -123,7 +123,7 @@ namespace pbrlib::backend::vk::builders
             const auto entries  = ptr_spec_info->entries();
             const auto data     = ptr_spec_info->data();
 
-            _specialization_infos.emplace_back(
+            _specialization_infos.emplace_back (
                 static_cast<uint32_t>(entries.size()), entries.data(), 
                 static_cast<uint32_t>(data.size()), data.data()
             );

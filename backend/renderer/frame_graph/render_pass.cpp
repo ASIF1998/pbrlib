@@ -98,7 +98,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> RenderPass::descriptorSet(uint32_t set_id) const
     {
-        if (auto res = _input_descriptor_sets.find(set_id); res != std::end(_input_descriptor_sets))
+        if (auto res = _input_descriptor_sets.find(set_id); res != std::end(_input_descriptor_sets)) [[likely]]
             return res->second;
 
         throw exception::RuntimeError("[render-pass] failed find input descriptor set");

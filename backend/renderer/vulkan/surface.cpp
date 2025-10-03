@@ -167,7 +167,7 @@ namespace pbrlib::backend::vk
     {
         auto ptr_sdl_window = static_cast<SDL_Window*>(ptr_window->_ptr_window);
 
-        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE)
+        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE) [[unlikely]]
             throw exception::InitializeError("[vk-surface] failed create");
     }
 

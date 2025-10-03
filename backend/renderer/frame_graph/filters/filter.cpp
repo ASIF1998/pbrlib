@@ -15,7 +15,7 @@ namespace pbrlib::backend
 
     vk::Image& Filter::srcImage()
     {
-        if (!_ptr_src_image)
+        if (!_ptr_src_image) [[unlikely]]
             throw exception::InvalidState("[filter] didn't set source image");
         
         return *_ptr_src_image;

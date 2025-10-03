@@ -123,7 +123,7 @@ namespace pbrlib::backend
         auto ptr_pos_uv         = &_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
         auto ptr_normal_tangent = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
-        auto ptr_ssao = buildSSAOSubpass(
+        auto ptr_ssao = buildSSAOSubpass (
             ptr_pos_uv, 
             ptr_normal_tangent, 
             &_depth_buffer.value(),

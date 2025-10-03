@@ -29,7 +29,7 @@ namespace pbrlib::backend
             .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _descriptor_set_handle = device.allocateDescriptorSet(
+        _descriptor_set_handle = device.allocateDescriptorSet (
             _descriptor_set_layout_handle,
             "[bilateral-blur] input descriptor set"
         );
@@ -59,7 +59,7 @@ namespace pbrlib::backend
 
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
 
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_descriptor_set_handle) != VK_SUCCESS)
+        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_descriptor_set_handle) != VK_SUCCESS) [[unlikely]]
             log::error("[bilateral-blur] failed free descriptor set");
 
         vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
@@ -92,7 +92,7 @@ namespace pbrlib::backend
         const auto& input_image         = srcImage();
         const auto  ptr_output_image    = colorOutputAttach(_output_image_name);
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = input_image.view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
@@ -100,7 +100,7 @@ namespace pbrlib::backend
             .binding                = 0
         });
         
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_output_image->view_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,

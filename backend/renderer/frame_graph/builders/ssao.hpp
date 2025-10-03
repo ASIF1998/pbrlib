@@ -36,8 +36,7 @@ namespace pbrlib::backend::builders
 
         SSAO& gbufferDescriptorSet(VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout_handle) noexcept;
 
-        [[nodiscard]]
-        std::unique_ptr<CompoundRenderPass> build();
+        [[nodiscard]] std::unique_ptr<CompoundRenderPass> build();
 
     private:
         vk::Device& _device;

@@ -25,7 +25,7 @@ namespace pbrlib::backend
                 }
             }
 
-            if (!_subpasses.empty())
+            if (!_subpasses.empty()) [[likely]]
             {
                 const auto [descriptor_set_handle, descriptor_set_layout_handle] = _subpasses.back()->resultDescriptorSet();
 

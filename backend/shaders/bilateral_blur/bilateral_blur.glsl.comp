@@ -93,7 +93,7 @@ void main()
             float dist_s = length(vec2(i, j));
             float dist_l = luma(offset_color) - l;
 
-            float weight = exp(fac_s * dist_s * dist_s) * exp(fac_l * dist_l * dist_l);;
+            float weight = exp((fac_s * dist_s * dist_s) + (fac_l * dist_l * dist_l));
             
             total_weight    += weight;
             color           += offset_color * weight;

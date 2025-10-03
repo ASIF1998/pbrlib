@@ -46,7 +46,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!ptr_item || !ptr_item->hasComponent<components::Renderable>())
+        if (!ptr_item || !ptr_item->hasComponent<components::Renderable>()) [[unlikely]]
             throw exception::InvalidArgument("[mesh-manager] ptr_item");
 
         auto& renderable = ptr_item->getComponent<components::Renderable>();
@@ -161,14 +161,14 @@ namespace pbrlib::backend
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
 
-            _device.writeDescriptorSet({
+            _device.writeDescriptorSet ({
                 .buffer     = _vbos_refs.value(),
                 .set_handle = _descriptor_set_handle,
                 .size       = static_cast<uint32_t>(_vbos_refs->size),
                 .binding    = Bindings::eVertexBuffers
             });
 
-            _device.writeDescriptorSet({
+            _device.writeDescriptorSet ({
                 .buffer     = _instances_buffer.value(),
                 .set_handle = _descriptor_set_handle,
                 .size       = static_cast<uint32_t>(_instances_buffer->size),

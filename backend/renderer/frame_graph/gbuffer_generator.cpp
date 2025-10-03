@@ -49,7 +49,7 @@ namespace pbrlib::backend
 
     GBufferGenerator::~GBufferGenerator()
     {
-         const auto device_handle = device().device();
+        const auto device_handle = device().device();
 
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
 
@@ -100,7 +100,7 @@ namespace pbrlib::backend
 
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_pos_uv_image->view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _result_descriptor_set_handle,
@@ -108,7 +108,7 @@ namespace pbrlib::backend
             .binding                = GBufferDescriptorSetBindings::ePosUv
         });
 
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_normal_tangent_image->view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _result_descriptor_set_handle,
@@ -116,7 +116,7 @@ namespace pbrlib::backend
             .binding                = GBufferDescriptorSetBindings::eNormalTangent
         });
         
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = ptr_material_index_image->view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _result_descriptor_set_handle,
@@ -124,7 +124,7 @@ namespace pbrlib::backend
             .binding                = GBufferDescriptorSetBindings::eMaterialIndices
         });
         
-        device().writeDescriptorSet({
+        device().writeDescriptorSet ({
             .view_handle            = depthStencil()->view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _result_descriptor_set_handle,
@@ -355,7 +355,7 @@ namespace pbrlib::backend
                 _push_constant_block.instance_id    = renderable.instance_id;
                 _push_constant_block.material_index = renderable.material_id;
     
-                vkCmdPushConstants(
+                vkCmdPushConstants (
                     command_buffer_handle, 
                     _pipeline_layout_handle, 
                     VK_SHADER_STAGE_VERTEX_BIT, 
@@ -407,7 +407,7 @@ namespace pbrlib::backend
             .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _result_descriptor_set_handle = device().allocateDescriptorSet(
+        _result_descriptor_set_handle = device().allocateDescriptorSet (
             _result_descriptor_set_layout_handle, 
             "[gbuffer-generator] descritor set with results"
         );

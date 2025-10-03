@@ -104,7 +104,7 @@ namespace pbrlib::backend
         );
 
         void depthStencil(const vk::Image* ptr_image);
-        
+
         [[nodiscard]]
         vk::Image* colorOutputAttach(std::string_view name);
         

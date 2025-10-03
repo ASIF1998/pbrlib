@@ -42,7 +42,7 @@ namespace pbrlib::backend::vk::builders
 
     VkPipeline ComputePipeline::build()
     {
-        if (_pipeline_layout_handle == VK_NULL_HANDLE)
+        if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
 
         const VkPipelineShaderStageCreateInfo stage 

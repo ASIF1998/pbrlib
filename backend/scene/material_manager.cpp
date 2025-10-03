@@ -128,7 +128,7 @@ namespace pbrlib::backend
         {
             for (const auto i: std::views::iota(0u, _images.size()))
             {
-                _device.writeDescriptorSet({
+                _device.writeDescriptorSet ({
                     .view_handle            = _images[i].view_handle,
                     .sampler_handle         = _sampler_handle,
                     .set_handle             = _descriptor_set_handle,
@@ -148,7 +148,7 @@ namespace pbrlib::backend
 
             _materials_indices_buffer->write(std::span<const Material>(_materials), 0);
 
-            _device.writeDescriptorSet({
+            _device.writeDescriptorSet ({
                 .buffer     = _materials_indices_buffer.value(),
                 .set_handle = _descriptor_set_handle,
                 .size       = static_cast<uint32_t>(_materials_indices_buffer->size),
