@@ -100,7 +100,7 @@ namespace pbrlib::testing
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
 
-        _device.writeDescriptorSet({
+        _device.writeDescriptorSet ({
             .view_handle            = image_1.view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
@@ -108,7 +108,7 @@ namespace pbrlib::testing
             .binding                = 0
         });
         
-        _device.writeDescriptorSet({
+        _device.writeDescriptorSet ({
             .view_handle            = image_2.view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
@@ -116,7 +116,7 @@ namespace pbrlib::testing
             .binding                = 1
         });
 
-        _device.writeDescriptorSet({
+        _device.writeDescriptorSet ({
             .buffer     = _count_changed_pixels_buffer.value(),
             .set_handle = _descriptor_set_handle,
             .size       = static_cast<uint32_t>(_count_changed_pixels_buffer->size),

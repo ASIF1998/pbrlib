@@ -146,7 +146,7 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetImage)
         .build();
 
     EXPECT_NO_THROW({
-        device.writeDescriptorSet({
+        device.writeDescriptorSet ({
             .view_handle            = image.view_handle,
             .set_handle             = descriptor_set,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -174,7 +174,7 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
 
         
     EXPECT_NO_THROW({
-        device.writeDescriptorSet({
+        device.writeDescriptorSet ({
             .buffer     = buffer,
             .set_handle = descriptor_set,
             .size       = static_cast<uint32_t>(buffer.size),
