@@ -12,6 +12,8 @@ namespace pbrlib::settings
 
         float spatial_sigma     = 1.5;
         float luminance_sigma   = 1.5;
+
+        float radius = 0.05f;
     };
 }
 

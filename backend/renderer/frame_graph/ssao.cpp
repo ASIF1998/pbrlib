@@ -354,5 +354,11 @@ namespace pbrlib::backend
         blur_settings.sample_count  = ssao_settings.blur_samples_count;
         blur_settings.sigma_s       = ssao_settings.spatial_sigma;
         blur_settings.sigma_l       = ssao_settings.luminance_sigma;
+
+        if (_params.radius != ssao_settings.radius)
+        {
+            _params.radius = ssao_settings.radius;
+            _params_buffer->write(_params, 0);
+        }
     }
 }
