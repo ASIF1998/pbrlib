@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pbrlib/rendering/window.hpp>
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/window.hpp>
+#include <pbrlib/camera.hpp>
 
 #include <string_view>
 #include <functional>
@@ -36,8 +36,8 @@ namespace pbrlib::testing
 
 namespace pbrlib
 {
-    using SetupCallback     = std::function<void(Engine& engine, Scene& scene)>;
-    using UpdateCallback    = std::function<void (const InputStay& input_stay, float delta_time)>;
+    using SetupCallback     = std::function<void(Scene& scene)>;
+    using UpdateCallback    = std::function<void (Engine& engine, const InputStay& input_stay, float delta_time)>;
 }
 
 namespace pbrlib
@@ -55,12 +55,12 @@ namespace pbrlib
     public:
         explicit Engine(const Config& config);
 
-        Engine(Engine&& engine)         = default;
+        Engine(Engine&& engine)         = delete;
         Engine(const Engine& engine)    = delete;
 
         ~Engine();
 
-        Engine& operator = (Engine&& engine)        = default;
+        Engine& operator = (Engine&& engine)        = delete;
         Engine& operator = (const Engine&& engine)  = delete;
 
         void resize(uint32_t width, uint32_t height);
@@ -70,6 +70,8 @@ namespace pbrlib
 
         void setup(SetupCallback setup_callback);
         void update(UpdateCallback update_callback);
+
+        void update(const Config& config);
 
         void run();
 

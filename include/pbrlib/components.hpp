@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace pbrlib::component
+namespace pbrlib::components
 {
     struct Tag final
     {

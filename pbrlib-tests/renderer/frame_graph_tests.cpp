@@ -28,11 +28,11 @@ TEST(FrameGraphTests, Ctor)
         pbrlib::backend::vk::Device device;
         device.init();
 
-        pbrlib::backend::Canvas canvas(device, nullptr, config);
+        pbrlib::backend::Canvas canvas(device, config.width, config.height);
         
         pbrlib::backend::MaterialManager    material_manager    (device);
         pbrlib::backend::MeshManager        mesh_manager        (device);
 
-        pbrlib::backend::FrameGraph frame_graph(device, canvas, material_manager, mesh_manager);
+        pbrlib::backend::FrameGraph frame_graph(device, config, canvas, material_manager, mesh_manager);
     });
 }

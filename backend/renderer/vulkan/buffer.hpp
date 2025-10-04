@@ -16,6 +16,11 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
+namespace pbrlib::backend::vk::builders
+{
+    class Buffer;
+}
+
 namespace pbrlib::backend::vk
 {
     enum class BufferType
@@ -27,21 +32,20 @@ namespace pbrlib::backend::vk
 
     class Buffer final
     {
-        explicit Buffer(Device& device);
+        friend class builders::Buffer;
+
+        explicit Buffer(Device& device) noexcept;
 
         void writeToVram(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
         void writeToRam(const uint8_t* ptr_data, size_t size, VkDeviceSize offset);
 
     public:
-        class Builder;
-
-    public:
-        Buffer(Buffer&& buffer);
+        Buffer(Buffer&& buffer) noexcept;
         Buffer(const Buffer& buffer) = delete;
 
         ~Buffer();
 
-        Buffer& operator = (Buffer&& buffer);
+        Buffer& operator = (Buffer&& buffer) noexcept;
         Buffer& operator = (const Buffer& buffer) = delete;
 
         template<typename T>
@@ -84,34 +88,39 @@ namespace pbrlib::backend::vk
 
         BufferType type;
 
+        VkBufferUsageFlags usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+
     private:
         Device&         _device;
         VmaAllocation   _allocation = VK_NULL_HANDLE;
     };
+}
 
-    class Buffer::Builder final
+namespace pbrlib::backend::vk::builders
+{
+    class Buffer final
     {
         void validate();
 
         VkSharingMode sharingMode() const;
 
     public:
-        explicit Builder(Device& device);
+        explicit Buffer(Device& device);
 
-        Builder(Builder&& builder)      = delete;
-        Builder(const Builder& builder) = delete;
+        Buffer(Buffer&& builder)      = delete;
+        Buffer(const Buffer& builder) = delete;
 
-        Builder& operator = (Builder&& builder)         = delete;
-        Builder& operator = (const Builder& builder)    = delete;
+        Buffer& operator = (Buffer&& builder)         = delete;
+        Buffer& operator = (const Buffer& builder)    = delete;
 
-        Builder& addQueueFamilyIndex(uint32_t index);
-        Builder& size(VkDeviceSize size)                noexcept;
-        Builder& usage(VkImageUsageFlags usage)         noexcept;
-        Builder& type(BufferType buffer_type)           noexcept;
+        Buffer& addQueueFamilyIndex(uint32_t index);
+        Buffer& size(VkDeviceSize size)                noexcept;
+        Buffer& usage(VkImageUsageFlags usage)         noexcept;
+        Buffer& type(BufferType buffer_type)           noexcept;
 
-        Builder& name(std::string_view buffer_name);
+        Buffer& name(std::string_view buffer_name);
 
-        [[nodiscard]] Buffer build();
+        [[nodiscard]] vk::Buffer build();
 
     private:
         Device& _device;
@@ -119,7 +128,7 @@ namespace pbrlib::backend::vk
         std::vector<uint32_t> _queues;
 
         VkDeviceSize        _size   = 0;
-        VkImageUsageFlags   _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
+        VkBufferUsageFlags  _usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
 
         BufferType _type = BufferType::eDeviceOnly;
 

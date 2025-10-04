@@ -96,21 +96,21 @@ namespace pbrlib::backend::vk::utils
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    GraphicsPipelineBuilder::GraphicsPipelineBuilder(Device& device) :
+    GraphicsPipeline::GraphicsPipeline(Device& device) noexcept :
         _device (device)
     { }
 
-    GraphicsPipelineBuilder::~GraphicsPipelineBuilder()
+    GraphicsPipeline::~GraphicsPipeline()
     {
         for (const auto& stage: _stages)
             vkDestroyShaderModule(_device.device(), stage.module, nullptr);
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage)
+    GraphicsPipeline& GraphicsPipeline::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info)
     {
-        const VkPipelineShaderStageCreateInfo pipeline_stage =
+        VkPipelineShaderStageCreateInfo pipeline_stage =
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
@@ -118,12 +118,25 @@ namespace pbrlib::backend::vk
             .pName  = "main"
         };
 
+        if (ptr_spec_info)
+        {
+            const auto entries  = ptr_spec_info->entries();
+            const auto data     = ptr_spec_info->data();
+
+            _specialization_infos.emplace_back (
+                static_cast<uint32_t>(entries.size()), entries.data(), 
+                static_cast<uint32_t>(data.size()), data.data()
+            );
+
+            pipeline_stage.pSpecializationInfo = &_specialization_infos.back();
+        }
+
         _stages.push_back(pipeline_stage);
 
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::addAttachmentsState(bool blendEnable)
+    GraphicsPipeline& GraphicsPipeline::addAttachmentsState(bool blendEnable)
     {
         const VkPipelineColorBlendAttachmentState state =
         {
@@ -140,61 +153,61 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::primitiveType(PrimitiveType primitive_type) noexcept
+    GraphicsPipeline& GraphicsPipeline::primitiveType(PrimitiveType primitive_type) noexcept
     {
         _primitive_type = primitive_type;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::polygonMode(PolygonMode polygon_mode) noexcept
+    GraphicsPipeline& GraphicsPipeline::polygonMode(PolygonMode polygon_mode) noexcept
     {
         _polygon_mode = polygon_mode;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::cullMode(CullMode cull_mode) noexcept
+    GraphicsPipeline& GraphicsPipeline::cullMode(CullMode cull_mode) noexcept
     {
         _cull_mode = cull_mode;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::frontFace(FrontFace front_face) noexcept
+    GraphicsPipeline& GraphicsPipeline::frontFace(FrontFace front_face) noexcept
     {
         _front_face = front_face;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::sampleCount(SampleCount count) noexcept
+    GraphicsPipeline& GraphicsPipeline::sampleCount(SampleCount count) noexcept
     {
         _sample_count = count;
         return *this;   
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::depthStencilTest(bool is_enable) noexcept
+    GraphicsPipeline& GraphicsPipeline::depthStencilTest(bool is_enable) noexcept
     {
         _enable_depth_stencil_test = is_enable;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
+    GraphicsPipeline& GraphicsPipeline::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
     {
         _pipeline_layout_handle = layout_handle;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::renderPassHandle(VkRenderPass render_pass_handle) noexcept 
+    GraphicsPipeline& GraphicsPipeline::renderPassHandle(VkRenderPass render_pass_handle) noexcept 
     {
         _render_pass_handle = render_pass_handle;
         return *this;
     }
 
-    GraphicsPipelineBuilder& GraphicsPipelineBuilder::subpass(uint32_t subpass_index) noexcept
+    GraphicsPipeline& GraphicsPipeline::subpass(uint32_t subpass_index) noexcept
     {
         _subpass = subpass_index;
         return *this;
     }
 
-    VkPipeline GraphicsPipelineBuilder::build()
+    VkPipeline GraphicsPipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE)
             throw exception::InvalidState("[vk-graphics-pipeline-builder] pipeline layout handle is null");

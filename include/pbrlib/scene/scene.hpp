@@ -37,9 +37,11 @@ namespace pbrlib
     {
         friend class Scene;
 
-        using SceneItems = std::list<SceneItem>;
-
-        explicit SceneItem(std::string_view name, SceneItem* ptr_parent, Scene* ptr_scene);
+        explicit SceneItem (
+            std::string_view    name, 
+            SceneItem*          ptr_parent, 
+            Scene*              ptr_scene
+        );
 
         void update (
             const InputStay&    input_stay, 
@@ -89,7 +91,7 @@ namespace pbrlib
 
         SceneItem* _ptr_parent = nullptr;
         
-        SceneItems _children;
+        std::list<SceneItem> _children;
     };
 
     class Scene final

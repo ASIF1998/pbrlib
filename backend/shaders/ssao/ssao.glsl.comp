@@ -1,0 +1,88 @@
+#version 460
+
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_nonuniform_qualifier : enable
+
+#include <gpu_cpu_constants.h>
+layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
+
+#include <generation.glsl>
+
+#define PBRLIB_GBUFFER_GENERATOR_EXPORTS_SET_ID 0
+#include <gbuffer_generator/exports.glsl>
+#include <gbuffer_generator/packing.glsl>
+
+#define PBRLIB_MATERIAL_MANAGER_SET_ID 2
+#include <material_manager/exports.glsl>
+
+layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
+
+layout(set = 1, binding = 1) uniform Params
+{
+    float   radius;
+    uint    sample_count;
+    vec2    noise_scale;
+};
+
+layout(set = 1, binding = 2) uniform Samples
+{
+    vec4 samples[64];
+};
+
+layout(push_constant) uniform PerFrameData
+{
+    mat4 projection;
+    mat4 view;
+};
+
+vec2 getUV(vec4 pos_in_view_space)
+{
+    vec4 ndc = projection * pos_in_view_space;
+    return (ndc.xy / ndc.w) * 0.5 + 0.5;
+}
+
+float calcOcclusion(vec3 pos, mat3 tbn)
+{
+    const float bias = 0.01;
+
+    float occlusion     = 0.0;
+    float origin_depth  = length((view * vec4(pos, 1)).xyz);
+
+    for (uint i = 0; i < sample_count; ++i)
+    {
+        vec4 sample_pos = view * vec4(pos + tbn * samples[i].xyz * radius, 1);
+        vec4 gbuff_pos  = view * vec4(unpackPos(texture(gbuffer_pos_uv, getUV(sample_pos))), 1);
+
+        float range_check = smoothstep(1.0, 0.0, abs(length(sample_pos.xyz) - origin_depth) / radius);
+
+        occlusion += float(gbuff_pos.z >= (sample_pos.z + bias)) * range_check;  
+    }
+
+    return 1.0 - (occlusion / float(sample_count));
+}
+
+void main()
+{
+    ivec2 pixel_coord = ivec2(gl_GlobalInvocationID.xy);
+
+    vec2 screen_uv = vec2(gl_GlobalInvocationID) / vec2(imageSize(result));
+
+    vec4 g_pos_uv = texture(gbuffer_pos_uv, screen_uv); 
+    vec3 pos    = vec3(0);
+    vec2 uv     = vec2(0);
+
+    unpackPosUv(texture(gbuffer_pos_uv, screen_uv), pos, uv);
+
+    vec3 random_direction = randomVec(pos);
+
+    vec3 normal     = unpackNormal(texture(gbuffer_normal_tangent, screen_uv));
+    vec3 tangent    = normalize(random_direction - normal * dot(random_direction, normal));
+
+    mat3 tbn = mat3(
+        tangent,
+        cross(normal, tangent),
+        normal
+    );
+
+    imageStore(result, pixel_coord, vec4(vec3(calcOcclusion(pos, tbn)), 1.0));
+}

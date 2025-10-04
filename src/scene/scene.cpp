@@ -30,8 +30,8 @@ namespace pbrlib
 
         _handle = _ptr_scene->_registry.create();
 
-        addComponent<component::Tag>(name.empty() ? "SceneItem" : name);
-        addComponent<component::Transform>();
+        addComponent<components::Tag>(name.empty() ? "SceneItem" : name);
+        addComponent<components::Transform>();
     }
 
     SceneItem::SceneItem(SceneItem&& item) :
@@ -83,7 +83,7 @@ namespace pbrlib
         if (_update_callback)
             _update_callback(*this, input_stay, delta_time, world_transform);
 
-        const auto& local_transform = getComponent<component::Transform>().transform;
+        const auto& local_transform = getComponent<components::Transform>().transform;
         const auto  transform       = world_transform * local_transform;
 
         if (auto ptr_mesh_manager = _ptr_scene->_ptr_mesh_manager)
@@ -131,7 +131,7 @@ namespace pbrlib
 
     std::string_view Scene::name() const
     {
-        return _root->getComponent<component::Tag>().name;
+        return _root->getComponent<components::Tag>().name;
     }
 
     void Scene::update(const InputStay& input_stay, float delta_time)
@@ -189,14 +189,14 @@ namespace pbrlib
 
         auto& instance_node = ptr_parent->addItem(instance_name);
 
-        auto&       dst_transform = instance_node.getComponent<component::Transform>();
-        const auto& src_transform = ptr_item->getComponent<component::Transform>();
+        auto&       dst_transform = instance_node.getComponent<components::Transform>();
+        const auto& src_transform = ptr_item->getComponent<components::Transform>();
 
         dst_transform.transform = src_transform.transform * transform;
 
-        if (ptr_item->hasComponent<backend::component::Renderable>())
+        if (ptr_item->hasComponent<backend::components::Renderable>())
         {
-            instance_node.addComponent<backend::component::Renderable>();
+            instance_node.addComponent<backend::components::Renderable>();
             _ptr_mesh_manager->addInstance(ptr_item, &instance_node);
         }
 
@@ -204,7 +204,7 @@ namespace pbrlib
 
         for (const auto& child: ptr_item->_children)
         {
-            const auto& child_tag           = child.getComponent<component::Tag>();
+            const auto& child_tag           = child.getComponent<components::Tag>();
             const auto  child_instance_tag  = std::format("[{}] - {}", instance_name, child_tag.name);
 
             createInstance(child_tag.name, child_instance_tag, math::mat4(1.0f));

@@ -4,7 +4,9 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/config.hpp>
+
+#include <pbrlib/camera.hpp>
 
 #include <string>
 
@@ -19,10 +21,9 @@ namespace pbrlib::testing
 
 namespace pbrlib::backend
 {
-    struct  Config;
-    class   Canvas;
-    class   MaterialManager;
-    class   MeshManager;
+    class Canvas;
+    class MaterialManager;
+    class MeshManager;
 }
 
 namespace pbrlib::backend
@@ -35,14 +36,26 @@ namespace pbrlib::backend
 
         void build();
 
+        std::unique_ptr<RenderPass> buildGBufferGeneratorSubpass();
+
+        std::unique_ptr<RenderPass> buildSSAOSubpass (
+            vk::Image*              ptr_pos_uv, 
+            vk::Image*              ptr_normal_tangent,
+            vk::Image*              ptr_depth_buffer,
+            const RenderPass*       ptr_gbuffer
+        );
+
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);
+
+        void clearImages(vk::CommandBuffer& command_buffer);
 
     public:
         explicit FrameGraph (
-            vk::Device&         device, 
-            Canvas&             canvas,
-            MaterialManager&    material_manager,
-            MeshManager&        mesh_manager
+            vk::Device&             device, 
+            const pbrlib::Config&   config,
+            Canvas&                 canvas,
+            MaterialManager&        material_manager,
+            MeshManager&            mesh_manager
         );
 
         FrameGraph(FrameGraph&& frame_graph)        = delete;
@@ -55,9 +68,13 @@ namespace pbrlib::backend
 
         bool rebuildPasses();
 
+        void update(const Config& config);
+
     private:
         vk::Device& _device;
         Canvas&     _canvas;
+        
+        pbrlib::Config _config;
 
         std::unique_ptr<RenderPass> _ptr_render_pass;
 

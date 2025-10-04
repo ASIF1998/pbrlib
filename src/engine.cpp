@@ -16,6 +16,8 @@
 
 #include <backend/profiling.hpp>
 
+#include <backend/utils/align_size.hpp>
+
 #include <pbrlib/input/input_stay.hpp>
 
 #include <pbrlib/scene/scene.hpp>
@@ -45,26 +47,30 @@ namespace pbrlib
         backend::log::priv::EngineLogger::init();
         backend::log::priv::AppLogger::init();
 
+        _ptr_device = std::make_unique<backend::vk::Device>();
+        _ptr_device->init();
+
+        const uint32_t groupSize    = _ptr_device->workGroupSize();
+        const uint32_t width        = backend::utils::alignSize(config.width, groupSize);
+        const uint32_t height       = backend::utils::alignSize(config.height, groupSize);
+
         if (config.draw_in_window) [[likely]]
         {
             _window = Window::Builder()
                 .title(config.title)
-                .size(config.width, config.height)
+                .size(width, height)
                 .resizable(false)
                 .build();
+
+            _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, &_window.value());
         }
-
-        _ptr_device = std::make_unique<backend::vk::Device>();
-        _ptr_device->init();
-
-        const auto ptr_window = _window ? &_window.value() : nullptr;
-
-        _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, ptr_window, config);
+        else 
+            _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, width, height);
 
         _ptr_material_manager   = std::make_unique<backend::MaterialManager>(*_ptr_device);
         _ptr_mesh_manager       = std::make_unique<backend::MeshManager>(*_ptr_device);
         _ptr_scene              = std::make_unique<Scene>(config.title);
-        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
+        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, config, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
 
         _ptr_scene->meshManager(_ptr_mesh_manager.get());
     }
@@ -97,15 +103,13 @@ namespace pbrlib
 
         if (_setup_callback) [[likely]]
         {
-            _setup_callback(*this, *_ptr_scene);
+            _setup_callback(*_ptr_scene);
             _setup_callback = nullptr;
         }
 
         InputStay input_stay;
 
         bool is_close = true;
-
-        backend::log::info("[engine] initialize is done");
 
         do
         {
@@ -122,7 +126,7 @@ namespace pbrlib
             updateTime();
 
             if (_update_callback) [[likely]]
-                _update_callback(input_stay, _delta_time);
+                _update_callback(*this, input_stay, _delta_time);
 
             _ptr_scene->update(input_stay, _delta_time);
 
@@ -164,24 +168,10 @@ namespace pbrlib
 
         std::vector<const SceneItem*> items;
 
-        auto view = _ptr_scene->_registry.view<backend::component::Renderable>();
+        auto view = _ptr_scene->_registry.view<backend::components::Renderable>();
 
         for (auto entity: view)
-            items.push_back(view.get<backend::component::Renderable>(entity).ptr_item);
-
-        std::sort(std::begin(items), std::end(items), [this] (const SceneItem* item_1, const SceneItem* item_2)
-        {
-            const auto& bbox_1 = item_1->getComponent<backend::component::Renderable>().bbox;
-            const auto& bbox_2 = item_2->getComponent<backend::component::Renderable>().bbox;
-
-            const auto transform_1 = item_1->getComponent<component::Transform>();
-            const auto transform_2 = item_2->getComponent<component::Transform>();
-
-            const auto p1 = _camera.view() * transform_1.transform * ((bbox_1.p_min + bbox_1.p_max) * 0.5);
-            const auto p2 = _camera.view() * transform_2.transform * ((bbox_2.p_min + bbox_2.p_max) * 0.5);
-
-            return p1.z < p2.z;
-        });
+            items.push_back(view.get<backend::components::Renderable>(entity).ptr_item);
 
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->draw(_camera, items);
@@ -205,5 +195,11 @@ namespace pbrlib
         _delta_time = std::chrono::duration_cast<msFloat>(end - begin).count() * seconds_per_milisceond;
 
         begin = end;
+    }
+
+    void Engine::update(const Config& config)
+    {
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->update(config);
     }
 }

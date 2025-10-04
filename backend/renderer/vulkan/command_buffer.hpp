@@ -25,12 +25,12 @@ namespace pbrlib::backend::vk
         CommandBuffer(const Device& device, VkCommandPool command_pool_handle);
 
     public:
-        CommandBuffer(CommandBuffer&& command_buffer);
+        CommandBuffer(CommandBuffer&& command_buffer) noexcept;
         CommandBuffer(const CommandBuffer& command_buffer) = delete;
 
         ~CommandBuffer();
 
-        CommandBuffer& operator = (CommandBuffer&& command_buffer);
+        CommandBuffer& operator = (CommandBuffer&& command_buffer) noexcept;
         CommandBuffer& operator = (const CommandBuffer& command_buffer) = delete;
 
         void write (

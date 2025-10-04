@@ -11,12 +11,13 @@
 
 namespace pbrlib::backend::vk
 {
-    Buffer::Buffer(Device& device) :
+    Buffer::Buffer(Device& device) noexcept :
         _device (device)
     { }
 
-    Buffer::Buffer(Buffer&& buffer) :
-        _device (buffer._device)
+    Buffer::Buffer(Buffer&& buffer) noexcept :
+        _device (buffer._device),
+        usage   (buffer.usage)
     {
         std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
@@ -30,12 +31,13 @@ namespace pbrlib::backend::vk
             vmaDestroyBuffer(_device.vmaAllocator(), handle, _allocation);
     }
 
-    Buffer& Buffer::operator = (Buffer&& buffer)
+    Buffer& Buffer::operator = (Buffer&& buffer) noexcept
     {
         std::swap(handle, buffer.handle);
         std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
         std::swap(type, buffer.type);
+        std::swap(usage, buffer.usage);
 
         return *this;
     }
@@ -44,7 +46,7 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        auto staging_buffer = Buffer::Builder(_device)
+        auto staging_buffer = builders::Buffer(_device)
             .name("staging-buffer")
             .size(data_size)
             .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)
@@ -136,43 +138,43 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    Buffer::Builder::Builder(Device& device) :
+    Buffer::Buffer(Device& device) :
         _device (device)
     { }
 
-    Buffer::Builder& Buffer::Builder::addQueueFamilyIndex(uint32_t index)
+    Buffer& Buffer::addQueueFamilyIndex(uint32_t index)
     {
         _queues.push_back(index);
         return *this;
     }
 
-    Buffer::Builder& Buffer::Builder::size(VkDeviceSize size) noexcept
+    Buffer& Buffer::size(VkDeviceSize size) noexcept
     {
         _size = size;
         return *this;
     }
 
-    Buffer::Builder& Buffer::Builder::usage(VkImageUsageFlags usage) noexcept
+    Buffer& Buffer::usage(VkImageUsageFlags usage) noexcept
     {
         _usage = usage;
         return *this;
     }
 
-    Buffer::Builder& Buffer::Builder::name(std::string_view buffer_name)
+    Buffer& Buffer::name(std::string_view buffer_name)
     {
         _name = buffer_name;
         return *this;
     }
 
-    Buffer::Builder& Buffer::Builder::type(BufferType buffer_type)  noexcept
+    Buffer& Buffer::type(BufferType buffer_type)  noexcept
     {
         _type = buffer_type;
         return *this;
     }
 
-    void Buffer::Builder::validate()
+    void Buffer::validate()
     {
         if (_queues.empty())
             throw exception::InvalidState("[vk-buffer::builder] not queues");
@@ -184,20 +186,21 @@ namespace pbrlib::backend::vk
             throw exception::InvalidState("[vk-buffer::builder] invalid usage");
     }
 
-    VkSharingMode Buffer::Builder::sharingMode() const
+    VkSharingMode Buffer::sharingMode() const
     {
-        std::unordered_set<uint32_t> family_indices (std::begin(_queues), std::end(_queues));
+        std::unordered_set<uint32_t> family_indices (std::cbegin(_queues), std::cend(_queues));
         return family_indices.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT; 
     }
 
-    Buffer Buffer::Builder::build()
+    vk::Buffer Buffer::build()
     {
         validate();
 
-        Buffer buffer (_device);
+        vk::Buffer buffer (_device);
 
-        buffer.size = _size;
-        buffer.type = _type;
+        buffer.size     = _size;
+        buffer.type     = _type;
+        buffer.usage    = _usage;
 
         const VkBufferCreateInfo buffer_info 
         { 

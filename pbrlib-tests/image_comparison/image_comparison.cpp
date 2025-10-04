@@ -21,18 +21,17 @@ namespace pbrlib::testing
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        _pipeline_layout = pbrlib::backend::vk::PipelineLayout::Builder(_device)
-            .addSet()
-                .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(
-            _pipeline_layout->sets_layout[0], 
-            "[vk-image-comparator] descriptor-set"
-        );
+        _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
+            .addSetLayout(_descriptor_set_layout_handle)
+            .build();
 
+        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-image-comparator] descriptor-set");
+        
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
         const VkComputePipelineCreateInfo pipeline_create_info
@@ -45,7 +44,7 @@ namespace pbrlib::testing
                 .module = backend::vk::shader::compile(_device, shader_name),
                 .pName  = "main"
             },
-            .layout = _pipeline_layout->handle
+            .layout = _pipeline_layout_handle
         };
 
         const auto device_handle = _device.device();
@@ -69,7 +68,7 @@ namespace pbrlib::testing
 
         VK_CHECK(vkCreateSampler(device_handle, &sampler_create_info, nullptr, &_sampler_handle));
 
-        _count_changed_pixels_buffer = pbrlib::backend::vk::Buffer::Builder(_device)
+        _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .size(sizeof(uint32_t))
             .type(pbrlib::backend::vk::BufferType::eReadback)
@@ -86,7 +85,8 @@ namespace pbrlib::testing
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
 
-        vkFreeDescriptorSets(_device.device(), _device.descriptorPool(), 1, &_descriptor_set_handle);
+        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
+        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
     }
 
     bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
@@ -100,62 +100,28 @@ namespace pbrlib::testing
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
 
-        const VkDescriptorImageInfo image_1_info 
-        { 
-            .sampler        = _sampler_handle,
-            .imageView      = image_1.view_handle,
-            .imageLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
+        _device.writeDescriptorSet ({
+            .view_handle            = image_1.view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+        
+        _device.writeDescriptorSet ({
+            .view_handle            = image_2.view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 1
+        });
 
-        const VkDescriptorImageInfo image_2_info 
-        { 
-            .sampler        = _sampler_handle,
-            .imageView      = image_2.view_handle,
-            .imageLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-        };
-
-        const VkDescriptorBufferInfo count_changed_pixels_buffer_info
-        {
-            .buffer = _count_changed_pixels_buffer->handle,
-            .range  = _count_changed_pixels_buffer->size
-        };
-
-        const std::array desc_write_info
-        {
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 0,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo         = &image_1_info
-            },
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 1,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo         = &image_2_info
-            },
-            VkWriteDescriptorSet
-            { 
-                .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet             = _descriptor_set_handle,
-                .dstBinding         = 2,
-                .descriptorCount    = 1,
-                .descriptorType     = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                .pBufferInfo        = &count_changed_pixels_buffer_info
-            }
-        };
-
-        vkUpdateDescriptorSets(
-            _device.device(),
-            static_cast<uint32_t>(desc_write_info.size()), desc_write_info.data(),
-            0, nullptr
-        );
+        _device.writeDescriptorSet ({
+            .buffer     = _count_changed_pixels_buffer.value(),
+            .set_handle = _descriptor_set_handle,
+            .size       = static_cast<uint32_t>(_count_changed_pixels_buffer->size),
+            .binding    = 2
+        });
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-image-comparator");
 
@@ -164,7 +130,7 @@ namespace pbrlib::testing
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout->handle, 0, 1, &_descriptor_set_handle, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle, 0, nullptr);
             vkCmdDispatch(command_buffer_handle, image_1.width, image_1.height, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 
@@ -186,7 +152,7 @@ namespace pbrlib::testing
 
         if constexpr (generate_image_reference)
         {
-            backend::vk::Image::Exporter(_device)
+            backend::vk::exporters::Image(_device)
                 .filename(path_to_reference)
                 .image(&image_1)
                 .exoprt();
@@ -196,7 +162,7 @@ namespace pbrlib::testing
 
         return compare(
             image_1, 
-            backend::vk::Image::Loader(_device)
+            backend::vk::loaders::Image(_device)
                 .filename(path_to_reference)
                 .load()
         );

@@ -2,6 +2,7 @@
 
 #include <pbrlib/math/quat.hpp>
 #include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 TEST(QuatTests, Constructor)
 {
@@ -165,7 +166,7 @@ TEST(QuatTests, Lerp)
     constexpr pbrlib::math::quat q1 (3.0f, 4.0f, 5.0f, 1.0f);
     constexpr pbrlib::math::quat q2 (15.0f, 20.0f, 25.0f, 5.0f);
 
-    pbrlib::testing::equality(pbrlib::math::lerp(0.5f, q1, q2), res);
+    pbrlib::testing::equality(pbrlib::math::lerp(q1, q2, 0.5f), res);
 }
 
 TEST(QuatTests, Slerp)
@@ -175,7 +176,7 @@ TEST(QuatTests, Slerp)
     constexpr pbrlib::math::quat q1 (0.12f, 0.300f, 0.4000f, 0.500f);
     constexpr pbrlib::math::quat q2 (-0.5f, -0.15f, -0.220f, -0.25f);
 
-    pbrlib::testing::equality(pbrlib::math::slerp(0.5f, q1, q2), res);
+    pbrlib::testing::equality(pbrlib::math::slerp(q1, q2, 0.5f), res);
 }
 
 TEST(QuatTests, ToTransform)

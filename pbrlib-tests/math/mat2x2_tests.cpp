@@ -1,6 +1,7 @@
 #include "../utils.hpp"
 
 #include <pbrlib/math/matrix2x2.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -234,51 +235,52 @@ TEST(Mat2Tests, AccessToElement)
         2, 1, 3, 4
     };
 
-    for (size_t i{0}; i < 2; i++) {
-        for (size_t j{0}; j < 2; j++) {
+    for (size_t i{0}; i < 2; i++) 
+    {
+        for (size_t j{0}; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 2; i++) {
-        for (size_t j{0}; j < 2; j++) {
+    for (size_t i{0}; i < 2; i++) 
+    {
+        for (size_t j{0}; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m.at(i, j));
-        }
     }
 }
 
 TEST(Mat2Tests, AccessToElementTypeFloat)
 {
-    constexpr mat2    m (0.0065f, 1.23f, 23.3f, 23.454f);
-    constexpr float               r[4] {
-        0.0065f, 1.23f, 23.3f, 23.454f
-    };
+    constexpr mat2 m (0.0065f, 1.23f, 23.3f, 23.454f);
 
-    for (size_t i{0}; i < 2; i++) {
-        for (size_t j{0}; j < 2; j++) {
+    constexpr float r[4] {0.0065f, 1.23f, 23.3f, 23.454f};
+
+    for (size_t i{0}; i < 2; i++) 
+    {
+        for (size_t j{0}; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 2; i++) {
-        for (size_t j{0}; j < 2; j++) {
+    for (size_t i{0}; i < 2; i++) 
+    {
+        for (size_t j{0}; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m.at(i, j));
-        }
     }
 }
 
 TEST(Mat2Tests, Determinant)
 {
-    constexpr Matrix2x2<int>    m (2, 1, 3, 4);
-    constexpr int               r (5);
+    constexpr Matrix2x2<int> m (2, 1, 3, 4);
+
+    constexpr int r = 5;
 
     pbrlib::testing::equality(r, m.det());
 }
 
 TEST(Mat2Tests, DeterminantTypeFloat)
 {
-    constexpr mat2  m (0.0065f, 1.23f, 23.3f, 23.454f);
-    constexpr float             r (-28.506549f);
+    constexpr mat2 m (0.0065f, 1.23f, 23.3f, 23.454f);
+
+    constexpr float r = -28.506549f;
 
     pbrlib::testing::equality(r, m.det());
 }
@@ -356,4 +358,10 @@ TEST(Mat2Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(2, 2);
     }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(Mat2Tests, LPOVERLAPPED_ENTRY)
+{
+    constexpr mat2 result (0.75f);
+    pbrlib::testing::equality(result, lerp(mat2(0.0f), mat2(1.0f), 0.75f));
 }

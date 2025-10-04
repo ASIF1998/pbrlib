@@ -19,7 +19,7 @@ namespace pbrlib
 
 namespace pbrlib::backend
 {
-    struct PbrMaterial final
+    struct Material final
     {
         uint32_t albedo     = std::numeric_limits<uint32_t>::max();
         uint32_t normal_map = std::numeric_limits<uint32_t>::max();
@@ -71,7 +71,7 @@ namespace pbrlib::backend
 
         void update();
 
-        [[nodiscard]] VkDescriptorSet descriptorSet() const noexcept;
+        [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet() const noexcept;
 
         [[nodiscard]] size_t imageCount()       const noexcept;
         [[nodiscard]] size_t materialCount()    const noexcept;
@@ -79,8 +79,8 @@ namespace pbrlib::backend
     private:
         vk::Device& _device;
 
-        std::vector<vk::Image>      _images;
-        std::vector<PbrMaterial>    _materials;
+        std::vector<vk::Image>  _images;
+        std::vector<Material>   _materials;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
 

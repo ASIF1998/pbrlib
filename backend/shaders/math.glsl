@@ -1,0 +1,6 @@
+#ifndef PBRLIB_MATH_GLSL
+#define PBRLIB_MATH_GLSL
+
+const float pi = 3.14159265358979323846264338327950288;
+
+#endif

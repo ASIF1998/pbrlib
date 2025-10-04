@@ -5,7 +5,7 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    struct Vec2
+    struct Vec2 final
     {
     public:
         inline constexpr Vec2()                 noexcept;

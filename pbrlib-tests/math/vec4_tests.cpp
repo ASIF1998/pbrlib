@@ -1,6 +1,7 @@
 #include "../utils.hpp"
 
 #include <pbrlib/math/vec4.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -147,4 +148,10 @@ TEST(Vec4Tests, NormalizeEdgeCase)
     EXPECT_THROW({
         [[maybe_unuse]] const auto res = normalize(v);
     }, pbrlib::exception::MathError);
+}
+
+TEST(Vec4Tests, Lerp)
+{
+    constexpr vec4 result (0.75f);
+    pbrlib::testing::equality(result, lerp(vec4(0.0f), vec4(1.0f), 0.75f));
 }

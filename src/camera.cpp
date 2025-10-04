@@ -1,4 +1,4 @@
-#include <pbrlib/rendering/camera.hpp>
+#include <pbrlib/camera.hpp>
 #include <pbrlib/transform.hpp>
 
 namespace pbrlib

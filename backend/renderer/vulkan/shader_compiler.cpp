@@ -26,7 +26,7 @@
 
 namespace pbrlib::backend::vk::shader::utils
 {
-    struct IncludeProcessData
+    struct IncludeProcessData final
     {
         std::string                             header_data;
         std::unique_ptr<glsl_include_result_t>  ptr_include_result;
@@ -229,6 +229,20 @@ namespace pbrlib::backend::vk::shader
 
         return shader_module_handle;
     }    
+}
+
+namespace pbrlib::backend::vk::shader
+{
+    std::span<const VkSpecializationMapEntry> SpecializationInfoBase::entries() const noexcept
+    {
+        return _entries;
+    }
+
+    SpecializationInfoBase& SpecializationInfoBase::addEntry(uint32_t constant_id, uint32_t offset, size_t size)
+    {
+        _entries.emplace_back(constant_id, offset, size);
+        return *this;
+    }
 }
 
 namespace pbrlib::backend::vk::shader

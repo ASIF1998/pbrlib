@@ -10,7 +10,7 @@ namespace pbrlib
     class Camera final
     {
     public:
-        struct Range
+        struct Range final
         {
             float near_dist = 0.0f;
             float far_dist  = std::numeric_limits<float>::infinity();

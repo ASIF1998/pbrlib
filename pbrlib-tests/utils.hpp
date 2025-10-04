@@ -61,60 +61,60 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix2x2<Type>& m, const Type a[4])
     {
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 2 + j]);
-            }
         }
     }
 
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix2x2<Type>& m, const Type a[4], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 2 + j]) << err_msg << std::endl;
-            }
         }
     }
 
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix3x3<Type>& m, const Type a[9])
     {
-        for (size_t i = 0; i < 3; i++) {
-            for (size_t j = 0; j < 3; j++) {
+        for (size_t i = 0; i < 3; i++) 
+        {
+            for (size_t j = 0; j < 3; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 3 + j]);
-            }
         }
     }
 
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix3x3<Type>& m, const Type a[9], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 3; i++) {
-            for (size_t j = 0; j < 3; j++) {
+        for (size_t i = 0; i < 3; i++) 
+        {
+            for (size_t j = 0; j < 3; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 3 + j]) << err_msg << std::endl;
-            }
         }
     }
 
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix4x4<Type>& m, const Type a[16])
     {
-        for (size_t i = 0; i < 4; i++) {
-            for (size_t j = 0; j < 4; j++) {
+        for (size_t i = 0; i < 4; i++) 
+        {
+            for (size_t j = 0; j < 4; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 4 + j]);
-            }
         }
     }
 
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix4x4<Type>& m, const Type a[16], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 4; i++) {
-            for (size_t j = 0; j < 4; j++) {
+        for (size_t i = 0; i < 4; i++) 
+        {
+            for (size_t j = 0; j < 4; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 4 + j]) << err_msg << std::endl;
-            }
         }
     }
 
@@ -172,37 +172,37 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat2& m1, const pbrlib::math::mat2& m2)
     {
-        for (size_t i = 0; i < 2; ++i) {
-            for (size_t j = 0; j < 2; ++j) {
+        for (size_t i = 0; i < 2; ++i) 
+        {
+            for (size_t j = 0; j < 2; ++j)
                 EXPECT_NEAR(m1[i][j], m2[i][j], 0.0001f);
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat2& m1, const pbrlib::math::mat2& m2, const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 2; ++i) {
-            for (size_t j = 0; j < 2; ++j) {
+        for (size_t i = 0; i < 2; ++i) 
+        {
+            for (size_t j = 0; j < 2; ++j)
                 EXPECT_NEAR(m1[i][j], m2[i][j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat2& m, const float a[4])
     {
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 2 + j], 0.0001f);
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat2& m, const float a[4], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 2 + j], 0.0001F) << err_msg << std::endl;
-            }
         }
     }
 
@@ -212,10 +212,10 @@ namespace pbrlib::testing
         float v[4];
         _mm_store_ps(v, a);
 
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_NEAR(m.at(i, j), v[i * 2 + j], 0.0001f);
-            }
         }
 
     }
@@ -225,47 +225,47 @@ namespace pbrlib::testing
         float v[4];
         _mm_store_ps(v, a);
 
-        for (size_t i = 0; i < 2; i++) {
-            for (size_t j = 0; j < 2; j++) {
+        for (size_t i = 0; i < 2; i++) 
+        {
+            for (size_t j = 0; j < 2; j++)
                 EXPECT_NEAR(m.at(i, j), v[i * 2 + j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 #endif
 
     inline void equality(const pbrlib::math::mat3& m1, const pbrlib::math::mat3& m2)
     {
-        for (size_t i = 0; i < 3; ++i) {
-            for (size_t j = 0; j < 3; ++j) {
+        for (size_t i = 0; i < 3; ++i) 
+        {
+            for (size_t j = 0; j < 3; ++j)
                 EXPECT_NEAR(m1[i][j], m2[i][j], 0.0001f);
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat3& m1, const pbrlib::math::mat3& m2, const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 3; ++i) {
-            for (size_t j = 0; j < 3; ++j) {
+        for (size_t i = 0; i < 3; ++i) 
+        {
+            for (size_t j = 0; j < 3; ++j)
                 EXPECT_NEAR(m1[i][j], m2[i][j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat3& m, const float a[9])
     {
-        for (size_t i = 0; i < 3; i++) {
-            for (size_t j = 0; j < 3; j++) {
+        for (size_t i = 0; i < 3; i++) 
+        {
+            for (size_t j = 0; j < 3; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 3 + j], 0.0001f);
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat3& m, const float a[9], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 3; i++) {
-            for (size_t j = 0; j < 3; j++) {
+        for (size_t i = 0; i < 3; i++) 
+        {
+            for (size_t j = 0; j < 3; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 3 + j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 
@@ -280,28 +280,28 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat4& m1, const pbrlib::math::mat4& m2, const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 4; ++i) {
-            for (size_t j = 0; j < 4; ++j) {
+        for (size_t i = 0; i < 4; ++i) 
+        {
+            for (size_t j = 0; j < 4; ++j)
                 EXPECT_NEAR(m1[i][j], m2[i][j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat4& m, const float a[16])
     {
-        for (size_t i = 0; i < 4; i++) {
-            for (size_t j = 0; j < 4; j++) {
+        for (size_t i = 0; i < 4; i++) 
+        {
+            for (size_t j = 0; j < 4; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 4 + j], 0.0001f);
-            }
         }
     }
 
     inline void equality(const pbrlib::math::mat4& m, const float a[16], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 4; i++) {
-            for (size_t j = 0; j < 4; j++) {
+        for (size_t i = 0; i < 4; i++) 
+        {
+            for (size_t j = 0; j < 4; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 4 + j], 0.0001f) << err_msg << std::endl;
-            }
         }
     }
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <backend/renderer/vulkan/buffer.hpp>
-
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <vulkan/vulkan.h>
@@ -9,6 +7,7 @@
 #include <map>
 #include <span>
 #include <vector>
+#include <tuple>
 
 #include <string>
 #include <string_view>
@@ -17,7 +16,8 @@
 
 namespace pbrlib
 {
-    class SceneItem;
+    class   SceneItem;
+    struct  Config;
 }
 
 namespace pbrlib::backend
@@ -28,8 +28,33 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend::vk
 {
+    class Device;
     class Image;
     class CommandBuffer;
+}
+
+namespace pbrlib::backend
+{
+    template<typename T>
+    struct AttachmentsTraits final
+    { };
+
+    struct AttachmentMetadata final
+    {
+        std::string_view    name;
+        VkFormat            format  = VK_FORMAT_UNDEFINED;
+        VkImageUsageFlags   usage   = VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
+    };
+
+    template <typename RenderPass>
+    concept HasAttachments = requires()
+    {
+        {AttachmentsTraits<RenderPass>::metadata()} -> std::convertible_to<std::span<const AttachmentMetadata>>;
+    };
+
+    template<typename T>
+    struct InputDescriptorSetTraits final
+    { };
 }
 
 namespace pbrlib::backend
@@ -47,8 +72,10 @@ namespace pbrlib::backend
 
     class RenderPass
     {
+        void sync(vk::CommandBuffer& command_buffer);
+
     public:
-        RenderPass() = default;
+        explicit RenderPass(vk::Device& device) noexcept;
 
         RenderPass(RenderPass&& render_pass)        = delete;
         RenderPass(const RenderPass& render_pass)   = delete;
@@ -58,31 +85,74 @@ namespace pbrlib::backend
         RenderPass& operator = (RenderPass&& render_pass)       = delete;
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
-        virtual [[nodiscard]] bool init(vk::Device& device, const RenderContext& context);
-        virtual [[nodiscard]] bool rebuild(vk::Device& device, const RenderContext& context) = 0;
+        virtual [[nodiscard]] bool init(const RenderContext& context, uint32_t width, uint32_t height);
+        
+        virtual [[nodiscard]] bool rebuild(uint32_t width, uint32_t height) = 0;
 
         virtual void draw(vk::CommandBuffer& command_buffer);
 
+        virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
+        virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
+
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
+
+        void addSyncImage (
+            vk::Image*              ptr_image, 
+            VkImageLayout           new_layout, 
+            VkPipelineStageFlags2   src_stage, 
+            VkPipelineStageFlags2   dst_stage
+        );
+
         void depthStencil(const vk::Image* ptr_image);
-        
+
         [[nodiscard]]
         vk::Image* colorOutputAttach(std::string_view name);
-
+        
         [[nodiscard]]
         const vk::Image* depthStencil() const noexcept;
 
-    protected:
-        virtual void prePass(vk::CommandBuffer& command_buffer);
-        virtual void render(size_t item_id , vk::CommandBuffer& command_buffer) = 0; 
-        virtual void postPass(vk::CommandBuffer& command_buffer);
+        [[nodiscard]]
+        vk::Device& device() noexcept;
+
+        [[nodiscard]]
+        const RenderContext& context() const noexcept;
+
+        [[nodiscard]]
+        std::pair<uint32_t, uint32_t> size() const noexcept;
+
+        void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
+
+        [[nodiscard]] 
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
+
+        [[nodiscard]] 
+        virtual std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
+
+        virtual void update(const Config& config);
 
     protected:
-        std::map<std::string, vk::Image*, std::less<void>> _color_output_images;
+        virtual void render(vk::CommandBuffer& command_buffer) = 0;
+
+    private:
+        using SyncData = std::tuple <
+            vk::Image*, 
+            VkImageLayout, 
+            VkPipelineStageFlags2, 
+            VkPipelineStageFlags2
+        >;
+
+        std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
+        
+        std::vector<SyncData> _sync_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;
 
         const RenderContext*    _ptr_context    = nullptr;
         vk::Device*             _ptr_device     = nullptr;
+
+        uint32_t _width     = 0;
+        uint32_t _height    = 0;
+
+        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
     };
 }

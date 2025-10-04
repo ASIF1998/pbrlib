@@ -11,6 +11,11 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
+namespace pbrlib::backend::vk::shader
+{
+    class SpecializationInfoBase;
+}
+
 namespace pbrlib::backend::vk
 {
     enum class PrimitiveType
@@ -49,35 +54,38 @@ namespace pbrlib::backend::vk
         e32, 
         e64
     };
+}
 
-    class GraphicsPipelineBuilder final
+namespace pbrlib::backend::vk::builders
+{
+    class GraphicsPipeline final
     {
     public:
-        explicit GraphicsPipelineBuilder(Device& device);
+        explicit GraphicsPipeline(Device& device) noexcept;
 
-        GraphicsPipelineBuilder(GraphicsPipelineBuilder&& builder)      = delete;
-        GraphicsPipelineBuilder(const GraphicsPipelineBuilder& builder) = delete;
+        GraphicsPipeline(GraphicsPipeline&& builder)        = delete;
+        GraphicsPipeline(const GraphicsPipeline& builder)   = delete;
 
-        ~GraphicsPipelineBuilder();
+        ~GraphicsPipeline();
 
-        GraphicsPipelineBuilder& operator = (GraphicsPipelineBuilder&& builder)         = delete;
-        GraphicsPipelineBuilder& operator = (const GraphicsPipelineBuilder& builder)    = delete;
+        GraphicsPipeline& operator = (GraphicsPipeline&& builder)       = delete;
+        GraphicsPipeline& operator = (const GraphicsPipeline& builder)  = delete;
 
-        GraphicsPipelineBuilder& addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage);
-        GraphicsPipelineBuilder& addAttachmentsState(bool blendEnable);
+        GraphicsPipeline& addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info = nullptr);
+        GraphicsPipeline& addAttachmentsState(bool blendEnable);
 
-        GraphicsPipelineBuilder& primitiveType(PrimitiveType primitive_type)    noexcept;
-        GraphicsPipelineBuilder& polygonMode(PolygonMode polygon_mode)          noexcept;
-        GraphicsPipelineBuilder& cullMode(CullMode cull_mode)                   noexcept;
-        GraphicsPipelineBuilder& frontFace(FrontFace front_face)                noexcept;
-        GraphicsPipelineBuilder& sampleCount(SampleCount count)                 noexcept;
+        GraphicsPipeline& primitiveType(PrimitiveType primitive_type)   noexcept;
+        GraphicsPipeline& polygonMode(PolygonMode polygon_mode)         noexcept;
+        GraphicsPipeline& cullMode(CullMode cull_mode)                  noexcept;
+        GraphicsPipeline& frontFace(FrontFace front_face)               noexcept;
+        GraphicsPipeline& sampleCount(SampleCount count)                noexcept;
 
-        GraphicsPipelineBuilder& depthStencilTest(bool is_enable) noexcept;
+        GraphicsPipeline& depthStencilTest(bool is_enable) noexcept;
 
-        GraphicsPipelineBuilder& pipelineLayoutHandle(VkPipelineLayout layout_handle)   noexcept;
-        GraphicsPipelineBuilder& renderPassHandle(VkRenderPass render_pass_handle)      noexcept;
+        GraphicsPipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle)  noexcept;
+        GraphicsPipeline& renderPassHandle(VkRenderPass render_pass_handle)     noexcept;
 
-        GraphicsPipelineBuilder& subpass(uint32_t subpass_index) noexcept;
+        GraphicsPipeline& subpass(uint32_t subpass_index) noexcept;
 
         [[nodiscard]] VkPipeline build();
 
@@ -100,5 +108,6 @@ namespace pbrlib::backend::vk
 
         std::vector<VkPipelineShaderStageCreateInfo>        _stages;
         std::vector<VkPipelineColorBlendAttachmentState>    _attachments_state;
+        std::vector<VkSpecializationInfo>                   _specialization_infos;
     };
 }

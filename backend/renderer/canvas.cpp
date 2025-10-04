@@ -1,5 +1,3 @@
-#include <pbrlib/config.hpp>
-
 #include <backend/renderer/canvas.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
@@ -9,32 +7,35 @@
 
 #include <backend/profiling.hpp>
 
+#include <backend/utils/align_size.hpp>
+
+#include <pbrlib/exceptions.hpp>
+
 namespace pbrlib::backend
 {
-    Canvas::Canvas (
-        vk::Device&             device, 
-        const pbrlib::Window*   ptr_window,
-        const pbrlib::Config&   config
-    ) :
+    Canvas::Canvas(vk::Device& device, const pbrlib::Window* ptr_window) :
         _device(device)
     {
-        PBRLIB_PROFILING_ZONE_SCOPED;
+        _surface.vk_surface.emplace(_device, ptr_window);
+    }
 
-        if (ptr_window) [[likely]]
-            _surface.vk_surface.emplace(_device, ptr_window);
-        else [[unlikely]]
-        {
-            _image = vk::Image::Builder(_device)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .fillColor(math::vec3(0))
-                .format(VK_FORMAT_R8G8B8A8_UNORM)
-                .name("result-image")
-                .size(config.width, config.height)
-                .tiling(VK_IMAGE_TILING_OPTIMAL)
-                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-                .build();
+    Canvas::Canvas(vk::Device& device, uint32_t width, uint32_t height) :
+        _device(device)
+    {
+        const uint32_t groupSize = device.workGroupSize();
 
-        }
+        width   = backend::utils::alignSize(width, groupSize);
+        height  = backend::utils::alignSize(height, groupSize);
+
+        _image = vk::builders::Image(_device)
+            .addQueueFamilyIndex(_device.queue().family_index)
+            .fillColor(math::vec3(0))
+            .format(VK_FORMAT_R8G8B8A8_UNORM)
+            .name("result-image")
+            .size(width, height)
+            .tiling(VK_IMAGE_TILING_OPTIMAL)
+            .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+            .build();
     }
 
     void Canvas::nextImage()

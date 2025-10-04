@@ -277,7 +277,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        log::info("[importer]\t - porocess node: {}", ptr_node->mName.C_Str());
+        log::info("[importer]\t - process node: {}", ptr_node->mName.C_Str());
 
         ScopedTransform scoped_transform (this, utils::cast(ptr_node->mTransformation));
 
@@ -301,14 +301,14 @@ namespace pbrlib::backend
 
                 if (const auto ptr_material = ptr_scene->mMaterials[ptr_mesh->mMaterialIndex]) [[likely]]
                 {
-                    auto& component = item.addComponent<component::Renderable>();
+                    auto& component = item.addComponent<components::Renderable>();
                     component.ptr_item = &item;
 
                     _ptr_material_manager->add(
                         &item,
                         ptr_material->GetName().C_Str(),
-                        getComressedImage(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE, 4),
+                        getComressedImage(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_METALNESS, 1),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE_ROUGHNESS, 1)
                     );
@@ -316,7 +316,7 @@ namespace pbrlib::backend
                 else 
                     continue;
 
-                auto& renderable = item.getComponent<component::Renderable>();
+                auto& renderable = item.getComponent<components::Renderable>();
 
                 for (auto j: std::views::iota(0u, ptr_mesh->mNumVertices))
                 {
@@ -345,7 +345,7 @@ namespace pbrlib::backend
 
                 log::info("[importer]\t\t - volume: {}", renderable.bbox.volume());
 
-                auto& transform = item.getComponent<pbrlib::component::Transform>();
+                auto& transform = item.getComponent<pbrlib::components::Transform>();
                 transform.transform = _current_state.transform;
 
                 _ptr_mesh_manager->add(name, attributes, indices, &item);

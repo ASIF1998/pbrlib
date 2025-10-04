@@ -3,62 +3,76 @@
 
 #include <backend/utils/vulkan.hpp>
 
+#include <pbrlib/exceptions.hpp>
+
 #include <ranges>
 
 #include <stdexcept>
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    PipelineLayout::PipelineLayout(Device& device) : 
+    PipelineLayout::PipelineLayout(Device& device) noexcept :
         _device (device)
     { }
 
-    PipelineLayout::PipelineLayout(PipelineLayout&& layout) :
-        _device (layout._device)
+    PipelineLayout& PipelineLayout::addSetLayout(VkDescriptorSetLayout layout_handle)
     {
-        std::swap(handle, layout.handle);
-        std::swap(sets_layout, layout.sets_layout);
-    }
-
-    PipelineLayout::~PipelineLayout()
-    {
-        const auto device_handle = _device.device();
-
-        for (const auto set_layout_handle : sets_layout)
-            vkDestroyDescriptorSetLayout(device_handle, set_layout_handle, nullptr);
-
-        vkDestroyPipelineLayout(device_handle, handle, nullptr);
-    }
-
-    PipelineLayout& PipelineLayout::operator = (PipelineLayout&& layout)
-    {
-        std::swap(handle, layout.handle);
-        std::swap(sets_layout, layout.sets_layout);
-
+        _sets_layout.emplace_back(layout_handle);
         return *this;
+    }
+
+    PipelineLayout& PipelineLayout::pushConstant(const VkPushConstantRange& push_constant)
+    {
+        _push_constant.emplace(push_constant);
+        return *this;
+    }
+
+    VkPipelineLayout PipelineLayout::build()
+    {
+        VkPipelineLayoutCreateInfo pipeline_layout_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
+        };
+
+        if (!_sets_layout.empty())
+        {
+            pipeline_layout_create_info.setLayoutCount  = static_cast<uint32_t>(_sets_layout.size());
+            pipeline_layout_create_info.pSetLayouts     = _sets_layout.data();
+        }
+
+        if (_push_constant)
+        {
+            pipeline_layout_create_info.pushConstantRangeCount  = 1;
+            pipeline_layout_create_info.pPushConstantRanges     = &_push_constant.value();
+        }
+
+        VkPipelineLayout layout_handle = VK_NULL_HANDLE;
+
+        VK_CHECK(vkCreatePipelineLayout(
+            _device.device(),
+            &pipeline_layout_create_info,
+            nullptr,
+            &layout_handle
+        ));
+
+        return layout_handle;
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    PipelineLayout::Builder::Builder(Device& device) :
+    DescriptorSetLayout::DescriptorSetLayout(Device& device) noexcept :
         _device (device)
     { }
 
-    PipelineLayout::Builder& PipelineLayout::Builder::addSet()
-    {
-        _sets.emplace_back();
-        return *this;
-    }
-
-    PipelineLayout::Builder& PipelineLayout::Builder::addBinding (
+    DescriptorSetLayout& DescriptorSetLayout::addBinding (
         uint32_t            binding, 
         VkDescriptorType    desc_type, 
         uint32_t            count, 
         VkShaderStageFlags  stages
     )
     {
-        _sets.back().emplace_back
+        _bindings.emplace_back
         (
             VkDescriptorSetLayoutBinding
             {
@@ -72,60 +86,38 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    PipelineLayout::Builder& PipelineLayout::Builder::pushConstant(const VkPushConstantRange& push_constant)
+    VkDescriptorSetLayout DescriptorSetLayout::build()
     {
-        _push_constant.emplace(push_constant);
-        return *this;
-    }
+        if (_bindings.empty()) [[unlikely]]
+            throw exception::InvalidState("[vk-descritor-set-layout::builder] bindings count is 0");
 
-    PipelineLayout PipelineLayout::Builder::build()
-    {
-        PipelineLayout layout (_device);
+        const std::vector<VkDescriptorBindingFlags> bindings_flags (_bindings.size(), VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT); 
 
-        VkPipelineLayoutCreateInfo pipeline_layout_create_info
+        const VkDescriptorSetLayoutBindingFlagsCreateInfo set_layout_binding_flags_create_info
         {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
+            .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+            .bindingCount   = static_cast<uint32_t>(bindings_flags.size()),
+            .pBindingFlags  = bindings_flags.data()
         };
 
-        if (!_sets.empty())
+        const VkDescriptorSetLayoutCreateInfo desc_set_create_info
         {
-            layout.sets_layout.resize(_sets.size());
+            .sType          = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .pNext          = &set_layout_binding_flags_create_info,
+            .flags          = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT_EXT,
+            .bindingCount   = static_cast<uint32_t>(_bindings.size()),
+            .pBindings      = _bindings.data()
+        };
 
-            VkDescriptorSetLayoutCreateInfo desc_set_create_info
-            {
-                .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
-            };
+        VkDescriptorSetLayout sets_layout = VK_NULL_HANDLE;
 
-            for (const auto i: std::views::iota(0u, _sets.size()))
-            {
-                desc_set_create_info.bindingCount   = static_cast<uint32_t>(_sets[i].size());
-                desc_set_create_info.pBindings      = _sets[i].data();
-
-                VK_CHECK(vkCreateDescriptorSetLayout(
-                    _device.device(),
-                    &desc_set_create_info,
-                    nullptr,
-                    &layout.sets_layout[i]
-                ));
-            }
-
-            pipeline_layout_create_info.setLayoutCount  = static_cast<uint32_t>(layout.sets_layout.size());
-            pipeline_layout_create_info.pSetLayouts     = layout.sets_layout.data();
-        }
-
-        if (_push_constant)
-        {
-            pipeline_layout_create_info.pushConstantRangeCount  = 1;
-            pipeline_layout_create_info.pPushConstantRanges     = &_push_constant.value();
-        }
-
-        VK_CHECK(vkCreatePipelineLayout(
+        VK_CHECK(vkCreateDescriptorSetLayout(
             _device.device(),
-            &pipeline_layout_create_info,
+            &desc_set_create_info,
             nullptr,
-            &layout.handle
+            &sets_layout
         ));
 
-        return layout;
+        return sets_layout;
     }
 }

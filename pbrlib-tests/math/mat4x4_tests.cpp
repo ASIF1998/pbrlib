@@ -2,6 +2,7 @@
 
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/vec4.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -317,16 +318,16 @@ TEST(Mat4Tests, AccessToElement)
         7, 6, 4, 2
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
-        }
     }
 }
 
@@ -346,16 +347,16 @@ TEST(Mat4Tests, AccessToElementTypeFloat)
         7.0f, 6.0f, 4.0f, 2.0f
     };
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 4; i++) {
-        for (size_t j{0}; j < 4; j++) {
+    for (size_t i{0}; i < 4; i++) 
+    {
+        for (size_t j{0}; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
-        }
     }
 }
 
@@ -490,4 +491,10 @@ TEST(Mat4Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(4, 4);
     }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(Mat4Tests, Lerp)
+{
+    constexpr mat4 result (0.75f);
+    pbrlib::testing::equality(result, lerp(mat4(0.0f), mat4(1.0f), 0.75f));
 }

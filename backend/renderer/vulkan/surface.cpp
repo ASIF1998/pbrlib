@@ -1,4 +1,4 @@
-#include <pbrlib/rendering/window.hpp>
+#include <pbrlib/window.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
@@ -104,7 +104,7 @@ namespace pbrlib::backend::vk
         for(const auto& format: formats | std::views::filter(is_valid_format))
             return format;
 
-        throw exception::InvalidState("[vulkan::surface] failed find surface format");
+        throw exception::InvalidState("[vk-surface] failed find surface format");
     }
 }
 
@@ -113,6 +113,11 @@ namespace pbrlib::backend::vk
     Surface::Surface(Device& device, const pbrlib::Window* ptr_window) :
         _device (device)
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (!ptr_window) [[unlikely]]
+            throw exception::InvalidArgument("[vk-surface] pointer to window is null");
+
         createSurface(ptr_window);
         
         _surface_format = getFormat(getSurfaceFormats());
@@ -162,8 +167,8 @@ namespace pbrlib::backend::vk
     {
         auto ptr_sdl_window = static_cast<SDL_Window*>(ptr_window->_ptr_window);
 
-        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE)
-            throw exception::InitializeError("[vulkan::surface] failed create");
+        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE) [[unlikely]]
+            throw exception::InitializeError("[vk-surface] failed create");
     }
 
     void Surface::createSwapchain(const pbrlib::Window* ptr_window)

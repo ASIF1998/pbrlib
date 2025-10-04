@@ -10,7 +10,7 @@
 namespace pbrlib::math
 {
     template<typename Type>
-    struct Vec4
+    struct Vec4 final
     {
     public:
         inline constexpr Vec4(Type xyzw = static_cast<Type>(0))                                             noexcept;

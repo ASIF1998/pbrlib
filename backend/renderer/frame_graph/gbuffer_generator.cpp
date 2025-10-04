@@ -27,31 +27,123 @@
 
 namespace pbrlib::backend
 {
+    struct GBufferDescriptorSetBindings
+    {
+        enum 
+        {
+            ePosUv,
+            eNormalTangent,
+            eMaterialIndices,
+            eDepthBuffer
+        };
+    };
+}
+
+namespace pbrlib::backend
+{
+    GBufferGenerator::GBufferGenerator(vk::Device& device) :
+        RenderPass(device)
+    {
+        createResultDescriptorSet();
+    }
+
     GBufferGenerator::~GBufferGenerator()
     {
-        const auto device_handle = _ptr_device->device();
+        const auto device_handle = device().device();
 
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
 
+        if (vkFreeDescriptorSets(
+            device_handle,
+            device().descriptorPool(),
+            1, &_result_descriptor_set_handle) != VK_SUCCESS
+        ) [[unlikely]]
+            log::error("[gbuffer-generator] failed free vulkan descriptor set");
+
+        vkDestroyDescriptorSetLayout(device_handle, _result_descriptor_set_layout_handle, nullptr);
+
+        vkDestroySampler(device_handle, _sampler_handle, nullptr);
+ 
         vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
+        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
-    bool GBufferGenerator::init(vk::Device& device, const RenderContext& context)
+    void GBufferGenerator::createSampler()
+    {
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_NEAREST,
+            .minFilter      = VK_FILTER_NEAREST,
+            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
+        };
+
+        VK_CHECK(vkCreateSampler(
+            device().device(),
+            &sampler_create_info,
+            nullptr, 
+            &_sampler_handle
+        ));
+    }
+
+    void GBufferGenerator::initResultDescriptorSet()
+    {
+        createSampler();
+
+        const auto ptr_pos_uv_image         = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        const auto ptr_normal_tangent_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        const auto ptr_material_index_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
+
+        constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_pos_uv_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::ePosUv
+        });
+
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_normal_tangent_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eNormalTangent
+        });
+        
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_material_index_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eMaterialIndices
+        });
+        
+        device().writeDescriptorSet ({
+            .view_handle            = depthStencil()->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            .binding                = GBufferDescriptorSetBindings::eDepthBuffer
+        });
+    }
+
+    bool GBufferGenerator::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!RenderPass::init(device, context))
+        if (!RenderPass::init(context, width, height)) [[unlikely]]
         {
             log::error("[gbuffer-generator] failed initialize");
             return false;
         }
 
-        const auto ptr_image = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
-
-        /// @todo думаю это тоже стоит перенсти в RenderPass и инициализировать там
-        _width  = ptr_image->width;
-        _height = ptr_image->height;
+        const auto ptr_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
 
         createRenderPass();
 
@@ -62,19 +154,20 @@ namespace pbrlib::backend
             .size       = sizeof(GBufferPushConstantBlock)
         };
 
-        _pipeline_layout = vk::PipelineLayout::Builder(*_ptr_device)
+        const auto [_, mesh_manager_set_layout] = context.ptr_mesh_manager->descriptorSet();
+
+        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .pushConstant(push_constant_range)
-            .addSet()
-                .addBinding(MeshManager::Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-                .addBinding(MeshManager::Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+            .addSetLayout(mesh_manager_set_layout)
             .build();
 
         createFramebuffer();
+        initResultDescriptorSet();
 
-        return rebuild(device, context);
+        return rebuild(width, height);
     }
 
-    bool GBufferGenerator::rebuild(vk::Device& device, const RenderContext& context)
+    bool GBufferGenerator::rebuild([[maybe_unused]] uint32_t width, [[maybe_unused]] uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -83,26 +176,19 @@ namespace pbrlib::backend
 
         auto prev_pipeline = _pipeline_handle;
 
-        try
-        {
-            _pipeline_handle = vk::GraphicsPipelineBuilder(*_ptr_device)
-                .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
-                .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
-                .addAttachmentsState(false)
-                .addAttachmentsState(false)
-                .addAttachmentsState(false)
-                .depthStencilTest(true)
-                .pipelineLayoutHandle(_pipeline_layout->handle)
-                .renderPassHandle(_render_pass_handle)
-                .subpass(0)
-                .build();
-
-            vkDestroyPipeline(_ptr_device->device(), prev_pipeline, nullptr);
-        } 
-        catch (std::exception& ex)
-        {
-            backend::log::error("[gbuffer-generate] failed rebuild: {}", ex.what());
-        }
+        _pipeline_handle = vk::builders::GraphicsPipeline(device())
+            .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
+            .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .addAttachmentsState(false)
+            .addAttachmentsState(false)
+            .addAttachmentsState(false)
+            .depthStencilTest(true)
+            .pipelineLayoutHandle(_pipeline_layout_handle)
+            .renderPassHandle(_render_pass_handle)
+            .subpass(0)
+            .build();
+        
+        vkDestroyPipeline(device().device(), prev_pipeline, nullptr);
 
         return true;
     }
@@ -114,15 +200,15 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto* ptr_pos_uv_attach   = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
-        const auto* ptr_nor_tan_attach  = colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent);
-        const auto* ptr_mat_idx_attach  = colorOutputAttach(GBufferFinalAttachmentsName::material_index);
+        const auto* ptr_pos_uv_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        const auto* ptr_nor_tan_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        const auto* ptr_mat_idx_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
-        _render_pass_handle = vk::RenderPassBuilder(*_ptr_device)
+        _render_pass_handle = vk::builders::RenderPass(device())
             .addColorAttachment(ptr_pos_uv_attach, final_attachments_layout)
             .addColorAttachment(ptr_nor_tan_attach, final_attachments_layout)
             .addColorAttachment(ptr_mat_idx_attach, final_attachments_layout)
-            .depthAttachment(_ptr_depth_stencil_image, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL)
+            .depthAttachment(depthStencil(), VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL)
             .build();
     }
 
@@ -130,18 +216,20 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto ptr_pos_uv_attach    = colorOutputAttach(GBufferFinalAttachmentsName::pos_uv);
-        const auto ptr_nor_tan_attach   = colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent);
-        const auto ptr_mat_idx_attach   = colorOutputAttach(GBufferFinalAttachmentsName::material_index);
+        const auto ptr_pos_uv_attach    = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        const auto ptr_nor_tan_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        const auto ptr_mat_idx_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
-        _framebuffer_handle = vk::FramebufferBuild(*_ptr_device)
-            .size(_width, _height)
+        const auto [width, height] = size();
+
+        _framebuffer_handle = vk::builders::Framebuffer(device())
+            .size(width, height)
             .layers(1)
             .renderPass(_render_pass_handle)
             .addAttachment(*ptr_pos_uv_attach)
             .addAttachment(*ptr_nor_tan_attach)
             .addAttachment(*ptr_mat_idx_attach)
-            .addAttachment(*_ptr_depth_stencil_image)
+            .addAttachment(*depthStencil())
             .build();
     }
 }
@@ -150,24 +238,22 @@ namespace pbrlib::backend
 {
     void GBufferGenerator::setupColorAttachmentsLayout()
     {
-        colorOutputAttach(GBufferFinalAttachmentsName::pos_uv)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(GBufferFinalAttachmentsName::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     }
 
-    void GBufferGenerator::prePass(vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::beginPass(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        RenderPass::prePass(command_buffer);
-
         setupColorAttachmentsLayout();
 
-        _push_constant_block.projection_view = _ptr_context->projection * _ptr_context->view; 
+        _push_constant_block.projection_view = context().projection * context().view;
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] pre-pass");
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[gbuffer-generator] pre-pass");
 
             constexpr VkClearValue pos_clear_value
             {
@@ -206,12 +292,14 @@ namespace pbrlib::backend
                 depth_clear_value
             };
 
+            const auto [width, height] = size();
+
             const VkRect2D area 
             {
                 0, 
                 0, 
-                _width, 
-                _height 
+                width, 
+                height 
             };
 
             const VkRenderPassBeginInfo render_pass_begin_info
@@ -232,68 +320,101 @@ namespace pbrlib::backend
 
             const VkViewport viewport
             {
-                .width      = static_cast<float>(_width),
-                .height     = static_cast<float>(_height),
+                .width      = static_cast<float>(width),
+                .height     = static_cast<float>(height),
                 .minDepth   = 0.0f,
                 .maxDepth   = 1.0
             };
 
-            const auto descriptor_set = _ptr_context->ptr_mesh_manager->descriptorSet();
+            const auto [descriptor_set, _] = context().ptr_mesh_manager->descriptorSet();
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout->handle, 0, 1, &descriptor_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &descriptor_set, 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);
-        }, "[gbuffer-generator] pre-pass", vk::marker_colors::graphics_pipeline);
+        }, "[gbuffer-generator] begin-pass", vk::marker_colors::graphics_pipeline);
     }
 
-    void GBufferGenerator::render(size_t item_id, vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto ptr_item = _ptr_context->items[item_id];
+        beginPass(command_buffer);
 
-        const auto& tag = ptr_item->getComponent<pbrlib::component::Tag>();
-
-        command_buffer.write([this, item_id, ptr_item] (VkCommandBuffer command_buffer_handle)
+        for (const auto ptr_item: context().items)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] run-pipeline");
+            const auto& tag = ptr_item->getComponent<pbrlib::components::Tag>();
+    
+            command_buffer.write([this, ptr_item] (VkCommandBuffer command_buffer_handle)
+            {
+                PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[gbuffer-generator] run-pipeline");
+    
+                const auto& renderable = ptr_item->getComponent<components::Renderable>();
+    
+                _push_constant_block.instance_id    = renderable.instance_id;
+                _push_constant_block.material_index = renderable.material_id;
+    
+                vkCmdPushConstants (
+                    command_buffer_handle, 
+                    _pipeline_layout_handle, 
+                    VK_SHADER_STAGE_VERTEX_BIT, 
+                    0, sizeof(GBufferPushConstantBlock), &_push_constant_block
+                );
+    
+                const auto& index_buffer = context().ptr_mesh_manager->indexBuffer(renderable.instance_id);
+    
+                vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);
+            }, std::format("[gbuffer-pass] run-pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
+        }
 
-            const auto& renderable = ptr_item->getComponent<component::Renderable>();
-
-            _push_constant_block.instance_id    = renderable.instance_id;
-            _push_constant_block.material_index = renderable.material_id;
-
-            vkCmdPushConstants(
-                command_buffer_handle, 
-                _pipeline_layout->handle, 
-                VK_SHADER_STAGE_VERTEX_BIT, 
-                0, sizeof(GBufferPushConstantBlock), &_push_constant_block
-            );
-
-            const auto& index_buffer = _ptr_context->ptr_mesh_manager->indexBuffer(renderable.instance_id);
-
-            vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-            vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);
-        }, std::format("[gbuffer-pass] run-pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
+        endPass(command_buffer);
     }
 
-    void GBufferGenerator::postPass(vk::CommandBuffer& command_buffer)
+    void GBufferGenerator::endPass(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
-
-        RenderPass::postPass(command_buffer);
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(*_ptr_device, command_buffer_handle, "[gbuffer-generator] post-pass");
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[gbuffer-generator] post-pass");
 
             vkCmdEndRenderPass(command_buffer_handle);
-        }, "[gbuffer-generator] post-pass", vk::marker_colors::graphics_pipeline);
+        }, "[gbuffer-generator] end-pass", vk::marker_colors::graphics_pipeline);
 
-        colorOutputAttach(GBufferFinalAttachmentsName::pos_uv)->layout          = final_attachments_layout;
-        colorOutputAttach(GBufferFinalAttachmentsName::normal_tangent)->layout  = final_attachments_layout;
-        colorOutputAttach(GBufferFinalAttachmentsName::material_index)->layout  = final_attachments_layout;
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->layout          = final_attachments_layout;
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->layout  = final_attachments_layout;
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->layout  = final_attachments_layout;
+    }
+
+    VkPipelineStageFlags2 GBufferGenerator::srcStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_VERTEX_SHADER_BIT;
+    }
+
+    VkPipelineStageFlags2 GBufferGenerator::dstStage() const noexcept
+    {
+        return VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+    }
+
+    void GBufferGenerator::createResultDescriptorSet()
+    {
+        _result_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device())
+            .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
+
+        _result_descriptor_set_handle = device().allocateDescriptorSet (
+            _result_descriptor_set_layout_handle, 
+            "[gbuffer-generator] descritor set with results"
+        );
+    }
+
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
+    {
+        return std::make_pair(_result_descriptor_set_handle, _result_descriptor_set_layout_handle);
     }
 }

@@ -96,8 +96,8 @@ namespace pbrlib
 		void reset() noexcept;
 
 	public:
-		math::vec2 getCurrentCoord()	const; 
-		math::vec2 getRelativeMotion() 	const;
+		math::vec2 getCurrentCoord()	const noexcept; 
+		math::vec2 getRelativeMotion() 	const noexcept;
 
 		bool isMotion() const noexcept;
 

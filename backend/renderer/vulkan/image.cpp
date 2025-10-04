@@ -52,13 +52,14 @@ namespace pbrlib::backend::vk
         _from_swapchain (from_swapchain)
     { }
 
-    Image::Image(Image&& image) :
+    Image::Image(Image&& image) noexcept :
         _device     (image._device),
         width       (image.width),
         height      (image.height),
         format      (image.format),
         level_count (image.level_count),
-        layer_count (image.layer_count)
+        layer_count (image.layer_count),
+        layout      (image.layout)
     {
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
@@ -70,11 +71,11 @@ namespace pbrlib::backend::vk
     {
         vkDestroyImageView(_device.device(), view_handle, nullptr);
 
-        if (!_from_swapchain)
+        if (!_from_swapchain) [[likely]]
             vmaDestroyImage(_device.vmaAllocator(), handle, _allocation);
     }
 
-    Image& Image::operator = (Image&& image)
+    Image& Image::operator = (Image&& image) noexcept
     {
         width   = image.width;
         height  = image.height;
@@ -82,6 +83,8 @@ namespace pbrlib::backend::vk
 
         level_count = image.level_count;
         layer_count = image.layer_count;
+
+        layout = image.layout;
 
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
@@ -99,7 +102,7 @@ namespace pbrlib::backend::vk
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
-        auto staging_buffer = Buffer::Builder(_device)
+        auto staging_buffer = builders::Buffer(_device)
             .name("staging-buffer")
             .size(image_size)
             .usage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT)
@@ -112,6 +115,8 @@ namespace pbrlib::backend::vk
         staging_buffer.write(image_data, 0);
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-copy-buffer-to-image");
+
+        changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([&data, &staging_buffer, this] (VkCommandBuffer command_buffer_handle)
         {
@@ -164,6 +169,19 @@ namespace pbrlib::backend::vk
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-change-image-layout");
 
+        changeLayout(command_buffer, new_layout, src_stage, dst_stage);
+        _device.submit(command_buffer);
+    }
+
+    void Image::changeLayout (
+        CommandBuffer&          command_buffer,
+        VkImageLayout           new_layout,
+        VkPipelineStageFlags2   src_stage, 
+        VkPipelineStageFlags2   dst_stage 
+    )
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         command_buffer.write([this, new_layout, src_stage, dst_stage] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image] changle-image-layout");
@@ -207,99 +225,97 @@ namespace pbrlib::backend::vk
             vkCmdPipelineBarrier2(command_buffer_handle, &dependency_info);
         }, "[vk-image] changle-image-layout", vk::marker_colors::change_layout);
 
-        _device.submit(command_buffer);
-
         layout = new_layout;
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
-    Image::Builder::Builder(Device& device) :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    void Image::Builder::validate()
+    void Image::validate()
     {
-        if (_width == 0 || _height == 0)
+        if (_width == 0 || _height == 0) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] size is zero");
 
-        if (_format == VK_FORMAT_UNDEFINED)
+        if (_format == VK_FORMAT_UNDEFINED) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] format is undefined");
 
-        if (_queues.empty())
+        if (_queues.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] not queues");
 
-        if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM)
+        if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM) [[unlikely]]
             throw exception::InvalidState("[vk-image::builder] invalid usage");
     }
 
-    Image::Builder& Image::Builder::size(uint32_t width, uint32_t height) noexcept
+    Image& Image::size(uint32_t width, uint32_t height) noexcept
     {
         _width  = width;
         _height = height;
         return *this;
     }
 
-    Image::Builder& Image::Builder::format(VkFormat format) noexcept
+    Image& Image::format(VkFormat format) noexcept
     {
         _format = format;
         return *this;
     }
 
-    Image::Builder& Image::Builder::filter(VkFilter filter) noexcept
+    Image& Image::filter(VkFilter filter) noexcept
     {
         _filter = filter;
         return *this;
     }
 
-    Image::Builder& Image::Builder::fillColor(const pbrlib::math::vec4& fill_color)
+    Image& Image::fillColor(const pbrlib::math::vec4& fill_color)
     {
         _fill_color = fill_color;
         return *this;
     }
 
-    Image::Builder& Image::Builder::addQueueFamilyIndex(uint32_t index)
+    Image& Image::addQueueFamilyIndex(uint32_t index)
     {
         _queues.push_back(index);
         return *this;
     }
 
-    Image::Builder& Image::Builder::sampleCount(VkSampleCountFlagBits sample_count) noexcept
+    Image& Image::sampleCount(VkSampleCountFlagBits sample_count) noexcept
     {
         _sample_count = sample_count;
         return *this;
     }
 
-    Image::Builder& Image::Builder::tiling(VkImageTiling tiling) noexcept
+    Image& Image::tiling(VkImageTiling tiling) noexcept
     {
         _tiling = tiling;
         return *this;
     }
     
-    Image::Builder& Image::Builder::usage(VkImageUsageFlags usage) noexcept
+    Image& Image::usage(VkImageUsageFlags usage) noexcept
     {
         _usage = usage;
         return *this;
     }
 
-    Image::Builder& Image::Builder::name(std::string_view image_name)
+    Image& Image::name(std::string_view image_name)
     {
         _name = image_name;
         return *this;
     }
 
-    VkSharingMode Image::Builder::sharingMode()
+    VkSharingMode Image::sharingMode()
     {
         std::unordered_set<uint32_t> families (std::begin(_queues), std::end(_queues));
         return families.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
     }
 
-    Image Image::Builder::build()
+    vk::Image Image::build()
     {
         validate();
 
-        Image image (_device);
+        vk::Image image (_device);
 
         image.width     = _width;
         image.height    = _height;
@@ -343,11 +359,11 @@ namespace pbrlib::backend::vk
 
         if (_usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
-            
-        if (_usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+        else if (_usage & VK_IMAGE_USAGE_SAMPLED_BIT)
+            image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        else if (_usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-            
-        if (_usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+        else if (_usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         const auto aspect = _format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
@@ -386,7 +402,7 @@ namespace pbrlib::backend::vk
             &image.view_handle
         ));
 
-        if (!_name.empty())
+        if (!_name.empty()) [[likely]]
         {
             VkDebugUtilsObjectNameInfoEXT name_info 
             { 
@@ -408,25 +424,25 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::decoders
 {
-    Image::Decoder::Decoder(Device& device) :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    Image::Decoder& Image::Decoder::name(std::string_view image_name)
+    Image& Image::name(std::string_view image_name)
     {
         _name = image_name;
         return *this;
     }
 
-    Image::Decoder& Image::Decoder::channelsPerPixel(int32_t channels_per_pixel)
+    Image& Image::channelsPerPixel(int32_t channels_per_pixel)
     {
         _channels_per_pixel = channels_per_pixel;
         return *this;
     }
 
-    Image::Decoder& Image::Decoder::compressedImage(const uint8_t* ptr_data, size_t size)
+    Image& Image::compressedImage(const uint8_t* ptr_data, size_t size)
     {
         _compressed_image.ptr_data  = ptr_data;
         _compressed_image.size      = size;
@@ -434,16 +450,16 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    void Image::Decoder::validate()
+    void Image::validate()
     {
-        if (_channels_per_pixel < 1 && _channels_per_pixel > 4) 
+        if (_channels_per_pixel < 1 && _channels_per_pixel > 4) [[unlikely]]
             throw exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
 
-        if (!_compressed_image.ptr_data || !_compressed_image.size)
+        if (!_compressed_image.ptr_data || !_compressed_image.size) [[unlikely]]
             throw exception::InvalidState("[vk-image::decoder] compressed image data is empty");
     }
 
-    Image Image::Decoder::decode()
+    vk::Image Image::decode()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -462,6 +478,8 @@ namespace pbrlib::backend::vk
             .format = formats[_channels_per_pixel - 1]
         };
 
+        stbi_set_flip_vertically_on_load(true);
+
         write_data.ptr_data = stbi_load_from_memory(
             _compressed_image.ptr_data, 
             static_cast<int>(_compressed_image.size), 
@@ -470,7 +488,7 @@ namespace pbrlib::backend::vk
             _channels_per_pixel
         );
 
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .format(write_data.format)
             .name(_name)
@@ -488,25 +506,25 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::loaders
 {
-    Image::Loader::Loader(Device& device) noexcept :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    Image::Loader& Image::Loader::filename(const std::filesystem::path& filename)
+    Image& Image::filename(const std::filesystem::path& filename)
     {
         _filename = filename;
         return *this;
     }
 
-    void Image::Loader::validate()
+    void Image::validate()
     {
-        if (!std::filesystem::exists(_filename))
+        if (!std::filesystem::exists(_filename)) [[unlikely]]
             throw exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
     }
 
-    Image Image::Loader::load()
+    vk::Image Image::load()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -526,10 +544,10 @@ namespace pbrlib::backend::vk
             STBI_rgb_alpha
         );
 
-        if (data.width < 1 || data.height < 1 || !data.ptr_data)
+        if (data.width < 1 || data.height < 1 || !data.ptr_data) [[unlikely]]
             throw exception::RuntimeError(std::format("[image-loader] failed load image '{}'", _filename.string()));
 
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .name(_filename.filename().string())
             .addQueueFamilyIndex(_device.queue().family_index)
             .format(data.format)
@@ -545,37 +563,43 @@ namespace pbrlib::backend::vk
     }
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::exporters
 {
-    Image::Exporter::Exporter(Device& device) noexcept :
+    Image::Image(Device& device) noexcept :
         _device (device)
     { }
 
-    Image::Exporter& Image::Exporter::image(const Image* ptr_image)
+    Image& Image::image(const vk::Image* ptr_image)
     {
         _ptr_image = ptr_image;
         return *this;
     }
 
-    Image::Exporter& Image::Exporter::filename(const std::filesystem::path& filename)
+    Image& Image::filename(const std::filesystem::path& filename)
     {
         _filename = filename;
         return *this;
     }
 
-    void Image::Exporter::validate()
+    void Image::validate()
     {
-        if (!_ptr_image)
+        if (!_ptr_image) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] image is null");
 
-        if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+        if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] invalid image layout");
 
-        if (_filename.empty())
+        if (_filename.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] didn't set filename");
+
+        if (std::filesystem::is_directory(_filename)) [[unlikely]]
+            throw exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
+
+        if (const auto save_directory = _filename.parent_path(); !std::filesystem::exists(save_directory)) [[unlikely]]
+            std::filesystem::create_directory(save_directory);
     }
 
-    void Image::Exporter::exoprt()
+    void Image::exoprt()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -584,7 +608,7 @@ namespace pbrlib::backend::vk
         auto width  = static_cast<int>(_ptr_image->width);
         auto height = static_cast<int>(_ptr_image->height);
         
-        auto image = Image::Builder(_device)
+        auto image = builders::Image(_device)
             .size(_ptr_image->width, _ptr_image->height)
             .format(VK_FORMAT_R8G8B8A8_UNORM)
             .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
@@ -642,6 +666,11 @@ namespace pbrlib::backend::vk
 
         _device.submit(command_buffer);
 
+        std::ofstream file (_filename, std::ios::out | std::ios::binary);
+
+        if (!file) [[unlikely]]
+            throw exception::FileOpen("[vk-image::exporter] failed create writer");
+
         const VkImageSubresource sub_resource 
         {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -664,11 +693,6 @@ namespace pbrlib::backend::vk
             image._allocation,
             reinterpret_cast<void**>(&ptr_data)
         ));
-
-        std::ofstream file (_filename, std::ios::out | std::ios::binary);
-
-        if (!file)
-            throw exception::FileOpen("[vk-image::exporter] failed create writer");
 
         std::function<void (void*, int)> writer = [this, &file] (void* data, int size)
         {

@@ -10,60 +10,55 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
-namespace pbrlib::backend::vk
+namespace pbrlib::backend::vk::builders
 {
     class PipelineLayout final
     {
-        explicit PipelineLayout(Device& device);
-
     public:
-        class Builder;
+        explicit PipelineLayout(Device& device) noexcept;
 
-        PipelineLayout(PipelineLayout&& layout);
-        PipelineLayout(const PipelineLayout& layout) = delete;
+        PipelineLayout(PipelineLayout&& builder)      = delete;
+        PipelineLayout(const PipelineLayout& builder) = delete;
 
-        ~PipelineLayout();
+        PipelineLayout& operator = (PipelineLayout&& builder)         = delete;
+        PipelineLayout& operator = (const PipelineLayout& builder)    = delete;
 
-        PipelineLayout& operator = (PipelineLayout&& layout);
-        PipelineLayout& operator = (const PipelineLayout& layout) = delete;
+        PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
+        PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        VkPipelineLayout handle = VK_NULL_HANDLE;
-
-        std::vector<VkDescriptorSetLayout> sets_layout;
-
-    private:
-        Device& _device;
-    };
-
-    class PipelineLayout::Builder final
-    {
-    public:
-        explicit Builder(Device& device);
-
-        Builder(Builder&& builder)      = delete;
-        Builder(const Builder& builder) = delete;
-
-        Builder& operator = (Builder&& builder)         = delete;
-        Builder& operator = (const Builder& builder)    = delete;
-
-        Builder& addSet();
-        
-        Builder& addBinding (
-            uint32_t            binding, 
-            VkDescriptorType    desc_type, 
-            uint32_t            count, 
-            VkShaderStageFlags  stages
-        );
-
-        Builder& pushConstant(const VkPushConstantRange& push_constant);
-
-        [[nodiscard]] PipelineLayout build();
+        [[nodiscard]] VkPipelineLayout build();
         
     private:
         Device& _device;
 
         std::optional<VkPushConstantRange> _push_constant;
 
-        std::vector<std::vector<VkDescriptorSetLayoutBinding>> _sets;
+        std::vector<VkDescriptorSetLayout> _sets_layout;
+    };
+
+    class DescriptorSetLayout final
+    {
+    public:
+        explicit DescriptorSetLayout(Device& device) noexcept;
+
+        DescriptorSetLayout(DescriptorSetLayout&& layout)       = delete;
+        DescriptorSetLayout(const DescriptorSetLayout& layout)  = delete;
+
+        DescriptorSetLayout& operator = (DescriptorSetLayout&& layout)      = delete;
+        DescriptorSetLayout& operator = (const DescriptorSetLayout& layout) = delete;
+
+        DescriptorSetLayout& addBinding (
+            uint32_t            binding,
+            VkDescriptorType    desc_type,
+            uint32_t            count,
+            VkShaderStageFlags  stages
+        );
+
+        
+        VkDescriptorSetLayout build();
+    private:
+        Device& _device;
+
+        std::vector<VkDescriptorSetLayoutBinding> _bindings;
     };
 }

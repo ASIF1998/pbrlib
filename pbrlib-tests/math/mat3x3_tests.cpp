@@ -2,6 +2,7 @@
 
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/lerp.hpp>
 
 using namespace pbrlib::math;
 
@@ -156,16 +157,16 @@ TEST(Mat3Tests, AccessToElement)
         9, 7, 3
     };
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
+    for (size_t i{0}; i < 3; i++) 
+    {
+        for (size_t j{0}; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m[i][j]);
-        }
     }
 
-    for (size_t i{0}; i < 3; i++) {
-        for (size_t j{0}; j < 3; j++) {
+    for (size_t i{0}; i < 3; i++) 
+    {
+        for (size_t j{0}; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m.at(i, j));
-        }
     }
 }
 
@@ -239,4 +240,10 @@ TEST(Mat3Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(3, 3);
     }, pbrlib::exception::InvalidArgument);
+}
+
+TEST(Mat3Tests, Lerp)
+{
+    constexpr mat3 result (0.75f);
+    pbrlib::testing::equality(result, lerp(mat3(0.0f), mat3(1.0f), 0.75f));
 }

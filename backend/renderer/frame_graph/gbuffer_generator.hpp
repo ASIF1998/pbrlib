@@ -7,16 +7,41 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 
 #include <optional>
+#include <array>
 
 namespace pbrlib::backend
 {
-    struct GBufferFinalAttachmentsName final
+    class GBufferGenerator;
+
+    template<>
+    struct AttachmentsTraits<GBufferGenerator>
     {
+        static constexpr auto metadata()
+        {
+            constexpr auto usage_flags = 
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
+            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
+            constexpr std::array metadata
+            {
+                AttachmentMetadata(pos_uv, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+                AttachmentMetadata(normal_tangent, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+                AttachmentMetadata(material_index, VK_FORMAT_R16_UINT, usage_flags)
+            };
+
+            return metadata;
+        }
+
         constexpr static auto pos_uv            = "gbuffer-pos-uv";
         constexpr static auto normal_tangent    = "gbuffer-normal-tangent";
         constexpr static auto material_index    = "gbuffer-material-index";
     };
+}
 
+namespace pbrlib::backend
+{
     struct GBufferPushConstantBlock final
     {
         math::mat4  projection_view;
@@ -27,33 +52,46 @@ namespace pbrlib::backend
     class GBufferGenerator final :
         public RenderPass
     {
-        bool init(vk::Device& device, const RenderContext& context)     override;
-        bool rebuild(vk::Device& device, const RenderContext& context)  override;
+        void createResultDescriptorSet();
 
-        void render(size_t item_id, vk::CommandBuffer& command_buffer)  override;
-        void prePass(vk::CommandBuffer& command_buffer)                 override;
-        void postPass(vk::CommandBuffer& command_buffer)                override;
+        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
+        bool rebuild(uint32_t width, uint32_t height)                               override;
+        
+        void beginPass(vk::CommandBuffer& command_buffer);
+        void render(vk::CommandBuffer& command_buffer) override;
+        void endPass(vk::CommandBuffer& command_buffer);
         
         void createRenderPass();
         void createFramebuffer();
 
+        void createSampler();
+        void initResultDescriptorSet();
+
         void setupColorAttachmentsLayout();
 
+        VkPipelineStageFlags2 srcStage() const noexcept override;
+        VkPipelineStageFlags2 dstStage() const noexcept override;
+
+        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+
     public:
+        explicit GBufferGenerator(vk::Device& device);
         ~GBufferGenerator();
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
-        uint32_t _width     = 0;
-        uint32_t _height    = 0;
-
-        VkPipeline                          _pipeline_handle    = VK_NULL_HANDLE;
-        VkRenderPass                        _render_pass_handle = VK_NULL_HANDLE;
-        std::optional<vk::PipelineLayout>   _pipeline_layout;
+        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
+        VkRenderPass                        _render_pass_handle     = VK_NULL_HANDLE;
+        VkPipelineLayout                    _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
 
         GBufferPushConstantBlock _push_constant_block;
+
+        VkDescriptorSet         _result_descriptor_set_handle           = VK_NULL_HANDLE;
+        VkDescriptorSetLayout   _result_descriptor_set_layout_handle    = VK_NULL_HANDLE;
+
+        VkSampler _sampler_handle = VK_NULL_HANDLE;
     };
 }

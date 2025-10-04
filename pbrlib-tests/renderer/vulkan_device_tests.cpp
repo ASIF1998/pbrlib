@@ -51,7 +51,7 @@ TEST_F(VulkanDeviceTests, BuildImage)
                             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
                             VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
-    auto image = pbrlib::backend::vk::Image::Builder(device)
+    auto image = pbrlib::backend::vk::builders::Image(device)
         .size(width, height)
         .format(format)
         .filter(filter)
@@ -76,7 +76,7 @@ TEST_F(VulkanDeviceTests, BuildBuffer)
     constexpr size_t size = 12342;
     constexpr auto usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
-    auto buffer = pbrlib::backend::vk::Buffer::Builder(device)
+    auto buffer = pbrlib::backend::vk::builders::Buffer(device)
         .size(size)
         .usage(usage)
         .addQueueFamilyIndex(device.queue().family_index)
@@ -101,28 +101,87 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 {
     constexpr uint32_t descriptor_count = 100;
 
-    auto pipeline_layout = pbrlib::backend::vk::PipelineLayout::Builder(device)
-        .addSet()
-            .addBinding(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)   
-            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(4, VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(5, VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL)
-            .addBinding(10, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, descriptor_count, VK_SHADER_STAGE_FRAGMENT_BIT)
+    constexpr std::array bindings
+    {
+        std::make_tuple(0, VK_DESCRIPTOR_TYPE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(2, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(4, VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(5, VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, descriptor_count, VK_SHADER_STAGE_ALL),
+        std::make_tuple(10, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, descriptor_count, VK_SHADER_STAGE_FRAGMENT_BIT)
+    };
+
+    pbrlib::backend::vk::builders::DescriptorSetLayout descriptor_set_layout_builder(device);
+    for (const auto [binding, descriptor_type, count, stage] : bindings)
+        descriptor_set_layout_builder.addBinding(binding, descriptor_type, count, stage);
+
+    const auto descriptor_set_layout = descriptor_set_layout_builder.build();
+    pbrlib::testing::notEquality<VkDescriptorSetLayout>(descriptor_set_layout, VK_NULL_HANDLE);
+
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
+    pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set, VK_NULL_HANDLE);
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
+}
+
+TEST_F(VulkanDeviceTests, WriteDescriptorSetImage)
+{
+    const auto descriptor_set_layout = pbrlib::backend::vk::builders::DescriptorSetLayout(device)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_ALL)
         .build();
 
-    for (const auto set_layout_handle: pipeline_layout.sets_layout)
-    {
-        auto descriptor_set_handle = device.allocateDescriptorSet(set_layout_handle);
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
 
-        pbrlib::testing::notEquality<VkDescriptorSetLayout>(set_layout_handle, VK_NULL_HANDLE);
-        pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set_handle, VK_NULL_HANDLE);
+    auto image = pbrlib::backend::vk::builders::Image(device)
+        .size(10, 10)
+        .format(VK_FORMAT_R32_SFLOAT)
+        .addQueueFamilyIndex(device.queue().family_index)
+        .usage(VK_IMAGE_USAGE_STORAGE_BIT)
+        .build();
 
-        vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set_handle);
-    }
+    EXPECT_NO_THROW({
+        device.writeDescriptorSet ({
+            .view_handle            = image.view_handle,
+            .set_handle             = descriptor_set,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+    });
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
+}
+
+TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
+{
+    const auto descriptor_set_layout = pbrlib::backend::vk::builders::DescriptorSetLayout(device)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_ALL)
+        .build();
+
+    const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
+
+    auto buffer = pbrlib::backend::vk::builders::Buffer(device)
+        .size(1024)
+        .usage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+        .addQueueFamilyIndex(device.queue().family_index)
+        .build();
+
+        
+    EXPECT_NO_THROW({
+        device.writeDescriptorSet ({
+            .buffer     = buffer,
+            .set_handle = descriptor_set,
+            .size       = static_cast<uint32_t>(buffer.size),
+            .binding    = 0
+        });
+    });
+
+    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
+    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }

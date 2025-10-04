@@ -1,5 +1,5 @@
-#ifndef PACKING_GLSL
-#define PACKING_GLSL
+#ifndef PBRLIB_PACKING_GLSL
+#define PBRLIB_PACKING_GLSL
 
 struct GBufferData
 {
@@ -66,7 +66,7 @@ vec2 unpack(uint value)
 
 void pack(
     in GBufferData  data,
-    out vec4        gbuffer_pos,
+    out vec4        gbuffer_pos_uv,
     out vec4        gbuffer_normal_tangent,
     out uint        gbuffer_material_index
 )
@@ -75,24 +75,61 @@ void pack(
     vec2    pack_tangent    = packUnitVec(data.tangent);
     float   pack_uv         = uintBitsToFloat(pack(data.uv));
 
-    gbuffer_pos             = vec4(pos, pack_uv);
+    gbuffer_pos_uv          = vec4(data.pos, pack_uv);
     gbuffer_normal_tangent  = vec4(pack_normal, pack_tangent);
     gbuffer_material_index  = data.material_index;
 }
 
 GBufferData unpack(
-    vec4 gbuffer_pos,
+    vec4 gbuffer_pos_uv,
     vec4 gbuffer_normal_tangent,
     uint gbuffer_material_index
 )
 {
     return GBufferData (
-        gbuffer_pos.xyz,
+        gbuffer_pos_uv.xyz,
         unpackUnitVec(gbuffer_normal_tangent.xy),
         unpackUnitVec(gbuffer_normal_tangent.zw),
-        unpack(floatBitsToUint(gbuffer_pos.w)),
+        unpack(floatBitsToUint(gbuffer_pos_uv.w)),
         gbuffer_material_index
     );
+}
+
+vec3 unpackPos(in vec4 gbuffer_pos_uv)
+{
+    return gbuffer_pos_uv.xyz;
+}
+
+vec2 unpackUv(in vec4 gbuffer_pos_uv)
+{
+    return unpack(floatBitsToUint(gbuffer_pos_uv.w));
+}
+
+vec3 unpackNormal(in vec4 gbuffer_normal_tangent)
+{
+    return unpackUnitVec(gbuffer_normal_tangent.xy);
+}
+
+vec3 unpackTangent(in vec4 gbuffer_normal_tangent)
+{
+    return unpackUnitVec(gbuffer_normal_tangent.zw);
+}
+
+uint unpackMaterialIndex(in uint gbuffer_material_index)
+{
+    return gbuffer_material_index;
+}
+
+void unpackPosUv(in vec4 gbuffer_pos_uv, out vec3 pos, out vec2 uv)
+{
+    pos = unpackPos(gbuffer_pos_uv);
+    uv  = unpackUv(gbuffer_pos_uv);
+}
+
+void unpackNormalTangent(in vec4 gbuffer_normal_tangent, out vec3 normal, out vec3 tangent)
+{
+    normal  = unpackNormal(gbuffer_normal_tangent);
+    tangent = unpackTangent(gbuffer_normal_tangent);
 }
 
 #endif

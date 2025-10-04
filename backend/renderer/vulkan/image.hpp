@@ -13,6 +13,17 @@
 namespace pbrlib::backend::vk
 {
     class Device;
+    class CommandBuffer;
+}
+
+namespace pbrlib::backend::vk::builders
+{
+    class Image;
+}
+
+namespace pbrlib::backend::vk::exporters
+{
+    class Image;
 }
 
 namespace pbrlib::backend::vk
@@ -28,27 +39,30 @@ namespace pbrlib::backend::vk
     class Image final
     {
         friend class Surface;
+        friend class builders::Image;
+        friend class exporters::Image;
 
         explicit Image(Device& device, bool from_swapchain = false);
 
     public:
-        class Builder;
-        class Decoder;
-        class Loader;
-        class Exporter;
-
-    public:
-        Image(Image&& image);
+        Image(Image&& image) noexcept;
         Image(const Image& image) = delete;
 
         ~Image();
 
-        Image& operator = (Image&& image);
+        Image& operator = (Image&& image) noexcept;
         Image& operator = (const Image& image) = delete;
 
         void write(const ImageWriteData& data);
 
         void changeLayout (
+            VkImageLayout           new_layout,
+            VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
+            VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
+        );
+
+        void changeLayout (
+            CommandBuffer&          command_buffer,
             VkImageLayout           new_layout,
             VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
@@ -72,8 +86,11 @@ namespace pbrlib::backend::vk
 
         bool _from_swapchain;
     };
+}
 
-    class Image::Builder final
+namespace pbrlib::backend::vk::builders
+{
+    class Image final
     {
         friend class Device;
 
@@ -82,26 +99,26 @@ namespace pbrlib::backend::vk
         [[nodiscard]] VkSharingMode sharingMode();
 
     public:
-        explicit Builder(Device& device);
+        explicit Image(Device& device) noexcept;
 
-        Builder(Builder&& builder)      = delete;
-        Builder(const Builder& builder) = delete;
+        Image(Image&& builder)      = delete;
+        Image(const Image& builder) = delete;
 
-        Builder& operator = (Builder&& builder)         = delete;
-        Builder& operator = (const Builder& builder)    = delete;
+        Image& operator = (Image&& builder)         = delete;
+        Image& operator = (const Image& builder)    = delete;
 
-        Builder& size(uint32_t width, uint32_t height)  noexcept;
-        Builder& format(VkFormat format)                noexcept;
-        Builder& usage(VkImageUsageFlags usage)         noexcept;
-        Builder& addQueueFamilyIndex(uint32_t index);
+        Image& size(uint32_t width, uint32_t height)    noexcept;
+        Image& format(VkFormat format)                  noexcept;
+        Image& usage(VkImageUsageFlags usage)           noexcept;
+        Image& addQueueFamilyIndex(uint32_t index);
 
-        [[maybe_unused]] Builder& filter(VkFilter filter)                           noexcept;
-        [[maybe_unused]] Builder& sampleCount(VkSampleCountFlagBits sample_count)   noexcept;
-        [[maybe_unused]] Builder& tiling(VkImageTiling tiling)                      noexcept;
-        [[maybe_unused]] Builder& fillColor(const pbrlib::math::vec4& fill_color);
-        [[maybe_unused]] Builder& name(std::string_view image_name);
+        [[maybe_unused]] Image& filter(VkFilter filter)                             noexcept;
+        [[maybe_unused]] Image& sampleCount(VkSampleCountFlagBits sample_count)     noexcept;
+        [[maybe_unused]] Image& tiling(VkImageTiling tiling)                        noexcept;
+        [[maybe_unused]] Image& fillColor(const pbrlib::math::vec4& fill_color);
+        [[maybe_unused]] Image& name(std::string_view image_name);
 
-        [[nodiscard]] Image build();
+        [[nodiscard]] vk::Image build();
 
     private:
         Device& _device;
@@ -122,25 +139,28 @@ namespace pbrlib::backend::vk
 
         std::string _name;
     };
+}
 
-    class Image::Decoder final
+namespace pbrlib::backend::vk::decoders
+{
+    class Image final
     {
         void validate();
 
     public:
-        explicit Decoder(Device& device);
+        explicit Image(Device& device) noexcept;
 
-        Decoder(Decoder&& decoder)      = delete;
-        Decoder(const Decoder& decoder) = delete;
+        Image(Image&& decoder)      = delete;
+        Image(const Image& decoder) = delete;
 
-        Decoder& operator = (Decoder&& decoder)         = delete;
-        Decoder& operator = (const Decoder& decoder)    = delete;
+        Image& operator = (Image&& decoder)         = delete;
+        Image& operator = (const Image& decoder)    = delete;
 
-        Decoder& name(std::string_view image_name);
-        Decoder& channelsPerPixel(int32_t channels_per_pixel);
-        Decoder& compressedImage(const uint8_t* ptr_data, size_t size);
+        Image& name(std::string_view image_name);
+        Image& channelsPerPixel(int32_t channels_per_pixel);
+        Image& compressedImage(const uint8_t* ptr_data, size_t size);
 
-        [[nodiscard]] Image decode();
+        [[nodiscard]] vk::Image decode();
 
     private:
         Device& _device;
@@ -155,53 +175,59 @@ namespace pbrlib::backend::vk
             size_t size             = 0;
         } _compressed_image;
     };
+}
 
-    class Image::Loader final
+namespace pbrlib::backend::vk::loaders
+{
+    class Image final
     {
         void validate();
 
     public:
-        explicit Loader(Device& device) noexcept;
+        explicit Image(Device& device) noexcept;
 
-        Loader(Loader&& loader)         = delete;
-        Loader(const Loader& loader)    = delete;
+        Image(Image&& loader)         = delete;
+        Image(const Image& loader)    = delete;
 
-        Loader& operator = (Loader&& loader)        = delete;
-        Loader& operator = (const Loader& loader)   = delete;
+        Image& operator = (Image&& loader)        = delete;
+        Image& operator = (const Image& loader)   = delete;
 
-        Loader& filename(const std::filesystem::path& filename);
+        Image& filename(const std::filesystem::path& filename);
 
-        [[nodiscard]] Image load();
+        [[nodiscard]] vk::Image load();
 
     private:
         Device& _device;
 
         std::filesystem::path _filename;
     };
+}
 
-    class Image::Exporter final
+namespace pbrlib::backend::vk::exporters
+{
+    class Image final
     {
         void validate();
 
     public:
-        explicit Exporter(Device& device) noexcept;
+        explicit Image(Device& device) noexcept;
 
-        Exporter(Exporter&& exporter)       = delete;
-        Exporter(const Exporter& exporter)  = delete;
+        Image(Image&& exporter)         = delete;
+        Image(const Image& exporter)    = delete;
 
-        Exporter& operator = (Exporter&& exporter)      = delete;
-        Exporter& operator = (const Exporter& exporter) = delete;
+        Image& operator = (Image&& exporter)        = delete;
+        Image& operator = (const Image& exporter)   = delete;
 
-        Exporter& image(const Image* ptr_image);
-        Exporter& filename(const std::filesystem::path& filename);
+        Image& image(const vk::Image* ptr_image);
+        Image& filename(const std::filesystem::path& filename);
 
         [[nodiscard]] void exoprt();
 
     private:
         Device& _device;
 
-        const Image* _ptr_image = nullptr;
+        const vk::Image* _ptr_image = nullptr;
 
         std::filesystem::path _filename;
     };
-};
+}
