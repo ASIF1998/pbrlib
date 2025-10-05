@@ -121,13 +121,13 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    AssimpImporter& AssimpImporter::device(vk::Device* ptr_device)
+    AssimpImporter& AssimpImporter::device(vk::Device* ptr_device) noexcept
     {
         _ptr_device = ptr_device;
         return *this;
     }
 
-    AssimpImporter& AssimpImporter::scene(Scene* ptr_scene)
+    AssimpImporter& AssimpImporter::scene(Scene* ptr_scene) noexcept
     {
         _ptr_scene = ptr_scene;
         return *this;
@@ -139,19 +139,19 @@ namespace pbrlib::backend
         return *this;
     }
 
-    AssimpImporter& AssimpImporter::materialManager(MaterialManager* ptr_material_manager)
+    AssimpImporter& AssimpImporter::materialManager(MaterialManager* ptr_material_manager) noexcept
     {
         _ptr_material_manager = ptr_material_manager;
         return *this;
     }
     
-    AssimpImporter& AssimpImporter::meshManager(MeshManager* ptr_mesh_manager)
+    AssimpImporter& AssimpImporter::meshManager(MeshManager* ptr_mesh_manager) noexcept
     {
         _ptr_mesh_manager = ptr_mesh_manager;
         return *this;
     }
 
-    AssimpImporter& AssimpImporter::transform(const math::mat4& matrix)
+    AssimpImporter& AssimpImporter::transform(const math::mat4& matrix) noexcept
     {
         _current_state.transform = matrix;
         return *this;
@@ -181,15 +181,11 @@ namespace pbrlib::backend
 
         Assimp::Importer importer;
         
-        importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
         importer.SetPropertyBool(AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION, true);
 
         constexpr auto assimp_read_flags = 
-                aiProcess_GenNormals    
-            |   aiProcess_CalcTangentSpace 
-            |   aiProcess_GenUVCoords 
-            |   aiProcess_JoinIdenticalVertices 
-            |   aiProcess_Triangulate;
+                aiProcess_CalcTangentSpace 
+            |   aiProcess_JoinIdenticalVertices;
 
         const auto ptr_scene = importer.ReadFile(_filename.string(), assimp_read_flags);
 
@@ -217,7 +213,7 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    static auto vertexCount(const aiScene* ptr_scene, const aiNode* ptr_node)
+    static auto vertexCount(const aiScene* ptr_scene, const aiNode* ptr_node) noexcept
         -> std::pair<size_t, size_t>
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -244,16 +240,22 @@ namespace pbrlib::backend
     CompressedImageData getComressedImage(
         const aiScene*      ptr_scene, 
         const aiMaterial*   ptr_material, 
-        aiTextureType       texuture_type, 
+        aiTextureType       texture_type, 
         uint8_t             channels_per_pixel
     )
     {
         aiString texture_name;
-        if (ptr_material->Get(AI_MATKEY_TEXTURE(texuture_type, 0), texture_name) != aiReturn_SUCCESS) [[unlikely]]
-            return { };
+        if (ptr_material->Get(AI_MATKEY_TEXTURE(texture_type, 0), texture_name) != aiReturn_SUCCESS) [[unlikely]]
+        {
+            log::error("[importer] failed process texture type: {}", static_cast<uint32_t>(texture_type));
+            return CompressedImageData();
+        }
 
         if (texture_name.C_Str()[0] != '*') [[unlikely]]
-            return { };
+        {
+            log::error("[importer] unsupported texture name: {}", texture_name.C_Str());
+            return CompressedImageData();
+        }
 
         auto ptr_texture = ptr_scene->mTextures[std::stoi(texture_name.C_Str() + 1)];
 
@@ -326,18 +328,20 @@ namespace pbrlib::backend
 
                     renderable.bbox.add(pos);
 
-                    VertexAttribute attribute;
-                    attribute.pos       = pos;
-                    attribute.normal    = utils::castToHalf(ptr_mesh->mNormals[j]);
-                    attribute.tangent   = utils::castToHalf(ptr_mesh->mTangents[j]);
-                    attribute.uv        = utils::castToHalf(pbrlib::math::vec2(uv.x, uv.y));
-
-                    attributes.push_back(attribute);
+                    attributes.emplace_back(
+                        pos, 
+                        utils::castToHalf(ptr_mesh->mNormals[j]), 
+                        utils::castToHalf(ptr_mesh->mTangents[j]), 
+                        utils::castToHalf(pbrlib::math::vec2(uv.x, uv.y))
+                    );
                 }
 
                 std::span faces (ptr_mesh->mFaces, ptr_mesh->mNumFaces);
                 for (const auto& face: faces)
                 {
+                    if (face.mNumIndices != 3) 
+                        log::error("[importer] an invalid face that contains {} indices", face.mNumIndices);
+                    
                     indices.push_back(face.mIndices[0]);
                     indices.push_back(face.mIndices[1]);
                     indices.push_back(face.mIndices[2]);

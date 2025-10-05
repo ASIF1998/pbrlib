@@ -40,12 +40,12 @@ namespace pbrlib::backend
         AssimpImporter& operator = (AssimpImporter&& importer)      = delete;
         AssimpImporter& operator = (const AssimpImporter& importer) = delete;
 
-        AssimpImporter& device(vk::Device* ptr_device);
-        AssimpImporter& scene(Scene* ptr_scene);
+        AssimpImporter& device(vk::Device* ptr_device)                          noexcept;
+        AssimpImporter& scene(Scene* ptr_scene)                                 noexcept;
+        AssimpImporter& materialManager(MaterialManager* ptr_material_manager)  noexcept;
+        AssimpImporter& meshManager(MeshManager* ptr_mesh_manager)              noexcept;
+        AssimpImporter& transform(const math::mat4& matrix)                     noexcept;
         AssimpImporter& filename(const std::filesystem::path& filename);
-        AssimpImporter& materialManager(MaterialManager* ptr_material_manager);
-        AssimpImporter& meshManager(MeshManager* ptr_mesh_manager);
-        AssimpImporter& transform(const math::mat4& matrix);
 
         bool import();
 
