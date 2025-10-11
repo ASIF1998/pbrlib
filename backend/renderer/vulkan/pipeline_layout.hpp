@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <vector>
 #include <optional>
@@ -55,7 +55,7 @@ namespace pbrlib::backend::vk::builders
         );
 
         
-        VkDescriptorSetLayout build();
+        DescriptorSetLayoutHandle build();
 
     private:
         Device& _device;

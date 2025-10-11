@@ -185,7 +185,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_image_desc_set, _result_image_desc_set_layout);
+        return std::make_pair(_result_image_desc_set, _result_image_desc_set_layout.get());
     }
 
     void SSAO::createSampler()

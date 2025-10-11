@@ -2,6 +2,7 @@
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
@@ -91,13 +92,13 @@ namespace pbrlib::backend
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
-        VkDescriptorSet         _result_image_desc_set          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _result_image_desc_set_layout   = VK_NULL_HANDLE;
+        VkDescriptorSet                 _result_image_desc_set = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
 
         VkSampler _result_image_sampler = VK_NULL_HANDLE;
 
-        VkDescriptorSet         _ssao_desc_set          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _ssao_desc_set_layout   = VK_NULL_HANDLE;
+        VkDescriptorSet                 _ssao_desc_set = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;

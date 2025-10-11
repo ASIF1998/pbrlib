@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/frame_graph/filters/filter.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 namespace pbrlib::backend
 {
@@ -45,8 +46,8 @@ namespace pbrlib::backend
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
-        VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
+        VkDescriptorSet                 _descriptor_set_handle = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
 

@@ -3,8 +3,8 @@
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
 #include <backend/renderer/vulkan/buffer.hpp>
-
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <optional>
 #include <array>
@@ -90,7 +90,7 @@ namespace pbrlib::backend
         GBufferPushConstantBlock _push_constant_block;
 
         VkDescriptorSet         _result_descriptor_set_handle           = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _result_descriptor_set_layout_handle    = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
     };

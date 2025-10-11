@@ -161,7 +161,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
+        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle.get());
     }
 
     size_t MaterialManager::imageCount() const noexcept

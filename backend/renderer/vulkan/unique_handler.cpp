@@ -29,6 +29,11 @@ namespace pbrlib::backend::vk
         vkDestroyShaderModule(_device_handle, shader_module_handle, nullptr);
     }
 
+    void HandleDispatcher::destroy(VkDescriptorSetLayout descriptor_set_layout_handle) noexcept
+    {
+        vkDestroyDescriptorSetLayout(_device_handle, descriptor_set_layout_handle, nullptr);
+    }
+
     void HandleDispatcher::destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle) noexcept
     {
         vkFreeCommandBuffers(_device_handle, command_pool_handle, 1, &command_buffer_handle);

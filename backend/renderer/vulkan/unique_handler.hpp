@@ -19,6 +19,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkInstance instance_handle)                                                 noexcept;
         static void destroy(VkDevice device_handle)                                                     noexcept;
         static void destroy(VkShaderModule shader_module_handle)                                        noexcept;
+        static void destroy(VkDescriptorSetLayout descriptor_set_layout_handle)                         noexcept;
         static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)   noexcept;
 
         static void initForDeviceResources(VkDevice device_handle);
@@ -68,10 +69,11 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk
 {
-    using InstanceHandle        = UniqueHandle<VkInstance>;
-    using DeviceHandle          = UniqueHandle<VkDevice>;
-    using ShaderModuleHandle    = UniqueHandle<VkShaderModule>;
-    using CommandBufferHandle   = UniqueHandle<VkCommandBuffer, VkCommandPool>;
+    using InstanceHandle            = UniqueHandle<VkInstance>;
+    using DeviceHandle              = UniqueHandle<VkDevice>;
+    using DescriptorSetLayoutHandle = UniqueHandle<VkDescriptorSetLayout>;
+    using ShaderModuleHandle        = UniqueHandle<VkShaderModule>;
+    using CommandBufferHandle       = UniqueHandle<VkCommandBuffer, VkCommandPool>;
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>

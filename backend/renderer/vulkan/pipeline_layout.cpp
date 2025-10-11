@@ -86,7 +86,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkDescriptorSetLayout DescriptorSetLayout::build()
+    DescriptorSetLayoutHandle DescriptorSetLayout::build()
     {
         if (_bindings.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-descritor-set-layout::builder] bindings count is 0");
@@ -109,13 +109,13 @@ namespace pbrlib::backend::vk::builders
             .pBindings      = _bindings.data()
         };
 
-        VkDescriptorSetLayout sets_layout = VK_NULL_HANDLE;
+        DescriptorSetLayoutHandle sets_layout;
 
         VK_CHECK(vkCreateDescriptorSetLayout(
             _device.device(),
             &desc_set_create_info,
             nullptr,
-            &sets_layout
+            &sets_layout.get()
         ));
 
         return sets_layout;

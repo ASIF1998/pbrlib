@@ -368,6 +368,8 @@ namespace pbrlib::backend::vk
 
         VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle.get()));
 
+        HandleDispatcher::initForDeviceResources(_device_handle);
+
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
 

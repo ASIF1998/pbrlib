@@ -1,5 +1,7 @@
 #pragma once
 
+#include <backend/renderer/vulkan/unique_handler.hpp>
+
 #include <pbrlib/math/vec4.hpp>
 
 #include <vulkan/vulkan.hpp>

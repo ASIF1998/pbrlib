@@ -91,9 +91,9 @@ namespace pbrlib::backend
         std::vector<Instance>       _instances;
         std::optional<vk::Buffer>   _instances_buffer;
 
-        VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
-
+        VkDescriptorSet                 _descriptor_set_handle = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        
         bool _descriptor_set_is_changed = true;
 
         std::unordered_map<const SceneItem*, size_t> _item_to_instance_id;
