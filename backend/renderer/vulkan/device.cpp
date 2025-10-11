@@ -40,8 +40,6 @@ namespace pbrlib::backend::vk
         vkDestroyDescriptorPool(_device_handle, _descriptor_pool_handle, nullptr);
         vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
         vmaDestroyAllocator(_vma_allocator_handle);
-        vkDestroyDevice(_device_handle, nullptr);
-        vkDestroyInstance(_instance_handle, nullptr);
 
         shader::finalizeCompiler();
     }
@@ -368,7 +366,7 @@ namespace pbrlib::backend::vk
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle));
+        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle.get()));
 
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }

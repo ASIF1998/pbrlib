@@ -136,7 +136,7 @@ namespace pbrlib::backend::vk
     private:
         InstanceHandle      _instance_handle;
         VkPhysicalDevice    _physical_device_handle = VK_NULL_HANDLE;
-        VkDevice            _device_handle          = VK_NULL_HANDLE;
+        DeviceHandle        _device_handle;
 
         VkPhysicalDeviceLimits _device_limits;
 
