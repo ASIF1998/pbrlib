@@ -143,7 +143,7 @@ namespace pbrlib::backend
                 context().ptr_material_manager->descriptorSet().first
             };
 
-            vkCmdBindDescriptorSets(
+            vkCmdBindDescriptorSets (
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 0, 
@@ -157,7 +157,7 @@ namespace pbrlib::backend
                 context().view
             };
 
-            vkCmdPushConstants(
+            vkCmdPushConstants (
                 command_buffer_handle, 
                 _pipeline_layout_handle, 
                 VK_SHADER_STAGE_COMPUTE_BIT, 

@@ -56,6 +56,7 @@ namespace pbrlib::backend::vk::builders
 
         
         VkDescriptorSetLayout build();
+
     private:
         Device& _device;
 

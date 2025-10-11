@@ -6,7 +6,6 @@
 
 #include <backend/profiling.hpp>
 
-
 #include <vma/vk_mem_alloc.h>
 
 #include <numeric>
@@ -135,7 +134,7 @@ namespace pbrlib::backend::vk
 #endif
 
     private:
-        VkInstance          _instance_handle        = VK_NULL_HANDLE;
+        InstanceHandle      _instance_handle;
         VkPhysicalDevice    _physical_device_handle = VK_NULL_HANDLE;
         VkDevice            _device_handle          = VK_NULL_HANDLE;
 

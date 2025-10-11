@@ -6,12 +6,17 @@ namespace pbrlib::backend::vk
 {
     VkDevice HandleDispatcher::_device_handle = VK_NULL_HANDLE;
 
-    void HandleDispatcher::init(VkDevice device_handle)
+    void HandleDispatcher::initForDeviceResources(VkDevice device_handle)
     {
         if (device_handle == VK_NULL_HANDLE)
             throw exception::InvalidArgument("[vk-handle-dispatcher] device handle is null");
 
         _device_handle = device_handle;
+    }
+    
+    void HandleDispatcher::destroy(VkInstance instance_handle) noexcept
+    {
+        vkDestroyInstance(instance_handle, nullptr);
     }
 
     void HandleDispatcher::destroy(VkDevice device_handle) noexcept

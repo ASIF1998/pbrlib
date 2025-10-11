@@ -16,11 +16,12 @@ namespace pbrlib::backend::vk
         HandleDispatcher& operator = (HandleDispatcher&& dispatcher)        = delete;
         HandleDispatcher& operator = (const HandleDispatcher& dispatcher)   = delete;
 
+        static void destroy(VkInstance instance_handle)                                                 noexcept;
         static void destroy(VkDevice device_handle)                                                     noexcept;
         static void destroy(VkShaderModule shader_module_handle)                                        noexcept;
         static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)   noexcept;
 
-        static void init(VkDevice device_handle);
+        static void initForDeviceResources(VkDevice device_handle);
 
     private:
         static VkDevice _device_handle;
@@ -54,18 +55,20 @@ namespace pbrlib::backend::vk
         explicit operator   bool()      const noexcept;
         operator            Handle()    const noexcept;
 
-        Handle get() const noexcept;
+        Handle&         get() noexcept;
+        const Handle&   get() const noexcept;
 
         void swap(UniqueHandle& rsh) noexcept;
 
     private:
         Handle                              handle_     = VK_NULL_HANDLE;
-        std::tuple<FinalizationContext...>  context_    = std::make_tuple<FinalizationContext...>(VK_NULL_HANDLE...);
+        std::tuple<FinalizationContext...>  context_;
     };
 }
 
 namespace pbrlib::backend::vk
 {
+    using InstanceHandle        = UniqueHandle<VkInstance>;
     using DeviceHandle          = UniqueHandle<VkDevice>;
     using ShaderModuleHandle    = UniqueHandle<VkShaderModule>;
     using CommandBufferHandle   = UniqueHandle<VkCommandBuffer, VkCommandPool>;

@@ -107,7 +107,7 @@ namespace pbrlib::backend::vk
         instance_info.enabledExtensionCount     = static_cast<uint32_t>(extensions.size());
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
-        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle));
+        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.get()));
     }
 
     VkInstance Device::instance() const noexcept
