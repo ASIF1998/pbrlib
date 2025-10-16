@@ -53,15 +53,6 @@ namespace pbrlib::backend
 
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
 
-        if (vkFreeDescriptorSets(
-            device_handle,
-            device().descriptorPool(),
-            1, &_result_descriptor_set_handle) != VK_SUCCESS
-        ) [[unlikely]]
-            log::error("[gbuffer-generator] failed free vulkan descriptor set");
-
-        vkDestroyDescriptorSetLayout(device_handle, _result_descriptor_set_layout_handle, nullptr);
-
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
  
         vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
@@ -415,6 +406,6 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_descriptor_set_handle, _result_descriptor_set_layout_handle.get());
+        return std::make_pair(_result_descriptor_set_handle.get(), _result_descriptor_set_layout_handle.get());
     }
 }

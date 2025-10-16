@@ -46,15 +46,6 @@ namespace pbrlib::backend
     {
         const auto device_handle = device().device();
 
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_result_image_desc_set) != VK_SUCCESS) [[unlikely]]
-            log::error("[ssao] failed free descriptor set with result image");
-        
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
-            log::error("[ssao] failed free descriptor set with data for compute");
-
-        vkDestroyDescriptorSetLayout(device_handle, _result_image_desc_set_layout, nullptr);
-        vkDestroyDescriptorSetLayout(device_handle, _ssao_desc_set_layout, nullptr);
-        
         vkDestroySampler(device_handle, _result_image_sampler, nullptr);
 
         vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
@@ -139,7 +130,7 @@ namespace pbrlib::backend
             const std::array sets_descriptors
             {
                 descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
-                _ssao_desc_set,
+                _ssao_desc_set.get(),
                 context().ptr_material_manager->descriptorSet().first
             };
 
@@ -185,7 +176,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_image_desc_set, _result_image_desc_set_layout.get());
+        return std::make_pair(_result_image_desc_set.get(), _result_image_desc_set_layout.get());
     }
 
     void SSAO::createSampler()

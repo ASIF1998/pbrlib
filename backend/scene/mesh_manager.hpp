@@ -55,8 +55,6 @@ namespace pbrlib::backend
         MeshManager(MeshManager&& manager)      = delete;
         MeshManager(const MeshManager& manager) = delete;
         
-        ~MeshManager();
-        
         MeshManager& operator = (MeshManager&& manager)         = delete;
         MeshManager& operator = (const MeshManager& manager)    = delete;
         
@@ -91,7 +89,7 @@ namespace pbrlib::backend
         std::vector<Instance>       _instances;
         std::optional<vk::Buffer>   _instances_buffer;
 
-        VkDescriptorSet                 _descriptor_set_handle = VK_NULL_HANDLE;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
         
         bool _descriptor_set_is_changed = true;

@@ -37,7 +37,6 @@ namespace pbrlib::backend::vk
 #endif
 
         vkDestroyFence(_device_handle, _submit_fence_handle, nullptr);
-        vkDestroyDescriptorPool(_device_handle, _descriptor_pool_handle, nullptr);
         vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
         vmaDestroyAllocator(_vma_allocator_handle);
 
@@ -567,7 +566,7 @@ namespace pbrlib::backend::vk
             .pPoolSizes         = pool_sizes.data()
         };
 
-        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle));
+        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle.get()));
     }
 
     VkDescriptorPool Device::descriptorPool() const noexcept
@@ -575,7 +574,7 @@ namespace pbrlib::backend::vk
         return _descriptor_pool_handle;
     }
 
-    VkDescriptorSet Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
+    vk::DescriptorSetHandle Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
     {
         VkDescriptorSet descriptor_set_handle = VK_NULL_HANDLE;
 
@@ -602,7 +601,7 @@ namespace pbrlib::backend::vk
             setName(name_info);
         }
 
-        return descriptor_set_handle;
+        return vk::DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.get());
     }
 
     void Device::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info) const

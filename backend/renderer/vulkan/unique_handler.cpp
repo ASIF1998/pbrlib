@@ -1,4 +1,5 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/logger/logger.hpp>
 
 #include <pbrlib/exceptions.hpp>
 
@@ -32,6 +33,21 @@ namespace pbrlib::backend::vk
     void HandleDispatcher::destroy(VkDescriptorSetLayout descriptor_set_layout_handle) noexcept
     {
         vkDestroyDescriptorSetLayout(_device_handle, descriptor_set_layout_handle, nullptr);
+    }
+
+    void HandleDispatcher::destroy(VkDescriptorPool descriptor_pool_handle) noexcept
+    {
+        if (descriptor_pool_handle != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(_device_handle, descriptor_pool_handle, nullptr);
+    }
+    
+    void HandleDispatcher::destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept
+    {
+        if (
+                descriptor_set_handle != VK_NULL_HANDLE 
+            &&  vkFreeDescriptorSets(_device_handle, descriptor_pool_handle, 1, &descriptor_set_handle) != VK_SUCCESS
+        ) [[unlikely]]
+            log::error("[vk-handle-dispatcher] failed free vulkan descriptor set: {}", reinterpret_cast<uint64_t>(descriptor_set_handle));
     }
 
     void HandleDispatcher::destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle) noexcept

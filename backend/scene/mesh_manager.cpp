@@ -28,15 +28,6 @@ namespace pbrlib::backend
         _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[mesh-manager] descriptor-set-layout");
     }
 
-    MeshManager::~MeshManager()
-    {
-        const auto device_handle = _device.device();
-
-        vkDeviceWaitIdle(device_handle);
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
-    }
-
     void MeshManager::add (
         std::string_view                    name,
         std::span<const VertexAttribute>    attributes, 
@@ -183,7 +174,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MeshManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle.get());
+        return std::make_pair(_descriptor_set_handle.get(), _descriptor_set_layout_handle.get());
     }
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const

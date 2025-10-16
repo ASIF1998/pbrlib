@@ -46,7 +46,7 @@ namespace pbrlib::backend
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
-        VkDescriptorSet                 _descriptor_set_handle = VK_NULL_HANDLE;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;

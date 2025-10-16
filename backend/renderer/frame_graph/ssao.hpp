@@ -92,12 +92,12 @@ namespace pbrlib::backend
         VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
         VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
 
-        VkDescriptorSet                 _result_image_desc_set = VK_NULL_HANDLE;
+        vk::DescriptorSetHandle         _result_image_desc_set;
         vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
 
         VkSampler _result_image_sampler = VK_NULL_HANDLE;
 
-        VkDescriptorSet                 _ssao_desc_set = VK_NULL_HANDLE;
+        vk::DescriptorSetHandle         _ssao_desc_set;
         vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
 
         Params                      _params;

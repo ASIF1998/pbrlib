@@ -65,13 +65,7 @@ namespace pbrlib::backend
 
     MaterialManager::~MaterialManager()
     {
-        const auto device_handle = _device.device();
-
-        vkDeviceWaitIdle(device_handle);
-
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
+        vkDestroySampler(_device.device(), _sampler_handle, nullptr);
     }
 
     void MaterialManager::add (
@@ -161,7 +155,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle.get());
+        return std::make_pair(_descriptor_set_handle.get(), _descriptor_set_layout_handle.get());
     }
 
     size_t MaterialManager::imageCount() const noexcept

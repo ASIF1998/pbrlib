@@ -22,6 +22,7 @@ namespace pbrlib::backend
                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
             |   VK_IMAGE_USAGE_SAMPLED_BIT 
             |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_TRANSFER_DST_BIT
             |   VK_IMAGE_USAGE_STORAGE_BIT;
 
             constexpr std::array metadata
@@ -89,7 +90,7 @@ namespace pbrlib::backend
 
         GBufferPushConstantBlock _push_constant_block;
 
-        VkDescriptorSet         _result_descriptor_set_handle           = VK_NULL_HANDLE;
+        vk::DescriptorSetHandle         _result_descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;

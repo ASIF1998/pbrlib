@@ -59,11 +59,6 @@ namespace pbrlib::backend
 
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
 
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_descriptor_set_handle) != VK_SUCCESS) [[unlikely]]
-            log::error("[bilateral-blur] failed free descriptor set");
-
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-
         vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
@@ -145,7 +140,7 @@ namespace pbrlib::backend
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle, 
+                0, 1, &_descriptor_set_handle.get(), 
                 0, nullptr
             );
 

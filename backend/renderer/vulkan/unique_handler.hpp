@@ -16,11 +16,13 @@ namespace pbrlib::backend::vk
         HandleDispatcher& operator = (HandleDispatcher&& dispatcher)        = delete;
         HandleDispatcher& operator = (const HandleDispatcher& dispatcher)   = delete;
 
-        static void destroy(VkInstance instance_handle)                                                 noexcept;
-        static void destroy(VkDevice device_handle)                                                     noexcept;
-        static void destroy(VkShaderModule shader_module_handle)                                        noexcept;
-        static void destroy(VkDescriptorSetLayout descriptor_set_layout_handle)                         noexcept;
-        static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)   noexcept;
+        static void destroy(VkInstance instance_handle)                                                     noexcept;
+        static void destroy(VkDevice device_handle)                                                         noexcept;
+        static void destroy(VkShaderModule shader_module_handle)                                            noexcept;
+        static void destroy(VkDescriptorSetLayout descriptor_set_layout_handle)                             noexcept;
+        static void destroy(VkDescriptorPool descriptor_pool_handle)                                        noexcept;
+        static void destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept;
+        static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)       noexcept;
 
         static void initForDeviceResources(VkDevice device_handle);
 
@@ -72,6 +74,8 @@ namespace pbrlib::backend::vk
     using InstanceHandle            = UniqueHandle<VkInstance>;
     using DeviceHandle              = UniqueHandle<VkDevice>;
     using DescriptorSetLayoutHandle = UniqueHandle<VkDescriptorSetLayout>;
+    using DescriptorPoolHandle      = UniqueHandle<VkDescriptorPool>;
+    using DescriptorSetHandle       = UniqueHandle<VkDescriptorSet, VkDescriptorPool>;
     using ShaderModuleHandle        = UniqueHandle<VkShaderModule>;
     using CommandBufferHandle       = UniqueHandle<VkCommandBuffer, VkCommandPool>;
 }

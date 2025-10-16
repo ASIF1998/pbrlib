@@ -109,7 +109,7 @@ namespace pbrlib::backend::vk
 
         [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(std::string_view name = "");
 
-        [[nodiscard]] VkDescriptorSet allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
+        [[nodiscard]] vk::DescriptorSetHandle allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
 
         [[nodiscard]] const Functions& vulkanFunctions() const noexcept;
 
@@ -150,7 +150,7 @@ namespace pbrlib::backend::vk
 
         Functions _functions;
 
-        VkDescriptorPool _descriptor_pool_handle = VK_NULL_HANDLE;
+        vk::DescriptorPoolHandle _descriptor_pool_handle;
 
 #ifdef PBRLIB_ENABLE_PROPFILING
         TracyVkCtx _tracy_ctx = nullptr;
