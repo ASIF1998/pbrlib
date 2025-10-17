@@ -74,4 +74,9 @@ namespace pbrlib::backend::vk
     {
         vmaDestroyAllocator(allocator_handle);
     }
+
+    void HandleDispatcher::destroy(VkRenderPass render_pass_handle) noexcept
+    {
+        vkDestroyRenderPass(_device_handle, render_pass_handle, nullptr);
+    }
 }

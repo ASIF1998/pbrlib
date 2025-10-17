@@ -52,7 +52,6 @@ namespace pbrlib::backend
         const auto device_handle = device().device();
 
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
-        vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
     }
 
     void GBufferGenerator::createSampler()
