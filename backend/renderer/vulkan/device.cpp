@@ -35,7 +35,6 @@ namespace pbrlib::backend::vk
 #endif
 
         vkDestroyFence(_device_handle, _submit_fence_handle, nullptr);
-        vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
 
         shader::finalizeCompiler();
     }
@@ -421,7 +420,7 @@ namespace pbrlib::backend::vk
             .queueFamilyIndex   = _general_queue.family_index
         };
 
-        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue));
+        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue.get()));
     }
 
     CommandBuffer Device::oneTimeSubmitCommandBuffer(std::string_view name)
@@ -434,7 +433,7 @@ namespace pbrlib::backend::vk
             { 
                 .sType          = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType     = VK_OBJECT_TYPE_COMMAND_BUFFER,
-                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle),
+                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle.get()),
                 .pObjectName    = name.data()
             };
 

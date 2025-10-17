@@ -84,4 +84,9 @@ namespace pbrlib::backend::vk
     {
         vkDestroyFramebuffer(_device_handle, framebuffer_handle, nullptr);
     }
+
+    void HandleDispatcher::destroy(VkCommandPool command_pool_handle) noexcept
+    {
+        vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
+    }
 }

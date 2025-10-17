@@ -12,20 +12,22 @@
 namespace pbrlib::backend::vk
 {
     CommandBuffer::CommandBuffer(const Device& device, VkCommandPool command_pool_handle) :
-        _device                 (device),
-        _command_pool_handle    (command_pool_handle)
+        _device (device)
     { 
         const VkCommandBufferAllocateInfo alloc_info = 
         { 
             .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-            .commandPool        = _command_pool_handle,
+            .commandPool        = command_pool_handle,
             .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
             .commandBufferCount = 1
         };
 
         level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         
-        VK_CHECK(vkAllocateCommandBuffers(_device.device(), &alloc_info, &handle));
+        VkCommandBuffer command_buffer_handle = VK_NULL_HANDLE;
+        VK_CHECK(vkAllocateCommandBuffers(_device.device(), &alloc_info, &command_buffer_handle));
+
+        handle = vk::CommandBufferHandle(command_buffer_handle, command_pool_handle);
     }
 
     CommandBuffer::CommandBuffer(CommandBuffer&& command_buffer) noexcept :
@@ -34,16 +36,6 @@ namespace pbrlib::backend::vk
         _is_recording_started   (command_buffer._is_recording_started)
     {
         std::swap(command_buffer.handle, handle);
-        std::swap(command_buffer._command_pool_handle, _command_pool_handle);
-    }
-
-    CommandBuffer::~CommandBuffer()
-    {
-        vkFreeCommandBuffers(
-            _device.device(),
-            _command_pool_handle, 
-            1, &handle
-        );
     }
 
     CommandBuffer& CommandBuffer::operator = (CommandBuffer&& command_buffer) noexcept
@@ -52,7 +44,6 @@ namespace pbrlib::backend::vk
         _is_recording_started   = command_buffer._is_recording_started;
 
         std::swap(handle, command_buffer.handle);
-        std::swap(_command_pool_handle, command_buffer._command_pool_handle);
 
         return *this;
     }
