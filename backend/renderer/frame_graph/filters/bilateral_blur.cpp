@@ -55,10 +55,7 @@ namespace pbrlib::backend
 
     BilateralBlur::~BilateralBlur()
     {
-        const auto device_handle = device().device();
-
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
+        vkDestroySampler(device().device(), _sampler_handle, nullptr);
     }
 
     bool BilateralBlur::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -107,9 +104,7 @@ namespace pbrlib::backend
     {
         constexpr auto blur_shader = "shaders/bilateral_blur/bilateral_blur.glsl.comp";
 
-        auto prev_handle = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::ComputePipeline(device())
+        auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(blur_shader)
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .specializationInfo
@@ -119,7 +114,7 @@ namespace pbrlib::backend
             )
             .build();
 
-        vkDestroyPipeline(device().device(), prev_handle, nullptr);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }

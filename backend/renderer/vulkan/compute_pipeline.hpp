@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <filesystem>
 
@@ -13,7 +13,6 @@ namespace pbrlib::backend::vk::shader
 {
     class SpecializationInfoBase;
 }
-
 
 namespace pbrlib::backend::vk::builders
 {
@@ -33,7 +32,7 @@ namespace pbrlib::backend::vk::builders
 
         ComputePipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
 
-        [[nodiscard]] VkPipeline build();
+        [[nodiscard]] vk::PipelineHandle build();
 
     private:
         Device& _device;

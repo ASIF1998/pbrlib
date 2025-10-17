@@ -54,7 +54,6 @@ namespace pbrlib::backend
         vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
         vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
     void GBufferGenerator::createSampler()
@@ -162,9 +161,7 @@ namespace pbrlib::backend
         constexpr auto vert_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.vert";
         constexpr auto frag_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.frag";
 
-        auto prev_pipeline = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::GraphicsPipeline(device())
+        auto new_pipeline = vk::builders::GraphicsPipeline(device())
             .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
             .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
             .addAttachmentsState(false)
@@ -175,8 +172,8 @@ namespace pbrlib::backend
             .renderPassHandle(_render_pass_handle)
             .subpass(0)
             .build();
-        
-        vkDestroyPipeline(device().device(), prev_pipeline, nullptr);
+
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }

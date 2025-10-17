@@ -44,7 +44,7 @@ namespace pbrlib::backend
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
-        VkPipeline                  _pipeline_handle        = VK_NULL_HANDLE;
+        vk::PipelineHandle          _pipeline_handle;
 
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
         vk::DescriptorSetHandle         _descriptor_set_handle;

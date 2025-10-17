@@ -7,6 +7,7 @@
 
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
+#include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 
 #include <backend/utils/paths.hpp>
@@ -34,30 +35,10 @@ namespace pbrlib::testing
         
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
-        const VkComputePipelineCreateInfo pipeline_create_info
-        {
-            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
-            .stage = 
-            {
-                .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage  = VK_SHADER_STAGE_COMPUTE_BIT,
-                .module = backend::vk::shader::compile(_device, shader_name),
-                .pName  = "main"
-            },
-            .layout = _pipeline_layout_handle
-        };
-
-        const auto device_handle = _device.device();
-
-        VK_CHECK(vkCreateComputePipelines(
-            device_handle, 
-            VK_NULL_HANDLE, 
-            1, &pipeline_create_info, 
-            nullptr, 
-            &_pipeline_handle
-        ));
-
-        vkDestroyShaderModule(device_handle, pipeline_create_info.stage.module, nullptr);
+        _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
+            .shader(shader_name)
+            .pipelineLayoutHandle(_pipeline_layout_handle)
+            .build();
 
         const VkSamplerCreateInfo sampler_create_info
         {
@@ -66,7 +47,7 @@ namespace pbrlib::testing
             .minFilter  = VK_FILTER_NEAREST
         };
 
-        VK_CHECK(vkCreateSampler(device_handle, &sampler_create_info, nullptr, &_sampler_handle));
+        VK_CHECK(vkCreateSampler(_device.device(), &sampler_create_info, nullptr, &_sampler_handle));
 
         _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
@@ -81,8 +62,6 @@ namespace pbrlib::testing
     ImageComparison::~ImageComparison()
     {
         const auto device_handle = _device.device();
-        
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
     }
 

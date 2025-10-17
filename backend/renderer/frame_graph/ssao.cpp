@@ -47,7 +47,6 @@ namespace pbrlib::backend
         const auto device_handle = device().device();
 
         vkDestroySampler(device_handle, _result_image_sampler, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
     bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -103,14 +102,12 @@ namespace pbrlib::backend
 
         constexpr auto ssao_shader = "shaders/ssao/ssao.glsl.comp";
 
-        auto prev_handle = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::ComputePipeline(device())
+        auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .build();
 
-        vkDestroyPipeline(device().device(), prev_handle, nullptr);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }

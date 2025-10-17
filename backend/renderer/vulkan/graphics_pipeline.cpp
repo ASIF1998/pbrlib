@@ -207,7 +207,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkPipeline GraphicsPipeline::build()
+    vk::PipelineHandle GraphicsPipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE)
             throw exception::InvalidState("[vk-graphics-pipeline-builder] pipeline layout handle is null");
@@ -318,6 +318,6 @@ namespace pbrlib::backend::vk::builders
             &pipeline_handle
         ));
 
-        return pipeline_handle;
+        return vk::PipelineHandle(pipeline_handle);
     }
 }

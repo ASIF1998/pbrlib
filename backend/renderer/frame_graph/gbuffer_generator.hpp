@@ -83,7 +83,7 @@ namespace pbrlib::backend
 
     private:
         vk::PipelineLayoutHandle            _pipeline_layout_handle;
-        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
+        vk::PipelineHandle                  _pipeline_handle;
         VkRenderPass                        _render_pass_handle     = VK_NULL_HANDLE;
 
         VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;

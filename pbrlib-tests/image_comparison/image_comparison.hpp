@@ -36,7 +36,7 @@ namespace pbrlib::testing
         backend::vk::Device& _device;
 
         backend::vk::PipelineLayoutHandle   _pipeline_layout_handle;
-        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
+        backend::vk::PipelineHandle         _pipeline_handle;
 
         backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
         backend::vk::DescriptorSetHandle        _descriptor_set_handle;
