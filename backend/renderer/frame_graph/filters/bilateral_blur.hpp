@@ -37,8 +37,6 @@ namespace pbrlib::backend
 
         explicit BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings);
 
-        ~BilateralBlur();
-
         [[nodiscard]] Settings&         settings() noexcept;
         [[nodiscard]] const Settings&   settings() const noexcept;
 
@@ -49,7 +47,7 @@ namespace pbrlib::backend
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
         vk::DescriptorSetHandle         _descriptor_set_handle;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        vk::SamplerHandle _sampler_handle;
 
         std::string _output_image_name;
 

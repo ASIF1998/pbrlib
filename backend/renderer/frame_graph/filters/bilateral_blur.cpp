@@ -49,13 +49,8 @@ namespace pbrlib::backend
             device.device(),
             &sampler_create_info,
             nullptr, 
-            &_sampler_handle
+            &_sampler_handle.get()
         ));
-    }
-
-    BilateralBlur::~BilateralBlur()
-    {
-        vkDestroySampler(device().device(), _sampler_handle, nullptr);
     }
 
     bool BilateralBlur::init(const RenderContext& context, uint32_t width, uint32_t height)

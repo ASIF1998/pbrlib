@@ -48,7 +48,7 @@ namespace pbrlib::backend
             _device.device(),
             &sampler_create_info,
             nullptr,
-            &_sampler_handle
+            &_sampler_handle.get()
         ));
 
         constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
@@ -61,11 +61,6 @@ namespace pbrlib::backend
             .build();
 
         _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
-    }
-
-    MaterialManager::~MaterialManager()
-    {
-        vkDestroySampler(_device.device(), _sampler_handle, nullptr);
     }
 
     void MaterialManager::add (

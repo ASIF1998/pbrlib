@@ -21,8 +21,6 @@ namespace pbrlib::testing
     public:
         explicit ImageComparison(pbrlib::backend::vk::Device& device);
 
-        ~ImageComparison();
-
         [[nodiscard]]
         bool compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2);
 
@@ -41,7 +39,7 @@ namespace pbrlib::testing
         backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
         backend::vk::DescriptorSetHandle        _descriptor_set_handle;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        backend::vk::SamplerHandle _sampler_handle;
 
         std::optional<backend::vk::Buffer> _count_changed_pixels_buffer;
     };

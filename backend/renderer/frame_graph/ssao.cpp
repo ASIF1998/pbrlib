@@ -42,13 +42,6 @@ namespace pbrlib::backend
         _result_image_desc_set = device.allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
     }
 
-    SSAO::~SSAO()
-    {
-        const auto device_handle = device().device();
-
-        vkDestroySampler(device_handle, _result_image_sampler, nullptr);
-    }
-
     bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -190,7 +183,7 @@ namespace pbrlib::backend
             device().device(),
             &sampler_create_info,
             nullptr, 
-            &_result_image_sampler
+            &_result_image_sampler.get()
         ));
     }
 

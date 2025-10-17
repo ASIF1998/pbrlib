@@ -65,6 +65,11 @@ namespace pbrlib::backend::vk
         vkDestroyPipeline(_device_handle, pipeline_handle, nullptr);
     }
 
+    void HandleDispatcher::destroy(VkSampler sampler_handle) noexcept
+    {
+        vkDestroySampler(_device_handle, sampler_handle, nullptr);
+    }
+
     void HandleDispatcher::destroy(VmaAllocator allocator_handle) noexcept
     {
         vmaDestroyAllocator(allocator_handle);

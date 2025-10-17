@@ -86,7 +86,6 @@ namespace pbrlib::backend
 
     public:
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
-        ~SSAO();
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
@@ -95,7 +94,7 @@ namespace pbrlib::backend
         vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
         vk::DescriptorSetHandle         _result_image_desc_set;
 
-        VkSampler _result_image_sampler = VK_NULL_HANDLE;
+        vk::SamplerHandle _result_image_sampler;
 
         vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
         vk::DescriptorSetHandle         _ssao_desc_set;

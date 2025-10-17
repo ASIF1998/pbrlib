@@ -26,6 +26,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)       noexcept;
         static void destroy(VkPipelineLayout pipeline_layout_handle)                                        noexcept;
         static void destroy(VkPipeline pipeline_handle)                                                     noexcept;
+        static void destroy(VkSampler sampler_handle)                                                       noexcept;
         static void destroy(VmaAllocator allocator_handle)                                                  noexcept;
 
         static void initForDeviceResources(VkDevice device_handle);
@@ -84,6 +85,7 @@ namespace pbrlib::backend::vk
     using CommandBufferHandle       = UniqueHandle<VkCommandBuffer, VkCommandPool>;
     using PipelineLayoutHandle      = UniqueHandle<VkPipelineLayout>;
     using PipelineHandle            = UniqueHandle<VkPipeline>;
+    using SamplerHandle             = UniqueHandle<VkSampler>;
     using AllocatorHandle           = UniqueHandle<VmaAllocator>;
 }
 

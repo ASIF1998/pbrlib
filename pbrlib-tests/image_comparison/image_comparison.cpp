@@ -47,7 +47,7 @@ namespace pbrlib::testing
             .minFilter  = VK_FILTER_NEAREST
         };
 
-        VK_CHECK(vkCreateSampler(_device.device(), &sampler_create_info, nullptr, &_sampler_handle));
+        VK_CHECK(vkCreateSampler(_device.device(), &sampler_create_info, nullptr, &_sampler_handle.get()));
 
         _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
@@ -57,12 +57,6 @@ namespace pbrlib::testing
             .build(); 
         
         _count_changed_pixels_buffer->write(0, 0);
-    }
-
-    ImageComparison::~ImageComparison()
-    {
-        const auto device_handle = _device.device();
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
     }
 
     bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)

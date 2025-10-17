@@ -55,8 +55,6 @@ namespace pbrlib::backend
         MaterialManager(MaterialManager&& material_manager)         = delete;
         MaterialManager(const MaterialManager& material_manager)    = delete;
 
-        ~MaterialManager();
-
         MaterialManager& operator = (MaterialManager&& material_manager)        = delete;
         MaterialManager& operator = (const MaterialManager& material_manager)   = delete;  
 
@@ -82,7 +80,7 @@ namespace pbrlib::backend
         std::vector<vk::Image>  _images;
         std::vector<Material>   _materials;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        vk::SamplerHandle _sampler_handle;
 
         std::optional<vk::Buffer> _materials_indices_buffer;       
 

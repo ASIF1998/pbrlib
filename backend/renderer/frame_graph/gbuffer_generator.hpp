@@ -93,6 +93,6 @@ namespace pbrlib::backend
         vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
         vk::DescriptorSetHandle         _result_descriptor_set_handle;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        vk::SamplerHandle _sampler_handle;
     };
 }
