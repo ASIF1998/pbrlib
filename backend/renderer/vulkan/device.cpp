@@ -15,8 +15,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include <vma/vk_mem_alloc.h>
-
 #include <stdexcept>
 #include <array>
 #include <format>
@@ -38,7 +36,6 @@ namespace pbrlib::backend::vk
 
         vkDestroyFence(_device_handle, _submit_fence_handle, nullptr);
         vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
-        vmaDestroyAllocator(_vma_allocator_handle);
 
         shader::finalizeCompiler();
     }
@@ -401,7 +398,7 @@ namespace pbrlib::backend::vk
             .vulkanApiVersion   = backend::utils::vulkanVersion()
         };
 
-        VK_CHECK(vmaCreateAllocator(&allocator_info, &_vma_allocator_handle));
+        VK_CHECK(vmaCreateAllocator(&allocator_info, &_allocator_handle.get()));
     }
 }
 
@@ -409,7 +406,7 @@ namespace pbrlib::backend::vk
 {
     VmaAllocator Device::vmaAllocator() const noexcept
     {
-        return _vma_allocator_handle;
+        return _allocator_handle;
     }
 }
 

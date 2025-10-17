@@ -146,7 +146,7 @@ namespace pbrlib::backend::vk
         VkCommandPool   _command_pool_for_general_queue = VK_NULL_HANDLE;
         VkFence         _submit_fence_handle            = VK_NULL_HANDLE;
 
-        VmaAllocator _vma_allocator_handle = VK_NULL_HANDLE;
+        AllocatorHandle _allocator_handle;
 
         Functions _functions;
 
