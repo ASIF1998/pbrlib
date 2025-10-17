@@ -82,16 +82,16 @@ namespace pbrlib::backend
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
+        vk::PipelineLayoutHandle            _pipeline_layout_handle;
         VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
         VkRenderPass                        _render_pass_handle     = VK_NULL_HANDLE;
-        VkPipelineLayout                    _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
 
         GBufferPushConstantBlock _push_constant_block;
 
-        vk::DescriptorSetHandle         _result_descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _result_descriptor_set_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
     };

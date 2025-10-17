@@ -27,7 +27,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkPipelineLayout PipelineLayout::build()
+    vk::PipelineLayoutHandle PipelineLayout::build()
     {
         VkPipelineLayoutCreateInfo pipeline_layout_create_info
         {
@@ -55,7 +55,7 @@ namespace pbrlib::backend::vk::builders
             &layout_handle
         ));
 
-        return layout_handle;
+        return vk::PipelineLayoutHandle(layout_handle);
     }
 }
 

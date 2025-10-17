@@ -88,7 +88,7 @@ namespace pbrlib::backend
 
         bool _descriptor_set_is_changed = true;
 
-        vk::DescriptorSetHandle         _descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
     };
 }

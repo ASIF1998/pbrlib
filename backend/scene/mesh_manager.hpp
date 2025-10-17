@@ -89,8 +89,8 @@ namespace pbrlib::backend
         std::vector<Instance>       _instances;
         std::optional<vk::Buffer>   _instances_buffer;
 
-        vk::DescriptorSetHandle         _descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
         
         bool _descriptor_set_is_changed = true;
 

@@ -89,16 +89,16 @@ namespace pbrlib::backend
         ~SSAO();
 
     private:
-        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
-        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        VkPipeline                  _pipeline_handle        = VK_NULL_HANDLE;
 
-        vk::DescriptorSetHandle         _result_image_desc_set;
         vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
+        vk::DescriptorSetHandle         _result_image_desc_set;
 
         VkSampler _result_image_sampler = VK_NULL_HANDLE;
 
-        vk::DescriptorSetHandle         _ssao_desc_set;
         vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
+        vk::DescriptorSetHandle         _ssao_desc_set;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;

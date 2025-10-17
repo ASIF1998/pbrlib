@@ -47,8 +47,6 @@ namespace pbrlib::backend
         const auto device_handle = device().device();
 
         vkDestroySampler(device_handle, _result_image_sampler, nullptr);
-
-        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 

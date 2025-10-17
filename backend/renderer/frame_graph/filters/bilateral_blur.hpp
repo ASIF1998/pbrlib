@@ -43,11 +43,11 @@ namespace pbrlib::backend
         [[nodiscard]] const Settings&   settings() const noexcept;
 
     private:
-        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
-        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        VkPipeline                  _pipeline_handle        = VK_NULL_HANDLE;
 
-        vk::DescriptorSetHandle         _descriptor_set_handle;
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
 

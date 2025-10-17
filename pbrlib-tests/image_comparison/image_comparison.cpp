@@ -84,9 +84,6 @@ namespace pbrlib::testing
         
         vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
         vkDestroySampler(device_handle, _sampler_handle, nullptr);
-
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
     }
 
     bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
@@ -130,7 +127,7 @@ namespace pbrlib::testing
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle.get(), 0, nullptr);
             vkCmdDispatch(command_buffer_handle, image_1.width, image_1.height, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 

@@ -55,6 +55,11 @@ namespace pbrlib::backend::vk
         vkFreeCommandBuffers(_device_handle, command_pool_handle, 1, &command_buffer_handle);
     }
 
+    void HandleDispatcher::destroy(VkPipelineLayout pipeline_layout_handle) noexcept
+    {
+        vkDestroyPipelineLayout(_device_handle, pipeline_layout_handle, nullptr);
+    }
+
     void HandleDispatcher::destroy(VmaAllocator allocator_handle) noexcept
     {
         vmaDestroyAllocator(allocator_handle);

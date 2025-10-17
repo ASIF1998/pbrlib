@@ -24,6 +24,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkDescriptorPool descriptor_pool_handle)                                        noexcept;
         static void destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept;
         static void destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle)       noexcept;
+        static void destroy(VkPipelineLayout pipeline_layout_handle)                                        noexcept;
         static void destroy(VmaAllocator allocator_handle)                                                  noexcept;
 
         static void initForDeviceResources(VkDevice device_handle);
@@ -80,6 +81,7 @@ namespace pbrlib::backend::vk
     using DescriptorSetHandle       = UniqueHandle<VkDescriptorSet, VkDescriptorPool>;
     using ShaderModuleHandle        = UniqueHandle<VkShaderModule>;
     using CommandBufferHandle       = UniqueHandle<VkCommandBuffer, VkCommandPool>;
+    using PipelineLayoutHandle      = UniqueHandle<VkPipelineLayout>;
     using AllocatorHandle           = UniqueHandle<VmaAllocator>;
 }
 

@@ -26,7 +26,7 @@ namespace pbrlib::backend::vk::builders
         PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
         PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        [[nodiscard]] VkPipelineLayout build();
+        [[nodiscard]] vk::PipelineLayoutHandle build();
         
     private:
         Device& _device;

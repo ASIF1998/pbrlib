@@ -1,10 +1,8 @@
 #pragma once
 
 #include <backend/renderer/vulkan/buffer.hpp>
-
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
-
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <optional>
 
@@ -37,11 +35,11 @@ namespace pbrlib::testing
     private:
         backend::vk::Device& _device;
 
-        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
-        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
+        backend::vk::PipelineLayoutHandle   _pipeline_layout_handle;
+        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
 
-        VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
+        backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
+        backend::vk::DescriptorSetHandle        _descriptor_set_handle;
 
         VkSampler _sampler_handle = VK_NULL_HANDLE;
 
