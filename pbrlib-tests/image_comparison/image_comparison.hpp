@@ -21,6 +21,12 @@ namespace pbrlib::testing
     public:
         explicit ImageComparison(pbrlib::backend::vk::Device& device);
 
+        ImageComparison(ImageComparison&& image_comparison)         = delete;
+        ImageComparison(const ImageComparison& image_comparison)    = delete;
+
+        ImageComparison& operator = (ImageComparison&& image_comparison)        = delete;
+        ImageComparison& operator = (const ImageComparison& image_comparison)   = delete;
+
         [[nodiscard]]
         bool compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2);
 
