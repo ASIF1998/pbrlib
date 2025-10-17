@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <vector>
 
@@ -31,7 +31,7 @@ namespace pbrlib::backend::vk::builders
         
         Framebuffer& addAttachment(const vk::Image& attachment);
 
-        [[nodiscard]] VkFramebuffer build();
+        [[nodiscard]] vk::FramebufferHandle build();
         
     private:
         Device& _device;

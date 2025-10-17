@@ -29,6 +29,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkSampler sampler_handle)                                                       noexcept;
         static void destroy(VmaAllocator allocator_handle)                                                  noexcept;
         static void destroy(VkRenderPass render_pass_handle)                                                noexcept;
+        static void destroy(VkFramebuffer framebuffer_handle)                                               noexcept;
 
         static void initForDeviceResources(VkDevice device_handle);
 
@@ -89,6 +90,7 @@ namespace pbrlib::backend::vk
     using SamplerHandle             = UniqueHandle<VkSampler>;
     using AllocatorHandle           = UniqueHandle<VmaAllocator>;
     using RenderPassHandle          = UniqueHandle<VkRenderPass>;
+    using FramebufferHandle         = UniqueHandle<VkFramebuffer>;
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>

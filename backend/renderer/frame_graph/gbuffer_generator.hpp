@@ -77,16 +77,15 @@ namespace pbrlib::backend
 
     public:
         explicit GBufferGenerator(vk::Device& device);
-        ~GBufferGenerator();
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
+        vk::FramebufferHandle _framebuffer_handle;
+
         vk::PipelineLayoutHandle            _pipeline_layout_handle;
         vk::RenderPassHandle                _render_pass_handle;
         vk::PipelineHandle                  _pipeline_handle;
-
-        VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
 
         GBufferPushConstantBlock _push_constant_block;
 

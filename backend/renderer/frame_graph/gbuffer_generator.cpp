@@ -47,13 +47,6 @@ namespace pbrlib::backend
         createResultDescriptorSet();
     }
 
-    GBufferGenerator::~GBufferGenerator()
-    {
-        const auto device_handle = device().device();
-
-        vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
-    }
-
     void GBufferGenerator::createSampler()
     {
         constexpr VkSamplerCreateInfo sampler_create_info 
