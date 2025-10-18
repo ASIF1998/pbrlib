@@ -118,7 +118,7 @@ namespace pbrlib::backend
             const std::array sets_descriptors
             {
                 descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
-                _ssao_desc_set.get(),
+                _ssao_desc_set.handle(),
                 context().ptr_material_manager->descriptorSet().first
             };
 
@@ -164,7 +164,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_image_desc_set.get(), _result_image_desc_set_layout.get());
+        return std::make_pair(_result_image_desc_set.handle(), _result_image_desc_set_layout.handle());
     }
 
     void SSAO::createSampler()
@@ -183,7 +183,7 @@ namespace pbrlib::backend
             device().device(),
             &sampler_create_info,
             nullptr, 
-            &_result_image_sampler.get()
+            &_result_image_sampler.handle()
         ));
     }
 

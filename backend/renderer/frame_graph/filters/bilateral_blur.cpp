@@ -49,7 +49,7 @@ namespace pbrlib::backend
             device.device(),
             &sampler_create_info,
             nullptr, 
-            &_sampler_handle.get()
+            &_sampler_handle.handle()
         ));
     }
 
@@ -128,7 +128,7 @@ namespace pbrlib::backend
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle.get(), 
+                0, 1, &_descriptor_set_handle.handle(), 
                 0, nullptr
             );
 

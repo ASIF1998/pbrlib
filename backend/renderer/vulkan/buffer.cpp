@@ -20,21 +20,13 @@ namespace pbrlib::backend::vk
         usage   (buffer.usage)
     {
         std::swap(handle, buffer.handle);
-        std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
         std::swap(type, buffer.type);
-    }
-
-    Buffer::~Buffer()
-    {
-        if (handle != VK_NULL_HANDLE)
-            vmaDestroyBuffer(_device.vmaAllocator(), handle, _allocation);
     }
 
     Buffer& Buffer::operator = (Buffer&& buffer) noexcept
     {
         std::swap(handle, buffer.handle);
-        std::swap(_allocation, buffer._allocation);
         std::swap(size, buffer.size);
         std::swap(type, buffer.type);
         std::swap(usage, buffer.usage);
@@ -82,7 +74,7 @@ namespace pbrlib::backend::vk
         VK_CHECK(vmaCopyMemoryToAllocation(
             _device.vmaAllocator(),
             ptr_data,
-            _allocation, offset,
+            handle.context<VmaAllocation>(), offset,
             data_size
         ));
     }
@@ -118,9 +110,11 @@ namespace pbrlib::backend::vk
 
         void* ptr_src = nullptr;
 
-        VK_CHECK(vmaMapMemory(_device.vmaAllocator(), _allocation, &ptr_src));
-        memcpy(ptr_dst, reinterpret_cast<uint8_t*>(ptr_src) + offset_in_src, size);       
-        vmaUnmapMemory(_device.vmaAllocator(), _allocation);
+        const auto allocation_handle = handle.context<VmaAllocation>();
+
+        VK_CHECK(vmaMapMemory(_device.vmaAllocator(), allocation_handle, &ptr_src));
+        memcpy(ptr_dst, reinterpret_cast<uint8_t*>(ptr_src) + offset_in_src, size);
+        vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
     }
 }
 
@@ -224,14 +218,19 @@ namespace pbrlib::backend::vk::builders
         else 
             alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
+        VkBuffer        buffer_handle       = VK_NULL_HANDLE;
+        VmaAllocation   allocation_handle   = VK_NULL_HANDLE;
+        
         VK_CHECK(vmaCreateBuffer(
             _device.vmaAllocator(),
             &buffer_info,
             &alloc_info,
-            &buffer.handle,
-            &buffer._allocation,
+            &buffer_handle,
+            &allocation_handle,
             nullptr
         ));
+
+        buffer.handle = BufferHandle(buffer_handle, allocation_handle);
 
         if (!_name.empty())
         {
@@ -239,7 +238,7 @@ namespace pbrlib::backend::vk::builders
             { 
                 .sType          = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType     = VK_OBJECT_TYPE_BUFFER,
-                .objectHandle   = reinterpret_cast<uint64_t>(buffer.handle),
+                .objectHandle   = reinterpret_cast<uint64_t>(buffer.handle.handle()),
                 .pObjectName    = _name.c_str()
             };
 

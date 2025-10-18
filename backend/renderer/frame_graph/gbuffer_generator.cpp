@@ -64,7 +64,7 @@ namespace pbrlib::backend
             device().device(),
             &sampler_create_info,
             nullptr, 
-            &_sampler_handle.get()
+            &_sampler_handle.handle()
         ));
     }
 
@@ -391,6 +391,6 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_descriptor_set_handle.get(), _result_descriptor_set_layout_handle.get());
+        return std::make_pair(_result_descriptor_set_handle.handle(), _result_descriptor_set_layout_handle.handle());
     }
 }

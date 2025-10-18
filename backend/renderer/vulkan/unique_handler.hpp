@@ -31,16 +31,19 @@ namespace pbrlib::backend::vk
         static void destroy(VkRenderPass render_pass_handle)                                                noexcept;
         static void destroy(VkFramebuffer framebuffer_handle)                                               noexcept;
         static void destroy(VkCommandPool command_pool_handle)                                              noexcept;
+        static void destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle)                        noexcept;
 
-        static void initForDeviceResources(VkDevice device_handle);
+        static void initForDeviceResources(VkDevice device_handle, VmaAllocator allocator_handle);
 
     private:
-        static VkDevice _device_handle;
+        static VkDevice     _device_handle;
+        static VmaAllocator _allocator_handle;
     };
 }
 
 namespace pbrlib::backend::vk
 {
+    /// @todo Добавить проверку, что Handle и FinalizationContext - это тривиальные типы
     template<typename Handle, typename... FinalizationContext>
     concept VulkanHandle = requires(Handle handle, FinalizationContext... context)
     {
@@ -66,8 +69,14 @@ namespace pbrlib::backend::vk
         explicit operator   bool()      const noexcept;
         operator            Handle()    const noexcept;
 
-        Handle&         get() noexcept;
-        const Handle&   get() const noexcept;
+        Handle&         handle() noexcept;
+        const Handle&   handle() const noexcept;
+
+        template<typename T>
+        T& context();
+
+        template<typename T>
+        const T& context() const;
 
         void swap(UniqueHandle& rsh) noexcept;
 
@@ -93,6 +102,7 @@ namespace pbrlib::backend::vk
     using FramebufferHandle         = UniqueHandle<VkFramebuffer>;
     using CommandPoolHandle         = UniqueHandle<VkCommandPool>;
     using CommandBufferHandle       = UniqueHandle<VkCommandBuffer, VkCommandPool>;
+    using BufferHandle              = UniqueHandle<VkBuffer, VmaAllocation>;
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>

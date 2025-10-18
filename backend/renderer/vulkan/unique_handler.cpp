@@ -5,14 +5,22 @@
 
 namespace pbrlib::backend::vk
 {
-    VkDevice HandleDispatcher::_device_handle = VK_NULL_HANDLE;
+    VkDevice        HandleDispatcher::_device_handle    = VK_NULL_HANDLE;
+    VmaAllocator    HandleDispatcher::_allocator_handle = VK_NULL_HANDLE;
+}
 
-    void HandleDispatcher::initForDeviceResources(VkDevice device_handle)
+namespace pbrlib::backend::vk
+{
+    void HandleDispatcher::initForDeviceResources(VkDevice device_handle, VmaAllocator allocator_handle)
     {
         if (device_handle == VK_NULL_HANDLE)
             throw exception::InvalidArgument("[vk-handle-dispatcher] device handle is null");
 
-        _device_handle = device_handle;
+        if (allocator_handle == VK_NULL_HANDLE)
+            throw exception::InvalidArgument("[vk-handle-dispatcher] allocator handle is null");
+
+        _device_handle      = device_handle;
+        _allocator_handle   = allocator_handle;
     }
     
     void HandleDispatcher::destroy(VkInstance instance_handle) noexcept
@@ -88,5 +96,10 @@ namespace pbrlib::backend::vk
     void HandleDispatcher::destroy(VkCommandPool command_pool_handle) noexcept
     {
         vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
+    }
+
+    void HandleDispatcher::destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle) noexcept
+    {
+        vmaDestroyBuffer(_allocator_handle, buffer_handle, allocation_handle);
     }
 }

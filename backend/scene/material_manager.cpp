@@ -48,7 +48,7 @@ namespace pbrlib::backend
             _device.device(),
             &sampler_create_info,
             nullptr,
-            &_sampler_handle.get()
+            &_sampler_handle.handle()
         ));
 
         constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
@@ -150,7 +150,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle.get(), _descriptor_set_layout_handle.get());
+        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
     }
 
     size_t MaterialManager::imageCount() const noexcept

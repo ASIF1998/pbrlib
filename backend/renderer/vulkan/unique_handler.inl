@@ -52,14 +52,14 @@ namespace pbrlib::backend::vk
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    Handle& UniqueHandle<Handle, FinalizationContext...>::get() noexcept
+    Handle& UniqueHandle<Handle, FinalizationContext...>::handle() noexcept
     {
         return handle_;
     }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    const Handle& UniqueHandle<Handle, FinalizationContext...>::get() const noexcept
+    const Handle& UniqueHandle<Handle, FinalizationContext...>::handle() const noexcept
     {
         return handle_;
     }
@@ -70,5 +70,21 @@ namespace pbrlib::backend::vk
     {
         std::swap(handle_, rsh.handle_);
         std::swap(context_, rsh.context_);
+    }
+
+    template<typename Handle, typename... FinalizationContext>
+    requires VulkanHandle<Handle, FinalizationContext...>
+    template<typename T>
+    T& UniqueHandle<Handle, FinalizationContext...>::context()
+    {
+        return std::get<T>(context_);
+    }
+    
+    template<typename Handle, typename... FinalizationContext>
+    requires VulkanHandle<Handle, FinalizationContext...>
+    template<typename T>
+    const T& UniqueHandle<Handle, FinalizationContext...>::context() const
+    {
+        return std::get<T>(context_);
     }
 }

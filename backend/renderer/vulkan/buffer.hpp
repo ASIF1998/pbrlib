@@ -43,8 +43,6 @@ namespace pbrlib::backend::vk
         Buffer(Buffer&& buffer) noexcept;
         Buffer(const Buffer& buffer) = delete;
 
-        ~Buffer();
-
         Buffer& operator = (Buffer&& buffer) noexcept;
         Buffer& operator = (const Buffer& buffer) = delete;
 
@@ -83,16 +81,15 @@ namespace pbrlib::backend::vk
 
         VkDeviceAddress address() const;
 
-        VkBuffer        handle  = VK_NULL_HANDLE;
-        VkDeviceSize    size    = 0;
+        BufferHandle handle;
+        VkDeviceSize size   = 0;
 
         BufferType type;
 
         VkBufferUsageFlags usage  = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
 
     private:
-        Device&         _device;
-        VmaAllocation   _allocation = VK_NULL_HANDLE;
+        Device& _device;
     };
 }
 

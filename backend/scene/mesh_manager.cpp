@@ -174,7 +174,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MeshManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle.get(), _descriptor_set_layout_handle.get());
+        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
     }
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const

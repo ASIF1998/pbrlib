@@ -115,7 +115,7 @@ namespace pbrlib::backend::vk::builders
             _device.device(),
             &desc_set_create_info,
             nullptr,
-            &sets_layout.get()
+            &sets_layout.handle()
         ));
 
         return sets_layout;

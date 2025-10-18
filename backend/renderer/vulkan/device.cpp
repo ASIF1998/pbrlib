@@ -46,12 +46,13 @@ namespace pbrlib::backend::vk
         createInstance(config::enable_vulkan_debug_print);
         getPhysicalDevice();
         createDevice();
+        createGpuAllocator();
+
+        HandleDispatcher::initForDeviceResources(_device_handle, _allocator_handle);
 
         loadFunctions();
 
         shader::initCompiler();
-
-        createGpuAllocator();
 
         createCommandPools();
 
@@ -100,7 +101,7 @@ namespace pbrlib::backend::vk
         instance_info.enabledExtensionCount     = static_cast<uint32_t>(extensions.size());
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
-        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.get()));
+        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
     }
 
     VkInstance Device::instance() const noexcept
@@ -361,9 +362,7 @@ namespace pbrlib::backend::vk
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle.get()));
-
-        HandleDispatcher::initForDeviceResources(_device_handle);
+        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle.handle()));
 
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
@@ -397,7 +396,7 @@ namespace pbrlib::backend::vk
             .vulkanApiVersion   = backend::utils::vulkanVersion()
         };
 
-        VK_CHECK(vmaCreateAllocator(&allocator_info, &_allocator_handle.get()));
+        VK_CHECK(vmaCreateAllocator(&allocator_info, &_allocator_handle.handle()));
     }
 }
 
@@ -420,7 +419,7 @@ namespace pbrlib::backend::vk
             .queueFamilyIndex   = _general_queue.family_index
         };
 
-        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue.get()));
+        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue.handle()));
     }
 
     CommandBuffer Device::oneTimeSubmitCommandBuffer(std::string_view name)
@@ -433,7 +432,7 @@ namespace pbrlib::backend::vk
             { 
                 .sType          = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType     = VK_OBJECT_TYPE_COMMAND_BUFFER,
-                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle.get()),
+                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle.handle()),
                 .pObjectName    = name.data()
             };
 
@@ -562,7 +561,7 @@ namespace pbrlib::backend::vk
             .pPoolSizes         = pool_sizes.data()
         };
 
-        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle.get()));
+        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle.handle()));
     }
 
     VkDescriptorPool Device::descriptorPool() const noexcept
@@ -597,7 +596,7 @@ namespace pbrlib::backend::vk
             setName(name_info);
         }
 
-        return vk::DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.get());
+        return vk::DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.handle());
     }
 
     void Device::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info) const
