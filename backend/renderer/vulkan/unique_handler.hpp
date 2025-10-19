@@ -56,12 +56,11 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk
 {
-    /// @todo Добавить проверку, что Handle и FinalizationContext - это тривиальные типы
     template<typename Handle, typename... FinalizationContext>
     concept VulkanHandle = requires(Handle handle, FinalizationContext... context)
     {
         HandleDispatcher::destroy(handle, context...);
-    };
+    } && std::is_trivial_v<Handle> && (std::is_trivial_v<FinalizationContext> && ...);
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
