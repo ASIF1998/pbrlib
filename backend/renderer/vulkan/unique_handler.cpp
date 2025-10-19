@@ -135,4 +135,9 @@ namespace pbrlib::backend::vk
     {
         vkDestroyFence(_device_handle, fence_handle, nullptr);
     }
+
+    void HandleDispatcher::destroy(VkSemaphore semaphore_handle) noexcept
+    {
+        vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
+    }
 }

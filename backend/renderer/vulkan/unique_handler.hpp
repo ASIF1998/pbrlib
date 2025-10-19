@@ -37,6 +37,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkSurfaceKHR surface_handle)                                                    noexcept;
         static void destroy(VkSwapchainKHR swapchain_handle)                                                noexcept;
         static void destroy(VkFence fence_handle)                                                           noexcept;
+        static void destroy(VkSemaphore semaphore_handle)                                                   noexcept;
 
         static void initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle);
 
@@ -114,6 +115,7 @@ namespace pbrlib::backend::vk
     using SurfaceHandle             = UniqueHandle<VkSurfaceKHR>;
     using SwapchainHandle           = UniqueHandle<VkSwapchainKHR>;
     using FenceHandle               = UniqueHandle<VkFence>;
+    using SemaphoreHandle           = UniqueHandle<VkSemaphore>;
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>
