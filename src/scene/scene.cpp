@@ -26,7 +26,7 @@ namespace pbrlib
         _ptr_parent (ptr_parent)
     {
         if (!_ptr_scene)
-            throw exception::InvalidArgument("ptr_scene");
+            throw exception::InvalidArgument("[scene-item] ctor: ptr_scene is null");
 
         _handle = _ptr_scene->_registry.create();
 
