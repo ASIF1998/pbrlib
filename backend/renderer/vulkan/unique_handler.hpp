@@ -8,16 +8,18 @@
 #include <functional>
 #include <tuple>
 
+#include <type_traits>
+
 namespace pbrlib::backend::vk
 {
-    class HandleDispatcher final
+    class ResourceDestroyer final
     {
     public:
-        HandleDispatcher(HandleDispatcher&& dispatcher)         = delete;
-        HandleDispatcher(const HandleDispatcher& dispatcher)    = delete;
+        ResourceDestroyer(ResourceDestroyer&& destroyer)        = delete;
+        ResourceDestroyer(const ResourceDestroyer& destroyer)   = delete;
 
-        HandleDispatcher& operator = (HandleDispatcher&& dispatcher)        = delete;
-        HandleDispatcher& operator = (const HandleDispatcher& dispatcher)   = delete;
+        ResourceDestroyer& operator = (ResourceDestroyer&& destroyer)       = delete;
+        ResourceDestroyer& operator = (const ResourceDestroyer& destroyer)  = delete;
 
         static void destroy(VkInstance instance_handle)                                                     noexcept;
         static void destroy(VkDevice device_handle)                                                         noexcept;
@@ -59,7 +61,7 @@ namespace pbrlib::backend::vk
     template<typename Handle, typename... FinalizationContext>
     concept VulkanHandle = requires(Handle handle, FinalizationContext... context)
     {
-        HandleDispatcher::destroy(handle, context...);
+        ResourceDestroyer::destroy(handle, context...);
     } && std::is_trivial_v<Handle> && (std::is_trivial_v<FinalizationContext> && ...);
 
     template<typename Handle, typename... FinalizationContext>

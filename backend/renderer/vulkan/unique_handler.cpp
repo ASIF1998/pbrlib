@@ -5,14 +5,14 @@
 
 namespace pbrlib::backend::vk
 {
-    VkInstance      HandleDispatcher::_instance_handle  = VK_NULL_HANDLE;
-    VkDevice        HandleDispatcher::_device_handle    = VK_NULL_HANDLE;
-    VmaAllocator    HandleDispatcher::_allocator_handle = VK_NULL_HANDLE;
+    VkInstance      ResourceDestroyer::_instance_handle     = VK_NULL_HANDLE;
+    VkDevice        ResourceDestroyer::_device_handle       = VK_NULL_HANDLE;
+    VmaAllocator    ResourceDestroyer::_allocator_handle    = VK_NULL_HANDLE;
 }
 
 namespace pbrlib::backend::vk
 {
-    void HandleDispatcher::initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle)
+    void ResourceDestroyer::initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle)
     {
         if (instance_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-handle-dispatcher] instance handle is null");
@@ -28,33 +28,33 @@ namespace pbrlib::backend::vk
         _allocator_handle   = allocator_handle;
     }
     
-    void HandleDispatcher::destroy(VkInstance instance_handle) noexcept
+    void ResourceDestroyer::destroy(VkInstance instance_handle) noexcept
     {
         vkDestroyInstance(instance_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkDevice device_handle) noexcept
+    void ResourceDestroyer::destroy(VkDevice device_handle) noexcept
     {
         vkDestroyDevice(device_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkShaderModule shader_module_handle) noexcept
+    void ResourceDestroyer::destroy(VkShaderModule shader_module_handle) noexcept
     {
         vkDestroyShaderModule(_device_handle, shader_module_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkDescriptorSetLayout descriptor_set_layout_handle) noexcept
+    void ResourceDestroyer::destroy(VkDescriptorSetLayout descriptor_set_layout_handle) noexcept
     {
         vkDestroyDescriptorSetLayout(_device_handle, descriptor_set_layout_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkDescriptorPool descriptor_pool_handle) noexcept
+    void ResourceDestroyer::destroy(VkDescriptorPool descriptor_pool_handle) noexcept
     {
         if (descriptor_pool_handle != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(_device_handle, descriptor_pool_handle, nullptr);
     }
     
-    void HandleDispatcher::destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept
+    void ResourceDestroyer::destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept
     {
         if (
                 descriptor_set_handle != VK_NULL_HANDLE 
@@ -63,52 +63,52 @@ namespace pbrlib::backend::vk
             log::error("[vk-handle-dispatcher] failed free vulkan descriptor set: {}", reinterpret_cast<uint64_t>(descriptor_set_handle));
     }
 
-    void HandleDispatcher::destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle) noexcept
+    void ResourceDestroyer::destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle) noexcept
     {
         vkFreeCommandBuffers(_device_handle, command_pool_handle, 1, &command_buffer_handle);
     }
 
-    void HandleDispatcher::destroy(VkPipelineLayout pipeline_layout_handle) noexcept
+    void ResourceDestroyer::destroy(VkPipelineLayout pipeline_layout_handle) noexcept
     {
         vkDestroyPipelineLayout(_device_handle, pipeline_layout_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkPipeline pipeline_handle) noexcept
+    void ResourceDestroyer::destroy(VkPipeline pipeline_handle) noexcept
     {
         vkDestroyPipeline(_device_handle, pipeline_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkSampler sampler_handle) noexcept
+    void ResourceDestroyer::destroy(VkSampler sampler_handle) noexcept
     {
         vkDestroySampler(_device_handle, sampler_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VmaAllocator allocator_handle) noexcept
+    void ResourceDestroyer::destroy(VmaAllocator allocator_handle) noexcept
     {
         vmaDestroyAllocator(allocator_handle);
     }
 
-    void HandleDispatcher::destroy(VkRenderPass render_pass_handle) noexcept
+    void ResourceDestroyer::destroy(VkRenderPass render_pass_handle) noexcept
     {
         vkDestroyRenderPass(_device_handle, render_pass_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkFramebuffer framebuffer_handle) noexcept
+    void ResourceDestroyer::destroy(VkFramebuffer framebuffer_handle) noexcept
     {
         vkDestroyFramebuffer(_device_handle, framebuffer_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkCommandPool command_pool_handle) noexcept
+    void ResourceDestroyer::destroy(VkCommandPool command_pool_handle) noexcept
     {
         vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle) noexcept
+    void ResourceDestroyer::destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle) noexcept
     {
         vmaDestroyBuffer(_allocator_handle, buffer_handle, allocation_handle);
     }
 
-    void HandleDispatcher::destroy(VkImage image_handle, VmaAllocation allocation_handle, bool is_own) noexcept
+    void ResourceDestroyer::destroy(VkImage image_handle, VmaAllocation allocation_handle, bool is_own) noexcept
     {
         // The is_own flag exists because the image may belong to the swapchain,
         // in which case it must not (and cannot) be destroyed manually.
@@ -116,33 +116,33 @@ namespace pbrlib::backend::vk
             vmaDestroyImage(_allocator_handle, image_handle, allocation_handle);
     }
 
-    void HandleDispatcher::destroy(VkImageView image_view_handle) noexcept
+    void ResourceDestroyer::destroy(VkImageView image_view_handle) noexcept
     {
         vkDestroyImageView(_device_handle, image_view_handle, nullptr);
     }
     
-    void HandleDispatcher::destroy(VkSurfaceKHR surface_handle) noexcept
+    void ResourceDestroyer::destroy(VkSurfaceKHR surface_handle) noexcept
     {
         vkDestroySurfaceKHR(_instance_handle, surface_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkSwapchainKHR swapchain_handle) noexcept
+    void ResourceDestroyer::destroy(VkSwapchainKHR swapchain_handle) noexcept
     {
         vkDestroySwapchainKHR(_device_handle, swapchain_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkFence fence_handle) noexcept
+    void ResourceDestroyer::destroy(VkFence fence_handle) noexcept
     {
         vkDestroyFence(_device_handle, fence_handle, nullptr);
     }
 
-    void HandleDispatcher::destroy(VkSemaphore semaphore_handle) noexcept
+    void ResourceDestroyer::destroy(VkSemaphore semaphore_handle) noexcept
     {
         vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
     }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-    void HandleDispatcher::destroy(TracyVkCtx tracy_ctx_handle) noexcept
+    void ResourceDestroyer::destroy(TracyVkCtx tracy_ctx_handle) noexcept
     {
         if (tracy_ctx_handle)
             TracyVkDestroy(tracy_ctx_handle);

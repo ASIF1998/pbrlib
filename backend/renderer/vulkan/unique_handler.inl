@@ -24,7 +24,7 @@ namespace pbrlib::backend::vk
     {
         std::apply([this] (const auto... handles) 
         {
-            HandleDispatcher::destroy(handle_, handles...);
+            ResourceDestroyer::destroy(handle_, handles...);
         }, context_);
     }
 
