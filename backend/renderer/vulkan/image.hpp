@@ -50,8 +50,6 @@ namespace pbrlib::backend::vk
         Image(Image&& image) noexcept;
         Image(const Image& image) = delete;
 
-        ~Image();
-
         Image& operator = (Image&& image) noexcept;
         Image& operator = (const Image& image) = delete;
 
@@ -70,9 +68,8 @@ namespace pbrlib::backend::vk
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
         );
 
-        ImageHandle handle;
-
-        VkImageView view_handle = VK_NULL_HANDLE;
+        ImageHandle     handle;
+        ImageViewHandle view_handle;
         
         uint32_t width  = 0;
         uint32_t height = 0;

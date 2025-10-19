@@ -293,7 +293,7 @@ namespace pbrlib::backend::vk
         for (auto& image: _images)
         {
             image_view_info.image = image.handle.handle();
-            VK_CHECK(vkCreateImageView(_device.device(), &image_view_info, nullptr, &image.view_handle));
+            VK_CHECK(vkCreateImageView(_device.device(), &image_view_info, nullptr, &image.view_handle.handle()));
         }
     }
 

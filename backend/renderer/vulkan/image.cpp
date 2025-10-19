@@ -64,11 +64,6 @@ namespace pbrlib::backend::vk
         std::swap(view_handle, image.view_handle);
     }
 
-    Image::~Image()
-    {
-        vkDestroyImageView(_device.device(), view_handle, nullptr);
-    }
-
     Image& Image::operator = (Image&& image) noexcept
     {
         width   = image.width;
@@ -395,7 +390,7 @@ namespace pbrlib::backend::vk::builders
             _device.device(),
             &image_view_info,
             nullptr,
-            &image.view_handle
+            &image.view_handle.handle()
         ));
 
         if (!_name.empty()) [[likely]]
@@ -410,7 +405,7 @@ namespace pbrlib::backend::vk::builders
 
             _device.setName(name_info);
 
-            name_info.objectHandle  = reinterpret_cast<uint64_t>(image.view_handle);
+            name_info.objectHandle  = reinterpret_cast<uint64_t>(image.view_handle.handle());
             name_info.objectType    = VK_OBJECT_TYPE_IMAGE_VIEW;
 
             _device.setName(name_info);

@@ -110,4 +110,9 @@ namespace pbrlib::backend::vk
         if (is_own) [[likely]]
             vmaDestroyImage(_allocator_handle, image_handle, allocation_handle);
     }
+
+    void HandleDispatcher::destroy(VkImageView image_view_handle) noexcept
+    {
+        vkDestroyImageView(_device_handle, image_view_handle, nullptr);
+    }
 }
