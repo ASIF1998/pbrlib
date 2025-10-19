@@ -252,8 +252,8 @@ namespace pbrlib::backend::vk
 
         for (auto handle: handles)
         {
-            vk::Image image (_device, true);
-            image.handle    = handle;
+            vk::Image image (_device);
+            image.handle    = ImageHandle(handle, VK_NULL_HANDLE, false);
             image.width     = width; 
             image.height    = height; 
             image.format    = _surface_format.format;
@@ -292,7 +292,7 @@ namespace pbrlib::backend::vk
 
         for (auto& image: _images)
         {
-            image_view_info.image = image.handle;
+            image_view_info.image = image.handle.handle();
             VK_CHECK(vkCreateImageView(_device.device(), &image_view_info, nullptr, &image.view_handle));
         }
     }

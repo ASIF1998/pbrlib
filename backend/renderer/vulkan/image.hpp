@@ -44,7 +44,7 @@ namespace pbrlib::backend::vk
         friend class builders::Image;
         friend class exporters::Image;
 
-        explicit Image(Device& device, bool from_swapchain = false);
+        explicit Image(Device& device);
 
     public:
         Image(Image&& image) noexcept;
@@ -70,7 +70,8 @@ namespace pbrlib::backend::vk
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
         );
 
-        VkImage     handle      = VK_NULL_HANDLE;
+        ImageHandle handle;
+
         VkImageView view_handle = VK_NULL_HANDLE;
         
         uint32_t width  = 0;
@@ -83,10 +84,7 @@ namespace pbrlib::backend::vk
         VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     private:
-        Device&         _device;
-        VmaAllocation   _allocation = VK_NULL_HANDLE;
-
-        bool _from_swapchain;
+        Device& _device;
     };
 }
 

@@ -102,4 +102,12 @@ namespace pbrlib::backend::vk
     {
         vmaDestroyBuffer(_allocator_handle, buffer_handle, allocation_handle);
     }
+
+    void HandleDispatcher::destroy(VkImage image_handle, VmaAllocation allocation_handle, bool is_own) noexcept
+    {
+        // The is_own flag exists because the image may belong to the swapchain,
+        // in which case it must not (and cannot) be destroyed manually.
+        if (is_own) [[likely]]
+            vmaDestroyImage(_allocator_handle, image_handle, allocation_handle);
+    }
 }

@@ -47,9 +47,8 @@ namespace pbrlib::backend::utils
 
 namespace pbrlib::backend::vk
 {
-    Image::Image(Device& device, bool from_swapchain) :
-        _device         (device),
-        _from_swapchain (from_swapchain)
+    Image::Image(Device& device) :
+        _device (device)
     { }
 
     Image::Image(Image&& image) noexcept :
@@ -63,16 +62,11 @@ namespace pbrlib::backend::vk
     {
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
-        std::swap(_allocation, image._allocation);
-        std::swap(_from_swapchain, image._from_swapchain);
     }
 
     Image::~Image()
     {
         vkDestroyImageView(_device.device(), view_handle, nullptr);
-
-        if (!_from_swapchain) [[likely]]
-            vmaDestroyImage(_device.vmaAllocator(), handle, _allocation);
     }
 
     Image& Image::operator = (Image&& image) noexcept
@@ -88,8 +82,6 @@ namespace pbrlib::backend::vk
 
         std::swap(handle, image.handle);
         std::swap(view_handle, image.view_handle);
-        std::swap(_allocation, image._allocation);
-        std::swap(_from_swapchain, image._from_swapchain);
 
         return *this;
     }
@@ -147,7 +139,7 @@ namespace pbrlib::backend::vk
             { 
                 .sType          = VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2,
                 .srcBuffer      = staging_buffer.handle,
-                .dstImage       = handle,
+                .dstImage       = handle.handle(),
                 .dstImageLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 .regionCount    = 1,
                 .pRegions       = &region
@@ -211,7 +203,7 @@ namespace pbrlib::backend::vk
                 .newLayout              = new_layout,
                 .srcQueueFamilyIndex    = family_index,
                 .dstQueueFamilyIndex    = family_index,
-                .image                  = handle,
+                .image                  = handle.handle(),
                 .subresourceRange       = range
             };
 
@@ -348,14 +340,18 @@ namespace pbrlib::backend::vk::builders
         if (_tiling == VK_IMAGE_TILING_LINEAR)
             alloc_info.flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |  VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
+        VkImage         image_handle        = VK_NULL_HANDLE;
+        VmaAllocation   allocation_handle   = VK_NULL_HANDLE;
         VK_CHECK(vmaCreateImage(
             _device.vmaAllocator(), 
             &image_info, 
             &alloc_info, 
-            &image.handle, 
-            &image._allocation, 
+            &image_handle, 
+            &allocation_handle, 
             nullptr
         ));
+
+        image.handle = ImageHandle(image_handle, allocation_handle, true);
 
         if (_usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
             image.changeLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
@@ -388,7 +384,7 @@ namespace pbrlib::backend::vk::builders
         const VkImageViewCreateInfo image_view_info 
         { 
             .sType              = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-            .image              = image.handle,
+            .image              = image.handle.handle(),
             .viewType           = VK_IMAGE_VIEW_TYPE_2D,
             .format             = _format,
             .components         = components,
@@ -408,7 +404,7 @@ namespace pbrlib::backend::vk::builders
             { 
                 .sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType    = VK_OBJECT_TYPE_IMAGE,
-                .objectHandle  = reinterpret_cast<uint64_t>(image.handle),
+                .objectHandle  = reinterpret_cast<uint64_t>(image.handle.handle()),
                 .pObjectName   = _name.c_str()
             };
 
@@ -652,9 +648,9 @@ namespace pbrlib::backend::vk::exporters
             const VkBlitImageInfo2 blit_info 
             { 
                 .sType          = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2,
-                .srcImage       = _ptr_image->handle,
+                .srcImage       = _ptr_image->handle.handle(),
                 .srcImageLayout = _ptr_image->layout,
-                .dstImage       = image.handle,
+                .dstImage       = image.handle.handle(),
                 .dstImageLayout = image.layout,
                 .regionCount    = 1,
                 .pRegions       = &region,
@@ -682,15 +678,17 @@ namespace pbrlib::backend::vk::exporters
 
         vkGetImageSubresourceLayout(
             _device.device(),
-            image.handle,
+            image.handle.handle(),
             &sub_resource, 
             &sub_resource_layout
         );
 
+        const auto allocation_handle = image.handle.context<VmaAllocation>();
+
         uint8_t* ptr_data = nullptr;
         VK_CHECK(vmaMapMemory(
             _device.vmaAllocator(),
-            image._allocation,
+            allocation_handle,
             reinterpret_cast<void**>(&ptr_data)
         ));
 
@@ -704,6 +702,6 @@ namespace pbrlib::backend::vk::exporters
             (*reinterpret_cast<std::function<void (void*, int)>*>(context))(data, size);
         }, &writer, width, height, 4, ptr_data + sub_resource_layout.offset, static_cast<int>(sub_resource_layout.rowPitch));
 
-        vmaUnmapMemory(_device.vmaAllocator(), image._allocation);
+        vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
     }
 }

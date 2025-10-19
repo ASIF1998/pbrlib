@@ -91,9 +91,9 @@ namespace pbrlib::backend
 
             vkCmdBlitImage(
                 command_buffer_handle, 
-                ptr_result->handle,
+                ptr_result->handle.handle(),
                 ptr_result->layout,
-                _surface.ptr_image->handle,
+                _surface.ptr_image->handle.handle(),
                 _surface.ptr_image->layout,
                 1, &image_blit, 
                 VK_FILTER_NEAREST
