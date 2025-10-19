@@ -4,8 +4,6 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/utils/vulkan.hpp>
 
 #include <pbrlib/scene/scene.hpp>

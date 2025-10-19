@@ -4,9 +4,6 @@
 
 #include <pbrlib/math/vec4.hpp>
 
-#include <vulkan/vulkan.hpp>
-#include <vma/vk_mem_alloc.h>
-
 #include <string>
 #include <string_view>
 

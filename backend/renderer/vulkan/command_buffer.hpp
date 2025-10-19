@@ -37,7 +37,7 @@ namespace pbrlib::backend::vk
             const pbrlib::math::vec3&   col     = pbrlib::math::vec3(0)
         );
 
-        vk::CommandBufferHandle handle;
+        CommandBufferHandle     handle;
         VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
 
     private:

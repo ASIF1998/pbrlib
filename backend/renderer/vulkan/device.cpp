@@ -30,10 +30,6 @@ namespace pbrlib::backend::vk
 
         vkDeviceWaitIdle(_device_handle);
 
-#ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkDestroy(_tracy_ctx);
-#endif
-
         shader::finalizeCompiler();
     }
 
@@ -459,7 +455,7 @@ namespace pbrlib::backend::vk
         }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkCollect(_tracy_ctx, command_buffer.handle);
+        TracyVkCollect(_tracy_ctx_handle.handle(), command_buffer.handle);
 #endif
 
         vkEndCommandBuffer(command_buffer.handle);
@@ -685,7 +681,7 @@ namespace pbrlib::backend::vk
     {
 #ifdef PBRLIB_ENABLE_PROPFILING
         auto tracy_setup_command_buffer = oneTimeSubmitCommandBuffer("tracy-setup");
-        _tracy_ctx = TracyVkContextCalibrated(
+        auto tracy_ctx_handle = TracyVkContextCalibrated(
             _physical_device_handle, 
             _device_handle, 
             _general_queue.handle, 
@@ -694,8 +690,10 @@ namespace pbrlib::backend::vk
             VK_NULL_HANDLE
         );
 
-        if (!_tracy_ctx)
+        if (!tracy_ctx_handle)
             throw exception::InitializeError("[vk-device] failed create tracy context for profiling");
+
+        _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
 #endif
     }
 }

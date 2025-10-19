@@ -1,7 +1,5 @@
 #include <backend/renderer/frame_graph/ssao.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/logger/logger.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>

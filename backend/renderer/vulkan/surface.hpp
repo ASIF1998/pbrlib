@@ -2,8 +2,6 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 
-#include <vulkan/vulkan.h>
-
 #include <vector>
 #include <numeric>
 

@@ -3,8 +3,6 @@
 #include <backend/renderer/vulkan/utils.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <vma/vk_mem_alloc.h>
-
 #include <vector>
 #include <span>
 

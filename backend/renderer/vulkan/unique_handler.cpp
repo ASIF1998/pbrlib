@@ -140,4 +140,12 @@ namespace pbrlib::backend::vk
     {
         vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
     }
+
+#ifdef PBRLIB_ENABLE_PROPFILING
+    void HandleDispatcher::destroy(TracyVkCtx tracy_ctx_handle) noexcept
+    {
+        if (tracy_ctx_handle)
+            TracyVkDestroy(tracy_ctx_handle);
+    }
+#endif
 }

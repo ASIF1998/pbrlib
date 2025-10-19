@@ -4,8 +4,6 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/utils/vulkan.hpp>
 
-#include <backend/profiling.hpp>
-
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #define STBI_NO_GIF

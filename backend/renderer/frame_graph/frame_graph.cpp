@@ -15,8 +15,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <pbrlib/config.hpp>
 
 #include <pbrlib/scene/scene.hpp>

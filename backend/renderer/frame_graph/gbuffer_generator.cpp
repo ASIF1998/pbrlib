@@ -17,8 +17,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <pbrlib/scene/scene.hpp>
 
 #include <pbrlib/math/matrix4x4.hpp>

@@ -5,8 +5,6 @@
 
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <unordered_set>
 
 namespace pbrlib::backend::vk

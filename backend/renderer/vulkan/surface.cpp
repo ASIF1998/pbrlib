@@ -6,8 +6,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <SDL3/SDL_vulkan.h>
 
 #include <ranges>

@@ -5,8 +5,6 @@
 
 #include <backend/utils/vulkan.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/utils/align_size.hpp>
 
 #include <pbrlib/exceptions.hpp>

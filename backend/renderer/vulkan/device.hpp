@@ -3,10 +3,6 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 
-#include <backend/profiling.hpp>
-
-#include <vma/vk_mem_alloc.h>
-
 #include <numeric>
 
 #include <string_view>
@@ -128,7 +124,7 @@ namespace pbrlib::backend::vk
 #ifdef PBRLIB_ENABLE_PROPFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {
-            return _tracy_ctx;
+            return _tracy_ctx_handle.handle();
         }
 #endif
 
@@ -152,7 +148,7 @@ namespace pbrlib::backend::vk
         vk::DescriptorPoolHandle _descriptor_pool_handle;
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkCtx _tracy_ctx = nullptr;
+        TracyCtxHandle _tracy_ctx_handle;
 #endif
     };
 }

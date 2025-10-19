@@ -5,8 +5,6 @@
 
 #include <backend/utils/vulkan.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/components.hpp>
 
 #include <pbrlib/scene/scene.hpp>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <backend/profiling.hpp>
+
 #include <vulkan/vulkan.h>
 #include <vma/vk_mem_alloc.h>
 
@@ -38,6 +40,10 @@ namespace pbrlib::backend::vk
         static void destroy(VkSwapchainKHR swapchain_handle)                                                noexcept;
         static void destroy(VkFence fence_handle)                                                           noexcept;
         static void destroy(VkSemaphore semaphore_handle)                                                   noexcept;
+
+#ifdef PBRLIB_ENABLE_PROPFILING
+        static void destroy(TracyVkCtx tracy_ctx_handle) noexcept;
+#endif
 
         static void initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle);
 
@@ -116,6 +122,10 @@ namespace pbrlib::backend::vk
     using SwapchainHandle           = UniqueHandle<VkSwapchainKHR>;
     using FenceHandle               = UniqueHandle<VkFence>;
     using SemaphoreHandle           = UniqueHandle<VkSemaphore>;
+
+#ifdef PBRLIB_ENABLE_PROPFILING
+    using TracyCtxHandle = UniqueHandle<TracyVkCtx>;
+#endif
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>

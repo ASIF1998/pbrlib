@@ -13,8 +13,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 namespace pbrlib::backend
 {
     BilateralBlur::BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings):
