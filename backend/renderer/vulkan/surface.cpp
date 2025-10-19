@@ -146,7 +146,6 @@ namespace pbrlib::backend::vk
         _images.clear();
 
         vkDestroySwapchainKHR(_device.device(), _swapchain_handle, nullptr);
-        vkDestroySurfaceKHR(_device.instance(), _surface_handle, nullptr);
     }
 
     Surface& Surface::operator = (Surface&& surface)
@@ -167,7 +166,7 @@ namespace pbrlib::backend::vk
     {
         auto ptr_sdl_window = static_cast<SDL_Window*>(ptr_window->_ptr_window);
 
-        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE) [[unlikely]]
+        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle.handle()) == SDL_FALSE) [[unlikely]]
             throw exception::InitializeError("[vk-surface] failed create");
     }
 

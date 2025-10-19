@@ -34,10 +34,12 @@ namespace pbrlib::backend::vk
         static void destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle)                        noexcept;
         static void destroy(VkImage image_handle, VmaAllocation allocation_handle, bool is_own)             noexcept;
         static void destroy(VkImageView image_view_handle)                                                  noexcept;
+        static void destroy(VkSurfaceKHR surface_handle)                                                    noexcept;
 
-        static void initForDeviceResources(VkDevice device_handle, VmaAllocator allocator_handle);
+        static void initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle);
 
     private:
+        static VkInstance   _instance_handle;
         static VkDevice     _device_handle;
         static VmaAllocator _allocator_handle;
     };
@@ -107,6 +109,7 @@ namespace pbrlib::backend::vk
     using BufferHandle              = UniqueHandle<VkBuffer, VmaAllocation>;
     using ImageHandle               = UniqueHandle<VkImage, VmaAllocation, bool>;
     using ImageViewHandle           = UniqueHandle<VkImageView>;
+    using SurfaceHandle             = UniqueHandle<VkSurfaceKHR>;
 }
 
 #include <backend/renderer/vulkan/unique_handler.inl>

@@ -48,7 +48,11 @@ namespace pbrlib::backend::vk
         createDevice();
         createGpuAllocator();
 
-        HandleDispatcher::initForDeviceResources(_device_handle, _allocator_handle);
+        HandleDispatcher::initForDeviceResources(
+            _instance_handle, 
+            _device_handle, 
+            _allocator_handle
+        );
 
         loadFunctions();
 

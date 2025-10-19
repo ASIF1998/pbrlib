@@ -51,7 +51,7 @@ namespace pbrlib::backend::vk
         [[nodiscard]] NextImageInfo nextImage();
         
     private:
-        VkSurfaceKHR    _surface_handle     = VK_NULL_HANDLE;
+        SurfaceHandle   _surface_handle;
         VkSwapchainKHR  _swapchain_handle   = VK_NULL_HANDLE;
 
         std::vector<vk::Image> _images;

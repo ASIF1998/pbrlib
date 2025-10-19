@@ -6,6 +6,7 @@
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>
 #include <backend/utils/vulkan.hpp>
@@ -78,7 +79,7 @@ namespace pbrlib::backend
         const auto  ptr_output_image    = colorOutputAttach(_output_image_name);
 
         device().writeDescriptorSet ({
-            .view_handle            = input_image.view_handle,
+            .view_handle            = input_image.view_handle.handle(),
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -86,7 +87,7 @@ namespace pbrlib::backend
         });
         
         device().writeDescriptorSet ({
-            .view_handle            = ptr_output_image->view_handle,
+            .view_handle            = ptr_output_image->view_handle.handle(),
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
