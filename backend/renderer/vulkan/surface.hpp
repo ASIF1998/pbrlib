@@ -43,8 +43,6 @@ namespace pbrlib::backend::vk
         Surface(Surface&& surface);
         Surface(const Surface& surface) = delete;
 
-        ~Surface();
-
         Surface& operator = (Surface&& surface);
         Surface& operator = (const Surface& surface) = delete;
 
@@ -62,6 +60,6 @@ namespace pbrlib::backend::vk
 
         mutable uint32_t _current_image_index = 0; 
 
-        VkFence _next_image_fence_handle = VK_NULL_HANDLE;
+        FenceHandle _next_image_fence_handle;
     };
 }

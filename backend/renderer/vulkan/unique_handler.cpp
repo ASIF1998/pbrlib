@@ -130,4 +130,9 @@ namespace pbrlib::backend::vk
     {
         vkDestroySwapchainKHR(_device_handle, swapchain_handle, nullptr);
     }
+
+    void HandleDispatcher::destroy(VkFence fence_handle) noexcept
+    {
+        vkDestroyFence(_device_handle, fence_handle, nullptr);
+    }
 }

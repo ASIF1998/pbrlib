@@ -139,11 +139,6 @@ namespace pbrlib::backend::vk
         std::swap(_next_image_fence_handle, surface._next_image_fence_handle);
     }
 
-    Surface::~Surface()
-    {
-        vkDestroyFence(_device.device(), _next_image_fence_handle, nullptr);
-    }
-
     Surface& Surface::operator = (Surface&& surface)
     {
         std::swap(_surface_handle, surface._surface_handle);
@@ -303,7 +298,7 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device.device(), &fence_create_info, nullptr, &_next_image_fence_handle));
+            VK_CHECK(vkCreateFence(_device.device(), &fence_create_info, nullptr, &_next_image_fence_handle.handle()));
         }
 
         VK_CHECK(vkAcquireNextImageKHR(
@@ -316,11 +311,11 @@ namespace pbrlib::backend::vk
 
         VK_CHECK(vkWaitForFences(
             _device.device(),
-            1, &_next_image_fence_handle,
+            1, &_next_image_fence_handle.handle(),
             VK_TRUE, std::numeric_limits<uint64_t>::max()
         ));
 
-        VK_CHECK(vkResetFences(_device.device(), 1, &_next_image_fence_handle));
+        VK_CHECK(vkResetFences(_device.device(), 1, &_next_image_fence_handle.handle()));
 
         return NextImageInfo
         {

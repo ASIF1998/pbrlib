@@ -141,9 +141,9 @@ namespace pbrlib::backend::vk
 
         VkPhysicalDeviceProperties2 _gpu_properties = { };
 
-        Queue                   _general_queue;
-        vk::CommandPoolHandle   _command_pool_for_general_queue;
-        VkFence                 _submit_fence_handle            = VK_NULL_HANDLE;
+        Queue               _general_queue;
+        CommandPoolHandle   _command_pool_for_general_queue;
+        FenceHandle         _submit_fence_handle;
 
         AllocatorHandle _allocator_handle;
 

@@ -34,8 +34,6 @@ namespace pbrlib::backend::vk
         TracyVkDestroy(_tracy_ctx);
 #endif
 
-        vkDestroyFence(_device_handle, _submit_fence_handle, nullptr);
-
         shader::finalizeCompiler();
     }
 
@@ -457,7 +455,7 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device_handle, &fence_create_info, nullptr, &_submit_fence_handle));
+            VK_CHECK(vkCreateFence(_device_handle, &fence_create_info, nullptr, &_submit_fence_handle.handle()));
         }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
@@ -480,8 +478,8 @@ namespace pbrlib::backend::vk
         };
 
         VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, _submit_fence_handle));
-        VK_CHECK(vkWaitForFences(_device_handle, 1, &_submit_fence_handle, VK_TRUE, std::numeric_limits<uint64_t>::max()));
-        VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle));
+        VK_CHECK(vkWaitForFences(_device_handle, 1, &_submit_fence_handle.handle(), VK_TRUE, std::numeric_limits<uint64_t>::max()));
+        VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle.handle()));
     }
 }
 
