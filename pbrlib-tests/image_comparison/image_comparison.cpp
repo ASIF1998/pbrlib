@@ -47,7 +47,7 @@ namespace pbrlib::testing
             .minFilter  = VK_FILTER_NEAREST
         };
 
-        VK_CHECK(vkCreateSampler(_device.device(), &sampler_create_info, nullptr, &_sampler_handle.get()));
+        VK_CHECK(vkCreateSampler(_device.device(), &sampler_create_info, nullptr, &_sampler_handle.handle()));
 
         _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
@@ -100,7 +100,7 @@ namespace pbrlib::testing
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle.get(), 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_layout_handle, 0, 1, &_descriptor_set_handle.handle(), 0, nullptr);
             vkCmdDispatch(command_buffer_handle, image_1.width, image_1.height, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 
