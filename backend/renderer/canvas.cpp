@@ -110,7 +110,7 @@ namespace pbrlib::backend
         { 
             .sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
             .swapchainCount = 1,
-            .pSwapchains    = &_surface.vk_surface->_swapchain_handle,
+            .pSwapchains    = &_surface.vk_surface->_swapchain_handle.handle(),
             .pImageIndices  = &_surface.index,
             .pResults       = &result
         };

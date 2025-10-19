@@ -142,10 +142,6 @@ namespace pbrlib::backend::vk
     Surface::~Surface()
     {
         vkDestroyFence(_device.device(), _next_image_fence_handle, nullptr);
-
-        _images.clear();
-
-        vkDestroySwapchainKHR(_device.device(), _swapchain_handle, nullptr);
     }
 
     Surface& Surface::operator = (Surface&& surface)
@@ -205,7 +201,7 @@ namespace pbrlib::backend::vk
             .clipped                = VK_TRUE
         };
 
-        VK_CHECK(vkCreateSwapchainKHR(_device.device(), &swapchain_info, nullptr, &_swapchain_handle));
+        VK_CHECK(vkCreateSwapchainKHR(_device.device(), &swapchain_info, nullptr, &_swapchain_handle.handle()));
     }
 
     std::vector<VkSurfaceFormatKHR> Surface::getSurfaceFormats()

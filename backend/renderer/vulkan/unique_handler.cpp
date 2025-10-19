@@ -125,4 +125,9 @@ namespace pbrlib::backend::vk
     {
         vkDestroySurfaceKHR(_instance_handle, surface_handle, nullptr);
     }
+
+    void HandleDispatcher::destroy(VkSwapchainKHR swapchain_handle) noexcept
+    {
+        vkDestroySwapchainKHR(_device_handle, swapchain_handle, nullptr);
+    }
 }
