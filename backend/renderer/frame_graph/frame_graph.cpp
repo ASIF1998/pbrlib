@@ -15,8 +15,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <pbrlib/config.hpp>
 
 #include <pbrlib/scene/scene.hpp>
@@ -235,7 +233,7 @@ namespace pbrlib::backend
             {
                 vkCmdClearColorImage(
                     command_buffer_handle, 
-                    image.handle, image.layout, 
+                    image.handle.handle(), image.layout, 
                     &clear_color, 
                     1, &range
                 );

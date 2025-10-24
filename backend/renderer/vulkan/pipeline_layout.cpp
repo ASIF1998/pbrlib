@@ -27,7 +27,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkPipelineLayout PipelineLayout::build()
+    PipelineLayoutHandle PipelineLayout::build()
     {
         VkPipelineLayoutCreateInfo pipeline_layout_create_info
         {
@@ -55,7 +55,7 @@ namespace pbrlib::backend::vk::builders
             &layout_handle
         ));
 
-        return layout_handle;
+        return PipelineLayoutHandle(layout_handle);
     }
 }
 
@@ -86,7 +86,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkDescriptorSetLayout DescriptorSetLayout::build()
+    DescriptorSetLayoutHandle DescriptorSetLayout::build()
     {
         if (_bindings.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-descritor-set-layout::builder] bindings count is 0");
@@ -109,13 +109,13 @@ namespace pbrlib::backend::vk::builders
             .pBindings      = _bindings.data()
         };
 
-        VkDescriptorSetLayout sets_layout = VK_NULL_HANDLE;
+        DescriptorSetLayoutHandle sets_layout;
 
         VK_CHECK(vkCreateDescriptorSetLayout(
             _device.device(),
             &desc_set_create_info,
             nullptr,
-            &sets_layout
+            &sets_layout.handle()
         ));
 
         return sets_layout;

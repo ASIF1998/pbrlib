@@ -1,7 +1,6 @@
 #include <backend/renderer/frame_graph/compound_render_pass.hpp>
 
 #include <backend/logger/logger.hpp>
-
 #include <backend/profiling.hpp>
 
 namespace pbrlib::backend

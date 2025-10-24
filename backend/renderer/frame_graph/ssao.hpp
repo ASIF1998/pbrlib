@@ -2,6 +2,7 @@
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
@@ -85,19 +86,18 @@ namespace pbrlib::backend
 
     public:
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
-        ~SSAO();
 
     private:
-        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
-        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        vk::PipelineHandle          _pipeline_handle;
 
-        VkDescriptorSet         _result_image_desc_set          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _result_image_desc_set_layout   = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
+        vk::DescriptorSetHandle         _result_image_desc_set;
 
-        VkSampler _result_image_sampler = VK_NULL_HANDLE;
+        vk::SamplerHandle _result_image_sampler;
 
-        VkDescriptorSet         _ssao_desc_set          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _ssao_desc_set_layout   = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
+        vk::DescriptorSetHandle         _ssao_desc_set;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;

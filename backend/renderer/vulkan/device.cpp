@@ -15,8 +15,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include <vma/vk_mem_alloc.h>
-
 #include <stdexcept>
 #include <array>
 #include <format>
@@ -32,17 +30,6 @@ namespace pbrlib::backend::vk
 
         vkDeviceWaitIdle(_device_handle);
 
-#ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkDestroy(_tracy_ctx);
-#endif
-
-        vkDestroyFence(_device_handle, _submit_fence_handle, nullptr);
-        vkDestroyDescriptorPool(_device_handle, _descriptor_pool_handle, nullptr);
-        vkDestroyCommandPool(_device_handle, _command_pool_for_general_queue, nullptr);
-        vmaDestroyAllocator(_vma_allocator_handle);
-        vkDestroyDevice(_device_handle, nullptr);
-        vkDestroyInstance(_instance_handle, nullptr);
-
         shader::finalizeCompiler();
     }
 
@@ -53,12 +40,17 @@ namespace pbrlib::backend::vk
         createInstance(config::enable_vulkan_debug_print);
         getPhysicalDevice();
         createDevice();
+        createGpuAllocator();
+
+        ResourceDestroyer::initForDeviceResources(
+            _instance_handle, 
+            _device_handle, 
+            _allocator_handle
+        );
 
         loadFunctions();
 
         shader::initCompiler();
-
-        createGpuAllocator();
 
         createCommandPools();
 
@@ -107,7 +99,7 @@ namespace pbrlib::backend::vk
         instance_info.enabledExtensionCount     = static_cast<uint32_t>(extensions.size());
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
-        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle));
+        VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
     }
 
     VkInstance Device::instance() const noexcept
@@ -368,7 +360,12 @@ namespace pbrlib::backend::vk
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle));
+        VK_CHECK(vkCreateDevice(
+            _physical_device_handle, 
+            &device_info, 
+            nullptr, 
+            &_device_handle.handle()
+        ));
 
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
@@ -402,7 +399,7 @@ namespace pbrlib::backend::vk
             .vulkanApiVersion   = backend::utils::vulkanVersion()
         };
 
-        VK_CHECK(vmaCreateAllocator(&allocator_info, &_vma_allocator_handle));
+        VK_CHECK(vmaCreateAllocator(&allocator_info, &_allocator_handle.handle()));
     }
 }
 
@@ -410,7 +407,7 @@ namespace pbrlib::backend::vk
 {
     VmaAllocator Device::vmaAllocator() const noexcept
     {
-        return _vma_allocator_handle;
+        return _allocator_handle;
     }
 }
 
@@ -425,7 +422,12 @@ namespace pbrlib::backend::vk
             .queueFamilyIndex   = _general_queue.family_index
         };
 
-        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue));
+        VK_CHECK(vkCreateCommandPool(
+            _device_handle, 
+            &command_pool_info, 
+            nullptr, 
+            &_command_pool_for_general_queue.handle()
+        ));
     }
 
     CommandBuffer Device::oneTimeSubmitCommandBuffer(std::string_view name)
@@ -438,7 +440,7 @@ namespace pbrlib::backend::vk
             { 
                 .sType          = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType     = VK_OBJECT_TYPE_COMMAND_BUFFER,
-                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle),
+                .objectHandle   = reinterpret_cast<uint64_t>(command_buffer.handle.handle()),
                 .pObjectName    = name.data()
             };
 
@@ -459,11 +461,15 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device_handle, &fence_create_info, nullptr, &_submit_fence_handle));
+            VK_CHECK(vkCreateFence(
+                _device_handle, 
+                &fence_create_info, 
+                nullptr, &_submit_fence_handle.handle()
+            ));
         }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkCollect(_tracy_ctx, command_buffer.handle);
+        TracyVkCollect(_tracy_ctx_handle.handle(), command_buffer.handle);
 #endif
 
         vkEndCommandBuffer(command_buffer.handle);
@@ -482,8 +488,15 @@ namespace pbrlib::backend::vk
         };
 
         VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, _submit_fence_handle));
-        VK_CHECK(vkWaitForFences(_device_handle, 1, &_submit_fence_handle, VK_TRUE, std::numeric_limits<uint64_t>::max()));
-        VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle));
+
+        VK_CHECK(vkWaitForFences(
+            _device_handle, 
+            1, &_submit_fence_handle.handle(), 
+            VK_TRUE, 
+            std::numeric_limits<uint64_t>::max()
+        ));
+        
+        VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle.handle()));
     }
 }
 
@@ -567,7 +580,12 @@ namespace pbrlib::backend::vk
             .pPoolSizes         = pool_sizes.data()
         };
 
-        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle));
+        VK_CHECK(vkCreateDescriptorPool(
+            _device_handle, 
+            &pool_info, 
+            nullptr, 
+            &_descriptor_pool_handle.handle()
+        ));
     }
 
     VkDescriptorPool Device::descriptorPool() const noexcept
@@ -575,7 +593,7 @@ namespace pbrlib::backend::vk
         return _descriptor_pool_handle;
     }
 
-    VkDescriptorSet Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
+    DescriptorSetHandle Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
     {
         VkDescriptorSet descriptor_set_handle = VK_NULL_HANDLE;
 
@@ -602,7 +620,7 @@ namespace pbrlib::backend::vk
             setName(name_info);
         }
 
-        return descriptor_set_handle;
+        return DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.handle());
     }
 
     void Device::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info) const
@@ -689,7 +707,7 @@ namespace pbrlib::backend::vk
     {
 #ifdef PBRLIB_ENABLE_PROPFILING
         auto tracy_setup_command_buffer = oneTimeSubmitCommandBuffer("tracy-setup");
-        _tracy_ctx = TracyVkContextCalibrated(
+        auto tracy_ctx_handle = TracyVkContextCalibrated(
             _physical_device_handle, 
             _device_handle, 
             _general_queue.handle, 
@@ -698,8 +716,10 @@ namespace pbrlib::backend::vk
             VK_NULL_HANDLE
         );
 
-        if (!_tracy_ctx)
+        if (!tracy_ctx_handle)
             throw exception::InitializeError("[vk-device] failed create tracy context for profiling");
+
+        _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
 #endif
     }
 }

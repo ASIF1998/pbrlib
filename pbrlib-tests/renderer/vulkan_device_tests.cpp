@@ -125,9 +125,6 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 
     const auto descriptor_set = device.allocateDescriptorSet(descriptor_set_layout);
     pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_set, VK_NULL_HANDLE);
-
-    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
-    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }
 
 TEST_F(VulkanDeviceTests, WriteDescriptorSetImage)
@@ -153,9 +150,6 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetImage)
             .binding                = 0
         });
     });
-
-    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
-    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }
 
 TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
@@ -181,7 +175,4 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
             .binding    = 0
         });
     });
-
-    vkFreeDescriptorSets(device.device(), device.descriptorPool(), 1, &descriptor_set);
-    vkDestroyDescriptorSetLayout(device.device(), descriptor_set_layout, nullptr);
 }

@@ -5,8 +5,6 @@
 
 #include <backend/utils/vulkan.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/components.hpp>
 
 #include <pbrlib/scene/scene.hpp>
@@ -25,16 +23,10 @@ namespace pbrlib::backend
             .addBinding(Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[mesh-manager] descriptor-set-layout");
-    }
-
-    MeshManager::~MeshManager()
-    {
-        const auto device_handle = _device.device();
-
-        vkDeviceWaitIdle(device_handle);
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
+        _descriptor_set_handle = _device.allocateDescriptorSet (
+            _descriptor_set_layout_handle, 
+            "[mesh-manager] descriptor-set-layout"
+        );
     }
 
     void MeshManager::add (
@@ -183,7 +175,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MeshManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
+        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
     }
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const

@@ -2,7 +2,7 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <functional>
 
@@ -28,8 +28,6 @@ namespace pbrlib::backend::vk
         CommandBuffer(CommandBuffer&& command_buffer) noexcept;
         CommandBuffer(const CommandBuffer& command_buffer) = delete;
 
-        ~CommandBuffer();
-
         CommandBuffer& operator = (CommandBuffer&& command_buffer) noexcept;
         CommandBuffer& operator = (const CommandBuffer& command_buffer) = delete;
 
@@ -39,13 +37,11 @@ namespace pbrlib::backend::vk
             const pbrlib::math::vec3&   col     = pbrlib::math::vec3(0)
         );
 
-        VkCommandBuffer         handle  = VK_NULL_HANDLE;
+        CommandBufferHandle     handle;
         VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
 
     private:
         const Device&   _device;
         bool            _is_recording_started = false;
-
-        VkCommandPool _command_pool_handle;
     };
 }

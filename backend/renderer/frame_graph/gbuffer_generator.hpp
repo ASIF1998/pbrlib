@@ -3,8 +3,8 @@
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
 #include <backend/renderer/vulkan/buffer.hpp>
-
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <optional>
 #include <array>
@@ -22,6 +22,7 @@ namespace pbrlib::backend
                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
             |   VK_IMAGE_USAGE_SAMPLED_BIT 
             |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_TRANSFER_DST_BIT
             |   VK_IMAGE_USAGE_STORAGE_BIT;
 
             constexpr std::array metadata
@@ -76,22 +77,21 @@ namespace pbrlib::backend
 
     public:
         explicit GBufferGenerator(vk::Device& device);
-        ~GBufferGenerator();
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     private:
-        VkPipeline                          _pipeline_handle        = VK_NULL_HANDLE;
-        VkRenderPass                        _render_pass_handle     = VK_NULL_HANDLE;
-        VkPipelineLayout                    _pipeline_layout_handle = VK_NULL_HANDLE;
+        vk::FramebufferHandle _framebuffer_handle;
 
-        VkFramebuffer _framebuffer_handle = VK_NULL_HANDLE;
+        vk::PipelineLayoutHandle            _pipeline_layout_handle;
+        vk::RenderPassHandle                _render_pass_handle;
+        vk::PipelineHandle                  _pipeline_handle;
 
         GBufferPushConstantBlock _push_constant_block;
 
-        VkDescriptorSet         _result_descriptor_set_handle           = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _result_descriptor_set_layout_handle    = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _result_descriptor_set_handle;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        vk::SamplerHandle _sampler_handle;
     };
 }

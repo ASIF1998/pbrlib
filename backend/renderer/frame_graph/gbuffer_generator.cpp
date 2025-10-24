@@ -17,8 +17,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <pbrlib/scene/scene.hpp>
 
 #include <pbrlib/math/matrix4x4.hpp>
@@ -47,28 +45,6 @@ namespace pbrlib::backend
         createResultDescriptorSet();
     }
 
-    GBufferGenerator::~GBufferGenerator()
-    {
-        const auto device_handle = device().device();
-
-        vkDestroyFramebuffer(device_handle, _framebuffer_handle, nullptr);
-
-        if (vkFreeDescriptorSets(
-            device_handle,
-            device().descriptorPool(),
-            1, &_result_descriptor_set_handle) != VK_SUCCESS
-        ) [[unlikely]]
-            log::error("[gbuffer-generator] failed free vulkan descriptor set");
-
-        vkDestroyDescriptorSetLayout(device_handle, _result_descriptor_set_layout_handle, nullptr);
-
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
- 
-        vkDestroyRenderPass(device_handle, _render_pass_handle, nullptr);
-        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
-    }
-
     void GBufferGenerator::createSampler()
     {
         constexpr VkSamplerCreateInfo sampler_create_info 
@@ -86,7 +62,7 @@ namespace pbrlib::backend
             device().device(),
             &sampler_create_info,
             nullptr, 
-            &_sampler_handle
+            &_sampler_handle.handle()
         ));
     }
 
@@ -174,9 +150,7 @@ namespace pbrlib::backend
         constexpr auto vert_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.vert";
         constexpr auto frag_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.frag";
 
-        auto prev_pipeline = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::GraphicsPipeline(device())
+        auto new_pipeline = vk::builders::GraphicsPipeline(device())
             .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)
             .addStage(frag_shader, VK_SHADER_STAGE_FRAGMENT_BIT)
             .addAttachmentsState(false)
@@ -187,8 +161,8 @@ namespace pbrlib::backend
             .renderPassHandle(_render_pass_handle)
             .subpass(0)
             .build();
-        
-        vkDestroyPipeline(device().device(), prev_pipeline, nullptr);
+
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }
@@ -413,8 +387,12 @@ namespace pbrlib::backend
         );
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
+    auto GBufferGenerator::resultDescriptorSet() const noexcept
+        -> std::pair<VkDescriptorSet, VkDescriptorSetLayout>
     {
-        return std::make_pair(_result_descriptor_set_handle, _result_descriptor_set_layout_handle);
+        return std::make_pair (
+            _result_descriptor_set_handle.handle(), 
+            _result_descriptor_set_layout_handle.handle()
+        );
     }
 }

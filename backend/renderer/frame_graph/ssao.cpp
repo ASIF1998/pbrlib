@@ -1,7 +1,5 @@
 #include <backend/renderer/frame_graph/ssao.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/logger/logger.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
@@ -39,26 +37,10 @@ namespace pbrlib::backend
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _result_image_desc_set = device.allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
-    }
-
-    SSAO::~SSAO()
-    {
-        const auto device_handle = device().device();
-
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_result_image_desc_set) != VK_SUCCESS) [[unlikely]]
-            log::error("[ssao] failed free descriptor set with result image");
-        
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_ssao_desc_set) != VK_SUCCESS) [[unlikely]]
-            log::error("[ssao] failed free descriptor set with data for compute");
-
-        vkDestroyDescriptorSetLayout(device_handle, _result_image_desc_set_layout, nullptr);
-        vkDestroyDescriptorSetLayout(device_handle, _ssao_desc_set_layout, nullptr);
-        
-        vkDestroySampler(device_handle, _result_image_sampler, nullptr);
-
-        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
+        _result_image_desc_set = device.allocateDescriptorSet(
+            _result_image_desc_set_layout, 
+            "[ssao] descritor set with results"
+        );
     }
 
     bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -114,14 +96,12 @@ namespace pbrlib::backend
 
         constexpr auto ssao_shader = "shaders/ssao/ssao.glsl.comp";
 
-        auto prev_handle = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::ComputePipeline(device())
+        auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .build();
 
-        vkDestroyPipeline(device().device(), prev_handle, nullptr);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }
@@ -139,11 +119,11 @@ namespace pbrlib::backend
             const std::array sets_descriptors
             {
                 descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
-                _ssao_desc_set,
+                _ssao_desc_set.handle(),
                 context().ptr_material_manager->descriptorSet().first
             };
 
-            vkCmdBindDescriptorSets(
+            vkCmdBindDescriptorSets (
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 0, 
@@ -157,7 +137,7 @@ namespace pbrlib::backend
                 context().view
             };
 
-            vkCmdPushConstants(
+            vkCmdPushConstants (
                 command_buffer_handle, 
                 _pipeline_layout_handle, 
                 VK_SHADER_STAGE_COMPUTE_BIT, 
@@ -185,7 +165,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
     {
-        return std::make_pair(_result_image_desc_set, _result_image_desc_set_layout);
+        return std::make_pair(_result_image_desc_set.handle(), _result_image_desc_set_layout.handle());
     }
 
     void SSAO::createSampler()
@@ -204,7 +184,7 @@ namespace pbrlib::backend
             device().device(),
             &sampler_create_info,
             nullptr, 
-            &_result_image_sampler
+            &_result_image_sampler.handle()
         ));
     }
 

@@ -5,8 +5,6 @@
 
 #include <backend/utils/vulkan.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/utils/align_size.hpp>
 
 #include <pbrlib/exceptions.hpp>
@@ -91,9 +89,9 @@ namespace pbrlib::backend
 
             vkCmdBlitImage(
                 command_buffer_handle, 
-                ptr_result->handle,
+                ptr_result->handle.handle(),
                 ptr_result->layout,
-                _surface.ptr_image->handle,
+                _surface.ptr_image->handle.handle(),
                 _surface.ptr_image->layout,
                 1, &image_blit, 
                 VK_FILTER_NEAREST
@@ -110,7 +108,7 @@ namespace pbrlib::backend
         { 
             .sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
             .swapchainCount = 1,
-            .pSwapchains    = &_surface.vk_surface->_swapchain_handle,
+            .pSwapchains    = &_surface.vk_surface->_swapchain_handle.handle(),
             .pImageIndices  = &_surface.index,
             .pResults       = &result
         };

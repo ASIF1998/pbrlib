@@ -4,8 +4,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <stdexcept>
 
 #include <ranges>

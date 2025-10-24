@@ -2,8 +2,6 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 
-#include <vulkan/vulkan.h>
-
 #include <vector>
 #include <numeric>
 
@@ -43,16 +41,14 @@ namespace pbrlib::backend::vk
         Surface(Surface&& surface);
         Surface(const Surface& surface) = delete;
 
-        ~Surface();
-
         Surface& operator = (Surface&& surface);
         Surface& operator = (const Surface& surface) = delete;
 
         [[nodiscard]] NextImageInfo nextImage();
         
     private:
-        VkSurfaceKHR    _surface_handle     = VK_NULL_HANDLE;
-        VkSwapchainKHR  _swapchain_handle   = VK_NULL_HANDLE;
+        SurfaceHandle       _surface_handle;
+        SwapchainHandle     _swapchain_handle;
 
         std::vector<vk::Image> _images;
 
@@ -62,6 +58,6 @@ namespace pbrlib::backend::vk
 
         mutable uint32_t _current_image_index = 0; 
 
-        VkFence _next_image_fence_handle = VK_NULL_HANDLE;
+        FenceHandle _next_image_fence_handle;
     };
 }

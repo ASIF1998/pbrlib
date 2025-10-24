@@ -1,11 +1,7 @@
 #pragma once
 
+#include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
-#include <backend/renderer/vulkan/surface.hpp>
-
-#include <backend/profiling.hpp>
-
-#include <vma/vk_mem_alloc.h>
 
 #include <numeric>
 
@@ -55,12 +51,12 @@ namespace pbrlib::backend::vk
 
     struct DescriptorBufferInfo final
     {
-        const vk::Buffer&   buffer;
-        VkDescriptorSet     set_handle      = VK_NULL_HANDLE;
-        uint32_t            offset          = 0;
-        uint32_t            size            = 0;
-        uint32_t            binding         = 0;
-        uint32_t            array_element   = 0;
+        const Buffer&   buffer;
+        VkDescriptorSet set_handle      = VK_NULL_HANDLE;
+        uint32_t        offset          = 0;
+        uint32_t        size            = 0;
+        uint32_t        binding         = 0;
+        uint32_t        array_element   = 0;
     };
 
     class Device final
@@ -108,7 +104,7 @@ namespace pbrlib::backend::vk
 
         [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(std::string_view name = "");
 
-        [[nodiscard]] VkDescriptorSet allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
+        [[nodiscard]] DescriptorSetHandle allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
 
         [[nodiscard]] const Functions& vulkanFunctions() const noexcept;
 
@@ -128,31 +124,31 @@ namespace pbrlib::backend::vk
 #ifdef PBRLIB_ENABLE_PROPFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {
-            return _tracy_ctx;
+            return _tracy_ctx_handle.handle();
         }
 #endif
 
     private:
-        VkInstance          _instance_handle        = VK_NULL_HANDLE;
+        InstanceHandle      _instance_handle;
         VkPhysicalDevice    _physical_device_handle = VK_NULL_HANDLE;
-        VkDevice            _device_handle          = VK_NULL_HANDLE;
+        DeviceHandle        _device_handle;
 
         VkPhysicalDeviceLimits _device_limits;
 
         VkPhysicalDeviceProperties2 _gpu_properties = { };
 
-        Queue           _general_queue;
-        VkCommandPool   _command_pool_for_general_queue = VK_NULL_HANDLE;
-        VkFence         _submit_fence_handle            = VK_NULL_HANDLE;
+        Queue               _general_queue;
+        CommandPoolHandle   _command_pool_for_general_queue;
+        FenceHandle         _submit_fence_handle;
 
-        VmaAllocator _vma_allocator_handle = VK_NULL_HANDLE;
+        AllocatorHandle _allocator_handle;
 
         Functions _functions;
 
-        VkDescriptorPool _descriptor_pool_handle = VK_NULL_HANDLE;
+        DescriptorPoolHandle _descriptor_pool_handle;
 
 #ifdef PBRLIB_ENABLE_PROPFILING
-        TracyVkCtx _tracy_ctx = nullptr;
+        TracyCtxHandle _tracy_ctx_handle;
 #endif
     };
 }

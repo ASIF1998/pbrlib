@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <vector>
 #include <optional>
@@ -25,16 +25,16 @@ namespace pbrlib::backend::vk::builders
         RenderPass& operator = (const RenderPass& builder)  = delete;
 
         RenderPass& addColorAttachment (
-            const vk::Image*    ptr_image, 
-            VkImageLayout       final_layout
+            const Image*    ptr_image, 
+            VkImageLayout   final_layout
         );
 
         RenderPass& depthAttachment (
-            const vk::Image*    ptr_image, 
-            VkImageLayout       final_layout
+            const Image*    ptr_image, 
+            VkImageLayout   final_layout
         );
 
-        [[nodiscard]] VkRenderPass build();
+        [[nodiscard]] RenderPassHandle build();
     
     private:
         Device& _device;

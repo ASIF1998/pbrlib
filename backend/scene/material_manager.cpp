@@ -4,8 +4,6 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/utils/vulkan.hpp>
 
 #include <pbrlib/scene/scene.hpp>
@@ -48,7 +46,7 @@ namespace pbrlib::backend
             _device.device(),
             &sampler_create_info,
             nullptr,
-            &_sampler_handle
+            &_sampler_handle.handle()
         ));
 
         constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
@@ -60,18 +58,10 @@ namespace pbrlib::backend
             .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
-    }
-
-    MaterialManager::~MaterialManager()
-    {
-        const auto device_handle = _device.device();
-
-        vkDeviceWaitIdle(device_handle);
-
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-        vkFreeDescriptorSets(device_handle, _device.descriptorPool(), 1, &_descriptor_set_handle);
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
+        _descriptor_set_handle = _device.allocateDescriptorSet (
+            _descriptor_set_layout_handle, 
+            "[material-system] images"
+        );
     }
 
     void MaterialManager::add (
@@ -161,7 +151,7 @@ namespace pbrlib::backend
 
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
+        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
     }
 
     size_t MaterialManager::imageCount() const noexcept

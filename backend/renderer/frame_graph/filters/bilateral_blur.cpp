@@ -6,13 +6,12 @@
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>
 #include <backend/utils/vulkan.hpp>
 
 #include <backend/logger/logger.hpp>
-
-#include <backend/profiling.hpp>
 
 namespace pbrlib::backend
 {
@@ -49,23 +48,8 @@ namespace pbrlib::backend
             device.device(),
             &sampler_create_info,
             nullptr, 
-            &_sampler_handle
+            &_sampler_handle.handle()
         ));
-    }
-
-    BilateralBlur::~BilateralBlur()
-    {
-        const auto device_handle = device().device();
-
-        vkDestroySampler(device_handle, _sampler_handle, nullptr);
-
-        if (vkFreeDescriptorSets(device_handle, device().descriptorPool(), 1, &_descriptor_set_handle) != VK_SUCCESS) [[unlikely]]
-            log::error("[bilateral-blur] failed free descriptor set");
-
-        vkDestroyDescriptorSetLayout(device_handle, _descriptor_set_layout_handle, nullptr);
-
-        vkDestroyPipelineLayout(device_handle, _pipeline_layout_handle, nullptr);
-        vkDestroyPipeline(device_handle, _pipeline_handle, nullptr);
     }
 
     bool BilateralBlur::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -93,7 +77,7 @@ namespace pbrlib::backend
         const auto  ptr_output_image    = colorOutputAttach(_output_image_name);
 
         device().writeDescriptorSet ({
-            .view_handle            = input_image.view_handle,
+            .view_handle            = input_image.view_handle.handle(),
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -101,7 +85,7 @@ namespace pbrlib::backend
         });
         
         device().writeDescriptorSet ({
-            .view_handle            = ptr_output_image->view_handle,
+            .view_handle            = ptr_output_image->view_handle.handle(),
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
@@ -114,9 +98,7 @@ namespace pbrlib::backend
     {
         constexpr auto blur_shader = "shaders/bilateral_blur/bilateral_blur.glsl.comp";
 
-        auto prev_handle = _pipeline_handle;
-
-        _pipeline_handle = vk::builders::ComputePipeline(device())
+        auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(blur_shader)
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .specializationInfo
@@ -126,7 +108,7 @@ namespace pbrlib::backend
             )
             .build();
 
-        vkDestroyPipeline(device().device(), prev_handle, nullptr);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }
@@ -145,7 +127,7 @@ namespace pbrlib::backend
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle, 
+                0, 1, &_descriptor_set_handle.handle(), 
                 0, nullptr
             );
 

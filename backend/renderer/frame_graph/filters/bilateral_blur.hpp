@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/frame_graph/filters/filter.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 namespace pbrlib::backend
 {
@@ -36,19 +37,17 @@ namespace pbrlib::backend
 
         explicit BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings);
 
-        ~BilateralBlur();
-
         [[nodiscard]] Settings&         settings() noexcept;
         [[nodiscard]] const Settings&   settings() const noexcept;
 
     private:
-        VkPipeline          _pipeline_handle        = VK_NULL_HANDLE;
-        VkPipelineLayout    _pipeline_layout_handle = VK_NULL_HANDLE;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        vk::PipelineHandle          _pipeline_handle;
 
-        VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
+        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
 
-        VkSampler _sampler_handle = VK_NULL_HANDLE;
+        vk::SamplerHandle _sampler_handle;
 
         std::string _output_image_name;
 

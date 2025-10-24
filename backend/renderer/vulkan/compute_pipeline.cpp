@@ -40,7 +40,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkPipeline ComputePipeline::build()
+    PipelineHandle ComputePipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
@@ -73,6 +73,6 @@ namespace pbrlib::backend::vk::builders
 
         vkDestroyShaderModule(_device.device(), stage.module, nullptr);
         
-        return pipeline_handle;
+        return PipelineHandle(pipeline_handle);
     }
 }

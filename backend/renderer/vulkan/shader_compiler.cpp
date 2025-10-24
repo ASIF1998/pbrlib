@@ -6,8 +6,6 @@
 
 #include <backend/utils/paths.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <pbrlib/exceptions.hpp>
 
 #include <glslang/Public/resource_limits_c.h>

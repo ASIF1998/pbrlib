@@ -114,7 +114,7 @@ namespace pbrlib::backend::vk::builders
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
-            .module = vk::shader::compile(_device, shader),
+            .module = shader::compile(_device, shader),
             .pName  = "main"
         };
 
@@ -207,7 +207,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    VkPipeline GraphicsPipeline::build()
+    PipelineHandle GraphicsPipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE)
             throw exception::InvalidState("[vk-graphics-pipeline-builder] pipeline layout handle is null");
@@ -318,6 +318,6 @@ namespace pbrlib::backend::vk::builders
             &pipeline_handle
         ));
 
-        return pipeline_handle;
+        return PipelineHandle(pipeline_handle);
     }
 }

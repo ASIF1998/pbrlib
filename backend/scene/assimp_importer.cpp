@@ -12,8 +12,6 @@
 
 #include <backend/components.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <backend/scene/material_manager.hpp>
 #include <backend/scene/mesh_manager.hpp>
 

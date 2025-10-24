@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <vector>
 #include <optional>
@@ -26,7 +26,7 @@ namespace pbrlib::backend::vk::builders
         PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
         PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        [[nodiscard]] VkPipelineLayout build();
+        [[nodiscard]] PipelineLayoutHandle build();
         
     private:
         Device& _device;
@@ -53,9 +53,9 @@ namespace pbrlib::backend::vk::builders
             uint32_t            count,
             VkShaderStageFlags  stages
         );
-
         
-        VkDescriptorSetLayout build();
+        DescriptorSetLayoutHandle build();
+
     private:
         Device& _device;
 

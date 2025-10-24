@@ -6,8 +6,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <backend/profiling.hpp>
-
 #include <SDL3/SDL_vulkan.h>
 
 #include <ranges>
@@ -139,16 +137,6 @@ namespace pbrlib::backend::vk
         std::swap(_next_image_fence_handle, surface._next_image_fence_handle);
     }
 
-    Surface::~Surface()
-    {
-        vkDestroyFence(_device.device(), _next_image_fence_handle, nullptr);
-
-        _images.clear();
-
-        vkDestroySwapchainKHR(_device.device(), _swapchain_handle, nullptr);
-        vkDestroySurfaceKHR(_device.instance(), _surface_handle, nullptr);
-    }
-
     Surface& Surface::operator = (Surface&& surface)
     {
         std::swap(_surface_handle, surface._surface_handle);
@@ -167,7 +155,14 @@ namespace pbrlib::backend::vk
     {
         auto ptr_sdl_window = static_cast<SDL_Window*>(ptr_window->_ptr_window);
 
-        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle) == SDL_FALSE) [[unlikely]]
+        const auto create_result = SDL_Vulkan_CreateSurface (
+            ptr_sdl_window, 
+            _device.instance(), 
+            nullptr, 
+            &_surface_handle.handle()
+        );
+
+        if (create_result == SDL_FALSE) [[unlikely]]
             throw exception::InitializeError("[vk-surface] failed create");
     }
 
@@ -206,7 +201,12 @@ namespace pbrlib::backend::vk
             .clipped                = VK_TRUE
         };
 
-        VK_CHECK(vkCreateSwapchainKHR(_device.device(), &swapchain_info, nullptr, &_swapchain_handle));
+        VK_CHECK(vkCreateSwapchainKHR(
+            _device.device(), 
+            &swapchain_info, 
+            nullptr, 
+            &_swapchain_handle.handle())
+        );
     }
 
     std::vector<VkSurfaceFormatKHR> Surface::getSurfaceFormats()
@@ -252,8 +252,8 @@ namespace pbrlib::backend::vk
 
         for (auto handle: handles)
         {
-            vk::Image image (_device, true);
-            image.handle    = handle;
+            vk::Image image (_device);
+            image.handle    = ImageHandle(handle, VK_NULL_HANDLE, false);
             image.width     = width; 
             image.height    = height; 
             image.format    = _surface_format.format;
@@ -292,8 +292,13 @@ namespace pbrlib::backend::vk
 
         for (auto& image: _images)
         {
-            image_view_info.image = image.handle;
-            VK_CHECK(vkCreateImageView(_device.device(), &image_view_info, nullptr, &image.view_handle));
+            image_view_info.image = image.handle.handle();
+            VK_CHECK(vkCreateImageView(
+                _device.device(), 
+                &image_view_info, 
+                nullptr, 
+                &image.view_handle.handle())
+            );
         }
     }
 
@@ -308,7 +313,12 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device.device(), &fence_create_info, nullptr, &_next_image_fence_handle));
+            VK_CHECK(vkCreateFence(
+                _device.device(), 
+                &fence_create_info, 
+                nullptr, 
+                &_next_image_fence_handle.handle())
+            );
         }
 
         VK_CHECK(vkAcquireNextImageKHR(
@@ -321,11 +331,11 @@ namespace pbrlib::backend::vk
 
         VK_CHECK(vkWaitForFences(
             _device.device(),
-            1, &_next_image_fence_handle,
+            1, &_next_image_fence_handle.handle(),
             VK_TRUE, std::numeric_limits<uint64_t>::max()
         ));
 
-        VK_CHECK(vkResetFences(_device.device(), 1, &_next_image_fence_handle));
+        VK_CHECK(vkResetFences(_device.device(), 1, &_next_image_fence_handle.handle()));
 
         return NextImageInfo
         {
