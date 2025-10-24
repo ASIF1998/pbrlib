@@ -360,7 +360,12 @@ namespace pbrlib::backend::vk
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VK_CHECK(vkCreateDevice(_physical_device_handle, &device_info, nullptr, &_device_handle.handle()));
+        VK_CHECK(vkCreateDevice(
+            _physical_device_handle, 
+            &device_info, 
+            nullptr, 
+            &_device_handle.handle()
+        ));
 
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
@@ -417,7 +422,12 @@ namespace pbrlib::backend::vk
             .queueFamilyIndex   = _general_queue.family_index
         };
 
-        VK_CHECK(vkCreateCommandPool(_device_handle, &command_pool_info, nullptr, &_command_pool_for_general_queue.handle()));
+        VK_CHECK(vkCreateCommandPool(
+            _device_handle, 
+            &command_pool_info, 
+            nullptr, 
+            &_command_pool_for_general_queue.handle()
+        ));
     }
 
     CommandBuffer Device::oneTimeSubmitCommandBuffer(std::string_view name)
@@ -451,7 +461,11 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device_handle, &fence_create_info, nullptr, &_submit_fence_handle.handle()));
+            VK_CHECK(vkCreateFence(
+                _device_handle, 
+                &fence_create_info, 
+                nullptr, &_submit_fence_handle.handle()
+            ));
         }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
@@ -474,7 +488,14 @@ namespace pbrlib::backend::vk
         };
 
         VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, _submit_fence_handle));
-        VK_CHECK(vkWaitForFences(_device_handle, 1, &_submit_fence_handle.handle(), VK_TRUE, std::numeric_limits<uint64_t>::max()));
+
+        VK_CHECK(vkWaitForFences(
+            _device_handle, 
+            1, &_submit_fence_handle.handle(), 
+            VK_TRUE, 
+            std::numeric_limits<uint64_t>::max()
+        ));
+        
         VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle.handle()));
     }
 }
@@ -559,7 +580,12 @@ namespace pbrlib::backend::vk
             .pPoolSizes         = pool_sizes.data()
         };
 
-        VK_CHECK(vkCreateDescriptorPool(_device_handle, &pool_info, nullptr, &_descriptor_pool_handle.handle()));
+        VK_CHECK(vkCreateDescriptorPool(
+            _device_handle, 
+            &pool_info, 
+            nullptr, 
+            &_descriptor_pool_handle.handle()
+        ));
     }
 
     VkDescriptorPool Device::descriptorPool() const noexcept
@@ -567,7 +593,7 @@ namespace pbrlib::backend::vk
         return _descriptor_pool_handle;
     }
 
-    vk::DescriptorSetHandle Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
+    DescriptorSetHandle Device::allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name) const
     {
         VkDescriptorSet descriptor_set_handle = VK_NULL_HANDLE;
 
@@ -594,7 +620,7 @@ namespace pbrlib::backend::vk
             setName(name_info);
         }
 
-        return vk::DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.handle());
+        return DescriptorSetHandle(descriptor_set_handle, _descriptor_pool_handle.handle());
     }
 
     void Device::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info) const

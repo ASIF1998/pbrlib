@@ -387,8 +387,12 @@ namespace pbrlib::backend
         );
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> GBufferGenerator::resultDescriptorSet() const noexcept
+    auto GBufferGenerator::resultDescriptorSet() const noexcept
+        -> std::pair<VkDescriptorSet, VkDescriptorSetLayout>
     {
-        return std::make_pair(_result_descriptor_set_handle.handle(), _result_descriptor_set_layout_handle.handle());
+        return std::make_pair (
+            _result_descriptor_set_handle.handle(), 
+            _result_descriptor_set_layout_handle.handle()
+        );
     }
 }

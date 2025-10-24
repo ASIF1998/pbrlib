@@ -51,12 +51,12 @@ namespace pbrlib::backend::vk
 
     struct DescriptorBufferInfo final
     {
-        const vk::Buffer&   buffer;
-        VkDescriptorSet     set_handle      = VK_NULL_HANDLE;
-        uint32_t            offset          = 0;
-        uint32_t            size            = 0;
-        uint32_t            binding         = 0;
-        uint32_t            array_element   = 0;
+        const Buffer&   buffer;
+        VkDescriptorSet set_handle      = VK_NULL_HANDLE;
+        uint32_t        offset          = 0;
+        uint32_t        size            = 0;
+        uint32_t        binding         = 0;
+        uint32_t        array_element   = 0;
     };
 
     class Device final
@@ -104,7 +104,7 @@ namespace pbrlib::backend::vk
 
         [[nodiscard]] CommandBuffer oneTimeSubmitCommandBuffer(std::string_view name = "");
 
-        [[nodiscard]] vk::DescriptorSetHandle allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
+        [[nodiscard]] DescriptorSetHandle allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
 
         [[nodiscard]] const Functions& vulkanFunctions() const noexcept;
 
@@ -145,7 +145,7 @@ namespace pbrlib::backend::vk
 
         Functions _functions;
 
-        vk::DescriptorPoolHandle _descriptor_pool_handle;
+        DescriptorPoolHandle _descriptor_pool_handle;
 
 #ifdef PBRLIB_ENABLE_PROPFILING
         TracyCtxHandle _tracy_ctx_handle;

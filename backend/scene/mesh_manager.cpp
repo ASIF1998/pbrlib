@@ -23,7 +23,10 @@ namespace pbrlib::backend
             .addBinding(Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[mesh-manager] descriptor-set-layout");
+        _descriptor_set_handle = _device.allocateDescriptorSet (
+            _descriptor_set_layout_handle, 
+            "[mesh-manager] descriptor-set-layout"
+        );
     }
 
     void MeshManager::add (

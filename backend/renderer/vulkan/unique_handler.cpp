@@ -12,7 +12,11 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk
 {
-    void ResourceDestroyer::initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle)
+    void ResourceDestroyer::initForDeviceResources (
+        VkInstance      instance_handle, 
+        VkDevice        device_handle, 
+        VmaAllocator    allocator_handle
+    )
     {
         if (instance_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-handle-dispatcher] instance handle is null");
@@ -144,7 +148,7 @@ namespace pbrlib::backend::vk
 #ifdef PBRLIB_ENABLE_PROPFILING
     void ResourceDestroyer::destroy(TracyVkCtx tracy_ctx_handle) noexcept
     {
-        if (tracy_ctx_handle)
+        if (tracy_ctx_handle) [[likely]]
             TracyVkDestroy(tracy_ctx_handle);
     }
 #endif

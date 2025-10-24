@@ -155,7 +155,14 @@ namespace pbrlib::backend::vk
     {
         auto ptr_sdl_window = static_cast<SDL_Window*>(ptr_window->_ptr_window);
 
-        if (SDL_Vulkan_CreateSurface(ptr_sdl_window, _device.instance(), nullptr, &_surface_handle.handle()) == SDL_FALSE) [[unlikely]]
+        const auto create_result = SDL_Vulkan_CreateSurface (
+            ptr_sdl_window, 
+            _device.instance(), 
+            nullptr, 
+            &_surface_handle.handle()
+        );
+
+        if (create_result == SDL_FALSE) [[unlikely]]
             throw exception::InitializeError("[vk-surface] failed create");
     }
 
@@ -194,7 +201,12 @@ namespace pbrlib::backend::vk
             .clipped                = VK_TRUE
         };
 
-        VK_CHECK(vkCreateSwapchainKHR(_device.device(), &swapchain_info, nullptr, &_swapchain_handle.handle()));
+        VK_CHECK(vkCreateSwapchainKHR(
+            _device.device(), 
+            &swapchain_info, 
+            nullptr, 
+            &_swapchain_handle.handle())
+        );
     }
 
     std::vector<VkSurfaceFormatKHR> Surface::getSurfaceFormats()
@@ -281,7 +293,12 @@ namespace pbrlib::backend::vk
         for (auto& image: _images)
         {
             image_view_info.image = image.handle.handle();
-            VK_CHECK(vkCreateImageView(_device.device(), &image_view_info, nullptr, &image.view_handle.handle()));
+            VK_CHECK(vkCreateImageView(
+                _device.device(), 
+                &image_view_info, 
+                nullptr, 
+                &image.view_handle.handle())
+            );
         }
     }
 
@@ -296,7 +313,12 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(_device.device(), &fence_create_info, nullptr, &_next_image_fence_handle.handle()));
+            VK_CHECK(vkCreateFence(
+                _device.device(), 
+                &fence_create_info, 
+                nullptr, 
+                &_next_image_fence_handle.handle())
+            );
         }
 
         VK_CHECK(vkAcquireNextImageKHR(

@@ -26,7 +26,7 @@ namespace pbrlib::backend::vk::builders
         PipelineLayout& addSetLayout(VkDescriptorSetLayout layout_handle);
         PipelineLayout& pushConstant(const VkPushConstantRange& push_constant);
 
-        [[nodiscard]] vk::PipelineLayoutHandle build();
+        [[nodiscard]] PipelineLayoutHandle build();
         
     private:
         Device& _device;
@@ -53,7 +53,6 @@ namespace pbrlib::backend::vk::builders
             uint32_t            count,
             VkShaderStageFlags  stages
         );
-
         
         DescriptorSetLayoutHandle build();
 

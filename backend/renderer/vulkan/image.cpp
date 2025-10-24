@@ -1,5 +1,5 @@
-#include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/utils/vulkan.hpp>
@@ -15,6 +15,7 @@
 #include <stdexcept>
 
 #include <algorithm>
+#include <array>
 #include <unordered_set>
 
 #include <fstream>

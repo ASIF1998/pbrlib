@@ -58,7 +58,10 @@ namespace pbrlib::backend
             .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
             .build();
 
-        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[material-system] images");
+        _descriptor_set_handle = _device.allocateDescriptorSet (
+            _descriptor_set_layout_handle, 
+            "[material-system] images"
+        );
     }
 
     void MaterialManager::add (

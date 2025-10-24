@@ -32,7 +32,7 @@ namespace pbrlib::backend::vk::builders
 
         ComputePipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
 
-        [[nodiscard]] vk::PipelineHandle build();
+        [[nodiscard]] PipelineHandle build();
 
     private:
         Device& _device;

@@ -37,7 +37,10 @@ namespace pbrlib::backend
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .build();
 
-        _result_image_desc_set = device.allocateDescriptorSet(_result_image_desc_set_layout, "[ssao] descritor set with results");
+        _result_image_desc_set = device.allocateDescriptorSet(
+            _result_image_desc_set_layout, 
+            "[ssao] descritor set with results"
+        );
     }
 
     bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)

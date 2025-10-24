@@ -31,7 +31,7 @@ namespace pbrlib::backend::vk::builders
         
         Framebuffer& addAttachment(const vk::Image& attachment);
 
-        [[nodiscard]] vk::FramebufferHandle build();
+        [[nodiscard]] FramebufferHandle build();
         
     private:
         Device& _device;

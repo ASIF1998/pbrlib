@@ -74,7 +74,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    vk::RenderPassHandle RenderPass::build()
+    RenderPassHandle RenderPass::build()
     {
         if (_color_attachments_refs.empty())
             throw exception::InvalidState("[render-pass-builder] color attachment count is 0");
@@ -108,6 +108,6 @@ namespace pbrlib::backend::vk::builders
             &render_pass_handle
         ));
 
-        return vk::RenderPassHandle(render_pass_handle);
+        return RenderPassHandle(render_pass_handle);
     }
 }

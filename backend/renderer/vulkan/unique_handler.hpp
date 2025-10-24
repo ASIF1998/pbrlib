@@ -47,7 +47,11 @@ namespace pbrlib::backend::vk
         static void destroy(TracyVkCtx tracy_ctx_handle) noexcept;
 #endif
 
-        static void initForDeviceResources(VkInstance instance_handle, VkDevice device_handle, VmaAllocator allocator_handle);
+        static void initForDeviceResources (
+            VkInstance      instance_handle, 
+            VkDevice        device_handle, 
+            VmaAllocator    allocator_handle
+        );
 
     private:
         static VkInstance   _instance_handle;

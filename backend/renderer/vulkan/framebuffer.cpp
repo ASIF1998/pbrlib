@@ -54,7 +54,7 @@ namespace pbrlib::backend::vk::builders
             throw exception::InvalidState("[vk-framebuffer::bulder] no attachments");
     }
 
-    vk::FramebufferHandle Framebuffer::build()
+    FramebufferHandle Framebuffer::build()
     {
         validate();
 
@@ -78,6 +78,6 @@ namespace pbrlib::backend::vk::builders
             &framebuffer_handle
         ));
 
-        return vk::FramebufferHandle(framebuffer_handle);
+        return FramebufferHandle(framebuffer_handle);
     }
 }

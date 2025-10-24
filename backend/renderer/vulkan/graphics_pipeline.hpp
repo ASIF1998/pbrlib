@@ -85,7 +85,7 @@ namespace pbrlib::backend::vk::builders
 
         GraphicsPipeline& subpass(uint32_t subpass_index) noexcept;
 
-        [[nodiscard]] vk::PipelineHandle build();
+        [[nodiscard]] PipelineHandle build();
 
     private:
         Device& _device;
