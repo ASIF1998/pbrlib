@@ -29,8 +29,6 @@ namespace pbrlib::backend::vk
             return;
 
         vkDeviceWaitIdle(_device_handle);
-
-        shader::finalizeCompiler();
     }
 
     void Device::init()
@@ -49,8 +47,6 @@ namespace pbrlib::backend::vk
         );
 
         loadFunctions();
-
-        shader::initCompiler();
 
         createCommandPools();
 

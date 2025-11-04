@@ -33,7 +33,7 @@ layout(set = PBRLIB_MESH_MANAGER_EXPORTS_SET_ID, binding = 0) buffer readonly Ve
 
 layout(set = PBRLIB_MESH_MANAGER_EXPORTS_SET_ID, binding = 1) buffer readonly InstanceData
 {
-    Instance[] instances;
+    Instance instances[];
 };
 
 #endif

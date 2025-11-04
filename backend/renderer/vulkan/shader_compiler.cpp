@@ -12,11 +12,11 @@
 
 #include <fstream>
 
-#define CHECK(fn, log_fn, log_fn_arg)                                                           \
-    do                                                                                          \
-    {                                                                                           \
-        if(!fn)                                                                                 \
-            throw exception::RuntimeError(std::format("[shader-compiler] {}", log_fn(log_fn_arg)));        \
+#define CHECK(fn, log_fn, log_fn_arg)                                                               \
+    do                                                                                              \
+    {                                                                                               \
+        if(!fn)                                                                                     \
+            throw exception::RuntimeError(std::format("[shader-compiler] {}", log_fn(log_fn_arg))); \
     } while (false)
 
 #define CHECK_SHADER(fn)    CHECK(fn, glslang_shader_get_info_log, ptr_shader)
@@ -26,6 +26,17 @@ namespace pbrlib::backend::vk::shader::utils
 {
     struct IncludeProcessData final
     {
+        IncludeProcessData(std::string&& header_data, std::unique_ptr<glsl_include_result_t>&& ptr_include) :
+            header_data         (std::move(header_data)),
+            ptr_include_result  (std::move(ptr_include))
+        { }
+
+        IncludeProcessData(IncludeProcessData&& data)       = default;
+        IncludeProcessData(const IncludeProcessData& data)  = delete;
+
+        IncludeProcessData& operator = (IncludeProcessData&& data)      = default;
+        IncludeProcessData& operator = (const IncludeProcessData& data) = delete;
+
         std::string                             header_data;
         std::unique_ptr<glsl_include_result_t>  ptr_include_result;
     };
@@ -34,12 +45,12 @@ namespace pbrlib::backend::vk::shader::utils
 
     static std::string getSource(const std::filesystem::path& filename)
     {
-        if (!std::filesystem::exists(filename))
+        if (!std::filesystem::exists(filename)) [[unlikely]]
             throw exception::InvalidState(std::format("[shader-compiler] not find file: {}", filename.string()));
 
         std::ifstream file(filename);
 
-        if (!file)
+        if (!file) [[unlikely]]
             throw exception::FileOpen(std::format("[shader-compiler] {}", filename.string()));
 
         std::ostringstream contents;
@@ -48,10 +59,8 @@ namespace pbrlib::backend::vk::shader::utils
         return contents.str();
     }
 
-    glslang_stage_t getStage(const std::filesystem::path& filename)
+    static glslang_stage_t getStage(const std::filesystem::path& filename)
     {
-        constexpr auto undefined_stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
-
         const auto extension = filename.extension().string();
 
 #define RETURN_STAGE(ext, vulkan_stage) if (std::strcmp(extension.data(), ext) == 0) return vulkan_stage
@@ -100,7 +109,7 @@ namespace pbrlib::backend::vk::shader::utils
         size_t      include_depth
     )
     {
-        if (!header_name)
+        if (!header_name) [[unlikely]]
             return nullptr;
 
         if (auto return_value = includes_data.find(header_name); return_value != std::end(includes_data))
@@ -118,15 +127,9 @@ namespace pbrlib::backend::vk::shader::utils
 
         auto return_value = ptr_include_data.get();
 
-        includes_data.insert(
-            std::make_pair(
-                std::move(key), 
-                IncludeProcessData 
-                {
-                    std::move(code), 
-                    std::move(ptr_include_data)
-                }
-            )
+        includes_data.emplace (
+            std::move(key),
+            IncludeProcessData(std::move(code), std::move(ptr_include_data))
         );
 
         return return_value;
@@ -134,9 +137,9 @@ namespace pbrlib::backend::vk::shader::utils
 
     static int freeInclude(void* ctx, glsl_include_result_t* ptr_result)
     {
-        if (ptr_result)
+        if (ptr_result) [[likely]]
         {
-            if (auto include_data = includes_data.find(ptr_result->header_name); include_data != std::end(includes_data))
+            if (auto include_data = includes_data.find(ptr_result->header_name); include_data != std::end(includes_data)) [[likely]]
                 includes_data.erase(include_data);
         }
 
@@ -188,7 +191,7 @@ namespace pbrlib::backend::vk::shader
 
         glslang_program_SPIRV_generate(ptr_program, stage);
 
-        if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program))
+        if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program)) [[unlikely]]
             throw exception::RuntimeError(std::format("[sahder-compiler]: {}", spirv_message));
 
         std::vector<uint32_t> il (glslang_program_SPIRV_get_size(ptr_program));
@@ -249,7 +252,7 @@ namespace pbrlib::backend::vk::shader
 
     void initCompiler()
     {
-        if (!glslang_initialize_process())
+        if (!glslang_initialize_process()) [[unlikely]]
             backend::log::error("[shader-compiler] failed initialize glslang.");
         
         is_init = true;
@@ -257,7 +260,7 @@ namespace pbrlib::backend::vk::shader
 
     void finalizeCompiler()
     {
-        if (is_init)
+        if (is_init) [[likely]]
             glslang_finalize_process();
 
         is_init = false;

@@ -22,6 +22,11 @@
 
 #include <pbrlib/scene/scene.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
+#include <backend/initialize.hpp>
+
 #include <SDL3/SDL.h>
 
 #include <stdexcept>
@@ -44,8 +49,9 @@ namespace pbrlib
 
         ++g_num_engine_instances;
 
-        backend::log::priv::EngineLogger::init();
-        backend::log::priv::AppLogger::init();
+        backend::initialize();
+
+        EventSystem::emmit(backend::events::Initialize());
 
         _ptr_device = std::make_unique<backend::vk::Device>();
         _ptr_device->init();
@@ -78,6 +84,7 @@ namespace pbrlib
     Engine::~Engine()
     {
         backend::log::info("[engine] finalize");
+        EventSystem::emmit(backend::events::Finalize());
 
         --g_num_engine_instances;
     }
