@@ -80,10 +80,4 @@ namespace pbrlib::backend
     {
         return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
     }
-
-    void CompoundRenderPass::update(const Config& config) 
-    {
-        for (auto& ptr_subpass: _subpasses)
-            ptr_subpass->update(config);
-    }
 }

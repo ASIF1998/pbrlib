@@ -82,8 +82,6 @@ namespace pbrlib::backend
         void createParamsBuffer();
         void createSamplesBuffer();
 
-        void update(const Config& config) override;
-
     public:
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
 

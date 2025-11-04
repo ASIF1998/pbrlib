@@ -23,8 +23,6 @@ namespace pbrlib::backend
 
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
 
-        void update(const Config& config) override;
-
     public:
         explicit CompoundRenderPass(vk::Device& device) noexcept;
 

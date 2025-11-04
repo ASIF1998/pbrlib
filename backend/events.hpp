@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pbrlib/config.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <filesystem>
@@ -39,6 +40,11 @@ namespace pbrlib::backend::events
 
         MaterialManager*    ptr_material_manager   = nullptr;
         MeshManager*        ptr_mesh_manager       = nullptr;
+    };
+
+    struct UpdateSSAO final
+    {
+        settings::SSAO settings;
     };
 
     /// SSAO settings change

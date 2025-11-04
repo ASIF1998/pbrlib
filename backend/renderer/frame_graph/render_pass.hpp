@@ -16,8 +16,7 @@
 
 namespace pbrlib
 {
-    class   SceneItem;
-    struct  Config;
+    class SceneItem;
 }
 
 namespace pbrlib::backend
@@ -127,8 +126,6 @@ namespace pbrlib::backend
 
         [[nodiscard]] 
         virtual std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
-
-        virtual void update(const Config& config);
 
     protected:
         virtual void render(vk::CommandBuffer& command_buffer) = 0;

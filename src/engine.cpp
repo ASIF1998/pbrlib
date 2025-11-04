@@ -204,9 +204,10 @@ namespace pbrlib
         begin = end;
     }
 
-    void Engine::update(const Config& config)
+    void Engine::update(const settings::SSAO& settings)
     {
-        if (_ptr_frame_graph) [[likely]]
-            _ptr_frame_graph->update(config);
+        EventSystem::emmit(backend::events::UpdateSSAO {
+           .settings = settings 
+        });
     }
 }

@@ -20,6 +20,9 @@
 
 #include <pbrlib/config.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 #include <random>
 
 #include <array>
@@ -52,6 +55,24 @@ namespace pbrlib::backend
             log::error("[ssao] failed initialize");
             return false;
         }
+
+        EventSystem::on([this] (const events::UpdateSSAO& settings)
+        {
+            PBRLIB_PROFILING_ZONE_SCOPED;
+
+            auto& blur_settings = _ptr_blur->settings();
+            auto& ssao_settings = settings.settings;
+
+            blur_settings.sample_count  = ssao_settings.blur_samples_count;
+            blur_settings.sigma_s       = ssao_settings.spatial_sigma;
+            blur_settings.sigma_l       = ssao_settings.luminance_sigma;
+
+            if (_params.radius != ssao_settings.radius)
+            {
+                _params.radius = ssao_settings.radius;
+                _params_buffer->write(_params, 0);
+            }
+        });
 
         createSamplesBuffer();
         createParamsBuffer();
@@ -324,21 +345,5 @@ namespace pbrlib::backend
         _samples_buffer->write(std::span<const pbrlib::math::vec4>(samples), 0);
 
         _params.sample_count = static_cast<uint32_t>(samples.size());
-    }
-
-    void SSAO::update(const Config& config)
-    {
-        auto& blur_settings = _ptr_blur->settings();
-        auto& ssao_settings = config.ssao;
-
-        blur_settings.sample_count  = ssao_settings.blur_samples_count;
-        blur_settings.sigma_s       = ssao_settings.spatial_sigma;
-        blur_settings.sigma_l       = ssao_settings.luminance_sigma;
-
-        if (_params.radius != ssao_settings.radius)
-        {
-            _params.radius = ssao_settings.radius;
-            _params_buffer->write(_params, 0);
-        }
     }
 }

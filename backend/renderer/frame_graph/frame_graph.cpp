@@ -202,13 +202,6 @@ namespace pbrlib::backend
         _render_context.projection  = camera.projection();
         _render_context.view        = camera.view();
     }
-
-    void FrameGraph::update(const Config& config)
-    {
-        _config = config;
-        if (_ptr_render_pass) [[likely]]
-            _ptr_render_pass->update(config);
-    }
 }
 
 namespace pbrlib::backend

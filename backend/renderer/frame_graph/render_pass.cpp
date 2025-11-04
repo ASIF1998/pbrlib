@@ -101,7 +101,4 @@ namespace pbrlib::backend
 
         throw exception::RuntimeError("[render-pass] failed find input descriptor set");
     }
-
-    void RenderPass::update(const Config& config)
-    { }
 }

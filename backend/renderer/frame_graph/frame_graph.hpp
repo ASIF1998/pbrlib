@@ -68,8 +68,6 @@ namespace pbrlib::backend
 
         bool rebuildPasses();
 
-        void update(const Config& config);
-
     private:
         vk::Device& _device;
         Canvas&     _canvas;
