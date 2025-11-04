@@ -90,8 +90,7 @@ int main()
             camera.width(config.width);
             camera.height(config.height);
 
-            if (!scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb")) [[unlikely]] 
-                throw std::runtime_error("[test-console] failed load content");
+            scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb");
 
             if (auto ptr_root_item = scene.item("Extended")) [[likely]]
             {

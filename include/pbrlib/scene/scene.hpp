@@ -114,7 +114,7 @@ namespace pbrlib
         
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
-        [[nodiscard]] bool import (
+        void import (
             Engine&                         engine,
             const std::filesystem::path&    filename,
             const math::mat4&               transform = math::mat4(1.0f)

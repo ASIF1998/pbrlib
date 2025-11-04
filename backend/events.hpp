@@ -1,5 +1,25 @@
 #pragma once
 
+#include <pbrlib/math/matrix4x4.hpp>
+
+#include <filesystem>
+
+namespace pbrlib
+{
+    class Scene;
+}
+
+namespace pbrlib::backend
+{
+    class MeshManager;
+    class MaterialManager;
+}
+
+namespace pbrlib::backend::vk
+{
+    class Device;
+}
+
 namespace pbrlib::backend::events
 {
     struct Initialize final
@@ -8,8 +28,19 @@ namespace pbrlib::backend::events
     struct Finalize final
     { };
         
+    struct AssimpImporter final
+    {
+        vk::Device* ptr_device = nullptr;
+        Scene*      ptr_scene  = nullptr;
 
-    /// AssimpImport
+        std::filesystem::path filename;
+
+        pbrlib::math::mat4 transform;
+
+        MaterialManager*    ptr_material_manager   = nullptr;
+        MeshManager*        ptr_mesh_manager       = nullptr;
+    };
+
     /// SSAO settings change
     /// GlobalSubpassesPipelinesRebuildEvent
 }
