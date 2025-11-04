@@ -137,24 +137,6 @@ namespace pbrlib::backend
         _ptr_render_pass->init(_render_context, width, height);
     }
 
-    bool FrameGraph::rebuildPasses()
-    {
-        try
-        {
-            backend::log::info("[frame-graph] rebuild passes");
-            
-            const auto [width, height] = _canvas.size();
-
-            return _ptr_render_pass ? _ptr_render_pass->rebuild(width, height) : false;
-        } 
-        catch (std::exception& ex)
-        {
-            backend::log::error("[frame-graph] failed rebuild: {}", ex.what());
-        }
-
-        return false;
-    }
-
     template<HasAttachments T>
     void createRenderPassImages(vk::Device& device, auto& images, uint32_t width, uint32_t height)
     {

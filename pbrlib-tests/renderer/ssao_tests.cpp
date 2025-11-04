@@ -37,16 +37,18 @@ TEST_F(SSAOTests, JunkShopAttachmentsWithBlur)
 
     constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::SSAO>::blur;
 
+    auto ssao = config().ssao;
+
     setup("Blender 2.glb", settings);
     for (uint32_t sample_count = 1; sample_count < 1 << 4; sample_count <<= 1)
     {
-        config().ssao.blur_samples_count = sample_count;
+        ssao.blur_samples_count = sample_count;
         for (float spatial_sigma = 0.1; spatial_sigma < 3.0; spatial_sigma += 0.7)
         {
-            config().ssao.spatial_sigma = spatial_sigma;
+            ssao.spatial_sigma = spatial_sigma;
             for (float luminance_sigma = 0.1; luminance_sigma < 3.0; luminance_sigma += 0.7)
             {
-                config().ssao.luminance_sigma = luminance_sigma;
+                ssao.luminance_sigma = luminance_sigma;
 
                 const auto filename = std::format(
                     "ssao/junk-shop-with-blur_sample-count={},spatial-sigma={},luminance-sigma={}.png", 
@@ -55,7 +57,7 @@ TEST_F(SSAOTests, JunkShopAttachmentsWithBlur)
                     luminance_sigma
                 );
 
-                engine().update(config());
+                engine().update(ssao);
                 check(filename, attahment_name);
             }
         }

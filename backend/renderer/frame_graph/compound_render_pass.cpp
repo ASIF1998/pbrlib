@@ -51,15 +51,6 @@ namespace pbrlib::backend
             ptr_subpass->draw(command_buffer);
     }
 
-    bool CompoundRenderPass::rebuild(uint32_t width, uint32_t height) 
-    {
-        bool res = true;
-        for (auto& subpass: _subpasses)
-            res &= subpass->rebuild(width, height);
-
-        return res;
-    }
-
     VkPipelineStageFlags2 CompoundRenderPass::srcStage() const noexcept
     {
         if (_subpasses.empty()) [[unlikely]]

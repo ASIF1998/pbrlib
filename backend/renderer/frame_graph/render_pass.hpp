@@ -86,8 +86,6 @@ namespace pbrlib::backend
 
         virtual [[nodiscard]] bool init(const RenderContext& context, uint32_t width, uint32_t height);
         
-        virtual [[nodiscard]] bool rebuild(uint32_t width, uint32_t height) = 0;
-
         virtual void draw(vk::CommandBuffer& command_buffer);
 
         virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;

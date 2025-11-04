@@ -99,7 +99,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             SPIRV-Tools-optd.lib
             SPIRV-Toolsd.lib
             SPIRVd.lib
-            SPVRemapperd.lib
     )
 else()
     set(glslang_LIBS_NAME 
@@ -111,7 +110,6 @@ else()
             SPIRV-Tools-opt.lib
             SPIRV-Tools.lib
             SPIRV.lib
-            SPVRemapper.lib
     )
 endif()
 

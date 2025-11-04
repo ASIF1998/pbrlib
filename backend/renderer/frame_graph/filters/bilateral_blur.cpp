@@ -13,6 +13,9 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 namespace pbrlib::backend
 {
     BilateralBlur::BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings):
@@ -62,6 +65,11 @@ namespace pbrlib::backend
             return false;
         }
 
+        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
+        {
+            createPipeline();
+        });
+
         constexpr VkPushConstantRange push_constant_range
         {
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -91,10 +99,10 @@ namespace pbrlib::backend
             .binding                = 1
         });
 
-        return rebuild(width, height);
+        return createPipeline();
     }
 
-    bool BilateralBlur::rebuild(uint32_t width, uint32_t height)
+    bool BilateralBlur::createPipeline()
     {
         constexpr auto blur_shader = "shaders/bilateral_blur/bilateral_blur.glsl.comp";
 

@@ -127,7 +127,10 @@ namespace pbrlib
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
             if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]
-                _ptr_frame_graph->rebuildPasses();
+            {
+                const auto [width, height] = _window->size();
+                EventSystem::emmit(backend::events::RecompilePipeline(width, height));
+            }
 #endif
 
             updateTime();

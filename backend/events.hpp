@@ -47,6 +47,9 @@ namespace pbrlib::backend::events
         settings::SSAO settings;
     };
 
-    /// SSAO settings change
-    /// GlobalSubpassesPipelinesRebuildEvent
+    struct RecompilePipeline final
+    { 
+        uint32_t width  = 0;
+        uint32_t height = 0;
+    };
 }

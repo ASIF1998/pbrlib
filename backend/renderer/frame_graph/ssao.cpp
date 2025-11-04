@@ -74,6 +74,11 @@ namespace pbrlib::backend
             }
         });
 
+        EventSystem::on([this] (const events::RecompilePipeline& event)
+        {
+            createPipeline(event.width, event.height);
+        });
+
         createSamplesBuffer();
         createParamsBuffer();
 
@@ -97,10 +102,10 @@ namespace pbrlib::backend
             .pushConstant(push_constant_range)
             .build();
 
-        return rebuild(width, height);
+        return createPipeline(width, height);
     }
 
-    bool SSAO::rebuild(uint32_t width, uint32_t height)
+    bool SSAO::createPipeline(uint32_t width, uint32_t height)
     {
         constexpr auto noise_width  = 4.0f;
         constexpr auto noise_height = 4.0f;

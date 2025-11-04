@@ -16,8 +16,9 @@ namespace pbrlib::backend
     class BilateralBlur final :
         public Filter
     {
-        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
-        bool rebuild(uint32_t width, uint32_t height)                               override;
+        bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
+        
+        bool createPipeline();
 
         void render(vk::CommandBuffer& command_buffer) override;
 
