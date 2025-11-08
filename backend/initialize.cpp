@@ -23,7 +23,7 @@ namespace pbrlib::backend
     {
         EventSystem::on([] ([[maybe_unused]] const events::Initialize& event) 
         {
-            if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) [[unlikely]]
+            if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) [[unlikely]]
             {
                 std::string error_msg = SDL_GetError();
                 SDL_ClearError();

@@ -111,7 +111,7 @@ namespace pbrlib::backend::vk
         const auto allocation_handle = handle.context<VmaAllocation>();
 
         VK_CHECK(vmaMapMemory(_device.vmaAllocator(), allocation_handle, &ptr_src));
-        memcpy(ptr_dst, reinterpret_cast<uint8_t*>(ptr_src) + offset_in_src, size);
+        memcpy(ptr_dst, reinterpret_cast<uint8_t*>(ptr_src) + offset_in_src, static_cast<size_t>(size));
         vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
     }
 }

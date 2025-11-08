@@ -162,7 +162,7 @@ namespace pbrlib::backend::vk
             &_surface_handle.handle()
         );
 
-        if (create_result == SDL_FALSE) [[unlikely]]
+        if (!create_result) [[unlikely]]
             throw exception::InitializeError("[vk-surface] failed create");
     }
 

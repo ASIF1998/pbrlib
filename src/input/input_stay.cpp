@@ -23,7 +23,7 @@ namespace pbrlib
 	void KeyboardStay::add(EventHandle event_handle)
 	{
 		auto ptr_event = utils::cast(event_handle);
-		if (auto keycode = backend::utils::sdl_to_pbrlib_keycode.find(ptr_event->key.keysym.sym); keycode != std::end(backend::utils::sdl_to_pbrlib_keycode))
+		if (auto keycode = backend::utils::sdl_to_pbrlib_keycode.find(ptr_event->key.key); keycode != std::end(backend::utils::sdl_to_pbrlib_keycode))
 		{
 			auto keycode_index = backend::utils::enumCast(keycode->second);
 
