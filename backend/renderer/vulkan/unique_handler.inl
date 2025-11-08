@@ -6,21 +6,21 @@ namespace pbrlib::backend::vk
 {
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>::UniqueHandle(Handle handle, FinalizationContext... context) noexcept :
+    inline UniqueHandle<Handle, FinalizationContext...>::UniqueHandle(Handle handle, FinalizationContext... context) noexcept :
         handle_     (handle),
         context_    (std::make_tuple(std::forward<FinalizationContext>(context)...))
     { }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>::UniqueHandle(UniqueHandle&& handler) noexcept
+    inline UniqueHandle<Handle, FinalizationContext...>::UniqueHandle(UniqueHandle&& handler) noexcept
     {
         swap(handler);
     }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>::~UniqueHandle()
+    inline UniqueHandle<Handle, FinalizationContext...>::~UniqueHandle()
     {
         std::apply([this] (const auto... handles) 
         {
@@ -30,7 +30,7 @@ namespace pbrlib::backend::vk
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>& UniqueHandle<Handle, FinalizationContext...>::operator = (UniqueHandle&& handler) noexcept
+    inline UniqueHandle<Handle, FinalizationContext...>& UniqueHandle<Handle, FinalizationContext...>::operator = (UniqueHandle&& handler) noexcept
     {
         swap(handler);
         return *this;
@@ -38,35 +38,35 @@ namespace pbrlib::backend::vk
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>::operator bool() const noexcept
+    inline UniqueHandle<Handle, FinalizationContext...>::operator bool() const noexcept
     {
         return handle_ != VK_NULL_HANDLE;
     }
     
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    UniqueHandle<Handle, FinalizationContext...>::operator Handle() const noexcept
+    inline UniqueHandle<Handle, FinalizationContext...>::operator Handle() const noexcept
     {
         return handle_;
     }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    Handle& UniqueHandle<Handle, FinalizationContext...>::handle() noexcept
+    inline Handle& UniqueHandle<Handle, FinalizationContext...>::handle() noexcept
     {
         return handle_;
     }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    const Handle& UniqueHandle<Handle, FinalizationContext...>::handle() const noexcept
+    inline const Handle& UniqueHandle<Handle, FinalizationContext...>::handle() const noexcept
     {
         return handle_;
     }
 
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
-    void UniqueHandle<Handle, FinalizationContext...>::swap(UniqueHandle<Handle, FinalizationContext...>& rsh) noexcept
+    inline void UniqueHandle<Handle, FinalizationContext...>::swap(UniqueHandle<Handle, FinalizationContext...>& rsh) noexcept
     {
         std::swap(handle_, rsh.handle_);
         std::swap(context_, rsh.context_);
@@ -75,7 +75,7 @@ namespace pbrlib::backend::vk
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
     template<typename T>
-    T& UniqueHandle<Handle, FinalizationContext...>::context()
+    inline T& UniqueHandle<Handle, FinalizationContext...>::context()
     {
         return std::get<T>(context_);
     }
@@ -83,7 +83,7 @@ namespace pbrlib::backend::vk
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
     template<typename T>
-    const T& UniqueHandle<Handle, FinalizationContext...>::context() const
+    inline const T& UniqueHandle<Handle, FinalizationContext...>::context() const
     {
         return std::get<T>(context_);
     }
