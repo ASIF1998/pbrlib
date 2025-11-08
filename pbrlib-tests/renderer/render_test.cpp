@@ -40,7 +40,7 @@ namespace pbrlib::testing
             camera.width(_config.width);
             camera.height(_config.height);
             
-            pbrlib::testing::thisTrue(scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string()));
+            scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string());
         });
     }
 

@@ -14,7 +14,6 @@ namespace pbrlib::backend
         public RenderPass
     {
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
-        bool rebuild(uint32_t width, uint32_t height)                               override;
         void render(vk::CommandBuffer& command_buffer)                              override;
         void draw(vk::CommandBuffer& command_buffer)                                override;
         
@@ -22,8 +21,6 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
-
-        void update(const Config& config) override;
 
     public:
         explicit CompoundRenderPass(vk::Device& device) noexcept;

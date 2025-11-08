@@ -6,7 +6,7 @@
 
 namespace pbrlib::settings
 {
-    struct SSAO
+    struct SSAO final
     {
         uint32_t blur_samples_count = 8;
 

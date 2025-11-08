@@ -64,8 +64,9 @@ namespace pbrlib::backend
             pbrlib::math::vec2  noise_scale;
         };
 
-        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
-        bool rebuild(uint32_t width, uint32_t height)                               override;
+        bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
+
+        bool createPipeline(uint32_t width, uint32_t height);
 
         void render(vk::CommandBuffer& command_buffer) override;
 
@@ -81,8 +82,6 @@ namespace pbrlib::backend
 
         void createParamsBuffer();
         void createSamplesBuffer();
-
-        void update(const Config& config) override;
 
     public:
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);

@@ -22,6 +22,11 @@
 
 #include <pbrlib/scene/scene.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
+#include <backend/initialize.hpp>
+
 #include <SDL3/SDL.h>
 
 #include <stdexcept>
@@ -44,8 +49,9 @@ namespace pbrlib
 
         ++g_num_engine_instances;
 
-        backend::log::priv::EngineLogger::init();
-        backend::log::priv::AppLogger::init();
+        backend::initialize();
+
+        EventSystem::emmit(backend::events::Initialize());
 
         _ptr_device = std::make_unique<backend::vk::Device>();
         _ptr_device->init();
@@ -78,6 +84,7 @@ namespace pbrlib
     Engine::~Engine()
     {
         backend::log::info("[engine] finalize");
+        EventSystem::emmit(backend::events::Finalize());
 
         --g_num_engine_instances;
     }
@@ -120,7 +127,10 @@ namespace pbrlib
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
             if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]
-                _ptr_frame_graph->rebuildPasses();
+            {
+                const auto [width, height] = _window->size();
+                EventSystem::emmit(backend::events::RecompilePipeline(width, height));
+            }
 #endif
 
             updateTime();
@@ -197,9 +207,10 @@ namespace pbrlib
         begin = end;
     }
 
-    void Engine::update(const Config& config)
+    void Engine::update(const settings::SSAO& settings)
     {
-        if (_ptr_frame_graph) [[likely]]
-            _ptr_frame_graph->update(config);
+        EventSystem::emmit(backend::events::UpdateSSAO {
+           .settings = settings 
+        });
     }
 }

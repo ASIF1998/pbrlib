@@ -21,6 +21,9 @@
 
 #include <pbrlib/math/matrix4x4.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 #include <array>
 
 namespace pbrlib::backend
@@ -119,6 +122,11 @@ namespace pbrlib::backend
             return false;
         }
 
+        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
+        {
+            createPipeline();
+        });
+
         const auto ptr_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
 
         createRenderPass();
@@ -140,10 +148,10 @@ namespace pbrlib::backend
         createFramebuffer();
         initResultDescriptorSet();
 
-        return rebuild(width, height);
+        return createPipeline();
     }
 
-    bool GBufferGenerator::rebuild([[maybe_unused]] uint32_t width, [[maybe_unused]] uint32_t height)
+    bool GBufferGenerator::createPipeline()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

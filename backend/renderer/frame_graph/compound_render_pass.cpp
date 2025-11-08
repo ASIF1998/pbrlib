@@ -51,15 +51,6 @@ namespace pbrlib::backend
             ptr_subpass->draw(command_buffer);
     }
 
-    bool CompoundRenderPass::rebuild(uint32_t width, uint32_t height) 
-    {
-        bool res = true;
-        for (auto& subpass: _subpasses)
-            res &= subpass->rebuild(width, height);
-
-        return res;
-    }
-
     VkPipelineStageFlags2 CompoundRenderPass::srcStage() const noexcept
     {
         if (_subpasses.empty()) [[unlikely]]
@@ -79,11 +70,5 @@ namespace pbrlib::backend
     std::pair<VkDescriptorSet, VkDescriptorSetLayout> CompoundRenderPass::resultDescriptorSet() const noexcept
     {
         return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
-    }
-
-    void CompoundRenderPass::update(const Config& config) 
-    {
-        for (auto& ptr_subpass: _subpasses)
-            ptr_subpass->update(config);
     }
 }

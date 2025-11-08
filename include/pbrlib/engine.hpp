@@ -16,6 +16,11 @@ namespace pbrlib
     class   Scene;
 }
 
+namespace pbrlib::settings
+{
+    struct SSAO;   
+}
+
 namespace pbrlib::backend
 {
     class FrameGraph;
@@ -71,7 +76,7 @@ namespace pbrlib
         void setup(SetupCallback setup_callback);
         void update(UpdateCallback update_callback);
 
-        void update(const Config& config);
+        void update(const settings::SSAO& settings);
 
         void run();
 

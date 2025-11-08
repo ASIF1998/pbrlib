@@ -2,6 +2,9 @@
 
 #include <pbrlib/exceptions.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 #include <backend/profiling.hpp>
 
 #include <SDL3/SDL.h>
@@ -30,10 +33,9 @@ namespace pbrlib
 
     Window::~Window()
     {
-        if (_ptr_window)
+        if (_ptr_window) [[likely]]
         {
             SDL_DestroyWindow(utils::cast(_ptr_window));
-            SDL_Quit();
         }
     }
 
@@ -93,10 +95,10 @@ namespace pbrlib
 
     void Window::Builder::validate()
     {
-        if (_title.empty())
+        if (_title.empty()) [[unlikely]]
             throw exception::InvalidState("[window::builder] title is empty");
 
-        if (_width == 0 || _height == 0)
+        if (_width == 0 || _height == 0) [[unlikely]]
             throw exception::InvalidState("[window::builder] size is 0"); 
     }
 
@@ -106,16 +108,8 @@ namespace pbrlib
 
         validate();
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
-        {
-            std::string error_msg = SDL_GetError();
-            SDL_ClearError();
-
-            throw exception::InitializeError(std::format("[window] SDL: {}", error_msg));
-        }
-
         auto flags = SDL_WINDOW_VULKAN;
-        if (_is_resizable) 
+        if (_is_resizable) [[likely]]
             flags |= SDL_WINDOW_RESIZABLE;
 
         auto ptr_sdl_window = SDL_CreateWindow(
@@ -124,7 +118,7 @@ namespace pbrlib
             flags
         );
 
-        if (!ptr_sdl_window) 
+        if (!ptr_sdl_window) [[unlikely]]
             throw exception::InitializeError("[window::builder] failed create window");
 
         return Window(ptr_sdl_window);

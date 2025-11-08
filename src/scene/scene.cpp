@@ -5,9 +5,7 @@
 
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 
-#include <backend/scene/material_manager.hpp>
 #include <backend/scene/mesh_manager.hpp>
-#include <backend/scene/assimp_importer.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -16,6 +14,9 @@
 #include <backend/components.hpp>
 
 #include <pbrlib/exceptions.hpp>
+
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
 
 #include <stack>
 
@@ -215,24 +216,20 @@ namespace pbrlib
         return instance_node;
     }
 
-    bool Scene::import (
+    void Scene::import (
         Engine&                         engine,
         const std::filesystem::path&    filename,
         const math::mat4&               transform
     )
     {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        backend::log::info("[importer] load model: '{}'", filename.string());
-
-        return backend::AssimpImporter()
-            .device(engine._ptr_device.get())
-            .scene(this)
-            .filename(filename)
-            .materialManager(engine._ptr_material_manager.get())
-            .meshManager(engine._ptr_mesh_manager.get())
-            .transform(transform)
-            .import();
+        EventSystem::emmit(backend::events::AssimpImporter {
+            .ptr_device             = engine._ptr_device.get(),
+            .ptr_scene              = this,
+            .filename               = filename,
+            .transform              = transform,
+            .ptr_material_manager   = engine._ptr_material_manager.get(),
+            .ptr_mesh_manager       = engine._ptr_mesh_manager.get()
+        });
     }
 
     void Scene::meshManager(backend::MeshManager* ptr_mesh_manager) noexcept
