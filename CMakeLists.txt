@@ -89,33 +89,7 @@ include_directories(third_party/stb)
 #####################################################
 #   glslang
 #####################################################
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(glslang_LIBS_NAME 
-            GenericCodeGend.lib
-            glslang-default-resource-limitsd.lib
-            glslangd.lib
-            MachineIndependentd.lib
-            OSDependentd.lib
-            SPIRV-Tools-optd.lib
-            SPIRV-Toolsd.lib
-            SPIRVd.lib
-    )
-else()
-    set(glslang_LIBS_NAME 
-            GenericCodeGen.lib
-            glslang-default-resource-limits.lib
-            glslang.lib
-            MachineIndependent.lib
-            OSDependent.lib
-            SPIRV-Tools-opt.lib
-            SPIRV-Tools.lib
-            SPIRV.lib
-    )
-endif()
-
-foreach(library ${glslang_LIBS_NAME})
-    set(glslang_LIBS ${glslang_LIBS} ${Vulkan_SDK_LIBS}/${library})
-endforeach()
+add_subdirectory(third_party/glslang)
 
 #####################################################
 #   spdlog
@@ -148,7 +122,13 @@ target_include_directories(pbrlib PUBLIC
 
 target_link_libraries(pbrlib PUBLIC
     ${Vulkan_LIBRARIES}
-    ${glslang_LIBS}
+    glslang
+    OSDependent
+    MachineIndependent
+    GenericCodeGen
+    SPIRV
+    SPIRV-Headers
+    glslang-default-resource-limits
     assimp
     SDL3::SDL3
     spdlog::spdlog_header_only
