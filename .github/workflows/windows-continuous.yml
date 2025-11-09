@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - '**.md'
   push:
-    branches: [master]
+    branches: [master, add-glslang-submodule]
     paths-ignore:
       - '**.md'
 jobs:
