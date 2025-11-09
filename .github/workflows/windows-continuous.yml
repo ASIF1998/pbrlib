@@ -35,6 +35,13 @@ jobs:
     name: build-windows
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v5
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
       - name: checkout project
         uses: actions/checkout@v4
         with:
@@ -56,6 +63,11 @@ jobs:
           install_runtime: true
           cache: true
           stripdown: true
+
+      - name: update glslang sources
+        run: |
+          cd third_party\glslang
+          python update_glslang_sources.py
 
       - name: build tests
         run: |
