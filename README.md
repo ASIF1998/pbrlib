@@ -37,6 +37,7 @@ The code is distributed under the GNU General Public License v3.0.
 - **CMake 3.27+**
 - **C++23** compiler
 - **Vulkan SDK**
+- **Python 3**
 
 ### Build options
 
@@ -44,8 +45,17 @@ The code is distributed under the GNU General Public License v3.0.
 - `PBRLIB_TEST_CONSOLE=ON` - Build test console
 - `PBRLIB_SETUP_CI=OFF` - CI settings
 
-### Dependencies
+### Building
+```bash
+cd third_party\glslang
+python update_glslang_sources.py
+cd "../.."
+mkdir build 
+cd build
+cmake ..
+```
 
+### Dependencies
 The project uses the following libraries:
 
 - **Vulkan SDK** - Vulkan API
@@ -56,6 +66,7 @@ The project uses the following libraries:
 - **VulkanMemoryAllocator** - Vulkan memory management
 - **Tracy** - Profiling
 - **STB** - Image loading
+- **glslang** - Shader compilation
 
 ## 🚀 Usage
 
