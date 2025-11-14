@@ -121,18 +121,20 @@ namespace pbrlib::backend::vk::shader::utils
         std::string code    = getSource(src_root_directory / header_name);
 
         auto ptr_include_data = std::make_unique<glsl_include_result_t>();
-        ptr_include_data->header_name   = key.data();
-        ptr_include_data->header_data   = code.data();
-        ptr_include_data->header_length = code.size();
 
-        auto return_value = ptr_include_data.get();
-
-        includes_data.emplace (
+        auto [iter, inserted] = includes_data.emplace (
             std::move(key),
             IncludeProcessData(std::move(code), std::move(ptr_include_data))
         );
 
-        return return_value;
+        if (!inserted) [[unlikely]]
+            throw exception::RuntimeError(std::format("[shader-compiler] failed to insert include file '{}': entry already exists in cache", header_name));
+
+        iter->second.ptr_include_result->header_name   = iter->first.c_str();
+        iter->second.ptr_include_result->header_data   = iter->second.header_data.c_str();
+        iter->second.ptr_include_result->header_length = iter->second.header_data.size();
+
+        return iter->second.ptr_include_result.get();
     }
 
     static int freeInclude(void* ctx, glsl_include_result_t* ptr_result)
