@@ -135,4 +135,10 @@ namespace pbrlib::math
 
         return Vec2<Type>(v.x / l, v.y / l);
     }
+
+    template<MathArithmetic Type>
+    inline Vec2<Type> round(const Vec2<Type>& v) noexcept
+    {
+        return Vec2<Type>(std::round(v.x), std::round(v.y));
+    }
 }

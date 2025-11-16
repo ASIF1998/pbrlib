@@ -51,6 +51,9 @@ namespace pbrlib::math
     template<MathArithmetic Type>
     Vec2<Type> normalize(const Vec2<Type>& v);
 
+    template<MathArithmetic Type>
+    inline Vec2<Type> round(const Vec2<Type>& v) noexcept;
+
     template<MathArithmetic T>
     inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);
 

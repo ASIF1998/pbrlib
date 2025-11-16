@@ -59,6 +59,9 @@ namespace pbrlib::math
     template<MathArithmetic Type>
     inline Matrix4x4<Type> inverse(const Matrix4x4<Type>& mat) noexcept;
 
+    template<MathArithmetic Type>
+    inline Matrix4x4<Type> round(const Matrix4x4<Type>& mat) noexcept;
+
     template<MathArithmetic T>
     inline constexpr Matrix4x4<T> operator * (const Matrix4x4<T>& mat, T s);
 
@@ -66,4 +69,4 @@ namespace pbrlib::math
     inline constexpr Matrix4x4<T> operator * (T s, const Matrix4x4<T>& mat);
 }
 
-#include "matrix4x4.inl"
+#include <backend/math/matrix4x4.inl>

@@ -159,4 +159,10 @@ namespace pbrlib::math
         res.normalize();
         return res;
     }
+
+    template<MathArithmetic Type>
+    inline Vec4<Type> round(const Vec4<Type>& v) noexcept
+    {
+        return Vec3<Type>(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w));
+    }
 }

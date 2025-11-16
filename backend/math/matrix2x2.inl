@@ -266,4 +266,15 @@ namespace pbrlib::math
 
         return mat;
     }
+
+    template<MathArithmetic Type>
+    inline Matrix2x2<Type> round(const Matrix2x2<Type>& mat) noexcept
+    {
+        const Matrix2x2<Type> res (
+            std::round(mat.at(0, 0)), std::round(mat.at(0, 1)),
+            std::round(mat.at(1, 0)), std::round(mat.at(1, 1))
+        );
+
+        return res;
+    }
 }

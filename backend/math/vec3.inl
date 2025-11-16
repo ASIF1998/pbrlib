@@ -24,7 +24,7 @@ namespace pbrlib::math
         x(vec2.x),
         y(vec2.y),
         z(z)
-{}
+    {}
 
     template<MathArithmetic Type>
     inline constexpr bool Vec3<Type>::operator == (const Vec3<Type>& v) const noexcept
@@ -157,5 +157,11 @@ namespace pbrlib::math
             throw exception::MathError("[vec3] failed normalize");
 
         return Vec3<Type>(v.x / l, v.y / l, v.z / l);
+    }
+
+    template<MathArithmetic Type>
+    inline Vec3<Type> round(const Vec3<Type>& v) noexcept
+    {
+        return Vec3<Type>(std::round(v.x), std::round(v.y), std::round(v.z));
     }
 }

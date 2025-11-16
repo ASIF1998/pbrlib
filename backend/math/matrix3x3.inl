@@ -280,4 +280,16 @@ namespace pbrlib::math
         res.inverse();
         return res;
     }
+
+    template<MathArithmetic Type>
+    inline Matrix3x3<Type> round(const Matrix3x3<Type>& mat) noexcept
+    {
+        const Matrix3x3<Type> res (
+            std::round(mat.at(0, 0)), std::round(mat.at(0, 1)), std::round(mat.at(0, 2)),
+            std::round(mat.at(1, 0)), std::round(mat.at(1, 1)), std::round(mat.at(1, 2)),
+            std::round(mat.at(2, 0)), std::round(mat.at(2, 1)), std::round(mat.at(2, 2))
+        );
+
+        return res;
+    }
 }

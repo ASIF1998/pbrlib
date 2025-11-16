@@ -58,6 +58,9 @@ namespace pbrlib::math
     template<MathArithmetic Type>
     inline constexpr Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat) noexcept;
 
+    template<MathArithmetic Type>
+    inline Matrix3x3<Type> round(const Matrix3x3<Type>& mat) noexcept;
+
     template<MathArithmetic T>
     inline constexpr Matrix3x3<T> operator * (const Matrix3x3<T>& mat, T s);
 
@@ -66,4 +69,4 @@ namespace pbrlib::math
 }
 
 
-#include "matrix3x3.inl"
+#include <backend/math/matrix3x3.inl>
