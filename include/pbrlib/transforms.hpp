@@ -2,8 +2,9 @@
 
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/quat.hpp>
 
-namespace pbrlib::transform
+namespace pbrlib::transforms
 {
     [[nodiscard]] math::mat4 translate(const math::vec3& t);
     [[nodiscard]] math::mat4 scale(const math::vec3& s);
@@ -27,4 +28,6 @@ namespace pbrlib::transform
         float       z_near, 
         float       z_far
     );
+
+    [[nodiscard]] math::quat angleAxis(float angle, const math::vec3& axis);
 }

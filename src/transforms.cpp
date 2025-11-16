@@ -1,10 +1,10 @@
-#include <pbrlib/transform.hpp>
+#include <pbrlib/transforms.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <cmath>
 #include <numbers>
 
-namespace pbrlib::transform
+namespace pbrlib::transforms
 {
     float radians(float angle)
     {
@@ -73,7 +73,7 @@ namespace pbrlib::transform
 
     math::mat4 rotate(const math::vec3& axis, float theta)
     {
-        math::vec3 r = normalize(axis);
+        math::vec3 r = math::normalize(axis);
 
         float theta_in_radians = radians(theta);
 
@@ -112,7 +112,7 @@ namespace pbrlib::transform
     )
     {
         auto f = math::normalize(pos - eye);
-        auto s = math::normalize(cross(f, up));
+        auto s = math::normalize(math::cross(f, up));
         auto u = math::cross(s, f);
 
         math::mat4 mat;
@@ -153,5 +153,10 @@ namespace pbrlib::transform
         mat[3][3] = 0.0f;
 
         return mat;
+    }
+
+    math::quat angleAxis(float angle, const math::vec3& axis)
+    {
+        return math::quat(math::normalize(axis) * std::sinf(angle * 0.5f), std::cosf(angle * 0.5f));
     }
 }

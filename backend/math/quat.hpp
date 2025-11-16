@@ -2,7 +2,7 @@
 
 #include "vec3.hpp"
 
-#include <pbrlib/transform.hpp>
+#include <pbrlib/math/matrix4x4.hpp>
 
 namespace pbrlib::math
 {

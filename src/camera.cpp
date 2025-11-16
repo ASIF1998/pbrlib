@@ -1,5 +1,5 @@
 #include <pbrlib/camera.hpp>
-#include <pbrlib/transform.hpp>
+#include <pbrlib/transforms.hpp>
 
 namespace pbrlib
 {
@@ -76,12 +76,12 @@ namespace pbrlib
 
     pbrlib::math::mat4 Camera::view() const
     {
-        return pbrlib::transform::lookAt(_pos, _eye, _up);
+        return pbrlib::transforms::lookAt(_pos, _eye, _up);
     }
 
     pbrlib::math::mat4 Camera::projection() const
     {
-        return pbrlib::transform::perspective(_fov_y, _width, _height, _range.near_dist, _range.far_dist);
+        return pbrlib::transforms::perspective(_fov_y, _width, _height, _range.near_dist, _range.far_dist);
     }
 
     void Camera::translate(const math::vec3& t)

@@ -1,13 +1,13 @@
 #include "utils.hpp"
 
-#include <pbrlib/transform.hpp>
+#include <pbrlib/transforms.hpp>
 #include <pbrlib/math/vec3.hpp>
 
 TEST(MovingTransform, Translate)
 {
     constexpr pbrlib::math::vec3 t (0.5f, 0.5f, 0.5f);
     
-    const auto transform = pbrlib::transform::translate(t);
+    const auto transform = pbrlib::transforms::translate(t);
 
     constexpr pbrlib::math::mat4 res (
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -23,7 +23,7 @@ TEST(MovingTransform, Scale)
 {
     constexpr pbrlib::math::vec3 t (0.5f, 0.5f, 0.5f);
     
-    auto transform = pbrlib::transform::scale(t);
+    auto transform = pbrlib::transforms::scale(t);
 
     constexpr pbrlib::math::mat4 res (
         0.5f, 0.0f, 0.0f, 0.0f,
@@ -48,12 +48,12 @@ TEST(MovingTransform, Rotates)
     constexpr pbrlib::math::vec3    axis3   (0.0000000f, 0.000000000f, 1.000000000f);
     constexpr pbrlib::math::vec3    v       (0.4767313f, 0.572077572f, 0.667423784f);
 
-    auto res1 = pbrlib::transform::rotateX(theta) * v;
-    auto res2 = pbrlib::transform::rotateY(theta) * v;
-    auto res3 = pbrlib::transform::rotateZ(theta) * v;
-    auto res4 = pbrlib::transform::rotate(axis1, theta) * v;
-    auto res5 = pbrlib::transform::rotate(axis2, theta) * v;
-    auto res6 = pbrlib::transform::rotate(axis3, theta) * v;
+    auto res1 = pbrlib::transforms::rotateX(theta) * v;
+    auto res2 = pbrlib::transforms::rotateY(theta) * v;
+    auto res3 = pbrlib::transforms::rotateZ(theta) * v;
+    auto res4 = pbrlib::transforms::rotate(axis1, theta) * v;
+    auto res5 = pbrlib::transforms::rotate(axis2, theta) * v;
+    auto res6 = pbrlib::transforms::rotate(axis3, theta) * v;
 
     pbrlib::testing::equality(r1, res1);
     pbrlib::testing::equality(r2, res2);
@@ -76,7 +76,7 @@ TEST(MovingTransform, LookAt)
     constexpr pbrlib::math::vec3 pos    (-5.0f, 0.00f, -1.0f);
     constexpr pbrlib::math::vec3 up     (0.00f, 1.00f, 0.00f);
 
-    auto look_at = pbrlib::transform::lookAt(pos, eye, up);
+    auto look_at = pbrlib::transforms::lookAt(pos, eye, up);
 
     pbrlib::testing::equality(look_at, res);
 }
