@@ -1,37 +1,34 @@
 #pragma once
 
-#include <cstdint>
+#include <backend/math/concepts.hpp>
 
 namespace pbrlib::math
 {
-    template<typename Type>
+    template<MathArithmetic Type>
     struct Vec2 final
     {
-    public:
         inline constexpr Vec2()                 noexcept;
         inline constexpr Vec2(Type xy)          noexcept;
         inline constexpr Vec2(Type x, Type y)   noexcept;
 
-        inline bool operator == (const Vec2& v) const noexcept;
-        inline bool operator != (const Vec2& v) const noexcept;
+        inline constexpr bool operator == (const Vec2& v) const noexcept;
+        inline constexpr bool operator != (const Vec2& v) const noexcept;
         
-        inline Vec2 operator + (const Vec2& v)  const noexcept;
-        inline Vec2 operator - (const Vec2& v)  const noexcept;
-        inline Vec2 operator * (Type s)         const noexcept;
+        inline constexpr Vec2 operator + (const Vec2& v)  const noexcept;
+        inline constexpr Vec2 operator - (const Vec2& v)  const noexcept;
 
-        inline Vec2& operator += (const Vec2& v)    noexcept;
-        inline Vec2& operator -= (const Vec2& v)    noexcept;
-        inline Vec2& operator *= (Type s)           noexcept;
+        inline constexpr Vec2& operator += (const Vec2& v)  noexcept;
+        inline constexpr Vec2& operator -= (const Vec2& v)  noexcept;
+        inline constexpr Vec2& operator *= (Type s)         noexcept;
 
-        inline Type& operator [] (size_t i) noexcept;
-        inline Type operator [] (size_t i)  const noexcept;
+        inline Type&            operator [] (size_t i) noexcept;
+        inline constexpr Type   operator [] (size_t i) const noexcept;
 
-        inline Type lengthSquared() const noexcept;
-        inline Type length()        const noexcept;
+        inline constexpr Type   lengthSquared()   const noexcept;
+        inline Type             length()          const noexcept;
 
         void normalize();
 
-    public: 
         union
         {
             struct
@@ -51,8 +48,14 @@ namespace pbrlib::math
         };
     };
 
-    template<typename Type>
+    template<MathArithmetic Type>
     Vec2<Type> normalize(const Vec2<Type>& v);
+
+    template<MathArithmetic T>
+    inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);
+
+    template<MathArithmetic T>
+    inline constexpr Vec2<T> operator * (T s, const Vec2<T>& v);
 }
 
-#include "vec2.inl"
+#include <backend/math/vec2.inl>

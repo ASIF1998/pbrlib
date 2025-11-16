@@ -5,59 +5,65 @@
 
 namespace pbrlib::math
 {
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec3<Type>::Vec3(Type xyz) noexcept :
-        x{xyz},
-        y{xyz},
-        z{xyz}
+        x(xyz),
+        y(xyz),
+        z(xyz)
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec3<Type>::Vec3(Type x, Type y, Type z) noexcept :
-        x{x},
-        y{y},
-        z{z}
+        x(x),
+        y(y),
+        z(z)
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec3<Type>::Vec3(const Vec2<Type>& vec2, Type z) noexcept :
-        x{vec2.x},
-        y{vec2.y},
-        z{z}
-    {}
+        x(vec2.x),
+        y(vec2.y),
+        z(z)
+{}
 
-    template<typename Type>
-    inline bool Vec3<Type>::operator == (const Vec3<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Vec3<Type>::operator == (const Vec3<Type>& v) const noexcept
     {
         return x == v.x && y == v.y && z == v.z;
     }
 
-    template<typename Type>
-    inline bool Vec3<Type>::operator != (const Vec3<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Vec3<Type>::operator != (const Vec3<Type>& v) const noexcept
     {
         return x != v.x || y != v.y || z != v.z;
     }
 
-    template<typename Type>
-    inline Vec3<Type> Vec3<Type>::operator + (const Vec3<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type> Vec3<Type>::operator + (const Vec3<Type>& v) const noexcept
     {
         return Vec3<Type>(x + v.x, y + v.y, z + v.z);
     }
 
-    template<typename Type>
-    inline Vec3<Type> Vec3<Type>::operator - (const Vec3<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type> Vec3<Type>::operator - (const Vec3<Type>& v) const noexcept
     {
         return Vec3<Type>(x - v.x, y - v.y, z - v.z);
     }
 
-    template<typename Type>
-    inline Vec3<Type> Vec3<Type>::operator * (const Type s) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec3<T> operator * (const Vec3<T>& v, T s)
     {
-        return Vec3<Type>(x * s, y * s, z * s);
+        return Vec3<T>(v.x * s, v.y * s, v.z * s);
     }
 
-    template<typename Type>
-    inline Vec3<Type>& Vec3<Type>::operator += (const Vec3<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec3<T> operator * (T s, const Vec3<T>& v)
+    {
+        return Vec3<T>(v.x * s, v.y * s, v.z * s);
+    }
+
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type>& Vec3<Type>::operator += (const Vec3<Type>& v) noexcept
     {
         x += v.x;
         y += v.y;
@@ -66,8 +72,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Vec3<Type>& Vec3<Type>::operator -= (const Vec3<Type>& v) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type>& Vec3<Type>::operator -= (const Vec3<Type>& v) noexcept
     {
         x -= v.x;
         y -= v.y;
@@ -76,8 +82,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Vec3<Type>& Vec3<Type>::operator *= (Type s) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type>& Vec3<Type>::operator *= (Type s) noexcept
     {
         x *= s;
         y *= s;
@@ -86,31 +92,33 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     Type& Vec3<Type>::operator [] (size_t i) noexcept
     {
         return xyz[i];
     }
 
-    template<typename Type>
-    Type Vec3<Type>::operator [] (size_t i) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type Vec3<Type>::operator [] (size_t i) const noexcept
     {
-        return xyz[i];
+        // In constexpr context MSVC cannot handle array access in union
+        // Use direct field access for constexpr evaluation
+        return (i == 0) ? x : ((i == 1) ? y : z);
     }
 
-    template<typename Type>
-    inline Type Vec3<Type>::lengthSquared() const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type Vec3<Type>::lengthSquared() const noexcept
     {
         return x * x + y * y + z * z;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline Type Vec3<Type>::length() const noexcept
     {
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     void Vec3<Type>::normalize()
     {
         auto l = length();
@@ -123,14 +131,14 @@ namespace pbrlib::math
         z /= l;
     }
 
-    template<typename Type>
-    inline Type dot(const Vec3<Type> v1, const Vec3<Type>& v2) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type dot(const Vec3<Type> v1, const Vec3<Type>& v2) noexcept
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
 
-    template<typename Type>
-    inline Vec3<Type> cross(const Vec3<Type> v1, const Vec3<Type>& v2) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type> cross(const Vec3<Type> v1, const Vec3<Type>& v2) noexcept
     {
         return Vec3<Type>
         (
@@ -140,7 +148,7 @@ namespace pbrlib::math
         );
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     Vec3<Type> normalize(const Vec3<Type>& v)
     {
         auto l = v.length();

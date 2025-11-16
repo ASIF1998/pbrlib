@@ -1,50 +1,44 @@
 #pragma once
 
-#if (defined(__SSE__) || defined(__AVX2__))
-#   include <xmmintrin.h>
-#endif
+#include <backend/math/vec2.hpp>
 
 namespace pbrlib::math
 {
-    template<typename Type>
-    struct Vec2;
-
-    template<typename Type>
+    template<MathArithmetic Type>
     class Matrix2x2 final
     {
     public:
         inline constexpr Matrix2x2()                noexcept;
         inline constexpr Matrix2x2(Type init_value) noexcept;
 
-        inline constexpr Matrix2x2(
+        inline constexpr Matrix2x2 (
             Type x0, Type y0,
             Type x1, Type y1
         ) noexcept;
 
-        inline bool operator == (const Matrix2x2& mat) const noexcept;
-        inline bool operator != (const Matrix2x2& mat) const noexcept;
+        inline constexpr bool operator == (const Matrix2x2& mat) const noexcept;
+        inline constexpr bool operator != (const Matrix2x2& mat) const noexcept;
 
-        inline Matrix2x2    operator + (const Matrix2x2& mat)   const noexcept;
-        inline Matrix2x2    operator - (const Matrix2x2& mat)   const noexcept;
-        inline Matrix2x2    operator * (const Matrix2x2& mat)   const noexcept;
-        inline Matrix2x2    operator * (Type scal)              const noexcept;
-        inline Vec2<Type>   operator * (const Vec2<Type>& v)    const noexcept;
+        inline constexpr Matrix2x2    operator + (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Matrix2x2    operator - (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Matrix2x2    operator * (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Vec2<Type>   operator * (const Vec2<Type>& v)    const noexcept;
 
-        inline Matrix2x2& operator += (const Matrix2x2& mat)    noexcept;
-        inline Matrix2x2& operator -= (const Matrix2x2& mat)    noexcept;
-        inline Matrix2x2& operator *= (const Matrix2x2& mat)    noexcept;
-        inline Matrix2x2& operator *= (Type scal)               noexcept;
+        inline constexpr Matrix2x2& operator += (const Matrix2x2& mat)    noexcept;
+        inline constexpr Matrix2x2& operator -= (const Matrix2x2& mat)    noexcept;
+        inline constexpr Matrix2x2& operator *= (const Matrix2x2& mat)    noexcept;
+        inline constexpr Matrix2x2& operator *= (Type scal)               noexcept;
 
         inline Type*        operator [] (size_t i) noexcept;
         inline const Type*  operator [] (size_t i) const noexcept;
 
-        inline Type&    at(size_t i, size_t j);
-        inline Type     at(size_t i, size_t j) const;
+        inline Type&            at(size_t i, size_t j);
+        inline constexpr Type   at(size_t i, size_t j) const noexcept;
 
-        inline Type det() const noexcept;
+        inline constexpr Type det() const noexcept;
 
-        inline void transpose() noexcept;
-        inline void inverse()   noexcept;
+        inline void             inverse() noexcept;
+        inline constexpr void   transpose() noexcept;
 
     private:
         union
@@ -54,62 +48,17 @@ namespace pbrlib::math
         };
     };
 
-#if (defined(__SSE__) || defined(__AVX2__))
-    template<>
-    class Matrix2x2<float>
-    {
-    public:
-        inline constexpr Matrix2x2();
+    template<MathArithmetic Type>
+    inline constexpr Matrix2x2<Type> transpose(const Matrix2x2<Type>& mat) noexcept;
 
-        inline constexpr Matrix2x2(float init_value)        noexcept;
-        inline constexpr Matrix2x2(const __m128& init_vec)  noexcept;
+    template<MathArithmetic Type>
+    inline constexpr Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat) noexcept;
 
-        inline constexpr Matrix2x2(
-            float x0, float y0,
-            float x1, float y1
-        )  noexcept;
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T> operator * (const Matrix2x2<T>& mat, T s);
 
-        inline bool operator == (const Matrix2x2& mat) const;
-        inline bool operator != (const Matrix2x2& mat) const;
-
-        inline Matrix2x2    operator + (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator - (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator * (const Matrix2x2& mat)   const;
-        inline Matrix2x2    operator * (float scal)             const;
-        inline vec2         operator * (const vec2& v)          const;
-
-        inline Matrix2x2& operator += (const Matrix2x2& mat);
-        inline Matrix2x2& operator -= (const Matrix2x2& mat);
-        inline Matrix2x2& operator *= (const Matrix2x2& mat);
-        inline Matrix2x2& operator *= (float scal);
-
-        inline float*       operator [] (size_t i);
-        inline const float* operator [] (size_t i) const;
-
-        inline float&   at(size_t i, size_t j);
-        inline float    at(size_t i, size_t j) const;
-
-        inline float det() const;
-
-        inline void transpose();
-
-        inline void inverse();
-
-    private:
-        union
-        {
-            float   _array2x2[2][2];
-            float   _array4[4];
-            __m128  _m128_simd;
-        };
-    };
-#endif
-
-    template<typename Type>
-    inline Matrix2x2<Type> transpose(const Matrix2x2<Type>& mat) noexcept;
-
-    template<typename Type>
-    Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat) noexcept;
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T> operator * (T s, const Matrix2x2<T>& mat);
 }
 
-#include "matrix2x2.inl"
+#include <backend/math/matrix2x2.inl>

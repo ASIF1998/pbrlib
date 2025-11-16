@@ -15,96 +15,64 @@ namespace pbrlib::math
         w(w)
     {}
 
-#if (defined(__SSE__) || defined(__AVX2__))
-    inline constexpr Quaternion::Quaternion(const __m128& m) noexcept :
-        xyzw_simd(m)
-    {}
-#endif
-
-    inline bool Quaternion::operator == (const Quaternion& q) const noexcept
+    inline constexpr bool Quaternion::operator == (const Quaternion& q) const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        return _mm_movemask_ps(_mm_cmpeq_ps(xyzw_simd, q.xyzw_simd)) == 15;
-#else 
         return v == q.v && w == q.w;
-#endif
     }
 
-    inline bool Quaternion::operator != (const Quaternion& q) const noexcept
+    inline constexpr bool Quaternion::operator != (const Quaternion& q) const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        return _mm_movemask_ps(_mm_cmpeq_ps(xyzw_simd, q.xyzw_simd)) != 15;
-#else   
         return v != q.v || w != q.w;
-#endif
     }
     
-    inline Quaternion Quaternion::operator + (const Quaternion& q) const noexcept
+    inline constexpr Quaternion Quaternion::operator + (const Quaternion& q) const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        return Quaternion(_mm_add_ps(xyzw_simd, q.xyzw_simd));
-#else
         return Quaternion(v + q.v, w + q.w);
-#endif
     }
 
-    inline Quaternion Quaternion::operator - (const Quaternion& q) const noexcept
+    inline constexpr Quaternion Quaternion::operator - (const Quaternion& q) const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        return Quaternion(_mm_sub_ps(xyzw_simd, q.xyzw_simd));
-#else   
         return Quaternion(v - q.v, w - q.w);
-#endif
     }
 
-    inline Quaternion Quaternion::operator * (const Quaternion& q) const noexcept
+    inline constexpr Quaternion Quaternion::operator * (const Quaternion& q) const noexcept
     {
         return Quaternion(q.v * w + v * q.w + cross(v, q.v), w * q.w - dot(v, q.v));
     }
 
-    inline Quaternion Quaternion::operator * (float f) const noexcept
+    inline constexpr Quaternion operator * (const Quaternion& q, float s)
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        return Quaternion(_mm_mul_ps(xyzw_simd, _mm_set1_ps(f)));
-#else
-        return Quaternion(v * f, w * f);
-#endif
+        return Quaternion(q.v * s, q.w * s);
+    }
+    
+    inline constexpr Quaternion operator * (float s, const Quaternion& q)
+    {
+        return Quaternion(q.v * s, q.w * s);
     }
 
-    inline Quaternion Quaternion::operator / (float f) const noexcept
+    inline constexpr Quaternion Quaternion::operator / (float f) const noexcept
     {
         assert(f != static_cast<float>(0u));
-#if (defined(__SSE__) || defined(__AVX2__))
-        return Quaternion(_mm_mul_ps(xyzw_simd, _mm_set1_ps(1.0f / f)));
-#else 
+
         float inv_f = 1.0f / f;
         return Quaternion(v * inv_f, w * inv_f);
-#endif
     }
 
-    inline Quaternion& Quaternion::operator += (const Quaternion& q) noexcept
+    inline constexpr Quaternion& Quaternion::operator += (const Quaternion& q) noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        xyzw_simd = _mm_add_ps(xyzw_simd, q.xyzw_simd);
-#else
         v += q.v;
         w += q.w;
-#endif
         return *this;
     }
 
-    inline Quaternion& Quaternion::operator -= (const Quaternion& q) noexcept
+    inline constexpr Quaternion& Quaternion::operator -= (const Quaternion& q) noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        xyzw_simd = _mm_sub_ps(xyzw_simd, q.xyzw_simd);
-#else
         v -= q.v;
         w -= q.w;
-#endif
         return *this;
     }
 
-    inline Quaternion& Quaternion::operator *= (const Quaternion& q) noexcept
+    inline constexpr Quaternion& Quaternion::operator *= (const Quaternion& q) noexcept
     {
         vec3 temp (v);
         v = q.v * w + temp * q.w + cross(temp, q.v);
@@ -112,28 +80,21 @@ namespace pbrlib::math
         return *this;
     }
 
-    inline Quaternion& Quaternion::operator *= (float f) noexcept
+    inline constexpr Quaternion& Quaternion::operator *= (float f) noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        xyzw_simd = _mm_mul_ps(xyzw_simd, _mm_set1_ps(f));
-#else
         v *= f;
         w *= f;
-#endif
         return *this;
     }
 
-    inline Quaternion& Quaternion::operator /= (float f) noexcept
+    inline constexpr Quaternion& Quaternion::operator /= (float f) noexcept
     {
         assert(f != static_cast<float>(0u));
-#if (defined(__SSE__) || defined(__AVX2__))
-        xyzw_simd = _mm_mul_ps(xyzw_simd, _mm_set1_ps(1.0f / f));
-#else 
+
         float inv_f = 1.0f / f;
 
         v *= inv_f;
         w *= inv_f;
-#endif    
         return *this;
     }
 
@@ -147,38 +108,18 @@ namespace pbrlib::math
         return xyzw[i];
     }
 
-    inline float Quaternion::lengthSquared() const noexcept
+    inline constexpr float Quaternion::lengthSquared() const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        float t[4];
-        _mm_store_ps(t, _mm_mul_ps(xyzw_simd, xyzw_simd));
-        return t[0] + t[1] + t[2] + t[3];
-#else
         return xyzw[0] * xyzw[0] + xyzw[1] * xyzw[1] + xyzw[2] * xyzw[2] + xyzw[3] * xyzw[3];
-#endif
     }
 
     inline float Quaternion::length() const noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        float t[4];
-        _mm_store_ps(t, _mm_mul_ps(xyzw_simd, xyzw_simd));
-        return sqrt(t[0] + t[1] + t[2] + t[3]);
-#else 
-        return sqrt(xyzw[0] * xyzw[0] + xyzw[1] * xyzw[1] + xyzw[2] * xyzw[2] + xyzw[3] * xyzw[3]);
-#endif
+        return std::sqrt(xyzw[0] * xyzw[0] + xyzw[1] * xyzw[1] + xyzw[2] * xyzw[2] + xyzw[3] * xyzw[3]);
     }
 
     inline void Quaternion::normalize()
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        float t[4];
-        _mm_store_ps(t, _mm_mul_ps(xyzw_simd, xyzw_simd));
-
-        float   l = sqrt(t[0] + t[1] + t[2] + t[3]);
-        assert(l != static_cast<float>(0u));
-        xyzw_simd = _mm_mul_ps(xyzw_simd, _mm_set1_ps(1.0f / l));
-#else
         float l = length();
 
         if (constexpr auto eps = 0.001f; l < eps) [[unlikely]] 
@@ -188,12 +129,11 @@ namespace pbrlib::math
 
         v *= l;
         w *= l;
-#endif
     }
 
-    inline void Quaternion::inverse()
+    inline constexpr void Quaternion::inverse()
     {
-        auto ls = lengthSquared();
+        const auto ls = lengthSquared();
 
         if (constexpr auto eps = 0.001f; ls < eps) [[unlikely]]
             throw exception::MathError("[quaternion] faield inverse because length squared is zerro");
@@ -201,19 +141,19 @@ namespace pbrlib::math
         *this = conjugate(*this) / ls;
     }
 
-    inline mat4 Quaternion::toMatrix() const noexcept
+    inline constexpr mat4 Quaternion::toMatrix() const noexcept
     {
-        float xx = v.x * v.x;
-        float yy = v.y * v.y;
-        float zz = v.z * v.z;
-        float xz = v.x * v.z;
-        float xy = v.x * v.y;
-        float yz = v.y * v.z;
-        float wx = w * v.x;
-        float wy = w * v.y;
-        float wz = w * v.z;
+        const float xx = v.x * v.x;
+        const float yy = v.y * v.y;
+        const float zz = v.z * v.z;
+        const float xz = v.x * v.z;
+        const float xy = v.x * v.y;
+        const float yz = v.y * v.z;
+        const float wx = w * v.x;
+        const float wy = w * v.y;
+        const float wz = w * v.z;
 
-        return mat4(
+        return mat4 (
             1.0f - 2.0f * (yy + zz),    2.0f * (xy + wz),           2.0f * (xz - wy),           0.0f,
             2.0f * (xy - wz),           1.0f - 2.0f * (xx +  zz),   2.0f * (yz + wx),           0.0f,
             2.0f * (xz + wy),           2.0f * (yz - wx),           1.0f - 2.0f * (xx +  yy),   0.0f,
@@ -221,40 +161,34 @@ namespace pbrlib::math
         );
     }
 
-    inline Quaternion Quaternion::i() noexcept
+    inline constexpr Quaternion Quaternion::i() noexcept
     {
         return Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    inline Quaternion Quaternion::j() noexcept
+    inline constexpr Quaternion Quaternion::j() noexcept
     {
         return Quaternion(0.0f, 1.0f, 0.0f, 0.0f);
     }
 
-    inline Quaternion Quaternion::k() noexcept
+    inline constexpr Quaternion Quaternion::k() noexcept
     {
         return Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
     }
 
-    inline Quaternion Quaternion::identity() noexcept
+    inline constexpr Quaternion Quaternion::identity() noexcept
     {
         return Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    inline Quaternion Quaternion::zerro() noexcept
+    inline constexpr Quaternion Quaternion::zerro() noexcept
     {
         return Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    inline float dot(const Quaternion& q1, const Quaternion& q2) noexcept
+    inline constexpr float dot(const Quaternion& q1, const Quaternion& q2) noexcept
     {
-#if (defined(__SSE__) || defined(__AVX2__))
-        float t[4];
-        _mm_store_ps(t, _mm_mul_ps(q1.xyzw_simd, q2.xyzw_simd));
-        return t[0] + t[1] + t[2] + t[3];
-#else
         return q1.xyzw[0] * q2.xyzw[0] + q1.xyzw[1] * q2.xyzw[1] + q1.xyzw[2] * q2.xyzw[2] + q1.xyzw[3] * q2.xyzw[3];
-#endif
     }
 
     inline Quaternion normalize(const Quaternion& q)
@@ -264,14 +198,14 @@ namespace pbrlib::math
         return tq;
     }
 
-    inline Quaternion inverse(const Quaternion& q)
+    inline constexpr Quaternion inverse(const Quaternion& q)
     {
         Quaternion tq (q);
         tq.inverse();
         return tq;
     }
 
-    inline Quaternion conjugate(const Quaternion& q)
+    inline constexpr Quaternion conjugate(const Quaternion& q)
     {
         return Quaternion(q.v * -1.0f, q.w);
     }

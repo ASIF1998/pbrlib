@@ -2,58 +2,66 @@
 
 #include <format>
 
+#include <cmath>
+
 namespace pbrlib::math
 {
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec2<Type>::Vec2() noexcept :
-        x{static_cast<Type>(0)},
-        y{static_cast<Type>(0)}
+        x(static_cast<Type>(0)),
+        y(static_cast<Type>(0))
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec2<Type>::Vec2(Type xy) noexcept :
-        x{xy},
-        y{xy}
+        x(xy),
+        y(xy)
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Vec2<Type>::Vec2(Type x, Type y) noexcept :
-        x{x},
-        y{y}
+        x(x),
+        y(y)
     {}
 
-    template<typename Type>
-    inline bool Vec2<Type>::operator == (const Vec2<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Vec2<Type>::operator == (const Vec2<Type>& v) const noexcept
     {
         return x == v.x && y == v.y;
     }
 
-    template<typename Type>
-    inline bool Vec2<Type>::operator != (const Vec2<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Vec2<Type>::operator != (const Vec2<Type>& v) const noexcept
     {
         return x != v.x || y != v.y;
     }
 
-    template<typename Type>
-    inline Vec2<Type> Vec2<Type>::operator + (const Vec2<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec2<Type> Vec2<Type>::operator + (const Vec2<Type>& v) const noexcept
     {
         return Vec2<Type>(x + v.x, y + v.y);
     }
 
-    template<typename Type>
-    inline Vec2<Type> Vec2<Type>::operator - (const Vec2<Type>& v) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec2<Type> Vec2<Type>::operator - (const Vec2<Type>& v) const noexcept
     {
         return Vec2<Type>(x - v.x, y - v.y);
     }
 
-    template<typename Type>
-    inline Vec2<Type> Vec2<Type>::operator * (Type s) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s)
     {
-        return Vec2<Type>(x * s, y * s);
+        return Vec2<T>(v.x * s, v.y * s);
     }
 
-    template<typename Type>
-    inline Vec2<Type>& Vec2<Type>::operator += (const Vec2<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec2<T> operator * (T s, const Vec2<T>& v)
+    {
+        return Vec2<T>(v.x * s, v.y * s);
+    }
+
+    template<MathArithmetic Type>
+    inline constexpr Vec2<Type>& Vec2<Type>::operator += (const Vec2<Type>& v) noexcept
     {
         x += v.x;
         y += v.y;
@@ -61,8 +69,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Vec2<Type>& Vec2<Type>::operator -= (const Vec2<Type>& v) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec2<Type>& Vec2<Type>::operator -= (const Vec2<Type>& v) noexcept
     {
         x -= v.x;
         y -= v.y;
@@ -70,8 +78,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Vec2<Type>& Vec2<Type>::operator *= (Type s) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Vec2<Type>& Vec2<Type>::operator *= (Type s) noexcept
     {
         x *= s;
         y *= s;
@@ -79,31 +87,33 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline Type& Vec2<Type>::operator [] (size_t i) noexcept
     {
         return xy[i];
     }
 
-    template<typename Type>
-    inline Type Vec2<Type>::operator [] (size_t i) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type Vec2<Type>::operator [] (size_t i) const noexcept
     {
-        return xy[i];
+        // In constexpr context MSVC cannot handle array access in union
+        // Use direct field access for constexpr evaluation
+        return (i == 0) ? x : y;
     }
 
-    template<typename Type>
-    inline Type Vec2<Type>::lengthSquared() const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type Vec2<Type>::lengthSquared() const noexcept
     {
         return x * x + y * y;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline Type Vec2<Type>::length() const noexcept
     {
-        return sqrt(x * x + y * y);
+        return std::sqrt(x * x + y * y);
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     void Vec2<Type>::normalize()
     {
         auto l = length();
@@ -115,7 +125,7 @@ namespace pbrlib::math
         y /= l;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     Vec2<Type> normalize(const Vec2<Type>& v)
     {
         auto l = v.length();

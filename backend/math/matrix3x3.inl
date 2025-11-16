@@ -7,7 +7,7 @@
 
 namespace pbrlib::math
 {
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Matrix3x3<Type>::Matrix3x3() noexcept :
         _array9 
         {
@@ -17,7 +17,7 @@ namespace pbrlib::math
         }
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Matrix3x3<Type>::Matrix3x3(Type init_value) noexcept :
         _array9 
         {
@@ -27,7 +27,7 @@ namespace pbrlib::math
         }
     {}
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline constexpr Matrix3x3<Type>::Matrix3x3 (
         Type x0, Type y0, Type z0,
         Type x1, Type y1, Type z1,
@@ -41,8 +41,8 @@ namespace pbrlib::math
         }
     {}
 
-    template<typename Type>
-    inline bool Matrix3x3<Type>::operator == (const Matrix3x3<Type>& mat) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Matrix3x3<Type>::operator == (const Matrix3x3<Type>& mat) const noexcept
     {
         bool res = true;
 
@@ -52,8 +52,8 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline bool Matrix3x3<Type>::operator != (const Matrix3x3<Type>& mat) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr bool Matrix3x3<Type>::operator != (const Matrix3x3<Type>& mat) const noexcept
     {
         bool res = true;
 
@@ -63,8 +63,8 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> Matrix3x3<Type>::operator + (const Matrix3x3<Type>& mat) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type> Matrix3x3<Type>::operator + (const Matrix3x3<Type>& mat) const noexcept
     {
         Matrix3x3<Type> res;
 
@@ -74,8 +74,8 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> Matrix3x3<Type>::operator - (const Matrix3x3<Type>& mat) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type> Matrix3x3<Type>::operator - (const Matrix3x3<Type>& mat) const noexcept
     {
         Matrix3x3<Type> res;
 
@@ -85,8 +85,8 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> Matrix3x3<Type>::operator * (const Matrix3x3<Type>& mat) const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type> Matrix3x3<Type>::operator * (const Matrix3x3<Type>& mat) const noexcept
     {
         Matrix3x3<Type> res (static_cast<Type>(0));
 
@@ -103,19 +103,34 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> Matrix3x3<Type>::operator * (Type scal) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Matrix3x3<T> operator * (const Matrix3x3<T>& mat, T s)
     {
-        Matrix3x3<Type> res;
-
-        for (size_t i = 0; i < 9; i++)
-            res._array9[i] = _array9[i] * scal;
+        Matrix3x3<T> res;
+        for (size_t i = 0; i < 3; ++i)
+        {
+            for (size_t j = 0; j < 3; ++j)
+                res.at(i, j) = mat.at(i, j) * s;
+        }
 
         return res;
     }
 
-    template<typename Type>
-    inline Vec3<Type> Matrix3x3<Type>::operator * (const Vec3<Type>& v) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Matrix3x3<T> operator * (T s, const Matrix3x3<T>& mat)
+    {
+        Matrix3x3<T> res;
+        for (size_t i = 0; i < 3; ++i)
+        {
+            for (size_t j = 0; j < 3; ++j)
+                res.at(i, j) = mat.at(i, j) * s;
+        }
+
+        return res;
+    }   
+
+    template<MathArithmetic Type>
+    inline constexpr Vec3<Type> Matrix3x3<Type>::operator * (const Vec3<Type>& v) const noexcept
     {
         Vec3<Type> res;
 
@@ -129,8 +144,8 @@ namespace pbrlib::math
         return res;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type>& Matrix3x3<Type>::operator += (const Matrix3x3<Type>& mat) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type>& Matrix3x3<Type>::operator += (const Matrix3x3<Type>& mat) noexcept
     {
         for (size_t i = 0; i < 9; i++)
             _array9[i] += mat._array9[i];
@@ -138,8 +153,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type>& Matrix3x3<Type>::operator -= (const Matrix3x3<Type>& mat) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type>& Matrix3x3<Type>::operator -= (const Matrix3x3<Type>& mat) noexcept
     {
         for (size_t i = 0; i < 9; i++)
             _array9[i] -= mat._array9[i];
@@ -147,15 +162,15 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type>& Matrix3x3<Type>::operator *= (const Matrix3x3<Type>& mat) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type>& Matrix3x3<Type>::operator *= (const Matrix3x3<Type>& mat) noexcept
     {
         *this = *this * mat;
         return *this;
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type>& Matrix3x3<Type>::operator *= (Type scal) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type>& Matrix3x3<Type>::operator *= (Type scal) noexcept
     {
         for (size_t i = 0; i < 9; i++) 
             _array9[i] *= scal;
@@ -163,19 +178,19 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline Type* Matrix3x3<Type>::operator [] (size_t i) noexcept
     {
         return _array3x3[i];
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline const Type* Matrix3x3<Type>::operator [] (size_t i) const noexcept
     {
         return _array3x3[i];
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline Type& Matrix3x3<Type>::at(size_t i, size_t j)
     {
         if (i > 2 || j > 2) [[unlikely]] 
@@ -184,36 +199,42 @@ namespace pbrlib::math
         return _array3x3[i][j];
     }
 
-    template<typename Type>
-    inline Type Matrix3x3<Type>::at(size_t i, size_t j) const
+    template<MathArithmetic Type>
+    inline constexpr Type Matrix3x3<Type>::at(size_t i, size_t j) const noexcept
     {
-        if (i > 2 || j > 2) [[unlikely]] 
-            throw exception::InvalidArgument(std::format("[math::mat3] i = {}, j = {}", i, j)); 
-
-        return _array3x3[i][j];
+        // In constexpr context MSVC cannot handle array access in union
+        // Use direct conditional access based on i and j
+        return (i == 0 && j == 0) ? _array9[0] : 
+               (i == 0 && j == 1) ? _array9[1] : 
+               (i == 0 && j == 2) ? _array9[2] : 
+               (i == 1 && j == 0) ? _array9[3] : 
+               (i == 1 && j == 1) ? _array9[4] : 
+               (i == 1 && j == 2) ? _array9[5] : 
+               (i == 2 && j == 0) ? _array9[6] : 
+               (i == 2 && j == 1) ? _array9[7] : _array9[8];
     }
 
-    template<typename Type>
-    inline Type Matrix3x3<Type>::det() const noexcept
+    template<MathArithmetic Type>
+    inline constexpr Type Matrix3x3<Type>::det() const noexcept
     {
-        return  
-                (_array3x3[0][0] * _array3x3[1][1] * _array3x3[2][2]) 
-            +   (_array3x3[2][0] * _array3x3[0][1] * _array3x3[1][2]) 
-            +   (_array3x3[1][0] * _array3x3[2][1] * _array3x3[0][2]) 
-            -   (_array3x3[2][0] * _array3x3[1][1] * _array3x3[0][2]) 
-            -   (_array3x3[0][0] * _array3x3[2][1] * _array3x3[1][2]) 
-            -   (_array3x3[1][0] * _array3x3[0][1] * _array3x3[2][2]);
+        return 
+                (at(0, 0) * at(1, 1) * at(2, 2)) 
+            +   (at(2, 0) * at(0, 1) * at(1, 2)) 
+            +   (at(1, 0) * at(2, 1) * at(0, 2)) 
+            -   (at(2, 0) * at(1, 1) * at(0, 2)) 
+            -   (at(0, 0) * at(2, 1) * at(1, 2)) 
+            -   (at(1, 0) * at(0, 1) * at(2, 2));
     }
 
-    template<typename Type>
-    inline void Matrix3x3<Type>::transpose() noexcept
+    template<MathArithmetic Type>
+    inline constexpr void Matrix3x3<Type>::transpose() noexcept
     {
-        std::swap(_array3x3[0][1], _array3x3[1][0]);
-        std::swap(_array3x3[0][2], _array3x3[2][0]);
-        std::swap(_array3x3[1][2], _array3x3[2][1]);
+        std::swap(at(0, 1), at(1, 0));
+        std::swap(at(0, 2), at(2, 0));
+        std::swap(at(1, 2), at(2, 1));
     }
 
-    template<typename Type>
+    template<MathArithmetic Type>
     inline void Matrix3x3<Type>::inverse() noexcept
     {
         auto d = det();
@@ -241,19 +262,19 @@ namespace pbrlib::math
         }
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> transpose(const Matrix3x3<Type>& mat) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type> transpose(const Matrix3x3<Type>& mat) noexcept
     {
         return 
         {
-            mat[0][0], mat[1][0], mat[2][0],
-            mat[0][1], mat[1][1], mat[2][1],
-            mat[0][2], mat[1][2], mat[2][2]
+            mat.at(0, 0), mat.at(1, 0), mat.at(2, 0),
+            mat.at(0, 1), mat.at(1, 1), mat.at(2, 1),
+            mat.at(0, 2), mat.at(1, 2), mat.at(2, 2)
         };
     }
 
-    template<typename Type>
-    inline Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat) noexcept
+    template<MathArithmetic Type>
+    inline constexpr Matrix3x3<Type> inverse(const Matrix3x3<Type>& mat) noexcept
     {
         Matrix3x3<Type> res (mat);
         res.inverse();
