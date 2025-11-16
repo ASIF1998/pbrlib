@@ -187,4 +187,10 @@ namespace pbrlib::math
             std::clamp(x.z, min_val.z, max_val.z)
         );
     }
+
+    template<MathArithmetic Type>
+    inline Vec3<Type> abs(const Vec3<Type>& v) noexcept
+    {
+        return Vec3<Type>(std::abs(v.x), std::abs(v.y), std::abs(v.z));
+    }
 }

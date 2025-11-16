@@ -74,6 +74,9 @@ namespace pbrlib::math
         const Vec4<Type>& max_val
     ) noexcept;
 
+    template<MathArithmetic Type>
+    inline Vec4<Type> abs(const Vec4<Type>& v) noexcept;
+
     template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (const Vec4<T>& v, T s);
 

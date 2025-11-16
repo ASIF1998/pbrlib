@@ -161,4 +161,10 @@ namespace pbrlib::math
             std::clamp(x.y, min_val.y, max_val.y)
         );
     }
+
+    template<MathArithmetic Type>
+    inline Vec2<Type> abs(const Vec2<Type>& v) noexcept
+    {
+        return Vec2<Type>(std::abs(v.x), std::abs(v.y));
+    }
 }
