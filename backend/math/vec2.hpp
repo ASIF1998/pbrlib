@@ -54,6 +54,16 @@ namespace pbrlib::math
     template<MathArithmetic Type>
     inline Vec2<Type> round(const Vec2<Type>& v) noexcept;
 
+    template<MathArithmetic Type>
+    inline Vec2<Type> clamp(const Vec2<Type>& x, Type min_val, Type max_val) noexcept;
+
+    template<MathArithmetic Type>
+    inline Vec2<Type> clamp (
+        const Vec2<Type>& x, 
+        const Vec2<Type>& min_val, 
+        const Vec2<Type>& max_val
+    ) noexcept;
+
     template<MathArithmetic T>
     inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);
 

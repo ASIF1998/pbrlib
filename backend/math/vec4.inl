@@ -1,4 +1,6 @@
 #include <pbrlib/exceptions.hpp>
+#include <cmath>
+#include <algorithm>
 
 namespace pbrlib::math
 {
@@ -164,5 +166,31 @@ namespace pbrlib::math
     inline Vec4<Type> round(const Vec4<Type>& v) noexcept
     {
         return Vec3<Type>(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w));
+    }
+
+    template<MathArithmetic Type>
+    inline Vec4<Type> clamp(const Vec4<Type>& x, Type min_val, Type max_val) noexcept
+    {
+        return Vec4<Type> (
+            std::clamp(x.x, min_val, max_val),
+            std::clamp(x.y, min_val, max_val),
+            std::clamp(x.z, min_val, max_val),
+            std::clamp(x.w, min_val, max_val)
+        );
+    }
+
+    template<MathArithmetic Type>
+    inline Vec4<Type> clamp (
+        const Vec4<Type>& x, 
+        const Vec4<Type>& min_val, 
+        const Vec4<Type>& max_val
+    ) noexcept
+    {
+        return Vec4<Type> (
+            std::clamp(x.x, min_val.x, max_val.x),
+            std::clamp(x.y, min_val.y, max_val.y),
+            std::clamp(x.z, min_val.z, max_val.z),
+            std::clamp(x.w, min_val.w, max_val.w)
+        );
     }
 }
