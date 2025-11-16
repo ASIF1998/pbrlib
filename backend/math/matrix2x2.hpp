@@ -4,58 +4,58 @@
 
 namespace pbrlib::math
 {
-    template<MathArithmetic Type>
+    template<MathArithmetic T>
     class Matrix2x2 final
     {
     public:
         inline constexpr Matrix2x2()                noexcept;
-        inline constexpr Matrix2x2(Type init_value) noexcept;
+        inline constexpr Matrix2x2(T init_value)    noexcept;
 
         inline constexpr Matrix2x2 (
-            Type x0, Type y0,
-            Type x1, Type y1
+            T x0, T y0,
+            T x1, T y1
         ) noexcept;
 
         inline constexpr bool operator == (const Matrix2x2& mat) const noexcept;
         inline constexpr bool operator != (const Matrix2x2& mat) const noexcept;
 
-        inline constexpr Matrix2x2    operator + (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Matrix2x2    operator - (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Matrix2x2    operator * (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Vec2<Type>   operator * (const Vec2<Type>& v)    const noexcept;
+        inline constexpr Matrix2x2  operator + (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Matrix2x2  operator - (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Matrix2x2  operator * (const Matrix2x2& mat)   const noexcept;
+        inline constexpr Vec2<T>    operator * (const Vec2<T>& v)       const noexcept;
 
-        inline constexpr Matrix2x2& operator += (const Matrix2x2& mat)    noexcept;
-        inline constexpr Matrix2x2& operator -= (const Matrix2x2& mat)    noexcept;
-        inline constexpr Matrix2x2& operator *= (const Matrix2x2& mat)    noexcept;
-        inline constexpr Matrix2x2& operator *= (Type scal)               noexcept;
+        inline constexpr Matrix2x2& operator += (const Matrix2x2& mat)  noexcept;
+        inline constexpr Matrix2x2& operator -= (const Matrix2x2& mat)  noexcept;
+        inline constexpr Matrix2x2& operator *= (const Matrix2x2& mat)  noexcept;
+        inline constexpr Matrix2x2& operator *= (T scal)                noexcept;
 
-        inline Type*        operator [] (size_t i) noexcept;
-        inline const Type*  operator [] (size_t i) const noexcept;
+        inline T*       operator [] (size_t i) noexcept;
+        inline const T* operator [] (size_t i) const noexcept;
 
-        inline Type&            at(size_t i, size_t j);
-        inline constexpr Type   at(size_t i, size_t j) const noexcept;
+        inline T&           at(size_t i, size_t j);
+        inline constexpr T  at(size_t i, size_t j) const noexcept;
 
-        inline constexpr Type det() const noexcept;
+        inline constexpr T det() const noexcept;
 
-        inline void             inverse() noexcept;
+        inline void             inverse()   noexcept;
         inline constexpr void   transpose() noexcept;
 
     private:
         union
         {
-            Type _array2x2[2][2];
-            Type _array4[4];
+            T _array2x2[2][2];
+            T _array4[4];
         };
     };
 
-    template<MathArithmetic Type>
-    inline constexpr Matrix2x2<Type> transpose(const Matrix2x2<Type>& mat) noexcept;
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T> transpose(const Matrix2x2<T>& mat) noexcept;
 
-    template<MathArithmetic Type>
-    inline constexpr Matrix2x2<Type> inverse(const Matrix2x2<Type>& mat) noexcept;
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T> inverse(const Matrix2x2<T>& mat) noexcept;
 
-    template<MathArithmetic Type>
-    inline Matrix2x2<Type> round(const Matrix2x2<Type>& mat) noexcept;
+    template<MathArithmetic T>
+    inline Matrix2x2<T> round(const Matrix2x2<T>& mat) noexcept;
 
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> operator * (const Matrix2x2<T>& mat, T s);

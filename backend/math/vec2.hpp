@@ -4,12 +4,12 @@
 
 namespace pbrlib::math
 {
-    template<MathArithmetic Type>
+    template<MathArithmetic T>
     struct Vec2 final
     {
-        inline constexpr Vec2()                 noexcept;
-        inline constexpr Vec2(Type xy)          noexcept;
-        inline constexpr Vec2(Type x, Type y)   noexcept;
+        inline constexpr Vec2()         noexcept;
+        inline constexpr Vec2(T xy)     noexcept;
+        inline constexpr Vec2(T x, T y) noexcept;
 
         inline constexpr bool operator == (const Vec2& v) const noexcept;
         inline constexpr bool operator != (const Vec2& v) const noexcept;
@@ -19,13 +19,13 @@ namespace pbrlib::math
 
         inline constexpr Vec2& operator += (const Vec2& v)  noexcept;
         inline constexpr Vec2& operator -= (const Vec2& v)  noexcept;
-        inline constexpr Vec2& operator *= (Type s)         noexcept;
+        inline constexpr Vec2& operator *= (T s)            noexcept;
 
-        inline Type&            operator [] (size_t i) noexcept;
-        inline constexpr Type   operator [] (size_t i) const noexcept;
+        inline T&            operator [] (size_t i) noexcept;
+        inline constexpr T   operator [] (size_t i) const noexcept;
 
-        inline constexpr Type   lengthSquared()   const noexcept;
-        inline Type             length()          const noexcept;
+        inline T             length()          const noexcept;
+        inline constexpr T   lengthSquared()   const noexcept;
 
         void normalize();
 
@@ -33,39 +33,39 @@ namespace pbrlib::math
         {
             struct
             {
-                Type x;
-                Type y;
+                T x;
+                T y;
             };
             
             struct
             {
-                Type r;
-                Type g;
+                T r;
+                T g;
             };
 
-            Type xy[2];
-            Type rg[2];
+            T xy[2];
+            T rg[2];
         };
     };
 
-    template<MathArithmetic Type>
-    Vec2<Type> normalize(const Vec2<Type>& v);
+    template<MathArithmetic T>
+    Vec2<T> normalize(const Vec2<T>& v);
 
-    template<MathArithmetic Type>
-    inline Vec2<Type> round(const Vec2<Type>& v) noexcept;
+    template<MathArithmetic T>
+    inline Vec2<T> round(const Vec2<T>& v) noexcept;
 
-    template<MathArithmetic Type>
-    inline Vec2<Type> clamp(const Vec2<Type>& x, Type min_val, Type max_val) noexcept;
+    template<MathArithmetic T>
+    inline Vec2<T> clamp(const Vec2<T>& x, T min_val, T max_val) noexcept;
 
-    template<MathArithmetic Type>
-    inline Vec2<Type> clamp (
-        const Vec2<Type>& x, 
-        const Vec2<Type>& min_val, 
-        const Vec2<Type>& max_val
+    template<MathArithmetic T>
+    inline Vec2<T> clamp (
+        const Vec2<T>& x, 
+        const Vec2<T>& min_val, 
+        const Vec2<T>& max_val
     ) noexcept;
 
-    template<MathArithmetic Type>
-    inline Vec2<Type> abs(const Vec2<Type>& v) noexcept;
+    template<MathArithmetic T>
+    inline Vec2<T> abs(const Vec2<T>& v) noexcept;
 
     template<MathArithmetic T>
     inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);

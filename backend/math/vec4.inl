@@ -4,60 +4,60 @@
 
 namespace pbrlib::math
 {
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>::Vec4(Type xyzw) noexcept :
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>::Vec4(T xyzw) noexcept :
         x(xyzw),
         y(xyzw),
         z(xyzw),
         w(xyzw)
     {}
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>::Vec4(Type x, Type y, Type z, Type w) noexcept :
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>::Vec4(T x, T y, T z, T w) noexcept :
         x(x),
         y(y),
         z(z),
         w(w)
     {}
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>::Vec4(const Vec3<Type>& vec3, Type w) noexcept :
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>::Vec4(const Vec3<T>& vec3, T w) noexcept :
         x(vec3.x),
         y(vec3.y),
         z(vec3.z),
         w(w)
     {}
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>::Vec4(const Vec2<Type>& v1, const Vec2<Type>& v2) noexcept :
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>::Vec4(const Vec2<T>& v1, const Vec2<T>& v2) noexcept :
         x(v1.x),
         y(v1.y),
         z(v2.x),
         w(v2.y)
     {}
 
-    template<MathArithmetic Type>
-    inline constexpr bool Vec4<Type>::operator == (const Vec4<Type>& v) const noexcept
+    template<MathArithmetic T>
+    inline constexpr bool Vec4<T>::operator == (const Vec4<T>& v) const noexcept
     {
         return x == v.x && y == v.y && z == v.z && w == v.w;
     }
 
-    template<MathArithmetic Type>
-    inline constexpr bool Vec4<Type>::operator != (const Vec4<Type>& v) const noexcept
+    template<MathArithmetic T>
+    inline constexpr bool Vec4<T>::operator != (const Vec4<T>& v) const noexcept
     {
         return x != v.x || y != v.y || z != v.z || w == v.w;
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type> Vec4<Type>::operator + (const Vec4<Type>& v) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec4<T> Vec4<T>::operator + (const Vec4<T>& v) const noexcept
     {
-        return Vec4<Type>(x + v.x, y + v.y, z + v.z, w + v.w);
+        return Vec4<T>(x + v.x, y + v.y, z + v.z, w + v.w);
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type> Vec4<Type>::operator - (const Vec4<Type>& v) const noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec4<T> Vec4<T>::operator - (const Vec4<T>& v) const noexcept
     {
-        return Vec4<Type>(x - v.x, y - v.y, z - v.z, w - v.w);
+        return Vec4<T>(x - v.x, y - v.y, z - v.z, w - v.w);
     }
 
     template<MathArithmetic T>
@@ -72,8 +72,8 @@ namespace pbrlib::math
         return Vec4<T>(v.x * s, v.y * s, v.z * s, v.z * s);
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>& Vec4<Type>::operator += (const Vec4<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>& Vec4<T>::operator += (const Vec4<T>& v) noexcept
     {
         x += v.x;
         y += v.y;
@@ -83,8 +83,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>& Vec4<Type>::operator -= (const Vec4<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>& Vec4<T>::operator -= (const Vec4<T>& v) noexcept
     {
         x -= v.x;
         y -= v.y;
@@ -94,8 +94,8 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Vec4<Type>& Vec4<Type>::operator *= (Type s) noexcept
+    template<MathArithmetic T>
+    inline constexpr Vec4<T>& Vec4<T>::operator *= (T s) noexcept
     {
         x *= s;
         y *= s;
@@ -105,38 +105,38 @@ namespace pbrlib::math
         return *this;
     }
 
-    template<MathArithmetic Type>
-    inline Type& Vec4<Type>::operator [] (size_t i) noexcept
+    template<MathArithmetic T>
+    inline T& Vec4<T>::operator [] (size_t i) noexcept
     {
         return xyzw[i];
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Type Vec4<Type>::operator [] (size_t i) const noexcept
+    template<MathArithmetic T>
+    inline constexpr T Vec4<T>::operator [] (size_t i) const noexcept
     {
         // In constexpr context MSVC cannot handle array access in union
         // Use direct field access for constexpr evaluation
         return (i == 0) ? x : ((i == 1) ? y : ((i == 2) ? z : w));
     }
 
-    template<MathArithmetic Type>
-    inline constexpr Type Vec4<Type>::lengthSquared() const noexcept
+    template<MathArithmetic T>
+    inline constexpr T Vec4<T>::lengthSquared() const noexcept
     {
         return x * x + y * y + z * z + w * w;
     }
 
-    template<MathArithmetic Type>
-    inline Type Vec4<Type>::length() const noexcept
+    template<MathArithmetic T>
+    inline T Vec4<T>::length() const noexcept
     {
         return sqrt(lengthSquared());
     }
 
-    template<MathArithmetic Type>
-    inline void Vec4<Type>::normalize()
+    template<MathArithmetic T>
+    inline void Vec4<T>::normalize()
     {
         auto l = length();
 
-        if (l == static_cast<Type>(0)) [[unlikely]]
+        if (l == static_cast<T>(0)) [[unlikely]]
             throw exception::MathError("[vec4] failed normalize");
 
         x /= l;
@@ -148,30 +148,30 @@ namespace pbrlib::math
 
 namespace pbrlib::math
 {
-    template<MathArithmetic Type>
-    inline constexpr Type dot(const Vec4<Type> v1, const Vec4<Type>& v2) noexcept
+    template<MathArithmetic T>
+    inline constexpr T dot(const Vec4<T> v1, const Vec4<T>& v2) noexcept
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
     }
 
-    template<MathArithmetic Type>
-    inline Vec4<Type> normalize(const Vec4<Type>& v)
+    template<MathArithmetic T>
+    inline Vec4<T> normalize(const Vec4<T>& v)
     {
-        Vec4<Type> res (v);
+        Vec4<T> res (v);
         res.normalize();
         return res;
     }
 
-    template<MathArithmetic Type>
-    inline Vec4<Type> round(const Vec4<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline Vec4<T> round(const Vec4<T>& v) noexcept
     {
-        return Vec3<Type>(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w));
+        return Vec3<T>(std::round(v.x), std::round(v.y), std::round(v.z), std::round(v.w));
     }
 
-    template<MathArithmetic Type>
-    inline Vec4<Type> clamp(const Vec4<Type>& x, Type min_val, Type max_val) noexcept
+    template<MathArithmetic T>
+    inline Vec4<T> clamp(const Vec4<T>& x, T min_val, T max_val) noexcept
     {
-        return Vec4<Type> (
+        return Vec4<T> (
             std::clamp(x.x, min_val, max_val),
             std::clamp(x.y, min_val, max_val),
             std::clamp(x.z, min_val, max_val),
@@ -179,14 +179,14 @@ namespace pbrlib::math
         );
     }
 
-    template<MathArithmetic Type>
-    inline Vec4<Type> clamp (
-        const Vec4<Type>& x, 
-        const Vec4<Type>& min_val, 
-        const Vec4<Type>& max_val
+    template<MathArithmetic T>
+    inline Vec4<T> clamp (
+        const Vec4<T>& x, 
+        const Vec4<T>& min_val, 
+        const Vec4<T>& max_val
     ) noexcept
     {
-        return Vec4<Type> (
+        return Vec4<T> (
             std::clamp(x.x, min_val.x, max_val.x),
             std::clamp(x.y, min_val.y, max_val.y),
             std::clamp(x.z, min_val.z, max_val.z),
@@ -194,9 +194,9 @@ namespace pbrlib::math
         );
     }
 
-    template<MathArithmetic Type>
-    inline Vec4<Type> abs(const Vec4<Type>& v) noexcept
+    template<MathArithmetic T>
+    inline Vec4<T> abs(const Vec4<T>& v) noexcept
     {
-        return Vec4<Type>(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
+        return Vec4<T>(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
     }
 }
