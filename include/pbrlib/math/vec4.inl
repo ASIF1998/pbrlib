@@ -45,7 +45,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr bool Vec4<T>::operator != (const Vec4<T>& v) const noexcept
     {
-        return x != v.x || y != v.y || z != v.z || w == v.w;
+        return x != v.x || y != v.y || z != v.z || w != v.w;
     }
 
     template<MathArithmetic T>
