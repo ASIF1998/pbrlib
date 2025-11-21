@@ -1,12 +1,17 @@
 #pragma once
 
 #include <pbrlib/math/concepts.hpp>
-#include <pbrlib/math/vec4.hpp>
 
 namespace pbrlib::math
 {
     template<MathArithmetic T>
-    class Matrix4x4
+    struct Vec4;
+}
+
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
+    class Matrix4x4 final
     {
     public:
         inline constexpr Matrix4x4() noexcept;

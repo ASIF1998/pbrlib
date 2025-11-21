@@ -48,12 +48,12 @@ TEST(MovingTransform, Rotates)
     constexpr pbrlib::math::vec3    axis3   (0.0000000f, 0.000000000f, 1.000000000f);
     constexpr pbrlib::math::vec3    v       (0.4767313f, 0.572077572f, 0.667423784f);
 
-    auto res1 = pbrlib::transforms::rotateX(theta) * v;
-    auto res2 = pbrlib::transforms::rotateY(theta) * v;
-    auto res3 = pbrlib::transforms::rotateZ(theta) * v;
-    auto res4 = pbrlib::transforms::rotate(axis1, theta) * v;
-    auto res5 = pbrlib::transforms::rotate(axis2, theta) * v;
-    auto res6 = pbrlib::transforms::rotate(axis3, theta) * v;
+    auto res1 = pbrlib::math::vec3(pbrlib::transforms::rotateX(theta) * v);
+    auto res2 = pbrlib::math::vec3(pbrlib::transforms::rotateY(theta) * v);
+    auto res3 = pbrlib::math::vec3(pbrlib::transforms::rotateZ(theta) * v);
+    auto res4 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis1, theta) * v);
+    auto res5 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis2, theta) * v);
+    auto res6 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis3, theta) * v);
 
     pbrlib::testing::equality(r1, res1);
     pbrlib::testing::equality(r2, res2);

@@ -1,9 +1,10 @@
-#include <memory>
-
-#include <algorithm>
-
-#include <format>
 #include <pbrlib/exceptions.hpp>
+
+#include <pbrlib/math/matrix4x4.hpp>
+
+#include <memory>
+#include <algorithm>
+#include <format>
 
 namespace pbrlib::math
 {
@@ -40,6 +41,16 @@ namespace pbrlib::math
             x2, y2, z2
         }
     {}
+
+    template<MathArithmetic T>
+    inline constexpr Matrix3x3<T>::Matrix3x3(const Matrix4x4<T>& mat) noexcept 
+    {
+        for (size_t i = 0; i < 3; ++i)
+        {
+            for (size_t j = 0; j < 3; ++j)
+                _array3x3[i][j] = mat.at(i, j);
+        }
+    }
 
     template<MathArithmetic T>
     inline constexpr bool Matrix3x3<T>::operator == (const Matrix3x3<T>& mat) const noexcept

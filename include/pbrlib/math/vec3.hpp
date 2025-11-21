@@ -1,6 +1,15 @@
 #pragma once
 
-#include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/concepts.hpp>
+
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
+    struct Vec4;
+
+    template<MathArithmetic T>
+    struct Vec2;
+}
 
 namespace pbrlib::math
 {
@@ -9,7 +18,8 @@ namespace pbrlib::math
     {
         inline constexpr Vec3(T xyz = static_cast<T>(0))                    noexcept;
         inline constexpr Vec3(T x, T y, T z = static_cast<T>(0))            noexcept;
-        inline constexpr Vec3(const Vec2<T>& vec2, T z = static_cast<T>(0)) noexcept;
+        inline constexpr Vec3(const Vec2<T>& vec, T z = static_cast<T>(0))  noexcept;
+        inline constexpr Vec3(const Vec4<T>& vec)                           noexcept;
 
         inline constexpr bool operator == (const Vec3& v) const noexcept;
         inline constexpr bool operator != (const Vec3& v) const noexcept;

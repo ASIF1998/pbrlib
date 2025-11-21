@@ -28,7 +28,7 @@ struct RotateComponent
 auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir) 
     -> pbrlib::math::vec3
 {
-    const auto move_dir = motion.getRelativeMotion();
+    const auto move_dir = motion.relativeMotion();
 
     const auto dx = move_dir.x / static_cast<float>(config.width);
     const auto dy = move_dir.y / static_cast<float>(config.height);
@@ -38,7 +38,7 @@ auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionS
 
     const auto rdir = pbrlib::math::normalize(rotation_2.toMatrix() * pbrlib::math::vec4(dir, 0.0f));
 
-    return pbrlib::math::vec3(rdir.x, rdir.y, rdir.z);
+    return pbrlib::math::vec3(rdir);
 }
 
 auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::vec3& dir, const pbrlib::math::vec3& up) noexcept

@@ -8,6 +8,12 @@ namespace pbrlib::math
     struct Vec3;
 
     template<MathArithmetic T>
+    class Matrix4x4;
+}
+
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
     class Matrix3x3 final
     {
     public:
@@ -19,6 +25,8 @@ namespace pbrlib::math
             T x1, T y1, T z1,
             T x2, T y2, T z2 
         ) noexcept;
+
+        inline constexpr Matrix3x3(const Matrix4x4<T>& mat) noexcept;
 
         inline constexpr bool operator == (const Matrix3x3& mat) const noexcept;
         inline constexpr bool operator != (const Matrix3x3& mat) const noexcept;

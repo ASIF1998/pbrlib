@@ -1,10 +1,12 @@
+#include <pbrlib/exceptions.hpp>
+
+#include <pbrlib/math/vec4.hpp>
+
 #include <memory>
 #include <cassert>
 
 #include <stdexcept>
 #include <format>
-
-#include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::math
 {

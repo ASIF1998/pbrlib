@@ -1,6 +1,16 @@
 #pragma once
 
-#include <pbrlib/math/vec2.hpp>
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
+    struct Vec2;
+
+    template<MathArithmetic T>
+    class Matrix3x3;
+    
+    template<MathArithmetic T>
+    class Matrix4x4;
+}
 
 namespace pbrlib::math
 {
@@ -15,6 +25,9 @@ namespace pbrlib::math
             T x0, T y0,
             T x1, T y1
         ) noexcept;
+
+        inline constexpr Matrix2x2(const Matrix3x3<T>& mat) noexcept;
+        inline constexpr Matrix2x2(const Matrix4x4<T>& mat) noexcept;
 
         inline constexpr bool operator == (const Matrix2x2& mat) const noexcept;
         inline constexpr bool operator != (const Matrix2x2& mat) const noexcept;

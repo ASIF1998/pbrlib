@@ -1,4 +1,8 @@
 #include <pbrlib/exceptions.hpp>
+
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec2.hpp>
+
 #include <cmath>
 #include <algorithm>
 

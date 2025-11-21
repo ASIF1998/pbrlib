@@ -5,11 +5,22 @@
 namespace pbrlib::math
 {
     template<MathArithmetic T>
+    struct Vec4;
+
+    template<MathArithmetic T>
+    struct Vec3;
+}
+
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
     struct Vec2 final
     {
-        inline constexpr Vec2()         noexcept;
-        inline constexpr Vec2(T xy)     noexcept;
-        inline constexpr Vec2(T x, T y) noexcept;
+        inline constexpr Vec2()                     noexcept;
+        inline constexpr Vec2(T xy)                 noexcept;
+        inline constexpr Vec2(T x, T y)             noexcept;
+        inline constexpr Vec2(const Vec3<T>& vec)   noexcept;
+        inline constexpr Vec2(const Vec4<T>& vec)   noexcept;
 
         inline constexpr bool operator == (const Vec2& v) const noexcept;
         inline constexpr bool operator != (const Vec2& v) const noexcept;

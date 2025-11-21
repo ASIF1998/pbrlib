@@ -1,5 +1,9 @@
 #include <pbrlib/exceptions.hpp>
 
+#include <pbrlib/math/vec2.hpp>
+#include <pbrlib/math/matrix3x3.hpp>
+#include <pbrlib/math/matrix4x4.hpp>
+
 #include <format>
 
 #include <memory>
@@ -36,6 +40,26 @@ namespace pbrlib::math
             x1, y1
         }
     {}
+
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T>::Matrix2x2(const Matrix3x3<T>& mat) noexcept
+    {
+        for (size_t i = 0; i < 2; ++i)
+        {
+            for (size_t j = 0; j < 2; ++j)
+                _array2x2[i][j] = mat.at(i, j);
+        }
+    }
+
+    template<MathArithmetic T>
+    inline constexpr Matrix2x2<T>::Matrix2x2(const Matrix4x4<T>& mat) noexcept
+    {
+        for (size_t i = 0; i < 2; ++i)
+        {
+            for (size_t j = 0; j < 2; ++j)
+                _array2x2[i][j] = mat.at(i, j);
+        }
+    }
 
     template<MathArithmetic T>
     inline constexpr bool Matrix2x2<T>::operator == (const Matrix2x2<T>& mat) const noexcept

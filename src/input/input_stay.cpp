@@ -125,12 +125,12 @@ namespace pbrlib
 		_is_motion = false;
 	}
 
-	math::vec2 MouseMotionStay::getCurrentCoord() const noexcept
+	math::vec2 MouseMotionStay::currentCoord() const noexcept
 	{
 		return _current_coord;
 	}
 
-	math::vec2 MouseMotionStay::getRelativeMotion() const noexcept
+	math::vec2 MouseMotionStay::relativeMotion() const noexcept
 	{
 		return _relative_motion;
 	}

@@ -4,7 +4,6 @@
 
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/input/input_stay.hpp>
-#include <pbrlib/transforms.hpp>
 
 TEST(SceneItemTests, Ctor)
 {
@@ -83,7 +82,7 @@ TEST(SceneItemTests, CreateInstance)
     constexpr std::string_view item_name            = "new-item";
     constexpr std::string_view instance_item_name   = "instance-item";
 
-    const auto transform = pbrlib::transforms::translate(pbrlib::math::vec3(-3, -5, 10));
+    const auto transform = pbrlib::transform::translate(pbrlib::math::vec3(-3, -5, 10));
     
     const auto& new_item        = scene.addItem(item_name);
     const auto& instance_item   = scene.createInstance(item_name, instance_item_name, transform);

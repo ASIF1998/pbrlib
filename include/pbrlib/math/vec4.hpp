@@ -1,8 +1,15 @@
 #pragma once
 
 #include <pbrlib/math/concepts.hpp>
-#include <pbrlib/math/vec3.hpp>
-#include <pbrlib/math/vec2.hpp>
+
+namespace pbrlib::math
+{
+    template<MathArithmetic T>
+    struct Vec3;
+
+    template<MathArithmetic T>
+    struct Vec2;
+}
 
 namespace pbrlib::math
 {

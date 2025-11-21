@@ -1,4 +1,8 @@
 #include <pbrlib/exceptions.hpp>
+
+#include <pbrlib/math/vec3.hpp>
+#include <pbrlib/math/vec4.hpp>
+
 #include <cmath>
 #include <algorithm>
 
@@ -21,6 +25,18 @@ namespace pbrlib::math
         x(x),
         y(y)
     {}
+
+    template<MathArithmetic T>
+    inline constexpr Vec2<T>::Vec2(const Vec3<T>& vec) noexcept :
+        x(vec.x),
+        y(vec.y)
+    { }
+    
+    template<MathArithmetic T>
+    inline constexpr Vec2<T>::Vec2(const Vec4<T>& vec) noexcept :
+        x(vec.x),
+        y(vec.y)
+    { }
 
     template<MathArithmetic T>
     inline constexpr bool Vec2<T>::operator == (const Vec2<T>& v) const noexcept
