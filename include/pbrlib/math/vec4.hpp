@@ -94,9 +94,13 @@ namespace pbrlib::math
 namespace pbrlib::math
 {
     using vec4      = Vec4<float>;
+    using dvec4     = Vec4<double>;
     using ivec4     = Vec4<int32_t>;
     using uvec4     = Vec4<uint32_t>;
+    using i16vec4   = Vec4<int16_t>;
     using u16vec4   = Vec4<uint16_t>;
+    using i8vec4    = Vec4<int8_t>;
+    using u8vec4    = Vec4<uint8_t>;
 }
 
 #include <pbrlib/math/vec4.inl>

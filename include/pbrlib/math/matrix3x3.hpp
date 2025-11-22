@@ -78,7 +78,14 @@ namespace pbrlib::math
 
 namespace pbrlib::math
 {
-    using mat3 = Matrix3x3<float>;
+    using mat3      = Matrix3x3<float>;
+    using dmat3     = Matrix3x3<double>;
+    using imat3     = Matrix3x3<int32_t>;
+    using umat3     = Matrix3x3<uint32_t>;
+    using i16mat3   = Matrix3x3<int16_t>;
+    using u16mat3   = Matrix3x3<uint16_t>;
+    using i8mat3    = Matrix3x3<int8_t>;
+    using u8mat3    = Matrix3x3<uint8_t>;
 }
 
 #include <pbrlib/math/matrix3x3.inl>

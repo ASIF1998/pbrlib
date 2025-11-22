@@ -88,9 +88,13 @@ namespace pbrlib::math
 namespace pbrlib::math
 {
     using vec2      = Vec2<float>;
+    using dvec2     = Vec2<double>;
     using ivec2     = Vec2<int32_t>;
     using uvec2     = Vec2<uint32_t>;
+    using i16vec2   = Vec2<int16_t>;
     using u16vec2   = Vec2<uint16_t>;
+    using i8vec2    = Vec2<int8_t>;
+    using u8vec2    = Vec2<uint8_t>;
 }
 
 #include <pbrlib/math/vec2.inl>

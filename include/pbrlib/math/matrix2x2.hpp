@@ -79,7 +79,14 @@ namespace pbrlib::math
 
 namespace pbrlib::math
 {
-    using mat2 = Matrix2x2<float>;
+    using mat2      = Matrix2x2<float>;
+    using dmat2     = Matrix2x2<double>;
+    using imat2     = Matrix2x2<int32_t>;
+    using umat2     = Matrix2x2<uint32_t>;
+    using i16mat2   = Matrix2x2<int16_t>;
+    using u16mat2   = Matrix2x2<uint16_t>;
+    using i8mat2    = Matrix2x2<int8_t>;
+    using u8mat2    = Matrix2x2<uint8_t>;
 }
 
 #include <pbrlib/math/matrix2x2.inl>

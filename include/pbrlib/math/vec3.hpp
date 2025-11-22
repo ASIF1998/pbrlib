@@ -98,9 +98,13 @@ namespace pbrlib::math
 namespace pbrlib::math
 {
     using vec3      = Vec3<float>;
+    using dvec3     = Vec3<double>;
     using ivec3     = Vec3<int32_t>;
     using uvec3     = Vec3<uint32_t>;
+    using i16vec3   = Vec3<int16_t>;
     using u16vec3   = Vec3<uint16_t>;
+    using i8vec3    = Vec3<int8_t>;
+    using u8vec3    = Vec3<uint8_t>;
 }
 
 #include <pbrlib/math/vec3.inl>

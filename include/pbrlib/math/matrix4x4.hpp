@@ -76,7 +76,14 @@ namespace pbrlib::math
 
 namespace pbrlib::math
 {
-    using mat4 = Matrix4x4<float>;
+    using mat4      = Matrix4x4<float>;
+    using dmat4     = Matrix4x4<double>;
+    using imat4     = Matrix4x4<int32_t>;
+    using umat4     = Matrix4x4<uint32_t>;
+    using i16mat4   = Matrix4x4<int16_t>;
+    using u16mat4   = Matrix4x4<uint16_t>;
+    using i8mat4    = Matrix4x4<int8_t>;
+    using u8mat4    = Matrix4x4<uint8_t>;
 }
 
 #include <pbrlib/math/matrix4x4.inl>
