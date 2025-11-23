@@ -1,3 +1,5 @@
+#include <pbrlib/exceptions.hpp>
+
 namespace pbrlib::math
 {
     inline constexpr Quaternion::Quaternion() noexcept :
@@ -50,9 +52,10 @@ namespace pbrlib::math
         return Quaternion(q.v * s, q.w * s);
     }
 
-    inline constexpr Quaternion Quaternion::operator / (float f) const noexcept
+    inline constexpr Quaternion Quaternion::operator / (float f) const
     {
-        assert(f != static_cast<float>(0u));
+        if (f != static_cast<float>(0u)) [[unlikely]]
+            throw exception::InvalidArgument("[quaternion] attempted to divide quaternion by zero scalar");
 
         float inv_f = 1.0f / f;
         return Quaternion(v * inv_f, w * inv_f);
@@ -87,9 +90,10 @@ namespace pbrlib::math
         return *this;
     }
 
-    inline constexpr Quaternion& Quaternion::operator /= (float f) noexcept
+    inline constexpr Quaternion& Quaternion::operator /= (float f)
     {
-        assert(f != static_cast<float>(0u));
+        if (f != static_cast<float>(0u)) [[unlikely]]
+            throw exception::InvalidArgument("[quaternion] attempted to divide quaternion by zero scalar");
 
         float inv_f = 1.0f / f;
 
@@ -139,26 +143,6 @@ namespace pbrlib::math
             throw exception::MathError("[quaternion] faield inverse because length squared is zerro");
 
         *this = conjugate(*this) / ls;
-    }
-
-    inline constexpr mat4 Quaternion::toMatrix() const noexcept
-    {
-        const float xx = v.x * v.x;
-        const float yy = v.y * v.y;
-        const float zz = v.z * v.z;
-        const float xz = v.x * v.z;
-        const float xy = v.x * v.y;
-        const float yz = v.y * v.z;
-        const float wx = w * v.x;
-        const float wy = w * v.y;
-        const float wz = w * v.z;
-
-        return mat4 (
-            1.0f - 2.0f * (yy + zz),    2.0f * (xy + wz),           2.0f * (xz - wy),           0.0f,
-            2.0f * (xy - wz),           1.0f - 2.0f * (xx +  zz),   2.0f * (yz + wx),           0.0f,
-            2.0f * (xz + wy),           2.0f * (yz - wx),           1.0f - 2.0f * (xx +  yy),   0.0f,
-            0.0f,                       0.0f,                       0.0f,                       1.0f
-        );
     }
 
     inline constexpr Quaternion Quaternion::i() noexcept

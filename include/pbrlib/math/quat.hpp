@@ -2,8 +2,6 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include <pbrlib/math/matrix4x4.hpp>
-
 namespace pbrlib::math
 {
     struct Quaternion final
@@ -18,13 +16,13 @@ namespace pbrlib::math
         inline constexpr Quaternion operator + (const Quaternion& q)    const noexcept;
         inline constexpr Quaternion operator - (const Quaternion& q)    const noexcept;
         inline constexpr Quaternion operator * (const Quaternion& q)    const noexcept;
-        inline constexpr Quaternion operator / (float f)                const noexcept;
+        inline constexpr Quaternion operator / (float f)                const;
 
         inline constexpr Quaternion& operator += (const Quaternion& q)  noexcept;
         inline constexpr Quaternion& operator -= (const Quaternion& q)  noexcept;
         inline constexpr Quaternion& operator *= (const Quaternion& q)  noexcept;
         inline constexpr Quaternion& operator *= (float f)              noexcept;
-        inline constexpr Quaternion& operator /= (float f)              noexcept;
+        inline constexpr Quaternion& operator /= (float f);
 
         inline float    operator [] (size_t i) const noexcept;
         inline float&   operator [] (size_t i) noexcept;
@@ -34,8 +32,6 @@ namespace pbrlib::math
 
         inline void             normalize();
         inline constexpr void   inverse();
-
-        inline constexpr mat4 toMatrix() const noexcept;
 
         /**
          * @brief a static method that creates the following quaternion:

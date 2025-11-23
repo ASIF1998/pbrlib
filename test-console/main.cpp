@@ -15,6 +15,7 @@
 
 #include <pbrlib/math/matrix2x2.hpp>
 #include <pbrlib/math/matrix3x3.hpp>
+#include <pbrlib/math/casts.hpp>
 
 #include <cmath>
 
@@ -36,7 +37,7 @@ auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionS
     const auto rotation_1 = pbrlib::transforms::angleAxis(dy, pbrlib::math::vec3(1, 0, 0));
     const auto rotation_2 = pbrlib::transforms::angleAxis(dx, pbrlib::math::vec3(0, 1, 0)) * rotation_1;
 
-    const auto rdir = pbrlib::math::normalize(rotation_2.toMatrix() * pbrlib::math::vec4(dir, 0.0f));
+    const auto rdir = pbrlib::math::normalize(pbrlib::math::toMatrix(rotation_2) * pbrlib::math::vec4(dir, 0.0f));
 
     return pbrlib::math::vec3(rdir);
 }
