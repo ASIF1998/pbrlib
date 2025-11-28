@@ -4,10 +4,9 @@
 
 namespace pbrlib::math
 {
-    template <typename T>
-    constexpr T lerp(const T& v_min, const T& v_max, std::floating_point auto t)
+    template <typename T, std::floating_point U>
+    constexpr T lerp(const T& v_min, const T& v_max, U t)
     {
-        using U = decltype(t);
         return v_min * (static_cast<U>(1.0) - t) + v_max * t;
     }
 

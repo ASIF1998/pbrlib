@@ -87,6 +87,12 @@ namespace std
         constexpr auto  parse(format_parse_context& ctx)                                    const;
         auto            format(const pbrlib::math::Matrix2x2<T>& mat, format_context& ctx)  const;
     };
+
+    template<pbrlib::math::MathArithmetic T>
+    struct hash<pbrlib::math::Matrix2x2<T>> final
+    {
+        inline constexpr size_t operator () (const pbrlib::math::Matrix2x2<T>& mat) const noexcept;
+    };
 }
 
 namespace pbrlib::math

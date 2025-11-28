@@ -360,7 +360,7 @@ TEST(Mat2Tests, AtMethodEdgeCase)
     }, pbrlib::exception::InvalidArgument);
 }
 
-TEST(Mat2Tests, LPOVERLAPPED_ENTRY)
+TEST(Mat2Tests, Lerp)
 {
     constexpr mat2 result (0.75f);
     pbrlib::testing::equality(result, lerp(mat2(0.0f), mat2(1.0f), 0.75f));

@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/vec3.hpp>
 
+#include <pbrlib/utils/combine_hash.hpp>
+
 #include <format>
 
 namespace pbrlib::math
@@ -113,6 +115,19 @@ namespace std
         auto format(const pbrlib::math::Quaternion& q, format_context& ctx) const
         {
             return format_to(ctx.out(), "quat[v:[{}, {}, {}], w:{}]", q.v.x, q.v.y, q.v.z, q.w);
+        }
+    };
+
+    template<>
+    struct hash<pbrlib::math::Quaternion> final
+    {
+        inline constexpr size_t operator () (const pbrlib::math::Quaternion& quat) const noexcept
+        {
+            size_t hash_value = 0;
+            pbrlib::combineHash(hash_value, quat.v);
+            pbrlib::combineHash(hash_value, quat.w);
+
+            return hash_value;
         }
     };
 }

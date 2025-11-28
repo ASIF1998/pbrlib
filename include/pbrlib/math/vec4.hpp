@@ -101,6 +101,12 @@ namespace std
         constexpr auto  parse(format_parse_context& ctx)                                const;
         auto            format(const pbrlib::math::Vec4<T>& vec, format_context& ctx)   const;
     };
+
+    template<pbrlib::math::MathArithmetic T>
+    struct hash<pbrlib::math::Vec4<T>> final
+    {
+        inline constexpr size_t operator () (const pbrlib::math::Vec4<T>& vec) const noexcept;
+    };
 }
 
 namespace pbrlib::math

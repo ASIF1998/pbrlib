@@ -2,7 +2,8 @@
 
 #include <pbrlib/math/matrix4x4.hpp>
 
-#include <memory>
+#include <pbrlib/utils/combine_hash.hpp>
+
 #include <algorithm>
 #include <format>
 
@@ -326,5 +327,18 @@ namespace std
                 mat[1][0], mat[1][1], mat[1][2], 
                 mat[2][0], mat[2][1], mat[2][2]
         );
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    inline constexpr size_t hash<pbrlib::math::Matrix3x3<T>>::operator () (const pbrlib::math::Matrix3x3<T>& mat) const noexcept
+    {
+        size_t hash_value = 0;
+        for (size_t i = 0; i < 3; ++i)
+        {
+            for (size_t j = 0; j < 3; ++j)
+                pbrlib::combineHash(hash_value, mat.at(i, j));
+        }
+
+        return hash_value;
     }
 }

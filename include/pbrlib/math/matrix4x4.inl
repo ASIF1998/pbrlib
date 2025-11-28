@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/vec4.hpp>
 
+#include <pbrlib/utils/combine_hash.hpp>
+
 #include <memory>
 #include <cassert>
 
@@ -389,5 +391,18 @@ namespace std
                 mat[2][0], mat[2][1], mat[2][2], mat[1][3],
                 mat[3][0], mat[3][1], mat[3][2], mat[3][3]
         );
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    inline constexpr size_t hash<pbrlib::math::Matrix4x4<T>>::operator () (const pbrlib::math::Matrix4x4<T>& mat) const noexcept
+    {
+        size_t hash_value = 0;
+        for (size_t i = 0; i < 4; ++i)
+        {
+            for (size_t j = 0; j < 4; ++j)
+                pbrlib::combineHash(hash_value, mat.at(i, j));
+        }
+
+        return hash_value;
     }
 }

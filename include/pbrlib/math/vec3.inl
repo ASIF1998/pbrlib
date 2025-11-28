@@ -3,6 +3,8 @@
 #include <pbrlib/math/vec4.hpp>
 #include <pbrlib/math/vec2.hpp>
 
+#include <pbrlib/utils/combine_hash.hpp>
+
 #include <cmath>
 #include <algorithm>
 
@@ -221,5 +223,16 @@ namespace std
     ) const
     {
         return format_to(ctx.out(), "vec3[{}, {}, {}]", vec.x, vec.y, vec.z);
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    inline constexpr size_t hash<pbrlib::math::Vec3<T>>::operator () (const pbrlib::math::Vec3<T>& vec) const noexcept
+    {
+        size_t hash_value = 0;
+        pbrlib::combineHash(hash_value, vec.x);
+        pbrlib::combineHash(hash_value, vec.y);
+        pbrlib::combineHash(hash_value, vec.z);
+
+        return hash_value;
     }
 }
