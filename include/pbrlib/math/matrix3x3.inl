@@ -304,3 +304,27 @@ namespace pbrlib::math
         return res;
     }
 }
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    constexpr auto formatter<pbrlib::math::Matrix3x3<T>>::parse(format_parse_context& ctx) const
+    {
+        return ctx.begin();
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    auto formatter<pbrlib::math::Matrix3x3<T>>::format (
+        const pbrlib::math::Matrix3x3<T>&   mat, 
+        format_context&                     ctx
+    ) const
+    {
+        return format_to (
+            ctx.out(), 
+            "\nmat3 [\n  [{}, {}, {}]\n  [{}, {}, {}]\n  [{}, {}, {}]\n]", 
+                mat[0][0], mat[0][1], mat[0][2], 
+                mat[1][0], mat[1][1], mat[1][2], 
+                mat[2][0], mat[2][1], mat[2][2]
+        );
+    }
+}

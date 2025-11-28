@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/concepts.hpp>
 
+#include <format>
+
 namespace pbrlib::math
 {
     template<MathArithmetic T>
@@ -72,6 +74,16 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Matrix4x4<T> operator * (T s, const Matrix4x4<T>& mat);
+}
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    struct formatter<pbrlib::math::Matrix4x4<T>>
+    {
+        constexpr auto  parse(format_parse_context& ctx)                                    const;
+        auto            format(const pbrlib::math::Matrix4x4<T>& mat, format_context& ctx)  const;
+    };
 }
 
 namespace pbrlib::math

@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/concepts.hpp>
 
+#include <format>
+
 namespace pbrlib::math
 {
     template<MathArithmetic T>
@@ -74,6 +76,16 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Matrix3x3<T> operator * (T s, const Matrix3x3<T>& mat);
+}
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    struct formatter<pbrlib::math::Matrix3x3<T>>
+    {
+        constexpr auto  parse(format_parse_context& ctx)                                    const;
+        auto            format(const pbrlib::math::Matrix3x3<T>& mat, format_context& ctx)  const;
+    };
 }
 
 namespace pbrlib::math

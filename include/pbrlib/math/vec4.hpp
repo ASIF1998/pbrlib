@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/concepts.hpp>
 
+#include <format>
+
 namespace pbrlib::math
 {
     template<MathArithmetic T>
@@ -89,6 +91,16 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (T s, const Vec4<T>& v);
+}
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    struct formatter<pbrlib::math::Vec4<T>>
+    {
+        constexpr auto  parse(format_parse_context& ctx)                                const;
+        auto            format(const pbrlib::math::Vec4<T>& vec, format_context& ctx)   const;
+    };
 }
 
 namespace pbrlib::math

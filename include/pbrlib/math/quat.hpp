@@ -2,6 +2,8 @@
 
 #include <pbrlib/math/vec3.hpp>
 
+#include <format>
+
 namespace pbrlib::math
 {
     struct Quaternion final
@@ -96,6 +98,23 @@ namespace pbrlib::math
      * @return (q.v * -1.0f, q.w).
     */
     inline constexpr Quaternion conjugate(const Quaternion& q);
+}
+
+namespace std
+{
+    template<>
+    struct formatter<pbrlib::math::Quaternion>
+    {
+        constexpr auto parse(format_parse_context& ctx) const
+        {
+            return ctx.end();
+        }
+
+        auto format(const pbrlib::math::Quaternion& q, format_context& ctx) const
+        {
+            return format_to(ctx.out(), "quat[v:[{}, {}, {}], w:{}]", q.v.x, q.v.y, q.v.z, q.w);
+        }
+    };
 }
 
 namespace pbrlib::math

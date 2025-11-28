@@ -1,5 +1,7 @@
 #pragma once
 
+#include <format>
+
 namespace pbrlib::math
 {
     template<MathArithmetic T>
@@ -75,6 +77,16 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> operator * (T s, const Matrix2x2<T>& mat);
+}
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    struct formatter<pbrlib::math::Matrix2x2<T>>
+    {
+        constexpr auto  parse(format_parse_context& ctx)                                    const;
+        auto            format(const pbrlib::math::Matrix2x2<T>& mat, format_context& ctx)  const;
+    };
 }
 
 namespace pbrlib::math

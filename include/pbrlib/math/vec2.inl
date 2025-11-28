@@ -184,3 +184,21 @@ namespace pbrlib::math
         return Vec2<T>(std::abs(v.x), std::abs(v.y));
     }
 }
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    constexpr auto formatter<pbrlib::math::Vec2<T>>::parse(format_parse_context& ctx) const
+    {
+        return ctx.begin();
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    auto formatter<pbrlib::math::Vec2<T>>::format (
+        const pbrlib::math::Vec2<T>&    vec, 
+        format_context&                 ctx
+    ) const
+    {
+        return format_to(ctx.out(), "vec2[{}, {}]", vec.x, vec.y);
+    }
+}

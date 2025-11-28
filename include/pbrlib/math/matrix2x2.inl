@@ -302,3 +302,21 @@ namespace pbrlib::math
         return res;
     }
 }
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    constexpr auto formatter<pbrlib::math::Matrix2x2<T>>::parse(format_parse_context& ctx) const
+    {
+        return ctx.begin();
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    auto formatter<pbrlib::math::Matrix2x2<T>>::format (
+        const pbrlib::math::Matrix2x2<T>&   mat, 
+        format_context&                     ctx
+    ) const
+    {
+        return format_to(ctx.out(), "\nmat2 [\n  [{}, {}]\n  [{}, {}]\n]", mat[0][0], mat[0][1], mat[1][0], mat[1][1]);
+    }
+}

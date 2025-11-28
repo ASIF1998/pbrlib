@@ -204,3 +204,21 @@ namespace pbrlib::math
         return Vec4<T>(std::abs(v.x), std::abs(v.y), std::abs(v.z), std::abs(v.w));
     }
 }
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    constexpr auto formatter<pbrlib::math::Vec4<T>>::parse(format_parse_context& ctx) const
+    {
+        return ctx.begin();
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    auto formatter<pbrlib::math::Vec4<T>>::format (
+        const pbrlib::math::Vec4<T>&    vec, 
+        format_context&                 ctx
+    ) const
+    {
+        return format_to(ctx.out(), "vec4[{}, {}, {}, {}]", vec.x, vec.y, vec.z, vec.w);
+    }
+}

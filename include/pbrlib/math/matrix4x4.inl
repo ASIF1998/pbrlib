@@ -366,3 +366,28 @@ namespace pbrlib::math
         return res;
     }
 }
+
+namespace std
+{
+    template<pbrlib::math::MathArithmetic T>
+    constexpr auto formatter<pbrlib::math::Matrix4x4<T>>::parse(format_parse_context& ctx) const
+    {
+        return ctx.begin();
+    }
+
+    template<pbrlib::math::MathArithmetic T>
+    auto formatter<pbrlib::math::Matrix4x4<T>>::format (
+        const pbrlib::math::Matrix4x4<T>&   mat, 
+        format_context&                     ctx
+    ) const
+    {
+        return format_to (
+            ctx.out(), 
+            "\nmat4 [\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n]", 
+                mat[0][0], mat[0][1], mat[0][2], mat[0][3], 
+                mat[1][0], mat[1][1], mat[1][2], mat[1][3], 
+                mat[2][0], mat[2][1], mat[2][2], mat[1][3],
+                mat[3][0], mat[3][1], mat[3][2], mat[3][3]
+        );
+    }
+}
