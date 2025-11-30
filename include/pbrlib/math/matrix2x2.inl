@@ -66,19 +66,26 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr bool Matrix2x2<T>::operator == (const Matrix2x2<T>& mat) const noexcept
     {
-        return      _array4[0] == mat._array4[0] 
-                &&  _array4[1] == mat._array4[1] 
-                &&  _array4[2] == mat._array4[2] 
-                &&  _array4[3] == mat._array4[3];
+        bool res = true;
+
+        for (size_t i = 0; i < 4 && res; i++) 
+        {
+            if constexpr (std::is_floating_point<T>::value)
+            {
+                constexpr auto eps = static_cast<T>(0.0001);
+                res &= std::abs(_array4[i] - mat._array4[i]) < eps;
+            }
+            else 
+                res &= _array4[i] == mat._array4[i];
+        }
+
+        return res;
     }
 
     template<MathArithmetic T>
     inline constexpr bool Matrix2x2<T>::operator != (const Matrix2x2<T>& mat) const noexcept
     {
-        return      _array4[0] != mat._array4[0] 
-                ||  _array4[1] != mat._array4[1] 
-                ||  _array4[2] != mat._array4[2] 
-                ||  _array4[3] != mat._array4[3];
+        return !(*this == mat);
     }
 
     template<MathArithmetic T>

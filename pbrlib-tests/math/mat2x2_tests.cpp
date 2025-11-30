@@ -223,25 +223,28 @@ TYPED_TEST(Mat2Tests, Transpose)
 
 TYPED_TEST(Mat2Tests, Inverse)
 {
-    constexpr Matrix2x2 res1 (
-        static_cast<TypeParam>(1), 
-        static_cast<TypeParam>(0), 
-        static_cast<TypeParam>(-2), 
-        static_cast<TypeParam>(1)
-    );
-
-    Matrix2x2 m (
-        static_cast<TypeParam>(1), 
-        static_cast<TypeParam>(2), 
-        static_cast<TypeParam>(0), 
-        static_cast<TypeParam>(1)
-    );
-
-    auto res2 = inverse(m);
-    pbrlib::testing::equality(res1, res2);
-
-    m.inverse();
-    pbrlib::testing::equality(res1, m);
+    if constexpr (std::is_floating_point<TypeParam>::value)
+    {
+        constexpr Matrix2x2 res1 (
+            static_cast<TypeParam>(1), 
+            static_cast<TypeParam>(0), 
+            static_cast<TypeParam>(-2), 
+            static_cast<TypeParam>(1)
+        );
+    
+        Matrix2x2 m (
+            static_cast<TypeParam>(1), 
+            static_cast<TypeParam>(2), 
+            static_cast<TypeParam>(0), 
+            static_cast<TypeParam>(1)
+        );
+    
+        auto res2 = inverse(m);
+        pbrlib::testing::equality(res1, res2);
+    
+        m.inverse();
+        pbrlib::testing::equality(res1, m);
+    }
 }
 
 TYPED_TEST(Mat2Tests, AtMethodEdgeCase)

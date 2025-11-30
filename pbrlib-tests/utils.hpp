@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <string_view>
-
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>
@@ -17,6 +15,9 @@
 #include <backend/logger/logger.hpp>
 
 #include <vulkan/vulkan.h>
+
+#include <string_view>
+#include <concepts>
 
 using namespace testing;
 
@@ -34,10 +35,13 @@ namespace pbrlib::testing
         EXPECT_NE(v1, v2) << err_msg << std::endl;
     }
 
-    template<typename Type>
-    inline void equality(const Type& v1, const Type& v2)
+    template<typename T, typename U>
+    inline void equality(const T& v1, const U& v2)
     {
-        EXPECT_EQ(v1, v2);
+        if constexpr (std::is_floating_point<T>::value || std::is_floating_point<U>::value)
+            EXPECT_NEAR(v1, v2, 0.0001f);
+        else 
+            EXPECT_EQ(v1, v2);
     }
 
     template<typename Type>
@@ -116,11 +120,6 @@ namespace pbrlib::testing
             for (size_t j = 0; j < 4; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 4 + j]) << err_msg << std::endl;
         }
-    }
-
-    inline void equality(float v1, float v2)
-    {
-        EXPECT_NEAR(v1, v2, 0.0001f);
     }
 
     inline void equality(float v1, float v2, const std::string_view err_msg)

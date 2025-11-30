@@ -1,4 +1,4 @@
-#include "../utils.hpp"
+#include "testing_types.hpp"
 
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/vec3.hpp>
@@ -6,33 +6,39 @@
 
 using namespace pbrlib::math;
 
-TEST(Mat3Tests, Constructor)
-{
-    constexpr Matrix3x3<int> m1;
-    constexpr Matrix3x3<int> m2 (23);
+template <typename T>
+class Mat3Tests 
+    : public ::testing::Test 
+{ };
 
-    constexpr Matrix3x3<int> m3 (
-        1, 2, 3,
-        2, 3, 4,
-        3, 4, 5
+TYPED_TEST_SUITE(Mat3Tests, MathTestingTypes);
+
+TYPED_TEST(Mat3Tests, Ctor)
+{
+    constexpr Matrix3x3<TypeParam>  m1;
+    constexpr Matrix3x3             m2 (static_cast<TypeParam>(23));
+    constexpr Matrix3x3             m3 (
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
+        static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     );
 
-    constexpr int r1[9] {
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1
+    constexpr TypeParam r1[9] {
+        static_cast<TypeParam>(1), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(1), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(1)
     };
 
-    constexpr int r2[9] {
-        23, 0, 0,
-        0, 23, 0,
-        0, 0, 23
+    constexpr TypeParam r2[9] {
+        static_cast<TypeParam>(23), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(23), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(23)
     };
 
-    constexpr int r3[9] {
-        1, 2, 3,
-        2, 3, 4,
-        3, 4, 5
+    constexpr TypeParam r3[9] {
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
+        static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     };
 
     pbrlib::testing::equality(m1, r1);
@@ -40,193 +46,261 @@ TEST(Mat3Tests, Constructor)
     pbrlib::testing::equality(m3, r3);
 }
 
-TEST(Mat3Tests, EqualAndNotEqual)
+TYPED_TEST(Mat3Tests, EqualAndNotEqual)
 {
-    constexpr Matrix3x3<int> m1 (
-        1, 2, 3,
-        2, 3, 4,
-        3, 4, 5
+    constexpr Matrix3x3 m1 (
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
+        static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     );
 
-    Matrix3x3<int> m2 (
-        1, 2, 3,
-        2, 3, 4,
-        3, 4, 5
+    Matrix3x3 m2 (
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
+        static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     );
 
     pbrlib::testing::thisTrue(m1 == m2);
 
-    m2.at(1, 2) = 60;
-
+    m2.at(1, 2) = static_cast<TypeParam>(60);
     pbrlib::testing::thisTrue(m1 != m2);
 }
 
-TEST(Mat3Tests, AdditionAndSubtraction)
+TYPED_TEST(Mat3Tests, AdditionAndSubtraction)
 {
-    constexpr Matrix3x3<short> m1 (23);
-    constexpr Matrix3x3<short> m2 (37);
+    constexpr Matrix3x3 m1 (static_cast<TypeParam>(23));
+    constexpr Matrix3x3 m2 (static_cast<TypeParam>(37));
 
-    Matrix3x3<short> res = m1 + m2;
-
-    pbrlib::testing::equality(Matrix3x3<short>(60), res);
+    auto res = m1 + m2;
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(60)), res);
 
     res = m1 - m2;
-
-    pbrlib::testing::equality(Matrix3x3<short>(-14), res);
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(-14)), res);
 
     res =   m1;
     res +=  m2;
-
-    pbrlib::testing::equality(Matrix3x3<short>(60), res);
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(60)), res);
 
     res -= m2;
-
-    pbrlib::testing::equality(Matrix3x3<short>(23), res);
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(23)), res);
 }
 
-TEST(Mat3Tests, ScalarMultiplication)
+TYPED_TEST(Mat3Tests, ScalarMultiplication)
 {
-    constexpr Matrix3x3<int>    m (16);
-    constexpr int               s (2);
+    constexpr Matrix3x3 m (static_cast<TypeParam>(16));
 
-    Matrix3x3<int> res = m * s;
+    constexpr auto s = static_cast<TypeParam>(2);
 
-    pbrlib::testing::equality(Matrix3x3<int>(32), res);
+    auto res = m * s;
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(32)), res);
     
     res *= s;
-
-    pbrlib::testing::equality(Matrix3x3<int>(64), res);
+    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(64)), res);
 }
 
-TEST(Mat3Tests, MatrixMultiplication)
+TYPED_TEST(Mat3Tests, MatrixMultiplication)
 {
-    constexpr mat3 m1 {
-        10.125f, 23.3f, 0.250f,
-        4.3500f, 3.20f, 0.450f,
-        2.5340f, 8.59f, 33.43f
+    constexpr Matrix3x3 m1 {
+        static_cast<TypeParam>(13), 
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3),
+        static_cast<TypeParam>(76), 
+        static_cast<TypeParam>(5), 
+        static_cast<TypeParam>(3),
+        static_cast<TypeParam>(8), 
+        static_cast<TypeParam>(9), 
+        static_cast<TypeParam>(2)
     };
 
-    constexpr mat3 m2 {
-        1.200f, 3.400f, 0.0500f,
-        4.300f, 34.00f, 4.4500f,
-        23.54f, 82.59f, 323.43f
+    constexpr Matrix3x3 m2 {
+        static_cast<TypeParam>(5), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(8),
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(1),
+        static_cast<TypeParam>(54), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(8)
     };
 
-    mat3 r = m1 * m2;
-
-    constexpr mat3 res {
-        27.0667000f, 39.269500f, 3.50150013f,
-        202.713800f, 247.21550f, 165.138489f,
-        1417.18062f, 3591.0337f, 10855.3154f  
+    auto r = m1 * m2;
+    constexpr Matrix3x3 res {
+        static_cast<TypeParam>(585), 
+        static_cast<TypeParam>(112), 
+        static_cast<TypeParam>(49),
+        static_cast<TypeParam>(110), 
+        static_cast<TypeParam>(18), 
+        static_cast<TypeParam>(11),
+        static_cast<TypeParam>(1222), 
+        static_cast<TypeParam>(210), 
+        static_cast<TypeParam>(196)  
     };
 
     pbrlib::testing::equality(r, res);
 
     r =     m1;
     r *=    m2;
-
     pbrlib::testing::equality(r, res);
 }
 
-TEST(Mat3Tests, MatrixAndVectorMultiplication)
+TYPED_TEST(Mat3Tests, MatrixAndVectorMultiplication)
 {
-    constexpr Matrix3x3<int> m {
-        1, 2, 3, 
-        6, 4, 3,
-        9, 7, 3
+    constexpr Matrix3x3 m {
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6), static_cast<TypeParam>(4), static_cast<TypeParam>(3),
+        static_cast<TypeParam>(9), static_cast<TypeParam>(7), static_cast<TypeParam>(3)
     };
 
-    constexpr ivec3 v (1, 3, 23);
-
-    ivec3 res (226, 175, 81);
+    constexpr Vec3<TypeParam> v (
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(23)
+    );
+    
+    constexpr Vec3<TypeParam> res (
+        static_cast<TypeParam>(226), 
+        static_cast<TypeParam>(175), 
+        static_cast<TypeParam>(81)
+    );
 
     pbrlib::testing::equality(res, m * v);
 }   
 
-TEST(Mat3Tests, AccessToElement)
+TYPED_TEST(Mat3Tests, AccessToElement)
 {
-    constexpr Matrix3x3<int> m {
-        1, 2, 3, 
-        6, 4, 3,
-        9, 7, 3
+    constexpr Matrix3x3 m {
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(4), 
+        static_cast<TypeParam>(3),
+        static_cast<TypeParam>(9), 
+        static_cast<TypeParam>(7), 
+        static_cast<TypeParam>(3)
     };
 
-    constexpr int r[9] {
-        1, 2, 3, 
-        6, 4, 3,
-        9, 7, 3
+    constexpr TypeParam r[9] {
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(4), 
+        static_cast<TypeParam>(3),
+        static_cast<TypeParam>(9), 
+        static_cast<TypeParam>(7), 
+        static_cast<TypeParam>(3)
     };
 
-    for (size_t i{0}; i < 3; i++) 
+    for (size_t i = 0; i < 3; i++) 
     {
-        for (size_t j{0}; j < 3; j++)
+        for (size_t j = 0; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m[i][j]);
     }
 
-    for (size_t i{0}; i < 3; i++) 
+    for (size_t i = 0; i < 3; i++) 
     {
-        for (size_t j{0}; j < 3; j++)
+        for (size_t j = 0; j < 3; j++)
             pbrlib::testing::equality(r[i * 3 + j], m.at(i, j));
     }
 }
 
-TEST(Mat3Tests, Determinant)
+TYPED_TEST(Mat3Tests, Determinant)
 {
-    constexpr mat3 m {
-        1.0f, 2.0f, 3.50f,
-        2.2f, 3.0f, 1.20f,
-        8.5f, 2.6f, 12.3f
+    constexpr Matrix3x3 m {
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(5),
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(7),
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(9)
     };
     
-    constexpr float r = -69.1700058f;
+    constexpr TypeParam r = static_cast<TypeParam>(64);
 
     pbrlib::testing::equality(r, m.det());
 }
 
-TEST(Mat3Tests, Transpose)
+TYPED_TEST(Mat3Tests, Transpose)
 {
-    constexpr mat3 res {
-        1.0f, 2.0f, 3.5f,
-        2.2f, 3.0f, 1.2f,
-        8.5f, 2.6f, 12.3f
+    constexpr Matrix3x3 res {
+        pbrlib::testing::roundForInteger<TypeParam>(1.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(3.5),
+        pbrlib::testing::roundForInteger<TypeParam>(2.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(3.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(1.2),
+        pbrlib::testing::roundForInteger<TypeParam>(8.5), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.6), 
+        pbrlib::testing::roundForInteger<TypeParam>(12.3)
     };
 
-    mat3 m {
-        1.0f, 2.2f, 8.50f,
-        2.0f, 3.0f, 2.60f,
-        3.5f, 1.2f, 12.3f
+    Matrix3x3 m {
+        pbrlib::testing::roundForInteger<TypeParam>(1.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(8.50),
+        pbrlib::testing::roundForInteger<TypeParam>(2.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(3.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.60),
+        pbrlib::testing::roundForInteger<TypeParam>(3.5), 
+        pbrlib::testing::roundForInteger<TypeParam>(1.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(12.3)
     };
 
     pbrlib::testing::equality(res, transpose(m));
 
     m.transpose();
-
     pbrlib::testing::equality(res, m);
 }
 
-TEST(Mat3Tests, Inverse)
+TYPED_TEST(Mat3Tests, Inverse)
 {
-    constexpr mat3 res {
-        1.0f, 2.0f, 3.5f,
-        2.2f, 3.0f, 1.2f,
-        8.5f, 2.6f, 12.3f
-    };
-
-    mat3 m {
-        -0.488362006f, 0.224085586236808f, 0.117102790226977f,
-        0.2437472790f, 0.252276998698858f, -0.09397136420000f,
-        0.2859621050f, -0.20818272200000f, 0.020239988300000f
-    };
-
-    pbrlib::testing::equality(res, inverse(m));
+    if constexpr (std::is_floating_point<TypeParam>::value)
+    {
+        constexpr Matrix3x3 res {
+            static_cast<TypeParam>(1.0), 
+            static_cast<TypeParam>(2.0), 
+            static_cast<TypeParam>(3.5),
+            static_cast<TypeParam>(2.2), 
+            static_cast<TypeParam>(3.0), 
+            static_cast<TypeParam>(1.2),
+            static_cast<TypeParam>(8.5), 
+            static_cast<TypeParam>(2.6), 
+            static_cast<TypeParam>(12.3)
+        };
+    
+        Matrix3x3 m {
+            static_cast<TypeParam>(-0.488362006), 
+            static_cast<TypeParam>(0.224085586236808), 
+            static_cast<TypeParam>(0.117102790226977),
+            static_cast<TypeParam>(0.2437472790), 
+            static_cast<TypeParam>(0.252276998698858), 
+            static_cast<TypeParam>(-0.09397136420000),
+            static_cast<TypeParam>(0.2859621050), 
+            static_cast<TypeParam>(-0.20818272200000), 
+            static_cast<TypeParam>(0.020239988300000)
+        };
+    
+        pbrlib::testing::equality(res, inverse(m));
+    }
 }
 
-TEST(Mat3Tests, AtMethodEdgeCase)
+TYPED_TEST(Mat3Tests, AtMethodEdgeCase)
 {
-    constexpr mat3 mat {
-        1.0f, 2.0f, 3.5f,
-        2.2f, 3.0f, 1.2f,
-        8.5f, 2.6f, 12.3f
+    constexpr Matrix3x3 mat {
+        pbrlib::testing::roundForInteger<TypeParam>(1.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(3.5),
+        pbrlib::testing::roundForInteger<TypeParam>(2.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(3.0), 
+        pbrlib::testing::roundForInteger<TypeParam>(1.2),
+        pbrlib::testing::roundForInteger<TypeParam>(8.5), 
+        pbrlib::testing::roundForInteger<TypeParam>(2.6), 
+        pbrlib::testing::roundForInteger<TypeParam>(12.3)
     };
 
     EXPECT_THROW({
@@ -242,8 +316,15 @@ TEST(Mat3Tests, AtMethodEdgeCase)
     }, pbrlib::exception::InvalidArgument);
 }
 
-TEST(Mat3Tests, Lerp)
+TYPED_TEST(Mat3Tests, Lerp)
 {
-    constexpr mat3 result (0.75f);
-    pbrlib::testing::equality(result, lerp(mat3(0.0f), mat3(1.0f), 0.75f));
+    if constexpr (std::is_floating_point<TypeParam>::value)
+    {
+        constexpr Matrix3x3 result (pbrlib::testing::roundForInteger<TypeParam>(0.75));
+        pbrlib::testing::equality(result, lerp (
+            Matrix3x3(static_cast<TypeParam>(0.0)), 
+            Matrix3x3(static_cast<TypeParam>(1.0)), 
+            pbrlib::testing::roundForInteger<TypeParam>(0.75))
+        );
+    }
 }
