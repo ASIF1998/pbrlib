@@ -340,6 +340,15 @@ namespace pbrlib::testing
     {
         EXPECT_FALSE(t) << err_msg << std::endl;
     }
+
+    template<typename T>
+    inline constexpr T roundForInteger(double v)
+    {
+        if constexpr (std::is_floating_point<T>::value)
+            return static_cast<T>(v);
+        
+        return static_cast<T>(v + 0.5);
+    } 
 }
 
 namespace pbrlib::testing::vk

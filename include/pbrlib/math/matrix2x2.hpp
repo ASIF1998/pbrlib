@@ -48,7 +48,7 @@ namespace pbrlib::math
         inline const T* operator [] (size_t i) const noexcept;
 
         inline T&           at(size_t i, size_t j);
-        inline constexpr T  at(size_t i, size_t j) const noexcept;
+        inline constexpr T  at(size_t i, size_t j) const;
 
         inline constexpr T det() const noexcept;
 

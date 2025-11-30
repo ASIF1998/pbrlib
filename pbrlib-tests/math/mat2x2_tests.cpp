@@ -1,351 +1,257 @@
-#include "../utils.hpp"
+#include "testing_types.hpp"
 
 #include <pbrlib/math/matrix2x2.hpp>
 #include <pbrlib/math/lerp.hpp>
+#include <pbrlib/math/concepts.hpp>
+
+#include <type_traits>
 
 using namespace pbrlib::math;
 
-TEST(Mat2Tests, Constructor)
+template <typename T>
+class Mat2Tests 
+    : public ::testing::Test 
+{ };
+
+TYPED_TEST_SUITE(Mat2Tests, MathTestingTypes);
+
+TYPED_TEST(Mat2Tests, Ctor)
 {
-    constexpr int r1[4] {
-        1, 0,
-        0, 1
+    constexpr TypeParam r1[4] {
+        static_cast<TypeParam>(1), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(1)
     };
 
-    constexpr int r2[4] {
-        23, 0,
-        0, 23
+    constexpr TypeParam r2[4] {
+        static_cast<TypeParam>(23), static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0), static_cast<TypeParam>(23)
     };
 
-    constexpr int r3[4] {
-        1, 2, 
-        3, 23
+    constexpr TypeParam r3[4] {
+        static_cast<TypeParam>(1), static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), static_cast<TypeParam>(23)
     };
 
-    constexpr Matrix2x2<int>    m1;
-    constexpr Matrix2x2<int>    m2(23);
-    constexpr Matrix2x2<int>    m3(1, 2, 3, 23);
-
-    pbrlib::testing::equality(m1, r1);
-    pbrlib::testing::equality(m2, r2);
-    pbrlib::testing::equality(m3, r3);
-}
-
-TEST(Mat2Tests, ConstructorTypeFloat)
-{
-#if (defined(__SSE__) || defined(__AVX2__))
-    union
-    {
-        __m128 simd;
-        float v[4];
-    } r4;
-
-    r4.simd = _mm_setr_ps(1.2f, 2.1f, 5.34f, 323.4f);
-#endif
-
-    constexpr float r1[4] = {
-        1.0f, 0.0f, 
-        0.0f, 1.0f
-    };
-
-    constexpr float r2[4] = {
-        2.3f, 0.0f,
-        0.0f, 2.3f
-    };
-    
-    constexpr mat2 m1;
-    constexpr mat2 m2(2.3f);
-    constexpr mat2 m3(1.2f, 2.1f, 5.34f, 323.4f);
-
-#if (defined(__SSE__) || defined(__AVX2__))
-    mat2 m4(r4.simd);
-#endif
-
-    pbrlib::testing::equality(m1, r1);
-    pbrlib::testing::equality(m2, r2);
-
-#if (defined(__SSE__) || defined(__AVX2__))
-    pbrlib::testing::equality(m4, r4.simd);
-#endif
-}
-
-TEST(Mat2Tests, EqualAndNotEqual)
-{
-    constexpr Matrix2x2<short>  m1 (1, 2, 3, 4);
-    Matrix2x2<short>            m2 (1, 2, 3, 4);
-
-    pbrlib::testing::thisTrue(m1 == m2);
-
-    m2.at(0, 1) = 6;
-
-    pbrlib::testing::thisTrue(m1 != m2);
-}
-
-TEST(Mat2Tests, EqualAndNotEqualTypeFloat)
-{
-    constexpr mat2  m1 (1.12f, 12.2f, 45.345f, 4.545f);
-    mat2            m2 (1.12f, 12.2f, 45.345f, 4.545f);
-
-    pbrlib::testing::thisTrue(m1 == m2);
-
-    m2.at(0, 1) = 0.43f;
-
-    pbrlib::testing::thisTrue(m1 != m2);
-}
-
-TEST(Mat2Tests, AdditionAndSubtraction)
-{
-    constexpr Matrix2x2<int> m1(2);
-    constexpr Matrix2x2<int> m2(3);
-
-    Matrix2x2<int> res = m1 + m2;
-
-    pbrlib::testing::equality(Matrix2x2<int>(5), res);
-
-    res = m1 - m2;
-
-    pbrlib::testing::equality(Matrix2x2<int>(-1), res);
-
-    res += m2;
-
-    pbrlib::testing::equality(res, m1);
-
-    res += m2;
-    res -= m2;
-
-    pbrlib::testing::equality(res, m1);
-}
-
-TEST(Mat2Tests, AdditionAndSubtractionTypeFloat)
-{
-    constexpr mat2 m1(2.5f);
-    constexpr mat2 m2(3.0f);
-
-    mat2 res = m1 + m2;
-
-    pbrlib::testing::equality(mat2(5.5f), res);
-
-    res = m1 - m2;
-
-    pbrlib::testing::equality(mat2(-0.5f), res);
-
-    res += m2;
-
-    pbrlib::testing::equality(res, m1);
-
-    res += m2;
-    res -= m2;
-
-    pbrlib::testing::equality(res, m1);
-}
-
-TEST(Mat2Tests, ScalarMultiplication)
-{
-    constexpr Matrix2x2<int>    m   (32);
-    constexpr int               s   (4);
-
-    Matrix2x2<int> res (m * s);
-
-    pbrlib::testing::equality(Matrix2x2<int>(128), res);
-    
-    res *= s;
-
-    pbrlib::testing::equality(Matrix2x2<int>(512), res);
-}
-
-TEST(Mat2Tests, ScalarMultiplicationTypeFloat)
-{
-    constexpr mat2  m   (16.5f);
-    constexpr float             s   (4.5f);
-
-    mat2 res = m * s;
-
-    pbrlib::testing::equality(mat2(74.25f), res);
-
-    res *= (1.0f / s);
-
-    pbrlib::testing::equality(mat2(16.5f), res);
-}
-
-TEST(Mat2Tests, MatrixMultiplication)
-{
-    constexpr Matrix2x2<int> res1 (15, 33, 16, 34);
-
-    constexpr Matrix2x2<int> m1 (3, 2, 6, 7);
-    constexpr Matrix2x2<int> m2 (1, 2, 3, 4);
-
-    Matrix2x2<int> res2 = m1 * m2;
-
-    pbrlib::testing::equality(res1, res2);
-
-    res2 = m1;
-    res2 *= m2;
-
-    pbrlib::testing::equality(res1, res2);
-}
-
-TEST(Mat2Tests, MatrixMultiplicationTypeFloat)
-{
-    constexpr mat2 res1 (
-        34.3500023f, 56.4490051f,
-        36.6135025f, 4.08415985f
+    constexpr Matrix2x2<TypeParam>  m1;
+    constexpr Matrix2x2             m2(static_cast<TypeParam>(23));
+    constexpr Matrix2x2             m3 (
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(23)
     );
 
-    constexpr mat2 m1 (4.3f, 0.012f, 6.0f, 7.87f);
-    constexpr mat2 m2 (1.5f, 4.65f, 12.43f, 0.5f);
+    pbrlib::testing::equality(m1, r1);
+    pbrlib::testing::equality(m2, r2);
+    pbrlib::testing::equality(m3, r3);  
+}
 
-    mat2 res2 = m1 * m2;
+TYPED_TEST(Mat2Tests, EqualAndNotEqual)
+{
+    constexpr Matrix2x2 m1 (
+        pbrlib::testing::roundForInteger<TypeParam>(1.12), 
+        pbrlib::testing::roundForInteger<TypeParam>(12.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(45.345), 
+        pbrlib::testing::roundForInteger<TypeParam>(4.545)
+    );
 
+    Matrix2x2 m2 (
+        pbrlib::testing::roundForInteger<TypeParam>(1.12), 
+        pbrlib::testing::roundForInteger<TypeParam>(12.2), 
+        pbrlib::testing::roundForInteger<TypeParam>(45.345), 
+        pbrlib::testing::roundForInteger<TypeParam>(4.545)
+    );
+
+    pbrlib::testing::thisTrue(m1 == m2);
+
+    m2.at(0, 1) = static_cast<TypeParam>(6);
+
+    pbrlib::testing::thisTrue(m1 != m2);
+}
+
+TYPED_TEST(Mat2Tests, AdditionAndSubtraction)
+{
+    constexpr Matrix2x2 m1(static_cast<TypeParam>(3));
+    constexpr Matrix2x2 m2(static_cast<TypeParam>(4));
+
+    auto res = m1 + m2;
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(7)), res);
+
+    res = m2 - m1;
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(1)), res);
+
+    res += m1;
+    pbrlib::testing::equality(res, m2);
+
+    res += m2;
+    res -= m2;
+    pbrlib::testing::equality(res, m2);
+}
+
+TYPED_TEST(Mat2Tests, ScalarMultiplication)
+{
+    constexpr Matrix2x2 m (static_cast<TypeParam>(17));
+
+    constexpr auto s = static_cast<TypeParam>(5);
+
+    auto res = m * s;
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), res);
+
+    res *= s;
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(425)), res);
+}
+
+TYPED_TEST(Mat2Tests, MatrixMultiplication)
+{
+    constexpr Matrix2x2 res1 (
+        static_cast<TypeParam>(115), 
+        static_cast<TypeParam>(1885),
+        static_cast<TypeParam>(30), 
+        static_cast<TypeParam>(270)
+    );
+
+    constexpr Matrix2x2 m1 (
+        static_cast<TypeParam>(12), 
+        static_cast<TypeParam>(4), 
+        static_cast<TypeParam>(43), 
+        static_cast<TypeParam>(6)
+    );
+
+    constexpr Matrix2x2 m2 (
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(43)
+    );
+
+    auto res2 = m1 * m2;
     pbrlib::testing::equality(res1, res2);
 
     res2 = m1;
     res2 *= m2;
-
     pbrlib::testing::equality(res1, res2);
 }
 
-TEST(Mat2Tests, MatrixAndVectorMultiplication)
+TYPED_TEST(Mat2Tests, MatrixAndVectorMultiplication)
 {
-    constexpr ivec2 res1 (13, 14);
+    constexpr Vec2 res1 (
+        static_cast<TypeParam>(103), 
+        static_cast<TypeParam>(247)
+    );
 
-    constexpr Matrix2x2<int>    m (2, 1, 3, 4);
-    constexpr ivec2             v (2, 3);
+    constexpr Matrix2x2 m (
+        static_cast<TypeParam>(13), 
+        static_cast<TypeParam>(32), 
+        static_cast<TypeParam>(5), 
+        static_cast<TypeParam>(11)
+    );
 
-    ivec2 res2 = m * v;
+    constexpr Vec2 v (
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(5)
+    );
 
+    auto res2 = m * v;
     pbrlib::testing::equality(res1, res2);
 }
 
-TEST(Mat2Tests, MatrixAndVectorMultiplicationTypeFloat)
+TYPED_TEST(Mat2Tests, AccessToElement)
 {
-    constexpr vec2 res1 (43.0760002f, 11.8300009f);
+    constexpr Matrix2x2 m (
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(4)
+    );
 
-    constexpr mat2 m (1.5f, 4.65f, 12.43f, 0.5f);
-    constexpr vec2 v (2.2f, 3.2f);
-
-    vec2 res2 = m * v;
-
-    pbrlib::testing::equality(res1, res2);
-}
-
-TEST(Mat2Tests, AccessToElement)
-{
-    constexpr Matrix2x2<int>    m (2, 1, 3, 4);
-    constexpr int               r[4] {
-        2, 1, 3, 4
+    constexpr TypeParam r[4] {
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(4)
     };
 
-    for (size_t i{0}; i < 2; i++) 
+    for (size_t i = 0; i < 2; i++) 
     {
-        for (size_t j{0}; j < 2; j++)
+        for (size_t j = 0; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m[i][j]);
     }
 
-    for (size_t i{0}; i < 2; i++) 
+    for (size_t i = 0; i < 2; i++) 
     {
-        for (size_t j{0}; j < 2; j++)
+        for (size_t j = 0; j < 2; j++)
             pbrlib::testing::equality(r[i * 2 + j], m.at(i, j));
     }
 }
 
-TEST(Mat2Tests, AccessToElementTypeFloat)
+TYPED_TEST(Mat2Tests, Determinant)
 {
-    constexpr mat2 m (0.0065f, 1.23f, 23.3f, 23.454f);
+    constexpr Matrix2x2 m (
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(4)
+    );
 
-    constexpr float r[4] {0.0065f, 1.23f, 23.3f, 23.454f};
-
-    for (size_t i{0}; i < 2; i++) 
-    {
-        for (size_t j{0}; j < 2; j++)
-            pbrlib::testing::equality(r[i * 2 + j], m[i][j]);
-    }
-
-    for (size_t i{0}; i < 2; i++) 
-    {
-        for (size_t j{0}; j < 2; j++)
-            pbrlib::testing::equality(r[i * 2 + j], m.at(i, j));
-    }
-}
-
-TEST(Mat2Tests, Determinant)
-{
-    constexpr Matrix2x2<int> m (2, 1, 3, 4);
-
-    constexpr int r = 5;
+    constexpr auto r = static_cast<TypeParam>(5);
 
     pbrlib::testing::equality(r, m.det());
 }
 
-TEST(Mat2Tests, DeterminantTypeFloat)
+TYPED_TEST(Mat2Tests, Transpose)
 {
-    constexpr mat2 m (0.0065f, 1.23f, 23.3f, 23.454f);
+    Matrix2x2 m (
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(4)
+    );
 
-    constexpr float r = -28.506549f;
+    constexpr Matrix2x2 res1 (
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(4)
+    );
 
-    pbrlib::testing::equality(r, m.det());
-}
-
-TEST(Mat2Tests, Transpose)
-{
-    Matrix2x2<int>  m (2, 1, 3, 4);
-
-    constexpr Matrix2x2<int>    res1 (2, 3, 1, 4);
-    Matrix2x2<int>              res2 (transpose(m));
-
+    auto res2 = transpose(m);
     pbrlib::testing::equality(res1, res2);
 
     m.transpose();
-
     pbrlib::testing::equality(res1, m);
 }
 
-TEST(Mat2Tests, TransposeTypeFloat)
+TYPED_TEST(Mat2Tests, Inverse)
 {
-    mat2 m (2.2f, 1.2f, 2.3f, 4.4f);
+    constexpr Matrix2x2 res1 (
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(-2), 
+        static_cast<TypeParam>(1)
+    );
 
-    constexpr mat2  res1 (2.2f, 2.3f, 1.2f, 4.4f);
-    mat2            res2 (transpose(m));
+    Matrix2x2 m (
+        static_cast<TypeParam>(1), 
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(1)
+    );
 
-    pbrlib::testing::equality(res1, res2);
-
-    m.transpose();
-
-    pbrlib::testing::equality(res1, res2);
-}
-
-TEST(Mat2Tests, Inverse)
-{
-    constexpr Matrix2x2<int> res1 (1, -2, 0, 1);
-
-    Matrix2x2<int>  m (1, 2, 0, 1);
-
-    Matrix2x2<int> res2 = inverse(m);
-
+    auto res2 = inverse(m);
     pbrlib::testing::equality(res1, res2);
 
     m.inverse();
-
     pbrlib::testing::equality(res1, m);
 }
 
-TEST(Mat2Tests, InverseTypeFloat)
+TYPED_TEST(Mat2Tests, AtMethodEdgeCase)
 {
-    constexpr mat2 res1 (-2.0f, 1.0f, 1.5f, -0.5f);
-
-    mat2  m (1.0f, 2.0f, 3.0f, 4.0f);
-
-    mat2 res2 = inverse(m);
-
-    pbrlib::testing::equality(res1, res2);
-
-    m.inverse();
-
-    pbrlib::testing::equality(res1, res2);
-}
-
-TEST(Mat2Tests, AtMethodEdgeCase)
-{
-    constexpr mat2 mat (-2.0f, 1.0f, 1.5f, -0.5f);
+    constexpr Matrix2x2 mat (
+        static_cast<TypeParam>(-2.0), 
+        static_cast<TypeParam>(1.0), 
+        static_cast<TypeParam>(1.5), 
+        static_cast<TypeParam>(-0.5)
+    );
 
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(2, 0);
@@ -360,8 +266,15 @@ TEST(Mat2Tests, AtMethodEdgeCase)
     }, pbrlib::exception::InvalidArgument);
 }
 
-TEST(Mat2Tests, Lerp)
+TYPED_TEST(Mat2Tests, Lerp)
 {
-    constexpr mat2 result (0.75f);
-    pbrlib::testing::equality(result, lerp(mat2(0.0f), mat2(1.0f), 0.75f));
+    if constexpr (std::is_floating_point<TypeParam>::value)
+    {
+        constexpr Matrix2x2 result (pbrlib::testing::roundForInteger<TypeParam>(0.75));
+        pbrlib::testing::equality(result, lerp (
+            Matrix2x2(static_cast<TypeParam>(0.0)), 
+            Matrix2x2(static_cast<TypeParam>(1.0)), 
+            pbrlib::testing::roundForInteger<TypeParam>(0.75))
+        );
+    }
 }

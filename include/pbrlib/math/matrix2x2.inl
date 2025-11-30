@@ -212,15 +212,18 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline T& Matrix2x2<T>::at(size_t i, size_t j)
     {
-        if (i > 1 || j > 2) [[unlikely]] 
+        if (i > 1 || j > 1) [[unlikely]] 
             throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
 
         return _array2x2[i][j];
     }
 
     template<MathArithmetic T>
-    inline constexpr T Matrix2x2<T>::at(size_t i, size_t j) const noexcept
+    inline constexpr T Matrix2x2<T>::at(size_t i, size_t j) const
     {
+        if (i > 1 || j > 1) [[unlikely]] 
+            throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
+
         // In constexpr context MSVC cannot handle array access in union
         // Use direct conditional access based on i and j
         return (i == 0 && j == 0) ? _array4[0] : 
