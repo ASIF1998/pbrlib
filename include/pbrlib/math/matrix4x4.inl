@@ -54,9 +54,16 @@ namespace pbrlib::math
     inline constexpr bool Matrix4x4<T>::operator == (const Matrix4x4<T>& mat) const noexcept
     {
         bool res = true;
-
-        for (size_t i = 0; i < 16; i++)
-            res &= _array16[i] == mat._array16[i];
+        for (size_t i = 0; i < 16 && res; i++) 
+        {
+            if constexpr (std::is_floating_point<T>::value)
+            {
+                constexpr auto eps = static_cast<T>(0.0001);
+                res &= std::abs(_array16[i] - mat._array16[i]) < eps;
+            }
+            else 
+                res &= _array16[i] == mat._array16[i];
+        }
 
         return res;
     }
@@ -64,12 +71,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr bool Matrix4x4<T>::operator != (const Matrix4x4<T>& mat) const noexcept
     {
-        bool res = true;
-
-        for (size_t i = 0; i < 16; i++)
-            res |= _array16[i] != mat._array16[i];
-
-        return res;
+        return !(*this == mat);
     }
 
     template<MathArithmetic T>
@@ -210,8 +212,11 @@ namespace pbrlib::math
     }
 
     template<MathArithmetic T>
-    inline constexpr T Matrix4x4<T>::at(size_t i, size_t j) const noexcept
+    inline constexpr T Matrix4x4<T>::at(size_t i, size_t j) const
     {
+        if (i > 3 || j > 3) [[unlikely]] 
+            throw exception::InvalidArgument(std::format("[math::mat4] i = {}, j = {}", i, j));
+
         // In constexpr context MSVC cannot handle array access in union
         // Use direct conditional access based on i and j
         return (i == 0 && j == 0) ? _array16[0] : 
