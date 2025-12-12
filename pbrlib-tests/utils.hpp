@@ -44,6 +44,21 @@ namespace pbrlib::testing
             EXPECT_EQ(v1, v2);
     }
 
+    template<typename T>
+    inline void equality(const pbrlib::math::Vec2<T>& v1, const pbrlib::math::Vec2<T>& v2)
+    {
+        if constexpr (std::is_floating_point<T>::value)
+        {
+            EXPECT_NEAR(v1.x, v2.x, 0.0001f);
+            EXPECT_NEAR(v1.y, v2.y, 0.0001f);
+        }
+        else
+        {
+            EXPECT_EQ(v1.x, v2.x);
+            EXPECT_EQ(v1.y, v2.y);
+        }
+    }
+
     template<typename Type>
     inline void equality(const Type& v1, const Type& v2, const std::string_view err_msg)
     {
