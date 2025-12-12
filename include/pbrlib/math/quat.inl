@@ -54,7 +54,12 @@ namespace pbrlib::math
 
     inline constexpr Quaternion Quaternion::operator / (float f) const
     {
-        if (f != static_cast<float>(0u)) [[unlikely]]
+        constexpr auto custom_abs = [] (float v) 
+        {
+            return v < 0.0f ? -v : v;
+        };
+
+        if (constexpr float eps = 0.0001f; custom_abs(f) < eps) [[unlikely]]
             throw exception::InvalidArgument("[quaternion] attempted to divide quaternion by zero scalar");
 
         float inv_f = 1.0f / f;
@@ -92,7 +97,12 @@ namespace pbrlib::math
 
     inline constexpr Quaternion& Quaternion::operator /= (float f)
     {
-        if (f != static_cast<float>(0u)) [[unlikely]]
+        constexpr auto custom_abs = [] (float v) 
+        {
+            return v < 0.0f ? -v : v;
+        };
+
+        if (constexpr auto eps = 0.0001f; custom_abs(f) < eps)
             throw exception::InvalidArgument("[quaternion] attempted to divide quaternion by zero scalar");
 
         float inv_f = 1.0f / f;
