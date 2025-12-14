@@ -100,7 +100,7 @@ TYPED_TEST(Vec2Tests, Normalize)
     }
 }
 
-TYPED_TEST(Vec2Tests, NormalizeEdgeCase)
+TYPED_TEST(Vec2Tests, ZeroVectorNormalization)
 {
     Vec2 v (static_cast<TypeParam>(0), static_cast<TypeParam>(0));
 

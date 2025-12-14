@@ -136,7 +136,7 @@ TYPED_TEST(Vec4Tests, Normalize)
     }
 }
 
-TYPED_TEST(Vec4Tests, NormalizeEdgeCase)
+TYPED_TEST(Vec4Tests, ZeroVectorNormalization)
 {
     Vec4 v (
         static_cast<TypeParam>(0), 

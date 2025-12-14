@@ -110,9 +110,13 @@ TYPED_TEST(Vec3Tests, Normalize)
     }
 }
 
-TYPED_TEST(Vec3Tests, NormalizeEdgeCase)
+TYPED_TEST(Vec3Tests, ZeroVectorNormalization)
 {
-    Vec3 v (static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(0));
+    Vec3 v (
+        static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(0)
+    );
 
     EXPECT_THROW({
         v.normalize();
