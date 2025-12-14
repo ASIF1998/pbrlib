@@ -79,8 +79,6 @@ namespace pbrlib::backend
     public:
         explicit GBufferGenerator(vk::Device& device);
 
-        static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
     private:
         vk::FramebufferHandle _framebuffer_handle;
 
@@ -94,5 +92,7 @@ namespace pbrlib::backend
         vk::DescriptorSetHandle         _result_descriptor_set_handle;
 
         vk::SamplerHandle _sampler_handle;
+
+        static constexpr auto _final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };
 }
