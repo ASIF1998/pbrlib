@@ -1,4 +1,4 @@
-#include "testing_types.hpp"    
+#include "testing_types.hpp"
 
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/lerp.hpp>
@@ -49,8 +49,17 @@ TYPED_TEST(Vec3Tests, AdditionAndSubtraction)
 
 TYPED_TEST(Vec3Tests, Multiplication)
 {
-    Vec3             v      (static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(6));
-    constexpr Vec3   res    (static_cast<TypeParam>(4), static_cast<TypeParam>(6), static_cast<TypeParam>(12));
+    Vec3 v (
+        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6)
+    );
+
+    constexpr Vec3 res (
+        static_cast<TypeParam>(4), 
+        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(12)
+    );
     
     constexpr auto s = static_cast<TypeParam>(2);
 
