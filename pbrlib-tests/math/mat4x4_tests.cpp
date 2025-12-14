@@ -99,17 +99,17 @@ TYPED_TEST(Mat4Tests, AdditionAndSubtraction)
 
 TYPED_TEST(Mat4Tests, ScalarMultiplication)
 {
-    constexpr Matrix4x4 m (static_cast<TypeParam>(16));
-    
-    constexpr auto s = static_cast<TypeParam>(2);
+    constexpr Matrix4x4 m (static_cast<TypeParam>(17));
 
-    auto res = m * s;
+    constexpr auto s = static_cast<TypeParam>(5);
 
-    pbrlib::testing::equality(Matrix4x4(static_cast<TypeParam>(32)), res);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m * s);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), s * m);
 
-    res *= s;
+    auto m2 = m;
+    m2 *= s;
 
-    pbrlib::testing::equality(Matrix4x4(static_cast<TypeParam>(64)), res);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m2);
 }
 
 TYPED_TEST(Mat4Tests, MatrixMultiplication)

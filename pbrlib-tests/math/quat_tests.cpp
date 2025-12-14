@@ -66,6 +66,7 @@ TEST(QuatTests, ScalarMultiplicationAndDivision)
     float s = 3.0f;
 
     pbrlib::testing::equality(res1, q * s);
+    pbrlib::testing::equality(res1, s * q);
 
     q *= s;
 

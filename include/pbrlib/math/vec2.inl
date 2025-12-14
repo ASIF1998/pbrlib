@@ -43,13 +43,21 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr bool Vec2<T>::operator == (const Vec2<T>& v) const noexcept
     {
+        if constexpr (std::is_floating_point<T>::value)
+        {
+            constexpr auto eps = static_cast<T>(0.0001);
+            return 
+                    std::abs(x - v.x) < eps
+                &&  std::abs(y - v.y) < eps;
+        }
+
         return x == v.x && y == v.y;
     }
 
     template<MathArithmetic T>
     inline constexpr bool Vec2<T>::operator != (const Vec2<T>& v) const noexcept
     {
-        return x != v.x || y != v.y;
+        return !(*this == v);
     }
 
     template<MathArithmetic T>

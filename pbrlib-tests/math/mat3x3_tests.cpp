@@ -87,15 +87,17 @@ TYPED_TEST(Mat3Tests, AdditionAndSubtraction)
 
 TYPED_TEST(Mat3Tests, ScalarMultiplication)
 {
-    constexpr Matrix3x3 m (static_cast<TypeParam>(16));
+   constexpr Matrix3x3 m (static_cast<TypeParam>(17));
 
-    constexpr auto s = static_cast<TypeParam>(2);
+    constexpr auto s = static_cast<TypeParam>(5);
 
-    auto res = m * s;
-    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(32)), res);
-    
-    res *= s;
-    pbrlib::testing::equality(Matrix3x3(static_cast<TypeParam>(64)), res);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m * s);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), s * m);
+
+    auto m2 = m;
+    m2 *= s;
+
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m2);
 }
 
 TYPED_TEST(Mat3Tests, MatrixMultiplication)

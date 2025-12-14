@@ -94,11 +94,13 @@ TYPED_TEST(Mat2Tests, ScalarMultiplication)
 
     constexpr auto s = static_cast<TypeParam>(5);
 
-    auto res = m * s;
-    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), res);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m * s);
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), s * m);
 
-    res *= s;
-    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(425)), res);
+    auto m2 = m;
+    m2 *= s;
+
+    pbrlib::testing::equality(Matrix2x2(static_cast<TypeParam>(85)), m2);
 }
 
 TYPED_TEST(Mat2Tests, MatrixMultiplication)

@@ -55,6 +55,7 @@ TYPED_TEST(Vec2Tests, Multiplication)
     constexpr auto s = static_cast<TypeParam>(2);
 
     pbrlib::testing::equality(res, v * s);
+    pbrlib::testing::equality(res, s * v);
 
     v *= s;
 
