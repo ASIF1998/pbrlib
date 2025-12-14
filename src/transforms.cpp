@@ -1,17 +1,12 @@
-#include <pbrlib/transform.hpp>
+#include <pbrlib/transforms.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
+#include <pbrlib/math/casts.hpp>
 
 #include <cmath>
 #include <numbers>
 
-namespace pbrlib::transform
+namespace pbrlib::transforms
 {
-    float radians(float angle)
-    {
-        constexpr float p = static_cast<float>(std::numbers::pi_v<float>) / 180.0f;
-        return angle * p;
-    }
-
     math::mat4 translate(const math::vec3& t)
     {
         return math::mat4 (
@@ -34,8 +29,8 @@ namespace pbrlib::transform
 
     math::mat4 rotateX(float theta)
     {
-        float sin_theta = sin(radians(theta));
-        float cos_theta = cos(radians(theta));
+        float sin_theta = sin(math::toRadians(theta));
+        float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             1.0f, 0.0f,         0.0f,       0.0f,
@@ -47,8 +42,8 @@ namespace pbrlib::transform
 
     math::mat4 rotateY(float theta)
     {
-        float sin_theta = sin(radians(theta));
-        float cos_theta = cos(radians(theta));
+        float sin_theta = sin(math::toRadians(theta));
+        float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             cos_theta,  0.0f, sin_theta,    0.0f,
@@ -60,8 +55,8 @@ namespace pbrlib::transform
 
     math::mat4 rotateZ(float theta)
     {
-        float sin_theta = sin(radians(theta));
-        float cos_theta = cos(radians(theta));
+        float sin_theta = sin(math::toRadians(theta));
+        float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             cos_theta,  -sin_theta, 0.0f, 0.0f,
@@ -73,9 +68,9 @@ namespace pbrlib::transform
 
     math::mat4 rotate(const math::vec3& axis, float theta)
     {
-        math::vec3 r = normalize(axis);
+        math::vec3 r = math::normalize(axis);
 
-        float theta_in_radians = radians(theta);
+        float theta_in_radians = math::toRadians(theta);
 
         float sin_theta             = sin(theta_in_radians);
         float cos_theta             = cos(theta_in_radians);
@@ -112,7 +107,7 @@ namespace pbrlib::transform
     )
     {
         auto f = math::normalize(pos - eye);
-        auto s = math::normalize(cross(f, up));
+        auto s = math::normalize(math::cross(f, up));
         auto u = math::cross(s, f);
 
         math::mat4 mat;
@@ -141,7 +136,7 @@ namespace pbrlib::transform
         float       z_far
     )
     {
-        const auto rad = radians(fovy);
+        const auto rad = math::toRadians(fovy);
 
         math::mat4 mat;
 
@@ -153,5 +148,10 @@ namespace pbrlib::transform
         mat[3][3] = 0.0f;
 
         return mat;
+    }
+
+    math::quat angleAxis(float angle, const math::vec3& axis)
+    {
+        return math::quat(math::normalize(axis) * std::sinf(angle * 0.5f), std::cosf(angle * 0.5f));
     }
 }

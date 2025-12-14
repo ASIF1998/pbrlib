@@ -1,5 +1,7 @@
 #include <pbrlib/math/aabb.hpp>
 
+#include <pbrlib/utils/combine_hash.hpp>
+
 namespace pbrlib::math
 {
     vec3& AABB::operator [] (size_t i)
@@ -56,5 +58,17 @@ namespace pbrlib::math
     {
         p_min = pbrlib::math::vec3(std::min(p_min.x, p.x), std::min(p_min.y, p.y), std::min(p_min.z, p.z));
         p_max = pbrlib::math::vec3(std::max(p_max.x, p.x), std::max(p_max.y, p.y), std::max(p_max.z, p.z));
+    }
+}
+
+namespace std
+{
+    size_t hash<pbrlib::math::AABB>::operator () (const pbrlib::math::AABB& aabb) const noexcept
+    {
+        size_t hash_value = 0;
+        pbrlib::combineHash(hash_value, aabb.p_min);
+        pbrlib::combineHash(hash_value, aabb.p_max);
+        
+        return hash_value;
     }
 }

@@ -3,7 +3,7 @@
 
 #include <pbrlib/scene/scene.hpp>
 
-#include <pbrlib/transform.hpp>
+#include <pbrlib/transforms.hpp>
 #include <pbrlib/camera.hpp>
 #include <pbrlib/input/input_stay.hpp>
 
@@ -13,6 +13,12 @@
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>
 
+#include <pbrlib/math/matrix2x2.hpp>
+#include <pbrlib/math/matrix3x3.hpp>
+#include <pbrlib/math/casts.hpp>
+
+#include <cmath>
+
 #include <backend/utils/paths.hpp>
 
 struct RotateComponent
@@ -20,24 +26,20 @@ struct RotateComponent
     float angle = 0.0f;
 };
 
-auto angleAxis(float angle, const pbrlib::math::vec3& axis)
-{
-    return pbrlib::math::quat(pbrlib::math::normalize(axis) * sin(angle * 0.5), cos(angle * 0.5));
-}
-
 auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir) 
     -> pbrlib::math::vec3
 {
-    const auto move_dir = motion.getRelativeMotion();
+    const auto move_dir = motion.relativeMotion();
 
     const auto dx = move_dir.x / static_cast<float>(config.width);
     const auto dy = move_dir.y / static_cast<float>(config.height);
 
-    const auto rotation = angleAxis(dx, pbrlib::math::vec3(0, 1, 0)) * angleAxis(dy, pbrlib::math::vec3(1, 0, 0));
+    const auto rotation_1 = pbrlib::transforms::angleAxis(dy, pbrlib::math::vec3(1, 0, 0));
+    const auto rotation_2 = pbrlib::transforms::angleAxis(dx, pbrlib::math::vec3(0, 1, 0)) * rotation_1;
 
-    const auto rdir = pbrlib::math::normalize(rotation.toMatrix() * pbrlib::math::vec4(dir, 0.0));
+    const auto rdir = pbrlib::math::normalize(pbrlib::math::toMatrix(rotation_2) * pbrlib::math::vec4(dir, 0.0f));
 
-    return pbrlib::math::vec3(rdir.x, rdir.y, rdir.z);
+    return pbrlib::math::vec3(rdir);
 }
 
 auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::vec3& dir, const pbrlib::math::vec3& up) noexcept
@@ -47,7 +49,7 @@ auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::v
         return dir;
 
     if (keyboard.isDown(pbrlib::Keycode::S))
-        return dir * -1.0;
+        return dir * -1.0f;
 
     if (keyboard.isDown(pbrlib::Keycode::A))
         return pbrlib::math::cross(up, dir);
@@ -56,7 +58,7 @@ auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::v
         return pbrlib::math::cross(dir, up);
 
     if (keyboard.isDown(pbrlib::Keycode::Space))
-        return up * -1.0;
+        return up * -1.0f;
 
     if (keyboard.isDown(pbrlib::Keycode::ShiftLeft))
         return up;
@@ -106,10 +108,10 @@ int main()
                     rotate_component.angle += 0.5;
 
                     auto& transform = item.getComponent<pbrlib::components::Transform>();
-                    transform.transform = pbrlib::transform::rotateZ(rotate_component.angle);
+                    transform.transform = pbrlib::transforms::rotateZ(rotate_component.angle);
                 });
 
-                const auto instance_transform = pbrlib::transform::translate(pbrlib::math::vec3(-2, 2, 3));
+                const auto instance_transform = pbrlib::transforms::translate(pbrlib::math::vec3(-2, 2, 3));
 
                 scene.createInstance("Extended", "Extended - 2", instance_transform);
             }

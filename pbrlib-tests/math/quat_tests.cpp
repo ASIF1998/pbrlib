@@ -3,6 +3,7 @@
 #include <pbrlib/math/quat.hpp>
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/lerp.hpp>
+#include <pbrlib/math/casts.hpp>
 
 TEST(QuatTests, Constructor)
 {
@@ -65,6 +66,7 @@ TEST(QuatTests, ScalarMultiplicationAndDivision)
     float s = 3.0f;
 
     pbrlib::testing::equality(res1, q * s);
+    pbrlib::testing::equality(res1, s * q);
 
     q *= s;
 
@@ -190,7 +192,7 @@ TEST(QuatTests, ToTransform)
 
     constexpr pbrlib::math::quat q (1.0f, 0.0f, 0.0f, 0.0f);
 
-    pbrlib::testing::equality(q.toMatrix(), res);
+    pbrlib::testing::equality(pbrlib::math::toMatrix(q), res);
 }
 
 TEST(QuatTests, NormalizeEdgeCase)

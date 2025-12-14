@@ -46,8 +46,8 @@ namespace pbrlib::backend
     struct GBufferPushConstantBlock final
     {
         math::mat4  projection_view;
-        uint32_t    instance_id;
-        uint32_t    material_index;
+        uint32_t    instance_id     = ~0u;
+        uint32_t    material_index  = ~0u;
     };
 
     class GBufferGenerator final :

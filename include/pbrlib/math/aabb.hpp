@@ -29,4 +29,13 @@ namespace pbrlib::math
     };
 }
 
+namespace std
+{
+    template<>
+    struct hash<pbrlib::math::AABB> final
+    {
+        size_t operator () (const pbrlib::math::AABB& aabb) const noexcept;
+    };
+}
+
 #include "aabb.inl"
