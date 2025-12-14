@@ -79,13 +79,13 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (const Vec4<T>& v, T s)
     {
-        return Vec4<T>(v.x * s, v.y * s, v.z * s, v.z * s);
+        return Vec4<T>(v.x * s, v.y * s, v.z * s, v.w * s);
     }
 
     template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (T s, const Vec4<T>& v)
     {
-        return Vec4<T>(v.x * s, v.y * s, v.z * s, v.z * s);
+        return Vec4<T>(v.x * s, v.y * s, v.z * s, v.w * s);
     }
 
     template<MathArithmetic T>
