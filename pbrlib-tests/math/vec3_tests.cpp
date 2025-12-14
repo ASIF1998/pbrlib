@@ -99,12 +99,30 @@ TYPED_TEST(Vec3Tests, Normalize)
 {
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
-        constexpr Vec3 r1 (static_cast<TypeParam>(0.99497598400), static_cast<TypeParam>(0.100024336737), static_cast<TypeParam>(0.00422390176269));
-        constexpr Vec3 r2 (static_cast<TypeParam>(0.00131073419), static_cast<TypeParam>(0.757122039000), static_cast<TypeParam>(0.65327209200000));
+        constexpr Vec3 r1 (
+            static_cast<TypeParam>(0.99497598400),
+            static_cast<TypeParam>(0.100024336737),
+            static_cast<TypeParam>(0.00422390176269)
+        );
+
+        constexpr Vec3 r2 (
+            static_cast<TypeParam>(0.00131073419),
+            static_cast<TypeParam>(0.757122039000),
+            static_cast<TypeParam>(0.65327209200000)
+        );
     
-        constexpr Vec3 v1 (static_cast<TypeParam>(7643.8738), static_cast<TypeParam>(768.434), static_cast<TypeParam>(32.45));
-        constexpr Vec3 v2 (static_cast<TypeParam>(0.1323230), static_cast<TypeParam>(76.4340), static_cast<TypeParam>(65.95));
-    
+        constexpr Vec3 v1 (
+            static_cast<TypeParam>(7643.8738),
+            static_cast<TypeParam>(768.434),
+            static_cast<TypeParam>(32.45)
+        );
+
+        constexpr Vec3 v2 (
+            static_cast<TypeParam>(0.1323230),
+            static_cast<TypeParam>(76.4340),
+            static_cast<TypeParam>(65.95)
+        );
+
         pbrlib::testing::equality(r1, normalize(v1));
         pbrlib::testing::equality(r2, normalize(v2));
     }
