@@ -79,6 +79,8 @@ int main()
         {
             .blur_samples_count = 8
         };
+
+        config.aa = pbrlib::settings::AA::eFXAA;
         
         pbrlib::Engine engine (config);
 

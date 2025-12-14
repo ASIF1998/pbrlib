@@ -11,6 +11,8 @@
 #include <backend/renderer/frame_graph/builders/ssao.hpp>
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
+#include <backend/renderer/frame_graph/filters/fxaa.hpp>
+
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/logger/logger.hpp>
@@ -108,6 +110,20 @@ namespace pbrlib::backend
             .build();
     }
 
+    void FrameGraph::setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa)
+    {
+        if (aa == settings::AA::eNone)
+            return ;
+
+        if (aa == settings::AA::eFXAA)
+        {
+            std::unique_ptr<Filter> ptr_fxaa = std::make_unique<FXAA>(_device);
+            ptr_fxaa->apply(image);
+
+            compound_render_pass.add(std::move(ptr_fxaa));
+        }
+    }
+
     void FrameGraph::build()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -130,6 +146,8 @@ namespace pbrlib::backend
         
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
+
+        setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
 
