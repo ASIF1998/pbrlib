@@ -17,7 +17,7 @@ namespace pbrlib::backend
 
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
 
-        void createPipeline();
+        bool createPipeline();
 
     public:
         explicit FXAA(vk::Device& device);
@@ -25,5 +25,8 @@ namespace pbrlib::backend
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
+
+        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
+        vk::DescriptorSetHandle         _descriptor_set_handle;
     };
 }
