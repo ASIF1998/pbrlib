@@ -195,6 +195,7 @@ namespace pbrlib::backend
 
         createRenderPassImages<GBufferGenerator>(_device, _images, width, height);
         createRenderPassImages<SSAO>(_device, _images, width, height);
+        createRenderPassImages<FXAA>(_device, _images, width, height);
     }
 }
 

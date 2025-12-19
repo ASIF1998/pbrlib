@@ -5,6 +5,33 @@
 
 namespace pbrlib::backend
 {
+    class FXAA;
+
+    template<>
+    struct AttachmentsTraits<FXAA> final
+    {
+        static constexpr auto metadata()
+        {
+            constexpr auto usage_flags = 
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
+            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
+            constexpr std::array metadata
+            {
+                AttachmentMetadata(result, VK_FORMAT_A2R10G10B10_UNORM_PACK32, usage_flags),
+            };
+
+            return metadata;
+        };
+
+        constexpr static auto result = "fxaa";
+    };
+}
+
+namespace pbrlib::backend
+{
     class FXAA final :
         public Filter
     {
