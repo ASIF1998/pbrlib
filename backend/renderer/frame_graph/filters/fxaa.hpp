@@ -55,5 +55,7 @@ namespace pbrlib::backend
 
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
         vk::DescriptorSetHandle         _descriptor_set_handle;
+
+        vk::SamplerHandle _sampler_handle;
     };
 }

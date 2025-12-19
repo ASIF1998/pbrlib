@@ -3,6 +3,8 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/image.hpp>
+#include <backend/utils/vulkan.hpp>
 
 #include <backend/events.hpp>
 #include <pbrlib/event_system.hpp>
@@ -45,6 +47,42 @@ namespace pbrlib::backend
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(_descriptor_set_layout_handle)
             .build();
+
+        const auto& input_image         = srcImage();
+        const auto  ptr_output_image    = colorOutputAttach(AttachmentsTraits<FXAA>::result);
+
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_NEAREST,
+            .minFilter      = VK_FILTER_NEAREST,
+            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
+        };
+
+        VK_CHECK(vkCreateSampler(
+            device().device(),
+            &sampler_create_info,
+            nullptr, 
+            &_sampler_handle.handle()
+        ));
+
+        device().writeDescriptorSet ({
+            .view_handle            = input_image.view_handle.handle(),
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
+        
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_output_image->view_handle.handle(),
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
+            .binding                = 1
+        });
 
         return createPipeline();
     }

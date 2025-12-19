@@ -64,8 +64,8 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(AttachmentsTraits<SSAO>::blur);
-
+        auto ptr_result = &_images.at(AttachmentsTraits<FXAA>::result);
+        
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
     }
@@ -125,6 +125,16 @@ namespace pbrlib::backend
                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                 VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
             );
+
+            auto ptr_fxaa_result = &_images.at(AttachmentsTraits<FXAA>::result);
+
+            ptr_fxaa->addSyncImage (
+                ptr_fxaa_result, 
+                VK_IMAGE_LAYOUT_GENERAL, 
+                VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
+            );
+
+            ptr_fxaa->addColorOutput(AttachmentsTraits<FXAA>::result, ptr_fxaa_result);
 
             compound_render_pass.add(std::move(ptr_fxaa));
         }
