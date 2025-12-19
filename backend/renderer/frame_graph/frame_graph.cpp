@@ -120,6 +120,12 @@ namespace pbrlib::backend
             std::unique_ptr<Filter> ptr_fxaa = std::make_unique<FXAA>(_device);
             ptr_fxaa->apply(image);
 
+            ptr_fxaa->addSyncImage (
+                &image, 
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
+            );
+
             compound_render_pass.add(std::move(ptr_fxaa));
         }
     }
