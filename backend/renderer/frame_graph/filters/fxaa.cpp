@@ -4,6 +4,8 @@
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/command_buffer.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/utils/vulkan.hpp>
 
 #include <backend/events.hpp>
@@ -102,6 +104,26 @@ namespace pbrlib::backend
     void FXAA::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
+        {
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
+
+            vkCmdBindDescriptorSets(
+                command_buffer_handle, 
+                VK_PIPELINE_BIND_POINT_COMPUTE, 
+                _pipeline_layout_handle, 
+                0, 1, &_descriptor_set_handle.handle(), 
+                0, nullptr
+            );
+
+            const auto [width, height] = size();
+
+            const auto group_count_x = width / device().workGroupSize();
+            const auto group_count_y = height / device().workGroupSize();
+
+            vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+        }, "[fxaa] run-pipeline", vk::marker_colors::fxaa);
     }
 
     VkPipelineStageFlags2 FXAA::srcStage() const noexcept
