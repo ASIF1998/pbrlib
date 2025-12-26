@@ -20,7 +20,7 @@ namespace pbrlib::backend
 
             constexpr std::array metadata
             {
-                AttachmentMetadata(result, VK_FORMAT_A2R10G10B10_UNORM_PACK32, usage_flags),
+                AttachmentMetadata(result, VK_FORMAT_R16G16B16A16_SFLOAT, usage_flags),
             };
 
             return metadata;

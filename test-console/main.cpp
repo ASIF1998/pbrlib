@@ -107,7 +107,7 @@ int main()
                 )
                 {
                     auto& rotate_component = item.getComponent<RotateComponent>();
-                    rotate_component.angle += 0.5;
+                    rotate_component.angle += 10.0 * delta_time;
 
                     auto& transform = item.getComponent<pbrlib::components::Transform>();
                     transform.transform = pbrlib::transforms::rotateZ(rotate_component.angle);

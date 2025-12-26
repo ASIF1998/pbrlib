@@ -163,7 +163,7 @@ namespace pbrlib::backend
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
 
-        setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
+        setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::ssao), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
 
