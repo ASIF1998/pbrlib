@@ -59,7 +59,7 @@ namespace pbrlib::backend
 
     bool BilateralBlur::createPipeline()
     {
-        constexpr auto blur_shader = "shaders/bilateral_blur/bilateral_blur.glsl.comp";
+        constexpr auto blur_shader = "shaders/bilateral_blur.glsl.comp";
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(blur_shader)
