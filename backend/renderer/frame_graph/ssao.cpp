@@ -12,7 +12,7 @@
 
 #include <backend/scene/material_manager.hpp>
 
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>

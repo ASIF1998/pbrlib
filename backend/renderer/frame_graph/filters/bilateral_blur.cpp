@@ -9,7 +9,7 @@
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 

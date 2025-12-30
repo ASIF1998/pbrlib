@@ -6,7 +6,7 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/events.hpp>
 #include <pbrlib/event_system.hpp>

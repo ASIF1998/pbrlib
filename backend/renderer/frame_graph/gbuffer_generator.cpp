@@ -7,7 +7,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/framebuffer.hpp>
 #include <backend/renderer/vulkan/graphics_pipeline.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/scene/mesh_manager.hpp>
 
