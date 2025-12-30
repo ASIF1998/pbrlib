@@ -1,13 +1,37 @@
 #include <backend/renderer/frame_graph/filters/filter.hpp>
+#include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/image.hpp>
+#include <backend/utils/vulkan.hpp>
 
 #include <pbrlib/exceptions.hpp>
 
+#include <format>
+
 namespace pbrlib::backend
 {
-    Filter::Filter(vk::Device& device, vk::Image& dst_image) noexcept :
+    Filter::Filter(std::string_view filter_name, vk::Device& device, vk::Image& dst_image) noexcept :
         RenderPass      (device),
+        _name           (filter_name),
         _ptr_dst_image  (&dst_image)
-    { }
+    {
+        _io_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+            .build();
+
+        _io_descriptor_set_handle = device.allocateDescriptorSet (
+            _io_descriptor_set_layout_handle,
+            std::format("[{}] input descriptor set", _name)
+        );
+
+        device.writeDescriptorSet ({
+            .view_handle            = _ptr_dst_image->view_handle.handle(),
+            .set_handle             = _io_descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
+            .binding                = 1
+        });
+    }
 
     void Filter::apply(vk::Image& image)
     {
@@ -26,12 +50,38 @@ namespace pbrlib::backend
             VK_IMAGE_LAYOUT_GENERAL,
             VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
         );
+
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_LINEAR,
+            .minFilter      = VK_FILTER_LINEAR,
+            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
+        };
+
+        VK_CHECK(vkCreateSampler (
+            device().device(),
+            &sampler_create_info,
+            nullptr, 
+            &_input_image_sampler_handle.handle()
+        ));
+
+        device().writeDescriptorSet ({
+            .view_handle            = srcImage().view_handle.handle(),
+            .sampler_handle         = _input_image_sampler_handle,
+            .set_handle             = _io_descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
     }
 
     vk::Image& Filter::srcImage()
     {
         if (!_ptr_src_image) [[unlikely]]
-            throw exception::InvalidState("[filter] didn't set source image");
+            throw exception::InvalidState(std::format("[{}] didn't set source image", _name));
         
         return *_ptr_src_image;
     }
@@ -39,5 +89,10 @@ namespace pbrlib::backend
     vk::Image& Filter::dstImage() noexcept
     {
         return *_ptr_dst_image;
+    }
+
+    std::pair<VkDescriptorSet, VkDescriptorSetLayout> Filter::IODescriptorSet() noexcept
+    {
+        return std::make_pair(_io_descriptor_set_handle.handle(), _io_descriptor_set_layout_handle.handle());
     }
 }

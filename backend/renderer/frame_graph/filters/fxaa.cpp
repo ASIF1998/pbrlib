@@ -18,18 +18,8 @@
 namespace pbrlib::backend
 {
     FXAA::FXAA(vk::Device& device, vk::Image& dst_image) :
-        Filter (device, dst_image)
-    { 
-        _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _descriptor_set_handle = device.allocateDescriptorSet (
-            _descriptor_set_layout_handle,
-            "[fxaa] input descriptor set"
-        );
-    }
+        Filter ("fxaa", device, dst_image)
+    { }
 
     bool FXAA::init(const RenderContext& context, uint32_t width, uint32_t height)
     {
@@ -46,42 +36,11 @@ namespace pbrlib::backend
             createPipeline();
         });
 
-        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(_descriptor_set_layout_handle)
-            .build();
-
-        constexpr VkSamplerCreateInfo sampler_create_info 
-        {
-            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter      = VK_FILTER_LINEAR,
-            .minFilter      = VK_FILTER_LINEAR,
-            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
-        };
-
-        VK_CHECK(vkCreateSampler(
-            device().device(),
-            &sampler_create_info,
-            nullptr, 
-            &_sampler_handle.handle()
-        ));
-
-        device().writeDescriptorSet ({
-            .view_handle            = srcImage().view_handle.handle(),
-            .sampler_handle         = _sampler_handle,
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .binding                = 0
-        });
+        const auto [_, io_set_layout_handle] = IODescriptorSet();
         
-        device().writeDescriptorSet ({
-            .view_handle            = dstImage().view_handle.handle(),
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
-            .binding                = 1
-        });
+        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
+            .addSetLayout(io_set_layout_handle)
+            .build();
 
         return createPipeline();
     }
@@ -106,11 +65,12 @@ namespace pbrlib::backend
         {
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
+            const auto [io_set_handle, _] = IODescriptorSet();
             vkCmdBindDescriptorSets(
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle.handle(), 
+                0, 1, &io_set_handle, 
                 0, nullptr
             );
 
