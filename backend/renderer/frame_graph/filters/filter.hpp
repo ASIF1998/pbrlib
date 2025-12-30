@@ -26,6 +26,9 @@ namespace pbrlib::backend
 
         [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> IODescriptorSet() noexcept;
 
+    protected:
+        void dispatchCompute(VkCommandBuffer command_buffer_handle);
+
     private:
         std::string _name;
 

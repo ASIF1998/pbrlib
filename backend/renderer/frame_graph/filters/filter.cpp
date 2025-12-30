@@ -79,4 +79,14 @@ namespace pbrlib::backend
     {
         return std::make_pair(_io_descriptor_set_handle.handle(), _io_descriptor_set_layout_handle.handle());
     }
+
+    void Filter::dispatchCompute(VkCommandBuffer command_buffer_handle)
+    {
+        const auto [width, height] = size();
+
+        const auto group_count_x = width / device().workGroupSize();
+        const auto group_count_y = height / device().workGroupSize();
+
+        vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+    }
 }

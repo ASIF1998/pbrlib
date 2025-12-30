@@ -102,12 +102,7 @@ namespace pbrlib::backend
                 0, sizeof(Settings), &_settings
             );
 
-            const auto [width, height] = size();
-
-            const auto group_count_x = width / device().workGroupSize();
-            const auto group_count_y = height / device().workGroupSize();
-
-            vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+            dispatchCompute(command_buffer_handle);
         }, "[bilateral-blur] run-pipeline", vk::marker_colors::bilateral_blur);
     }
 

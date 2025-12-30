@@ -74,12 +74,7 @@ namespace pbrlib::backend
                 0, nullptr
             );
 
-            const auto [width, height] = size();
-
-            const auto group_count_x = width / device().workGroupSize();
-            const auto group_count_y = height / device().workGroupSize();
-
-            vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+            dispatchCompute(command_buffer_handle);
         }, "[fxaa] run-pipeline", vk::marker_colors::fxaa);
     }
 
