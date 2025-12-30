@@ -18,10 +18,9 @@
 
 namespace pbrlib::backend
 {
-    BilateralBlur::BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings):
-        Filter              (device),
-        _output_image_name  (output_image_name),
-        _settings           (settings)
+    BilateralBlur::BilateralBlur(vk::Device& device, vk::Image& dst_image, const Settings& settings):
+        Filter      (device, dst_image),
+        _settings   (settings)
     {
         _settings.sample_count = utils::alignSize(_settings.sample_count, 2u);
         _settings.sample_count = std::clamp<uint32_t>(_settings.sample_count, 1, 8);
@@ -81,11 +80,8 @@ namespace pbrlib::backend
             .pushConstant(push_constant_range)
             .build();
 
-        const auto& input_image         = srcImage();
-        const auto  ptr_output_image    = colorOutputAttach(_output_image_name);
-
         device().writeDescriptorSet ({
-            .view_handle            = input_image.view_handle.handle(),
+            .view_handle            = srcImage().view_handle.handle(),
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -93,7 +89,7 @@ namespace pbrlib::backend
         });
         
         device().writeDescriptorSet ({
-            .view_handle            = ptr_output_image->view_handle.handle(),
+            .view_handle            = dstImage().view_handle.handle(),
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1

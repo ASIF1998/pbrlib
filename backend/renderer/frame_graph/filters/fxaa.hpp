@@ -47,7 +47,7 @@ namespace pbrlib::backend
         bool createPipeline();
 
     public:
-        explicit FXAA(vk::Device& device);
+        explicit FXAA(vk::Device& device, vk::Image& dst_image);
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;

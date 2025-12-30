@@ -117,24 +117,10 @@ namespace pbrlib::backend
 
         if (aa == settings::AA::eFXAA)
         {
-            std::unique_ptr<Filter> ptr_fxaa = std::make_unique<FXAA>(_device);
+            auto& result = _images.at(AttachmentsTraits<FXAA>::result);
+
+            auto ptr_fxaa = std::make_unique<FXAA>(_device, result);
             ptr_fxaa->apply(image);
-
-            ptr_fxaa->addSyncImage (
-                &image, 
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-                VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-            );
-
-            auto ptr_fxaa_result = &_images.at(AttachmentsTraits<FXAA>::result);
-
-            ptr_fxaa->addSyncImage (
-                ptr_fxaa_result, 
-                VK_IMAGE_LAYOUT_GENERAL, 
-                VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-            );
-
-            ptr_fxaa->addColorOutput(AttachmentsTraits<FXAA>::result, ptr_fxaa_result);
 
             compound_render_pass.add(std::move(ptr_fxaa));
         }

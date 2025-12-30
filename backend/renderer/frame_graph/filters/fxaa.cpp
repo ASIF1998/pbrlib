@@ -17,8 +17,8 @@
 
 namespace pbrlib::backend
 {
-    FXAA::FXAA(vk::Device& device) :
-        Filter (device)
+    FXAA::FXAA(vk::Device& device, vk::Image& dst_image) :
+        Filter (device, dst_image)
     { 
         _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
@@ -50,9 +50,6 @@ namespace pbrlib::backend
             .addSetLayout(_descriptor_set_layout_handle)
             .build();
 
-        const auto& input_image         = srcImage();
-        const auto  ptr_output_image    = colorOutputAttach(AttachmentsTraits<FXAA>::result);
-
         constexpr VkSamplerCreateInfo sampler_create_info 
         {
             .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -72,7 +69,7 @@ namespace pbrlib::backend
         ));
 
         device().writeDescriptorSet ({
-            .view_handle            = input_image.view_handle.handle(),
+            .view_handle            = srcImage().view_handle.handle(),
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -80,7 +77,7 @@ namespace pbrlib::backend
         });
         
         device().writeDescriptorSet ({
-            .view_handle            = ptr_output_image->view_handle.handle(),
+            .view_handle            = dstImage().view_handle.handle(),
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
