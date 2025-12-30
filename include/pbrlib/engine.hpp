@@ -18,7 +18,8 @@ namespace pbrlib
 
 namespace pbrlib::settings
 {
-    struct SSAO;   
+    struct SSAO;
+    struct FXAA;
 }
 
 namespace pbrlib::backend
@@ -77,6 +78,7 @@ namespace pbrlib
         void update(UpdateCallback update_callback);
 
         void update(const settings::SSAO& settings);
+        void update(const settings::FXAA& settings);
 
         void run();
 

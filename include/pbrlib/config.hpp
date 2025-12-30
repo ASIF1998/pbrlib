@@ -22,6 +22,13 @@ namespace pbrlib::settings
         eNone,
         eFXAA
     };
+
+    struct FXAA final
+    {
+        float span_max      = 0.5f;
+        float reduce_min    = 0.5f;
+        float reduce_mul    = 0.5f;
+    };
 }
 
 namespace pbrlib

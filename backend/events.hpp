@@ -47,6 +47,11 @@ namespace pbrlib::backend::events
         settings::SSAO settings;
     };
 
+    struct UpdateFXAA final
+    {
+        settings::FXAA settings;
+    };
+
     struct RecompilePipeline final
     { 
         uint32_t width  = 0;

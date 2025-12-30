@@ -35,6 +35,13 @@ namespace pbrlib::backend
     class FXAA final :
         public Filter
     {
+        struct Config final
+        {
+            float span_max      = 8.0;
+            float reduce_min    = 1.0 / 128.0;
+            float reduce_mul    = 1.0 / 8.0;
+        };
+
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
         
         void render(vk::CommandBuffer& command_buffer) override;
@@ -52,5 +59,7 @@ namespace pbrlib::backend
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
+
+        Config _config;
     };
 }

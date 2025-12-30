@@ -15,6 +15,8 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <pbrlib/math/lerp.hpp>
+
 namespace pbrlib::backend
 {
     FXAA::FXAA(vk::Device& device, vk::Image& dst_image) :
@@ -36,10 +38,36 @@ namespace pbrlib::backend
             createPipeline();
         });
 
+        EventSystem::on([this] (const events::UpdateFXAA& settings)
+        {
+            const auto& config = settings.settings;
+
+            if (config.span_max < 0.0 || config.span_max > 1.0) [[unlikely]]
+                return;
+
+            if (config.reduce_min < 0.0 || config.reduce_min > 1.0) [[unlikely]]
+                return;
+
+            if (config.reduce_mul < 0.0 || config.reduce_mul > 1.0) [[unlikely]]
+                return;
+
+            _config.span_max    = math::lerp(4.0f, 16.0f, settings.settings.span_max);
+            _config.reduce_min  = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, settings.settings.reduce_min);
+            _config.reduce_mul  = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, settings.settings.reduce_mul);
+        });
+
         const auto [_, io_set_layout_handle] = IODescriptorSet();
+
+        constexpr VkPushConstantRange push_constant_range =
+        {
+            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+            .offset     = 0,
+            .size       = sizeof(Config)
+        };
         
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(io_set_layout_handle)
+            .pushConstant(push_constant_range)
             .build();
 
         return createPipeline();
@@ -72,6 +100,13 @@ namespace pbrlib::backend
                 _pipeline_layout_handle, 
                 0, 1, &io_set_handle, 
                 0, nullptr
+            );
+
+            vkCmdPushConstants (
+                command_buffer_handle, 
+                _pipeline_layout_handle, 
+                VK_SHADER_STAGE_COMPUTE_BIT, 
+                0, static_cast<uint32_t>(sizeof(Config)), &_config
             );
 
             dispatchCompute(command_buffer_handle);

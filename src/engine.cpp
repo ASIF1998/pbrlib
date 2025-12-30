@@ -213,4 +213,11 @@ namespace pbrlib
            .settings = settings 
         });
     }
+
+    void Engine::update(const settings::FXAA& settings)
+    {
+        EventSystem::emmit(backend::events::UpdateFXAA {
+           .settings = settings 
+        });
+    }
 }
