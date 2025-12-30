@@ -121,6 +121,9 @@ namespace pbrlib::backend::vk
         [[nodiscard]]
         const uint8_t workGroupSize() const noexcept;
 
+        [[nodiscard]] vk::SamplerHandle createLinearSampler();
+        [[nodiscard]] vk::SamplerHandle createNearestSampler();
+
 #ifdef PBRLIB_ENABLE_PROPFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {

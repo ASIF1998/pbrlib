@@ -75,7 +75,6 @@ namespace pbrlib::backend
 
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
 
-        void createSampler();
         void bindResultDescriptorSet();
 
         void createSSAODescriptorSet();

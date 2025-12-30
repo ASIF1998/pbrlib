@@ -695,6 +695,48 @@ namespace pbrlib::backend::vk
             0, nullptr
         );
     }
+
+    vk::SamplerHandle Device::createLinearSampler()
+    {
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_LINEAR,
+            .minFilter      = VK_FILTER_LINEAR
+        };
+
+        vk::SamplerHandle sampler_handle;
+
+        VK_CHECK(vkCreateSampler (
+            _device_handle,
+            &sampler_create_info,
+            nullptr, 
+            &sampler_handle.handle()
+        ));
+
+        return sampler_handle;
+    }
+
+    vk::SamplerHandle Device::createNearestSampler()
+    {
+        constexpr VkSamplerCreateInfo sampler_create_info 
+        {
+            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            .magFilter      = VK_FILTER_NEAREST,
+            .minFilter      = VK_FILTER_NEAREST
+        };
+
+        vk::SamplerHandle sampler_handle;
+
+        VK_CHECK(vkCreateSampler (
+            _device_handle,
+            &sampler_create_info,
+            nullptr, 
+            &sampler_handle.handle()
+        ));
+
+        return sampler_handle;
+    }
 }
 
 namespace pbrlib::backend::vk

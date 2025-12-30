@@ -35,19 +35,7 @@ namespace pbrlib::backend
                 .build()
         );
 
-        constexpr VkSamplerCreateInfo sampler_create_info
-        {
-            .sType      = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter  = VK_FILTER_LINEAR,
-            .minFilter  = VK_FILTER_LINEAR,
-        };
-
-        VK_CHECK(vkCreateSampler(
-            _device.device(),
-            &sampler_create_info,
-            nullptr,
-            &_sampler_handle.handle()
-        ));
+        _sampler_handle = _device.createLinearSampler();
 
         constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 

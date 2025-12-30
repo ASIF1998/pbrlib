@@ -48,30 +48,9 @@ namespace pbrlib::backend
         createResultDescriptorSet();
     }
 
-    void GBufferGenerator::createSampler()
-    {
-        constexpr VkSamplerCreateInfo sampler_create_info 
-        {
-            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter      = VK_FILTER_NEAREST,
-            .minFilter      = VK_FILTER_NEAREST,
-            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
-        };
-
-        VK_CHECK(vkCreateSampler(
-            device().device(),
-            &sampler_create_info,
-            nullptr, 
-            &_sampler_handle.handle()
-        ));
-    }
-
     void GBufferGenerator::initResultDescriptorSet()
     {
-        createSampler();
+        _sampler_handle = device().createNearestSampler();
 
         const auto ptr_pos_uv_image         = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
         const auto ptr_normal_tangent_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);

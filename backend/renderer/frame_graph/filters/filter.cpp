@@ -51,23 +51,7 @@ namespace pbrlib::backend
             VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
         );
 
-        constexpr VkSamplerCreateInfo sampler_create_info 
-        {
-            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter      = VK_FILTER_LINEAR,
-            .minFilter      = VK_FILTER_LINEAR,
-            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .borderColor    = VK_BORDER_COLOR_INT_OPAQUE_BLACK
-        };
-
-        VK_CHECK(vkCreateSampler (
-            device().device(),
-            &sampler_create_info,
-            nullptr, 
-            &_input_image_sampler_handle.handle()
-        ));
+        _input_image_sampler_handle = device().createLinearSampler();
 
         device().writeDescriptorSet ({
             .view_handle            = srcImage().view_handle.handle(),

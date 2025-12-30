@@ -66,7 +66,6 @@ namespace pbrlib::backend
         void createRenderPass();
         void createFramebuffer();
 
-        void createSampler();
         void initResultDescriptorSet();
 
         void setupColorAttachmentsLayout();
