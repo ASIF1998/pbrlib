@@ -3,6 +3,8 @@
 #include <backend/renderer/frame_graph/filters/filter.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
+#include <array>
+
 namespace pbrlib::backend
 {
     class FXAA;
