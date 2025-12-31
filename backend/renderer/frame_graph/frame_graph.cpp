@@ -11,6 +11,8 @@
 #include <backend/renderer/frame_graph/builders/ssao.hpp>
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
+#include <backend/renderer/frame_graph/filters/fxaa.hpp>
+
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/logger/logger.hpp>
@@ -62,8 +64,8 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(AttachmentsTraits<SSAO>::blur);
-
+        auto ptr_result = &_images.at(AttachmentsTraits<FXAA>::result);
+        
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
     }
@@ -108,6 +110,22 @@ namespace pbrlib::backend
             .build();
     }
 
+    void FrameGraph::setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa)
+    {
+        if (aa == settings::AA::eNone)
+            return ;
+
+        if (aa == settings::AA::eFXAA)
+        {
+            auto& result = _images.at(AttachmentsTraits<FXAA>::result);
+
+            auto ptr_fxaa = std::make_unique<FXAA>(_device, result);
+            ptr_fxaa->apply(image);
+
+            compound_render_pass.add(std::move(ptr_fxaa));
+        }
+    }
+
     void FrameGraph::build()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -130,6 +148,8 @@ namespace pbrlib::backend
         
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
+
+        setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
 
@@ -171,6 +191,7 @@ namespace pbrlib::backend
 
         createRenderPassImages<GBufferGenerator>(_device, _images, width, height);
         createRenderPassImages<SSAO>(_device, _images, width, height);
+        createRenderPassImages<FXAA>(_device, _images, width, height);
     }
 }
 

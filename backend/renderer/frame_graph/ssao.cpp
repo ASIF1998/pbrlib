@@ -12,7 +12,7 @@
 
 #include <backend/scene/material_manager.hpp>
 
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>
@@ -194,29 +194,9 @@ namespace pbrlib::backend
         return std::make_pair(_result_image_desc_set.handle(), _result_image_desc_set_layout.handle());
     }
 
-    void SSAO::createSampler()
-    {
-        constexpr VkSamplerCreateInfo sampler_create_info 
-        {
-            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter      = VK_FILTER_NEAREST,
-            .minFilter      = VK_FILTER_NEAREST,
-            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE
-        };
-
-        VK_CHECK(vkCreateSampler(
-            device().device(),
-            &sampler_create_info,
-            nullptr, 
-            &_result_image_sampler.handle()
-        ));
-    }
-
     void SSAO::bindResultDescriptorSet()
     {
-        createSampler();
+        _result_image_sampler = device().createNearestSampler();
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 

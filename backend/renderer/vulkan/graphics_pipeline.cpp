@@ -3,7 +3,7 @@
 #include <backend/renderer/vulkan/graphics_pipeline.hpp>
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <pbrlib/exceptions.hpp>
 

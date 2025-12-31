@@ -23,6 +23,8 @@ TEST_F(SSAOTests, JunkShopAttachments)
     };
 
     constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::SSAO>::ssao;
+    
+    setup("Blender 2.glb", settings);
     check("ssao/junk-shop-ssao-result.png", attahment_name);
 }
 

@@ -11,7 +11,7 @@
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 
 #include <backend/utils/paths.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -114,7 +114,10 @@ namespace pbrlib::testing
                 0, nullptr
             );
             
-            vkCmdDispatch(command_buffer_handle, image_1.width, image_1.height, 1);
+            const auto group_count_x = image_1.width / _device.workGroupSize();
+            const auto group_count_y = image_1.height / _device.workGroupSize();
+
+            vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 
         _device.submit(command_buffer);

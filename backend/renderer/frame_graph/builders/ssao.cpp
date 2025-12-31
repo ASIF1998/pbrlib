@@ -71,21 +71,8 @@ namespace pbrlib::backend::builders
     {
         validate();
 
-        auto ptr_compound_render_pass = std::make_unique<CompoundRenderPass>(_device);
-
-        std::unique_ptr<BilateralBlur> ptr_blur = std::make_unique<BilateralBlur>(_device, AttachmentsTraits<backend::SSAO>::blur, _blur_settings);
-
-        ptr_blur->addSyncImage (
-            _ptr_ssao_image, 
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-            VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-        );
-        
-        ptr_blur->addSyncImage (
-            _ptr_blur_image, 
-            VK_IMAGE_LAYOUT_GENERAL, 
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-        );
+        auto ptr_blur = std::make_unique<BilateralBlur>(_device, *_ptr_blur_image, _blur_settings);
+        ptr_blur->apply(*_ptr_ssao_image);
 
         std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<backend::SSAO>(_device, ptr_blur.get());
 
@@ -97,22 +84,20 @@ namespace pbrlib::backend::builders
 
         ptr_ssao->addColorOutput(AttachmentsTraits<backend::SSAO>::ssao, _ptr_ssao_image);
 
-        for (auto& sync_data: _sync)
+        for (const auto& [ptr_image, expected_layout, src_stage]: _sync)
         {
-            const auto dst_stage = sync_data.expected_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL ? ptr_ssao->srcStage() : ptr_ssao->dstStage();
+            const auto dst_stage = expected_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL ? ptr_ssao->srcStage() : ptr_ssao->dstStage();
 
             ptr_ssao->addSyncImage (
-                sync_data.ptr_image,
-                sync_data.expected_layout,
-                sync_data.src_stage, dst_stage
+                ptr_image,
+                expected_layout,
+                src_stage, dst_stage
             );
         }
 
         ptr_ssao->descriptorSet(InputDescriptorSetTraits<backend::SSAO>::gbuffer, _gbuffer_set_handle, _gbuffer_set_layout_handle);
 
-        ptr_blur->addColorOutput(AttachmentsTraits<backend::SSAO>::blur, _ptr_blur_image);
-        ptr_blur->apply(*_ptr_ssao_image);
-        
+        auto ptr_compound_render_pass = std::make_unique<CompoundRenderPass>(_device);
         ptr_compound_render_pass->add(std::move(ptr_ssao));
         ptr_compound_render_pass->add(std::move(ptr_blur));
 

@@ -15,6 +15,20 @@ namespace pbrlib::settings
 
         float radius = 0.05f;
     };
+
+    enum class AA : 
+        uint8_t
+    {
+        eNone,
+        eFXAA
+    };
+
+    struct FXAA final
+    {
+        float span_max      = 0.5f;
+        float reduce_min    = 0.5f;
+        float reduce_mul    = 0.5f;
+    };
 }
 
 namespace pbrlib
@@ -30,5 +44,7 @@ namespace pbrlib
         bool draw_in_window = true;
 
         settings::SSAO ssao;
+        
+        settings::AA aa;
     };
 }

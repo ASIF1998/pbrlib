@@ -2,7 +2,7 @@
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 

@@ -1,0 +1,61 @@
+#version 460
+
+#extension GL_GOOGLE_include_directive : enable
+
+#define PBRLIB_FILTER_SET_ID 0
+#include <filter.glsl>
+
+#include <gpu_cpu_constants.h>
+layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
+
+layout(push_constant) uniform Configuration
+{
+    float span_max;
+    float reduce_min;
+    float reduce_mul;
+};
+
+void main()
+{
+    const vec3 luma = vec3(0.299, 0.587, 0.114);
+
+    vec2 inv_screen_size    = vec2(1) / vec2(imageSize(result));
+    vec2 screen_uv          = vec2(gl_GlobalInvocationID) * inv_screen_size;
+
+    float luma_tl = dot(luma, textureOffset(input_image, screen_uv, ivec2(-1, 1)).rgb);
+    float luma_tr = dot(luma, textureOffset(input_image, screen_uv, ivec2(1, 1)).rgb);
+    float luma_bl = dot(luma, textureOffset(input_image, screen_uv, ivec2(-1, -1)).rgb);
+    float luma_br = dot(luma, textureOffset(input_image, screen_uv, ivec2(1, -1)).rgb);
+
+    float luma_m = dot(luma, texture(input_image, screen_uv).rgb);
+
+    vec2 dir = vec2 (
+        -((luma_tl + luma_tr) - (luma_bl + luma_br)),
+        ((luma_tl + luma_bl) - (luma_tr + luma_br))
+    );
+
+    float dir_reduce                = max((luma_tl + luma_tr + luma_bl + luma_br) * (reduce_mul * 0.25), reduce_min);
+    float inverse_dir_adjustment    = 1.0 / (min(abs(dir.x), abs(dir.y)) + dir_reduce);
+
+    dir = min(vec2(span_max, span_max), max(vec2(-span_max, -span_max), dir * inverse_dir_adjustment));
+    dir = (dir * step(1.0, abs(dir))) * inv_screen_size;
+
+    vec3 res_1 = 0.5 * (
+        texture(input_image, screen_uv + (dir * vec2(1.0 / 3.0 - 0.5))).xyz +
+        texture(input_image, screen_uv + (dir * vec2(2.0 / 3.0 - 0.5))).xyz
+    );
+
+    vec3 res_2 = res_1 * 0.5 + 0.25 * (
+        texture(input_image, screen_uv + (dir * vec2(0.0 / 3.0 - 0.5))).xyz +
+        texture(input_image, screen_uv + (dir * vec2(3.0 / 3.0 - 0.5))).xyz
+    );
+
+    float luma_min = min(luma_m, min(min(luma_tl, luma_tr), min(luma_bl, luma_br)));
+    float luma_max = max(luma_m, max(max(luma_tl, luma_tr), max(luma_bl, luma_br)));
+
+    float luma_res_2 = dot(luma, res_2);
+
+    vec3 final_color = luma_res_2 < luma_min || luma_res_2 > luma_max ? res_1 : res_2;
+
+    imageStore(result, ivec2(gl_GlobalInvocationID.xy), vec4(final_color, 1.0));
+}

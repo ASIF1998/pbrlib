@@ -96,7 +96,7 @@ namespace pbrlib::backend::utils
 
 namespace pbrlib::backend
 {
-    class ScopedTransform
+    class ScopedTransform final
     {
     public:
         explicit ScopedTransform(AssimpImporter* ptr_importer, const math::mat4& transform) :
@@ -106,10 +106,16 @@ namespace pbrlib::backend
             _ptr_importer->_current_state.transform *= transform;
         }
 
+        ScopedTransform(ScopedTransform&& scoped_transform)         = delete;
+        ScopedTransform(const ScopedTransform& scoped_transform)    = delete;
+
         ~ScopedTransform()
         {
             _ptr_importer->_current_state.transform = _prev_transform;
         }
+
+        ScopedTransform& operator = (ScopedTransform&& scoped_transform)        = delete;
+        ScopedTransform& operator = (const ScopedTransform& scoped_transform)   = delete;
 
     private:
         AssimpImporter* _ptr_importer;
@@ -337,7 +343,7 @@ namespace pbrlib::backend
                 std::span faces (ptr_mesh->mFaces, ptr_mesh->mNumFaces);
                 for (const auto& face: faces)
                 {
-                    if (face.mNumIndices != 3) 
+                    if (face.mNumIndices != 3) [[unlikely]]
                         log::error("[importer] an invalid face that contains {} indices", face.mNumIndices);
                     
                     indices.push_back(face.mIndices[0]);

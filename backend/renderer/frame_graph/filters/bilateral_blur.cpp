@@ -9,7 +9,7 @@
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>
-#include <backend/utils/vulkan.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -18,41 +18,12 @@
 
 namespace pbrlib::backend
 {
-    BilateralBlur::BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings):
-        Filter              (device),
-        _output_image_name  (output_image_name),
-        _settings           (settings)
+    BilateralBlur::BilateralBlur(vk::Device& device, vk::Image& dst_image, const Settings& settings):
+        Filter      ("bilateral-blur", device, dst_image),
+        _settings   (settings)
     {
         _settings.sample_count = utils::alignSize(_settings.sample_count, 2u);
         _settings.sample_count = std::clamp<uint32_t>(_settings.sample_count, 1, 8);
-
-        _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _descriptor_set_handle = device.allocateDescriptorSet (
-            _descriptor_set_layout_handle,
-            "[bilateral-blur] input descriptor set"
-        );
-
-        constexpr VkSamplerCreateInfo sampler_create_info 
-        {
-            .sType          = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter      = VK_FILTER_LINEAR,
-            .minFilter      = VK_FILTER_LINEAR,
-            .addressModeU   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeV   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .addressModeW   = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-            .borderColor    = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK 
-        };
-
-        VK_CHECK(vkCreateSampler(
-            device.device(),
-            &sampler_create_info,
-            nullptr, 
-            &_sampler_handle.handle()
-        ));
     }
 
     bool BilateralBlur::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -76,35 +47,19 @@ namespace pbrlib::backend
             .size       = sizeof(Settings)
         };
 
+        const auto [_, io_set_layout_handle] = IODescriptorSet();
+
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(_descriptor_set_layout_handle)
+            .addSetLayout(io_set_layout_handle)
             .pushConstant(push_constant_range)
             .build();
-
-        const auto& input_image         = srcImage();
-        const auto  ptr_output_image    = colorOutputAttach(_output_image_name);
-
-        device().writeDescriptorSet ({
-            .view_handle            = input_image.view_handle.handle(),
-            .sampler_handle         = _sampler_handle,
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .binding                = 0
-        });
-        
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_output_image->view_handle.handle(),
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
-            .binding                = 1
-        });
 
         return createPipeline();
     }
 
     bool BilateralBlur::createPipeline()
     {
-        constexpr auto blur_shader = "shaders/bilateral_blur/bilateral_blur.glsl.comp";
+        constexpr auto blur_shader = "shaders/bilateral_blur.glsl.comp";
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(blur_shader)
@@ -131,11 +86,12 @@ namespace pbrlib::backend
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
+            const auto [io_set_handle, _] = IODescriptorSet();
             vkCmdBindDescriptorSets(
                 command_buffer_handle, 
                 VK_PIPELINE_BIND_POINT_COMPUTE, 
                 _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle.handle(), 
+                0, 1, &io_set_handle, 
                 0, nullptr
             );
 
@@ -146,12 +102,7 @@ namespace pbrlib::backend
                 0, sizeof(Settings), &_settings
             );
 
-            const auto [width, height] = size();
-
-            const auto group_count_x = width / device().workGroupSize();
-            const auto group_count_y = height / device().workGroupSize();
-
-            vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+            dispatchCompute(command_buffer_handle);
         }, "[bilateral-blur] run-pipeline", vk::marker_colors::bilateral_blur);
     }
 

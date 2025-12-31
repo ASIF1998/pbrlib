@@ -36,7 +36,7 @@ namespace pbrlib::backend
             float       sigma_l         = 0.1f;
         };
 
-        explicit BilateralBlur(vk::Device& device, std::string_view output_image_name, const Settings& settings);
+        explicit BilateralBlur(vk::Device& device, vk::Image& dst_image, const Settings& settings);
 
         [[nodiscard]] Settings&         settings() noexcept;
         [[nodiscard]] const Settings&   settings() const noexcept;
@@ -44,13 +44,6 @@ namespace pbrlib::backend
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
-
-        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
-        vk::DescriptorSetHandle         _descriptor_set_handle;
-
-        vk::SamplerHandle _sampler_handle;
-
-        std::string _output_image_name;
 
         Settings _settings;
     };

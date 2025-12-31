@@ -24,6 +24,7 @@ namespace pbrlib::backend
     class Canvas;
     class MaterialManager;
     class MeshManager;
+    class CompoundRenderPass;
 }
 
 namespace pbrlib::backend
@@ -44,6 +45,8 @@ namespace pbrlib::backend
             vk::Image*              ptr_depth_buffer,
             const RenderPass*       ptr_gbuffer
         );
+
+        void setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa);
 
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);
 
