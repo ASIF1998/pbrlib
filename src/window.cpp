@@ -12,7 +12,7 @@
 // #include <stdexcept>
 // #include <format>
 
-namespace utils
+namespace pbrlib::utils
 {
     SDL_Window* cast(void* ptr_window)
     {
