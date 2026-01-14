@@ -9,8 +9,8 @@ namespace pbrlib::math::utils
 namespace pbrlib::math
 {
     inline constexpr AABB::AABB() :
-        p_min(v_max, v_max, v_max),
-        p_max(v_min, v_min, v_min)
+        p_min(utils::v_max, utils::v_max, utils::v_max),
+        p_max(utils::v_min, utils::v_min, utils::v_min)
     { }
 
     inline constexpr AABB::AABB(const vec3& p) :
