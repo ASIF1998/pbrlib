@@ -14,7 +14,7 @@ namespace pbrlib::math
 {
     template<MathArithmetic T>
     inline constexpr Matrix4x4<T>::Matrix4x4() noexcept :
-        _array16 
+        _array16
         {
             static_cast<T>(1), static_cast<T>(0), static_cast<T>(0), static_cast<T>(0),
             static_cast<T>(0), static_cast<T>(1), static_cast<T>(0), static_cast<T>(0),
@@ -25,7 +25,7 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Matrix4x4<T>::Matrix4x4(T init_value) noexcept :
-        _array16 
+        _array16
         {
             init_value, static_cast<T>(0), static_cast<T>(0), static_cast<T>(0),
             static_cast<T>(0), init_value, static_cast<T>(0), static_cast<T>(0),
@@ -41,7 +41,7 @@ namespace pbrlib::math
         T x2, T y2, T z2, T w2,
         T x3, T y3, T z3, T w3
     ) noexcept :
-        _array16 
+        _array16
         {
             x0, y0, z0, w0,
             x1, y1, z1, w1,
@@ -54,14 +54,14 @@ namespace pbrlib::math
     inline constexpr bool Matrix4x4<T>::operator == (const Matrix4x4<T>& mat) const noexcept
     {
         bool res = true;
-        for (size_t i = 0; i < 16 && res; i++) 
+        for (size_t i = 0; i < 16 && res; i++)
         {
             if constexpr (std::is_floating_point<T>::value)
             {
                 constexpr auto eps = static_cast<T>(0.0001);
                 res &= std::abs(_array16[i] - mat._array16[i]) < eps;
             }
-            else 
+            else
                 res &= _array16[i] == mat._array16[i];
         }
 
@@ -80,7 +80,7 @@ namespace pbrlib::math
         Matrix4x4<T> res;
 
         for (size_t i = 0; i < 4; ++i)
-            res._vec_array[i] = _vec_array[i] + mat._vec_array[i]; 
+            res._vec_array[i] = _vec_array[i] + mat._vec_array[i];
 
         return res;
     }
@@ -91,7 +91,7 @@ namespace pbrlib::math
         Matrix4x4<T> res;
 
         for (size_t i = 0; i < 4; ++i)
-            res._vec_array[i] = _vec_array[i] - mat._vec_array[i]; 
+            res._vec_array[i] = _vec_array[i] - mat._vec_array[i];
 
         return res;
     }
@@ -101,12 +101,12 @@ namespace pbrlib::math
     {
         Matrix4x4<T> res (static_cast<T>(0));
 
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
-            for (size_t k = 0; k < 4; k++) 
+            for (size_t k = 0; k < 4; k++)
             {
                 auto v = mat._array4x4[i][k];
-                for (size_t j = 0; j < 4; j++) 
+                for (size_t j = 0; j < 4; j++)
                     res._array4x4[i][j] += v * _array4x4[k][j];
             }
         }
@@ -145,7 +145,7 @@ namespace pbrlib::math
     {
         Vec4<T> res;
 
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
             res.x += _array4x4[i][0] * v[i];
             res.y += _array4x4[i][1] * v[i];
@@ -205,7 +205,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline T& Matrix4x4<T>::at(size_t i, size_t j)
     {
-        if (i > 3 || j > 3) [[unlikely]] 
+        if (i > 3 || j > 3) [[unlikely]]
             throw exception::InvalidArgument(std::format("[math::mat4] i = {}, j = {}", i, j));
 
         return _array4x4[i][j];
@@ -214,25 +214,25 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr T Matrix4x4<T>::at(size_t i, size_t j) const
     {
-        if (i > 3 || j > 3) [[unlikely]] 
+        if (i > 3 || j > 3) [[unlikely]]
             throw exception::InvalidArgument(std::format("[math::mat4] i = {}, j = {}", i, j));
 
         // In constexpr context MSVC cannot handle array access in union
         // Use direct conditional access based on i and j
-        return (i == 0 && j == 0) ? _array16[0] : 
-               (i == 0 && j == 1) ? _array16[1] : 
-               (i == 0 && j == 2) ? _array16[2] : 
-               (i == 0 && j == 3) ? _array16[3] : 
-               (i == 1 && j == 0) ? _array16[4] : 
-               (i == 1 && j == 1) ? _array16[5] : 
-               (i == 1 && j == 2) ? _array16[6] : 
-               (i == 1 && j == 3) ? _array16[7] : 
-               (i == 2 && j == 0) ? _array16[8] : 
-               (i == 2 && j == 1) ? _array16[9] : 
-               (i == 2 && j == 2) ? _array16[10] : 
-               (i == 2 && j == 3) ? _array16[11] : 
-               (i == 3 && j == 0) ? _array16[12] : 
-               (i == 3 && j == 1) ? _array16[13] : 
+        return (i == 0 && j == 0) ? _array16[0] :
+               (i == 0 && j == 1) ? _array16[1] :
+               (i == 0 && j == 2) ? _array16[2] :
+               (i == 0 && j == 3) ? _array16[3] :
+               (i == 1 && j == 0) ? _array16[4] :
+               (i == 1 && j == 1) ? _array16[5] :
+               (i == 1 && j == 2) ? _array16[6] :
+               (i == 1 && j == 3) ? _array16[7] :
+               (i == 2 && j == 0) ? _array16[8] :
+               (i == 2 && j == 1) ? _array16[9] :
+               (i == 2 && j == 2) ? _array16[10] :
+               (i == 2 && j == 3) ? _array16[11] :
+               (i == 3 && j == 0) ? _array16[12] :
+               (i == 3 && j == 1) ? _array16[13] :
                (i == 3 && j == 2) ? _array16[14] : _array16[15];
     }
 
@@ -289,7 +289,7 @@ namespace pbrlib::math
     {
         auto d = det();
 
-        if (d != T(0)) [[likely]] 
+        if (d != T(0)) [[likely]]
         {
             auto tmat = pbrlib::math::transpose(*this);
 
@@ -332,7 +332,7 @@ namespace pbrlib::math
             _array4x4[3][2] = -(tmat[0][0] * a22342432 - tmat[0][1] * a21342431 + tmat[0][3] * a21322231);
             _array4x4[3][3] =   tmat[0][0] * a22332332 - tmat[0][1] * a21332331 + tmat[0][2] * a21322231;
 
-            for (size_t i = 0; i < 16; i++) 
+            for (size_t i = 0; i < 16; i++)
                 _array16[i] /= d;
         }
     }
@@ -343,7 +343,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline Matrix4x4<T> transpose(const Matrix4x4<T>& mat) noexcept
     {
-        return 
+        return
         {
             mat[0][0], mat[1][0], mat[2][0], mat[3][0],
             mat[0][1], mat[1][1], mat[2][1], mat[3][1],
@@ -384,15 +384,15 @@ namespace std
 
     template<pbrlib::math::MathArithmetic T>
     auto formatter<pbrlib::math::Matrix4x4<T>>::format (
-        const pbrlib::math::Matrix4x4<T>&   mat, 
+        const pbrlib::math::Matrix4x4<T>&   mat,
         format_context&                     ctx
     ) const
     {
         return format_to (
-            ctx.out(), 
-            "\nmat4 [\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n]", 
-                mat[0][0], mat[0][1], mat[0][2], mat[0][3], 
-                mat[1][0], mat[1][1], mat[1][2], mat[1][3], 
+            ctx.out(),
+            "\nmat4 [\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n  [{}, {}, {}, {}]\n]",
+                mat[0][0], mat[0][1], mat[0][2], mat[0][3],
+                mat[1][0], mat[1][1], mat[1][2], mat[1][3],
                 mat[2][0], mat[2][1], mat[2][2], mat[1][3],
                 mat[3][0], mat[3][1], mat[3][2], mat[3][3]
         );
@@ -405,7 +405,7 @@ namespace std
         for (size_t i = 0; i < 4; ++i)
         {
             for (size_t j = 0; j < 4; ++j)
-                pbrlib::combineHash(hash_value, mat.at(i, j));
+                pbrlib::utils::combineHash(hash_value, mat.at(i, j));
         }
 
         return hash_value;
