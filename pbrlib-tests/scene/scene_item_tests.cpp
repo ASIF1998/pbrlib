@@ -35,13 +35,13 @@ TEST(SceneItemTests, UpdateCallback)
     constexpr int test_component_num_value = 213;
 
     pbrlib::Scene scene("scene");
-    
+
     auto& item = scene.addItem("scene-item");
 
     item.update([](
-        pbrlib::SceneItem&          item, 
-        const pbrlib::InputStay&    input_stay, 
-        float                       delta_time, 
+        pbrlib::SceneItem&          item,
+        const pbrlib::InputStay&    input_stay,
+        float                       delta_time,
         const pbrlib::math::mat4&   world_transform
     )
     {
@@ -84,7 +84,7 @@ TEST(SceneItemTests, CreateInstance)
     constexpr std::string_view instance_item_name   = "instance-item";
 
     const auto transform = pbrlib::transforms::translate(pbrlib::math::vec3(-3, -5, 10));
-    
+
     const auto& new_item        = scene.addItem(item_name);
     const auto& instance_item   = scene.createInstance(item_name, instance_item_name, transform);
 

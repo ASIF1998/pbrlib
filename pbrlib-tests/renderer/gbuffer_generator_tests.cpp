@@ -6,7 +6,7 @@
 
 class GBufferGeneratorTests :
     public pbrlib::testing::RenderTest
-{ 
+{
 public:
     GBufferGeneratorTests() :
         pbrlib::testing::RenderTest("gbuffer-generator-tests", 1000, 1000)

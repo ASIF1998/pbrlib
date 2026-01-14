@@ -13,7 +13,7 @@ namespace pbrlib::testing
     backend::vk::Device& FrameGraphResourcesGetter::device()
     {
         return _ptr_frame_graph->_device;
-    } 
+    }
 
     backend::vk::Image* FrameGraphResourcesGetter::image(std::string_view name)
     {
@@ -24,7 +24,7 @@ namespace pbrlib::testing
     {
         return _ptr_frame_graph->_render_context.ptr_material_manager;
     }
-    
+
     const backend::MeshManager* FrameGraphResourcesGetter::meshManager() const
     {
         return _ptr_frame_graph->_render_context.ptr_mesh_manager;

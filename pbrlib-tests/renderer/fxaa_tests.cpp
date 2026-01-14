@@ -4,7 +4,7 @@
 
 class FXAATests :
     public pbrlib::testing::RenderTest
-{ 
+{
 public:
     FXAATests() :
         pbrlib::testing::RenderTest("fxaa-tests", 1000, 1000)

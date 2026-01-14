@@ -43,7 +43,7 @@ TEST(AABBTests, Corner)
 
     constexpr pbrlib::math::AABB aabb (p_min, p_max);
 
-    constexpr std::array points 
+    constexpr std::array points
     {
         pbrlib::math::vec3(0, 0, 0),
         pbrlib::math::vec3(1, 0, 0),
@@ -101,7 +101,7 @@ TEST(AABBTests, SubscriptOperatorEdgeCase)
     constexpr pbrlib::math::vec3 p2 (4, 5, 6);
 
     constexpr pbrlib::math::AABB aabb (p1, p2);
-    
+
     EXPECT_THROW({
         [[maybe_unused]] const auto p = aabb[2];
     }, pbrlib::exception::InvalidArgument);

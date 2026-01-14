@@ -6,7 +6,7 @@
 TEST(MovingTransform, Translate)
 {
     constexpr pbrlib::math::vec3 t (0.5f, 0.5f, 0.5f);
-    
+
     const auto transform = pbrlib::transforms::translate(t);
 
     constexpr pbrlib::math::mat4 res (
@@ -22,13 +22,13 @@ TEST(MovingTransform, Translate)
 TEST(MovingTransform, Scale)
 {
     constexpr pbrlib::math::vec3 t (0.5f, 0.5f, 0.5f);
-    
-    auto transform = pbrlib::transforms::scale(t);
+
+    const auto transform = pbrlib::transforms::scale(t);
 
     constexpr pbrlib::math::mat4 res (
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.5f, 0.0f, 
+        0.0f, 0.0f, 0.5f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
     );
 
@@ -40,7 +40,7 @@ TEST(MovingTransform, Rotates)
     constexpr pbrlib::math::vec3 r1 (0.476731300f, 0.864044726f, -0.161721885f);
     constexpr pbrlib::math::vec3 r2 (-0.339640319f, 0.572077572f, 0.746573329f);
     constexpr pbrlib::math::vec3 r3 (0.733799398f, -0.126822680f, 0.667423785f);
-    
+
     constexpr float theta = 60.0f;
 
     constexpr pbrlib::math::vec3    axis1   (1.0000000f, 0.000000000f, 0.000000000f);
@@ -48,12 +48,12 @@ TEST(MovingTransform, Rotates)
     constexpr pbrlib::math::vec3    axis3   (0.0000000f, 0.000000000f, 1.000000000f);
     constexpr pbrlib::math::vec3    v       (0.4767313f, 0.572077572f, 0.667423784f);
 
-    auto res1 = pbrlib::math::vec3(pbrlib::transforms::rotateX(theta) * v);
-    auto res2 = pbrlib::math::vec3(pbrlib::transforms::rotateY(theta) * v);
-    auto res3 = pbrlib::math::vec3(pbrlib::transforms::rotateZ(theta) * v);
-    auto res4 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis1, theta) * v);
-    auto res5 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis2, theta) * v);
-    auto res6 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis3, theta) * v);
+    const auto res1 = pbrlib::math::vec3(pbrlib::transforms::rotateX(theta) * v);
+    const auto res2 = pbrlib::math::vec3(pbrlib::transforms::rotateY(theta) * v);
+    const auto res3 = pbrlib::math::vec3(pbrlib::transforms::rotateZ(theta) * v);
+    const auto res4 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis1, theta) * v);
+    const auto res5 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis2, theta) * v);
+    const auto res6 = pbrlib::math::vec3(pbrlib::transforms::rotate(axis3, theta) * v);
 
     pbrlib::testing::equality(r1, res1);
     pbrlib::testing::equality(r2, res2);
@@ -76,7 +76,7 @@ TEST(MovingTransform, LookAt)
     constexpr pbrlib::math::vec3 pos    (-5.0f, 0.00f, -1.0f);
     constexpr pbrlib::math::vec3 up     (0.00f, 1.00f, 0.00f);
 
-    auto look_at = pbrlib::transforms::lookAt(pos, eye, up);
+    const auto look_at = pbrlib::transforms::lookAt(pos, eye, up);
 
     pbrlib::testing::equality(look_at, res);
 }

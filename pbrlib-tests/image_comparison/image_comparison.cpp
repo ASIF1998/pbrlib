@@ -32,7 +32,7 @@ namespace pbrlib::testing
             .build();
 
         _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-image-comparator] descriptor-set");
-        
+
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
         _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
@@ -48,9 +48,9 @@ namespace pbrlib::testing
         };
 
         VK_CHECK(vkCreateSampler(
-            _device.device(), 
-            &sampler_create_info, 
-            nullptr, 
+            _device.device(),
+            &sampler_create_info,
+            nullptr,
             &_sampler_handle.handle())
         );
 
@@ -59,8 +59,8 @@ namespace pbrlib::testing
             .size(sizeof(uint32_t))
             .type(pbrlib::backend::vk::BufferType::eReadback)
             .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-            .build(); 
-        
+            .build();
+
         _count_changed_pixels_buffer->write(0, 0);
     }
 
@@ -71,7 +71,7 @@ namespace pbrlib::testing
 
         if (image_1.level_count != image_2.level_count) [[unlikely]]
             return false;
-        
+
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
 
@@ -82,7 +82,7 @@ namespace pbrlib::testing
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
         });
-        
+
         _device.writeDescriptorSet ({
             .view_handle            = image_2.view_handle,
             .sampler_handle         = _sampler_handle,
@@ -107,13 +107,13 @@ namespace pbrlib::testing
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
             vkCmdBindDescriptorSets(
-                command_buffer_handle, 
-                VK_PIPELINE_BIND_POINT_COMPUTE, 
-                _pipeline_layout_handle, 
-                0, 1, &_descriptor_set_handle.handle(), 
+                command_buffer_handle,
+                VK_PIPELINE_BIND_POINT_COMPUTE,
+                _pipeline_layout_handle,
+                0, 1, &_descriptor_set_handle.handle(),
                 0, nullptr
             );
-            
+
             const auto group_count_x = image_1.width / _device.workGroupSize();
             const auto group_count_y = image_1.height / _device.workGroupSize();
 
@@ -129,7 +129,7 @@ namespace pbrlib::testing
     }
 
     bool ImageComparison::compare (
-        const backend::vk::Image&       image_1, 
+        const backend::vk::Image&       image_1,
         const std::filesystem::path&    path_to_reference
     )
     {
@@ -147,7 +147,7 @@ namespace pbrlib::testing
         }
 
         return compare(
-            image_1, 
+            image_1,
             backend::vk::loaders::Image(_device)
                 .filename(path_to_reference)
                 .load()

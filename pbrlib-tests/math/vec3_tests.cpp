@@ -6,8 +6,8 @@
 using namespace pbrlib::math;
 
 template <typename T>
-class Vec3Tests 
-    : public ::testing::Test 
+class Vec3Tests
+    : public ::testing::Test
 { };
 
 TYPED_TEST_SUITE(Vec3Tests, MathTestingTypes);
@@ -50,17 +50,17 @@ TYPED_TEST(Vec3Tests, AdditionAndSubtraction)
 TYPED_TEST(Vec3Tests, Multiplication)
 {
     Vec3 v (
-        static_cast<TypeParam>(2), 
-        static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(2),
+        static_cast<TypeParam>(3),
         static_cast<TypeParam>(6)
     );
 
     constexpr Vec3 res (
-        static_cast<TypeParam>(4), 
-        static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(4),
+        static_cast<TypeParam>(6),
         static_cast<TypeParam>(12)
     );
-    
+
     constexpr auto s = static_cast<TypeParam>(2);
 
     pbrlib::testing::equality(res, v * s);
@@ -90,7 +90,7 @@ TYPED_TEST(Vec3Tests, Length)
     {
         constexpr Vec3 v    (static_cast<TypeParam>(1.2), static_cast<TypeParam>(32.4), static_cast<TypeParam>(12.4));
         constexpr auto lr   = static_cast<TypeParam>(34.7125359);
-    
+
         pbrlib::testing::equality(lr, v.length());
     }
 }
@@ -110,7 +110,7 @@ TYPED_TEST(Vec3Tests, Normalize)
             static_cast<TypeParam>(0.757122039000),
             static_cast<TypeParam>(0.65327209200000)
         );
-    
+
         constexpr Vec3 v1 (
             static_cast<TypeParam>(7643.8738),
             static_cast<TypeParam>(768.434),
@@ -131,15 +131,15 @@ TYPED_TEST(Vec3Tests, Normalize)
 TYPED_TEST(Vec3Tests, ZeroVectorNormalization)
 {
     Vec3 v (
-        static_cast<TypeParam>(0), 
-        static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(0),
+        static_cast<TypeParam>(0),
         static_cast<TypeParam>(0)
     );
 
     EXPECT_THROW({
         v.normalize();
     }, pbrlib::exception::MathError);
-    
+
     EXPECT_THROW({
         [[maybe_unuse]] const auto res = normalize(v);
     }, pbrlib::exception::MathError);
@@ -151,8 +151,8 @@ TYPED_TEST(Vec3Tests, Lerp)
     {
         constexpr Vec3 result (static_cast<TypeParam>(0.75));
         pbrlib::testing::equality(result, lerp (
-            Vec3(static_cast<TypeParam>(0)), 
-            Vec3(static_cast<TypeParam>(1)), 
+            Vec3(static_cast<TypeParam>(0)),
+            Vec3(static_cast<TypeParam>(1)),
             static_cast<TypeParam>(0.75))
         );
     }
