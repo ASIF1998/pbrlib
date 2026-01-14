@@ -9,9 +9,6 @@
 
 #include <SDL3/SDL.h>
 
-// #include <stdexcept>
-// #include <format>
-
 namespace pbrlib::utils
 {
     SDL_Window* cast(void* ptr_window)

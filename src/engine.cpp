@@ -29,8 +29,6 @@
 
 #include <SDL3/SDL.h>
 
-// #include <stdexcept>
-
 #include <chrono>
 
 namespace pbrlib
