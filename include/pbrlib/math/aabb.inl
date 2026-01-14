@@ -1,10 +1,16 @@
 #include <limits>
 
+namespace pbrlib::math::utils
+{
+    static constexpr auto v_max = std::numeric_limits<float>::max();
+    static constexpr auto v_min = std::numeric_limits<float>::min();
+}
+
 namespace pbrlib::math
 {
     inline constexpr AABB::AABB() :
-        p_min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
-        p_max(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
+        p_min(v_max, v_max, v_max),
+        p_max(v_min, v_min, v_min)
     { }
 
     inline constexpr AABB::AABB(const vec3& p) :

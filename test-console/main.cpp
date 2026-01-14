@@ -26,7 +26,7 @@ struct RotateComponent
     float angle = 0.0f;
 };
 
-auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir) 
+auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir)
     -> pbrlib::math::vec3
 {
     const auto move_dir = motion.relativeMotion();
@@ -53,7 +53,7 @@ auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::v
 
     if (keyboard.isDown(pbrlib::Keycode::A))
         return pbrlib::math::cross(up, dir);
-    
+
     if (keyboard.isDown(pbrlib::Keycode::D))
         return pbrlib::math::cross(dir, up);
 
@@ -68,20 +68,20 @@ auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::v
 
 int main()
 {
-    try 
+    try
     {
         pbrlib::Config config;
         config.title    = "test-console";
         config.width    = 2000;
         config.height   = 1100;
 
-        config.ssao = 
+        config.ssao =
         {
             .blur_samples_count = 8
         };
 
         config.aa = pbrlib::settings::AA::eFXAA;
-        
+
         pbrlib::Engine engine (config);
 
         engine.setup([&engine, &config] (pbrlib::Scene& scene)
@@ -100,9 +100,9 @@ int main()
             {
                 ptr_root_item->addComponent<RotateComponent>();
                 ptr_root_item->update([](
-                    pbrlib::SceneItem&          item, 
-                    const pbrlib::InputStay&    input_stay, 
-                    float                       delta_time, 
+                    pbrlib::SceneItem&          item,
+                    const pbrlib::InputStay&    input_stay,
+                    float                       delta_time,
                     const pbrlib::math::mat4&   world_transform
                 )
                 {

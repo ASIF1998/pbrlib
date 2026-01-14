@@ -9,7 +9,7 @@
 
 namespace pbrlib::exception
 {
-    class Exception : 
+    class Exception :
         public std::exception
     {
     protected:
@@ -33,14 +33,14 @@ namespace pbrlib::exception
     public:
         explicit RuntimeError(std::string_view msg);
     };
-    
+
     class InitializeError final :
         public Exception
     {
     public:
         explicit InitializeError(std::string_view msg);
     };
-    
+
     class InvalidState final :
         public Exception
     {

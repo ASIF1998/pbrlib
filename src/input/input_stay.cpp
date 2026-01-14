@@ -22,8 +22,10 @@ namespace pbrlib
 
 	void KeyboardStay::add(EventHandle event_handle)
 	{
-		auto ptr_event = utils::cast(event_handle);
-		if (auto keycode = backend::utils::sdl_to_pbrlib_keycode.find(ptr_event->key.key); keycode != std::end(backend::utils::sdl_to_pbrlib_keycode))
+		auto ptr_event  = utils::cast(event_handle);
+		auto keycode    = backend::utils::sdl_to_pbrlib_keycode.find(ptr_event->key.key);
+
+		if (keycode != std::end(backend::utils::sdl_to_pbrlib_keycode))
 		{
 			auto keycode_index = backend::utils::enumCast(keycode->second);
 
@@ -36,15 +38,15 @@ namespace pbrlib
 
 	bool KeyboardStay::isDown(Keycode key_code) const noexcept
 	{
-		if (key_code == Keycode::Count)
+		if (key_code == Keycode::Count) [[unlikely]]
 			return false;
 
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eDown;
 	}
-	
+
     bool KeyboardStay::isUp(Keycode key_code) const noexcept
 	{
-		if (key_code == Keycode::Count)
+		if (key_code == Keycode::Count) [[unlikely]]
 			return false;
 
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eUp;
@@ -56,11 +58,11 @@ namespace pbrlib
 	void WindowStay::add(EventHandle event_handle)
 	{
 		auto ptr_event = utils::cast(event_handle);
-		
+
 		if (ptr_event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
 			_is_close = true;
 	}
-	
+
 	void WindowStay::reset() noexcept
 	{
 		_is_close = false;
@@ -77,7 +79,7 @@ namespace pbrlib
 	void MouseButtonsStay::add(EventHandle event_handle)
 	{
 		auto ptr_event = utils::cast(event_handle);
-		
+
 		size_t button_index = ptr_event->button.button;
 
 		if (button_index < SDL_BUTTON_LEFT || button_index > SDL_BUTTON_RIGHT)
@@ -90,12 +92,12 @@ namespace pbrlib
 		else if (ptr_event->type == SDL_EVENT_MOUSE_BUTTON_UP)
 			_pressed_map[button_index] = ButtonStay::eUp;
 	}
-	
+
 	bool MouseButtonsStay::isDown(MouseButton button) const noexcept
 	{
 		return _pressed_map[backend::utils::enumCast(button)] == ButtonStay::eDown;
 	}
-	
+
 	bool MouseButtonsStay::isUp(MouseButton button) const noexcept
 	{
 		return _pressed_map[backend::utils::enumCast(button)] == ButtonStay::eUp;

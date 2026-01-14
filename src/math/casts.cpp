@@ -28,9 +28,9 @@ namespace pbrlib::math
     quat toQuaternion(const mat4& mat)
     {
         /**
-         * The algorithm selects the largest quaternion component (based on the trace  
-         * or diagonal elements) to ensure accurate calculations and avoid division 
-         * by zero  or near-zero values, a technique commonly used in robotics and 
+         * The algorithm selects the largest quaternion component (based on the trace
+         * or diagonal elements) to ensure accurate calculations and avoid division
+         * by zero  or near-zero values, a technique commonly used in robotics and
          * graphics  (e.g., in methods described by Chiaverini and Siciliano).
         */
 
@@ -42,9 +42,9 @@ namespace pbrlib::math
             const auto inv_s    = 1.0f / s;
 
             return quat (
-                (mat[2][1] - mat[1][2]) * inv_s, 
-                (mat[0][2] - mat[2][0]) * inv_s, 
-                (mat[1][0] - mat[0][1]) * inv_s, 
+                (mat[2][1] - mat[1][2]) * inv_s,
+                (mat[0][2] - mat[2][0]) * inv_s,
+                (mat[1][0] - mat[0][1]) * inv_s,
                 0.25f * s
             );
         }
@@ -54,9 +54,9 @@ namespace pbrlib::math
             const auto inv_s    = 1.0f / s;
 
             return quat (
-                0.25f * s, 
-                (mat[0][1] + mat[1][0]) * inv_s, 
-                (mat[0][2] + mat[2][0]) * inv_s, 
+                0.25f * s,
+                (mat[0][1] + mat[1][0]) * inv_s,
+                (mat[0][2] + mat[2][0]) * inv_s,
                 (mat[2][1] - mat[1][2]) * inv_s
             );
         }
@@ -66,9 +66,9 @@ namespace pbrlib::math
             const auto inv_s    = 1.0f / s;
 
             return quat (
-                (mat[0][1] + mat[1][0]) * inv_s, 
-                0.25f * s, 
-                (mat[1][2] + mat[2][1]) * inv_s, 
+                (mat[0][1] + mat[1][0]) * inv_s,
+                0.25f * s,
+                (mat[1][2] + mat[2][1]) * inv_s,
                 (mat[0][2] - mat[2][0]) * inv_s
             );
         }
@@ -77,9 +77,9 @@ namespace pbrlib::math
         const auto inv_s    = 1.0f / s;
 
         return quat (
-            (mat[0][2] + mat[2][0]) * inv_s, 
-            (mat[1][2] + mat[2][1]) * inv_s, 
-            0.25f * s, 
+            (mat[0][2] + mat[2][0]) * inv_s,
+            (mat[1][2] + mat[2][1]) * inv_s,
+            0.25f * s,
             (mat[1][0] - mat[0][1]) * inv_s
         );
     }

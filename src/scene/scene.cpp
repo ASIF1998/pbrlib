@@ -22,7 +22,7 @@
 
 namespace pbrlib
 {
-    SceneItem::SceneItem(const std::string_view name, SceneItem* ptr_parent, Scene* ptr_scene) : 
+    SceneItem::SceneItem(const std::string_view name, SceneItem* ptr_parent, Scene* ptr_scene) :
         _ptr_scene  (ptr_scene),
         _ptr_parent (ptr_parent)
     {
@@ -46,7 +46,7 @@ namespace pbrlib
 
     SceneItem::~SceneItem()
     {
-        if (_handle != entt::null) 
+        if (_handle != entt::null) [[likely]]
             _ptr_scene->_registry.destroy(_handle);
     }
 
@@ -74,8 +74,8 @@ namespace pbrlib
     }
 
     void SceneItem::update (
-        const InputStay&    input_stay, 
-        float               delta_time, 
+        const InputStay&    input_stay,
+        float               delta_time,
         const math::mat4&   world_transform
     )
     {
@@ -87,7 +87,7 @@ namespace pbrlib
         const auto& local_transform = getComponent<components::Transform>().transform;
         const auto  transform       = world_transform * local_transform;
 
-        if (auto ptr_mesh_manager = _ptr_scene->_ptr_mesh_manager)
+        if (auto ptr_mesh_manager = _ptr_scene->_ptr_mesh_manager) [[likely]]
             ptr_mesh_manager->updateItemTransform(this, transform);
 
         for (auto& child: _children)
@@ -102,10 +102,10 @@ namespace pbrlib
     }
 }
 
-namespace pbrlib 
+namespace pbrlib
 {
     Scene::Scene(std::string_view name)
-    { 
+    {
         _root = SceneItem(name, nullptr, this);
         _items.emplace(name, &_root.value());
     }
@@ -139,7 +139,7 @@ namespace pbrlib
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!_ptr_mesh_manager)
+        if (!_ptr_mesh_manager) [[unlikely]]
             backend::log::warning("[scene] no mesh manager");
 
         _root->update(input_stay, delta_time, math::mat4(1.0f));
@@ -156,20 +156,20 @@ namespace pbrlib
     {
         if (auto it = _items.find(name); it != std::end(_items)) [[likely]]
             return it->second;
-        
+
         return nullptr;
     }
-    
+
     const SceneItem* Scene::item(std::string_view name) const
     {
         if (auto it = _items.find(name); it != std::end(_items)) [[likely]]
             return it->second;
-        
+
         return nullptr;
     }
 
     SceneItem& Scene::createInstance (
-        std::string_view    item_name, 
+        std::string_view    item_name,
         std::string_view    instance_name,
         const math::mat4&   transform
     )
@@ -178,10 +178,10 @@ namespace pbrlib
 
         auto ptr_item = item(item_name);
 
-        if (!ptr_item)
+        if (!ptr_item) [[unlikely]]
             throw exception::InvalidArgument(std::format("[scene] item '{}' not exist", item_name));
 
-        if (!ptr_item->_ptr_parent)
+        if (!ptr_item->_ptr_parent) [[unlikely]]
             throw exception::InvalidArgument("[scene] root node cannot be instantiated");
 
         auto ptr_parent = ptr_item->_ptr_parent;

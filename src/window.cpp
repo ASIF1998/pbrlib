@@ -9,8 +9,8 @@
 
 #include <SDL3/SDL.h>
 
-#include <stdexcept>
-#include <format>
+// #include <stdexcept>
+// #include <format>
 
 namespace utils
 {
@@ -99,7 +99,7 @@ namespace pbrlib
             throw exception::InvalidState("[window::builder] title is empty");
 
         if (_width == 0 || _height == 0) [[unlikely]]
-            throw exception::InvalidState("[window::builder] size is 0"); 
+            throw exception::InvalidState("[window::builder] size is 0");
     }
 
     Window Window::Builder::build()
@@ -113,8 +113,8 @@ namespace pbrlib
             flags |= SDL_WINDOW_RESIZABLE;
 
         auto ptr_sdl_window = SDL_CreateWindow(
-            _title.data(), 
-            static_cast<int>(_width), static_cast<int>(_height), 
+            _title.data(),
+            static_cast<int>(_width), static_cast<int>(_height),
             flags
         );
 

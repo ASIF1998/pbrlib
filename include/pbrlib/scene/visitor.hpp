@@ -7,7 +7,8 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    enum class TraversalCommand 
+    enum class TraversalCommand :
+        uint8_t
     {
         eContinue,
         eTerminate

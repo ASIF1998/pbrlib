@@ -10,11 +10,11 @@
 namespace pbrlib
 {
     template<typename Callback>
-    concept InvocableWithParams = requires 
+    concept InvocableWithParams = requires
     {
         typename entt::nth_argument_t<0, Callback>;
     };
-  
+
     class EventSystem final
     {
     public:

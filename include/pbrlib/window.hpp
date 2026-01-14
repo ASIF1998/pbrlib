@@ -30,11 +30,11 @@ namespace pbrlib
         Window& operator = (Window&& window);
         Window& operator = (const Window& window) = delete;
 
-        [[nodiscard]] 
-        std::string title() const; 
+        [[nodiscard]]
+        std::string title() const;
         void        title(std::string_view title);
 
-        [[nodiscard]] 
+        [[nodiscard]]
         std::pair<int32_t, int32_t> size() const noexcept;
 
         void messageBox(std::string_view title, std::string_view msg) const;

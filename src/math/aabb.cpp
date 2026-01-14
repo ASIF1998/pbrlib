@@ -8,15 +8,15 @@ namespace pbrlib::math
     {
         if (i > 1) [[unlikely]]
             throw exception::InvalidArgument("[aabb] invalid index in operator []");
-        
+
         return i == 0 ? p_min : p_max;
     }
-    
+
     const vec3& AABB::operator [] (size_t i) const
     {
         if (i > 1) [[unlikely]]
             throw exception::InvalidArgument("[aabb] invalid index in operator []");
-        
+
         return i == 0 ? p_min : p_max;
     }
 
@@ -68,7 +68,7 @@ namespace std
         size_t hash_value = 0;
         pbrlib::combineHash(hash_value, aabb.p_min);
         pbrlib::combineHash(hash_value, aabb.p_max);
-        
+
         return hash_value;
     }
 }

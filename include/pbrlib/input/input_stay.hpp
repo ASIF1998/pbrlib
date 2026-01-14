@@ -6,7 +6,6 @@
 #include <pbrlib/input/key_code.hpp>
 
 #include <array>
-#include <unordered_map>
 
 namespace pbrlib
 {
@@ -19,10 +18,11 @@ namespace pbrlib
 	{
 		friend struct InputStay;
 
-		enum class KeyStay
+		enum class KeyStay :
+            uint8_t
 		{
 			eDown,
-			eUp, 
+			eUp,
 			eNone
 		};
 
@@ -57,9 +57,10 @@ namespace pbrlib
 
 namespace pbrlib
 {
-	enum class MouseButton
+	enum class MouseButton :
+	    uint8_t
 	{
-		eLeft, 
+		eLeft,
 		eMiddle,
 		eRight
 	};
@@ -70,7 +71,8 @@ namespace pbrlib
 
 		void add(EventHandle event_handle);
 
-		enum class ButtonStay
+		enum class ButtonStay :
+		    uint8_t
 		{
 			eDown,
 			eUp,
@@ -96,7 +98,7 @@ namespace pbrlib
 		void reset() noexcept;
 
 	public:
-		math::vec2 currentCoord()	const noexcept; 
+		math::vec2 currentCoord()	const noexcept;
 		math::vec2 relativeMotion() 	const noexcept;
 
 		bool isMotion() const noexcept;

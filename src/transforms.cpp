@@ -3,7 +3,7 @@
 #include <pbrlib/math/casts.hpp>
 
 #include <cmath>
-#include <numbers>
+// #include <numbers>
 
 namespace pbrlib::transforms
 {
@@ -101,8 +101,8 @@ namespace pbrlib::transforms
     }
 
     math::mat4 lookAt (
-        const math::vec3& eye, 
-        const math::vec3& pos, 
+        const math::vec3& eye,
+        const math::vec3& pos,
         const math::vec3& up
     )
     {
@@ -132,7 +132,7 @@ namespace pbrlib::transforms
         float       fovy,
         uint32_t    width,
         uint32_t    height,
-        float       z_near, 
+        float       z_near,
         float       z_far
     )
     {
