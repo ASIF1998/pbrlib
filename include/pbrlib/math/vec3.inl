@@ -44,9 +44,9 @@ namespace pbrlib::math
         if constexpr (std::is_floating_point<T>::value)
         {
             constexpr auto eps = static_cast<T>(0.0001);
-            return 
-                    std::abs(x - v.x) < eps 
-                &&  std::abs(y - v.y) < eps 
+            return
+                    std::abs(x - v.x) < eps
+                &&  std::abs(y - v.y) < eps
                 &&  std::abs(z - v.z) < eps;
         }
 
@@ -143,7 +143,7 @@ namespace pbrlib::math
     void Vec3<T>::normalize()
     {
         auto l = length();
-        
+
         if (l == static_cast<T>(0)) [[unlikely]]
             throw exception::MathError("[vec3] failed normalize");
 
@@ -173,7 +173,7 @@ namespace pbrlib::math
     Vec3<T> normalize(const Vec3<T>& v)
     {
         auto l = v.length();
-        
+
         if (l == static_cast<T>(0)) [[unlikely]]
             throw exception::MathError("[vec3] failed normalize");
 
@@ -198,8 +198,8 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline Vec3<T> clamp (
-        const Vec3<T>& x, 
-        const Vec3<T>& min_val, 
+        const Vec3<T>& x,
+        const Vec3<T>& min_val,
         const Vec3<T>& max_val
     ) noexcept
     {
@@ -227,7 +227,7 @@ namespace std
 
     template<pbrlib::math::MathArithmetic T>
     auto formatter<pbrlib::math::Vec3<T>>::format (
-        const pbrlib::math::Vec3<T>&    vec, 
+        const pbrlib::math::Vec3<T>&    vec,
         format_context&                 ctx
     ) const
     {
@@ -238,9 +238,9 @@ namespace std
     inline constexpr size_t hash<pbrlib::math::Vec3<T>>::operator () (const pbrlib::math::Vec3<T>& vec) const noexcept
     {
         size_t hash_value = 0;
-        pbrlib::combineHash(hash_value, vec.x);
-        pbrlib::combineHash(hash_value, vec.y);
-        pbrlib::combineHash(hash_value, vec.z);
+        pbrlib::utils::combineHash(hash_value, vec.x);
+        pbrlib::utils::combineHash(hash_value, vec.y);
+        pbrlib::utils::combineHash(hash_value, vec.z);
 
         return hash_value;
     }

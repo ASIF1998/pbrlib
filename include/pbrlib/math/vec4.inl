@@ -48,10 +48,10 @@ namespace pbrlib::math
         if constexpr (std::is_floating_point<T>::value)
         {
             constexpr auto eps = static_cast<T>(0.0001);
-            return 
-                    std::abs(x - v.x) < eps 
-                &&  std::abs(y - v.y) < eps 
-                &&  std::abs(z - v.z) < eps 
+            return
+                    std::abs(x - v.x) < eps
+                &&  std::abs(y - v.y) < eps
+                &&  std::abs(z - v.z) < eps
                 &&  std::abs(w - v.w) < eps;
         }
 
@@ -197,8 +197,8 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline Vec4<T> clamp (
-        const Vec4<T>& x, 
-        const Vec4<T>& min_val, 
+        const Vec4<T>& x,
+        const Vec4<T>& min_val,
         const Vec4<T>& max_val
     ) noexcept
     {
@@ -227,7 +227,7 @@ namespace std
 
     template<pbrlib::math::MathArithmetic T>
     auto formatter<pbrlib::math::Vec4<T>>::format (
-        const pbrlib::math::Vec4<T>&    vec, 
+        const pbrlib::math::Vec4<T>&    vec,
         format_context&                 ctx
     ) const
     {
@@ -238,10 +238,10 @@ namespace std
     inline constexpr size_t hash<pbrlib::math::Vec4<T>>::operator () (const pbrlib::math::Vec4<T>& vec) const noexcept
     {
         size_t hash_value = 0;
-        pbrlib::combineHash(hash_value, vec.x);
-        pbrlib::combineHash(hash_value, vec.y);
-        pbrlib::combineHash(hash_value, vec.z);
-        pbrlib::combineHash(hash_value, vec.w);
+        pbrlib::utils::combineHash(hash_value, vec.x);
+        pbrlib::utils::combineHash(hash_value, vec.y);
+        pbrlib::utils::combineHash(hash_value, vec.z);
+        pbrlib::utils::combineHash(hash_value, vec.w);
 
         return hash_value;
     }

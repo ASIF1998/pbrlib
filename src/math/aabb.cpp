@@ -66,8 +66,8 @@ namespace std
     size_t hash<pbrlib::math::AABB>::operator () (const pbrlib::math::AABB& aabb) const noexcept
     {
         size_t hash_value = 0;
-        pbrlib::combineHash(hash_value, aabb.p_min);
-        pbrlib::combineHash(hash_value, aabb.p_max);
+        pbrlib::utils::combineHash(hash_value, aabb.p_min);
+        pbrlib::utils::combineHash(hash_value, aabb.p_max);
 
         return hash_value;
     }
