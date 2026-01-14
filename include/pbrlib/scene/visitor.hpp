@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 namespace pbrlib
 {
     class SceneItem;
@@ -30,8 +32,5 @@ namespace pbrlib
     };
 
     template<typename T>
-    concept IsSceneVisitor = requires(T visitor)
-    {
-        dynamic_cast<SceneVisitor*>(&visitor);
-    };
+    concept IsSceneVisitor = std::derived_from<T, SceneVisitor>;
 }
