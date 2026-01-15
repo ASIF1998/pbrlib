@@ -17,6 +17,8 @@
 
 #include <pbrlib/math/lerp.hpp>
 
+#include  <algorithm>
+
 namespace pbrlib::backend
 {
     FXAA::FXAA(vk::Device& device, vk::Image& dst_image) :
@@ -33,7 +35,7 @@ namespace pbrlib::backend
             return false;
         }
 
-        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& init) 
+        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& init)
         {
             createPipeline();
         });
@@ -42,18 +44,13 @@ namespace pbrlib::backend
         {
             const auto& config = settings.settings;
 
-            if (config.span_max < 0.0 || config.span_max > 1.0) [[unlikely]]
-                return;
+            const auto span_max     = std::clamp(config.span_max, 0.0, 1.0);
+            const auto reduce_min   = std::clamp(config.reduce_min, 0.0, 1.0);
+            const auto reduce_mul   = std::clamp(config.reduce_mul, 0.0, 1.0);
 
-            if (config.reduce_min < 0.0 || config.reduce_min > 1.0) [[unlikely]]
-                return;
-
-            if (config.reduce_mul < 0.0 || config.reduce_mul > 1.0) [[unlikely]]
-                return;
-
-            _config.span_max    = math::lerp(4.0f, 16.0f, settings.settings.span_max);
-            _config.reduce_min  = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, settings.settings.reduce_min);
-            _config.reduce_mul  = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, settings.settings.reduce_mul);
+            _config.span_max    = math::lerp(4.0f, 16.0f, span_max);
+            _config.reduce_min  = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, reduce_min);
+            _config.reduce_mul  = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, reduce_mul);
         });
 
         const auto [_, io_set_layout_handle] = IODescriptorSet();
@@ -64,7 +61,7 @@ namespace pbrlib::backend
             .offset     = 0,
             .size       = sizeof(Config)
         };
-        
+
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(io_set_layout_handle)
             .pushConstant(push_constant_range)
@@ -95,17 +92,17 @@ namespace pbrlib::backend
 
             const auto [io_set_handle, _] = IODescriptorSet();
             vkCmdBindDescriptorSets(
-                command_buffer_handle, 
-                VK_PIPELINE_BIND_POINT_COMPUTE, 
-                _pipeline_layout_handle, 
-                0, 1, &io_set_handle, 
+                command_buffer_handle,
+                VK_PIPELINE_BIND_POINT_COMPUTE,
+                _pipeline_layout_handle,
+                0, 1, &io_set_handle,
                 0, nullptr
             );
 
             vkCmdPushConstants (
-                command_buffer_handle, 
-                _pipeline_layout_handle, 
-                VK_SHADER_STAGE_COMPUTE_BIT, 
+                command_buffer_handle,
+                _pipeline_layout_handle,
+                VK_SHADER_STAGE_COMPUTE_BIT,
                 0, static_cast<uint32_t>(sizeof(Config)), &_config
             );
 

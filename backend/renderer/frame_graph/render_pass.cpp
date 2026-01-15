@@ -4,8 +4,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <stdexcept>
-
 #include <ranges>
 
 namespace pbrlib::backend
@@ -27,9 +25,9 @@ namespace pbrlib::backend
     }
 
     void RenderPass::addSyncImage (
-        vk::Image*              ptr_image, 
-        VkImageLayout           new_layout, 
-        VkPipelineStageFlags2   src_stage, 
+        vk::Image*              ptr_image,
+        VkImageLayout           new_layout,
+        VkPipelineStageFlags2   src_stage,
         VkPipelineStageFlags2   dst_stage
     )
     {
@@ -44,7 +42,7 @@ namespace pbrlib::backend
     vk::Image* RenderPass::colorOutputAttach(std::string_view name)
     {
         auto it = _color_output_images.find(name);
-        if (it == std::end(_color_output_images))
+        if (it == std::end(_color_output_images)) [[unlikely]]
             throw exception::InvalidState(std::format("[render-pass] failed find color output attachment '{}'", name));
 
         return it->second;
@@ -90,7 +88,7 @@ namespace pbrlib::backend
     }
 
     void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout)
-    { 
+    {
         _input_descriptor_sets.emplace(set_id, std::make_pair(set_handle, set_layout));
     }
 

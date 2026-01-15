@@ -76,7 +76,7 @@ namespace pbrlib::backend
         return true;
     }
 
-    void BilateralBlur::render(vk::CommandBuffer& command_buffer) 
+    void BilateralBlur::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -88,17 +88,17 @@ namespace pbrlib::backend
 
             const auto [io_set_handle, _] = IODescriptorSet();
             vkCmdBindDescriptorSets(
-                command_buffer_handle, 
-                VK_PIPELINE_BIND_POINT_COMPUTE, 
-                _pipeline_layout_handle, 
-                0, 1, &io_set_handle, 
+                command_buffer_handle,
+                VK_PIPELINE_BIND_POINT_COMPUTE,
+                _pipeline_layout_handle,
+                0, 1, &io_set_handle,
                 0, nullptr
             );
 
             vkCmdPushConstants(
                 command_buffer_handle,
-                _pipeline_layout_handle, 
-                VK_SHADER_STAGE_COMPUTE_BIT, 
+                _pipeline_layout_handle,
+                VK_SHADER_STAGE_COMPUTE_BIT,
                 0, sizeof(Settings), &_settings
             );
 
@@ -110,7 +110,7 @@ namespace pbrlib::backend
     {
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
-    
+
     VkPipelineStageFlags2 BilateralBlur::dstStage() const noexcept
     {
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;

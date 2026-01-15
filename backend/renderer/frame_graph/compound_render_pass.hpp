@@ -16,7 +16,7 @@ namespace pbrlib::backend
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
         void render(vk::CommandBuffer& command_buffer)                              override;
         void draw(vk::CommandBuffer& command_buffer)                                override;
-        
+
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
@@ -37,4 +37,4 @@ namespace pbrlib::backend
         VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
         VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
     };
-}   
+}

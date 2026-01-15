@@ -6,7 +6,6 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <optional>
 #include <array>
 
 namespace pbrlib::backend
@@ -18,9 +17,9 @@ namespace pbrlib::backend
     {
         static constexpr auto metadata()
         {
-            constexpr auto usage_flags = 
-                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
-            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            constexpr auto usage_flags =
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+            |   VK_IMAGE_USAGE_SAMPLED_BIT
             |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
             |   VK_IMAGE_USAGE_TRANSFER_DST_BIT
             |   VK_IMAGE_USAGE_STORAGE_BIT;
@@ -56,13 +55,13 @@ namespace pbrlib::backend
         void createResultDescriptorSet();
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
-        
+
         bool createPipeline();
-        
+
         void beginPass(vk::CommandBuffer& command_buffer);
         void render(vk::CommandBuffer& command_buffer) override;
         void endPass(vk::CommandBuffer& command_buffer);
-        
+
         void createRenderPass();
         void createFramebuffer();
 

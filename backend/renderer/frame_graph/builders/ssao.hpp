@@ -29,8 +29,8 @@ namespace pbrlib::backend::builders
         SSAO& settings(const pbrlib::settings::SSAO& config)    noexcept;
 
         SSAO& addSync (
-            vk::Image*              ptr_image, 
-            VkImageLayout           expected_layout, 
+            vk::Image*              ptr_image,
+            VkImageLayout           expected_layout,
             VkPipelineStageFlags2   src_stage
         );
 

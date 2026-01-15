@@ -26,7 +26,7 @@
 namespace pbrlib::backend
 {
     FrameGraph::FrameGraph (
-        vk::Device&             device, 
+        vk::Device&             device,
         const pbrlib::Config&   config,
         Canvas&                 canvas,
         MaterialManager&        material_manager,
@@ -38,7 +38,7 @@ namespace pbrlib::backend
     {
         _render_context.ptr_material_manager    = &material_manager;
         _render_context.ptr_mesh_manager        = &mesh_manager;
-        
+
         build();
     }
 }
@@ -65,7 +65,7 @@ namespace pbrlib::backend
         _device.submit(command_buffer);
 
         auto ptr_result = &_images.at(AttachmentsTraits<FXAA>::result);
-        
+
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _canvas.present(ptr_result);
     }
@@ -89,7 +89,7 @@ namespace pbrlib::backend
     }
 
     std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
-        vk::Image*              ptr_pos_uv, 
+        vk::Image*              ptr_pos_uv,
         vk::Image*              ptr_normal_tangent,
         vk::Image*              ptr_depth_buffer,
         const RenderPass*       ptr_gbuffer
@@ -102,10 +102,10 @@ namespace pbrlib::backend
         return builders::SSAO(_device)
             .ssaoImage(_images.at(AttachmentsTraits<SSAO>::ssao))
             .blurImage(_images.at(AttachmentsTraits<SSAO>::blur))
-            .settings(_config.ssao)            
-            .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
-            .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)   
-            .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)   
+            .settings(_config.ssao)
+            .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
+            .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
+            .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)
             .gbufferDescriptorSet(gbuffer_set_handle, gbuffer_set_layout_handle)
             .build();
     }
@@ -140,12 +140,12 @@ namespace pbrlib::backend
         auto ptr_normal_tangent = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
         auto ptr_ssao = buildSSAOSubpass (
-            ptr_pos_uv, 
-            ptr_normal_tangent, 
+            ptr_pos_uv,
+            ptr_normal_tangent,
             &_depth_buffer.value(),
             ptr_gbuffer_generator.get()
         );
-        
+
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
 
@@ -228,9 +228,9 @@ namespace pbrlib::backend
             for (auto& [_, image]: _images)
             {
                 vkCmdClearColorImage(
-                    command_buffer_handle, 
-                    image.handle.handle(), image.layout, 
-                    &clear_color, 
+                    command_buffer_handle,
+                    image.handle.handle(), image.layout,
+                    &clear_color,
                     1, &range
                 );
             }
