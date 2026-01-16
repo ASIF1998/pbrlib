@@ -69,14 +69,14 @@ namespace pbrlib::backend::vk::shader::utils
         RETURN_STAGE(".tesc", GLSLANG_STAGE_TESSCONTROL);
         RETURN_STAGE(".tesc", GLSLANG_STAGE_TESSEVALUATION);
         RETURN_STAGE(".geom", GLSLANG_STAGE_GEOMETRY);
-        
+
         RETURN_STAGE(".task", GLSLANG_STAGE_TASK);
         RETURN_STAGE(".mesh", GLSLANG_STAGE_MESH);
-        
+
         RETURN_STAGE(".frag", GLSLANG_STAGE_FRAGMENT);
 
         RETURN_STAGE(".comp", GLSLANG_STAGE_COMPUTE);
-        
+
         RETURN_STAGE(".rgen", GLSLANG_STAGE_RAYGEN);
         RETURN_STAGE(".rint", GLSLANG_STAGE_INTERSECT);
         RETURN_STAGE(".rahit", GLSLANG_STAGE_ANYHIT);
@@ -92,8 +92,8 @@ namespace pbrlib::backend::vk::shader::utils
     }
 
     static glsl_include_result_t* localInclude (
-        void*       ctx, 
-        const char* header_name, 
+        void*       ctx,
+        const char* header_name,
         const char* includer_name,
         size_t      include_depth
     )
@@ -103,8 +103,8 @@ namespace pbrlib::backend::vk::shader::utils
     }
 
     static glsl_include_result_t* systemInclude (
-        void*       ctx, 
-        const char* header_name, 
+        void*       ctx,
+        const char* header_name,
         const char* includer_name,
         size_t      include_depth
     )
@@ -114,7 +114,7 @@ namespace pbrlib::backend::vk::shader::utils
 
         if (auto return_value = includes_data.find(header_name); return_value != std::end(includes_data))
             return return_value->second.ptr_include_result.get();
-            
+
         static const auto src_root_directory = pbrlib::backend::utils::projectRoot() / "backend/shaders";
 
         std::string key     = header_name;
@@ -156,15 +156,15 @@ namespace pbrlib::backend::vk::shader
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
 
-        const glsl_include_callbacks_t includer 
-        { 
+        const glsl_include_callbacks_t includer
+        {
             .include_system         = utils::systemInclude,
             .include_local          = utils::localInclude,
             .free_include_result    = utils::freeInclude
         };
 
-        const glslang_input_t input 
-        { 
+        const glslang_input_t input
+        {
             .language                           = GLSLANG_SOURCE_GLSL,
             .stage                              = stage,
             .client                             = GLSLANG_CLIENT_VULKAN,
@@ -215,8 +215,8 @@ namespace pbrlib::backend::vk::shader
         auto il = createIL(backend::utils::projectRoot() / "backend" / filename);
 
         VkShaderModule shader_module_handle = VK_NULL_HANDLE;
-        
-        const VkShaderModuleCreateInfo shader_module_create_info 
+
+        const VkShaderModuleCreateInfo shader_module_create_info
         {
             .sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
             .codeSize   = il.size() * sizeof(uint32_t),
@@ -224,14 +224,14 @@ namespace pbrlib::backend::vk::shader
         };
 
         VK_CHECK(vkCreateShaderModule(
-            device.device(), 
-            &shader_module_create_info, 
-            nullptr, 
+            device.device(),
+            &shader_module_create_info,
+            nullptr,
             &shader_module_handle
         ));
 
         return shader_module_handle;
-    }    
+    }
 }
 
 namespace pbrlib::backend::vk::shader
@@ -256,7 +256,7 @@ namespace pbrlib::backend::vk::shader
     {
         if (!glslang_initialize_process()) [[unlikely]]
             backend::log::error("[shader-compiler] failed initialize glslang.");
-        
+
         is_init = true;
     }
 

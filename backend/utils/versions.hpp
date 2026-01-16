@@ -9,7 +9,7 @@ namespace pbrlib::backend::utils
     {
         return backend::priv::EngineVersion;
     }
-    
+
     [[nodiscard]]
     constexpr uint32_t vulkanVersion()
     {

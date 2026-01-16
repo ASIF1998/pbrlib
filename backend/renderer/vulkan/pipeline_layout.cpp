@@ -66,9 +66,9 @@ namespace pbrlib::backend::vk::builders
     { }
 
     DescriptorSetLayout& DescriptorSetLayout::addBinding (
-        uint32_t            binding, 
-        VkDescriptorType    desc_type, 
-        uint32_t            count, 
+        uint32_t            binding,
+        VkDescriptorType    desc_type,
+        uint32_t            count,
         VkShaderStageFlags  stages
     )
     {
@@ -91,7 +91,7 @@ namespace pbrlib::backend::vk::builders
         if (_bindings.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-descritor-set-layout::builder] bindings count is 0");
 
-        const std::vector<VkDescriptorBindingFlags> bindings_flags (_bindings.size(), VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT); 
+        const std::vector<VkDescriptorBindingFlags> bindings_flags (_bindings.size(), VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT);
 
         const VkDescriptorSetLayoutBindingFlagsCreateInfo set_layout_binding_flags_create_info
         {

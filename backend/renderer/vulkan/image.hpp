@@ -67,7 +67,7 @@ namespace pbrlib::backend::vk
 
         ImageHandle     handle;
         ImageViewHandle view_handle;
-        
+
         uint32_t width  = 0;
         uint32_t height = 0;
         VkFormat format = VK_FORMAT_UNDEFINED;
@@ -89,7 +89,7 @@ namespace pbrlib::backend::vk::builders
         friend class Device;
 
         void validate();
-        
+
         [[nodiscard]] VkSharingMode sharingMode();
 
     public:

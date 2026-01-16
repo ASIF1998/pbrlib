@@ -90,7 +90,7 @@ namespace pbrlib::backend::vk::utils
         return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
     }
 
-    auto cast(bool v)
+    auto cast(bool v) noexcept
     {
         return v ? VK_TRUE : VK_FALSE;
     }
@@ -124,7 +124,7 @@ namespace pbrlib::backend::vk::builders
             const auto data     = ptr_spec_info->data();
 
             _specialization_infos.emplace_back (
-                static_cast<uint32_t>(entries.size()), entries.data(), 
+                static_cast<uint32_t>(entries.size()), entries.data(),
                 static_cast<uint32_t>(data.size()), data.data()
             );
 
@@ -180,7 +180,7 @@ namespace pbrlib::backend::vk::builders
     GraphicsPipeline& GraphicsPipeline::sampleCount(SampleCount count) noexcept
     {
         _sample_count = count;
-        return *this;   
+        return *this;
     }
 
     GraphicsPipeline& GraphicsPipeline::depthStencilTest(bool is_enable) noexcept
@@ -195,7 +195,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    GraphicsPipeline& GraphicsPipeline::renderPassHandle(VkRenderPass render_pass_handle) noexcept 
+    GraphicsPipeline& GraphicsPipeline::renderPassHandle(VkRenderPass render_pass_handle) noexcept
     {
         _render_pass_handle = render_pass_handle;
         return *this;
@@ -209,13 +209,13 @@ namespace pbrlib::backend::vk::builders
 
     PipelineHandle GraphicsPipeline::build()
     {
-        if (_pipeline_layout_handle == VK_NULL_HANDLE)
+        if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-graphics-pipeline-builder] pipeline layout handle is null");
-        
-        if (_render_pass_handle == VK_NULL_HANDLE)
+
+        if (_render_pass_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-graphics-pipeline-builder] render pass handle is null");
 
-        if (_subpass == std::numeric_limits<uint32_t>::max())
+        if (_subpass == std::numeric_limits<uint32_t>::max()) [[unlikely]]
             throw exception::InvalidState("[vk-graphics-pipeline-builder] subpass index didn't set");
 
         constexpr VkPipelineVertexInputStateCreateInfo vertex_input_state =

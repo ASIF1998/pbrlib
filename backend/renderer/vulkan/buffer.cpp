@@ -52,8 +52,8 @@ namespace pbrlib::backend::vk
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-buffer] upalod-data-to-device-only-buffer");
 
-            const VkBufferCopy copy 
-            { 
+            const VkBufferCopy copy
+            {
                 .srcOffset  = 0,
                 .dstOffset  = offset,
                 .size       = static_cast<VkDeviceSize>(data_size)
@@ -86,8 +86,8 @@ namespace pbrlib::backend::vk
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-buffer] write-data-in-buffer");
 
-            const VkBufferCopy copy 
-            { 
+            const VkBufferCopy copy
+            {
                 .srcOffset  = 0,
                 .dstOffset  = offset_in_dst,
                 .size       = buffer.size
@@ -103,7 +103,7 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (type == BufferType::eDeviceOnly)
+        if (type == BufferType::eDeviceOnly) [[unlikely]]
             throw exception::RuntimeError("[vk-buffer] device only buffer don't support read value from CPU");
 
         void* ptr_src = nullptr;
@@ -120,8 +120,8 @@ namespace pbrlib::backend::vk
 {
     VkDeviceAddress Buffer::address() const
     {
-        const VkBufferDeviceAddressInfo buffer_device_address_info 
-        { 
+        const VkBufferDeviceAddressInfo buffer_device_address_info
+        {
             .sType  = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
             .buffer = handle
         };
@@ -168,20 +168,20 @@ namespace pbrlib::backend::vk::builders
 
     void Buffer::validate()
     {
-        if (_queues.empty())
+        if (_queues.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-buffer::builder] not queues");
 
-        if (!_size)
+        if (!_size) [[unlikely]]
             throw exception::InvalidState("[vk-buffer::builder] size is 0");
 
-        if (_usage == VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM)
+        if (_usage == VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM) [[unlikely]]
             throw exception::InvalidState("[vk-buffer::builder] invalid usage");
     }
 
     VkSharingMode Buffer::sharingMode() const
     {
         std::unordered_set<uint32_t> family_indices (std::cbegin(_queues), std::cend(_queues));
-        return family_indices.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT; 
+        return family_indices.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
     }
 
     vk::Buffer Buffer::build()
@@ -194,8 +194,8 @@ namespace pbrlib::backend::vk::builders
         buffer.type     = _type;
         buffer.usage    = _usage;
 
-        const VkBufferCreateInfo buffer_info 
-        { 
+        const VkBufferCreateInfo buffer_info
+        {
             .sType                  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
             .size                   = _size,
             .usage                  = _usage,
@@ -204,8 +204,8 @@ namespace pbrlib::backend::vk::builders
             .pQueueFamilyIndices    = _queues.data()
         };
 
-        VmaAllocationCreateInfo alloc_info 
-        { 
+        VmaAllocationCreateInfo alloc_info
+        {
             .usage = VMA_MEMORY_USAGE_AUTO
         };
 
@@ -213,12 +213,12 @@ namespace pbrlib::backend::vk::builders
             alloc_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
         else if (_type == BufferType::eStaging)
             alloc_info.flags =  VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |  VMA_ALLOCATION_CREATE_MAPPED_BIT | VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-        else 
+        else
             alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
         VkBuffer        buffer_handle       = VK_NULL_HANDLE;
         VmaAllocation   allocation_handle   = VK_NULL_HANDLE;
-        
+
         VK_CHECK(vmaCreateBuffer(
             _device.vmaAllocator(),
             &buffer_info,
@@ -230,10 +230,10 @@ namespace pbrlib::backend::vk::builders
 
         buffer.handle = BufferHandle(buffer_handle, allocation_handle);
 
-        if (!_name.empty())
+        if (!_name.empty()) [[likely]]
         {
-            const VkDebugUtilsObjectNameInfoEXT name_info 
-            { 
+            const VkDebugUtilsObjectNameInfoEXT name_info
+            {
                 .sType          = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType     = VK_OBJECT_TYPE_BUFFER,
                 .objectHandle   = reinterpret_cast<uint64_t>(buffer.handle.handle()),

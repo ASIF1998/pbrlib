@@ -48,8 +48,8 @@ namespace pbrlib::backend::vk
 #endif
 
         static void initForDeviceResources (
-            VkInstance      instance_handle, 
-            VkDevice        device_handle, 
+            VkInstance      instance_handle,
+            VkDevice        device_handle,
             VmaAllocator    allocator_handle
         );
 

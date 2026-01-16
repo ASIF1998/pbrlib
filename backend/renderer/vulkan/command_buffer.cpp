@@ -13,9 +13,9 @@ namespace pbrlib::backend::vk
 {
     CommandBuffer::CommandBuffer(const Device& device, VkCommandPool command_pool_handle) :
         _device (device)
-    { 
-        const VkCommandBufferAllocateInfo alloc_info = 
-        { 
+    {
+        const VkCommandBufferAllocateInfo alloc_info =
+        {
             .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .commandPool        = command_pool_handle,
             .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -23,7 +23,7 @@ namespace pbrlib::backend::vk
         };
 
         level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        
+
         VkCommandBuffer command_buffer_handle = VK_NULL_HANDLE;
         VK_CHECK(vkAllocateCommandBuffers(_device.device(), &alloc_info, &command_buffer_handle));
 
@@ -54,13 +54,13 @@ namespace pbrlib::backend::vk
         const pbrlib::math::vec3&   col
     )
     {
-        if (!callback)
+        if (!callback) [[unlikely]]
             throw exception::InvalidArgument("[vulkan::command-buffer] callback is empty");
 
         if (!_is_recording_started)
         {
-            constexpr VkCommandBufferBeginInfo begin_info 
-            { 
+            constexpr VkCommandBufferBeginInfo begin_info
+            {
                 .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
                 .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
             };
@@ -70,13 +70,13 @@ namespace pbrlib::backend::vk
             _is_recording_started = true;
         }
 
-        VkDebugMarkerMarkerInfoEXT marker_info 
-        { 
+        VkDebugMarkerMarkerInfoEXT marker_info
+        {
             .sType       = VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT,
             .pMarkerName = name.data()
         };
 
-        if (col.lengthSquared() > 0.0)
+        if (col.lengthSquared() > 0.0) [[likely]]
         {
             marker_info.color[0] = col.r;
             marker_info.color[1] = col.g;
@@ -86,12 +86,12 @@ namespace pbrlib::backend::vk
 
         const auto& functions = _device.vulkanFunctions();
 
-        if (functions.vkCmdDebugMarkerBeginEXT)
+        if (functions.vkCmdDebugMarkerBeginEXT) [[likely]]
             functions.vkCmdDebugMarkerBeginEXT(handle, &marker_info);
-           
+
         callback(handle);
 
-        if (functions.vkCmdDebugMarkerEndEXT)
+        if (functions.vkCmdDebugMarkerEndEXT) [[likely]]
             functions.vkCmdDebugMarkerEndEXT(handle);
     }
 }

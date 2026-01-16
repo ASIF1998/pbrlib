@@ -44,9 +44,9 @@ namespace pbrlib::backend
         {
             const auto& config = settings.settings;
 
-            const auto span_max     = std::clamp(config.span_max, 0.0, 1.0);
-            const auto reduce_min   = std::clamp(config.reduce_min, 0.0, 1.0);
-            const auto reduce_mul   = std::clamp(config.reduce_mul, 0.0, 1.0);
+            const auto span_max     = std::clamp(config.span_max, 0.0f, 1.0f);
+            const auto reduce_min   = std::clamp(config.reduce_min, 0.0f, 1.0f);
+            const auto reduce_mul   = std::clamp(config.reduce_mul, 0.0f, 1.0f);
 
             _config.span_max    = math::lerp(4.0f, 16.0f, span_max);
             _config.reduce_min  = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, reduce_min);

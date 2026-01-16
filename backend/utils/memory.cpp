@@ -12,7 +12,7 @@ namespace pbrlib::backend::utils
 #else
         void* vptr;
         assert(!posix_memalign(&vptr, PBRLIB_L1_CACHE_LINE_SIZE, size));
-        return vptr;  
+        return vptr;
 #endif
     }
 

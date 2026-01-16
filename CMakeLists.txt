@@ -71,7 +71,7 @@ set(Vulkan_SDK_LIBS ${Vulkan_INCLUDE_DIRS}/../Lib)
 #   assimp
 #####################################################
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    
+
 include_directories(third_party/assimp/include)
 add_subdirectory(third_party/assimp)
 
@@ -116,7 +116,7 @@ add_subdirectory(third_party/tracy)
 #####################################################
 #   add libs
 #####################################################
-target_include_directories(pbrlib PUBLIC 
+target_include_directories(pbrlib PUBLIC
     ${Vulkan_INCLUDE_DIRS}
 )
 
@@ -140,7 +140,7 @@ target_link_libraries(pbrlib PUBLIC
 #####################################################
 #   tests
 #####################################################
-if (PBRLIB_ENABLE_TESTS) 
+if (PBRLIB_ENABLE_TESTS)
     add_subdirectory(pbrlib-tests)
 endif()
 

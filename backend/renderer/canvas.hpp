@@ -41,8 +41,8 @@ namespace pbrlib::backend
         vk::Device& _device;
 
         std::optional<vk::Image> _image;
-        
-        struct 
+
+        struct
         {
             std::optional<vk::Surface>  vk_surface;
             vk::Image*                  ptr_image   = nullptr;

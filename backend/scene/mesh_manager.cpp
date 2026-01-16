@@ -11,8 +11,6 @@
 
 #include <pbrlib/exceptions.hpp>
 
-#include <array>
-
 namespace pbrlib::backend
 {
     MeshManager::MeshManager(vk::Device& device) :
@@ -24,14 +22,14 @@ namespace pbrlib::backend
             .build();
 
         _descriptor_set_handle = _device.allocateDescriptorSet (
-            _descriptor_set_layout_handle, 
+            _descriptor_set_layout_handle,
             "[mesh-manager] descriptor-set-layout"
         );
     }
 
     void MeshManager::add (
         std::string_view                    name,
-        std::span<const VertexAttribute>    attributes, 
+        std::span<const VertexAttribute>    attributes,
         std::span<const uint32_t>           indices,
         SceneItem*                          ptr_item
     )
@@ -47,7 +45,7 @@ namespace pbrlib::backend
         renderable.vertex_count = attributes.size();
         renderable.index_count  = indices.size();
 
-        constexpr VkFlags shared_buffer_usage = 
+        constexpr VkFlags shared_buffer_usage =
                 VK_BUFFER_USAGE_TRANSFER_DST_BIT
             |   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
@@ -89,7 +87,7 @@ namespace pbrlib::backend
 
     void MeshManager::addInstance(const SceneItem* ptr_src_item, SceneItem* ptr_dst_item)
     {
-        if (!ptr_src_item || !ptr_dst_item)
+        if (!ptr_src_item || !ptr_dst_item) [[unlikely]]
             throw exception::InvalidArgument("[mesh-manager] pointers to items is null");
 
         const auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
@@ -180,7 +178,7 @@ namespace pbrlib::backend
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const
     {
-        if (instance_id >= _instances.size())
+        if (instance_id >= _instances.size()) [[unlikely]]
             throw exception::InvalidArgument("[mesh-manager] invalid instance id");
 
         return _ibos[_instances[instance_id].mesh_id];
@@ -188,7 +186,7 @@ namespace pbrlib::backend
 
     const vk::Buffer& MeshManager::vertexBuffer(uint32_t instance_id) const
     {
-        if (instance_id >= _instances.size())
+        if (instance_id >= _instances.size()) [[unlikely]]
             throw exception::InvalidArgument("[mesh-manager] invalid instance id");
 
         return _vbos[_instances[instance_id].mesh_id];
@@ -207,7 +205,7 @@ namespace pbrlib::backend
         {
             auto& instance      = _instances[index->second];
             instance.model     = transform;
-            instance.normal    = math::transpose(math::inverse(transform));        
+            instance.normal    = math::transpose(math::inverse(transform));
         }
     }
 }

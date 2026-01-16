@@ -47,7 +47,7 @@ namespace pbrlib::backend::vk::shader
         {
             return std::span(reinterpret_cast<const uint8_t*>(&_data), sizeof(T));
         }
-        
+
     private:
         const T& _data;
     };

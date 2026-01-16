@@ -45,7 +45,7 @@ namespace pbrlib::backend::vk
         Surface& operator = (const Surface& surface) = delete;
 
         [[nodiscard]] NextImageInfo nextImage();
-        
+
     private:
         SurfaceHandle       _surface_handle;
         SwapchainHandle     _swapchain_handle;
@@ -56,7 +56,7 @@ namespace pbrlib::backend::vk
 
         Device& _device;
 
-        mutable uint32_t _current_image_index = 0; 
+        mutable uint32_t _current_image_index = 0;
 
         FenceHandle _next_image_fence_handle;
     };

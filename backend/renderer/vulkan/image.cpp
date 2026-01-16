@@ -97,7 +97,7 @@ namespace pbrlib::backend::vk
             .build();
 
         std::span<const uint8_t> image_data (data.ptr_data, image_size);
-        
+
         staging_buffer.write(image_data, 0);
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-copy-buffer-to-image");
@@ -110,16 +110,16 @@ namespace pbrlib::backend::vk
 
             const auto aspect = data.format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
 
-            const VkImageSubresourceLayers subresource 
-            { 
+            const VkImageSubresourceLayers subresource
+            {
                 .aspectMask     = static_cast<VkImageAspectFlags>(aspect),
                 .mipLevel       = 0,
                 .baseArrayLayer = 0,
                 .layerCount     = 1
             };
 
-            const VkBufferImageCopy2 region 
-            { 
+            const VkBufferImageCopy2 region
+            {
                 .sType              = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2,
                 .bufferOffset       = 0,
                 .bufferRowLength    = static_cast<uint32_t>(data.width), // scanline_size
@@ -129,8 +129,8 @@ namespace pbrlib::backend::vk
                 .imageExtent        = {static_cast<uint32_t>(data.width), static_cast<uint32_t>(data.height), 1}
             };
 
-            const VkCopyBufferToImageInfo2 copy_info 
-            { 
+            const VkCopyBufferToImageInfo2 copy_info
+            {
                 .sType          = VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2,
                 .srcBuffer      = staging_buffer.handle,
                 .dstImage       = handle.handle(),
@@ -147,8 +147,8 @@ namespace pbrlib::backend::vk
 
     void Image::changeLayout (
         VkImageLayout           new_layout,
-        VkPipelineStageFlags2   src_stage, 
-        VkPipelineStageFlags2   dst_stage 
+        VkPipelineStageFlags2   src_stage,
+        VkPipelineStageFlags2   dst_stage
     )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -162,8 +162,8 @@ namespace pbrlib::backend::vk
     void Image::changeLayout (
         CommandBuffer&          command_buffer,
         VkImageLayout           new_layout,
-        VkPipelineStageFlags2   src_stage, 
-        VkPipelineStageFlags2   dst_stage 
+        VkPipelineStageFlags2   src_stage,
+        VkPipelineStageFlags2   dst_stage
     )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -179,7 +179,7 @@ namespace pbrlib::backend::vk
                 ?   VK_IMAGE_ASPECT_DEPTH_BIT
                 :   VK_IMAGE_ASPECT_COLOR_BIT;
 
-            const VkImageSubresourceRange range 
+            const VkImageSubresourceRange range
             {
                 .aspectMask     = static_cast<VkImageAspectFlags>(aspect_mask),
                 .baseMipLevel   = 0,
@@ -201,8 +201,8 @@ namespace pbrlib::backend::vk
                 .subresourceRange       = range
             };
 
-            const VkDependencyInfo dependency_info 
-            { 
+            const VkDependencyInfo dependency_info
+            {
                 .sType                      = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
                 .imageMemoryBarrierCount    = 1,
                 .pImageMemoryBarriers       = &image_mem_barrier
@@ -278,7 +278,7 @@ namespace pbrlib::backend::vk::builders
         _tiling = tiling;
         return *this;
     }
-    
+
     Image& Image::usage(VkImageUsageFlags usage) noexcept
     {
         _usage = usage;
@@ -307,8 +307,8 @@ namespace pbrlib::backend::vk::builders
         image.height    = _height;
         image.format    = _format;
 
-        const VkImageCreateInfo image_info 
-        { 
+        const VkImageCreateInfo image_info
+        {
             .sType                  = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
             .imageType              = VK_IMAGE_TYPE_2D,
             .format                 = _format,
@@ -324,8 +324,8 @@ namespace pbrlib::backend::vk::builders
             .initialLayout          = VK_IMAGE_LAYOUT_UNDEFINED
         };
 
-        VmaAllocationCreateInfo alloc_info 
-        { 
+        VmaAllocationCreateInfo alloc_info
+        {
             .flags      = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
             .usage      = VMA_MEMORY_USAGE_AUTO,
             .priority   = 1.0f
@@ -337,11 +337,11 @@ namespace pbrlib::backend::vk::builders
         VkImage         image_handle        = VK_NULL_HANDLE;
         VmaAllocation   allocation_handle   = VK_NULL_HANDLE;
         VK_CHECK(vmaCreateImage(
-            _device.vmaAllocator(), 
-            &image_info, 
-            &alloc_info, 
-            &image_handle, 
-            &allocation_handle, 
+            _device.vmaAllocator(),
+            &image_info,
+            &alloc_info,
+            &image_handle,
+            &allocation_handle,
             nullptr
         ));
 
@@ -358,8 +358,8 @@ namespace pbrlib::backend::vk::builders
 
         const auto aspect = _format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
 
-        const VkImageSubresourceRange subresource_range 
-        { 
+        const VkImageSubresourceRange subresource_range
+        {
             .aspectMask        = static_cast<VkImageAspectFlags>(aspect),
             .baseMipLevel      = 0,
             .levelCount        = image.level_count,
@@ -367,16 +367,16 @@ namespace pbrlib::backend::vk::builders
             .layerCount        = image.layer_count
         };
 
-        constexpr VkComponentMapping components 
-        { 
+        constexpr VkComponentMapping components
+        {
             .r = VK_COMPONENT_SWIZZLE_IDENTITY,
             .g = VK_COMPONENT_SWIZZLE_IDENTITY,
             .b = VK_COMPONENT_SWIZZLE_IDENTITY,
             .a = VK_COMPONENT_SWIZZLE_IDENTITY
         };
 
-        const VkImageViewCreateInfo image_view_info 
-        { 
+        const VkImageViewCreateInfo image_view_info
+        {
             .sType              = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
             .image              = image.handle.handle(),
             .viewType           = VK_IMAGE_VIEW_TYPE_2D,
@@ -394,8 +394,8 @@ namespace pbrlib::backend::vk::builders
 
         if (!_name.empty()) [[likely]]
         {
-            VkDebugUtilsObjectNameInfoEXT name_info 
-            { 
+            VkDebugUtilsObjectNameInfoEXT name_info
+            {
                 .sType         = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
                 .objectType    = VK_OBJECT_TYPE_IMAGE,
                 .objectHandle  = reinterpret_cast<uint64_t>(image.handle.handle()),
@@ -463,7 +463,7 @@ namespace pbrlib::backend::vk::decoders
             VK_FORMAT_R8G8B8A8_UNORM
         };
 
-        ImageWriteData write_data 
+        ImageWriteData write_data
         {
             .format = formats[_channels_per_pixel - 1]
         };
@@ -471,8 +471,8 @@ namespace pbrlib::backend::vk::decoders
         stbi_set_flip_vertically_on_load(true);
 
         write_data.ptr_data = stbi_load_from_memory(
-            _compressed_image.ptr_data, 
-            static_cast<int>(_compressed_image.size), 
+            _compressed_image.ptr_data,
+            static_cast<int>(_compressed_image.size),
             &write_data.width, &write_data.height,
             &_channels_per_pixel,
             _channels_per_pixel
@@ -521,16 +521,16 @@ namespace pbrlib::backend::vk::loaders
         validate();
 
         int num_channels = 0;
-        
+
         ImageWriteData data
         {
             .format = VK_FORMAT_R8G8B8A8_UNORM
         };
-        
+
         data.ptr_data = stbi_load(
-            _filename.string().c_str(), 
-            &data.width, &data.height, 
-            &num_channels, 
+            _filename.string().c_str(),
+            &data.width, &data.height,
+            &num_channels,
             STBI_rgb_alpha
         );
 
@@ -597,7 +597,7 @@ namespace pbrlib::backend::vk::exporters
 
         auto width  = static_cast<int>(_ptr_image->width);
         auto height = static_cast<int>(_ptr_image->height);
-        
+
         auto image = builders::Image(_device)
             .size(_ptr_image->width, _ptr_image->height)
             .format(VK_FORMAT_R8G8B8A8_UNORM)
@@ -607,7 +607,7 @@ namespace pbrlib::backend::vk::exporters
             .fillColor(pbrlib::math::vec3(std::numeric_limits<float>::max()))
             .name("[vk-image::exporter] src-image")
             .build();
-        
+
         image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer();
@@ -625,13 +625,13 @@ namespace pbrlib::backend::vk::exporters
             const VkImageBlit2 region
             {
                 .sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2,
-                .srcSubresource = 
+                .srcSubresource =
                 {
                     .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                     .layerCount = 1
                 },
                 .srcOffsets = {{}, blit_size},
-                .dstSubresource = 
+                .dstSubresource =
                 {
                     .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                     .layerCount = 1
@@ -639,8 +639,8 @@ namespace pbrlib::backend::vk::exporters
                 .dstOffsets = {{}, blit_size}
             };
 
-            const VkBlitImageInfo2 blit_info 
-            { 
+            const VkBlitImageInfo2 blit_info
+            {
                 .sType          = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2,
                 .srcImage       = _ptr_image->handle.handle(),
                 .srcImageLayout = _ptr_image->layout,
@@ -661,7 +661,7 @@ namespace pbrlib::backend::vk::exporters
         if (!file) [[unlikely]]
             throw exception::FileOpen("[vk-image::exporter] failed create writer");
 
-        const VkImageSubresource sub_resource 
+        const VkImageSubresource sub_resource
         {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .mipLevel   = 0,
@@ -673,7 +673,7 @@ namespace pbrlib::backend::vk::exporters
         vkGetImageSubresourceLayout(
             _device.device(),
             image.handle.handle(),
-            &sub_resource, 
+            &sub_resource,
             &sub_resource_layout
         );
 
@@ -692,7 +692,7 @@ namespace pbrlib::backend::vk::exporters
         };
 
         stbi_write_png_to_func([](void *context, void *data, int size)
-        { 
+        {
             (*reinterpret_cast<std::function<void (void*, int)>*>(context))(data, size);
         }, &writer, width, height, 4, ptr_data + sub_resource_layout.offset, static_cast<int>(sub_resource_layout.rowPitch));
 

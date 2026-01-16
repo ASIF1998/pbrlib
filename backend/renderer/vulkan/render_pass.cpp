@@ -12,7 +12,7 @@ namespace pbrlib::backend::vk::builders
     { }
 
     RenderPass& RenderPass::addColorAttachment (
-        const vk::Image*    ptr_image, 
+        const vk::Image*    ptr_image,
         VkImageLayout       final_layout
     )
     {
@@ -45,7 +45,7 @@ namespace pbrlib::backend::vk::builders
     }
 
     RenderPass& RenderPass::depthAttachment (
-        const vk::Image*    ptr_image, 
+        const vk::Image*    ptr_image,
         VkImageLayout       final_layout
     )
     {

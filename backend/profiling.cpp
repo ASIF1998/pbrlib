@@ -20,6 +20,6 @@ void operator delete(void* ptr)
 {
     TracyFree(ptr);
     free(ptr);
-} 
+}
 
 #endif

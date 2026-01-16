@@ -21,7 +21,7 @@ namespace pbrlib::backend::vk
         eTriangle
     };
 
-    enum class PolygonMode 
+    enum class PolygonMode
     {
         eFill,
         eLine,
@@ -46,10 +46,10 @@ namespace pbrlib::backend::vk
     {
         e1,
         e2,
-        e4, 
-        e8, 
+        e4,
+        e8,
         e16,
-        e32, 
+        e32,
         e64
     };
 }
@@ -94,7 +94,7 @@ namespace pbrlib::backend::vk::builders
         PolygonMode     _polygon_mode   = PolygonMode::eFill;
         CullMode        _cull_mode      = CullMode::eBack;
         FrontFace       _front_face     = FrontFace::eClockwise;
-        
+
         SampleCount _sample_count = SampleCount::e1;
 
         bool _enable_depth_stencil_test = false;

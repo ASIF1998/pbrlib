@@ -51,7 +51,7 @@ namespace pbrlib::backend::vk
 
             if (type == BufferType::eStaging)
                 writeToRam(ptr_data, data.size_bytes(), offset_in_dst);
-            else 
+            else
                 writeToVram(ptr_data, data.size_bytes(), offset_in_dst);
         }
 
@@ -63,7 +63,7 @@ namespace pbrlib::backend::vk
 
             if (type == BufferType::eStaging)
                 writeToRam(ptr_data, size, offset_in_dst);
-            else 
+            else
                 writeToVram(ptr_data, size, offset_in_dst);
         }
 

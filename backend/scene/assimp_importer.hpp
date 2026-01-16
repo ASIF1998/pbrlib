@@ -8,7 +8,6 @@
 #include <assimp/scene.h>
 
 #include <filesystem>
-#include <span>
 
 namespace pbrlib
 {
@@ -57,7 +56,7 @@ namespace pbrlib::backend
 
         SceneItem* _ptr_root_item = nullptr;
 
-        struct 
+        struct
         {
             math::mat4 transform        = math::mat4(1.0f);
             SceneItem* ptr_scene_item   = nullptr;
