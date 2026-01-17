@@ -34,7 +34,7 @@ namespace pbrlib
 		bool isUp(Keycode key_code) 	const noexcept;
 
 	private:
-		std::array<KeyStay, backend::utils::enumCast(Keycode::Count)> _pressed_map;
+		std::array<KeyStay, backend::utils::enumCast(Keycode::eCount)> _pressed_map;
 	};
 }
 
