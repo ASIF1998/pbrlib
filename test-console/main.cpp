@@ -45,22 +45,22 @@ auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionS
 auto keyboardProcess(const pbrlib::KeyboardStay& keyboard, const pbrlib::math::vec3& dir, const pbrlib::math::vec3& up) noexcept
     -> pbrlib::math::vec3
 {
-    if (keyboard.isDown(pbrlib::Keycode::W))
+    if (keyboard.isDown(pbrlib::Keycode::eW))
         return dir;
 
-    if (keyboard.isDown(pbrlib::Keycode::S))
+    if (keyboard.isDown(pbrlib::Keycode::eS))
         return dir * -1.0f;
 
-    if (keyboard.isDown(pbrlib::Keycode::A))
+    if (keyboard.isDown(pbrlib::Keycode::eA))
         return pbrlib::math::cross(up, dir);
 
-    if (keyboard.isDown(pbrlib::Keycode::D))
+    if (keyboard.isDown(pbrlib::Keycode::eD))
         return pbrlib::math::cross(dir, up);
 
-    if (keyboard.isDown(pbrlib::Keycode::Space))
+    if (keyboard.isDown(pbrlib::Keycode::eSpace))
         return up * -1.0f;
 
-    if (keyboard.isDown(pbrlib::Keycode::ShiftLeft))
+    if (keyboard.isDown(pbrlib::Keycode::eShiftLeft))
         return up;
 
     return pbrlib::math::vec3(0);

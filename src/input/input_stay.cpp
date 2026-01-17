@@ -38,7 +38,7 @@ namespace pbrlib
 
 	bool KeyboardStay::isDown(Keycode key_code) const noexcept
 	{
-		if (key_code == Keycode::Count) [[unlikely]]
+		if (key_code == Keycode::eCount) [[unlikely]]
 			return false;
 
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eDown;
@@ -46,7 +46,7 @@ namespace pbrlib
 
     bool KeyboardStay::isUp(Keycode key_code) const noexcept
 	{
-		if (key_code == Keycode::Count) [[unlikely]]
+		if (key_code == Keycode::eCount) [[unlikely]]
 			return false;
 
 		return _pressed_map[backend::utils::enumCast(key_code)] == KeyStay::eUp;
@@ -57,7 +57,7 @@ namespace pbrlib
 {
 	void WindowStay::add(EventHandle event_handle)
 	{
-		auto ptr_event = utils::cast(event_handle);
+	    auto ptr_event = utils::cast(event_handle);
 
 		if (ptr_event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
 			_is_close = true;

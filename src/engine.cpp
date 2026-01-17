@@ -124,7 +124,7 @@ namespace pbrlib
                 is_close = input_stay.window.isClose();
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
-            if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[unlikely]]
+            if (input_stay.keyboard.isDown(pbrlib::Keycode::eF5)) [[unlikely]]
             {
                 const auto [width, height] = _window->size();
                 EventSystem::emmit(backend::events::RecompilePipeline(width, height));
