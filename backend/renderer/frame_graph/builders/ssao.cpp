@@ -19,7 +19,7 @@ namespace pbrlib::backend::builders
 
     SSAO& SSAO::settings(const pbrlib::settings::SSAO& config) noexcept
     {
-        _blur_settings = 
+        _blur_settings =
         {
             .sample_count   = config.blur_samples_count,
             .sigma_s        = config.spatial_sigma,
@@ -28,7 +28,7 @@ namespace pbrlib::backend::builders
 
         return *this;
     }
-    
+
     SSAO& SSAO::blurImage(vk::Image& ptr_result) noexcept
     {
         _ptr_blur_image = &ptr_result;
@@ -36,10 +36,10 @@ namespace pbrlib::backend::builders
     }
 
     SSAO& SSAO::addSync (
-        vk::Image*              ptr_image, 
-        VkImageLayout           expected_layout, 
+        vk::Image*              ptr_image,
+        VkImageLayout           expected_layout,
         VkPipelineStageFlags2   src_stage
-    ) 
+    )
     {
         _sync.emplace_back(ptr_image, expected_layout, src_stage);
         return *this;
@@ -56,7 +56,7 @@ namespace pbrlib::backend::builders
     {
         if (!_ptr_ssao_image) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] image for ssao didn't set");
-        
+
         if (!_ptr_blur_image) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] image for blur didn't set");
 
@@ -77,8 +77,8 @@ namespace pbrlib::backend::builders
         std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<backend::SSAO>(_device, ptr_blur.get());
 
         ptr_ssao->addSyncImage (
-            _ptr_ssao_image, 
-            VK_IMAGE_LAYOUT_GENERAL, 
+            _ptr_ssao_image,
+            VK_IMAGE_LAYOUT_GENERAL,
             VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
         );
 
@@ -86,7 +86,9 @@ namespace pbrlib::backend::builders
 
         for (const auto& [ptr_image, expected_layout, src_stage]: _sync)
         {
-            const auto dst_stage = expected_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL ? ptr_ssao->srcStage() : ptr_ssao->dstStage();
+            const auto dst_stage = expected_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+                ?   ptr_ssao->srcStage()
+                :   ptr_ssao->dstStage();
 
             ptr_ssao->addSyncImage (
                 ptr_image,

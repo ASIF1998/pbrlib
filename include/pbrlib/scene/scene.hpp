@@ -38,14 +38,14 @@ namespace pbrlib
         friend class Scene;
 
         explicit SceneItem (
-            std::string_view    name, 
-            SceneItem*          ptr_parent, 
+            std::string_view    name,
+            SceneItem*          ptr_parent,
             Scene*              ptr_scene
         );
 
         void update (
-            const InputStay&    input_stay, 
-            float               delta_time, 
+            const InputStay&    input_stay,
+            float               delta_time,
             const math::mat4&   world_transform
         );
 
@@ -53,13 +53,12 @@ namespace pbrlib
 
     public:
         using UpdateCallback = std::function<void (
-            SceneItem&          item, 
-            const InputStay&    input_stay, 
-            float               delta_time, 
+            SceneItem&          item,
+            const InputStay&    input_stay,
+            float               delta_time,
             const math::mat4&   world_transform
         )>;
 
-    public:
         SceneItem(SceneItem&& item);
         SceneItem(const SceneItem& item) = delete;
 
@@ -90,7 +89,7 @@ namespace pbrlib
         UpdateCallback      _update_callback;
 
         SceneItem* _ptr_parent = nullptr;
-        
+
         std::list<SceneItem> _children;
     };
 
@@ -111,7 +110,7 @@ namespace pbrlib
         Scene& operator = (const Scene& scene) = delete;
 
         [[nodiscard]] std::string_view name() const;
-        
+
         [[nodiscard]] SceneItem& addItem(std::string_view name);
 
         void import (
@@ -126,7 +125,7 @@ namespace pbrlib
         const SceneItem*    item(std::string_view name) const;
 
         SceneItem& createInstance (
-            std::string_view    item_name, 
+            std::string_view    item_name,
             std::string_view    instance_name,
             const math::mat4&   transform
         );

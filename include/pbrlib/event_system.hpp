@@ -1,20 +1,15 @@
 #pragma once
 
-#include <concepts>
-#include <functional>
-#include <memory>
-#include <list>
-
 #include <entt/entt.hpp>
 
 namespace pbrlib
 {
     template<typename Callback>
-    concept InvocableWithParams = requires 
+    concept InvocableWithParams = requires
     {
         typename entt::nth_argument_t<0, Callback>;
     };
-  
+
     class EventSystem final
     {
     public:

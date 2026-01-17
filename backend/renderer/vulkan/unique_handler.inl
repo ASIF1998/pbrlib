@@ -22,7 +22,7 @@ namespace pbrlib::backend::vk
     requires VulkanHandle<Handle, FinalizationContext...>
     inline UniqueHandle<Handle, FinalizationContext...>::~UniqueHandle()
     {
-        std::apply([this] (const auto... handles) 
+        std::apply([this] (const auto... handles)
         {
             ResourceDestroyer::destroy(handle_, handles...);
         }, context_);
@@ -42,7 +42,7 @@ namespace pbrlib::backend::vk
     {
         return handle_ != VK_NULL_HANDLE;
     }
-    
+
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
     inline UniqueHandle<Handle, FinalizationContext...>::operator Handle() const noexcept
@@ -79,7 +79,7 @@ namespace pbrlib::backend::vk
     {
         return std::get<T>(context_);
     }
-    
+
     template<typename Handle, typename... FinalizationContext>
     requires VulkanHandle<Handle, FinalizationContext...>
     template<typename T>

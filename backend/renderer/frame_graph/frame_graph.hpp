@@ -40,7 +40,7 @@ namespace pbrlib::backend
         std::unique_ptr<RenderPass> buildGBufferGeneratorSubpass();
 
         std::unique_ptr<RenderPass> buildSSAOSubpass (
-            vk::Image*              ptr_pos_uv, 
+            vk::Image*              ptr_pos_uv,
             vk::Image*              ptr_normal_tangent,
             vk::Image*              ptr_depth_buffer,
             const RenderPass*       ptr_gbuffer
@@ -54,7 +54,7 @@ namespace pbrlib::backend
 
     public:
         explicit FrameGraph (
-            vk::Device&             device, 
+            vk::Device&             device,
             const pbrlib::Config&   config,
             Canvas&                 canvas,
             MaterialManager&        material_manager,
@@ -72,7 +72,7 @@ namespace pbrlib::backend
     private:
         vk::Device& _device;
         Canvas&     _canvas;
-        
+
         pbrlib::Config _config;
 
         std::unique_ptr<RenderPass> _ptr_render_pass;

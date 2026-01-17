@@ -10,7 +10,7 @@ namespace pbrlib::components
     struct Tag final
     {
         explicit Tag(std::string_view name);
-    
+
         std::string name;
     };
 

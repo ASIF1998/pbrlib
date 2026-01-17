@@ -28,11 +28,11 @@ namespace pbrlib::backend::vk::builders
         Framebuffer& renderPass(VkRenderPass render_pass_handle)    noexcept;
         Framebuffer& size(uint32_t width, uint32_t height)          noexcept;
         Framebuffer& layers(uint32_t layerCount)                    noexcept;
-        
+
         Framebuffer& addAttachment(const vk::Image& attachment);
 
         [[nodiscard]] FramebufferHandle build();
-        
+
     private:
         Device& _device;
 

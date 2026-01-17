@@ -7,7 +7,7 @@
 
 using namespace std::literals;
 
-class EventSystemTests : 
+class EventSystemTests :
     public ::testing::Test
 {
 public:
@@ -48,7 +48,7 @@ TEST_F(EventSystemTests, EmitOn)
     };
 
     pbrlib::EventSystem::emmit(event);
-    
+
     pbrlib::testing::equality(received_value, value);
     pbrlib::testing::equality(_call_count.load(), 1);
 }
@@ -91,7 +91,7 @@ TEST_F(EventSystemTests, DifferentEventTypes)
 {
     struct TestEvent1 final
     { };
-    
+
     struct TestEvent2 final
     { };
 

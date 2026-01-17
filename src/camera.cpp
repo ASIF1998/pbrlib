@@ -12,7 +12,7 @@ namespace pbrlib
     {
         _eye = eye;
     }
-    
+
     void Camera::up(const pbrlib::math::vec3& up)
     {
         _up = up;
@@ -33,7 +33,7 @@ namespace pbrlib
     {
         _width = w;
     }
-    
+
     void Camera::height(uint32_t h)
     {
         _height = h;
@@ -43,12 +43,12 @@ namespace pbrlib
     {
         return _pos;
     }
-    
+
     const pbrlib::math::vec3& Camera::eye() const noexcept
     {
         return _eye;
     }
-    
+
     const pbrlib::math::vec3& Camera::up() const noexcept
     {
         return _up;
@@ -68,7 +68,7 @@ namespace pbrlib
     {
         return _width;
     }
-    
+
     uint32_t Camera::height() const noexcept
     {
         return _height;

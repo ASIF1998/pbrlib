@@ -49,7 +49,7 @@ namespace pbrlib
         math::vec3 _pos = math::vec3(0, 0, -1);
         math::vec3 _eye = math::vec3(0, 0, 0);
         math::vec3 _up  = math::vec3(0, 1, 0);
-        
+
         Range _range;
 
         float _fov_y = 0.0f;

@@ -29,8 +29,6 @@
 
 #include <SDL3/SDL.h>
 
-#include <stdexcept>
-
 #include <chrono>
 
 namespace pbrlib
@@ -70,7 +68,7 @@ namespace pbrlib
 
             _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, &_window.value());
         }
-        else 
+        else
             _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, width, height);
 
         _ptr_material_manager   = std::make_unique<backend::MaterialManager>(*_ptr_device);
@@ -126,7 +124,7 @@ namespace pbrlib
                 is_close = input_stay.window.isClose();
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
-            if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[likely]]
+            if (input_stay.keyboard.isDown(pbrlib::Keycode::F5)) [[unlikely]]
             {
                 const auto [width, height] = _window->size();
                 EventSystem::emmit(backend::events::RecompilePipeline(width, height));
@@ -210,14 +208,14 @@ namespace pbrlib
     void Engine::update(const settings::SSAO& settings)
     {
         EventSystem::emmit(backend::events::UpdateSSAO {
-           .settings = settings 
+           .settings = settings
         });
     }
 
     void Engine::update(const settings::FXAA& settings)
     {
         EventSystem::emmit(backend::events::UpdateFXAA {
-           .settings = settings 
+           .settings = settings
         });
     }
 }

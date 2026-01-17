@@ -12,7 +12,7 @@ TEST(CameraTests, Ctor)
 
     pbrlib::testing::equality(camera.range().near_dist, 0.0f);
     pbrlib::testing::thisTrue(std::isinf(camera.range().far_dist));
-    
+
     pbrlib::testing::equality(camera.fovY(), 0.0f);
 
     pbrlib::testing::equality(camera.width(), 0u);
@@ -34,7 +34,7 @@ TEST(CameraTests, SettersAndGetters)
     constexpr uint32_t height   = 600;
 
     pbrlib::Camera camera;
-    
+
     camera.pos(pos);
     camera.eye(eye);
     camera.up(up);
@@ -49,7 +49,7 @@ TEST(CameraTests, SettersAndGetters)
 
     pbrlib::testing::equality(camera.range().near_dist, near_dist);
     pbrlib::testing::equality(camera.range().far_dist, far_dist);
-    
+
     pbrlib::testing::equality(camera.fovY(), fov_y);
 
     pbrlib::testing::equality(camera.width(), width);

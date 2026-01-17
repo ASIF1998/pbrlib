@@ -42,7 +42,7 @@ namespace pbrlib::testing
 
 namespace pbrlib
 {
-    using SetupCallback     = std::function<void(Scene& scene)>;
+    using SetupCallback     = std::function<void (Scene& scene)>;
     using UpdateCallback    = std::function<void (Engine& engine, const InputStay& input_stay, float delta_time)>;
 }
 

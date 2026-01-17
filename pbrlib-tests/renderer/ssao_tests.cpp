@@ -2,11 +2,9 @@
 
 #include <backend/renderer/frame_graph/ssao.hpp>
 
-#include <array>
-
 class SSAOTests :
     public pbrlib::testing::RenderTest
-{ 
+{
 public:
     SSAOTests() :
         pbrlib::testing::RenderTest("ssao-tests", 1000, 1000)
@@ -23,7 +21,7 @@ TEST_F(SSAOTests, JunkShopAttachments)
     };
 
     constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::SSAO>::ssao;
-    
+
     setup("Blender 2.glb", settings);
     check("ssao/junk-shop-ssao-result.png", attahment_name);
 }
@@ -53,9 +51,9 @@ TEST_F(SSAOTests, JunkShopAttachmentsWithBlur)
                 ssao.luminance_sigma = luminance_sigma;
 
                 const auto filename = std::format(
-                    "ssao/junk-shop-with-blur_sample-count={},spatial-sigma={},luminance-sigma={}.png", 
-                    sample_count, 
-                    spatial_sigma, 
+                    "ssao/junk-shop-with-blur_sample-count={},spatial-sigma={},luminance-sigma={}.png",
+                    sample_count,
+                    spatial_sigma,
                     luminance_sigma
                 );
 

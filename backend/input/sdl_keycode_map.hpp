@@ -1,3 +1,7 @@
+#pragma once
+
+#include <unordered_map>
+
 namespace pbrlib::backend::utils
 {
     const std::unordered_map<SDL_Keycode, Keycode> sdl_to_pbrlib_keycode

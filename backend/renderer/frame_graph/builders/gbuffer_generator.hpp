@@ -18,7 +18,7 @@ namespace pbrlib::backend::builders
     class GBufferGenerator final
     {
         void validate();
-        
+
     public:
         explicit GBufferGenerator(vk::Device& device) noexcept;
 
@@ -27,8 +27,7 @@ namespace pbrlib::backend::builders
         GBufferGenerator& materialIndexImage(vk::Image& image)  noexcept;
         GBufferGenerator& depthStencilImage(vk::Image& image)   noexcept;
 
-        [[nodiscard]]
-        std::unique_ptr<RenderPass> build();
+        [[nodiscard]] std::unique_ptr<RenderPass> build();
 
     private:
         vk::Device& _device;

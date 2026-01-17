@@ -29,7 +29,7 @@ vec2 packUnitVec(vec3 v)
     v /= dot(abs(v), vec3(1.0, 1.0, 1.0));
 
     v.xy = v.z > 0.0 ? v.xy : octWrap(v.xy);
-    v.xy = v.xy * 0.5 + 0.5; 
+    v.xy = v.xy * 0.5 + 0.5;
 
     return v.xy;
 }

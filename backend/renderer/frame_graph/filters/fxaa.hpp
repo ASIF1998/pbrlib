@@ -14,9 +14,9 @@ namespace pbrlib::backend
     {
         static constexpr auto metadata()
         {
-            constexpr auto usage_flags = 
-                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT 
-            |   VK_IMAGE_USAGE_SAMPLED_BIT 
+            constexpr auto usage_flags =
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+            |   VK_IMAGE_USAGE_SAMPLED_BIT
             |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
             |   VK_IMAGE_USAGE_STORAGE_BIT;
 
@@ -45,9 +45,9 @@ namespace pbrlib::backend
         };
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
-        
+
         void render(vk::CommandBuffer& command_buffer) override;
-        
+
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 

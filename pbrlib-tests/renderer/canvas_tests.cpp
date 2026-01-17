@@ -15,7 +15,7 @@ protected:
     void SetUp() override
     {
         if constexpr (!pbrlib::testing::vk::isSupport())
-            GTEST_SKIP();        
+            GTEST_SKIP();
     }
 
     void setup(uint32_t width, uint32_t height)
@@ -23,7 +23,7 @@ protected:
         const pbrlib::Config config
         {
             .title          = "canvas-tests",
-            .width          = width, 
+            .width          = width,
             .height         = height,
             .draw_in_window = false
         };

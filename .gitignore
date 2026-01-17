@@ -1,5 +1,5 @@
 PBRLib.xcodeproj/
 .vscode/*
 gtest/
-build/
+*build*/
 info.hpp

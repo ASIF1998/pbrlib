@@ -40,7 +40,7 @@ namespace pbrlib::math
         /**
          * @brief a static method that creates the following quaternion:
          *      (1, 0, 0, 0).
-         * 
+         *
          * @return a quaternion of the following form: (1, 0, 0, 0).
         */
         inline constexpr static Quaternion i() noexcept;
@@ -48,7 +48,7 @@ namespace pbrlib::math
         /**
          * @brief a static method that creates the following quaternion:
          *      (0, 1, 0, 0).
-         * 
+         *
          * @return a quaternion of the following form: (0, 1, 0, 0).
         */
         inline constexpr static Quaternion j() noexcept;
@@ -56,7 +56,7 @@ namespace pbrlib::math
         /**
          * @brief a static method that creates the following quaternion:
          *      (0, 0, 1, 0).
-         * 
+         *
          * @return a quaternion of the following form: (0, 0, 1, 0).
         */
         inline constexpr static Quaternion k() noexcept;
@@ -64,7 +64,7 @@ namespace pbrlib::math
         /**
          * @brief a static method that creates the following quaternion:
          *      (0, 0, 0, 1).
-         * 
+         *
          * @return a quaternion of the following form: (0, 0, 0, 1).
         */
         inline constexpr static Quaternion identity() noexcept;
@@ -72,7 +72,7 @@ namespace pbrlib::math
         /**
          * @brief a static method that creates the following quaternion:
          *      (0, 0, 0, 0).
-         * 
+         *
          * @return a quaternion of the following form: (0, 0, 0, 0).
         */
         inline constexpr static Quaternion zerro() noexcept;
@@ -124,8 +124,8 @@ namespace std
         inline constexpr size_t operator () (const pbrlib::math::Quaternion& quat) const noexcept
         {
             size_t hash_value = 0;
-            pbrlib::combineHash(hash_value, quat.v);
-            pbrlib::combineHash(hash_value, quat.w);
+            pbrlib::utils::combineHash(hash_value, quat.v);
+            pbrlib::utils::combineHash(hash_value, quat.w);
 
             return hash_value;
         }

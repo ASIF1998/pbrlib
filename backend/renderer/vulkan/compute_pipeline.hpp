@@ -39,7 +39,7 @@ namespace pbrlib::backend::vk::builders
 
         std::filesystem::path _shader_name;
 
-        VkPipelineLayout _pipeline_layout_handle = VK_NULL_HANDLE; 
+        VkPipelineLayout _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkSpecializationInfo _specialization_info = { };
     };

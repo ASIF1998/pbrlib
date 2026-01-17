@@ -47,22 +47,22 @@ namespace pbrlib::backend
                 eInstances,
 
                 eCount
-            }; 
+            };
         };
 
         explicit MeshManager(vk::Device& device);
-        
+
         MeshManager(MeshManager&& manager)      = delete;
         MeshManager(const MeshManager& manager) = delete;
-        
+
         MeshManager& operator = (MeshManager&& manager)         = delete;
         MeshManager& operator = (const MeshManager& manager)    = delete;
-        
+
         void update();
 
         void add (
             std::string_view                    name,
-            std::span<const VertexAttribute>    attributes, 
+            std::span<const VertexAttribute>    attributes,
             std::span<const uint32_t>           indices,
             SceneItem*                          ptr_item
         );
@@ -91,7 +91,7 @@ namespace pbrlib::backend
 
         vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
         vk::DescriptorSetHandle         _descriptor_set_handle;
-        
+
         bool _descriptor_set_is_changed = true;
 
         std::unordered_map<const SceneItem*, size_t> _item_to_instance_id;

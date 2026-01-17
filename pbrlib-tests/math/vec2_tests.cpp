@@ -6,8 +6,8 @@
 using namespace pbrlib::math;
 
 template <typename T>
-class Vec2Tests 
-    : public ::testing::Test 
+class Vec2Tests
+    : public ::testing::Test
 { };
 
 TYPED_TEST_SUITE(Vec2Tests, MathTestingTypes);
@@ -51,7 +51,7 @@ TYPED_TEST(Vec2Tests, Multiplication)
 {
     Vec2             v      (static_cast<TypeParam>(2), static_cast<TypeParam>(3));
     constexpr Vec2   res    (static_cast<TypeParam>(4), static_cast<TypeParam>(6));
-    
+
     constexpr auto s = static_cast<TypeParam>(2);
 
     pbrlib::testing::equality(res, v * s);
@@ -79,7 +79,7 @@ TYPED_TEST(Vec2Tests, Length)
     {
         constexpr Vec2 v1 (static_cast<TypeParam>(3434.323), static_cast<TypeParam>(121.5454));
         constexpr Vec2 v2 (static_cast<TypeParam>(0.132323), static_cast<TypeParam>(76.43400));
-    
+
         pbrlib::testing::equality(static_cast<TypeParam>(3436.4731560991654), v1.length());
         pbrlib::testing::equality(static_cast<TypeParam>(76.43411453), v2.length());
     }
@@ -91,10 +91,10 @@ TYPED_TEST(Vec2Tests, Normalize)
     {
         constexpr Vec2 v1 (static_cast<TypeParam>(7643.8738), static_cast<TypeParam>(768.434));
         constexpr Vec2 v2 (static_cast<TypeParam>(0.1323230), static_cast<TypeParam>(76.4340));
-    
+
         constexpr Vec2 r1 (static_cast<TypeParam>(0.9949848650), static_cast<TypeParam>(0.100025222));
         constexpr Vec2 r2 (static_cast<TypeParam>(0.0017312034), static_cast<TypeParam>(0.999998509));
-        
+
         pbrlib::testing::equality(r1, normalize(v1));
         pbrlib::testing::equality(r2, normalize(v2));
     }
@@ -107,7 +107,7 @@ TYPED_TEST(Vec2Tests, ZeroVectorNormalization)
     EXPECT_THROW({
         v.normalize();
     }, pbrlib::exception::MathError);
-    
+
     EXPECT_THROW({
         [[maybe_unuse]] const auto res = normalize(v);
     }, pbrlib::exception::MathError);
@@ -119,8 +119,8 @@ TYPED_TEST(Vec2Tests, Lerp)
     {
         constexpr Vec2 result (static_cast<TypeParam>(0.75f));
         pbrlib::testing::equality(result, lerp (
-            Vec2(static_cast<TypeParam>(0)), 
-            Vec2(static_cast<TypeParam>(1)), 
+            Vec2(static_cast<TypeParam>(0)),
+            Vec2(static_cast<TypeParam>(1)),
             static_cast<TypeParam>(0.75))
         );
     }

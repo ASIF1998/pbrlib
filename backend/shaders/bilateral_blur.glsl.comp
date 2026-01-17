@@ -96,7 +96,7 @@ void main()
             float16_t dist_l = luma(offset_color) - l;
 
             float16_t weight = exp((fac_s * dist_s * dist_s) + (fac_l * dist_l * dist_l));
-            
+
             total_weight    += weight;
             color           += offset_color * weight;
         }

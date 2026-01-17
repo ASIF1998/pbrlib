@@ -28,7 +28,7 @@ namespace pbrlib::backend::events
 
     struct Finalize final
     { };
-        
+
     struct AssimpImporter final
     {
         vk::Device* ptr_device = nullptr;
@@ -53,7 +53,7 @@ namespace pbrlib::backend::events
     };
 
     struct RecompilePipeline final
-    { 
+    {
         uint32_t width  = 0;
         uint32_t height = 0;
     };

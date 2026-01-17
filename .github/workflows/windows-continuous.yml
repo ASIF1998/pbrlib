@@ -4,11 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore:
-      - '**.md'
+      - "**.md"
   push:
-    branches: [master, add-glslang-submodule]
+    branches: [mastere]
     paths-ignore:
-      - '**.md'
+      - "**.md"
 jobs:
   linting:
     name: linter
@@ -19,7 +19,7 @@ jobs:
 
       - name: install and build cppcheck
         run: |
-          git clone https://github.com/danmar/cppcheck.git  
+          git clone https://github.com/danmar/cppcheck.git
           cd cppcheck
           mkdir build
           cd build
@@ -39,8 +39,8 @@ jobs:
       - name: set up python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-          architecture: 'x64'
+          python-version: "3.x"
+          architecture: "x64"
 
       - name: checkout project
         uses: actions/checkout@v4
@@ -71,8 +71,8 @@ jobs:
 
       - name: build tests
         run: |
-          mkdir build 
-          cd build 
+          mkdir build
+          cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
           cmake --build . --config Release --target pbrlib-tests
 

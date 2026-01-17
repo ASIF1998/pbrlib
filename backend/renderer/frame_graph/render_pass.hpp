@@ -85,7 +85,7 @@ namespace pbrlib::backend
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
         virtual [[nodiscard]] bool init(const RenderContext& context, uint32_t width, uint32_t height);
-        
+
         virtual void draw(vk::CommandBuffer& command_buffer);
 
         virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
@@ -94,35 +94,28 @@ namespace pbrlib::backend
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 
         void addSyncImage (
-            vk::Image*              ptr_image, 
-            VkImageLayout           new_layout, 
-            VkPipelineStageFlags2   src_stage, 
+            vk::Image*              ptr_image,
+            VkImageLayout           new_layout,
+            VkPipelineStageFlags2   src_stage,
             VkPipelineStageFlags2   dst_stage
         );
 
         void depthStencil(const vk::Image* ptr_image);
 
-        [[nodiscard]]
-        vk::Image* colorOutputAttach(std::string_view name);
-        
-        [[nodiscard]]
-        const vk::Image* depthStencil() const noexcept;
+        [[nodiscard]] vk::Image*        colorOutputAttach(std::string_view name);
+        [[nodiscard]] const vk::Image*  depthStencil() const noexcept;
 
-        [[nodiscard]]
-        vk::Device& device() noexcept;
+        [[nodiscard]] vk::Device&           device() noexcept;
+        [[nodiscard]] const RenderContext&  context() const noexcept;
 
-        [[nodiscard]]
-        const RenderContext& context() const noexcept;
-
-        [[nodiscard]]
-        std::pair<uint32_t, uint32_t> size() const noexcept;
+        [[nodiscard]] std::pair<uint32_t, uint32_t> size() const noexcept;
 
         void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
 
-        [[nodiscard]] 
+        [[nodiscard]]
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
 
-        [[nodiscard]] 
+        [[nodiscard]]
         virtual std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
 
     protected:
@@ -130,14 +123,14 @@ namespace pbrlib::backend
 
     private:
         using SyncData = std::tuple <
-            vk::Image*, 
-            VkImageLayout, 
-            VkPipelineStageFlags2, 
+            vk::Image*,
+            VkImageLayout,
+            VkPipelineStageFlags2,
             VkPipelineStageFlags2
         >;
 
         std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
-        
+
         std::vector<SyncData> _sync_images;
 
         const vk::Image* _ptr_depth_stencil_image = nullptr;

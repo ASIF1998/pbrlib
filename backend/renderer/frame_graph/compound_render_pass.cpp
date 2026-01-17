@@ -36,7 +36,7 @@ namespace pbrlib::backend
         }
 
         log::error("[compound-render-pass] failed initialize");
-        
+
         return false;
     }
 
@@ -55,15 +55,15 @@ namespace pbrlib::backend
     {
         if (_subpasses.empty()) [[unlikely]]
             return VK_PIPELINE_STAGE_2_NONE;
-        
+
         return _subpasses.front()->srcStage();
     }
-    
+
     VkPipelineStageFlags2 CompoundRenderPass::dstStage() const noexcept
     {
         if (_subpasses.empty()) [[unlikely]]
             return VK_PIPELINE_STAGE_2_NONE;
-        
+
         return _subpasses.back()->dstStage();
     }
 

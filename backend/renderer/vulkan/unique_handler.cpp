@@ -13,8 +13,8 @@ namespace pbrlib::backend::vk
 namespace pbrlib::backend::vk
 {
     void ResourceDestroyer::initForDeviceResources (
-        VkInstance      instance_handle, 
-        VkDevice        device_handle, 
+        VkInstance      instance_handle,
+        VkDevice        device_handle,
         VmaAllocator    allocator_handle
     )
     {
@@ -31,7 +31,7 @@ namespace pbrlib::backend::vk
         _device_handle      = device_handle;
         _allocator_handle   = allocator_handle;
     }
-    
+
     void ResourceDestroyer::destroy(VkInstance instance_handle) noexcept
     {
         vkDestroyInstance(instance_handle, nullptr);
@@ -57,11 +57,11 @@ namespace pbrlib::backend::vk
         if (descriptor_pool_handle != VK_NULL_HANDLE)
             vkDestroyDescriptorPool(_device_handle, descriptor_pool_handle, nullptr);
     }
-    
+
     void ResourceDestroyer::destroy(VkDescriptorSet descriptor_set_handle, VkDescriptorPool descriptor_pool_handle) noexcept
     {
         if (
-                descriptor_set_handle != VK_NULL_HANDLE 
+                descriptor_set_handle != VK_NULL_HANDLE
             &&  vkFreeDescriptorSets(_device_handle, descriptor_pool_handle, 1, &descriptor_set_handle) != VK_SUCCESS
         ) [[unlikely]]
             log::error("[vk-handle-dispatcher] failed free vulkan descriptor set: {}", reinterpret_cast<uint64_t>(descriptor_set_handle));
@@ -124,7 +124,7 @@ namespace pbrlib::backend::vk
     {
         vkDestroyImageView(_device_handle, image_view_handle, nullptr);
     }
-    
+
     void ResourceDestroyer::destroy(VkSurfaceKHR surface_handle) noexcept
     {
         vkDestroySurfaceKHR(_instance_handle, surface_handle, nullptr);

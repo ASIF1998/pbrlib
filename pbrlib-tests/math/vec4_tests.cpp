@@ -6,8 +6,8 @@
 using namespace pbrlib::math;
 
 template <typename T>
-class Vec4Tests 
-    : public ::testing::Test 
+class Vec4Tests
+    : public ::testing::Test
 { };
 
 TYPED_TEST_SUITE(Vec4Tests, MathTestingTypes);
@@ -25,30 +25,30 @@ TYPED_TEST(Vec4Tests, EqualAndNotEqual)
 TYPED_TEST(Vec4Tests, AdditionAndSubtraction)
 {
     constexpr Vec4 v1 (
-        static_cast<TypeParam>(2), 
-        static_cast<TypeParam>(5), 
-        static_cast<TypeParam>(2), 
+        static_cast<TypeParam>(2),
+        static_cast<TypeParam>(5),
+        static_cast<TypeParam>(2),
         static_cast<TypeParam>(7)
     );
 
     constexpr Vec4 v2 (
-        static_cast<TypeParam>(4), 
-        static_cast<TypeParam>(7), 
-        static_cast<TypeParam>(10), 
+        static_cast<TypeParam>(4),
+        static_cast<TypeParam>(7),
+        static_cast<TypeParam>(10),
         static_cast<TypeParam>(8)
     );
 
     constexpr Vec4 r1 (
-        static_cast<TypeParam>(6), 
-        static_cast<TypeParam>(12), 
-        static_cast<TypeParam>(12), 
+        static_cast<TypeParam>(6),
+        static_cast<TypeParam>(12),
+        static_cast<TypeParam>(12),
         static_cast<TypeParam>(15)
     );
 
     constexpr Vec4 r2 (
-        static_cast<TypeParam>(2), 
-        static_cast<TypeParam>(2), 
-        static_cast<TypeParam>(8), 
+        static_cast<TypeParam>(2),
+        static_cast<TypeParam>(2),
+        static_cast<TypeParam>(8),
         static_cast<TypeParam>(1)
     );
 
@@ -71,7 +71,7 @@ TYPED_TEST(Vec4Tests, Multiplication)
         static_cast<TypeParam>(12),
         static_cast<TypeParam>(18)
     );
-    
+
     constexpr auto s = static_cast<TypeParam>(2);
 
     pbrlib::testing::equality(res, v * s);
@@ -134,7 +134,7 @@ TYPED_TEST(Vec4Tests, Normalize)
             static_cast<TypeParam>(0.0291400309757f),
             static_cast<TypeParam>(0.947051006709f)
         );
-    
+
         pbrlib::testing::equality(res1, normalize(v1));
     }
 }
@@ -151,7 +151,7 @@ TYPED_TEST(Vec4Tests, ZeroVectorNormalization)
     EXPECT_THROW({
         v.normalize();
     }, pbrlib::exception::MathError);
-    
+
     EXPECT_THROW({
         [[maybe_unuse]] const auto res = normalize(v);
     }, pbrlib::exception::MathError);

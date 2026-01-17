@@ -40,14 +40,14 @@ namespace pbrlib::backend
         constexpr auto stages  = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_COMPUTE_BIT;
 
         constexpr auto max_image_count = 2500;
-            
+
         _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
             .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, max_image_count, stages)
             .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
             .build();
 
         _descriptor_set_handle = _device.allocateDescriptorSet (
-            _descriptor_set_layout_handle, 
+            _descriptor_set_layout_handle,
             "[material-system] images"
         );
     }
@@ -64,11 +64,11 @@ namespace pbrlib::backend
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         _descriptor_set_is_changed = true;
-        
+
         if (ptr_scene_item && ptr_scene_item->hasComponent<components::Renderable>()) [[likely]]
         {
             auto& renderable = ptr_scene_item->getComponent<components::Renderable>();
-            
+
             renderable.material_id = static_cast<uint32_t>(_materials.size());
         }
         else [[unlikely]]

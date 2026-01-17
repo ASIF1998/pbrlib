@@ -15,7 +15,7 @@ namespace pbrlib::math
 {
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T>::Matrix2x2() noexcept :
-        _array4 
+        _array4
         {
             static_cast<T>(1), static_cast<T>(0),
             static_cast<T>(0), static_cast<T>(1)
@@ -24,7 +24,7 @@ namespace pbrlib::math
 
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T>::Matrix2x2(T init_value) noexcept :
-        _array4 
+        _array4
         {
             init_value, static_cast<T>(0),
             static_cast<T>(0), init_value
@@ -36,7 +36,7 @@ namespace pbrlib::math
         T x0, T y0,
         T x1, T y1
     ) noexcept :
-        _array4 
+        _array4
         {
             x0, y0,
             x1, y1
@@ -68,14 +68,14 @@ namespace pbrlib::math
     {
         bool res = true;
 
-        for (size_t i = 0; i < 4 && res; i++) 
+        for (size_t i = 0; i < 4 && res; i++)
         {
             if constexpr (std::is_floating_point<T>::value)
             {
                 constexpr auto eps = static_cast<T>(0.0001);
                 res &= std::abs(_array4[i] - mat._array4[i]) < eps;
             }
-            else 
+            else
                 res &= _array4[i] == mat._array4[i];
         }
 
@@ -91,7 +91,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> Matrix2x2<T>::operator + (const Matrix2x2<T>& mat) const noexcept
     {
-        return 
+        return
         {
             _array4[0] + mat._array4[0],
             _array4[1] + mat._array4[1],
@@ -103,7 +103,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> Matrix2x2<T>::operator - (const Matrix2x2<T>& mat) const noexcept
     {
-        return 
+        return
         {
             _array4[0] - mat._array4[0],
             _array4[1] - mat._array4[1],
@@ -115,7 +115,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> Matrix2x2<T>::operator * (const Matrix2x2<T>& mat) const noexcept
     {
-        return 
+        return
         {
             _array2x2[0][0] * mat._array2x2[0][0] + _array2x2[1][0] * mat._array2x2[0][1],
             _array2x2[0][0] * mat._array2x2[1][0] + _array2x2[1][0] * mat._array2x2[1][1],
@@ -127,7 +127,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> operator * (const Matrix2x2<T>& mat, T s)
     {
-        return 
+        return
         {
             mat[0][0] * s,
             mat[0][1] * s,
@@ -139,7 +139,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> operator * (T s, const Matrix2x2<T>& mat)
     {
-        return 
+        return
         {
             mat[0][0] * s,
             mat[0][1] * s,
@@ -151,7 +151,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Vec2<T> Matrix2x2<T>::operator * (const Vec2<T>& v) const noexcept
     {
-        return 
+        return
         {
             _array2x2[0][0] * v[0] + _array2x2[1][0] * v[1],
             _array2x2[0][1] * v[0] + _array2x2[1][1] * v[1]
@@ -219,8 +219,8 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline T& Matrix2x2<T>::at(size_t i, size_t j)
     {
-        if (i > 1 || j > 1) [[unlikely]] 
-            throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
+        if (i > 1 || j > 1) [[unlikely]]
+            throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j));
 
         return _array2x2[i][j];
     }
@@ -228,13 +228,13 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr T Matrix2x2<T>::at(size_t i, size_t j) const
     {
-        if (i > 1 || j > 1) [[unlikely]] 
-            throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j)); 
+        if (i > 1 || j > 1) [[unlikely]]
+            throw exception::InvalidArgument(std::format("[math::mat2] i = {}, j = {}", i, j));
 
         // In constexpr context MSVC cannot handle array access in union
         // Use direct conditional access based on i and j
-        return (i == 0 && j == 0) ? _array4[0] : 
-               (i == 0 && j == 1) ? _array4[1] : 
+        return (i == 0 && j == 0) ? _array4[0] :
+               (i == 0 && j == 1) ? _array4[1] :
                (i == 1 && j == 0) ? _array4[2] : _array4[3];
     }
 
@@ -258,7 +258,7 @@ namespace pbrlib::math
     {
         T d = det();
 
-        if (d != static_cast<T>(0)) [[likely]] 
+        if (d != static_cast<T>(0)) [[likely]]
         {
             const T a11 = at(1, 1) / d;
             const T a12 = -at(0, 1) / d;
@@ -278,7 +278,7 @@ namespace pbrlib::math
     template<MathArithmetic T>
     inline constexpr Matrix2x2<T> transpose(const Matrix2x2<T>& mat) noexcept
     {
-        return 
+        return
         {
             mat.at(0, 0), mat.at(1, 0),
             mat.at(0, 1), mat.at(1, 1)
@@ -290,7 +290,7 @@ namespace pbrlib::math
     {
         T d = mat.det();
 
-        if (d != static_cast<T>(0)) [[likely]] 
+        if (d != static_cast<T>(0)) [[likely]]
         {
             const T a11 = mat.at(1, 1) / d;
             const T a12 = -mat.at(0, 1) / d;
@@ -325,7 +325,7 @@ namespace std
 
     template<pbrlib::math::MathArithmetic T>
     auto formatter<pbrlib::math::Matrix2x2<T>>::format (
-        const pbrlib::math::Matrix2x2<T>&   mat, 
+        const pbrlib::math::Matrix2x2<T>&   mat,
         format_context&                     ctx
     ) const
     {
@@ -339,7 +339,7 @@ namespace std
         for (size_t i = 0; i < 2; ++i)
         {
             for (size_t j = 0; j < 2; ++j)
-                pbrlib::combineHash(hash_value, mat.at(i, j));
+                pbrlib::utils::combineHash(hash_value, mat.at(i, j));
         }
 
         return hash_value;

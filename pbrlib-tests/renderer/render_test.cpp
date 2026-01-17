@@ -20,7 +20,7 @@ namespace pbrlib::testing
         _comparator.emplace(_frame_graph_getter->device());
     }
 
-    void RenderTest::TearDown() 
+    void RenderTest::TearDown()
     {
         _frame_graph_getter = std::nullopt;
         _comparator         = std::nullopt;
@@ -39,7 +39,7 @@ namespace pbrlib::testing
             camera.range(0.01f, 100.0f);
             camera.width(_config.width);
             camera.height(_config.height);
-            
+
             scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string());
         });
     }
@@ -63,7 +63,7 @@ namespace pbrlib::testing
     {
         return _config;
     }
-    
+
     pbrlib::Engine& RenderTest::engine() noexcept
     {
         return _engine.value();

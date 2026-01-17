@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 namespace pbrlib
 {
     class SceneItem;
@@ -7,7 +9,8 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    enum class TraversalCommand 
+    enum class TraversalCommand :
+        uint8_t
     {
         eContinue,
         eTerminate
@@ -29,8 +32,5 @@ namespace pbrlib
     };
 
     template<typename T>
-    concept IsSceneVisitor = requires(T visitor)
-    {
-        dynamic_cast<SceneVisitor*>(&visitor);
-    };
+    concept IsSceneVisitor = std::derived_from<T, SceneVisitor>;
 }

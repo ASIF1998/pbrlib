@@ -55,7 +55,7 @@ float calcOcclusion(vec3 pos, mat3 tbn)
 
         float range_check = smoothstep(1.0, 0.0, abs(length(sample_pos.xyz) - origin_depth) / radius);
 
-        occlusion += float(gbuff_pos.z >= (sample_pos.z + bias)) * range_check;  
+        occlusion += float(gbuff_pos.z >= (sample_pos.z + bias)) * range_check;
     }
 
     return 1.0 - (occlusion / float(sample_count));
@@ -67,7 +67,7 @@ void main()
 
     vec2 screen_uv = vec2(gl_GlobalInvocationID) / vec2(imageSize(result));
 
-    vec4 g_pos_uv   = texture(gbuffer_pos_uv, screen_uv); 
+    vec4 g_pos_uv   = texture(gbuffer_pos_uv, screen_uv);
     vec3 pos        = vec3(0);
     vec2 uv         = vec2(0);
 

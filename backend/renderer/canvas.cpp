@@ -64,12 +64,12 @@ namespace pbrlib::backend
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "present-result-upload");
 
-            const auto width = static_cast<int32_t>(ptr_result->width);
-            const auto height  = static_cast<int32_t>(ptr_result->height);
+            const auto width    = static_cast<int32_t>(ptr_result->width);
+            const auto height   = static_cast<int32_t>(ptr_result->height);
 
-            const VkImageBlit image_blit 
+            const VkImageBlit image_blit
             {
-                .srcSubresource = 
+                .srcSubresource =
                 {
                     .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
                     .mipLevel       = 0,
@@ -87,13 +87,13 @@ namespace pbrlib::backend
                 .dstOffsets = {{0}, {width, height, 1}},
             };
 
-            vkCmdBlitImage(
-                command_buffer_handle, 
+            vkCmdBlitImage (
+                command_buffer_handle,
                 ptr_result->handle.handle(),
                 ptr_result->layout,
                 _surface.ptr_image->handle.handle(),
                 _surface.ptr_image->layout,
-                1, &image_blit, 
+                1, &image_blit,
                 VK_FILTER_NEAREST
             );
         }, "present-result-upload", vk::marker_colors::write_data_in_image);
@@ -104,8 +104,8 @@ namespace pbrlib::backend
 
         VkResult result = VK_SUCCESS;
 
-        const VkPresentInfoKHR present_info 
-        { 
+        const VkPresentInfoKHR present_info
+        {
             .sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
             .swapchainCount = 1,
             .pSwapchains    = &_surface.vk_surface->_swapchain_handle.handle(),

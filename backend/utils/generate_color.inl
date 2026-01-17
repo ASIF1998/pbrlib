@@ -19,6 +19,6 @@ namespace pbrlib::backend::vk::marker_colors
         auto g = static_cast<float>((hash >> 12) & 0x3ff) * 0.000977517f;
         auto b = static_cast<float>(hash & 0xfff) * 0.0002442002f;
 
-        return pbrlib::math::vec3(r, g, b);   
+        return pbrlib::math::vec3(r, g, b);
     }
 }

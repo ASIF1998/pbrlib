@@ -7,8 +7,8 @@
 using namespace pbrlib::math;
 
 template <typename T>
-class Mat4Tests 
-    : public ::testing::Test 
+class Mat4Tests
+    : public ::testing::Test
 { };
 
 TYPED_TEST_SUITE(Mat4Tests, MathTestingTypes);
@@ -28,7 +28,7 @@ TYPED_TEST(Mat4Tests, Ctor)
     constexpr TypeParam r1[16] {
         static_cast<TypeParam>(1), static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(1), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
-        static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(1), static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(1), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(1)
     };
 
@@ -55,14 +55,14 @@ TYPED_TEST(Mat4Tests, EqualAndNotEqual)
 {
     constexpr Matrix4x4 m1 {
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
-        static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(5), static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(5), static_cast<TypeParam>(6),
         static_cast<TypeParam>(1), static_cast<TypeParam>(9), static_cast<TypeParam>(5), static_cast<TypeParam>(8),
         static_cast<TypeParam>(1), static_cast<TypeParam>(5), static_cast<TypeParam>(6), static_cast<TypeParam>(4)
     };
 
     Matrix4x4 m2 {
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
-        static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(5), static_cast<TypeParam>(6), 
+        static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(5), static_cast<TypeParam>(6),
         static_cast<TypeParam>(1), static_cast<TypeParam>(9), static_cast<TypeParam>(5), static_cast<TypeParam>(8),
         static_cast<TypeParam>(1), static_cast<TypeParam>(5), static_cast<TypeParam>(6), static_cast<TypeParam>(4)
     };
@@ -115,7 +115,7 @@ TYPED_TEST(Mat4Tests, ScalarMultiplication)
 TYPED_TEST(Mat4Tests, MatrixMultiplication)
 {
     constexpr Matrix4x4 m1 {
-        static_cast<TypeParam>(6), static_cast<TypeParam>(4), static_cast<TypeParam>(5), static_cast<TypeParam>(3), 
+        static_cast<TypeParam>(6), static_cast<TypeParam>(4), static_cast<TypeParam>(5), static_cast<TypeParam>(3),
         static_cast<TypeParam>(5), static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(5),
         static_cast<TypeParam>(7), static_cast<TypeParam>(5), static_cast<TypeParam>(3), static_cast<TypeParam>(2),
         static_cast<TypeParam>(3), static_cast<TypeParam>(5), static_cast<TypeParam>(2), static_cast<TypeParam>(1)
@@ -178,13 +178,13 @@ TYPED_TEST(Mat4Tests, AccessToElement)
         static_cast<TypeParam>(7), static_cast<TypeParam>(6), static_cast<TypeParam>(4), static_cast<TypeParam>(2)
     };
 
-    for (size_t i =0; i < 4; i++) 
+    for (size_t i =0; i < 4; i++)
     {
         for (size_t j = 0; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m[i][j]);
     }
 
-    for (size_t i = 0; i < 4; i++) 
+    for (size_t i = 0; i < 4; i++)
     {
         for (size_t j = 0; j < 4; j++)
             pbrlib::testing::equality(r[i * 4 + j], m.at(i, j));
@@ -215,9 +215,9 @@ TYPED_TEST(Mat4Tests, Transpose)
     };
 
     constexpr Matrix4x4 r {
-        static_cast<TypeParam>(1), static_cast<TypeParam>(5), static_cast<TypeParam>(5), static_cast<TypeParam>(7), 
-        static_cast<TypeParam>(2), static_cast<TypeParam>(4), static_cast<TypeParam>(4), static_cast<TypeParam>(6), 
-        static_cast<TypeParam>(3), static_cast<TypeParam>(6), static_cast<TypeParam>(6), static_cast<TypeParam>(4), 
+        static_cast<TypeParam>(1), static_cast<TypeParam>(5), static_cast<TypeParam>(5), static_cast<TypeParam>(7),
+        static_cast<TypeParam>(2), static_cast<TypeParam>(4), static_cast<TypeParam>(4), static_cast<TypeParam>(6),
+        static_cast<TypeParam>(3), static_cast<TypeParam>(6), static_cast<TypeParam>(6), static_cast<TypeParam>(4),
         static_cast<TypeParam>(4), static_cast<TypeParam>(3), static_cast<TypeParam>(2), static_cast<TypeParam>(2)
     };
 
@@ -238,14 +238,14 @@ TYPED_TEST(Mat4Tests, Inverse)
             static_cast<TypeParam>(8), static_cast<TypeParam>(7), static_cast<TypeParam>(6), static_cast<TypeParam>(5),
             static_cast<TypeParam>(5), static_cast<TypeParam>(5), static_cast<TypeParam>(2), static_cast<TypeParam>(1)
         };
-    
+
         constexpr Matrix4x4 r {
-            static_cast<TypeParam>(-2), static_cast<TypeParam>(1.6923), static_cast<TypeParam>(-1.3076), static_cast<TypeParam>(1), 
+            static_cast<TypeParam>(-2), static_cast<TypeParam>(1.6923), static_cast<TypeParam>(-1.3076), static_cast<TypeParam>(1),
             static_cast<TypeParam>(1), static_cast<TypeParam>(-0.6923), static_cast<TypeParam>(0.3076), static_cast<TypeParam>(0),
             static_cast<TypeParam>(4), static_cast<TypeParam>(-4.0769), static_cast<TypeParam>(3.9230), static_cast<TypeParam>(-3),
             static_cast<TypeParam>(-3), static_cast<TypeParam>(3.1538), static_cast<TypeParam>(-2.8461), static_cast<TypeParam>(2)
         };
-    
+
         pbrlib::testing::equality(r, inverse(m));
     }
 }
@@ -257,11 +257,11 @@ TYPED_TEST(Mat4Tests, AtMethodEdgeCase)
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(4, 0);
     }, pbrlib::exception::InvalidArgument);
-    
+
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(0, 4);
     }, pbrlib::exception::InvalidArgument);
-    
+
     EXPECT_THROW({
         [[maybe_unused]] const auto p = mat.at(4, 4);
     }, pbrlib::exception::InvalidArgument);
@@ -273,8 +273,8 @@ TYPED_TEST(Mat4Tests, Lerp)
     {
         constexpr Matrix4x4 result (pbrlib::testing::roundForInteger<TypeParam>(0.75));
         pbrlib::testing::equality(result, lerp (
-            Matrix4x4(static_cast<TypeParam>(0.0)), 
-            Matrix4x4(static_cast<TypeParam>(1.0)), 
+            Matrix4x4(static_cast<TypeParam>(0.0)),
+            Matrix4x4(static_cast<TypeParam>(1.0)),
             pbrlib::testing::roundForInteger<TypeParam>(0.75))
         );
     }

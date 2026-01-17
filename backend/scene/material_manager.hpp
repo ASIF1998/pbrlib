@@ -7,7 +7,6 @@
 
 #include <optional>
 
-#include <string>
 #include <string_view>
 
 #include <vector>
@@ -47,7 +46,7 @@ namespace pbrlib::backend
                 eMaterial,
 
                 eCount
-            }; 
+            };
         };
 
         explicit MaterialManager(vk::Device& device);
@@ -56,7 +55,7 @@ namespace pbrlib::backend
         MaterialManager(const MaterialManager& material_manager)    = delete;
 
         MaterialManager& operator = (MaterialManager&& material_manager)        = delete;
-        MaterialManager& operator = (const MaterialManager& material_manager)   = delete;  
+        MaterialManager& operator = (const MaterialManager& material_manager)   = delete;
 
         void add (
             SceneItem*                  ptr_scene_item,
@@ -82,7 +81,7 @@ namespace pbrlib::backend
 
         vk::SamplerHandle _sampler_handle;
 
-        std::optional<vk::Buffer> _materials_indices_buffer;       
+        std::optional<vk::Buffer> _materials_indices_buffer;
 
         bool _descriptor_set_is_changed = true;
 

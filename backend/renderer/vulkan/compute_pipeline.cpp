@@ -23,7 +23,7 @@ namespace pbrlib::backend::vk::builders
         const auto entries  = spec_info.entries();
         const auto data     = spec_info.data();
 
-        _specialization_info = 
+        _specialization_info =
         {
             .mapEntryCount  = static_cast<uint32_t>(entries.size()),
             .pMapEntries    = entries.data(),
@@ -45,7 +45,7 @@ namespace pbrlib::backend::vk::builders
         if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
 
-        const VkPipelineShaderStageCreateInfo stage 
+        const VkPipelineShaderStageCreateInfo stage
         {
             .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -54,7 +54,7 @@ namespace pbrlib::backend::vk::builders
             .pSpecializationInfo    = &_specialization_info
         };
 
-        const VkComputePipelineCreateInfo pipeline_info 
+        const VkComputePipelineCreateInfo pipeline_info
         {
             .sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .stage  = stage,
@@ -67,12 +67,12 @@ namespace pbrlib::backend::vk::builders
             _device.device(),
             VK_NULL_HANDLE,
             1, &pipeline_info,
-            nullptr, 
+            nullptr,
             &pipeline_handle
         ));
 
         vkDestroyShaderModule(_device.device(), stage.module, nullptr);
-        
+
         return PipelineHandle(pipeline_handle);
     }
 }

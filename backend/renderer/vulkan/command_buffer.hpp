@@ -38,7 +38,7 @@ namespace pbrlib::backend::vk
         );
 
         CommandBufferHandle     handle;
-        VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY; 
+        VkCommandBufferLevel    level   = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
     private:
         const Device&   _device;

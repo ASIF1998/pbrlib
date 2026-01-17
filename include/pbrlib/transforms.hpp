@@ -16,16 +16,16 @@ namespace pbrlib::transforms
     [[nodiscard]] math::mat4 rotate(const math::vec3& axis, float theta);
 
     [[nodiscard]] math::mat4 lookAt (
-        const math::vec3& eye, 
-        const math::vec3& pos, 
+        const math::vec3& eye,
+        const math::vec3& pos,
         const math::vec3& up
     );
 
     [[nodiscard]] math::mat4 perspective (
-        float       fovy, 
+        float       fovy,
         uint32_t    width,
         uint32_t    height,
-        float       z_near, 
+        float       z_near,
         float       z_far
     );
 

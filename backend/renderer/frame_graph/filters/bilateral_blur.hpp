@@ -7,7 +7,8 @@ namespace pbrlib::backend
 {
     struct BilateralBlurSetsId final
     {
-        enum
+        enum :
+            uint8_t
         {
             eBlurImage
         };
@@ -17,7 +18,7 @@ namespace pbrlib::backend
         public Filter
     {
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
-        
+
         bool createPipeline();
 
         void render(vk::CommandBuffer& command_buffer) override;
@@ -25,12 +26,12 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        [[nodiscard]] 
+        [[nodiscard]]
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
-        
+
     public:
         struct alignas(16) Settings
-        {   
+        {
             uint32_t    sample_count    = 8;
             float       sigma_s         = static_cast<float>(sample_count) * 0.25f;
             float       sigma_l         = 0.1f;

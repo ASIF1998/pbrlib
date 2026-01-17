@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace pbrlib
+namespace pbrlib::utils
 {
     template<typename T>
     inline constexpr void combineHash(size_t& seed, const T& v)

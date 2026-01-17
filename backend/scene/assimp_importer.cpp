@@ -18,7 +18,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-#include <format>
+#include <span>
 
 namespace pbrlib::backend::utils
 {
@@ -31,7 +31,7 @@ namespace pbrlib::backend::utils
     /// from https://github.com/zeux/niagara.git
     uint16_t quantize(float v)
     {
-        const FloatBits bits 
+        const FloatBits bits
         {
             .value = v
         };
@@ -82,7 +82,7 @@ namespace pbrlib::backend::utils
         const auto z = quantize(vec.z);
         return pbrlib::math::u16vec3(x, y, z);
     }
-    
+
     pbrlib::math::vec4 cast(const aiColor3D& col)
     {
         return pbrlib::math::vec4(col.r, col.g, col.b, 0.0f);
@@ -148,7 +148,7 @@ namespace pbrlib::backend
         _ptr_material_manager = ptr_material_manager;
         return *this;
     }
-    
+
     AssimpImporter& AssimpImporter::meshManager(MeshManager* ptr_mesh_manager) noexcept
     {
         _ptr_mesh_manager = ptr_mesh_manager;
@@ -176,7 +176,7 @@ namespace pbrlib::backend
             log::error("[importer] pointer to material manager is null");
             return false;
         }
-        
+
         if (!_ptr_mesh_manager) [[unlikely]]
         {
             log::error("[importer] pointer to mesh manager is null");
@@ -184,11 +184,11 @@ namespace pbrlib::backend
         }
 
         Assimp::Importer importer;
-        
+
         importer.SetPropertyBool(AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION, true);
 
-        constexpr auto assimp_read_flags = 
-                aiProcess_CalcTangentSpace 
+        constexpr auto assimp_read_flags =
+                aiProcess_CalcTangentSpace
             |   aiProcess_JoinIdenticalVertices;
 
         const auto ptr_scene = importer.ReadFile(_filename.string(), assimp_read_flags);
@@ -242,9 +242,9 @@ namespace pbrlib::backend
     }
 
     CompressedImageData getComressedImage(
-        const aiScene*      ptr_scene, 
-        const aiMaterial*   ptr_material, 
-        aiTextureType       texture_type, 
+        const aiScene*      ptr_scene,
+        const aiMaterial*   ptr_material,
+        aiTextureType       texture_type,
         uint8_t             channels_per_pixel
     )
     {
@@ -267,8 +267,8 @@ namespace pbrlib::backend
             return  { };
 
         auto ptr_compressed_image   = reinterpret_cast<uint8_t*>(ptr_texture->pcData);
-        auto compressed_image_size  = ptr_texture->mHeight == 0 ? 
-            ptr_texture->mWidth : 
+        auto compressed_image_size  = ptr_texture->mHeight == 0 ?
+            ptr_texture->mWidth :
             ptr_texture->mWidth * ptr_texture->mHeight;
 
         return CompressedImageData
@@ -310,7 +310,7 @@ namespace pbrlib::backend
                     auto& component = item.addComponent<components::Renderable>();
                     component.ptr_item = &item;
 
-                    _ptr_material_manager->add(
+                    _ptr_material_manager->add (
                         &item,
                         ptr_material->GetName().C_Str(),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE, 4),
@@ -319,7 +319,7 @@ namespace pbrlib::backend
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE_ROUGHNESS, 1)
                     );
                 }
-                else 
+                else
                     continue;
 
                 auto& renderable = item.getComponent<components::Renderable>();
@@ -332,10 +332,10 @@ namespace pbrlib::backend
 
                     renderable.bbox.add(pos);
 
-                    attributes.emplace_back(
-                        pos, 
-                        utils::castToHalf(ptr_mesh->mNormals[j]), 
-                        utils::castToHalf(ptr_mesh->mTangents[j]), 
+                    attributes.emplace_back (
+                        pos,
+                        utils::castToHalf(ptr_mesh->mNormals[j]),
+                        utils::castToHalf(ptr_mesh->mTangents[j]),
                         utils::castToHalf(pbrlib::math::vec2(uv.x, uv.y))
                     );
                 }
@@ -345,7 +345,7 @@ namespace pbrlib::backend
                 {
                     if (face.mNumIndices != 3) [[unlikely]]
                         log::error("[importer] an invalid face that contains {} indices", face.mNumIndices);
-                    
+
                     indices.push_back(face.mIndices[0]);
                     indices.push_back(face.mIndices[1]);
                     indices.push_back(face.mIndices[2]);

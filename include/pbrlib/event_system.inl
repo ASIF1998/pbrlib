@@ -9,12 +9,12 @@ namespace pbrlib
     template<InvocableWithParams Callback>
     void EventSystem::on(Callback callback)
     {
-        using EventType = std::remove_cvref_t<
+        using EventType = std::remove_cvref_t <
             entt::nth_argument_t<0, Callback>
         >;
-        
+
         struct Listener final
-        {   
+        {
             explicit Listener(Callback callback) :
                 callback(callback)
             { }
@@ -32,7 +32,7 @@ namespace pbrlib
 
             Callback callback;
         };
-    
+
         static std::list<Listener> listeners;
 
         listeners.emplace_front(std::move(callback));

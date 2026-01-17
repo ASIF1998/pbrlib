@@ -30,7 +30,8 @@ namespace pbrlib::backend
 {
     struct GBufferDescriptorSetBindings
     {
-        enum 
+        enum :
+            uint8_t
         {
             ePosUv,
             eNormalTangent,
@@ -73,7 +74,7 @@ namespace pbrlib::backend
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eNormalTangent
         });
-        
+
         device().writeDescriptorSet ({
             .view_handle            = ptr_material_index_image->view_handle,
             .sampler_handle         = _sampler_handle,
@@ -81,7 +82,7 @@ namespace pbrlib::backend
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eMaterialIndices
         });
-        
+
         device().writeDescriptorSet ({
             .view_handle            = depthStencil()->view_handle,
             .sampler_handle         = _sampler_handle,
@@ -223,7 +224,7 @@ namespace pbrlib::backend
                     .float32 = {0.0f, 0.0f, 0.0f, 1.0f}
                 }
             };
-            
+
             constexpr VkClearValue nor_tan_clear_value
             {
                 .color
@@ -231,7 +232,7 @@ namespace pbrlib::backend
                     .float32 = {0.0f, 0.0f, 0.0f, 1.0f}
                 }
             };
-            
+
             constexpr VkClearValue material_index_clear_value
             {
                 .color
@@ -245,9 +246,9 @@ namespace pbrlib::backend
                 .depthStencil = {1.0f, 0}
             };
 
-            constexpr std::array clear_values 
+            constexpr std::array clear_values
             {
-                pos_clear_value, 
+                pos_clear_value,
                 nor_tan_clear_value,
                 material_index_clear_value,
                 depth_clear_value
@@ -255,12 +256,12 @@ namespace pbrlib::backend
 
             const auto [width, height] = size();
 
-            const VkRect2D area 
+            const VkRect2D area
             {
-                0, 
-                0, 
-                width, 
-                height 
+                0,
+                0,
+                width,
+                height
             };
 
             const VkRenderPassBeginInfo render_pass_begin_info
@@ -306,25 +307,25 @@ namespace pbrlib::backend
         for (const auto ptr_item: context().items)
         {
             const auto& tag = ptr_item->getComponent<pbrlib::components::Tag>();
-    
+
             command_buffer.write([this, ptr_item] (VkCommandBuffer command_buffer_handle)
             {
                 PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[gbuffer-generator] run-pipeline");
-    
+
                 const auto& renderable = ptr_item->getComponent<components::Renderable>();
-    
+
                 _push_constant_block.instance_id    = renderable.instance_id;
                 _push_constant_block.material_index = renderable.material_id;
-    
+
                 vkCmdPushConstants (
-                    command_buffer_handle, 
-                    _pipeline_layout_handle, 
-                    VK_SHADER_STAGE_VERTEX_BIT, 
+                    command_buffer_handle,
+                    _pipeline_layout_handle,
+                    VK_SHADER_STAGE_VERTEX_BIT,
                     0, sizeof(GBufferPushConstantBlock), &_push_constant_block
                 );
-    
+
                 const auto& index_buffer = context().ptr_mesh_manager->indexBuffer(renderable.instance_id);
-    
+
                 vkCmdBindIndexBuffer(command_buffer_handle, index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
                 vkCmdDrawIndexed(command_buffer_handle, static_cast<uint32_t>(renderable.index_count), 1, 0, 0, 0);
             }, std::format("[gbuffer-pass] run-pipeline: {}", tag.name), vk::marker_colors::graphics_pipeline);
@@ -369,7 +370,7 @@ namespace pbrlib::backend
             .build();
 
         _result_descriptor_set_handle = device().allocateDescriptorSet (
-            _result_descriptor_set_layout_handle, 
+            _result_descriptor_set_layout_handle,
             "[gbuffer-generator] descritor set with results"
         );
     }
@@ -378,7 +379,7 @@ namespace pbrlib::backend
         -> std::pair<VkDescriptorSet, VkDescriptorSetLayout>
     {
         return std::make_pair (
-            _result_descriptor_set_handle.handle(), 
+            _result_descriptor_set_handle.handle(),
             _result_descriptor_set_layout_handle.handle()
         );
     }

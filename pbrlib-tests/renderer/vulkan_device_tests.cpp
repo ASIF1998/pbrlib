@@ -19,7 +19,7 @@ public:
 
         device.init();
     }
-    
+
     pbrlib::backend::vk::Device device;
 };
 
@@ -46,9 +46,9 @@ TEST_F(VulkanDeviceTests, BuildImage)
     constexpr auto filter = VK_FILTER_LINEAR;
 
     constexpr auto fill_color = pbrlib::math::vec3(0.54, 0.12, 0.43);
-    
-    constexpr auto usage =  VK_IMAGE_USAGE_STORAGE_BIT          | 
-                            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | 
+
+    constexpr auto usage =  VK_IMAGE_USAGE_STORAGE_BIT          |
+                            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
                             VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     auto image = pbrlib::backend::vk::builders::Image(device)
@@ -166,7 +166,7 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
         .addQueueFamilyIndex(device.queue().family_index)
         .build();
 
-        
+
     EXPECT_NO_THROW({
         device.writeDescriptorSet ({
             .buffer     = buffer,

@@ -40,7 +40,7 @@ namespace pbrlib::testing
     {
         if constexpr (std::is_floating_point<T>::value || std::is_floating_point<U>::value)
             EXPECT_NEAR(v1, v2, 0.0001f);
-        else 
+        else
             EXPECT_EQ(v1, v2);
     }
 
@@ -65,7 +65,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix2x2<Type>& m, const Type a[4])
     {
-        for (size_t i = 0; i < 2; i++) 
+        for (size_t i = 0; i < 2; i++)
         {
             for (size_t j = 0; j < 2; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 2 + j]);
@@ -75,7 +75,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix2x2<Type>& m, const Type a[4], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 2; i++) 
+        for (size_t i = 0; i < 2; i++)
         {
             for (size_t j = 0; j < 2; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 2 + j]) << err_msg << std::endl;
@@ -85,7 +85,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix3x3<Type>& m, const Type a[9])
     {
-        for (size_t i = 0; i < 3; i++) 
+        for (size_t i = 0; i < 3; i++)
         {
             for (size_t j = 0; j < 3; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 3 + j]);
@@ -95,7 +95,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix3x3<Type>& m, const Type a[9], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 3; i++) 
+        for (size_t i = 0; i < 3; i++)
         {
             for (size_t j = 0; j < 3; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 3 + j]) << err_msg << std::endl;
@@ -105,7 +105,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix4x4<Type>& m, const Type a[16])
     {
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
             for (size_t j = 0; j < 4; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 4 + j]);
@@ -115,7 +115,7 @@ namespace pbrlib::testing
     template<typename Type>
     inline void equality(const pbrlib::math::Matrix4x4<Type>& m, const Type a[16], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
             for (size_t j = 0; j < 4; j++)
                 EXPECT_EQ(m.at(i, j), a[i * 4 + j]) << err_msg << std::endl;
@@ -129,7 +129,7 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat2& m, const float a[4], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 2; i++) 
+        for (size_t i = 0; i < 2; i++)
         {
             for (size_t j = 0; j < 2; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 2 + j], 0.0001F) << err_msg << std::endl;
@@ -138,7 +138,7 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat3& m, const float a[9])
     {
-        for (size_t i = 0; i < 3; i++) 
+        for (size_t i = 0; i < 3; i++)
         {
             for (size_t j = 0; j < 3; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 3 + j], 0.0001f);
@@ -147,7 +147,7 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat3& m, const float a[9], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 3; i++) 
+        for (size_t i = 0; i < 3; i++)
         {
             for (size_t j = 0; j < 3; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 3 + j], 0.0001f) << err_msg << std::endl;
@@ -156,7 +156,7 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat4& m, const float a[16])
     {
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
             for (size_t j = 0; j < 4; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 4 + j], 0.0001f);
@@ -165,7 +165,7 @@ namespace pbrlib::testing
 
     inline void equality(const pbrlib::math::mat4& m, const float a[16], const std::string_view err_msg)
     {
-        for (size_t i = 0; i < 4; i++) 
+        for (size_t i = 0; i < 4; i++)
         {
             for (size_t j = 0; j < 4; j++)
                 EXPECT_NEAR(m.at(i, j), a[i * 4 + j], 0.0001f) << err_msg << std::endl;
@@ -197,9 +197,9 @@ namespace pbrlib::testing
     {
         if constexpr (std::is_floating_point<T>::value)
             return static_cast<T>(v);
-        
+
         return static_cast<T>(v + 0.5);
-    } 
+    }
 }
 
 namespace pbrlib::testing::vk
@@ -209,7 +209,7 @@ namespace pbrlib::testing::vk
 #ifdef PBRLIB_RUN_FROM_CI
         /// swiftshader apparently doesn't support float16
         return false;
-#else 
+#else
         return true;
 #endif
     }

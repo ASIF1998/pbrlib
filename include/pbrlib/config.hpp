@@ -16,7 +16,7 @@ namespace pbrlib::settings
         float radius = 0.05f;
     };
 
-    enum class AA : 
+    enum class AA :
         uint8_t
     {
         eNone,
@@ -43,8 +43,7 @@ namespace pbrlib
         bool resible        = false;
         bool draw_in_window = true;
 
-        settings::SSAO ssao;
-        
-        settings::AA aa;
+        settings::SSAO  ssao;
+        settings::AA    aa;
     };
 }

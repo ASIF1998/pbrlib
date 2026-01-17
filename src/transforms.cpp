@@ -3,7 +3,6 @@
 #include <pbrlib/math/casts.hpp>
 
 #include <cmath>
-#include <numbers>
 
 namespace pbrlib::transforms
 {
@@ -29,8 +28,8 @@ namespace pbrlib::transforms
 
     math::mat4 rotateX(float theta)
     {
-        float sin_theta = sin(math::toRadians(theta));
-        float cos_theta = cos(math::toRadians(theta));
+        const float sin_theta = sin(math::toRadians(theta));
+        const float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             1.0f, 0.0f,         0.0f,       0.0f,
@@ -42,8 +41,8 @@ namespace pbrlib::transforms
 
     math::mat4 rotateY(float theta)
     {
-        float sin_theta = sin(math::toRadians(theta));
-        float cos_theta = cos(math::toRadians(theta));
+        const float sin_theta = sin(math::toRadians(theta));
+        const float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             cos_theta,  0.0f, sin_theta,    0.0f,
@@ -55,8 +54,8 @@ namespace pbrlib::transforms
 
     math::mat4 rotateZ(float theta)
     {
-        float sin_theta = sin(math::toRadians(theta));
-        float cos_theta = cos(math::toRadians(theta));
+        const float sin_theta = sin(math::toRadians(theta));
+        const float cos_theta = cos(math::toRadians(theta));
 
         return math::mat4 (
             cos_theta,  -sin_theta, 0.0f, 0.0f,
@@ -68,29 +67,29 @@ namespace pbrlib::transforms
 
     math::mat4 rotate(const math::vec3& axis, float theta)
     {
-        math::vec3 r = math::normalize(axis);
+        const auto r = math::normalize(axis);
 
-        float theta_in_radians = math::toRadians(theta);
+        const float theta_in_radians = math::toRadians(theta);
 
-        float sin_theta             = sin(theta_in_radians);
-        float cos_theta             = cos(theta_in_radians);
-        float one_minus_cos_theta   = 1.0f - cos_theta;
+        const float sin_theta           = sin(theta_in_radians);
+        const float cos_theta           = cos(theta_in_radians);
+        const float one_minus_cos_theta = 1.0f - cos_theta;
 
-        float rxry = r.x * r.y;
-        float rxrz = r.x * r.z;
-        float ryrz = r.y * r.z;
+        const float rxry = r.x * r.y;
+        const float rxrz = r.x * r.z;
+        const float ryrz = r.y * r.z;
 
-        float m11 = r.x * r.x * one_minus_cos_theta + cos_theta;
-        float m12 = rxry * one_minus_cos_theta - r.z * sin_theta;
-        float m13 = rxrz * one_minus_cos_theta + r.y * sin_theta;
+        const float m11 = r.x * r.x * one_minus_cos_theta + cos_theta;
+        const float m12 = rxry * one_minus_cos_theta - r.z * sin_theta;
+        const float m13 = rxrz * one_minus_cos_theta + r.y * sin_theta;
 
-        float m21 = rxry * one_minus_cos_theta + r.z * sin_theta;
-        float m22 = r.y * r.y * one_minus_cos_theta + cos_theta;
-        float m23 = ryrz * one_minus_cos_theta - r.x * sin_theta;
+        const float m21 = rxry * one_minus_cos_theta + r.z * sin_theta;
+        const float m22 = r.y * r.y * one_minus_cos_theta + cos_theta;
+        const float m23 = ryrz * one_minus_cos_theta - r.x * sin_theta;
 
-        float m31 = rxrz * one_minus_cos_theta - r.y * sin_theta;
-        float m32 = ryrz * one_minus_cos_theta + r.x * sin_theta;
-        float m33 = r.z * r.z * one_minus_cos_theta + cos_theta;
+        const float m31 = rxrz * one_minus_cos_theta - r.y * sin_theta;
+        const float m32 = ryrz * one_minus_cos_theta + r.x * sin_theta;
+        const float m33 = r.z * r.z * one_minus_cos_theta + cos_theta;
 
         return math::mat4 (
             m11,    m12,    m13,    0.0f,
@@ -101,14 +100,14 @@ namespace pbrlib::transforms
     }
 
     math::mat4 lookAt (
-        const math::vec3& eye, 
-        const math::vec3& pos, 
+        const math::vec3& eye,
+        const math::vec3& pos,
         const math::vec3& up
     )
     {
-        auto f = math::normalize(pos - eye);
-        auto s = math::normalize(math::cross(f, up));
-        auto u = math::cross(s, f);
+        const auto f = math::normalize(pos - eye);
+        const auto s = math::normalize(math::cross(f, up));
+        const auto u = math::cross(s, f);
 
         math::mat4 mat;
 
@@ -132,7 +131,7 @@ namespace pbrlib::transforms
         float       fovy,
         uint32_t    width,
         uint32_t    height,
-        float       z_near, 
+        float       z_near,
         float       z_far
     )
     {

@@ -25,17 +25,17 @@ namespace pbrlib::backend::vk::builders
         RenderPass& operator = (const RenderPass& builder)  = delete;
 
         RenderPass& addColorAttachment (
-            const Image*    ptr_image, 
+            const Image*    ptr_image,
             VkImageLayout   final_layout
         );
 
         RenderPass& depthAttachment (
-            const Image*    ptr_image, 
+            const Image*    ptr_image,
             VkImageLayout   final_layout
         );
 
         [[nodiscard]] RenderPassHandle build();
-    
+
     private:
         Device& _device;
 

@@ -25,14 +25,12 @@
 
 #include <random>
 
-#include <array>
-
 namespace pbrlib::backend
 {
     SSAO::SSAO(vk::Device& device, BilateralBlur* ptr_blur) :
         RenderPass  (device),
         _ptr_blur   (ptr_blur)
-    { 
+    {
         if (!ptr_blur) [[unlikely]]
             throw exception::InvalidArgument("[ssao] pointer to blur is null");
 
@@ -41,7 +39,7 @@ namespace pbrlib::backend
             .build();
 
         _result_image_desc_set = device.allocateDescriptorSet(
-            _result_image_desc_set_layout, 
+            _result_image_desc_set_layout,
             "[ssao] descritor set with results"
         );
     }
@@ -150,10 +148,10 @@ namespace pbrlib::backend
             };
 
             vkCmdBindDescriptorSets (
-                command_buffer_handle, 
-                VK_PIPELINE_BIND_POINT_COMPUTE, 
-                _pipeline_layout_handle, 0, 
-                static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(), 
+                command_buffer_handle,
+                VK_PIPELINE_BIND_POINT_COMPUTE,
+                _pipeline_layout_handle, 0,
+                static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(),
                 0, nullptr
             );
 
@@ -164,9 +162,9 @@ namespace pbrlib::backend
             };
 
             vkCmdPushConstants (
-                command_buffer_handle, 
-                _pipeline_layout_handle, 
-                VK_SHADER_STAGE_COMPUTE_BIT, 
+                command_buffer_handle,
+                _pipeline_layout_handle,
+                VK_SHADER_STAGE_COMPUTE_BIT,
                 0, static_cast<uint32_t>(sizeof(pbrlib::math::mat4) * matrices.size()), matrices.data()
             );
 
@@ -208,7 +206,7 @@ namespace pbrlib::backend
             .binding                = 0
         });
     }
-    
+
     void SSAO::createSSAODescriptorSet()
     {
         _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(device())

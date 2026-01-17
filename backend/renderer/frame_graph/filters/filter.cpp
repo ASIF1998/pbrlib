@@ -66,7 +66,7 @@ namespace pbrlib::backend
     {
         if (!_ptr_src_image) [[unlikely]]
             throw exception::InvalidState(std::format("[{}] didn't set source image", _name));
-        
+
         return *_ptr_src_image;
     }
 

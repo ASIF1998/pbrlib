@@ -84,7 +84,7 @@ TEST(QuatTests, quatMultiplication)
 
     constexpr pbrlib::math::quat    q1 (3.0f, 4.0f, 5.0f, 1.0f);
     pbrlib::math::quat              q2 (3.0f, 4.0f, 5.0f, 1.0f);
-    
+
     pbrlib::testing::equality(res, q1 * q2);
 
     q2 *= q1;
@@ -122,7 +122,7 @@ TEST(QuatTests, Normalize)
     pbrlib::math::quat q (3.0f, 4.0f, 5.0f, 1.0f);
 
     pbrlib::testing::equality(res, pbrlib::math::normalize(q));
-    
+
     q.normalize();
 
     pbrlib::testing::equality(res, q);
@@ -131,9 +131,9 @@ TEST(QuatTests, Normalize)
 TEST(QuatTests, Inverse)
 {
     constexpr pbrlib::math::quat res (
-        -0.0588235334f, 
-        -0.0784313753f, 
-        -0.0980392172f, 
+        -0.0588235334f,
+        -0.0784313753f,
+        -0.0980392172f,
         0.01960784380f
     );
 
