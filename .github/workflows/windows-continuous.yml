@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [master, code-refactoring]
+    branches: [mastere]
     paths-ignore:
       - "**.md"
 jobs:
