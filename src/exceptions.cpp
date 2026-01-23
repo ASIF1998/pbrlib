@@ -4,9 +4,9 @@
 
 namespace pbrlib::exception
 {
-    Exception::Exception(std::string_view msg, std::stacktrace trace)
+    Exception::Exception(std::string_view msg /*, std::stacktrace trace*/)
     {
-        _msg = std::format("[pbrlib] {}\n\nstacktrace:\n{}", msg, std::to_string(trace));
+        // _msg = std::format("[pbrlib] {}\n\nstacktrace:\n{}", msg, std::to_string(trace));
     }
 
     const char* Exception::what() const noexcept

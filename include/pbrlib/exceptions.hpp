@@ -5,7 +5,7 @@
 
 #include <exception>
 
-#include <stacktrace>
+// #include <stacktrace>
 
 namespace pbrlib::exception
 {
@@ -13,7 +13,7 @@ namespace pbrlib::exception
         public std::exception
     {
     protected:
-        explicit Exception(std::string_view msg, std::stacktrace trace = std::stacktrace::current());
+        explicit Exception(std::string_view msg /*, std::stacktrace trace = std::stacktrace::current()*/);
 
         const char* what() const noexcept override;
 
