@@ -6,34 +6,67 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [mastere, mac-os-porting]
+    branches: [master, mac-os-porting]
     paths-ignore:
       - "**.md"
 jobs:
-  # linting:
-  #   name: linter
-  #   runs-on: windows-latest
-  #   steps:
-  #     - name: checkout project
-  #       uses: actions/checkout@v4
+  linting:
+    name: linter
+    runs-on: windows-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v4
 
-  #     - name: install and build cppcheck
-  #       run: |
-  #         git clone https://github.com/danmar/cppcheck.git
-  #         cd cppcheck
-  #         mkdir build
-  #         cd build
-  #         cmake ..
-  #         cmake --build . --config Release --target cppcheck
-  #         cp "${{github.workspace}}/cppcheck/build/bin/Release/cppcheck.exe" "${{github.workspace}}/cppcheck.exe"
-  #         cp -r "${{github.workspace}}/cppcheck/build/bin/Release/cfg" "${{github.workspace}}/cfg"
+      - name: install and build cppcheck
+        run: |
+          git clone https://github.com/danmar/cppcheck.git
+          cd cppcheck
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release --target cppcheck
+          cp "${{github.workspace}}/cppcheck/build/bin/Release/cppcheck.exe" "${{github.workspace}}/cppcheck.exe"
+          cp -r "${{github.workspace}}/cppcheck/build/bin/Release/cfg" "${{github.workspace}}/cfg"
 
-  #     - name: run cppcheck
-  #       run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
+      - name: run cppcheck
+        run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
 
-  testing:
-    name: testing
+  macos-test:
+    name: macos-test 
     runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          architecture: "arm64"
+
+      - name: checkout project
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: update glslang sources
+        run: |
+          cd third_party/glslang
+          python3 update_glslang_sources.py
+
+      - name: build tests
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
+          cmake --build . --config Release --target pbrlib-tests
+
+      - name: run tests
+        run: |
+          cd build/bin
+          ./pbrlib-tests
+
+  windows-test:
+    name: windows-test
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
       - name: set up python
@@ -53,11 +86,9 @@ jobs:
           path: third_party\SDL\include\build_config\SDL_build_config.h
 
       - name: setup msvc
-        if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: install vulkan sdk
-        if: runner.os == 'Windows'
         uses: jakoch/install-vulkan-sdk-action@v1.0.0
         with:
           vulkan_version: 1.4.304.0
@@ -79,7 +110,6 @@ jobs:
           cmake --build . --config Release --target pbrlib-tests
 
       - name: setup swiftshader
-        if: runner.os == 'Windows'
         run: |
           mkdir CI
           cd CI
@@ -94,7 +124,6 @@ jobs:
           cp "${{github.workspace}}/CI/swiftshader/build/Windows/vulkan-1.dll" "${{github.workspace}}/build/bin/Release/vulkan-1.dll"
 
       - name: run tests
-        if: runner.os == 'Windows'
         run: |
           cd build/bin/Release
           ./pbrlib-tests.exe
