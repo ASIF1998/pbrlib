@@ -251,7 +251,7 @@ TYPED_TEST(Mat2Tests, Inverse)
 
 TYPED_TEST(Mat2Tests, AtMethodEdgeCase)
 {
-    constexpr Matrix2x2 mat (
+    const Matrix2x2 mat (
         static_cast<TypeParam>(-2.0),
         static_cast<TypeParam>(1.0),
         static_cast<TypeParam>(1.5),

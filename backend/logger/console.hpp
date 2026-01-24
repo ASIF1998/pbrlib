@@ -44,17 +44,17 @@ namespace pbrlib::backend::log::priv
     public:
         static void init()
         {
-            getLogger().set_pattern(T::getPattern());
+            // getLogger().set_pattern(T::getPattern());
         }
 
-        [[nodiscard]]
-        static auto& getLogger()
-        {
-            return logger.getLog();
-        }
+        // [[nodiscard]]
+        // static auto& getLogger()
+        // {
+        //     return logger.getLog();
+        // }
 
     private:
-        static ConsoleLogger logger;
+        // static ConsoleLogger logger;
     };
 
     class AppLogger final : public Logger<AppLogger>
@@ -77,6 +77,12 @@ namespace pbrlib::backend::log::priv
         }
     };
 
-    ConsoleLogger AppLogger::logger;
-    ConsoleLogger EngineLogger::logger;
+    // ConsoleLogger AppLogger::logger;
+    // ConsoleLogger EngineLogger::logger;
+
+    // template<>
+    // ConsoleLogger Logger<AppLogger>::logger;
+   
+    // template<>
+    // ConsoleLogger Logger<EngineLogger>::logger;
 }
