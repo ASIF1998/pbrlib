@@ -44,18 +44,21 @@ namespace pbrlib::backend::log::priv
     public:
         static void init()
         {
-            // getLogger().set_pattern(T::getPattern());
+            getLogger().set_pattern(T::getPattern());
         }
 
-        // [[nodiscard]]
-        // static auto& getLogger()
-        // {
-        //     return logger.getLog();
-        // }
+        [[nodiscard]]
+        static auto& getLogger()
+        {
+            return logger.getLog();
+        }
 
-    private:
-        // static ConsoleLogger logger;
+    protected:
+        static ConsoleLogger logger;
     };
+
+    template <class T>
+    ConsoleLogger Logger<T>::logger;
 
     class AppLogger final : public Logger<AppLogger>
     {
@@ -76,13 +79,4 @@ namespace pbrlib::backend::log::priv
             return "[%H:%M:%S %z] [%^pbrlib%$] %v";
         }
     };
-
-    // ConsoleLogger AppLogger::logger;
-    // ConsoleLogger EngineLogger::logger;
-
-    // template<>
-    // ConsoleLogger Logger<AppLogger>::logger;
-   
-    // template<>
-    // ConsoleLogger Logger<EngineLogger>::logger;
 }
