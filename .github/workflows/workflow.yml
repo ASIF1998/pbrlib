@@ -1,4 +1,4 @@
-name: windows-continuous
+name: workflow
 
 on:
   pull_request:
@@ -31,9 +31,9 @@ jobs:
       - name: run cppcheck
         run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
 
-  build-windows:
-    name: build-windows
-    runs-on: windows-latest
+  testing:
+    name: testing
+    runs-on: [windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v5
       - name: set up python
@@ -53,9 +53,11 @@ jobs:
           path: third_party\SDL\include\build_config\SDL_build_config.h
 
       - name: setup msvc
+        if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: install vulkan sdk
+        if: runner.os == 'Windows'
         uses: jakoch/install-vulkan-sdk-action@v1.0.0
         with:
           vulkan_version: 1.4.304.0
@@ -77,6 +79,7 @@ jobs:
           cmake --build . --config Release --target pbrlib-tests
 
       - name: setup swiftshader
+        if: runner.os == 'Windows'
         run: |
           mkdir CI
           cd CI
@@ -91,6 +94,7 @@ jobs:
           cp "${{github.workspace}}/CI/swiftshader/build/Windows/vulkan-1.dll" "${{github.workspace}}/build/bin/Release/vulkan-1.dll"
 
       - name: run tests
+        if: runner.os == 'Windows'
         run: |
           cd build/bin/Release
           ./pbrlib-tests.exe
