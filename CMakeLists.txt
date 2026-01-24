@@ -113,6 +113,11 @@ add_subdirectory(third_party/VulkanMemoryAllocator)
 add_subdirectory(third_party/entt)
 
 #####################################################
+#   cpptrace
+#####################################################
+add_subdirectory(third_party/cpptrace)
+
+#####################################################
 #   tracy
 #####################################################
 if (PBRLIB_TEST_CONSOLE)
@@ -139,6 +144,7 @@ target_link_libraries(pbrlib PUBLIC
     spdlog::spdlog_header_only
     VulkanMemoryAllocator
     SDL3::SDL3 
+    cpptrace::cpptrace
 )
 
 if (APPLE)
