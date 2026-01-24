@@ -1,6 +1,6 @@
 #include "../utils.hpp"
 
-#include <pbrlib/scene/Scene.hpp>
+#include <pbrlib/scene/scene.hpp>
 
 #include <optional>
 

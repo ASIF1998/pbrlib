@@ -215,7 +215,7 @@ namespace pbrlib::backend::vk::exporters
         Image& image(const vk::Image* ptr_image);
         Image& filename(const std::filesystem::path& filename);
 
-        [[nodiscard]] void exoprt();
+        void save();
 
     private:
         Device& _device;

@@ -141,7 +141,7 @@ namespace pbrlib::testing
             backend::vk::exporters::Image(_device)
                 .filename(path_to_reference)
                 .image(&image_1)
-                .exoprt();
+                .save();
 
             return true;
         }
