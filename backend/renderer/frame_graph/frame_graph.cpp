@@ -152,9 +152,8 @@ namespace pbrlib::backend
         setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
-
-        const auto [width, height] = _canvas.size();
-        _ptr_render_pass->init(_render_context, width, height);
+        if (const auto [width, height] = _canvas.size(); !_ptr_render_pass->init(_render_context, width, height))
+            throw exception::InitializeError("[frame-graph] failed initialize render passes");
     }
 
     template<HasAttachments T>
