@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [mastere]
+    branches: [mastere, mac-os-porting]
     paths-ignore:
       - "**.md"
 jobs:
