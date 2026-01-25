@@ -24,12 +24,12 @@ public:
     }
 
 protected:
-    std::atomic<int> _call_count{0};
+    std::atomic<int> _call_count = 0;
 };
 
-TEST_F(EventSystemTests, EmitOn)
+TEST_F(EventSystemTests, EmmitOn)
 {
-    struct TestEvent final
+    struct EmmitOnTestEvent final
     {
         int value = 0;
     };
@@ -38,12 +38,12 @@ TEST_F(EventSystemTests, EmitOn)
 
     int received_value = -1;
 
-    pbrlib::EventSystem::on([this, &received_value] (const TestEvent& event) {
+    pbrlib::EventSystem::on([this, &received_value] (const EmmitOnTestEvent& event) {
         received_value = event.value;
         ++_call_count;
     });
 
-    const TestEvent event {
+    const EmmitOnTestEvent event {
         .value = value
     };
 
@@ -55,29 +55,29 @@ TEST_F(EventSystemTests, EmitOn)
 
 TEST_F(EventSystemTests, MultipleListeners)
 {
-    struct TestEvent final
+    struct MultipleListenersTestEvent final
     { };
 
     bool event_1 = false;
     bool event_2 = false;
     bool event_3 = false;
 
-    pbrlib::EventSystem::on([this, &event_1] ([[maybe_unused]] const TestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_1] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
         event_1 = true;
         ++_call_count;
     });
 
-    pbrlib::EventSystem::on([this, &event_2] ([[maybe_unused]] const TestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_2] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
         event_2 = true;
         ++_call_count;
     });
 
-    pbrlib::EventSystem::on([this, &event_3] ([[maybe_unused]] const TestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_3] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
         event_3 = true;
         ++_call_count;
     });
 
-    pbrlib::EventSystem::emmit(TestEvent());
+    pbrlib::EventSystem::emmit(MultipleListenersTestEvent());
 
     pbrlib::testing::thisTrue(event_1);
     pbrlib::testing::thisTrue(event_2);
@@ -115,7 +115,7 @@ TEST_F(EventSystemTests, DifferentEventTypes)
 
 TEST_F(EventSystemTests, EventWithComplexData)
 {
-    struct TestEvent final
+    struct ComplexDataTestEvent final
     {
         uint32_t            value_1 = 0;
         float               value_2 = 0.0;
@@ -126,13 +126,13 @@ TEST_F(EventSystemTests, EventWithComplexData)
     static constexpr float      value_2 = 0.4534;
     static constexpr auto       str     = "Hello World"sv;
 
-    pbrlib::EventSystem::on([](const TestEvent& event) {
+    pbrlib::EventSystem::on([](const ComplexDataTestEvent& event) {
         pbrlib::testing::equality(event.value_1, value_1);
         pbrlib::testing::equality(event.value_2, value_2);
         pbrlib::testing::equality(event.str, str);
     });
 
-    constexpr TestEvent event = {
+    constexpr ComplexDataTestEvent event = {
         .value_1    = value_1,
         .value_2    = value_2,
         .str        = str
