@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [master, mac-os-porting]
+    branches: [master]
     paths-ignore:
       - "**.md"
 jobs:
@@ -32,7 +32,7 @@ jobs:
         run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
 
   macos-test:
-    name: macos-test 
+    name: macos-test
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
