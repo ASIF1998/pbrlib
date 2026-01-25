@@ -67,6 +67,8 @@ The project uses the following libraries:
 - **Tracy** - Profiling
 - **STB** - Image loading
 - **glslang** - Shader compilation
+- **MoltenVK** - Implementation of Vulkan API graphics and compute functionality for macOS
+- **cpptrace** - Сapturing and printing call stacks
 
 ## 🚀 Usage
 

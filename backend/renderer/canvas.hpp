@@ -29,8 +29,7 @@ namespace pbrlib::backend
         Canvas(Canvas&& canvas)         = default;
         Canvas(const Canvas& canvas)    = delete;
 
-        Canvas& operator = (Canvas&& canvas)        = default;
-        Canvas& operator = (const Canvas& canvas)   = delete;
+        Canvas& operator = (const Canvas& canvas) = delete;
 
         void present(const vk::Image* ptr_result);
 

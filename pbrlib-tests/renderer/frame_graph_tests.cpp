@@ -15,7 +15,7 @@ TEST(FrameGraphTests, Ctor)
     if constexpr (!pbrlib::testing::vk::isSupport())
         GTEST_SKIP();
 
-    ASSERT_NO_THROW([]
+    ASSERT_NO_THROW(
     {
         constexpr uint32_t width    = 800;
         constexpr uint32_t height   = 600;

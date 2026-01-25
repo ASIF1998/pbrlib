@@ -5,15 +5,13 @@
 
 #include <exception>
 
-#include <stacktrace>
-
 namespace pbrlib::exception
 {
     class Exception :
         public std::exception
     {
     protected:
-        explicit Exception(std::string_view msg, std::stacktrace trace = std::stacktrace::current());
+        explicit Exception(std::string_view msg);
 
         const char* what() const noexcept override;
 

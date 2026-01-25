@@ -53,9 +53,12 @@ namespace pbrlib::backend::log::priv
             return logger.getLog();
         }
 
-    private:
+    protected:
         static ConsoleLogger logger;
     };
+
+    template <class T>
+    ConsoleLogger Logger<T>::logger;
 
     class AppLogger final : public Logger<AppLogger>
     {
@@ -76,7 +79,4 @@ namespace pbrlib::backend::log::priv
             return "[%H:%M:%S %z] [%^pbrlib%$] %v";
         }
     };
-
-    ConsoleLogger AppLogger::logger;
-    ConsoleLogger EngineLogger::logger;
 }

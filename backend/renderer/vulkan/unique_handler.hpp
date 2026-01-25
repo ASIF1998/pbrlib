@@ -3,7 +3,7 @@
 #include <backend/profiling.hpp>
 
 #include <vulkan/vulkan.h>
-#include <vma/vk_mem_alloc.h>
+#include <vk_mem_alloc.h>
 
 #include <functional>
 #include <tuple>

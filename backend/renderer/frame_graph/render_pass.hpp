@@ -84,12 +84,12 @@ namespace pbrlib::backend
         RenderPass& operator = (RenderPass&& render_pass)       = delete;
         RenderPass& operator = (const RenderPass& render_pass)  = delete;
 
-        virtual [[nodiscard]] bool init(const RenderContext& context, uint32_t width, uint32_t height);
+        [[nodiscard]] virtual bool init(const RenderContext& context, uint32_t width, uint32_t height);
 
         virtual void draw(vk::CommandBuffer& command_buffer);
 
-        virtual [[nodiscard]] VkPipelineStageFlags2 srcStage() const noexcept = 0;
-        virtual [[nodiscard]] VkPipelineStageFlags2 dstStage() const noexcept = 0;
+        [[nodiscard]] virtual VkPipelineStageFlags2 srcStage() const noexcept = 0;
+        [[nodiscard]] virtual VkPipelineStageFlags2 dstStage() const noexcept = 0;
 
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
 

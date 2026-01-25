@@ -141,7 +141,7 @@ TYPED_TEST(Vec3Tests, ZeroVectorNormalization)
     }, pbrlib::exception::MathError);
 
     EXPECT_THROW({
-        [[maybe_unuse]] const auto res = normalize(v);
+        [[maybe_unused]] const auto res = normalize(v);
     }, pbrlib::exception::MathError);
 }
 

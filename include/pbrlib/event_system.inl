@@ -36,6 +36,6 @@ namespace pbrlib
         static std::list<Listener> listeners;
 
         listeners.emplace_front(std::move(callback));
-        _dispatcher.sink<EventType>().connect<&Listener::handle>(&listeners.front());
+        _dispatcher.sink<EventType>().template connect<&Listener::handle>(&listeners.front());
     }
 }

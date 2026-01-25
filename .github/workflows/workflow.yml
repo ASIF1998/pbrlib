@@ -1,4 +1,4 @@
-name: windows-continuous
+name: workflow
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [mastere]
+    branches: [master]
     paths-ignore:
       - "**.md"
 jobs:
@@ -31,8 +31,41 @@ jobs:
       - name: run cppcheck
         run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
 
-  build-windows:
-    name: build-windows
+  macos-test:
+    name: macos-test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          architecture: "arm64"
+
+      - name: checkout project
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: update glslang sources
+        run: |
+          cd third_party/glslang
+          python3 update_glslang_sources.py
+
+      - name: build tests
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
+          cmake --build . --config Release --target pbrlib-tests
+
+      - name: run tests
+        run: |
+          cd build/bin
+          ./pbrlib-tests
+
+  windows-test:
+    name: windows-test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5

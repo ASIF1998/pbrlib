@@ -589,7 +589,7 @@ namespace pbrlib::backend::vk::exporters
             std::filesystem::create_directory(save_directory);
     }
 
-    void Image::exoprt()
+    void Image::save()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

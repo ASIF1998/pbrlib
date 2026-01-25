@@ -75,7 +75,7 @@ namespace pbrlib::backend::vk
             .pApplicationInfo  = &app_info
         };
 
-        if (is_debug)
+        if (is_debug) [[unlikely]]
         {
             constexpr std::array layers {
                 "VK_LAYER_LUNARG_api_dump",
@@ -86,16 +86,38 @@ namespace pbrlib::backend::vk
             instance_info.ppEnabledLayerNames   = layers.data();
         }
 
-        constexpr std::array extensions {
-            VK_KHR_SURFACE_EXTENSION_NAME,
-            "VK_KHR_win32_surface",
-            VK_EXT_DEBUG_UTILS_EXTENSION_NAME
-        };
+
+        const auto extensions = instanceExtensions();
 
         instance_info.enabledExtensionCount     = static_cast<uint32_t>(extensions.size());
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
         VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
+    }
+
+    std::vector<const char*> Device::instanceExtensions()
+    {
+#if defined (PBRLIB_OS_APPLE)
+        const std::vector extensions
+        {
+            VK_KHR_SURFACE_EXTENSION_NAME, 
+            "VK_EXT_metal_surface",
+            VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+        };
+
+        return extensions;
+#elif defined (PBRLIB_OS_WINDOWS)
+        const std::vector extensions
+        {
+            VK_KHR_SURFACE_EXTENSION_NAME,
+            "VK_KHR_win32_surface",
+            VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+        };
+
+        return extensions;
+#else
+        static_assert(false, "Linux platform is not yet supported");
+#endif
     }
 
     VkInstance Device::instance() const noexcept

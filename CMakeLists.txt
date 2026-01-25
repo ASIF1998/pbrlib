@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.27)
 
+if (APPLE)
+    set(CMAKE_OSX_ARCHITECTURES arm64)
+endif()
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQURED ON)
 
-project(PBRLib)
+project(pbrlib)
 
 option(PBRLIB_ENABLE_TESTS "" OFF)
 option(PBRLIB_TEST_CONSOLE "" OFF)
@@ -24,6 +30,14 @@ if (PBRLIB_SETUP_CI)
     add_compile_definitions(PBRLIB_RUN_FROM_CI)
 endif()
 
+if (APPLE)
+    add_compile_definitions(PBRLIB_OS_APPLE)
+elseif(WIN32)
+    add_compile_definitions(PBRLIB_OS_WINDOWS)
+else()
+    add_compile_definitions(PBRLIB_OS_LINUX)
+endif()
+
 #####################################################
 #   Setup core.hpp
 #####################################################
@@ -42,7 +56,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 configure_file(backend/utils/private/info.hpp.in ../backend/utils/private/info.hpp)
 
 #####################################################
-#   Create PBRLib library
+#   Create pbrlib library
 #####################################################
 file(GLOB_RECURSE PBRLIB_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE PBRLIB_BACKEND_SOURCES CONFIGURE_DEPENDS backend/*.cpp)
@@ -63,9 +77,12 @@ endif()
 #####################################################
 #   Vulkan
 #####################################################
-find_package(Vulkan REQUIRED)
-
-set(Vulkan_SDK_LIBS ${Vulkan_INCLUDE_DIRS}/../Lib)
+if (APPLE)
+    add_subdirectory(third_party/MoltenVK)
+else()
+    find_package(Vulkan REQUIRED)
+    set(Vulkan_SDK_LIBS ${Vulkan_INCLUDE_DIRS}/../Lib)
+endif()
 
 #####################################################
 #   assimp
@@ -78,7 +95,6 @@ add_subdirectory(third_party/assimp)
 #####################################################
 #   SDL
 #####################################################
-include_directories(third_party/SDL/include)
 add_subdirectory(third_party/SDL)
 
 #####################################################
@@ -107,21 +123,25 @@ add_subdirectory(third_party/VulkanMemoryAllocator)
 add_subdirectory(third_party/entt)
 
 #####################################################
+#   cpptrace
+#####################################################
+add_subdirectory(third_party/cpptrace)
+
+#####################################################
 #   tracy
 #####################################################
-option(TRACY_ENABLE "" ON)
-option(TRACY_ON_DEMAND "" ON)
-add_subdirectory(third_party/tracy)
+if (PBRLIB_TEST_CONSOLE)
+    option(TRACY_ENABLE "" ON)
+    option(TRACY_ON_DEMAND "" ON)
+    add_subdirectory(third_party/tracy)
+
+    target_link_libraries(pbrlib PUBLIC Tracy::TracyClient)
+endif()
 
 #####################################################
 #   add libs
 #####################################################
-target_include_directories(pbrlib PUBLIC
-    ${Vulkan_INCLUDE_DIRS}
-)
-
 target_link_libraries(pbrlib PUBLIC
-    ${Vulkan_LIBRARIES}
     glslang
     OSDependent
     MachineIndependent
@@ -130,12 +150,21 @@ target_link_libraries(pbrlib PUBLIC
     SPIRV-Headers
     glslang-default-resource-limits
     assimp
-    SDL3::SDL3
+    EnTT::EnTT
     spdlog::spdlog_header_only
     VulkanMemoryAllocator
-    EnTT::EnTT
-    Tracy::TracyClient
+    SDL3::SDL3
+    cpptrace::cpptrace
 )
+
+if (APPLE)
+    target_link_libraries(pbrlib PUBLIC MoltenVK)
+else()
+    target_include_directories(pbrlib PUBLIC
+        ${Vulkan_INCLUDE_DIRS}
+    )
+    target_link_libraries(pbrlib PUBLIC ${Vulkan_LIBRARIES})
+endif()
 
 #####################################################
 #   tests
