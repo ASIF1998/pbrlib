@@ -69,7 +69,8 @@ namespace pbrlib::backend::vk
 
     void ResourceDestroyer::destroy(VkCommandBuffer command_buffer_handle, VkCommandPool command_pool_handle) noexcept
     {
-        vkFreeCommandBuffers(_device_handle, command_pool_handle, 1, &command_buffer_handle);
+        if (command_buffer_handle != VK_NULL_HANDLE && command_pool_handle != VK_NULL_HANDLE)
+            vkFreeCommandBuffers(_device_handle, command_pool_handle, 1, &command_buffer_handle);
     }
 
     void ResourceDestroyer::destroy(VkPipelineLayout pipeline_layout_handle) noexcept
