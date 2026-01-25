@@ -77,6 +77,8 @@ namespace pbrlib::backend::vk
 
         void createTracyContext();
 
+        std::vector<const char*> instanceExtensions();
+
     public:
         Device() = default;
 

@@ -30,6 +30,14 @@ if (PBRLIB_SETUP_CI)
     add_compile_definitions(PBRLIB_RUN_FROM_CI)
 endif()
 
+if (APPLE)
+    add_compile_definitions(PBRLIB_OS_APPLE)
+elseif(WIN32)
+    add_compile_definitions(PBRLIB_OS_WINDOWS)
+else()
+    add_compile_definitions(PBRLIB_OS_LINUX)
+endif()
+
 #####################################################
 #   Setup core.hpp
 #####################################################
@@ -133,7 +141,7 @@ endif()
 #####################################################
 #   add libs
 #####################################################
-target_link_libraries(pbrlib PUBLIC 
+target_link_libraries(pbrlib PUBLIC
     glslang
     OSDependent
     MachineIndependent
@@ -145,7 +153,7 @@ target_link_libraries(pbrlib PUBLIC
     EnTT::EnTT
     spdlog::spdlog_header_only
     VulkanMemoryAllocator
-    SDL3::SDL3 
+    SDL3::SDL3
     cpptrace::cpptrace
 )
 
@@ -171,4 +179,4 @@ endif()
 if (PBRLIB_TEST_CONSOLE)
     add_executable(test-console "test-console/main.cpp")
     target_link_libraries(test-console PRIVATE pbrlib)
-endif() 
+endif()
