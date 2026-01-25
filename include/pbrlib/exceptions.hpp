@@ -5,8 +5,6 @@
 
 #include <exception>
 
-// #include <stacktrace>
-
 namespace pbrlib::exception
 {
     class Exception :
