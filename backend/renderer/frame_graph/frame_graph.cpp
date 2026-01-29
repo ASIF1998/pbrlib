@@ -49,7 +49,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!_ptr_render_pass)
+        if (!_ptr_render_pass) [[unlikely]]
         {
             log::error("[frame-graph] failed draw scene because render pass is empty");
             return ;
@@ -152,7 +152,9 @@ namespace pbrlib::backend
         setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
-        if (const auto [width, height] = _canvas.size(); !_ptr_render_pass->init(_render_context, width, height))
+        
+        const auto [width, height] = _canvas.size(); 
+        if (!_ptr_render_pass->init(_render_context, width, height)) [[unlikely]]
             throw exception::InitializeError("[frame-graph] failed initialize render passes");
     }
 

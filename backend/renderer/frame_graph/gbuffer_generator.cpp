@@ -28,7 +28,7 @@
 
 namespace pbrlib::backend
 {
-    struct GBufferDescriptorSetBindings
+    struct GBufferDescriptorSetBindings final
     {
         enum :
             uint8_t

@@ -25,10 +25,8 @@ namespace pbrlib::backend::vk
 {
     Device::~Device()
     {
-        if (_device_handle == VK_NULL_HANDLE)
-            return;
-
-        vkDeviceWaitIdle(_device_handle);
+        if (_device_handle != VK_NULL_HANDLE)
+            vkDeviceWaitIdle(_device_handle);
     }
 
     void Device::init()
@@ -215,16 +213,16 @@ namespace pbrlib::backend::vk
             case VK_DRIVER_ID_MESA_RADV:
                 backend::log::info("[vk-device] driver ID: Mesa RADV");
                 break;
-            case VK_DRIVER_ID_NVIDIA_PROPRIETARY :
+            case VK_DRIVER_ID_NVIDIA_PROPRIETARY:
                 backend::log::info("[vk-device] driver ID: NVIDIA proprietary");
                 break;
-            case VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS  :
+            case VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS:
                 backend::log::info("[vk-device] driver ID: INTEL proprietary Windows");
                 break;
-            case VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA   :
+            case VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA:
                 backend::log::info("[vk-device] driver ID: INTEL open source Mesa");
                 break;
-            case VK_DRIVER_ID_IMAGINATION_PROPRIETARY    :
+            case VK_DRIVER_ID_IMAGINATION_PROPRIETARY:
                 backend::log::info("[vk-device] driver ID: Imagination proprietary");
                 break;
             default:
@@ -280,6 +278,7 @@ namespace pbrlib::backend::vk
         }
 
         throw exception::RuntimeError("[vk-device] couldn't find queue index");
+        std::unreachable();
     }
 
     bool Device::isRunFromFrameDebugger() const

@@ -61,6 +61,9 @@ namespace pbrlib
 
 		if (ptr_event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
 			_is_close = true;
+
+		if (ptr_event->type == SDL_EVENT_WINDOW_RESIZED)
+			_is_resized = true;
 	}
 
 	void WindowStay::reset() noexcept
@@ -71,6 +74,11 @@ namespace pbrlib
 	bool WindowStay::isClose() const noexcept
 	{
 		return _is_close;
+	}
+
+	bool WindowStay::isResized() const noexcept
+	{
+		return _is_resized;
 	}
 }
 

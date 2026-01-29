@@ -40,10 +40,11 @@ namespace pbrlib::backend
     {
         if (_surface.vk_surface) [[likely]]
         {
-            auto [ptr_image, index] = _surface.vk_surface->nextImage();
-
-            _surface.index      = index;
-            _surface.ptr_image  = ptr_image;
+            if (const auto next_image = _surface.vk_surface->nextImage(); next_image) [[likely]]
+            {
+                _surface.index      = next_image->index;
+                _surface.ptr_image  = next_image->ptr_image;
+            }
         }
     }
 

@@ -98,5 +98,6 @@ namespace pbrlib::backend
             return res->second;
 
         throw exception::RuntimeError("[render-pass] failed find input descriptor set");
+        std::unreachable();
     }
 }

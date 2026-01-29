@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <numeric>
+#include <optional>
 
 namespace pbrlib
 {
@@ -44,7 +45,7 @@ namespace pbrlib::backend::vk
         Surface& operator = (Surface&& surface);
         Surface& operator = (const Surface& surface) = delete;
 
-        [[nodiscard]] NextImageInfo nextImage();
+        [[nodiscard]] std::optional<NextImageInfo> nextImage();
 
     private:
         SurfaceHandle       _surface_handle;

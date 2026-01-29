@@ -49,9 +49,11 @@ namespace pbrlib
 
 	public:
 		bool isClose() const noexcept;
+		bool isResized() const noexcept;
 
 	private:
-		bool _is_close = false;
+		bool _is_close 		= false;
+		bool _is_resized 	= false;
 	};
 }
 

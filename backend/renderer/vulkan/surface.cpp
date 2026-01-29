@@ -302,7 +302,7 @@ namespace pbrlib::backend::vk
         }
     }
 
-    NextImageInfo Surface::nextImage()
+    std::optional<NextImageInfo> Surface::nextImage()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -321,13 +321,19 @@ namespace pbrlib::backend::vk
             );
         }
 
-        VK_CHECK(vkAcquireNextImageKHR(
+        const auto result = vkAcquireNextImageKHR(
             _device.device(),
             _swapchain_handle,
             std::numeric_limits<uint64_t>::max(),
             VK_NULL_HANDLE, _next_image_fence_handle,
             &_current_image_index
-        ));
+        );
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) [[unlikely]]
+            return std::nullopt;
+
+        if (result != VK_SUCCESS) [[unlikely]]
+            throw exception::RuntimeError("[vk-surface] failed get next image");
 
         VK_CHECK(vkWaitForFences(
             _device.device(),
