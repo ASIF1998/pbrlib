@@ -6,6 +6,9 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 #include <SDL3/SDL_vulkan.h>
 
 #include <ranges>
@@ -109,22 +112,20 @@ namespace pbrlib::backend::vk
 namespace pbrlib::backend::vk
 {
     Surface::Surface(Device& device, const pbrlib::Window* ptr_window) :
-        _device (device)
+        _ptr_window (ptr_window),
+        _device     (device)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         if (!ptr_window) [[unlikely]]
             throw exception::InvalidArgument("[vk-surface] pointer to window is null");
 
-        createSurface(ptr_window);
+       create();
 
-        _surface_format = getFormat(getSurfaceFormats());
-
-        createSwapchain(ptr_window);
-
-        const auto [width, height] = ptr_window->size();
-        getImages(width, height);
-        createImageViews(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+        EventSystem::on([this] ([[maybe_unused]] const events::ResizeWindow& event)
+        {
+            create();
+        });
     }
 
     Surface::Surface(Surface&& surface) :
@@ -149,6 +150,19 @@ namespace pbrlib::backend::vk
         _surface_format = surface._surface_format;
 
         return *this;
+    }
+
+    void Surface::create()
+    {
+        createSurface(_ptr_window);
+
+        _surface_format = getFormat(getSurfaceFormats());
+
+        createSwapchain(_ptr_window);
+
+        const auto [width, height] = _ptr_window->size();
+        getImages(width, height);
+        createImageViews(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
     }
 
     void Surface::createSurface(const pbrlib::Window* ptr_window)
@@ -250,6 +264,7 @@ namespace pbrlib::backend::vk
             &count, handles.data()
         ));
 
+        _images.clear();
         for (auto handle: handles)
         {
             vk::Image image (_device);

@@ -25,7 +25,7 @@ namespace pbrlib::backend::vk
 {
     Device::~Device()
     {
-        if (_device_handle != VK_NULL_HANDLE)
+        if (_device_handle != VK_NULL_HANDLE) [[likely]]
             vkDeviceWaitIdle(_device_handle);
     }
 

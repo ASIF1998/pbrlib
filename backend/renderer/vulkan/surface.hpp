@@ -36,6 +36,8 @@ namespace pbrlib::backend::vk
         void getImages(uint32_t width, uint32_t height);
         void createImageViews(uint32_t width, uint32_t height);
 
+        void create();
+
     public:
         explicit Surface(Device& device, const pbrlib::Window* ptr_window);
 
@@ -48,6 +50,8 @@ namespace pbrlib::backend::vk
         [[nodiscard]] std::optional<NextImageInfo> nextImage();
 
     private:
+        const pbrlib::Window* _ptr_window = nullptr;
+
         SurfaceHandle       _surface_handle;
         SwapchainHandle     _swapchain_handle;
 
