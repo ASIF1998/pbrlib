@@ -40,6 +40,33 @@ namespace pbrlib::backend
         _render_context.ptr_mesh_manager        = &mesh_manager;
 
         build();
+
+        _render_context.resizeImage = [this] (std::string_view name, uint32_t width, uint32_t height)
+        {
+            if (!width || !height) [[unlikely]]
+                throw exception::InvalidArgument(std::format("[frame-graph] new size for {} is invalid: {}x{}", name, width, height));
+
+            if (auto it = _images.find(name); it != std::end(_images)) [[likely]]
+            {
+                const auto format = it->second.format;
+                const auto usage = it->second.usage;
+
+                _images.extract(it);
+
+                auto image = _images.emplace(
+                    name,
+                    vk::builders::Image(_device)
+                        .size(width, height)
+                        .format(format)
+                        .usage(usage)
+                        .addQueueFamilyIndex(_device.queue().family_index)
+                        .name(name)
+                        .build()
+                );
+            }
+
+            throw exception::InvalidArgument(std::format("[frame-graph] failed find image '{}'", name));
+        };
     }
 }
 

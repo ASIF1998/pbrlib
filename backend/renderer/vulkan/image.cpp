@@ -306,6 +306,7 @@ namespace pbrlib::backend::vk::builders
         image.width     = _width;
         image.height    = _height;
         image.format    = _format;
+        image.usage     = _usage;
 
         const VkImageCreateInfo image_info
         {

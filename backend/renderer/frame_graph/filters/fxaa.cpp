@@ -53,6 +53,15 @@ namespace pbrlib::backend
             _config.reduce_mul  = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, reduce_mul);
         });
 
+        EventSystem::on([this, &context] (const events::ResizeWindow& event)
+        {
+            const auto metadata = AttachmentsTraits<FXAA>::metadata(); 
+            for (const auto& meta: metadata)
+                context.resizeImage(meta.name, event.width, event.height);
+
+            /// @todo resize from src and dst images
+        });
+
         const auto [_, io_set_layout_handle] = IODescriptorSet();
 
         constexpr VkPushConstantRange push_constant_range =

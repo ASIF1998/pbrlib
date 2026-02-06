@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include <optional>
+#include <functional>
 
 namespace pbrlib
 {
@@ -58,6 +59,8 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
+    using ResizeImageCallback = std::function<void (std::string_view name, uint32_t width, uint32_t height)>;
+
     struct RenderContext final
     {
         std::span<const SceneItem*> items;
@@ -67,6 +70,8 @@ namespace pbrlib::backend
 
         const MaterialManager*  ptr_material_manager    = nullptr;
         const MeshManager*      ptr_mesh_manager        = nullptr;
+
+        ResizeImageCallback resizeImage;
     };
 
     class RenderPass

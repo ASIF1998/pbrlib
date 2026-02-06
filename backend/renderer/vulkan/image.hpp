@@ -76,6 +76,8 @@ namespace pbrlib::backend::vk
         uint16_t    layer_count = 1;
 
         VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        
+        VkImageUsageFlags usage = VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM;
 
     private:
         Device& _device;

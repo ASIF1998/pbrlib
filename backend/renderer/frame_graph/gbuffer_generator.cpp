@@ -107,7 +107,16 @@ namespace pbrlib::backend
             createPipeline();
         });
 
-        const auto ptr_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        EventSystem::on([this, &context] (const events::ResizeWindow& event)
+        {
+            const auto metadata = AttachmentsTraits<GBufferGenerator>::metadata(); 
+            for (const auto& meta: metadata)
+                context.resizeImage(meta.name, event.width, event.height);
+
+            createRenderPass();
+            createFramebuffer();
+            initResultDescriptorSet();
+        });
 
         createRenderPass();
 

@@ -77,6 +77,16 @@ namespace pbrlib::backend
             createPipeline(event.width, event.height);
         });
 
+        EventSystem::on([this, &context] (const events::ResizeWindow& event)
+        {
+            const auto metadata = AttachmentsTraits<SSAO>::metadata(); 
+            for (const auto& meta: metadata)
+                context.resizeImage(meta.name, event.width, event.height);
+
+            bindResultDescriptorSet();
+            createSSAODescriptorSet();
+        });
+
         createSamplesBuffer();
         createParamsBuffer();
 
