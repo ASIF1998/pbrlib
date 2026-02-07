@@ -21,7 +21,17 @@ namespace pbrlib
 {
     Window::Window(void* ptr_window) noexcept :
         _ptr_window(ptr_window)
-    { }
+    {
+        EventSystem::on([this] (const backend::events::ResizeWindow& event)
+        {
+            const auto window_handle = utils::cast(_ptr_window);
+
+            const auto width    = static_cast<int32_t>(event.width);
+            const auto height   = static_cast<int32_t>(event.height);
+
+            SDL_SetWindowSize(window_handle, width, height);
+        });
+    }
 
     Window::Window(Window&& window)
     {

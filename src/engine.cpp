@@ -89,7 +89,10 @@ namespace pbrlib
 
     void Engine::resize(uint32_t width, uint32_t height)
     {
-        /// @todo impl
+        EventSystem::emmit(backend::events::ResizeWindow {
+            .width  = backend::utils::alignSize(static_cast<uint32_t>(width), 32u),
+            .height = backend::utils::alignSize(static_cast<uint32_t>(height), 32u)
+        });
     }
 
     void Engine::setup(SetupCallback callback)
@@ -128,9 +131,9 @@ namespace pbrlib
                 {
                     const auto [width, height] = _window->size();
 
-                    EventSystem::emmit(backend::events::ResizeWindow  {
-                        .width  = static_cast<uint32_t>(width),
-                        .height = static_cast<uint32_t>(height)
+                    EventSystem::emmit(backend::events::ResizeWindow {
+                        .width  = backend::utils::alignSize(static_cast<uint32_t>(width), 32u),
+                        .height = backend::utils::alignSize(static_cast<uint32_t>(height), 32u)
                     });
                 }
             }
@@ -155,7 +158,6 @@ namespace pbrlib
             _ptr_mesh_manager->update();
 
             draw();
-
         } while (!is_close);
     }
 

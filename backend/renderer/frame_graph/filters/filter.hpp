@@ -17,7 +17,7 @@ namespace pbrlib::backend
         public RenderPass
     {
     public:
-        explicit Filter(std::string_view filter_name, vk::Device& device, vk::Image& dst_image) noexcept;
+        explicit Filter(std::string_view name, vk::Device& device, vk::Image& dst_image) noexcept;
 
         void apply(vk::Image& image);
 

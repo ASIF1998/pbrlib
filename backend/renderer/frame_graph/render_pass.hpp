@@ -59,8 +59,6 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    using ResizeImageCallback = std::function<void (std::string_view name, uint32_t width, uint32_t height)>;
-
     struct RenderContext final
     {
         std::span<const SceneItem*> items;
@@ -70,12 +68,28 @@ namespace pbrlib::backend
 
         const MaterialManager*  ptr_material_manager    = nullptr;
         const MeshManager*      ptr_mesh_manager        = nullptr;
-
-        ResizeImageCallback resizeImage;
     };
 
     class RenderPass
     {
+        using SyncData = std::tuple <
+            vk::Image*,
+            VkImageLayout,
+            VkPipelineStageFlags2,
+            VkPipelineStageFlags2
+        >;
+
+        using ColorOutputImages = std::map <
+            std::string, 
+            vk::Image*, 
+            std::less<void>
+        >;
+
+        using InputDescriptorSets = std::unordered_map <
+            uint32_t, 
+            std::pair<VkDescriptorSet, VkDescriptorSetLayout>
+        >;
+
         void sync(vk::CommandBuffer& command_buffer);
 
     public:
@@ -127,14 +141,7 @@ namespace pbrlib::backend
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
 
     private:
-        using SyncData = std::tuple <
-            vk::Image*,
-            VkImageLayout,
-            VkPipelineStageFlags2,
-            VkPipelineStageFlags2
-        >;
-
-        std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
+        ColorOutputImages _color_output_images;
 
         std::vector<SyncData> _sync_images;
 
@@ -146,6 +153,6 @@ namespace pbrlib::backend
         uint32_t _width     = 0;
         uint32_t _height    = 0;
 
-        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
+        InputDescriptorSets _input_descriptor_sets;
     };
 }

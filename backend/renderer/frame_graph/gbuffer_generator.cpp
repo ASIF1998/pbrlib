@@ -107,17 +107,6 @@ namespace pbrlib::backend
             createPipeline();
         });
 
-        EventSystem::on([this, &context] (const events::ResizeWindow& event)
-        {
-            const auto metadata = AttachmentsTraits<GBufferGenerator>::metadata(); 
-            for (const auto& meta: metadata)
-                context.resizeImage(meta.name, event.width, event.height);
-
-            createRenderPass();
-            createFramebuffer();
-            initResultDescriptorSet();
-        });
-
         createRenderPass();
 
         constexpr VkPushConstantRange push_constant_range =

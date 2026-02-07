@@ -10,9 +10,9 @@
 
 namespace pbrlib::backend
 {
-    Filter::Filter(std::string_view filter_name, vk::Device& device, vk::Image& dst_image) noexcept :
+    Filter::Filter(std::string_view name, vk::Device& device, vk::Image& dst_image) noexcept :
         RenderPass      (device),
-        _name           (filter_name),
+        _name           (name),
         _ptr_dst_image  (&dst_image)
     {
         _io_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)

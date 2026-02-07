@@ -154,6 +154,12 @@ namespace pbrlib::backend::vk
 
     void Surface::create()
     {
+        _images.clear();
+        _swapchain_handle   = SwapchainHandle();
+        _surface_handle     = SurfaceHandle();
+
+        _current_image_index = 0;
+
         createSurface(_ptr_window);
 
         _surface_format = getFormat(getSurfaceFormats());
@@ -264,7 +270,6 @@ namespace pbrlib::backend::vk
             &count, handles.data()
         ));
 
-        _images.clear();
         for (auto handle: handles)
         {
             vk::Image image (_device);
