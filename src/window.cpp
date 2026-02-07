@@ -30,6 +30,8 @@ namespace pbrlib
             const auto height   = static_cast<int32_t>(event.height);
 
             SDL_SetWindowSize(window_handle, width, height);
+
+            EventSystem::emmit(backend::events::WindowSizeChanged());
         });
     }
 

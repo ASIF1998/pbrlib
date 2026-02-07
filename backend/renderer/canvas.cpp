@@ -9,12 +9,21 @@
 
 #include <pbrlib/exceptions.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 namespace pbrlib::backend
 {
     Canvas::Canvas(vk::Device& device, const pbrlib::Window* ptr_window) :
         _device(device)
     {
         _surface.vk_surface.emplace(_device, ptr_window);
+
+        EventSystem::on([this, ptr_window] ([[maybe_unused]] const events::WindowSizeChanged& event)
+        {
+            vkDeviceWaitIdle(_device.device());
+            _surface.vk_surface.emplace(_device, ptr_window);
+        });
     }
 
     Canvas::Canvas(vk::Device& device, uint32_t width, uint32_t height) :
