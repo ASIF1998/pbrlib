@@ -9,12 +9,26 @@
 
 #include <pbrlib/exceptions.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 namespace pbrlib::backend
 {
     Canvas::Canvas(vk::Device& device, const pbrlib::Window* ptr_window) :
         _device(device)
     {
-        _surface.vk_surface.emplace(_device, ptr_window);
+        if (!ptr_window) [[unlikely]]
+            throw exception::InvalidArgument("[canvas] ptr_window is null");
+
+        _surface.vk_surface.emplace(_device, *ptr_window);
+
+        EventSystem::on([this, ptr_window] ([[maybe_unused]] const events::WindowSizeChanged& event)
+        {
+            /// @todo add _image processing
+
+            vkDeviceWaitIdle(_device.device());
+            _surface.vk_surface.emplace(_device, *ptr_window);
+        });
     }
 
     Canvas::Canvas(vk::Device& device, uint32_t width, uint32_t height) :
@@ -36,25 +50,28 @@ namespace pbrlib::backend
             .build();
     }
 
-    void Canvas::nextImage()
+    bool Canvas::nextImage()
     {
         if (_surface.vk_surface) [[likely]]
         {
-            auto [ptr_image, index] = _surface.vk_surface->nextImage();
+            if (const auto next_image = _surface.vk_surface->nextImage()) [[likely]]
+            {
+                _surface.index      = next_image->index;
+                _surface.ptr_image  = next_image->ptr_image;
 
-            _surface.index      = index;
-            _surface.ptr_image  = ptr_image;
+                return true;
+            }
         }
+
+        return false;
     }
 
     void Canvas::present(const vk::Image* ptr_result)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!_surface.vk_surface) [[unlikely]]
+        if (!nextImage()) [[unlikely]]
             return ;
-
-        nextImage();
 
         _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
@@ -113,7 +130,12 @@ namespace pbrlib::backend
             .pResults       = &result
         };
 
-        VK_CHECK(vkQueuePresentKHR(_device.queue().handle, &present_info));
+        const auto present_result = vkQueuePresentKHR(_device.queue().handle, &present_info);
+
+        if (present_result == VK_ERROR_OUT_OF_DATE_KHR) [[unlikely]]
+            return ;
+
+        VK_CHECK(present_result);
     }
 
     Size Canvas::size() const

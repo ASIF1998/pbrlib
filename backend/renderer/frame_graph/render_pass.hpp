@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include <optional>
+#include <functional>
 
 namespace pbrlib
 {
@@ -71,6 +72,24 @@ namespace pbrlib::backend
 
     class RenderPass
     {
+        using SyncData = std::tuple <
+            vk::Image*,
+            VkImageLayout,
+            VkPipelineStageFlags2,
+            VkPipelineStageFlags2
+        >;
+
+        using ColorOutputImages = std::map <
+            std::string, 
+            vk::Image*, 
+            std::less<void>
+        >;
+
+        using InputDescriptorSets = std::unordered_map <
+            uint32_t, 
+            std::pair<VkDescriptorSet, VkDescriptorSetLayout>
+        >;
+
         void sync(vk::CommandBuffer& command_buffer);
 
     public:
@@ -122,14 +141,7 @@ namespace pbrlib::backend
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
 
     private:
-        using SyncData = std::tuple <
-            vk::Image*,
-            VkImageLayout,
-            VkPipelineStageFlags2,
-            VkPipelineStageFlags2
-        >;
-
-        std::map<std::string, vk::Image*, std::less<void>>  _color_output_images;
+        ColorOutputImages _color_output_images;
 
         std::vector<SyncData> _sync_images;
 
@@ -141,6 +153,6 @@ namespace pbrlib::backend
         uint32_t _width     = 0;
         uint32_t _height    = 0;
 
-        std::map<uint32_t, std::pair<VkDescriptorSet, VkDescriptorSetLayout>> _input_descriptor_sets;
+        InputDescriptorSets _input_descriptor_sets;
     };
 }

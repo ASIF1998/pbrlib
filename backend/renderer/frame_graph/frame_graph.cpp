@@ -23,6 +23,9 @@
 
 #include <pbrlib/exceptions.hpp>
 
+#include <pbrlib/event_system.hpp>
+#include <backend/events.hpp>
+
 namespace pbrlib::backend
 {
     FrameGraph::FrameGraph (
@@ -39,7 +42,18 @@ namespace pbrlib::backend
         _render_context.ptr_material_manager    = &material_manager;
         _render_context.ptr_mesh_manager        = &mesh_manager;
 
-        build();
+        const auto [width, height] = _canvas.size();
+        build(width, height);
+
+        EventSystem::on([this] (const events::ResizeWindow& event)
+        {
+            vkDeviceWaitIdle(_device.device());
+
+            _render_passes_images.clear();
+            _ptr_render_pass.reset();
+
+            build(event.width, event.height);
+        });
     }
 }
 
@@ -49,7 +63,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!_ptr_render_pass)
+        if (!_ptr_render_pass) [[unlikely]]
         {
             log::error("[frame-graph] failed draw scene because render pass is empty");
             return ;
@@ -64,9 +78,10 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
-        auto ptr_result = &_images.at(AttachmentsTraits<FXAA>::result);
+        auto ptr_result = &_render_passes_images.at(AttachmentsTraits<FXAA>::result);
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
         _canvas.present(ptr_result);
     }
 }
@@ -75,9 +90,9 @@ namespace pbrlib::backend
 {
     std::unique_ptr<RenderPass> FrameGraph::buildGBufferGeneratorSubpass()
     {
-        auto ptr_pos_uv_image           = &_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
-        auto ptr_nor_tan_image          = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
-        auto ptr_mat_index_image        = &_images.at(AttachmentsTraits<GBufferGenerator>::material_index);
+        auto ptr_pos_uv_image           = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        auto ptr_nor_tan_image          = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        auto ptr_mat_index_image        = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::material_index);
         auto ptr_depth_stencil_image    = &_depth_buffer.value();
 
         return builders::GBufferGenerator(_device)
@@ -100,8 +115,8 @@ namespace pbrlib::backend
         const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
 
         return builders::SSAO(_device)
-            .ssaoImage(_images.at(AttachmentsTraits<SSAO>::ssao))
-            .blurImage(_images.at(AttachmentsTraits<SSAO>::blur))
+            .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
+            .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
             .settings(_config.ssao)
             .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
             .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
@@ -117,7 +132,7 @@ namespace pbrlib::backend
 
         if (aa == settings::AA::eFXAA)
         {
-            auto& result = _images.at(AttachmentsTraits<FXAA>::result);
+            auto& result = _render_passes_images.at(AttachmentsTraits<FXAA>::result);
 
             auto ptr_fxaa = std::make_unique<FXAA>(_device, result);
             ptr_fxaa->apply(image);
@@ -126,18 +141,18 @@ namespace pbrlib::backend
         }
     }
 
-    void FrameGraph::build()
+    void FrameGraph::build(uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        createResources();
+        createResources(width, height);
 
         auto ptr_render_pass = std::make_unique<CompoundRenderPass>(_device);
 
         auto ptr_gbuffer_generator = buildGBufferGeneratorSubpass();
 
-        auto ptr_pos_uv         = &_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
-        auto ptr_normal_tangent = &_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        auto ptr_pos_uv         = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        auto ptr_normal_tangent = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
         auto ptr_ssao = buildSSAOSubpass (
             ptr_pos_uv,
@@ -149,10 +164,11 @@ namespace pbrlib::backend
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
 
-        setupAA(*ptr_render_pass, _images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
+        setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
-        if (const auto [width, height] = _canvas.size(); !_ptr_render_pass->init(_render_context, width, height))
+        
+        if (!_ptr_render_pass->init(_render_context, width, height)) [[unlikely]]
             throw exception::InitializeError("[frame-graph] failed initialize render passes");
     }
 
@@ -174,11 +190,9 @@ namespace pbrlib::backend
         }
     }
 
-    void FrameGraph::createResources()
+    void FrameGraph::createResources(uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
-
-        const auto [width, height] = _canvas.size();
 
         _depth_buffer = vk::builders::Image(_device)
             .size(width, height)
@@ -188,9 +202,9 @@ namespace pbrlib::backend
             .name("depth-buffer")
             .build();
 
-        createRenderPassImages<GBufferGenerator>(_device, _images, width, height);
-        createRenderPassImages<SSAO>(_device, _images, width, height);
-        createRenderPassImages<FXAA>(_device, _images, width, height);
+        createRenderPassImages<GBufferGenerator>(_device, _render_passes_images, width, height);
+        createRenderPassImages<SSAO>(_device, _render_passes_images, width, height);
+        createRenderPassImages<FXAA>(_device, _render_passes_images, width, height);
     }
 }
 
@@ -210,7 +224,7 @@ namespace pbrlib::backend
 {
     void FrameGraph::clearImages(vk::CommandBuffer& command_buffer)
     {
-        for (auto& [_, image]: _images)
+        for (auto& [_, image]: _render_passes_images)
             image.changeLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
@@ -224,7 +238,7 @@ namespace pbrlib::backend
                 .layerCount = 1
             };
 
-            for (auto& [_, image]: _images)
+            for (auto& [_, image]: _render_passes_images)
             {
                 vkCmdClearColorImage(
                     command_buffer_handle,

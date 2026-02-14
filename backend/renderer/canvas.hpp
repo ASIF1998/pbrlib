@@ -20,7 +20,7 @@ namespace pbrlib::backend
 
     class Canvas final
     {
-        void nextImage();
+        [[nodiscard]] bool nextImage();
 
     public:
         explicit Canvas(vk::Device& device, const pbrlib::Window* ptr_window);

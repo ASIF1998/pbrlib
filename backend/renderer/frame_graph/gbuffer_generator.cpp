@@ -28,7 +28,7 @@
 
 namespace pbrlib::backend
 {
-    struct GBufferDescriptorSetBindings
+    struct GBufferDescriptorSetBindings final
     {
         enum :
             uint8_t
@@ -106,8 +106,6 @@ namespace pbrlib::backend
         {
             createPipeline();
         });
-
-        const auto ptr_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
 
         createRenderPass();
 

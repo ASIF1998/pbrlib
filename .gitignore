@@ -3,3 +3,4 @@ PBRLib.xcodeproj/
 gtest/
 *build*/
 info.hpp
+CMakePresets.json

@@ -9,6 +9,7 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/scene/material_manager.hpp>
 #include <backend/scene/mesh_manager.hpp>
+#include <backend/shaders/gpu_cpu_constants.h>
 
 #include <backend/renderer/canvas.hpp>
 
@@ -63,7 +64,7 @@ namespace pbrlib
             _window = Window::Builder()
                 .title(config.title)
                 .size(width, height)
-                .resizable(false)
+                .resizable(config.resible)
                 .build();
 
             _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, &_window.value());
@@ -89,7 +90,16 @@ namespace pbrlib
 
     void Engine::resize(uint32_t width, uint32_t height)
     {
-        /// @todo impl
+        const auto new_width    = backend::utils::alignSize(width, static_cast<uint32_t>(PBRLIB_WORK_GROUP_SIZE));
+        const auto new_height   = backend::utils::alignSize(height, static_cast<uint32_t>(PBRLIB_WORK_GROUP_SIZE)); 
+
+        _camera.width(new_width);
+        _camera.height(new_height);
+
+        EventSystem::emmit(backend::events::ResizeWindow {
+            .width  = new_width,
+            .height = new_height
+        });
     }
 
     void Engine::setup(SetupCallback callback)
@@ -121,7 +131,19 @@ namespace pbrlib
             updateInputState(input_stay);
 
             if (_window) [[likely]]
+            {
                 is_close = input_stay.window.isClose();
+
+                if (input_stay.window.isResized()) [[unlikely]]
+                {
+                    const auto [width, height] = _window->size();
+                    resize(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+
+                    /// @todo
+                    continue;
+                }
+            }
+
 
 #ifdef PBRLIB_ENABLE_DEVELOPER_MODE
             if (input_stay.keyboard.isDown(pbrlib::Keycode::eF5)) [[unlikely]]
@@ -142,7 +164,6 @@ namespace pbrlib
             _ptr_mesh_manager->update();
 
             draw();
-
         } while (!is_close);
     }
 
