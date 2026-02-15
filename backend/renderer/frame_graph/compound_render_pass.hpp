@@ -26,7 +26,7 @@ namespace pbrlib::backend
         explicit CompoundRenderPass(vk::Device& device) noexcept;
 
         template<IsRenderPass T>
-        void add(std::unique_ptr<T>&& ptr_subpass)
+        void add(std::unique_ptr<T> ptr_subpass)
         {
             _subpasses.push_back(std::move(ptr_subpass));
         }
