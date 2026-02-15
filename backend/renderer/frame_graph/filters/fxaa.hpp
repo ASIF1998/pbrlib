@@ -37,7 +37,7 @@ namespace pbrlib::backend
     class FXAA final :
         public Filter
     {
-        struct Config final
+        struct Settings final
         {
             float span_max      = 8.0;
             float reduce_min    = 1.0 / 128.0;
@@ -62,6 +62,6 @@ namespace pbrlib::backend
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
 
-        Config _config;
+        Settings _settings;
     };
 }
