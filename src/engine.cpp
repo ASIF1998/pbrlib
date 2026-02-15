@@ -135,9 +135,6 @@ namespace pbrlib
                 {
                     const auto [width, height] = _window->size();
                     resize(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-
-                    /// @todo
-                    continue;
                 }
             }
 

@@ -47,7 +47,7 @@ namespace pbrlib::backend
             .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             .build();
 
-        EventSystem::on([this] ([[maybe_unused]] const events::ResizeWindow& event)
+        EventSystem::on([this] (const events::ResizeWindow& event)
         {
             vkDeviceWaitIdle(_device.device());
 
