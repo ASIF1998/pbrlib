@@ -72,8 +72,9 @@ int main()
     {
         pbrlib::Config config;
         config.title    = "test-console";
-        config.width    = 2000;
-        config.height   = 1100;
+        config.width    = 800;
+        config.height   = 600;
+        config.resible  = true;
 
         config.ssao =
         {

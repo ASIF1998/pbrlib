@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <numeric>
+#include <optional>
 
 namespace pbrlib
 {
@@ -30,23 +31,23 @@ namespace pbrlib::backend::vk
         [[nodiscard]]
         std::vector<VkSurfaceFormatKHR> getSurfaceFormats();
 
-        void createSurface(const pbrlib::Window* ptr_window);
-        void createSwapchain(const pbrlib::Window* ptr_window);
+        void createSurface();
+        void createSwapchain();
         void getImages(uint32_t width, uint32_t height);
         void createImageViews(uint32_t width, uint32_t height);
 
+        void create();
+
     public:
-        explicit Surface(Device& device, const pbrlib::Window* ptr_window);
+        explicit Surface(Device& device, const pbrlib::Window& window);
 
         Surface(Surface&& surface);
-        Surface(const Surface& surface) = delete;
 
-        Surface& operator = (Surface&& surface);
-        Surface& operator = (const Surface& surface) = delete;
-
-        [[nodiscard]] NextImageInfo nextImage();
+        [[nodiscard]] std::optional<NextImageInfo> nextImage();
 
     private:
+        const pbrlib::Window& _window;
+
         SurfaceHandle       _surface_handle;
         SwapchainHandle     _swapchain_handle;
 

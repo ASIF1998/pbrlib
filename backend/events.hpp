@@ -57,4 +57,10 @@ namespace pbrlib::backend::events
         uint32_t width  = 0;
         uint32_t height = 0;
     };
+
+    struct ResizeWindow final
+    {
+        uint32_t width  = 0;
+        uint32_t height = 0;
+    };
 }

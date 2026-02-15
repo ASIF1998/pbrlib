@@ -20,7 +20,7 @@ namespace pbrlib::utils
 namespace pbrlib
 {
     Window::Window(void* ptr_window) noexcept :
-        _ptr_window(ptr_window)
+        _ptr_window (ptr_window)
     { }
 
     Window::Window(Window&& window)

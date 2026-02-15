@@ -48,9 +48,9 @@ namespace pbrlib::backend
             const auto reduce_min   = std::clamp(config.reduce_min, 0.0f, 1.0f);
             const auto reduce_mul   = std::clamp(config.reduce_mul, 0.0f, 1.0f);
 
-            _config.span_max    = math::lerp(4.0f, 16.0f, span_max);
-            _config.reduce_min  = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, reduce_min);
-            _config.reduce_mul  = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, reduce_mul);
+            _settings.span_max      = math::lerp(4.0f, 16.0f, span_max);
+            _settings.reduce_min    = math::lerp(1.0f / 256.0f, 1.0f / 64.0f, reduce_min);
+            _settings.reduce_mul    = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, reduce_mul);
         });
 
         const auto [_, io_set_layout_handle] = IODescriptorSet();
@@ -103,7 +103,7 @@ namespace pbrlib::backend
                 command_buffer_handle,
                 _pipeline_layout_handle,
                 VK_SHADER_STAGE_COMPUTE_BIT,
-                0, static_cast<uint32_t>(sizeof(Config)), &_config
+                0, static_cast<uint32_t>(sizeof(Settings)), &_settings
             );
 
             dispatchCompute(command_buffer_handle);

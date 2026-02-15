@@ -33,9 +33,15 @@ namespace pbrlib::backend
     {
         friend class testing::FrameGraphResourcesGetter;
 
-        void createResources();
+        using RenderPassesImages = std::map <
+            std::string, 
+            vk::Image, 
+            std::less<void>
+        >;
 
-        void build();
+        void createResources(uint32_t width, uint32_t height);
+
+        void build(uint32_t width, uint32_t height);
 
         std::unique_ptr<RenderPass> buildGBufferGeneratorSubpass();
 
@@ -77,9 +83,8 @@ namespace pbrlib::backend
 
         std::unique_ptr<RenderPass> _ptr_render_pass;
 
-        std::map<std::string, vk::Image, std::less<void>> _images;
-
-        std::optional<vk::Image> _depth_buffer;
+        RenderPassesImages          _render_passes_images;
+        std::optional<vk::Image>    _depth_buffer;
 
         RenderContext _render_context;
     };

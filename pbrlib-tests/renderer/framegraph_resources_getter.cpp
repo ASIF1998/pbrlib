@@ -17,7 +17,7 @@ namespace pbrlib::testing
 
     backend::vk::Image* FrameGraphResourcesGetter::image(std::string_view name)
     {
-        return &_ptr_frame_graph->_images.at(name.data());
+        return &_ptr_frame_graph->_render_passes_images.at(name.data());
     }
 
     const backend::MaterialManager* FrameGraphResourcesGetter::materialManager() const

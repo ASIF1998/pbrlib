@@ -9,122 +9,124 @@
 
 namespace pbrlib
 {
-	using EventHandle = const void*;
+    using EventHandle = const void*;
 }
 
 namespace pbrlib
 {
-	class KeyboardStay final
-	{
-		friend struct InputStay;
+    class KeyboardStay final
+    {
+        friend struct InputStay;
 
-		enum class KeyStay :
+        enum class KeyStay :
             uint8_t
-		{
-			eDown,
-			eUp,
-			eNone
-		};
+        {
+            eDown,
+            eUp,
+            eNone
+        };
 
-		void add(EventHandle event_handle);
-		void reset();
+        void add(EventHandle event_handle);
+        void reset();
 
-	public:
-		bool isDown(Keycode key_code) 	const noexcept;
-		bool isUp(Keycode key_code) 	const noexcept;
+    public:
+        bool isDown(Keycode key_code) 	const noexcept;
+        bool isUp(Keycode key_code) 	const noexcept;
 
-	private:
-		std::array<KeyStay, backend::utils::enumCast(Keycode::eCount)> _pressed_map;
-	};
+    private:
+        std::array<KeyStay, backend::utils::enumCast(Keycode::eCount)> _pressed_map;
+    };
 }
 
 namespace pbrlib
 {
-	class WindowStay final
-	{
-		friend struct InputStay;
+    class WindowStay final
+    {
+        friend struct InputStay;
 
-		void add(EventHandle event_handle);
-		void reset() noexcept;
+        void add(EventHandle event_handle);
+        void reset() noexcept;
 
-	public:
-		bool isClose() const noexcept;
+    public:
+        bool isClose() const noexcept;
+        bool isResized() const noexcept;
 
-	private:
-		bool _is_close = false;
-	};
+    private:
+        bool _is_close      = false;
+        bool _is_resized    = false;
+    };
 }
 
 namespace pbrlib
 {
-	enum class MouseButton :
-	    uint8_t
-	{
-		eLeft,
-		eMiddle,
-		eRight
-	};
+    enum class MouseButton :
+        uint8_t
+    {
+        eLeft,
+        eMiddle,
+        eRight
+    };
 
-	class MouseButtonsStay final
-	{
-		friend struct InputStay;
+    class MouseButtonsStay final
+    {
+        friend struct InputStay;
 
-		void add(EventHandle event_handle);
+        void add(EventHandle event_handle);
 
-		enum class ButtonStay :
-		    uint8_t
-		{
-			eDown,
-			eUp,
-			eNone
-		};
+        enum class ButtonStay :
+            uint8_t
+        {
+            eDown,
+            eUp,
+            eNone
+        };
 
-	public:
-		bool isDown(MouseButton button) const noexcept;
-		bool isUp(MouseButton button)	const noexcept;
+    public:
+        bool isDown(MouseButton button) const noexcept;
+        bool isUp(MouseButton button)   const noexcept;
 
-	private:
-		std::array<ButtonStay, 3> _pressed_map;
-	};
+    private:
+        std::array<ButtonStay, 3> _pressed_map;
+    };
 }
 
 namespace pbrlib
 {
-	class MouseMotionStay final
-	{
-		friend struct InputStay;
+    class MouseMotionStay final
+    {
+        friend struct InputStay;
 
-		void update(EventHandle event_handle);
-		void reset() noexcept;
+        void update(EventHandle event_handle);
+        void reset() noexcept;
 
-	public:
-		math::vec2 currentCoord()   const noexcept;
-		math::vec2 relativeMotion() const noexcept;
+    public:
+        math::vec2 currentCoord()   const noexcept;
+        math::vec2 relativeMotion() const noexcept;
 
-		bool isMotion() const noexcept;
+        bool isMotion() const noexcept;
 
-	private:
-		math::vec2 _current_coord;
-		math::vec2 _relative_motion;
+    private:
+        math::vec2 _current_coord;
+        math::vec2 _relative_motion;
 
-		bool _is_motion = false;
-	};
+        bool _is_motion = false;
+    };
 }
 
 namespace pbrlib
 {
-	struct InputStay final
-	{
-	private:
-		friend class Engine;
+    struct InputStay final
+    {
+    private:
+        friend class Engine;
 
-		void add(EventHandle event_handle);
-		void reset();
+        void add(EventHandle event_handle);
+        void reset();
 
-	public:
-		KeyboardStay 		keyboard;
-		WindowStay			window;
-		MouseButtonsStay	mouse_buttons;
-		MouseMotionStay		mouse_motion;
-	};
+    public:
+        KeyboardStay        keyboard;
+        WindowStay          window;
+        MouseButtonsStay    mouse_buttons;
+        MouseMotionStay     mouse_motion;
+    };
 }

@@ -34,22 +34,26 @@ namespace pbrlib::backend::vk
 
     void ResourceDestroyer::destroy(VkInstance instance_handle) noexcept
     {
-        vkDestroyInstance(instance_handle, nullptr);
+        if (instance_handle != VK_NULL_HANDLE)
+            vkDestroyInstance(instance_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkDevice device_handle) noexcept
     {
-        vkDestroyDevice(device_handle, nullptr);
+        if (device_handle != VK_NULL_HANDLE)
+            vkDestroyDevice(device_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkShaderModule shader_module_handle) noexcept
     {
-        vkDestroyShaderModule(_device_handle, shader_module_handle, nullptr);
+        if (shader_module_handle != VK_NULL_HANDLE)
+            vkDestroyShaderModule(_device_handle, shader_module_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkDescriptorSetLayout descriptor_set_layout_handle) noexcept
     {
-        vkDestroyDescriptorSetLayout(_device_handle, descriptor_set_layout_handle, nullptr);
+        if (descriptor_set_layout_handle != VK_NULL_HANDLE)
+            vkDestroyDescriptorSetLayout(_device_handle, descriptor_set_layout_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkDescriptorPool descriptor_pool_handle) noexcept
@@ -75,42 +79,50 @@ namespace pbrlib::backend::vk
 
     void ResourceDestroyer::destroy(VkPipelineLayout pipeline_layout_handle) noexcept
     {
-        vkDestroyPipelineLayout(_device_handle, pipeline_layout_handle, nullptr);
+        if (pipeline_layout_handle != VK_NULL_HANDLE)
+            vkDestroyPipelineLayout(_device_handle, pipeline_layout_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkPipeline pipeline_handle) noexcept
     {
-        vkDestroyPipeline(_device_handle, pipeline_handle, nullptr);
+        if (pipeline_handle != VK_NULL_HANDLE)
+            vkDestroyPipeline(_device_handle, pipeline_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkSampler sampler_handle) noexcept
     {
-        vkDestroySampler(_device_handle, sampler_handle, nullptr);
+        if (sampler_handle != VK_NULL_HANDLE)
+            vkDestroySampler(_device_handle, sampler_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VmaAllocator allocator_handle) noexcept
     {
-        vmaDestroyAllocator(allocator_handle);
+        if (allocator_handle != VK_NULL_HANDLE)
+            vmaDestroyAllocator(allocator_handle);
     }
 
     void ResourceDestroyer::destroy(VkRenderPass render_pass_handle) noexcept
     {
-        vkDestroyRenderPass(_device_handle, render_pass_handle, nullptr);
+        if (render_pass_handle != VK_NULL_HANDLE)
+            vkDestroyRenderPass(_device_handle, render_pass_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkFramebuffer framebuffer_handle) noexcept
     {
-        vkDestroyFramebuffer(_device_handle, framebuffer_handle, nullptr);
+        if (framebuffer_handle != VK_NULL_HANDLE)
+            vkDestroyFramebuffer(_device_handle, framebuffer_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkCommandPool command_pool_handle) noexcept
     {
-        vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
+        if (command_pool_handle != VK_NULL_HANDLE)
+            vkDestroyCommandPool(_device_handle, command_pool_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkBuffer buffer_handle, VmaAllocation allocation_handle) noexcept
     {
-        vmaDestroyBuffer(_allocator_handle, buffer_handle, allocation_handle);
+        if (buffer_handle != VK_NULL_HANDLE)
+            vmaDestroyBuffer(_allocator_handle, buffer_handle, allocation_handle);
     }
 
     void ResourceDestroyer::destroy(VkImage image_handle, VmaAllocation allocation_handle, bool is_own) noexcept
@@ -123,27 +135,32 @@ namespace pbrlib::backend::vk
 
     void ResourceDestroyer::destroy(VkImageView image_view_handle) noexcept
     {
-        vkDestroyImageView(_device_handle, image_view_handle, nullptr);
+        if (image_view_handle != VK_NULL_HANDLE)
+            vkDestroyImageView(_device_handle, image_view_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkSurfaceKHR surface_handle) noexcept
     {
-        vkDestroySurfaceKHR(_instance_handle, surface_handle, nullptr);
+        if (surface_handle != VK_NULL_HANDLE)
+            vkDestroySurfaceKHR(_instance_handle, surface_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkSwapchainKHR swapchain_handle) noexcept
     {
-        vkDestroySwapchainKHR(_device_handle, swapchain_handle, nullptr);
+        if (swapchain_handle != VK_NULL_HANDLE)
+            vkDestroySwapchainKHR(_device_handle, swapchain_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkFence fence_handle) noexcept
     {
-        vkDestroyFence(_device_handle, fence_handle, nullptr);
+        if (fence_handle != VK_NULL_HANDLE)
+            vkDestroyFence(_device_handle, fence_handle, nullptr);
     }
 
     void ResourceDestroyer::destroy(VkSemaphore semaphore_handle) noexcept
     {
-        vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
+        if (semaphore_handle != VK_NULL_HANDLE)
+            vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
     }
 
 #ifdef PBRLIB_ENABLE_PROPFILING
