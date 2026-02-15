@@ -338,7 +338,8 @@ namespace pbrlib::backend::vk
             return std::nullopt;
         }
 
-        VK_CHECK(result);
+        if (result != VK_SUCCESS) [[unlikely]]
+            throw exception::RuntimeError("[vk-surface] failed get next image");
 
         VK_CHECK(vkWaitForFences(
             _device.device(),
@@ -347,9 +348,9 @@ namespace pbrlib::backend::vk
         ));
 
         VK_CHECK(vkResetFences(
-                _device.device(), 
-                1, &_next_image_fence_handle.handle()
-            ));
+            _device.device(), 
+            1, &_next_image_fence_handle.handle()
+        ));
 
         return NextImageInfo
         {

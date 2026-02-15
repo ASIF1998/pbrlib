@@ -22,10 +22,8 @@ namespace pbrlib::backend
 
         _surface.vk_surface.emplace(_device, *ptr_window);
 
-        EventSystem::on([this, ptr_window] ([[maybe_unused]] const events::WindowSizeChanged& event)
+        EventSystem::on([this, ptr_window] ([[maybe_unused]] const events::ResizeWindow& event)
         {
-            /// @todo add _image processing
-
             vkDeviceWaitIdle(_device.device());
             _surface.vk_surface.emplace(_device, *ptr_window);
         });
@@ -48,6 +46,26 @@ namespace pbrlib::backend
             .tiling(VK_IMAGE_TILING_OPTIMAL)
             .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             .build();
+
+        EventSystem::on([this] ([[maybe_unused]] const events::ResizeWindow& event)
+        {
+            vkDeviceWaitIdle(_device.device());
+
+            const uint32_t groupSize = _device.workGroupSize();
+
+            const auto width   = backend::utils::alignSize(event.width, groupSize);
+            const auto height  = backend::utils::alignSize(event.height, groupSize);
+
+            _image = vk::builders::Image(_device)
+                .addQueueFamilyIndex(_device.queue().family_index)
+                .fillColor(math::vec3(0))
+                .format(VK_FORMAT_R8G8B8A8_UNORM)
+                .name("result-image")
+                .size(width, height)
+                .tiling(VK_IMAGE_TILING_OPTIMAL)
+                .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+                .build();
+        });
     }
 
     bool Canvas::nextImage()
@@ -81,8 +99,10 @@ namespace pbrlib::backend
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "present-result-upload");
 
-            const auto width    = static_cast<int32_t>(ptr_result->width);
-            const auto height   = static_cast<int32_t>(ptr_result->height);
+            const auto [window_width, window_height] = size();
+
+            const auto width    = static_cast<int32_t>(window_width);
+            const auto height   = static_cast<int32_t>(window_height);
 
             const VkImageBlit image_blit
             {

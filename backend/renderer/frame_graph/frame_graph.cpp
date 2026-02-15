@@ -26,6 +26,9 @@
 #include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
 
+#include <backend/utils/align_size.hpp>
+#include <backend/shaders/gpu_cpu_constants.h>
+
 namespace pbrlib::backend
 {
     FrameGraph::FrameGraph (
@@ -144,6 +147,11 @@ namespace pbrlib::backend
     void FrameGraph::build(uint32_t width, uint32_t height)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        constexpr auto alignment = static_cast<uint32_t>(PBRLIB_WORK_GROUP_SIZE);
+
+        width   = backend::utils::alignSize(width, alignment);
+        height  = backend::utils::alignSize(height, alignment);
 
         createResources(width, height);
 

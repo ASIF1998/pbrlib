@@ -90,15 +90,12 @@ namespace pbrlib
 
     void Engine::resize(uint32_t width, uint32_t height)
     {
-        const auto new_width    = backend::utils::alignSize(width, static_cast<uint32_t>(PBRLIB_WORK_GROUP_SIZE));
-        const auto new_height   = backend::utils::alignSize(height, static_cast<uint32_t>(PBRLIB_WORK_GROUP_SIZE)); 
-
-        _camera.width(new_width);
-        _camera.height(new_height);
+        _camera.width(width);
+        _camera.height(height);
 
         EventSystem::emmit(backend::events::ResizeWindow {
-            .width  = new_width,
-            .height = new_height
+            .width  = width,
+            .height = height
         });
     }
 
