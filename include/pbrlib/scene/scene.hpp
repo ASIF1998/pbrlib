@@ -49,8 +49,6 @@ namespace pbrlib
             const math::mat4&   world_transform
         );
 
-        void visit(SceneVisitor* ptr_visitor);
-
     public:
         using UpdateCallback = std::function<void (
             SceneItem&          item,
@@ -130,12 +128,7 @@ namespace pbrlib
             const math::mat4&   transform
         );
 
-        template<IsSceneVisitor T>
-        void visit(const std::unique_ptr<T>& ptr_visitor)
-        {
-            if (ptr_visitor && _root) [[likely]]
-                _root->visit(ptr_visitor.get());
-        }
+        void visit(SceneVisitor* ptr_visitor);
 
     private:
         entt::registry              _registry;
