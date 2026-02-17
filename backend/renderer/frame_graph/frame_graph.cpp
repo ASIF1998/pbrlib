@@ -74,6 +74,9 @@ namespace pbrlib::backend
 
         updatePerFrameData(camera, items);
 
+        if (_pre_render_callback)
+            _pre_render_callback();
+
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-draw");
 
         clearImages(command_buffer);
@@ -81,7 +84,13 @@ namespace pbrlib::backend
         _ptr_render_pass->draw(command_buffer);
         _device.submit(command_buffer);
 
+        if (_post_render_callback)
+            _post_render_callback();
+
         auto ptr_result = &_render_passes_images.at(AttachmentsTraits<FXAA>::result);
+
+        if (_present_to_display_callback)
+            _pre_render_callback();
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
@@ -256,5 +265,23 @@ namespace pbrlib::backend
                 );
             }
         }, "[frame-graph] clear-images", vk::marker_colors::clear);
+    }
+}
+
+namespace pbrlib::backend
+{
+    void FrameGraph::preRenderCallback(const std::function<void()>& callback)
+    {
+        _pre_render_callback = callback;
+    }
+
+    void FrameGraph::postRenderCallback(const std::function<void()>& callback)
+    {
+        _post_render_callback = callback;
+    }
+
+    void FrameGraph::presentToDisplayCallback(const std::function<void()>& callback)
+    {
+        _present_to_display_callback = callback;
     }
 }

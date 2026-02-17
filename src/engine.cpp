@@ -233,4 +233,28 @@ namespace pbrlib
            .settings = settings
         });
     }
+
+    void Engine::preRenderCallback(const std::function<void()>& callback)
+    {
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->preRenderCallback(callback);
+        else 
+            backend::log::error("[engine] frame graph is not initialized, can't set pre render callback");
+    }
+
+    void Engine::postRenderCallback(const std::function<void()>& callback)
+    {
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->postRenderCallback(callback);
+        else 
+            backend::log::error("[engine] frame graph is not initialized, can't set post render callback");
+    }
+
+    void Engine::presentToDisplayCallback(const std::function<void()>& callback)
+    {
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->presentToDisplayCallback(callback);
+        else 
+            backend::log::error("[engine] frame graph is not initialized, can't set present to display callback");
+    }
 }

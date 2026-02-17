@@ -75,6 +75,10 @@ namespace pbrlib::backend
 
         void draw(const Camera& camera, std::span<const SceneItem*> items);
 
+        void preRenderCallback(const std::function<void()>& callback);
+        void postRenderCallback(const std::function<void()>& callback);
+        void presentToDisplayCallback(const std::function<void()>& callback);
+
     private:
         vk::Device& _device;
         Canvas&     _canvas;
@@ -87,5 +91,9 @@ namespace pbrlib::backend
         std::optional<vk::Image>    _depth_buffer;
 
         RenderContext _render_context;
+
+        std::function<void()> _pre_render_callback;
+        std::function<void()> _post_render_callback;
+        std::function<void()> _present_to_display_callback;
     };
 }
