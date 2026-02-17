@@ -58,10 +58,41 @@ configure_file(backend/utils/private/info.hpp.in ../backend/utils/private/info.h
 #####################################################
 #   Create pbrlib library
 #####################################################
-file(GLOB_RECURSE PBRLIB_SOURCES CONFIGURE_DEPENDS src/*.cpp)
-file(GLOB_RECURSE PBRLIB_BACKEND_SOURCES CONFIGURE_DEPENDS backend/*.cpp)
+add_subdirectory(backend)
+add_subdirectory(include/pbrlib)
+add_subdirectory(src)
 
-add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_BACKEND_SOURCES})
+add_library(pbrlib STATIC 
+    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_H}
+    ${PBRLIB_BACKEND_INPUT_H}
+    ${PBRLIB_BACKEND_LOGGER_H}
+    ${PBRLIB_BACKEND_RENDERER_SRC}
+    ${PBRLIB_BACKEND_RENDERER_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H}
+    ${PBRLIB_BACKEND_FILTERS_SRC}
+    ${PBRLIB_BACKEND_FILTERS_H}
+    ${PBRLIB_BACKEND_VULKAN_SRC}
+    ${PBRLIB_BACKEND_VULKAN_H}
+    ${PBRLIB_BACKEND_SCENE_SRC}
+    ${PBRLIB_BACKEND_SCENE_H}
+    ${PBRLIB_BACKEND_UTILS_SRC}
+    ${PBRLIB_BACKEND_UTILS_H}
+
+    ${PBRLIB_H}
+    ${PBRLIB_SRC}
+    ${PBRLIB_INPUT_H}
+    ${PBRLIB_INPUT_SRC}
+    ${PBRLIB_SCENE_H}
+    ${PBRLIB_SCENE_SRC}
+    ${PBRLIB_MATH_H}
+    ${PBRLIB_MATH_SRC}
+    ${PBRLIB_UTILS_H}
+    ${PBRLIB_LOGGER_H}
+)
 
 target_include_directories(pbrlib PUBLIC include)
 target_include_directories(pbrlib PUBLIC "")
