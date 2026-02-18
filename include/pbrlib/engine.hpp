@@ -82,6 +82,10 @@ namespace pbrlib
 
         void run();
 
+        void preRenderCallback(const std::function<void()>& callback);
+        void postRenderCallback(const std::function<void()>& callback);
+        void presentToDisplayCallback(const std::function<void()>& callback);
+
     private:
         std::optional<Window> _window;
 
