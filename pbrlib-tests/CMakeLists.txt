@@ -1,10 +1,35 @@
+cmake_minimum_required(VERSION 3.27)
+
 #####################################################
 #   Create PBRLibTests executable
 #####################################################
-file(GLOB_RECURSE PBRLIB_TESTS_SOURCES CONFIGURE_DEPENDS *.cpp)
-file(GLOB_RECURSE PBRLIB_TESTS_HEADERS CONFIGURE_DEPENDS *.hpp)
+add_subdirectory(math)
+add_subdirectory(renderer)
 
-add_executable(pbrlib-tests ${PBRLIB_TESTS_SOURCES} ${PBRLIB_TESTS_HEADERS})
+set(PBRLIB_TESTS_SCENE_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene/content_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene/scene_item_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/scene/scene_tests.cpp
+)
+
+set(PBRLIB_TESTS_IMAGE_COMPARISON_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/image_comparison/image_comparison.cpp
+)
+
+set(PBRLIB_TESTS_IMAGE_COMPARISON_H
+    ${CMAKE_CURRENT_SOURCE_DIR}/image_comparison/image_comparison.hpp
+)
+
+add_executable(pbrlib-tests 
+    ${PBRLIB_TESTS_MATH_SRC} 
+    ${PBRLIB_TESTS_MATH_H}
+    ${PBRLIB_TESTS_RENDERER_SRC}
+    ${PBRLIB_TESTS_RENDERER_H}
+    ${PBRLIB_TESTS_SCENE_SRC}
+    ${PBRLIB_TESTS_IMAGE_COMPARISON_SRC}
+    ${PBRLIB_TESTS_IMAGE_COMPARISON_H}
+    pbrlib_tests_run.cpp
+)
 
 target_include_directories(pbrlib-tests PRIVATE ../backend/include)
 
