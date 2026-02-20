@@ -485,7 +485,7 @@ namespace pbrlib::backend::vk
             ));
         }
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
         TracyVkCollect(_tracy_ctx_handle.handle(), command_buffer.handle);
 #endif
 
@@ -764,7 +764,7 @@ namespace pbrlib::backend::vk
 {
     void Device::createTracyContext()
     {
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
         auto tracy_setup_command_buffer = oneTimeSubmitCommandBuffer("tracy-setup");
         auto tracy_ctx_handle = TracyVkContextCalibrated(
             _physical_device_handle,

@@ -22,7 +22,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if (PBRLIB_TEST_CONSOLE)
-    add_compile_definitions(PBRLIB_ENABLE_PROPFILING)
+    add_compile_definitions(PBRLIB_ENABLE_PROFILING)
     add_compile_definitions(PBRLIB_ENABLE_DEVELOPER_MODE)
 endif()
 
