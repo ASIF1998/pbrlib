@@ -41,9 +41,9 @@ endif()
 #####################################################
 #   Setup core.hpp
 #####################################################
-set(PRLIB_ENGINE_VERSION_MAJOR 0)
-set(PRLIB_ENGINE_VERSION_MINOR 0)
-set(PRLIB_ENGINE_VERSION_PATCH 1)
+set(PBRLIB_ENGINE_VERSION_MAJOR 0)
+set(PBRLIB_ENGINE_VERSION_MINOR 0)
+set(PBRLIB_ENGINE_VERSION_PATCH 1)
 
 set(PRLIB_VULKAN_VERSION_MAJOR 1)
 set(PRLIB_VULKAN_VERSION_MINOR 3)
