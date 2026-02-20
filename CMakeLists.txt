@@ -21,23 +21,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-if (PBRLIB_TEST_CONSOLE)
-    add_compile_definitions(PBRLIB_ENABLE_PROFILING)
-    add_compile_definitions(PBRLIB_ENABLE_DEVELOPER_MODE)
-endif()
-
-if (PBRLIB_SETUP_CI)
-    add_compile_definitions(PBRLIB_RUN_FROM_CI)
-endif()
-
-if (APPLE)
-    add_compile_definitions(PBRLIB_OS_APPLE)
-elseif(WIN32)
-    add_compile_definitions(PBRLIB_OS_WINDOWS)
-else()
-    add_compile_definitions(PBRLIB_OS_LINUX)
-endif()
-
 #####################################################
 #   Setup core.hpp
 #####################################################
@@ -94,8 +77,25 @@ add_library(pbrlib STATIC
     ${PBRLIB_LOGGER_H}
 )
 
-# Use modern source_group(TREE) syntax for automatic IDE organization
-# This automatically creates groups based on directory structure
+#####################################################
+#   Add project defenitions
+#####################################################
+if (PBRLIB_TEST_CONSOLE)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_PROFILING)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_DEVELOPER_MODE)
+endif()
+
+if (PBRLIB_SETUP_CI)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_RUN_FROM_CI)
+endif()
+
+if (APPLE)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_APPLE)
+elseif(WIN32)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_WINDOWS)
+else()
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_LINUX)
+endif()
 
 #####################################################
 #   Source grouping
