@@ -160,7 +160,7 @@ endif()
 #####################################################
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
-include_directories(third_party/assimp/include)
+target_link_libraries(pbrlib PUBLIC third_party/assimp/include)
 add_subdirectory(third_party/assimp)
 
 #####################################################
@@ -171,7 +171,7 @@ add_subdirectory(third_party/SDL)
 #####################################################
 #   STB
 #####################################################
-include_directories(third_party/stb)
+target_link_libraries(pbrlib PUBLIC third_party/stb)
 
 #####################################################
 #   glslang
