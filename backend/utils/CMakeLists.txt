@@ -15,8 +15,3 @@ set(PBRLIB_BACKEND_UTILS_H
     ${CMAKE_CURRENT_SOURCE_DIR}/versions.hpp
     CACHE INTERNAL ""
 )
-
-source_group("backend\\utils" FILES
-    "${PBRLIB_BACKEND_UTILS_SRC}"
-    "${PBRLIB_BACKEND_UTILS_H}"
-)

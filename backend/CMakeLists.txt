@@ -25,19 +25,6 @@ set(PBRLIB_BACKEND_LOGGER_H
     CACHE INTERNAL ""
 )
 
-source_group("backend" FILES
-    "${PBRLIB_BACKEND_SRC}"
-    "${PBRLIB_BACKEND_H}"
-)
-
-source_group("backend\\input" FILES
-    "${PBRLIB_BACKEND_INPUT_H}"
-)
-
-source_group("backend\\logger" FILES
-    "${PBRLIB_BACKEND_LOGGER_H}"
-)
-
 add_subdirectory(renderer)
 add_subdirectory(scene)
 add_subdirectory(utils)

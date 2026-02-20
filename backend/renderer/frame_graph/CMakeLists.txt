@@ -18,10 +18,14 @@ set(PBRLIB_BACKEND_FRAME_GRAPH_H
     CACHE INTERNAL ""
 )
 
-source_group("backend\\renderer\\frame_graph" FILES
-    "${PBRLIB_BACKEND_FRAME_GRAPH_SRC}"
-    "${PBRLIB_BACKEND_FRAME_GRAPH_H}"
+set(PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_CPP
+    ${CMAKE_CURRENT_SOURCE_DIR}/builders/gbuffer_generator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/builders/ssao.cpp
 )
 
-add_subdirectory(builders)
+set(PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H
+    ${CMAKE_CURRENT_SOURCE_DIR}/builders/gbuffer_generator.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/builders/ssao.hpp
+)
+
 add_subdirectory(filters)

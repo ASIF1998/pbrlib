@@ -13,8 +13,3 @@ set(PBRLIB_BACKEND_SCENE_H
     ${CMAKE_CURRENT_SOURCE_DIR}/mesh_manager.hpp
     CACHE INTERNAL ""
 )
-
-source_group("backend\\scene" FILES
-    "${PBRLIB_BACKEND_SCENE_SRC}"
-    "${PBRLIB_BACKEND_SCENE_H}"
-)

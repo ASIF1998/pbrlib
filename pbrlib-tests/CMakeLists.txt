@@ -31,6 +31,22 @@ add_executable(pbrlib-tests
     pbrlib_tests_run.cpp
 )
 
+#####################################################
+#   Source grouping
+#####################################################
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+    PREFIX ""
+    FILES
+    ${PBRLIB_TESTS_MATH_SRC}
+    ${PBRLIB_TESTS_MATH_H}
+    ${PBRLIB_TESTS_RENDERER_SRC}
+    ${PBRLIB_TESTS_RENDERER_H}
+    ${PBRLIB_TESTS_SCENE_SRC}
+    ${PBRLIB_TESTS_IMAGE_COMPARISON_SRC}
+    ${PBRLIB_TESTS_IMAGE_COMPARISON_H}
+    pbrlib_tests_run.cpp
+)
+
 target_include_directories(pbrlib-tests PRIVATE ../backend/include)
 
 #####################################################

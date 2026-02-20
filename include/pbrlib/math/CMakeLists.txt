@@ -23,7 +23,3 @@ set(PBRLIB_MATH_H
     ${CMAKE_CURRENT_SOURCE_DIR}/concepts.hpp
     CACHE INTERNAL ""
 )
-
-source_group("include\\pbrlib\\math" FILES
-    "${PBRLIB_MATH_H}"
-)

@@ -10,10 +10,5 @@ set(PBRLIB_BACKEND_RENDERER_H
     CACHE INTERNAL ""
 )
 
-source_group("backend\\renderer" FILES
-    "${PBRLIB_BACKEND_RENDERER_SRC}"
-    "${PBRLIB_BACKEND_RENDERER_H}"
-)
-
 add_subdirectory(frame_graph)
 add_subdirectory(vulkan)

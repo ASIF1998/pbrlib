@@ -36,10 +36,4 @@ set(PBRLIB_UTILS_H
     CACHE INTERNAL ""
 )
 
-source_group("include\\pbrlib" FILES "${PBRLIB_H}")
-source_group("include\\pbrlib\\input" FILES "${PBRLIB_INPUT_H}")
-source_group("include\\pbrlib\\logger" FILES "${PBRLIB_LOGGER_H}")
-source_group("include\\pbrlib\\scene" FILES "${PBRLIB_SCENE_H}")
-source_group("include\\pbrlib\\utils" FILES "${PBRLIB_UTILS_H}")
-
 add_subdirectory(math)

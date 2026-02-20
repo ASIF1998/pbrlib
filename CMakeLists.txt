@@ -94,6 +94,46 @@ add_library(pbrlib STATIC
     ${PBRLIB_LOGGER_H}
 )
 
+# Use modern source_group(TREE) syntax for automatic IDE organization
+# This automatically creates groups based on directory structure
+
+#####################################################
+#   Source grouping
+#####################################################
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+    PREFIX ""
+    FILES
+    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_H}
+    ${PBRLIB_BACKEND_INPUT_H}
+    ${PBRLIB_BACKEND_LOGGER_H}
+    ${PBRLIB_BACKEND_RENDERER_SRC}
+    ${PBRLIB_BACKEND_RENDERER_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H}
+    ${PBRLIB_BACKEND_FILTERS_SRC}
+    ${PBRLIB_BACKEND_FILTERS_H}
+    ${PBRLIB_BACKEND_VULKAN_SRC}
+    ${PBRLIB_BACKEND_VULKAN_H}
+    ${PBRLIB_BACKEND_SCENE_SRC}
+    ${PBRLIB_BACKEND_SCENE_H}
+    ${PBRLIB_BACKEND_UTILS_SRC}
+    ${PBRLIB_BACKEND_UTILS_H}
+
+    ${PBRLIB_H}
+    ${PBRLIB_SRC}
+    ${PBRLIB_INPUT_H}
+    ${PBRLIB_INPUT_SRC}
+    ${PBRLIB_SCENE_H}
+    ${PBRLIB_SCENE_SRC}
+    ${PBRLIB_MATH_H}
+    ${PBRLIB_MATH_SRC}
+    ${PBRLIB_UTILS_H}
+    ${PBRLIB_LOGGER_H}
+)
+
 target_include_directories(pbrlib PUBLIC include)
 target_include_directories(pbrlib PUBLIC "")
 

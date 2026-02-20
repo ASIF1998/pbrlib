@@ -37,8 +37,3 @@ set(PBRLIB_BACKEND_VULKAN_H
     ${CMAKE_CURRENT_SOURCE_DIR}/utils.hpp
     CACHE INTERNAL ""
 )
-
-source_group("backend\\renderer\\vulkan" FILES
-    "${PBRLIB_BACKEND_VULKAN_SRC}"
-    "${PBRLIB_BACKEND_VULKAN_H}"
-)
