@@ -26,3 +26,8 @@ set(PBRLIB_SCENE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/scene.cpp
     CACHE INTERNAL ""
 )
+
+source_group("src" FILES "${PBRLIB_SRC}")
+source_group("src\\input" FILES "${PBRLIB_INPUT_SRC}")
+source_group("src\\math" FILES "${PBRLIB_MATH_SRC}")
+source_group("src\\scene" FILES "${PBRLIB_SCENE_SRC}")

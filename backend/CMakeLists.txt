@@ -14,7 +14,6 @@ set(PBRLIB_BACKEND_H
     CACHE INTERNAL ""
 )
 
-
 set(PBRLIB_BACKEND_INPUT_H
     ${CMAKE_CURRENT_SOURCE_DIR}/input/sdl_keycode_map.hpp
     CACHE INTERNAL ""
@@ -24,6 +23,19 @@ set(PBRLIB_BACKEND_LOGGER_H
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/console.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.hpp
     CACHE INTERNAL ""
+)
+
+source_group("backend" FILES
+    "${PBRLIB_BACKEND_SRC}"
+    "${PBRLIB_BACKEND_H}"
+)
+
+source_group("backend\\input" FILES
+    "${PBRLIB_BACKEND_INPUT_H}"
+)
+
+source_group("backend\\logger" FILES
+    "${PBRLIB_BACKEND_LOGGER_H}"
 )
 
 add_subdirectory(renderer)

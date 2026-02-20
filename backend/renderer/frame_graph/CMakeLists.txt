@@ -18,5 +18,10 @@ set(PBRLIB_BACKEND_FRAME_GRAPH_H
     CACHE INTERNAL ""
 )
 
+source_group("backend\\renderer\\frame_graph" FILES
+    "${PBRLIB_BACKEND_FRAME_GRAPH_SRC}"
+    "${PBRLIB_BACKEND_FRAME_GRAPH_H}"
+)
+
 add_subdirectory(builders)
 add_subdirectory(filters)
