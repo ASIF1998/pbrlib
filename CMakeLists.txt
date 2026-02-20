@@ -7,7 +7,7 @@ endif()
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQURED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(pbrlib)
 
