@@ -22,6 +22,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #####################################################
+# Generate compile_commands.json for other tools
+#####################################################
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+#####################################################
 #   Setup core.hpp
 #####################################################
 set(PBRLIB_ENGINE_VERSION_MAJOR 0)
