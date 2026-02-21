@@ -96,7 +96,7 @@ if (PBRLIB_BUILD_SAMPLES)
 endif()
 
 if (PBRLIB_SETUP_CI)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_RUN_FROM_CI)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_RUN_FROM_CI)
 endif()
 
 if (APPLE)
