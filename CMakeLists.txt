@@ -75,6 +75,8 @@ add_library(pbrlib STATIC
     ${PBRLIB_MATH_SRC}
     ${PBRLIB_UTILS_H}
     ${PBRLIB_LOGGER_H}
+
+    ${PBRLIB_SHADERS}
 )
 
 #####################################################
@@ -132,6 +134,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}
     ${PBRLIB_MATH_SRC}
     ${PBRLIB_UTILS_H}
     ${PBRLIB_LOGGER_H}
+
+    ${PBRLIB_SHADERS}
 )
 
 target_include_directories(pbrlib PUBLIC include)

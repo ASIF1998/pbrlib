@@ -28,3 +28,4 @@ set(PBRLIB_BACKEND_LOGGER_H
 add_subdirectory(renderer)
 add_subdirectory(scene)
 add_subdirectory(utils)
+add_subdirectory(shaders)
