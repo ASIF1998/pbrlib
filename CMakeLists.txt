@@ -11,9 +11,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(pbrlib)
 
-option(PBRLIB_ENABLE_TESTS "" OFF)
-option(PBRLIB_TEST_CONSOLE "" OFF)
-option(PBRLIB_SETUP_CI "" OFF)
+#####################################################
+#   Project options (cmake -DPBRLIB_*=ON/OFF)
+#####################################################
+option(PBRLIB_ENABLE_TESTS "Build pbrlib tests (pbrlib-tests)" OFF)
+option(PBRLIB_BUILD_SAMPLES "Build sample applications" OFF)
+option(PBRLIB_SETUP_CI "Enable CI-only defines" OFF)
 
 set(PBRLIB_PATH_TO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -87,7 +90,7 @@ add_library(pbrlib STATIC
 #####################################################
 #   Add project defenitions
 #####################################################
-if (PBRLIB_TEST_CONSOLE)
+if (PBRLIB_BUILD_SAMPLES)
     target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_PROFILING)
     target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_DEVELOPER_MODE)
 endif()
@@ -179,9 +182,7 @@ add_subdirectory(third_party/SDL)
 #####################################################
 #   STB
 #####################################################
-# add_library(stb INTERFACE)
 target_include_directories(pbrlib PUBLIC third_party/stb)
-# target_link_libraries(pbrlib PUBLIC stb)
 
 #####################################################
 #   glslang
@@ -211,9 +212,9 @@ add_subdirectory(third_party/cpptrace)
 #####################################################
 #   tracy
 #####################################################
-if (PBRLIB_TEST_CONSOLE)
-    option(TRACY_ENABLE "" ON)
-    option(TRACY_ON_DEMAND "" ON)
+if (PBRLIB_BUILD_SAMPLES)
+    option(TRACY_ENABLE "Build Tracy profiler client into the project" ON)
+    option(TRACY_ON_DEMAND "Connect to Tracy profiler only when server is running" ON)
     add_subdirectory(third_party/tracy)
 
     target_link_libraries(pbrlib PUBLIC Tracy::TracyClient)
