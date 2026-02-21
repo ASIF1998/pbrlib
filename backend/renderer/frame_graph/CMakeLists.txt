@@ -21,11 +21,13 @@ set(PBRLIB_BACKEND_FRAME_GRAPH_H
 set(PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/builders/gbuffer_generator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/builders/ssao.cpp
+    CACHE INTERNAL ""
 )
 
 set(PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H
     ${CMAKE_CURRENT_SOURCE_DIR}/builders/gbuffer_generator.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/builders/ssao.hpp
+    CACHE INTERNAL ""
 )
 
 add_subdirectory(filters)

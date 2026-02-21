@@ -167,10 +167,9 @@ endif()
 #####################################################
 #   assimp
 #####################################################
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-
-target_link_libraries(pbrlib PUBLIC third_party/assimp/include)
+set(ASSIMP_BUILD_TESTS   OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/assimp)
+target_link_libraries(pbrlib PUBLIC assimp::assimp)
 
 #####################################################
 #   SDL
@@ -180,7 +179,9 @@ add_subdirectory(third_party/SDL)
 #####################################################
 #   STB
 #####################################################
-target_link_libraries(pbrlib PUBLIC third_party/stb)
+# add_library(stb INTERFACE)
+target_include_directories(pbrlib PUBLIC third_party/stb)
+# target_link_libraries(pbrlib PUBLIC stb)
 
 #####################################################
 #   glslang
@@ -254,9 +255,8 @@ if (PBRLIB_ENABLE_TESTS)
 endif()
 
 #####################################################
-#   test console
+#   samples
 #####################################################
-if (PBRLIB_TEST_CONSOLE)
-    add_executable(test-console "test-console/main.cpp")
-    target_link_libraries(test-console PRIVATE pbrlib)
+if (PBRLIB_BUILD_SAMPLES)
+    add_subdirectory(samples)
 endif()
