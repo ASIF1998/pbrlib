@@ -43,7 +43,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkFence fence_handle)                                                           noexcept;
         static void destroy(VkSemaphore semaphore_handle)                                                   noexcept;
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
         static void destroy(TracyVkCtx tracy_ctx_handle) noexcept;
 #endif
 
@@ -128,7 +128,7 @@ namespace pbrlib::backend::vk
     using FenceHandle               = UniqueHandle<VkFence>;
     using SemaphoreHandle           = UniqueHandle<VkSemaphore>;
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
     using TracyCtxHandle = UniqueHandle<TracyVkCtx>;
 #endif
 }

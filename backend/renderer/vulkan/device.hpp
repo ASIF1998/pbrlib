@@ -126,7 +126,7 @@ namespace pbrlib::backend::vk
         [[nodiscard]] vk::SamplerHandle createLinearSampler();
         [[nodiscard]] vk::SamplerHandle createNearestSampler();
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {
             return _tracy_ctx_handle.handle();
@@ -152,7 +152,7 @@ namespace pbrlib::backend::vk
 
         DescriptorPoolHandle _descriptor_pool_handle;
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
         TracyCtxHandle _tracy_ctx_handle;
 #endif
     };

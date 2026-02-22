@@ -1,6 +1,6 @@
 #include <backend/profiling.hpp>
 
-#ifdef PBRLIB_ENABLE_PROPFILING
+#ifdef PBRLIB_ENABLE_PROFILING
 
 #include <stdexcept>
 #include <stdlib.h>

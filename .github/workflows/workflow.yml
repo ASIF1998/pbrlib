@@ -29,7 +29,12 @@ jobs:
           cp -r "${{github.workspace}}/cppcheck/build/bin/Release/cfg" "${{github.workspace}}/cfg"
 
       - name: run cppcheck
-        run: ./cppcheck.exe --error-exitcode=1 "src\*" "backend\*" "include\*" "test-console\*" "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt"
+        run: |
+          ./cppcheck.exe --error-exitcode=1 "src\*" "-isrc/CMakeLists.txt"
+          ./cppcheck.exe --error-exitcode=1 "backend\*" "-ibackend/CMakeLists.txt" "-ibackend/renderer/CMakeLists.txt" "-ibackend/renderer/frame_graph/CMakeLists.txt" "-ibackend/renderer/frame_graph/builders/CMakeLists.txt" "-ibackend/renderer/frame_graph/filters/CMakeLists.txt" "-ibackend/renderer/vulkan/CMakeLists.txt" "-ibackend/scene/CMakeLists.txt" "-ibackend/shaders" "-ibackend/utils/CMakeLists.txt"
+          ./cppcheck.exe --error-exitcode=1 "include\*" "-iinclude/pbrlib/CMakeLists.txt" "-iinclude/pbrlib/math/CMakeLists.txt"
+          ./cppcheck.exe --error-exitcode=1 "samples\*" "-isamples/CMakeLists.txt" "-isamples/interactive-scene/CMakeLists.txt"
+          ./cppcheck.exe --error-exitcode=1 "pbrlib-tests\*" "-ipbrlib-tests/CMakeLists.txt" "-ipbrlib-tests/math/CMakeLists.txt" "-ipbrlib-tests/renderer/CMakeLists.txt"
 
   macos-test:
     name: macos-test

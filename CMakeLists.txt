@@ -7,47 +7,38 @@ endif()
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQURED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(pbrlib)
 
-option(PBRLIB_ENABLE_TESTS "" OFF)
-option(PBRLIB_TEST_CONSOLE "" OFF)
-option(PBRLIB_SETUP_CI "" OFF)
+#####################################################
+#   Project options (cmake -DPBRLIB_*=ON/OFF)
+#####################################################
+option(PBRLIB_ENABLE_TESTS "Build pbrlib tests (pbrlib-tests)" OFF)
+option(PBRLIB_BUILD_SAMPLES "Build sample applications" OFF)
+option(PBRLIB_SETUP_CI "Enable CI-only defines" OFF)
 
-set(PRLIB_PATH_TO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(PBRLIB_PATH_TO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-if (PBRLIB_TEST_CONSOLE)
-    add_compile_definitions(PBRLIB_ENABLE_PROPFILING)
-    add_compile_definitions(PBRLIB_ENABLE_DEVELOPER_MODE)
-endif()
-
-if (PBRLIB_SETUP_CI)
-    add_compile_definitions(PBRLIB_RUN_FROM_CI)
-endif()
-
-if (APPLE)
-    add_compile_definitions(PBRLIB_OS_APPLE)
-elseif(WIN32)
-    add_compile_definitions(PBRLIB_OS_WINDOWS)
-else()
-    add_compile_definitions(PBRLIB_OS_LINUX)
-endif()
+#####################################################
+# Generate compile_commands.json for other tools
+#####################################################
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #####################################################
 #   Setup core.hpp
 #####################################################
-set(PRLIB_ENGINE_VERSION_MAJOR 0)
-set(PRLIB_ENGINE_VERSION_MINOR 0)
-set(PRLIB_ENGINE_VERSION_PATCH 1)
+set(PBRLIB_ENGINE_VERSION_MAJOR 0)
+set(PBRLIB_ENGINE_VERSION_MINOR 0)
+set(PBRLIB_ENGINE_VERSION_PATCH 1)
 
-set(PRLIB_VULKAN_VERSION_MAJOR 1)
-set(PRLIB_VULKAN_VERSION_MINOR 3)
-set(PRLIB_VULKAN_VERSION_PATCH 0)
+set(PBRLIB_VULKAN_VERSION_MAJOR 1)
+set(PBRLIB_VULKAN_VERSION_MINOR 3)
+set(PBRLIB_VULKAN_VERSION_PATCH 0)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -58,10 +49,102 @@ configure_file(backend/utils/private/info.hpp.in ../backend/utils/private/info.h
 #####################################################
 #   Create pbrlib library
 #####################################################
-file(GLOB_RECURSE PBRLIB_SOURCES CONFIGURE_DEPENDS src/*.cpp)
-file(GLOB_RECURSE PBRLIB_BACKEND_SOURCES CONFIGURE_DEPENDS backend/*.cpp)
+add_subdirectory(backend)
+add_subdirectory(include/pbrlib)
+add_subdirectory(src)
 
-add_library(pbrlib STATIC ${PBRLIB_SOURCES} ${PBRLIB_BACKEND_SOURCES})
+add_library(pbrlib STATIC 
+    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_H}
+    ${PBRLIB_BACKEND_INPUT_H}
+    ${PBRLIB_BACKEND_LOGGER_H}
+    ${PBRLIB_BACKEND_RENDERER_SRC}
+    ${PBRLIB_BACKEND_RENDERER_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H}
+    ${PBRLIB_BACKEND_FILTERS_SRC}
+    ${PBRLIB_BACKEND_FILTERS_H}
+    ${PBRLIB_BACKEND_VULKAN_SRC}
+    ${PBRLIB_BACKEND_VULKAN_H}
+    ${PBRLIB_BACKEND_SCENE_SRC}
+    ${PBRLIB_BACKEND_SCENE_H}
+    ${PBRLIB_BACKEND_UTILS_SRC}
+    ${PBRLIB_BACKEND_UTILS_H}
+
+    ${PBRLIB_H}
+    ${PBRLIB_SRC}
+    ${PBRLIB_INPUT_H}
+    ${PBRLIB_INPUT_SRC}
+    ${PBRLIB_SCENE_H}
+    ${PBRLIB_SCENE_SRC}
+    ${PBRLIB_MATH_H}
+    ${PBRLIB_MATH_SRC}
+    ${PBRLIB_UTILS_H}
+    ${PBRLIB_LOGGER_H}
+
+    ${PBRLIB_SHADERS}
+)
+
+#####################################################
+#   Add project defenitions
+#####################################################
+if (PBRLIB_BUILD_SAMPLES)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_PROFILING)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_DEVELOPER_MODE)
+endif()
+
+if (PBRLIB_SETUP_CI)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_RUN_FROM_CI)
+endif()
+
+if (APPLE)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_APPLE)
+elseif(WIN32)
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_WINDOWS)
+else()
+    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_LINUX)
+endif()
+
+#####################################################
+#   Source grouping
+#####################################################
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+    PREFIX ""
+    FILES
+    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_H}
+    ${PBRLIB_BACKEND_INPUT_H}
+    ${PBRLIB_BACKEND_LOGGER_H}
+    ${PBRLIB_BACKEND_RENDERER_SRC}
+    ${PBRLIB_BACKEND_RENDERER_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_H}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_SRC}
+    ${PBRLIB_BACKEND_FRAME_GRAPH_BUILDERS_H}
+    ${PBRLIB_BACKEND_FILTERS_SRC}
+    ${PBRLIB_BACKEND_FILTERS_H}
+    ${PBRLIB_BACKEND_VULKAN_SRC}
+    ${PBRLIB_BACKEND_VULKAN_H}
+    ${PBRLIB_BACKEND_SCENE_SRC}
+    ${PBRLIB_BACKEND_SCENE_H}
+    ${PBRLIB_BACKEND_UTILS_SRC}
+    ${PBRLIB_BACKEND_UTILS_H}
+
+    ${PBRLIB_H}
+    ${PBRLIB_SRC}
+    ${PBRLIB_INPUT_H}
+    ${PBRLIB_INPUT_SRC}
+    ${PBRLIB_SCENE_H}
+    ${PBRLIB_SCENE_SRC}
+    ${PBRLIB_MATH_H}
+    ${PBRLIB_MATH_SRC}
+    ${PBRLIB_UTILS_H}
+    ${PBRLIB_LOGGER_H}
+
+    ${PBRLIB_SHADERS}
+)
 
 target_include_directories(pbrlib PUBLIC include)
 target_include_directories(pbrlib PUBLIC "")
@@ -87,10 +170,9 @@ endif()
 #####################################################
 #   assimp
 #####################################################
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-
-include_directories(third_party/assimp/include)
+set(ASSIMP_BUILD_TESTS   OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/assimp)
+target_link_libraries(pbrlib PUBLIC assimp::assimp)
 
 #####################################################
 #   SDL
@@ -100,7 +182,7 @@ add_subdirectory(third_party/SDL)
 #####################################################
 #   STB
 #####################################################
-include_directories(third_party/stb)
+target_include_directories(pbrlib PUBLIC third_party/stb)
 
 #####################################################
 #   glslang
@@ -130,9 +212,9 @@ add_subdirectory(third_party/cpptrace)
 #####################################################
 #   tracy
 #####################################################
-if (PBRLIB_TEST_CONSOLE)
-    option(TRACY_ENABLE "" ON)
-    option(TRACY_ON_DEMAND "" ON)
+if (PBRLIB_BUILD_SAMPLES)
+    option(TRACY_ENABLE "Build Tracy profiler client into the project" ON)
+    option(TRACY_ON_DEMAND "Connect to Tracy profiler only when server is running" ON)
     add_subdirectory(third_party/tracy)
 
     target_link_libraries(pbrlib PUBLIC Tracy::TracyClient)
@@ -174,9 +256,8 @@ if (PBRLIB_ENABLE_TESTS)
 endif()
 
 #####################################################
-#   test console
+#   samples
 #####################################################
-if (PBRLIB_TEST_CONSOLE)
-    add_executable(test-console "test-console/main.cpp")
-    target_link_libraries(test-console PRIVATE pbrlib)
+if (PBRLIB_BUILD_SAMPLES)
+    add_subdirectory(samples)
 endif()

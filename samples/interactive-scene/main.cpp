@@ -71,7 +71,7 @@ int main()
     try
     {
         pbrlib::Config config;
-        config.title    = "test-console";
+        config.title    = "interactive-scene";
         config.width    = 800;
         config.height   = 600;
         config.resible  = true;

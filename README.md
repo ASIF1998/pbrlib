@@ -42,7 +42,7 @@ The code is distributed under the GNU General Public License v3.0.
 ### Build options
 
 - `PBRLIB_ENABLE_TESTS=ON` - Enable tests
-- `PBRLIB_TEST_CONSOLE=ON` - Build test console
+- `PBRLIB_BUILD_SAMPLES=ON` - Build samples
 - `PBRLIB_SETUP_CI=OFF` - CI settings
 
 ### Building
