@@ -12,6 +12,13 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib
 {
+    enum class MessageBox : uint8_t
+    {
+        eInfo,
+        eWarning,
+        eError
+    };
+
     class Window final
     {
         friend class pbrlib::backend::vk::Surface;
@@ -37,7 +44,7 @@ namespace pbrlib
         [[nodiscard]]
         std::pair<int32_t, int32_t> size() const noexcept;
 
-        void messageBox(std::string_view title, std::string_view msg) const;
+        void messageBox(std::string_view title, std::string_view msg, MessageBox msg_type = MessageBox::eInfo) const;
 
     private:
         void* _ptr_window = nullptr;

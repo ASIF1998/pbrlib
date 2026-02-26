@@ -62,9 +62,14 @@ namespace pbrlib
         return std::make_pair(width, height);
     }
 
-    void Window::messageBox(std::string_view title, std::string_view msg) const
+    void Window::messageBox(std::string_view title, std::string_view msg, MessageBox msg_type) const
     {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.data(), msg.data(), utils::cast(_ptr_window));
+        if (msg_type == MessageBox::eInfo)
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.data(), msg.data(), utils::cast(_ptr_window));
+        else if (msg_type == MessageBox::eWarning)
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title.data(), msg.data(), utils::cast(_ptr_window));
+        else 
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.data(), msg.data(), utils::cast(_ptr_window));
     }
 }
 
