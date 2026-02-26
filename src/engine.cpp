@@ -238,7 +238,7 @@ namespace pbrlib
     {
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->preRenderCallback(callback);
-        else 
+        else
             backend::log::error("[engine] frame graph is not initialized, can't set pre render callback");
     }
 
@@ -246,7 +246,7 @@ namespace pbrlib
     {
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->postRenderCallback(callback);
-        else 
+        else
             backend::log::error("[engine] frame graph is not initialized, can't set post render callback");
     }
 
@@ -254,7 +254,7 @@ namespace pbrlib
     {
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->presentToDisplayCallback(callback);
-        else 
+        else
             backend::log::error("[engine] frame graph is not initialized, can't set present to display callback");
     }
 }
