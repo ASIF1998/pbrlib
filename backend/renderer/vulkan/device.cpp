@@ -467,7 +467,12 @@ namespace pbrlib::backend::vk
         return command_buffer;
     }
 
-    void Device::submit(const CommandBuffer& command_buffer)
+    void Device::submit(
+        const CommandBuffer&    command_buffer,
+        VkSemaphore             wait_semaphore,
+        VkSemaphore             signal_semaphore,
+        VkFence                 fence
+    )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -497,14 +502,44 @@ namespace pbrlib::backend::vk
             .commandBuffer  = command_buffer.handle
         };
 
-        const VkSubmitInfo2KHR submit_info
+        VkSubmitInfo2KHR submit_info
         {
             .sType                  = VK_STRUCTURE_TYPE_SUBMIT_INFO_2_KHR,
             .commandBufferInfoCount = 1,
             .pCommandBufferInfos    = &command_buffer_info
         };
 
-        VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, _submit_fence_handle));
+        /// @todo refactoring
+        VkSemaphoreSubmitInfo wait_semaphore_info = { };
+        if (wait_semaphore != VK_NULL_HANDLE)
+        {
+            wait_semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
+            wait_semaphore_info.semaphore = wait_semaphore;
+            wait_semaphore_info.value = std::numeric_limits<uint64_t>::max();
+            wait_semaphore_info.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+            submit_info.waitSemaphoreInfoCount = 1;
+            submit_info.pWaitSemaphoreInfos = &wait_semaphore_info;
+        }
+
+        VkSemaphoreSubmitInfo signal_semaphore_info = { };
+        if (signal_semaphore != VK_NULL_HANDLE)
+        {
+            signal_semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
+            signal_semaphore_info.semaphore = signal_semaphore;
+            signal_semaphore_info.value = std::numeric_limits<uint64_t>::max();
+            signal_semaphore_info.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+            submit_info.signalSemaphoreInfoCount = 1;
+            submit_info.pSignalSemaphoreInfos = &signal_semaphore_info;
+        }
+
+        const auto frence_handle = fence == VK_NULL_HANDLE ? _submit_fence_handle : fence;
+
+        VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, frence_handle));
+
+        if (fence != VK_NULL_HANDLE)
+            return ;
 
         VK_CHECK(vkWaitForFences(
             _device_handle,

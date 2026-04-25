@@ -107,7 +107,12 @@ namespace pbrlib::backend::vk
 
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 
-        void submit(const CommandBuffer& command_buffer);
+        void submit (
+            const CommandBuffer&    command_buffer,
+            VkSemaphore             wait_semaphore      = VK_NULL_HANDLE, 
+            VkSemaphore             signal_semaphore    = VK_NULL_HANDLE,
+            VkFence                 fence               = VK_NULL_HANDLE
+        );
 
         void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
         void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;

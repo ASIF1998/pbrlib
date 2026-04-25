@@ -68,11 +68,11 @@ namespace pbrlib::backend
         });
     }
 
-    bool Canvas::nextImage()
+    bool Canvas::nextImage(VkSemaphore wait_semaphore)
     {
         if (_surface.vk_surface) [[likely]]
         {
-            if (const auto next_image = _surface.vk_surface->nextImage()) [[likely]]
+            if (const auto next_image = _surface.vk_surface->nextImage(wait_semaphore)) [[likely]]
             {
                 _surface.index      = next_image->index;
                 _surface.ptr_image  = next_image->ptr_image;
@@ -84,11 +84,11 @@ namespace pbrlib::backend
         return false;
     }
 
-    void Canvas::present(const vk::Image* ptr_result)
+    void Canvas::present(const vk::Image* ptr_result, VkSemaphore wait_semaphore)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!nextImage()) [[unlikely]]
+        if (!nextImage(wait_semaphore)) [[unlikely]]
             return ;
 
         _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);

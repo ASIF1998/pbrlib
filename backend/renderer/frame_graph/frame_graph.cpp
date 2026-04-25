@@ -14,6 +14,7 @@
 #include <backend/renderer/frame_graph/filters/fxaa.hpp>
 
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -47,6 +48,8 @@ namespace pbrlib::backend
 
         const auto [width, height] = _canvas.size();
         build(width, height);
+
+        initFrameSync();
 
         EventSystem::on([this] (const events::ResizeWindow& event)
         {
@@ -82,7 +85,25 @@ namespace pbrlib::backend
         clearImages(command_buffer);
 
         _ptr_render_pass->draw(command_buffer);
-        _device.submit(command_buffer);
+
+        /// @todo refactoring
+        const auto frame_index = _render_context.flight_frame_index;
+
+        VK_CHECK(vkWaitForFences (
+            _device.device(), 
+            1, &_in_flight_fences[frame_index].handle(),
+            VK_TRUE,
+            std::numeric_limits<uint64_t>::max()
+        ));
+
+        VK_CHECK(vkResetFences(_device.device(), 1, &_in_flight_fences[frame_index].handle()));
+
+        _device.submit(
+            command_buffer,
+            VK_NULL_HANDLE,
+            VK_NULL_HANDLE,
+            _in_flight_fences[frame_index]
+        );
 
         if (_post_render_callback)
             _post_render_callback();
@@ -90,11 +111,11 @@ namespace pbrlib::backend
         auto ptr_result = &_render_passes_images.at(AttachmentsTraits<FXAA>::result);
 
         if (_present_to_display_callback)
-            _pre_render_callback();
+            _present_to_display_callback();
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        _canvas.present(ptr_result);
+        _canvas.present(ptr_result, _image_available_semaphores[frame_index]);
     }
 }
 
@@ -222,6 +243,48 @@ namespace pbrlib::backend
         createRenderPassImages<GBufferGenerator>(_device, _render_passes_images, width, height);
         createRenderPassImages<SSAO>(_device, _render_passes_images, width, height);
         createRenderPassImages<FXAA>(_device, _render_passes_images, width, height);
+    }
+
+    void FrameGraph::initFrameSync()
+    {
+        _image_available_semaphores.resize(_canvas.framesInFlight());
+        _render_finished_semaphores.resize(_canvas.framesInFlight());
+        _in_flight_fences.resize(_canvas.framesInFlight());
+
+        constexpr VkSemaphoreCreateInfo semaphore_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+        };
+
+        constexpr VkFenceCreateInfo fence_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+            .flags = VK_FENCE_CREATE_SIGNALED_BIT
+        };
+
+        for (const auto frame_index: std::views::iota(0u, _canvas.framesInFlight()))
+        {
+            VK_CHECK(vkCreateSemaphore (
+                _device.device(),
+                &semaphore_create_info,
+                nullptr,
+                &_image_available_semaphores[frame_index].handle()
+            ));
+
+            VK_CHECK(vkCreateSemaphore (
+                _device.device(),
+                &semaphore_create_info,
+                nullptr,
+                &_render_finished_semaphores[frame_index].handle()
+            ));
+
+            VK_CHECK(vkCreateFence (
+                _device.device(),
+                &fence_create_info,
+                nullptr,
+                &_in_flight_fences[frame_index].handle()
+            ));
+        }
     }
 }
 
