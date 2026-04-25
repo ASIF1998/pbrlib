@@ -59,6 +59,8 @@ namespace pbrlib::backend
 
         void clearImages(vk::CommandBuffer& command_buffer);
 
+        void flush(vk::CommandBuffer& command_buffer);
+
     public:
         explicit FrameGraph (
             vk::Device&             device,

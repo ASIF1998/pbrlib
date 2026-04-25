@@ -3,6 +3,9 @@
 #include <backend/renderer/canvas.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+#include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/sync.hpp>
 
 #include <backend/renderer/frame_graph/compound_render_pass.hpp>
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
@@ -12,9 +15,6 @@
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
 #include <backend/renderer/frame_graph/filters/fxaa.hpp>
-
-#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
-#include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -85,24 +85,22 @@ namespace pbrlib::backend
         clearImages(command_buffer);
 
         _ptr_render_pass->draw(command_buffer);
+        flush(command_buffer);
+    }
 
-        /// @todo refactoring
+    void FrameGraph::flush(vk::CommandBuffer& command_buffer)
+    {
         const auto frame_index = _render_context.flight_frame_index;
 
-        VK_CHECK(vkWaitForFences (
-            _device.device(), 
-            1, &_in_flight_fences[frame_index].handle(),
-            VK_TRUE,
-            std::numeric_limits<uint64_t>::max()
-        ));
+        const auto fence_handle = _in_flight_fences[frame_index].handle();
 
-        VK_CHECK(vkResetFences(_device.device(), 1, &_in_flight_fences[frame_index].handle()));
+        vk::sync(_device.device(), fence_handle);
 
         _device.submit(
             command_buffer,
             VK_NULL_HANDLE,
             VK_NULL_HANDLE,
-            _in_flight_fences[frame_index]
+            fence_handle
         );
 
         if (_post_render_callback)
@@ -115,7 +113,8 @@ namespace pbrlib::backend
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        _canvas.present(ptr_result, _image_available_semaphores[frame_index]);
+        const auto available_semaphore = _image_available_semaphores[frame_index].handle();
+        _canvas.present(ptr_result, available_semaphore);
     }
 }
 
@@ -247,9 +246,9 @@ namespace pbrlib::backend
 
     void FrameGraph::initFrameSync()
     {
-        _image_available_semaphores.resize(_canvas.framesInFlight());
-        _render_finished_semaphores.resize(_canvas.framesInFlight());
-        _in_flight_fences.resize(_canvas.framesInFlight());
+        _image_available_semaphores.reserve(_canvas.framesInFlight());
+        _render_finished_semaphores.reserve(_canvas.framesInFlight());
+        _in_flight_fences.reserve(_canvas.framesInFlight());
 
         constexpr VkSemaphoreCreateInfo semaphore_create_info
         {
@@ -262,28 +261,11 @@ namespace pbrlib::backend
             .flags = VK_FENCE_CREATE_SIGNALED_BIT
         };
 
-        for (const auto frame_index: std::views::iota(0u, _canvas.framesInFlight()))
+        for ([[maybe_unused]] const auto frame_index: std::views::iota(0u, _canvas.framesInFlight()))
         {
-            VK_CHECK(vkCreateSemaphore (
-                _device.device(),
-                &semaphore_create_info,
-                nullptr,
-                &_image_available_semaphores[frame_index].handle()
-            ));
-
-            VK_CHECK(vkCreateSemaphore (
-                _device.device(),
-                &semaphore_create_info,
-                nullptr,
-                &_render_finished_semaphores[frame_index].handle()
-            ));
-
-            VK_CHECK(vkCreateFence (
-                _device.device(),
-                &fence_create_info,
-                nullptr,
-                &_in_flight_fences[frame_index].handle()
-            ));
+            _image_available_semaphores.emplace_back(vk::create(_device.device(), semaphore_create_info));
+            _render_finished_semaphores.emplace_back(vk::create(_device.device(), semaphore_create_info));
+            _in_flight_fences.emplace_back(vk::create(_device.device(), fence_create_info));
         }
     }
 }

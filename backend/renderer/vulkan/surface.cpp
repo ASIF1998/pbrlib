@@ -3,6 +3,7 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/sync.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -310,12 +311,7 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(
-                _device.device(),
-                &fence_create_info,
-                nullptr,
-                &_next_image_fence_handle.handle())
-            );
+            _next_image_fence_handle = vk::create(_device.device(), fence_create_info);
         }
 
         const auto result = vkAcquireNextImageKHR(
@@ -339,16 +335,7 @@ namespace pbrlib::backend::vk
         if (result != VK_SUCCESS) [[unlikely]]
             throw exception::RuntimeError("[vk-surface] failed get next image");
 
-        VK_CHECK(vkWaitForFences(
-            _device.device(),
-            1, &_next_image_fence_handle.handle(),
-            VK_TRUE, std::numeric_limits<uint64_t>::max()
-        ));
-
-        VK_CHECK(vkResetFences(
-            _device.device(),
-            1, &_next_image_fence_handle.handle()
-        ));
+        sync(_device.device(), _next_image_fence_handle);
 
         return NextImageInfo
         {

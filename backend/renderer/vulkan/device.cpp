@@ -11,6 +11,8 @@
 
 #include <backend/renderer/vulkan/buffer.hpp>
 
+#include <backend/renderer/vulkan/sync.hpp>
+
 #include <backend/shaders/gpu_cpu_constants.h>
 
 #include <SDL3/SDL_vulkan.h>
@@ -467,28 +469,32 @@ namespace pbrlib::backend::vk
         return command_buffer;
     }
 
-    void Device::submit(
-        const CommandBuffer&    command_buffer,
-        VkSemaphore             wait_semaphore,
-        VkSemaphore             signal_semaphore,
-        VkFence                 fence
-    )
+    void Device::submit(const CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (_submit_fence_handle == VK_NULL_HANDLE)
+        if (_submit_fence_handle == VK_NULL_HANDLE) [[unlikely]]
         {
             constexpr VkFenceCreateInfo fence_create_info
             {
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(
-                _device_handle,
-                &fence_create_info,
-                nullptr, &_submit_fence_handle.handle()
-            ));
+            _submit_fence_handle = create(_device_handle, fence_create_info);
         }
+
+        submit(command_buffer, VK_NULL_HANDLE, VK_NULL_HANDLE, _submit_fence_handle);
+        sync(_device_handle, _submit_fence_handle);
+    }
+
+    void Device::submit (
+        const CommandBuffer&    command_buffer,
+        VkSemaphore             wait_semaphore_handle,
+        VkSemaphore             signal_semaphore_handle,
+        VkFence                 fence_handle
+    )
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
 
 #ifdef PBRLIB_ENABLE_PROFILING
         TracyVkCollect(_tracy_ctx_handle.handle(), command_buffer.handle);
@@ -509,46 +515,33 @@ namespace pbrlib::backend::vk
             .pCommandBufferInfos    = &command_buffer_info
         };
 
-        /// @todo refactoring
-        VkSemaphoreSubmitInfo wait_semaphore_info = { };
-        if (wait_semaphore != VK_NULL_HANDLE)
+        constexpr auto make_semaphore_info = [] (VkSemaphore semaphore_handle)
         {
-            wait_semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-            wait_semaphore_info.semaphore = wait_semaphore;
-            wait_semaphore_info.value = std::numeric_limits<uint64_t>::max();
-            wait_semaphore_info.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            const VkSemaphoreSubmitInfo submit_info
+            {
+                .sType      = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO,
+                .semaphore  = semaphore_handle,
+                .stageMask  = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
+            };
 
-            submit_info.waitSemaphoreInfoCount = 1;
-            submit_info.pWaitSemaphoreInfos = &wait_semaphore_info;
+            return submit_info;
+        };
+
+        const auto wait_semaphore_info = make_semaphore_info(wait_semaphore_handle);
+        if (wait_semaphore_handle != VK_NULL_HANDLE)
+        {
+            submit_info.pWaitSemaphoreInfos     = &wait_semaphore_info;
+            submit_info.waitSemaphoreInfoCount  = 1;
         }
 
-        VkSemaphoreSubmitInfo signal_semaphore_info = { };
-        if (signal_semaphore != VK_NULL_HANDLE)
+        const auto signal_semaphore_info = make_semaphore_info(signal_semaphore_handle);
+        if (signal_semaphore_handle != VK_NULL_HANDLE)
         {
-            signal_semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-            signal_semaphore_info.semaphore = signal_semaphore;
-            signal_semaphore_info.value = std::numeric_limits<uint64_t>::max();
-            signal_semaphore_info.stageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-            submit_info.signalSemaphoreInfoCount = 1;
-            submit_info.pSignalSemaphoreInfos = &signal_semaphore_info;
+            submit_info.pSignalSemaphoreInfos       = &signal_semaphore_info;
+            submit_info.signalSemaphoreInfoCount    = 1;
         }
 
-        const auto frence_handle = fence == VK_NULL_HANDLE ? _submit_fence_handle : fence;
-
-        VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, frence_handle));
-
-        if (fence != VK_NULL_HANDLE)
-            return ;
-
-        VK_CHECK(vkWaitForFences(
-            _device_handle,
-            1, &_submit_fence_handle.handle(),
-            VK_TRUE,
-            std::numeric_limits<uint64_t>::max()
-        ));
-
-        VK_CHECK(vkResetFences(_device_handle, 1, &_submit_fence_handle.handle()));
+        VK_CHECK(vkQueueSubmit2(_general_queue.handle, 1, &submit_info, fence_handle));
     }
 }
 
