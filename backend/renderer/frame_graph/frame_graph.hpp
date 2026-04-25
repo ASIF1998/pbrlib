@@ -40,6 +40,7 @@ namespace pbrlib::backend
         >;
 
         void createResources(uint32_t width, uint32_t height);
+        void initFrameSync();
 
         void build(uint32_t width, uint32_t height);
 
@@ -57,6 +58,8 @@ namespace pbrlib::backend
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);
 
         void clearImages(vk::CommandBuffer& command_buffer);
+
+        void flush(vk::CommandBuffer& command_buffer);
 
     public:
         explicit FrameGraph (
@@ -89,6 +92,10 @@ namespace pbrlib::backend
 
         RenderPassesImages          _render_passes_images;
         std::optional<vk::Image>    _depth_buffer;
+
+        std::vector<vk::SemaphoreHandle>    _image_available_semaphores;
+        std::vector<vk::SemaphoreHandle>    _render_finished_semaphores;
+        std::vector<vk::FenceHandle>        _in_flight_fences;
 
         RenderContext _render_context;
 

@@ -3,14 +3,9 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 
-#include <numeric>
-
 #include <string_view>
 
 #include <vector>
-#include <unordered_map>
-
-#include <optional>
 
 namespace pbrlib::backend
 {
@@ -113,6 +108,13 @@ namespace pbrlib::backend::vk
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 
         void submit(const CommandBuffer& command_buffer);
+
+        void submit (
+            const CommandBuffer&    command_buffer,
+            VkSemaphore             wait_semaphore_handle, 
+            VkSemaphore             signal_semaphore_handle,
+            VkFence                 fence_handle
+        );
 
         void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
         void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;

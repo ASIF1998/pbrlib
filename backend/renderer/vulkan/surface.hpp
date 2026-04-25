@@ -3,7 +3,6 @@
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <vector>
-#include <numeric>
 #include <optional>
 
 namespace pbrlib
@@ -43,7 +42,12 @@ namespace pbrlib::backend::vk
 
         Surface(Surface&& surface);
 
-        [[nodiscard]] std::optional<NextImageInfo> nextImage();
+        [[nodiscard]] std::optional<NextImageInfo> nextImage(VkSemaphore wait_semaphore);
+
+        [[nodiscard]] constexpr static uint8_t framesInFlight() noexcept
+        {
+            return 2;
+        }
 
     private:
         const pbrlib::Window& _window;

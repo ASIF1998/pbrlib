@@ -3,6 +3,7 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/sync.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -175,8 +176,6 @@ namespace pbrlib::backend::vk
             &capabilities
         ));
 
-        constexpr uint32_t image_count = 2;
-
         const auto [width, height] = _window.size();
 
         const auto family_index = _device.queue().family_index;
@@ -185,7 +184,7 @@ namespace pbrlib::backend::vk
         {
             .sType                  = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             .surface                = _surface_handle,
-            .minImageCount          = image_count,
+            .minImageCount          = framesInFlight(),
             .imageFormat            = _surface_format.format,
             .imageColorSpace        = _surface_format.colorSpace,
             .imageExtent            = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)},
@@ -301,7 +300,7 @@ namespace pbrlib::backend::vk
         }
     }
 
-    std::optional<NextImageInfo> Surface::nextImage()
+    std::optional<NextImageInfo> Surface::nextImage(VkSemaphore wait_semaphore)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -312,26 +311,21 @@ namespace pbrlib::backend::vk
                 .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO
             };
 
-            VK_CHECK(vkCreateFence(
-                _device.device(),
-                &fence_create_info,
-                nullptr,
-                &_next_image_fence_handle.handle())
-            );
+            _next_image_fence_handle = vk::create(_device.device(), fence_create_info);
         }
 
         const auto result = vkAcquireNextImageKHR(
             _device.device(),
             _swapchain_handle,
             std::numeric_limits<uint64_t>::max(),
-            VK_NULL_HANDLE, _next_image_fence_handle,
+            wait_semaphore, _next_image_fence_handle,
             &_current_image_index
         );
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR) [[unlikely]]
         {
             VK_CHECK(vkResetFences(
-                _device.device(), 
+                _device.device(),
                 1, &_next_image_fence_handle.handle()
             ));
 
@@ -341,16 +335,7 @@ namespace pbrlib::backend::vk
         if (result != VK_SUCCESS) [[unlikely]]
             throw exception::RuntimeError("[vk-surface] failed get next image");
 
-        VK_CHECK(vkWaitForFences(
-            _device.device(),
-            1, &_next_image_fence_handle.handle(),
-            VK_TRUE, std::numeric_limits<uint64_t>::max()
-        ));
-
-        VK_CHECK(vkResetFences(
-            _device.device(), 
-            1, &_next_image_fence_handle.handle()
-        ));
+        sync(_device.device(), _next_image_fence_handle);
 
         return NextImageInfo
         {

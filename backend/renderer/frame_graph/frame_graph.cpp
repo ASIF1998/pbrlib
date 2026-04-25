@@ -3,6 +3,9 @@
 #include <backend/renderer/canvas.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
+#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
+#include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/sync.hpp>
 
 #include <backend/renderer/frame_graph/compound_render_pass.hpp>
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
@@ -12,8 +15,6 @@
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
 
 #include <backend/renderer/frame_graph/filters/fxaa.hpp>
-
-#include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -47,6 +48,8 @@ namespace pbrlib::backend
 
         const auto [width, height] = _canvas.size();
         build(width, height);
+
+        initFrameSync();
 
         EventSystem::on([this] (const events::ResizeWindow& event)
         {
@@ -82,7 +85,23 @@ namespace pbrlib::backend
         clearImages(command_buffer);
 
         _ptr_render_pass->draw(command_buffer);
-        _device.submit(command_buffer);
+        flush(command_buffer);
+    }
+
+    void FrameGraph::flush(vk::CommandBuffer& command_buffer)
+    {
+        const auto frame_index = _render_context.flight_frame_index;
+
+        const auto fence_handle = _in_flight_fences[frame_index].handle();
+
+        vk::sync(_device.device(), fence_handle);
+
+        _device.submit(
+            command_buffer,
+            VK_NULL_HANDLE,
+            VK_NULL_HANDLE,
+            fence_handle
+        );
 
         if (_post_render_callback)
             _post_render_callback();
@@ -90,11 +109,12 @@ namespace pbrlib::backend
         auto ptr_result = &_render_passes_images.at(AttachmentsTraits<FXAA>::result);
 
         if (_present_to_display_callback)
-            _pre_render_callback();
+            _present_to_display_callback();
 
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        _canvas.present(ptr_result);
+        const auto available_semaphore = _image_available_semaphores[frame_index].handle();
+        _canvas.present(ptr_result, available_semaphore);
     }
 }
 
@@ -184,7 +204,7 @@ namespace pbrlib::backend
         setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
-        
+
         if (!_ptr_render_pass->init(_render_context, width, height)) [[unlikely]]
             throw exception::InitializeError("[frame-graph] failed initialize render passes");
     }
@@ -223,6 +243,31 @@ namespace pbrlib::backend
         createRenderPassImages<SSAO>(_device, _render_passes_images, width, height);
         createRenderPassImages<FXAA>(_device, _render_passes_images, width, height);
     }
+
+    void FrameGraph::initFrameSync()
+    {
+        _image_available_semaphores.reserve(_canvas.framesInFlight());
+        _render_finished_semaphores.reserve(_canvas.framesInFlight());
+        _in_flight_fences.reserve(_canvas.framesInFlight());
+
+        constexpr VkSemaphoreCreateInfo semaphore_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+        };
+
+        constexpr VkFenceCreateInfo fence_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+            .flags = VK_FENCE_CREATE_SIGNALED_BIT
+        };
+
+        for ([[maybe_unused]] const auto frame_index: std::views::iota(0u, _canvas.framesInFlight()))
+        {
+            _image_available_semaphores.emplace_back(vk::create(_device.device(), semaphore_create_info));
+            _render_finished_semaphores.emplace_back(vk::create(_device.device(), semaphore_create_info));
+            _in_flight_fences.emplace_back(vk::create(_device.device(), fence_create_info));
+        }
+    }
 }
 
 namespace pbrlib::backend
@@ -234,6 +279,8 @@ namespace pbrlib::backend
         _render_context.items       = items;
         _render_context.projection  = camera.projection();
         _render_context.view        = camera.view();
+
+        _render_context.flight_frame_index = (++_render_context.flight_frame_index) % _canvas.framesInFlight();
     }
 }
 
