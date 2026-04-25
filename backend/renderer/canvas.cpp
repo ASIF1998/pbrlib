@@ -170,4 +170,9 @@ namespace pbrlib::backend
             .height = ptr_image->height
         };
     }
+
+    uint8_t Canvas::framesInFlight() const noexcept
+    {
+        return _surface.vk_surface ? vk::Surface::framesInFlight() : 1;
+    }
 }

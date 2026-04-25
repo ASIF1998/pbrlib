@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
 
-#include <functional>
 #include <tuple>
 
 #include <type_traits>

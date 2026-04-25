@@ -184,7 +184,7 @@ namespace pbrlib::backend
         setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
-        
+
         if (!_ptr_render_pass->init(_render_context, width, height)) [[unlikely]]
             throw exception::InitializeError("[frame-graph] failed initialize render passes");
     }
@@ -234,6 +234,8 @@ namespace pbrlib::backend
         _render_context.items       = items;
         _render_context.projection  = camera.projection();
         _render_context.view        = camera.view();
+
+        _render_context.flight_frame_index = (++_render_context.flight_frame_index) % _canvas.framesInFlight();
     }
 }
 

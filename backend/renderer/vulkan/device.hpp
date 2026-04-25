@@ -3,14 +3,9 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 
-#include <numeric>
-
 #include <string_view>
 
 #include <vector>
-#include <unordered_map>
-
-#include <optional>
 
 namespace pbrlib::backend
 {

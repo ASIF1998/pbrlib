@@ -98,7 +98,7 @@ namespace pbrlib::backend::vk
 #if defined (PBRLIB_OS_APPLE)
         const std::vector extensions
         {
-            VK_KHR_SURFACE_EXTENSION_NAME, 
+            VK_KHR_SURFACE_EXTENSION_NAME,
             "VK_EXT_metal_surface",
             VK_EXT_DEBUG_UTILS_EXTENSION_NAME
         };

@@ -3,8 +3,6 @@
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 
-#include <numeric>
-
 namespace pbrlib
 {
     class Camera final

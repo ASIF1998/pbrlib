@@ -12,7 +12,6 @@
 #include <string>
 #include <string_view>
 
-#include <optional>
 #include <functional>
 
 namespace pbrlib
@@ -68,6 +67,8 @@ namespace pbrlib::backend
 
         const MaterialManager*  ptr_material_manager    = nullptr;
         const MeshManager*      ptr_mesh_manager        = nullptr;
+
+        uint8_t flight_frame_index = std::numeric_limits<uint8_t>::max() - 1;
     };
 
     class RenderPass
@@ -80,13 +81,13 @@ namespace pbrlib::backend
         >;
 
         using ColorOutputImages = std::map <
-            std::string, 
-            vk::Image*, 
+            std::string,
+            vk::Image*,
             std::less<void>
         >;
 
         using InputDescriptorSets = std::unordered_map <
-            uint32_t, 
+            uint32_t,
             std::pair<VkDescriptorSet, VkDescriptorSetLayout>
         >;
 

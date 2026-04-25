@@ -36,6 +36,9 @@ namespace pbrlib::backend
         [[nodiscard]]
         Size size() const;
 
+        [[nodiscard]]
+        uint8_t framesInFlight() const noexcept;
+
     private:
         vk::Device& _device;
 

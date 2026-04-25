@@ -3,7 +3,6 @@
 #include <pbrlib/window.hpp>
 #include <pbrlib/camera.hpp>
 
-#include <string_view>
 #include <functional>
 #include <optional>
 #include <memory>
