@@ -28,7 +28,7 @@ namespace pbrlib::backend::vk
     Device::~Device()
     {
         if (_device_handle != VK_NULL_HANDLE) [[likely]]
-        vkDeviceWaitIdle(_device_handle);
+            vkDeviceWaitIdle(_device_handle);
     }
 
     void Device::init()
@@ -42,11 +42,11 @@ namespace pbrlib::backend::vk
 
         ResourceDestroyer::initForDeviceResources(
             _instance_handle,
+            &_instance_functions,
             _device_handle,
+            &_device_functions,
             _allocator_handle
         );
-
-        loadFunctions();
 
         createCommandPools();
 
@@ -77,7 +77,8 @@ namespace pbrlib::backend::vk
 
         if (is_debug) [[unlikely]]
         {
-            constexpr std::array layers {
+            constexpr std::array layers 
+            {
                 "VK_LAYER_LUNARG_api_dump",
                 "VK_LAYER_KHRONOS_validation"
             };
@@ -93,6 +94,11 @@ namespace pbrlib::backend::vk
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
         VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
+
+        loadInstanceFunctions();
+
+        if (is_debug) [[unlikely]]
+            setupDebugUtilsMessenger();
     }
 
     std::vector<const char*> Device::instanceExtensions()
@@ -386,6 +392,8 @@ namespace pbrlib::backend::vk
             &_device_handle.handle()
         ));
 
+        loadDeviceFunctions();
+
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
 
@@ -565,21 +573,53 @@ namespace pbrlib::backend::vk
         return ptr_function;
     }
 
-    void Device::loadFunctions()
+    template<typename VulkanFunctionType>
+    VulkanFunctionType loadFunction(VkInstance instance_handle, const std::string_view function_name)
+    {
+        auto ptr_function = reinterpret_cast<VulkanFunctionType>(
+            vkGetInstanceProcAddr(
+                instance_handle,
+                function_name.data()
+            )
+        );
+
+        if (ptr_function)
+            log::info("[vk-function-loader] {}", function_name);
+        else
+            log::error("[vk-function-loader] {}", function_name);
+
+        return ptr_function;
+    }
+
+    void Device::loadDeviceFunctions()
     {
         if (config::enable_vulkan_set_obj_name)
-            _functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
+            _device_functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
 
         if (isRunFromFrameDebugger()) [[unlikely]]
         {
-            _functions.vkCmdDebugMarkerBeginEXT = loadFunction<PFN_vkCmdDebugMarkerBeginEXT>(_device_handle, "vkCmdDebugMarkerBeginEXT");
-            _functions.vkCmdDebugMarkerEndEXT   = loadFunction<PFN_vkCmdDebugMarkerEndEXT>(_device_handle, "vkCmdDebugMarkerEndEXT");
+            _device_functions.vkCmdDebugMarkerBeginEXT = loadFunction<PFN_vkCmdDebugMarkerBeginEXT>(_device_handle, "vkCmdDebugMarkerBeginEXT");
+            _device_functions.vkCmdDebugMarkerEndEXT   = loadFunction<PFN_vkCmdDebugMarkerEndEXT>(_device_handle, "vkCmdDebugMarkerEndEXT");
         }
     }
 
-    const Functions& Device::vulkanFunctions() const noexcept
+    void Device::loadInstanceFunctions()
     {
-        return _functions;
+        if constexpr (config::enable_vulkan_debug_print)
+        {
+            _instance_functions.vkCreateDebugUtilsMessengerEXT  = loadFunction<PFN_vkCreateDebugUtilsMessengerEXT>(_instance_handle, "vkCreateDebugUtilsMessengerEXT");
+            _instance_functions.vkDestroyDebugUtilsMessengerEXT = loadFunction<PFN_vkDestroyDebugUtilsMessengerEXT>(_instance_handle, "vkDestroyDebugUtilsMessengerEXT");
+        }
+    }
+
+    const DeviceFunctions& Device::deviceFunctions() const noexcept
+    {
+        return _device_functions;
+    }
+
+    const InstanceFunctions& Device::instanceFunctions() const noexcept
+    {
+        return _instance_functions;
     }
 }
 
@@ -587,8 +627,8 @@ namespace pbrlib::backend::vk
 {
     void Device::setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const
     {
-        if (_functions.vkSetDebugUtilsObjectNameEXT) [[likely]]
-            _functions.vkSetDebugUtilsObjectNameEXT(_device_handle, &name_info);
+        if (_device_functions.vkSetDebugUtilsObjectNameEXT) [[likely]]
+            _device_functions.vkSetDebugUtilsObjectNameEXT(_device_handle, &name_info);
     }
 }
 
@@ -808,5 +848,70 @@ namespace pbrlib::backend::vk
 
         _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
 #endif
+    }
+}
+
+namespace pbrlib::backend::vk
+{
+    VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessageCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
+        VkDebugUtilsMessageTypeFlagsEXT             type,
+        const VkDebugUtilsMessengerCallbackDataEXT* ptr_callback_data,
+        void*                                       ptr_user_data
+    )
+    {
+        if (!ptr_callback_data || !ptr_callback_data->pMessage) [[unlikely]]
+            return VK_FALSE;
+
+        constexpr auto prefix = [] (VkDebugUtilsMessageTypeFlagsEXT type)
+        {
+            if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+                return "validation";
+            
+            if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+                return "performance";
+
+            return "general";
+        };
+
+        std::string header = std::format("[{}]", prefix(type));
+        
+        if (ptr_callback_data->pMessageIdName)
+            header += std::format("[{}]", ptr_callback_data->pMessageIdName);
+        else 
+            header += "[no-id]";
+
+        if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+            log::error("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+        else if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+            log::warning("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+        else
+            log::info("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+
+        return severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT ? VK_TRUE : VK_FALSE;
+    }
+
+    void Device::setupDebugUtilsMessenger()
+    {
+        if (!_instance_functions.vkCreateDebugUtilsMessengerEXT) [[unlikely]]
+        {
+            log::error("[vk-device] failed to load vkCreateDebugUtilsMessengerEXT, is VK_EXT_debug_utils extension enabled?");
+            return ;
+        }
+
+        const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info 
+        { 
+            .sType              = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity    = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType        = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+            .pfnUserCallback    = debugUtilsMessageCallback
+        };
+
+        VK_CHECK(_instance_functions.vkCreateDebugUtilsMessengerEXT(
+            _instance_handle, 
+            &messenger_create_info, 
+            nullptr, 
+            &_debug_utils_messenger_handle.handle()
+        ));
     }
 }

@@ -1,35 +1,48 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/device.hpp>
 #include <backend/logger/logger.hpp>
 
 #include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::backend::vk
 {
-    VkInstance      ResourceDestroyer::_instance_handle     = VK_NULL_HANDLE;
-    VkDevice        ResourceDestroyer::_device_handle       = VK_NULL_HANDLE;
-    VmaAllocator    ResourceDestroyer::_allocator_handle    = VK_NULL_HANDLE;
+    VkInstance          ResourceDestroyer::_instance_handle         = VK_NULL_HANDLE;
+    InstanceFunctions*  ResourceDestroyer::_ptr_instance_functions  = nullptr;
+    VkDevice            ResourceDestroyer::_device_handle           = VK_NULL_HANDLE;
+    DeviceFunctions*    ResourceDestroyer::_ptr_device_functions    = nullptr;
+    VmaAllocator        ResourceDestroyer::_allocator_handle        = VK_NULL_HANDLE;
 }
 
 namespace pbrlib::backend::vk
 {
     void ResourceDestroyer::initForDeviceResources (
-        VkInstance      instance_handle,
-        VkDevice        device_handle,
-        VmaAllocator    allocator_handle
+        VkInstance          instance_handle,
+        InstanceFunctions*  ptr_instance_functions,
+        VkDevice            device_handle,
+        DeviceFunctions*    ptr_device_functions,
+        VmaAllocator        allocator_handle
     )
     {
         if (instance_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-handle-dispatcher] instance handle is null");
 
+        if (!ptr_instance_functions) [[unlikely]]
+            throw exception::InvalidArgument("[vk-handle-dispatcher] pointer to instance functions is null");
+
         if (device_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-handle-dispatcher] device handle is null");
+
+        if (!ptr_device_functions) [[unlikely]]
+            throw exception::InvalidArgument("[vk-handle-dispatcher] pointer to device functions is null");
 
         if (allocator_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-handle-dispatcher] allocator handle is null");
 
-        _instance_handle    = instance_handle;
-        _device_handle      = device_handle;
-        _allocator_handle   = allocator_handle;
+        _instance_handle        = instance_handle;
+        _ptr_instance_functions = ptr_instance_functions;
+        _device_handle          = device_handle;
+        _ptr_device_functions   = ptr_device_functions;
+        _allocator_handle       = allocator_handle;
     }
 
     void ResourceDestroyer::destroy(VkInstance instance_handle) noexcept
@@ -161,6 +174,12 @@ namespace pbrlib::backend::vk
     {
         if (semaphore_handle != VK_NULL_HANDLE)
             vkDestroySemaphore(_device_handle, semaphore_handle, nullptr);
+    }
+
+    void ResourceDestroyer::destroy(VkDebugUtilsMessengerEXT debug_utils_messenger_handle) noexcept
+    {
+        if (debug_utils_messenger_handle && _ptr_instance_functions->vkDestroyDebugUtilsMessengerEXT)
+            _ptr_instance_functions->vkDestroyDebugUtilsMessengerEXT(_instance_handle, debug_utils_messenger_handle, nullptr);
     }
 
 #ifdef PBRLIB_ENABLE_PROFILING
