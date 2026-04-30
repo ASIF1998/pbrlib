@@ -42,7 +42,9 @@ namespace pbrlib::backend::vk
 
         ResourceDestroyer::initForDeviceResources(
             _instance_handle,
+            &_instance_functions,
             _device_handle,
+            &_device_functions,
             _allocator_handle
         );
 
@@ -94,6 +96,9 @@ namespace pbrlib::backend::vk
         VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
 
         loadInstanceFunctions();
+
+        if (is_debug) [[unlikely]]
+            setupDebugUtilsMessenger();
     }
 
     std::vector<const char*> Device::instanceExtensions()
@@ -843,5 +848,70 @@ namespace pbrlib::backend::vk
 
         _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
 #endif
+    }
+}
+
+namespace pbrlib::backend::vk
+{
+    VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessageCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
+        VkDebugUtilsMessageTypeFlagsEXT             type,
+        const VkDebugUtilsMessengerCallbackDataEXT* ptr_callback_data,
+        void*                                       ptr_user_data
+    )
+    {
+        if (!ptr_callback_data || !ptr_callback_data->pMessage) [[unlikely]]
+            return VK_FALSE;
+
+        constexpr auto prefix = [] (VkDebugUtilsMessageTypeFlagsEXT type)
+        {
+            if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+                return "validation";
+            
+            if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+                return "performance";
+
+            return "general";
+        };
+
+        std::string header = std::format("[{}]", prefix(type));
+        
+        if (ptr_callback_data->pMessageIdName)
+            header += std::format("[{}]", ptr_callback_data->pMessageIdName);
+        else 
+            header += "[no-id]";
+
+        if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+            log::error("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+        else if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+            log::warning("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+        else
+            log::info("[vk-device][{}] {}", header, ptr_callback_data->pMessage);
+
+        return severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT ? VK_TRUE : VK_FALSE;
+    }
+
+    void Device::setupDebugUtilsMessenger()
+    {
+        if (!_instance_functions.vkCreateDebugUtilsMessengerEXT) [[unlikely]]
+        {
+            log::error("[vk-device] failed to load vkCreateDebugUtilsMessengerEXT, is VK_EXT_debug_utils extension enabled?");
+            return ;
+        }
+
+        const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info 
+        { 
+            .sType              = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity    = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType        = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
+            .pfnUserCallback    = debugUtilsMessageCallback
+        };
+
+        VK_CHECK(_instance_functions.vkCreateDebugUtilsMessengerEXT(
+            _instance_handle, 
+            &messenger_create_info, 
+            nullptr, 
+            &_debug_utils_messenger_handle.handle()
+        ));
     }
 }

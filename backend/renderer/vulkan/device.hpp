@@ -65,6 +65,7 @@ namespace pbrlib::backend::vk
         void getGeneralQueueIndex();
 
         void createInstance(bool is_debug);
+        void setupDebugUtilsMessenger();
         void getPhysicalDevice();
         void createDevice();
         void createGpuAllocator();
@@ -162,6 +163,8 @@ namespace pbrlib::backend::vk
         InstanceFunctions   _instance_functions;
 
         DescriptorPoolHandle _descriptor_pool_handle;
+
+        DebugUtilsMessengerHandle _debug_utils_messenger_handle; 
 
 #ifdef PBRLIB_ENABLE_PROFILING
         TracyCtxHandle _tracy_ctx_handle;

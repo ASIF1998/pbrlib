@@ -11,6 +11,12 @@
 
 namespace pbrlib::backend::vk
 {
+    struct InstanceFunctions;
+    struct DeviceFunctions;
+}
+
+namespace pbrlib::backend::vk
+{
     class ResourceDestroyer final
     {
     public:
@@ -41,21 +47,26 @@ namespace pbrlib::backend::vk
         static void destroy(VkSwapchainKHR swapchain_handle)                                                noexcept;
         static void destroy(VkFence fence_handle)                                                           noexcept;
         static void destroy(VkSemaphore semaphore_handle)                                                   noexcept;
+        static void destroy(VkDebugUtilsMessengerEXT debug_utils_messenger_handle)                          noexcept;
 
 #ifdef PBRLIB_ENABLE_PROFILING
         static void destroy(TracyVkCtx tracy_ctx_handle) noexcept;
 #endif
 
         static void initForDeviceResources (
-            VkInstance      instance_handle,
-            VkDevice        device_handle,
-            VmaAllocator    allocator_handle
+            VkInstance          instance_handle,
+            InstanceFunctions*  ptr_instance_functions,
+            VkDevice            device_handle,
+            DeviceFunctions*    ptr_device_functions,
+            VmaAllocator        allocator_handle
         );
 
     private:
-        static VkInstance   _instance_handle;
-        static VkDevice     _device_handle;
-        static VmaAllocator _allocator_handle;
+        static VkInstance           _instance_handle;
+        static InstanceFunctions*   _ptr_instance_functions;
+        static VkDevice             _device_handle;
+        static DeviceFunctions*     _ptr_device_functions;
+        static VmaAllocator         _allocator_handle;
     };
 }
 
@@ -126,6 +137,7 @@ namespace pbrlib::backend::vk
     using SwapchainHandle           = UniqueHandle<VkSwapchainKHR>;
     using FenceHandle               = UniqueHandle<VkFence>;
     using SemaphoreHandle           = UniqueHandle<VkSemaphore>;
+    using DebugUtilsMessengerHandle = UniqueHandle<VkDebugUtilsMessengerEXT>;
 
 #ifdef PBRLIB_ENABLE_PROFILING
     using TracyCtxHandle = UniqueHandle<TracyVkCtx>;
