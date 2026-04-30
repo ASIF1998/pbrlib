@@ -28,7 +28,7 @@ namespace pbrlib::backend::vk
     Device::~Device()
     {
         if (_device_handle != VK_NULL_HANDLE) [[likely]]
-        vkDeviceWaitIdle(_device_handle);
+            vkDeviceWaitIdle(_device_handle);
     }
 
     void Device::init()
@@ -45,8 +45,6 @@ namespace pbrlib::backend::vk
             _device_handle,
             _allocator_handle
         );
-
-        loadFunctions();
 
         createCommandPools();
 
@@ -77,7 +75,8 @@ namespace pbrlib::backend::vk
 
         if (is_debug) [[unlikely]]
         {
-            constexpr std::array layers {
+            constexpr std::array layers 
+            {
                 "VK_LAYER_LUNARG_api_dump",
                 "VK_LAYER_KHRONOS_validation"
             };
@@ -93,6 +92,8 @@ namespace pbrlib::backend::vk
         instance_info.ppEnabledExtensionNames   = extensions.data();
 
         VK_CHECK(vkCreateInstance(&instance_info, nullptr, &_instance_handle.handle()));
+
+        loadInstanceFunctions();
     }
 
     std::vector<const char*> Device::instanceExtensions()
@@ -386,6 +387,8 @@ namespace pbrlib::backend::vk
             &_device_handle.handle()
         ));
 
+        loadDeviceFunctions();
+
         vkGetDeviceQueue(_device_handle, _general_queue.family_index, _general_queue.index, &_general_queue.handle);
     }
 
@@ -565,21 +568,53 @@ namespace pbrlib::backend::vk
         return ptr_function;
     }
 
-    void Device::loadFunctions()
+    template<typename VulkanFunctionType>
+    VulkanFunctionType loadFunction(VkInstance instance_handle, const std::string_view function_name)
+    {
+        auto ptr_function = reinterpret_cast<VulkanFunctionType>(
+            vkGetInstanceProcAddr(
+                instance_handle,
+                function_name.data()
+            )
+        );
+
+        if (ptr_function)
+            log::info("[vk-function-loader] {}", function_name);
+        else
+            log::error("[vk-function-loader] {}", function_name);
+
+        return ptr_function;
+    }
+
+    void Device::loadDeviceFunctions()
     {
         if (config::enable_vulkan_set_obj_name)
-            _functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
+            _device_functions.vkSetDebugUtilsObjectNameEXT = loadFunction<PFN_vkSetDebugUtilsObjectNameEXT>(_device_handle, "vkSetDebugUtilsObjectNameEXT");
 
         if (isRunFromFrameDebugger()) [[unlikely]]
         {
-            _functions.vkCmdDebugMarkerBeginEXT = loadFunction<PFN_vkCmdDebugMarkerBeginEXT>(_device_handle, "vkCmdDebugMarkerBeginEXT");
-            _functions.vkCmdDebugMarkerEndEXT   = loadFunction<PFN_vkCmdDebugMarkerEndEXT>(_device_handle, "vkCmdDebugMarkerEndEXT");
+            _device_functions.vkCmdDebugMarkerBeginEXT = loadFunction<PFN_vkCmdDebugMarkerBeginEXT>(_device_handle, "vkCmdDebugMarkerBeginEXT");
+            _device_functions.vkCmdDebugMarkerEndEXT   = loadFunction<PFN_vkCmdDebugMarkerEndEXT>(_device_handle, "vkCmdDebugMarkerEndEXT");
         }
     }
 
-    const Functions& Device::vulkanFunctions() const noexcept
+    void Device::loadInstanceFunctions()
     {
-        return _functions;
+        if constexpr (config::enable_vulkan_debug_print)
+        {
+            _instance_functions.vkCreateDebugUtilsMessengerEXT  = loadFunction<PFN_vkCreateDebugUtilsMessengerEXT>(_instance_handle, "vkCreateDebugUtilsMessengerEXT");
+            _instance_functions.vkDestroyDebugUtilsMessengerEXT = loadFunction<PFN_vkDestroyDebugUtilsMessengerEXT>(_instance_handle, "vkDestroyDebugUtilsMessengerEXT");
+        }
+    }
+
+    const DeviceFunctions& Device::deviceFunctions() const noexcept
+    {
+        return _device_functions;
+    }
+
+    const InstanceFunctions& Device::instanceFunctions() const noexcept
+    {
+        return _instance_functions;
     }
 }
 
@@ -587,8 +622,8 @@ namespace pbrlib::backend::vk
 {
     void Device::setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const
     {
-        if (_functions.vkSetDebugUtilsObjectNameEXT) [[likely]]
-            _functions.vkSetDebugUtilsObjectNameEXT(_device_handle, &name_info);
+        if (_device_functions.vkSetDebugUtilsObjectNameEXT) [[likely]]
+            _device_functions.vkSetDebugUtilsObjectNameEXT(_device_handle, &name_info);
     }
 }
 

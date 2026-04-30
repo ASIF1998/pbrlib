@@ -26,12 +26,18 @@ namespace pbrlib::backend::vk
         uint32_t    family_index    = std::numeric_limits<uint32_t>::max();
     };
 
-    struct Functions final
+    struct DeviceFunctions final
     {
         PFN_vkSetDebugUtilsObjectNameEXT vkSetDebugUtilsObjectNameEXT = VK_NULL_HANDLE;
 
         PFN_vkCmdDebugMarkerBeginEXT    vkCmdDebugMarkerBeginEXT    = VK_NULL_HANDLE;
         PFN_vkCmdDebugMarkerEndEXT      vkCmdDebugMarkerEndEXT      = VK_NULL_HANDLE;
+    };
+
+    struct InstanceFunctions final
+    {
+        PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessengerEXT  = VK_NULL_HANDLE;
+        PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = VK_NULL_HANDLE;
     };
 
     struct DescriptorImageInfo final
@@ -64,7 +70,8 @@ namespace pbrlib::backend::vk
         void createGpuAllocator();
         void createCommandPools();
 
-        void loadFunctions();
+        void loadDeviceFunctions();
+        void loadInstanceFunctions();
 
         void createDescriptorPool();
 
@@ -103,7 +110,8 @@ namespace pbrlib::backend::vk
 
         [[nodiscard]] DescriptorSetHandle allocateDescriptorSet(VkDescriptorSetLayout desc_set_layout_handle, std::string_view name = "") const;
 
-        [[nodiscard]] const Functions& vulkanFunctions() const noexcept;
+        [[nodiscard]] const DeviceFunctions&    deviceFunctions()   const noexcept;
+        [[nodiscard]] const InstanceFunctions&  instanceFunctions() const noexcept;
 
         void setName(const VkDebugUtilsObjectNameInfoEXT& name_info) const;
 
@@ -150,7 +158,8 @@ namespace pbrlib::backend::vk
 
         AllocatorHandle _allocator_handle;
 
-        Functions _functions;
+        DeviceFunctions     _device_functions;
+        InstanceFunctions   _instance_functions;
 
         DescriptorPoolHandle _descriptor_pool_handle;
 

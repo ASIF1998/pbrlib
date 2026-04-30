@@ -84,7 +84,7 @@ namespace pbrlib::backend::vk
             marker_info.color[3] = 1.0f;
         }
 
-        const auto& functions = _device.vulkanFunctions();
+        const auto& functions = _device.deviceFunctions();
 
         if (functions.vkCmdDebugMarkerBeginEXT) [[likely]]
             functions.vkCmdDebugMarkerBeginEXT(handle, &marker_info);
