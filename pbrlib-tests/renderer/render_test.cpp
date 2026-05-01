@@ -53,7 +53,6 @@ namespace pbrlib::testing
         _engine->run();
 
         auto ptr_result = _frame_graph_getter->image(attachment_name);
-
         ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
         pbrlib::testing::thisTrue(_comparator->compare(*ptr_result, refs_root_dir / reference_image));

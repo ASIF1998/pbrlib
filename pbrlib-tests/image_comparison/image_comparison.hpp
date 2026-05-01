@@ -28,7 +28,7 @@ namespace pbrlib::testing
         ImageComparison& operator = (const ImageComparison& image_comparison)   = delete;
 
         [[nodiscard]]
-        bool compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2);
+        bool compare(const backend::vk::Image& image, const backend::vk::Image& image_2);
 
         [[nodiscard]]
         bool compare (

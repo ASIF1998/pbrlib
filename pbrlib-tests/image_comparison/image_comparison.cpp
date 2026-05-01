@@ -129,7 +129,7 @@ namespace pbrlib::testing
     }
 
     bool ImageComparison::compare (
-        const backend::vk::Image&       image_1,
+        const backend::vk::Image&       image,
         const std::filesystem::path&    path_to_reference
     )
     {
@@ -140,14 +140,14 @@ namespace pbrlib::testing
         {
             backend::vk::exporters::Image(_device)
                 .filename(path_to_reference)
-                .image(&image_1)
+                .image(&image)
                 .save();
 
             return true;
         }
 
         return compare(
-            image_1,
+            image,
             backend::vk::loaders::Image(_device)
                 .filename(path_to_reference)
                 .load()
