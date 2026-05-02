@@ -5,7 +5,7 @@
 
 namespace pbrlib::backend::vk
 {
-    vk::SemaphoreHandle create(VkDevice device_handle, const VkSemaphoreCreateInfo& create_info)
+    SemaphoreHandle create(VkDevice device_handle, const VkSemaphoreCreateInfo& create_info)
     {
         VkSemaphore semaphore_handle = VK_NULL_HANDLE;
 
@@ -19,10 +19,10 @@ namespace pbrlib::backend::vk
         if (semaphore_handle == VK_NULL_HANDLE) [[unlikely]]
             throw pbrlib::exception::InitializeError("failed create semaphore");
 
-        return vk::SemaphoreHandle(semaphore_handle);
+        return SemaphoreHandle(semaphore_handle);
     }
 
-    vk::FenceHandle create(VkDevice device_handle, const VkFenceCreateInfo& create_info)
+    FenceHandle create(VkDevice device_handle, const VkFenceCreateInfo& create_info)
     {
         VkFence fence_handle = VK_NULL_HANDLE;
 
@@ -36,7 +36,7 @@ namespace pbrlib::backend::vk
         if (fence_handle == VK_NULL_HANDLE) [[unlikely]]
             throw pbrlib::exception::InitializeError("failed create fence");
 
-        return vk::FenceHandle(fence_handle);
+        return FenceHandle(fence_handle);
     }
 
     void sync(VkDevice device_handle, VkFence fence_handle, uint64_t timeout)

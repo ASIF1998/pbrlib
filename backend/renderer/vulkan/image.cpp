@@ -29,18 +29,21 @@ namespace pbrlib::backend::utils
             case VK_FORMAT_R8_UNORM:
                 return 1;
             case VK_FORMAT_R8G8_UNORM:
+            case VK_FORMAT_R16_SFLOAT:
                 return 2;
             case VK_FORMAT_R8G8B8_UNORM:
                 return 3;
             case VK_FORMAT_R8G8B8A8_UNORM:
                 return 4;
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+                return 8;
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 16;
             default:
                 throw exception::RuntimeError("[vk-image] undefined pixel format");
         }
 
-        return std::numeric_limits<uint8_t>::max();
+        std::unreachable();
     }
 }
 
