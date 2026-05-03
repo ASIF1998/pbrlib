@@ -88,6 +88,7 @@ namespace pbrlib::backend
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
+            PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[fxaa] run-pipeline");
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
             const auto [io_set_handle, _] = IODescriptorSet();
@@ -99,7 +100,7 @@ namespace pbrlib::backend
                 0, nullptr
             );
 
-            vkCmdPushConstants (
+            vkCmdPushConstants(
                 command_buffer_handle,
                 _pipeline_layout_handle,
                 VK_SHADER_STAGE_COMPUTE_BIT,

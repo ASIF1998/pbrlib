@@ -14,10 +14,6 @@ namespace pbrlib::testing
     {
         if constexpr (!pbrlib::testing::vk::isSupport())
             GTEST_SKIP() << "fix bug with insufficient precision when saving to file";
-
-        _engine.emplace(_config);
-        _frame_graph_getter.emplace(_engine.value());
-        _comparator.emplace(_frame_graph_getter->device());
     }
 
     void RenderTest::TearDown()
@@ -29,6 +25,13 @@ namespace pbrlib::testing
 
     void RenderTest::setup(const std::filesystem::path& content, const Settings& settings)
     {
+        if (_engine)
+            return ;
+
+        _engine.emplace(_config);
+        _frame_graph_getter.emplace(_engine.value());
+        _comparator.emplace(_frame_graph_getter->device());
+
         _engine->setup([this, content, &settings] (pbrlib::Scene& scene)
         {
             auto& camera = _engine->camera();

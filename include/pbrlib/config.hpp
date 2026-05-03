@@ -44,6 +44,6 @@ namespace pbrlib
         bool draw_in_window = true;
 
         settings::SSAO  ssao;
-        settings::AA    aa;
+        settings::AA    aa = settings::AA::eNone;
     };
 }
