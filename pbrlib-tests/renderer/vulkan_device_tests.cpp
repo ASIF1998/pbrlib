@@ -21,7 +21,7 @@ public:
         if constexpr (!pbrlib::testing::vk::isSupport())
             GTEST_SKIP();
 
-        pbrlib::EventSystem::emmit(pbrlib::backend::events::Initialize());
+        pbrlib::EventSystem::emit(pbrlib::backend::events::Initialize());
         device.emplace();
         device->init();
     }
@@ -29,7 +29,7 @@ public:
     void TearDown() override
     {
         device = std::nullopt;
-        pbrlib::EventSystem::emmit(pbrlib::backend::events::Finalize());
+        pbrlib::EventSystem::emit(pbrlib::backend::events::Finalize());
     }
 
     std::optional<pbrlib::backend::vk::Device> device;
