@@ -49,9 +49,7 @@ namespace pbrlib::backend::vk
         );
 
         createCommandPools();
-
         createDescriptorPool();
-
         createTracyContext();
     }
 }
@@ -834,16 +832,14 @@ namespace pbrlib::backend::vk
     {
 #ifdef PBRLIB_ENABLE_PROFILING
         auto tracy_setup_command_buffer = oneTimeSubmitCommandBuffer("tracy-setup");
-        auto tracy_ctx_handle = TracyVkContextCalibrated(
+        auto tracy_ctx_handle = TracyVkContext(
             _physical_device_handle,
             _device_handle,
             _general_queue.handle,
-            tracy_setup_command_buffer.handle,
-            VK_NULL_HANDLE,
-            VK_NULL_HANDLE
+            tracy_setup_command_buffer.handle
         );
 
-        if (!tracy_ctx_handle)
+        if (!tracy_ctx_handle) [[unlikely]]
             throw exception::InitializeError("[vk-device] failed create tracy context for profiling");
 
         _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
