@@ -1,10 +1,11 @@
 #pragma once
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
-
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
+
+#include <pbrlib/event_system.hpp>
 
 #include <array>
 
@@ -50,7 +51,8 @@ namespace pbrlib::backend
     };
 
     class GBufferGenerator final :
-        public RenderPass
+        public RenderPass,
+        public pbrlib::EventSystem
     {
         void createResultDescriptorSet();
 

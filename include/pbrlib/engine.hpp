@@ -2,6 +2,7 @@
 
 #include <pbrlib/window.hpp>
 #include <pbrlib/camera.hpp>
+#include <pbrlib/event_system.hpp>
 
 #include <functional>
 #include <optional>
@@ -47,7 +48,8 @@ namespace pbrlib
 
 namespace pbrlib
 {
-    class Engine final
+    class Engine final :
+        public pbrlib::EventSystem
     {
         friend class Scene;
         friend class testing::FrameGraphResourcesGetter;
@@ -56,6 +58,8 @@ namespace pbrlib
 
         void draw();
         void updateTime();
+
+        void initialize();
 
     public:
         explicit Engine(const Config& config);

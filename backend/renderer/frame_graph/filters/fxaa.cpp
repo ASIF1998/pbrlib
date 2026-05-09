@@ -35,12 +35,12 @@ namespace pbrlib::backend
             return false;
         }
 
-        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& init)
+        on([this] ([[maybe_unused]] const events::RecompilePipeline& init)
         {
             createPipeline();
         });
 
-        EventSystem::on([this] (const events::UpdateFXAA& settings)
+        on([this] (const events::UpdateFXAA& settings)
         {
             const auto& config = settings.settings;
 

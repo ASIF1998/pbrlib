@@ -3,6 +3,8 @@
 #include <backend/renderer/frame_graph/filters/filter.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
+#include <pbrlib/event_system.hpp>
+
 namespace pbrlib::backend
 {
     struct BilateralBlurSetsId final
@@ -15,7 +17,8 @@ namespace pbrlib::backend
     };
 
     class BilateralBlur final :
-        public Filter
+        public Filter,
+        public pbrlib::EventSystem
     {
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
 

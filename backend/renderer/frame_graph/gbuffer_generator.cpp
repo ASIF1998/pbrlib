@@ -1,5 +1,4 @@
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
-
 #include <backend/renderer/vulkan/render_pass.hpp>
 #include <backend/renderer/vulkan/shader_compiler.hpp>
 #include <backend/renderer/vulkan/device.hpp>
@@ -8,20 +7,13 @@
 #include <backend/renderer/vulkan/framebuffer.hpp>
 #include <backend/renderer/vulkan/graphics_pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
-
 #include <backend/scene/mesh_manager.hpp>
-
 #include <backend/components.hpp>
-
 #include <backend/utils/paths.hpp>
-
 #include <backend/logger/logger.hpp>
 
 #include <pbrlib/scene/scene.hpp>
-
 #include <pbrlib/math/matrix4x4.hpp>
-
-#include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
 
 #include <array>
@@ -102,7 +94,7 @@ namespace pbrlib::backend
             return false;
         }
 
-        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
+        on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
         {
             createPipeline();
         });

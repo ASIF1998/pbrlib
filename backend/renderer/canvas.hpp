@@ -3,6 +3,8 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/surface.hpp>
 
+#include <pbrlib/event_system.hpp>
+
 #include <optional>
 
 namespace pbrlib
@@ -18,7 +20,8 @@ namespace pbrlib::backend
         uint32_t height = 0;
     };
 
-    class Canvas final
+    class Canvas final :
+        public pbrlib::EventSystem
     {
         [[nodiscard]] bool nextImage(VkSemaphore wait_semaphore);
 
@@ -26,10 +29,11 @@ namespace pbrlib::backend
         explicit Canvas(vk::Device& device, const pbrlib::Window* ptr_window);
         explicit Canvas(vk::Device& device, uint32_t width, uint32_t height);
 
-        Canvas(Canvas&& canvas)         = default;
+        Canvas(Canvas&& canvas)         = delete;
         Canvas(const Canvas& canvas)    = delete;
 
-        Canvas& operator = (const Canvas& canvas) = delete;
+        Canvas& operator = (Canvas&& canvas)        = delete;
+        Canvas& operator = (const Canvas& canvas)   = delete;
 
         void present(const vk::Image* ptr_result, VkSemaphore wait_semaphore);
 

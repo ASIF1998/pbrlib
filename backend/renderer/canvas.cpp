@@ -22,7 +22,7 @@ namespace pbrlib::backend
 
         _surface.vk_surface.emplace(_device, *ptr_window);
 
-        EventSystem::on([this, ptr_window] ([[maybe_unused]] const events::ResizeWindow& event)
+        on([this, ptr_window] ([[maybe_unused]] const events::ResizeWindow& event)
         {
             vkDeviceWaitIdle(_device.device());
             _surface.vk_surface.emplace(_device, *ptr_window);
@@ -47,7 +47,7 @@ namespace pbrlib::backend
             .usage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
             .build();
 
-        EventSystem::on([this] (const events::ResizeWindow& event)
+        on([this] (const events::ResizeWindow& event)
         {
             vkDeviceWaitIdle(_device.device());
 

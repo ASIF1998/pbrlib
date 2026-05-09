@@ -10,10 +10,10 @@ namespace pbrlib
         typename entt::nth_argument_t<0, Callback>;
     };
 
-    class EventSystem final
+    class EventSystem
     {
     public:
-        EventSystem() = delete;
+        EventSystem() = default;
 
         EventSystem(EventSystem&& event_system)         = delete;
         EventSystem(const EventSystem& event_system)    = delete;
@@ -25,7 +25,7 @@ namespace pbrlib
         static void emmit(const Event& event);
 
         template<InvocableWithParams Callback>
-        static void on(Callback callback);
+        void on(Callback callback);
 
     private:
         static entt::dispatcher _dispatcher;

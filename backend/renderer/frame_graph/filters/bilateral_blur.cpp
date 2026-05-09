@@ -36,7 +36,7 @@ namespace pbrlib::backend
             return false;
         }
 
-        EventSystem::on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
+        on([this] ([[maybe_unused]] const events::RecompilePipeline& event)
         {
             createPipeline();
         });
