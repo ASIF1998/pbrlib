@@ -54,7 +54,7 @@ namespace pbrlib::backend
             return false;
         }
 
-        EventSystem::on([this] (const events::UpdateSSAO& settings)
+        on([this] (const events::UpdateSSAO& settings)
         {
             PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -72,7 +72,7 @@ namespace pbrlib::backend
             }
         });
 
-        EventSystem::on([this] (const events::RecompilePipeline& event)
+        on([this] (const events::RecompilePipeline& event)
         {
             createPipeline(event.width, event.height);
         });

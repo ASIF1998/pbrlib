@@ -10,23 +10,18 @@
 #include <backend/scene/material_manager.hpp>
 #include <backend/scene/mesh_manager.hpp>
 #include <backend/shaders/gpu_cpu_constants.h>
-
 #include <backend/renderer/canvas.hpp>
-
 #include <backend/components.hpp>
-
 #include <backend/profiling.hpp>
-
 #include <backend/utils/align_size.hpp>
+#include <backend/logger/logger.hpp>
+#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/scene/assimp_importer.hpp>
 
 #include <pbrlib/input/input_stay.hpp>
-
 #include <pbrlib/scene/scene.hpp>
-
 #include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
-
-#include <backend/initialize.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -48,9 +43,9 @@ namespace pbrlib
 
         ++g_num_engine_instances;
 
-        backend::initialize();
+        initialize();
 
-        EventSystem::emmit(backend::events::Initialize());
+        EventSystem::emit(backend::events::Initialize());
 
         _ptr_device = std::make_unique<backend::vk::Device>();
         _ptr_device->init();
@@ -83,9 +78,66 @@ namespace pbrlib
     Engine::~Engine()
     {
         backend::log::info("[engine] finalize");
-        EventSystem::emmit(backend::events::Finalize());
+        EventSystem::emit(backend::events::Finalize());
 
         --g_num_engine_instances;
+    }
+
+    void Engine::initialize()
+    {
+        on([] ([[maybe_unused]] const backend::events::Initialize& event)
+        {
+            if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) [[unlikely]]
+            {
+                std::string error_msg = SDL_GetError();
+                SDL_ClearError();
+
+                throw exception::InitializeError(std::format("[window] SDL: {}", error_msg));
+            }
+        });
+
+        on([] ([[maybe_unused]] const backend::events::Finalize& event)
+        {
+            SDL_Quit();
+        });
+
+        on([] ([[maybe_unused]] const backend::events::Initialize& event)
+        {
+            backend::log::priv::EngineLogger::init();
+            backend::log::priv::AppLogger::init();
+        });
+
+        on([] ([[maybe_unused]] const backend::events::Initialize& event)
+        {
+            backend::vk::shader::initCompiler();
+        });
+
+        on([] ([[maybe_unused]] const backend::events::Finalize& event)
+        {
+            backend::vk::shader::finalizeCompiler();
+        });
+
+        on([this] ([[maybe_unused]] const backend::events::Initialize& event)
+        {
+            on([] (const backend::events::AssimpImporter& event)
+            {
+                PBRLIB_PROFILING_ZONE_SCOPED;
+
+                backend::log::info("[importer] load model: '{}'", event.filename.string());
+
+                const bool res = backend::AssimpImporter()
+                    .device(event.ptr_device)
+                    .scene(event.ptr_scene)
+                    .filename(event.filename)
+                    .materialManager(event.ptr_material_manager)
+                    .meshManager(event.ptr_mesh_manager)
+                    .transform(event.transform)
+                    .import();
+
+                if (!res)
+                    throw exception::RuntimeError(std::format("[importer] failed load model: {}", event.filename.string()));
+            });
+        });
     }
 
     void Engine::resize(uint32_t width, uint32_t height)
@@ -93,7 +145,7 @@ namespace pbrlib
         _camera.width(width);
         _camera.height(height);
 
-        EventSystem::emmit(backend::events::ResizeWindow {
+        EventSystem::emit(backend::events::ResizeWindow {
             .width  = width,
             .height = height
         });
@@ -143,7 +195,7 @@ namespace pbrlib
             if (input_stay.keyboard.isDown(pbrlib::Keycode::eF5)) [[unlikely]]
             {
                 const auto [width, height] = _window->size();
-                EventSystem::emmit(backend::events::RecompilePipeline(width, height));
+                EventSystem::emit(backend::events::RecompilePipeline(width, height));
             }
 #endif
 
@@ -222,14 +274,14 @@ namespace pbrlib
 
     void Engine::update(const settings::SSAO& settings)
     {
-        EventSystem::emmit(backend::events::UpdateSSAO {
+        EventSystem::emit(backend::events::UpdateSSAO {
            .settings = settings
         });
     }
 
     void Engine::update(const settings::FXAA& settings)
     {
-        EventSystem::emmit(backend::events::UpdateFXAA {
+        EventSystem::emit(backend::events::UpdateFXAA {
            .settings = settings
         });
     }

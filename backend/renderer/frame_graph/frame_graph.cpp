@@ -51,7 +51,7 @@ namespace pbrlib::backend
 
         initFrameSync();
 
-        EventSystem::on([this] (const events::ResizeWindow& event)
+        on([this] (const events::ResizeWindow& event)
         {
             vkDeviceWaitIdle(_device.device());
 

@@ -3,11 +3,11 @@
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
-
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
+#include <pbrlib/event_system.hpp>
 
 #include <optional>
 #include <array>
@@ -55,7 +55,8 @@ namespace pbrlib::backend
 namespace pbrlib::backend
 {
     class SSAO final :
-        public RenderPass
+        public RenderPass,
+        public pbrlib::EventSystem
     {
         struct alignas(16) Params final
         {

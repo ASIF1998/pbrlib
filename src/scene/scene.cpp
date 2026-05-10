@@ -215,7 +215,7 @@ namespace pbrlib
         const math::mat4&               transform
     )
     {
-        EventSystem::emmit(backend::events::AssimpImporter {
+        EventSystem::emit(backend::events::AssimpImporter {
             .ptr_device             = engine._ptr_device.get(),
             .ptr_scene              = this,
             .filename               = filename,

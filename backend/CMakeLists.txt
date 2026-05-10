@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 3.27)
 
 set(PBRLIB_BACKEND_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/initialize.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/profiling.cpp
     CACHE INTERNAL ""
 )
 
 set(PBRLIB_BACKEND_H
     ${CMAKE_CURRENT_SOURCE_DIR}/events.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/initialize.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/profiling.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/components.hpp
     CACHE INTERNAL ""
@@ -20,7 +18,7 @@ set(PBRLIB_BACKEND_INPUT_H
 )
 
 set(PBRLIB_BACKEND_LOGGER_H
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger/console.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/console.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.hpp
     CACHE INTERNAL ""
 )

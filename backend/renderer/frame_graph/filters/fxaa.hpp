@@ -3,6 +3,8 @@
 #include <backend/renderer/frame_graph/filters/filter.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
+#include <pbrlib/event_system.hpp>
+
 #include <array>
 
 namespace pbrlib::backend
@@ -35,7 +37,8 @@ namespace pbrlib::backend
 namespace pbrlib::backend
 {
     class FXAA final :
-        public Filter
+        public Filter,
+        public pbrlib::EventSystem
     {
         struct Settings final
         {

@@ -1,15 +1,13 @@
 #pragma once
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
-
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <pbrlib/config.hpp>
-
 #include <pbrlib/camera.hpp>
+#include <pbrlib/event_system.hpp>
 
 #include <string>
-
 #include <memory>
 #include <map>
 #include <optional>
@@ -29,13 +27,14 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    class FrameGraph final
+    class FrameGraph final :
+        public pbrlib::EventSystem
     {
         friend class testing::FrameGraphResourcesGetter;
 
         using RenderPassesImages = std::map <
-            std::string, 
-            vk::Image, 
+            std::string,
+            vk::Image,
             std::less<void>
         >;
 

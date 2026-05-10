@@ -91,8 +91,8 @@ add_library(pbrlib STATIC
 #   Add project defenitions
 #####################################################
 if (PBRLIB_BUILD_SAMPLES)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_PROFILING)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_ENABLE_DEVELOPER_MODE)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_ENABLE_PROFILING)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_ENABLE_DEVELOPER_MODE)
 endif()
 
 if (PBRLIB_SETUP_CI)
