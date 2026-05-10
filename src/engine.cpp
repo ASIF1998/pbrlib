@@ -45,7 +45,7 @@ namespace pbrlib
 
         initialize();
 
-        EventSystem::emmit(backend::events::Initialize());
+        EventSystem::emit(backend::events::Initialize());
 
         _ptr_device = std::make_unique<backend::vk::Device>();
         _ptr_device->init();
@@ -78,7 +78,7 @@ namespace pbrlib
     Engine::~Engine()
     {
         backend::log::info("[engine] finalize");
-        EventSystem::emmit(backend::events::Finalize());
+        EventSystem::emit(backend::events::Finalize());
 
         --g_num_engine_instances;
     }
@@ -145,7 +145,7 @@ namespace pbrlib
         _camera.width(width);
         _camera.height(height);
 
-        EventSystem::emmit(backend::events::ResizeWindow {
+        EventSystem::emit(backend::events::ResizeWindow {
             .width  = width,
             .height = height
         });
@@ -195,7 +195,7 @@ namespace pbrlib
             if (input_stay.keyboard.isDown(pbrlib::Keycode::eF5)) [[unlikely]]
             {
                 const auto [width, height] = _window->size();
-                EventSystem::emmit(backend::events::RecompilePipeline(width, height));
+                EventSystem::emit(backend::events::RecompilePipeline(width, height));
             }
 #endif
 
@@ -274,14 +274,14 @@ namespace pbrlib
 
     void Engine::update(const settings::SSAO& settings)
     {
-        EventSystem::emmit(backend::events::UpdateSSAO {
+        EventSystem::emit(backend::events::UpdateSSAO {
            .settings = settings
         });
     }
 
     void Engine::update(const settings::FXAA& settings)
     {
-        EventSystem::emmit(backend::events::UpdateFXAA {
+        EventSystem::emit(backend::events::UpdateFXAA {
            .settings = settings
         });
     }

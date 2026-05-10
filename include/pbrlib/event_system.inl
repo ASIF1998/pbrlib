@@ -1,7 +1,7 @@
 namespace pbrlib
 {
     template<typename Event>
-    void EventSystem::emmit(const Event& event)
+    void EventSystem::emit(const Event& event)
     {
         _dispatcher.trigger(event);
     }
@@ -13,17 +13,19 @@ namespace pbrlib
             entt::nth_argument_t<0, Callback>
         >;
 
-        struct Listener final
+        struct Subscription final :
+            public Listener
         {
-            explicit Listener(Callback callback) :
+            explicit Subscription(Callback callback) :
                 callback(callback)
-            { }
+            { 
+                _dispatcher.sink<EventType>().template connect<&Subscription::handle>(this);
+            }
 
-            Listener(Listener&& listener)       = default;
-            Listener(const Listener& listener)  = delete;
-
-            Listener& operator = (Listener&& listener)      = default;
-            Listener& operator = (const Listener& listener) = delete;
+            ~Subscription() override 
+            {
+                _dispatcher.sink<EventType>().template disconnect<&Subscription::handle>(this);
+            }
 
             void handle(const EventType& event) const
             {
@@ -33,9 +35,6 @@ namespace pbrlib
             Callback callback;
         };
 
-        static std::list<Listener> listeners;
-
-        listeners.emplace_front(std::move(callback));
-        _dispatcher.sink<EventType>().template connect<&Listener::handle>(&listeners.front());
+        _listeners.emplace_front(std::make_unique<Subscription>(std::move(callback)));
     }
 }
