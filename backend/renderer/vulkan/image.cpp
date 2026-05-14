@@ -12,13 +12,9 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-#include <stdexcept>
-
 #include <algorithm>
 #include <array>
 #include <unordered_set>
-
-#include <fstream>
 
 namespace pbrlib::backend::utils
 {
@@ -592,12 +588,65 @@ namespace pbrlib::backend::vk::exporters
             std::filesystem::create_directory(save_directory);
     }
 
+    Buffer fetch(Device& device, const vk::Image& image)
+    {
+        if (image.layout != VK_IMAGE_LAYOUT_GENERAL && image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
+            throw exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
+
+        const auto size = image.width * image.height * utils::formatSize(image.format);
+        auto buffer = builders::Buffer(device)
+            .addQueueFamilyIndex(device.queue().family_index)
+            .name("[vk-image::exporter] fetch buffer")
+            .size(size)
+            .type(BufferType::eReadback)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+            .build();
+
+        auto command_buffer = device.oneTimeSubmitCommandBuffer("[vk-image::exporter] copy from image to buffer");
+        command_buffer.write([&buffer, &image] (const auto command_buffer_handle)
+        {
+            constexpr VkImageSubresourceLayers color_image_subresource
+            {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel       = 0,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            const VkBufferImageCopy2 copy_region
+            {
+                .sType              = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2,
+                .imageSubresource   = color_image_subresource,
+                .imageExtent        = {image.width, image.height, 1u}
+            };
+
+            const VkCopyImageToBufferInfo2 copy_image_to_buffer_info
+            {
+                .sType          = VK_STRUCTURE_TYPE_COPY_IMAGE_TO_BUFFER_INFO_2,
+                .srcImage       = image.handle.handle(),
+                .srcImageLayout = image.layout,
+                .dstBuffer      = buffer.handle.handle(),
+                .regionCount    = 1,
+                .pRegions       = &copy_region
+            };
+
+            vkCmdCopyImageToBuffer2(command_buffer_handle, &copy_image_to_buffer_info);
+        });
+
+        device.submit(command_buffer);
+
+        return buffer;
+    }
+
     void Image::save()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         validate();
 
+        const auto readback_buffer = fetch(_device, *_ptr_image);
+
+#if 0
         auto width  = static_cast<int>(_ptr_image->width);
         auto height = static_cast<int>(_ptr_image->height);
 
@@ -700,5 +749,6 @@ namespace pbrlib::backend::vk::exporters
         }, &writer, width, height, 4, ptr_data + sub_resource_layout.offset, static_cast<int>(sub_resource_layout.rowPitch));
 
         vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
+#endif
     }
 }
