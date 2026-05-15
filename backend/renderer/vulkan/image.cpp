@@ -638,13 +638,32 @@ namespace pbrlib::backend::vk::exporters
         return buffer;
     }
 
+    void writeToPng(std::span<const uint8_t> data, uint8_t chanel_count)
+    {
+        if (!chanel_count) [[unlikely]]
+            throw exception::InvalidArgument("[vk-image::exporter] chanel count is 0");
+    }
+
     void Image::save()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         validate();
 
-        const auto readback_buffer = fetch(_device, *_ptr_image);
+        auto readback_buffer = fetch(_device, *_ptr_image);
+        readback_buffer.map([this] (std::span<const uint8_t> data)
+        {
+            switch (_ptr_image->format)
+            {
+                case VK_FORMAT_R8_UNORM:
+                    writeToPng(data, 1);
+                    break;
+
+                /// @todo add undefined format exception type
+                default:
+                    throw exception::InvalidState("[vk-image::exporter] undefined image format");
+            }
+        });
 
 #if 0
         auto width  = static_cast<int>(_ptr_image->width);
