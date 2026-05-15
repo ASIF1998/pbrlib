@@ -16,6 +16,8 @@
 #include <array>
 #include <unordered_set>
 
+#include <fstream>
+
 namespace pbrlib::backend::utils
 {
     constexpr uint8_t formatSize(VkFormat format)
@@ -35,6 +37,28 @@ namespace pbrlib::backend::utils
                 return 8;
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 16;
+            default:
+                throw exception::RuntimeError("[vk-image] undefined pixel format");
+        }
+
+        std::unreachable();
+    }
+
+    constexpr uint8_t channelCount(VkFormat format)
+    {
+        switch (format)
+        {
+            case VK_FORMAT_R8_UNORM:
+            case VK_FORMAT_R16_SFLOAT:
+                return 1;
+            case VK_FORMAT_R8G8_UNORM:
+                return 2;
+            case VK_FORMAT_R8G8B8_UNORM:
+                return 3;
+            case VK_FORMAT_R8G8B8A8_UNORM:
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+            case VK_FORMAT_R32G32B32A32_SFLOAT:
+                return 4;
             default:
                 throw exception::RuntimeError("[vk-image] undefined pixel format");
         }
@@ -590,6 +614,8 @@ namespace pbrlib::backend::vk::exporters
 
     Buffer fetch(Device& device, const vk::Image& image)
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (image.layout != VK_IMAGE_LAYOUT_GENERAL && image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
             throw exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
 
@@ -638,10 +664,26 @@ namespace pbrlib::backend::vk::exporters
         return buffer;
     }
 
-    void writeToPng(std::span<const uint8_t> data, uint8_t chanel_count)
+    void writeToPng(const std::filesystem::path& filename, std::span<const uint8_t> data, uint32_t width, uint32_t height, uint8_t channel_count)
     {
-        if (!chanel_count) [[unlikely]]
-            throw exception::InvalidArgument("[vk-image::exporter] chanel count is 0");
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (!channel_count) [[unlikely]]
+            throw exception::InvalidArgument("[vk-image::exporter] channel count is 0");
+
+        if (data.empty()) [[unlikely]]
+            throw exception::InvalidArgument("[vk-image::exporter] image data is empty");
+
+        std::ofstream file (filename, std::ios::out | std::ios::binary);
+
+        if (!file) [[unlikely]]
+            throw exception::FileOpen("[vk-image::exporter] failed create writer");
+
+        stbi_write_png_to_func([](void *context, void *data, int size)
+        {
+            auto ptr_file = reinterpret_cast<std::ofstream*>(context);
+            ptr_file->write(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
+        }, &file, static_cast<int32_t>(width), static_cast<int32_t>(height), channel_count, data.data(), static_cast<int>(channel_count * width));
     }
 
     void Image::save()
@@ -656,7 +698,10 @@ namespace pbrlib::backend::vk::exporters
             switch (_ptr_image->format)
             {
                 case VK_FORMAT_R8_UNORM:
-                    writeToPng(data, 1);
+                case VK_FORMAT_R8G8_UNORM:
+                case VK_FORMAT_R8G8B8_UNORM:
+                case VK_FORMAT_R8G8B8A8_UNORM:
+                    writeToPng(_filename, data, _ptr_image->width, _ptr_image->height, utils::channelCount(_ptr_image->format));
                     break;
 
                 /// @todo add undefined format exception type
@@ -664,110 +709,5 @@ namespace pbrlib::backend::vk::exporters
                     throw exception::InvalidState("[vk-image::exporter] undefined image format");
             }
         });
-
-#if 0
-        auto width  = static_cast<int>(_ptr_image->width);
-        auto height = static_cast<int>(_ptr_image->height);
-
-        auto image = builders::Image(_device)
-            .size(_ptr_image->width, _ptr_image->height)
-            .format(VK_FORMAT_R8G8B8A8_UNORM)
-            .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
-            .addQueueFamilyIndex(_device.queue().family_index)
-            .tiling(VK_IMAGE_TILING_LINEAR)
-            .fillColor(pbrlib::math::vec3(std::numeric_limits<float>::max()))
-            .name("[vk-image::exporter] src-image")
-            .build();
-
-        image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer();
-        command_buffer.write([&image, this] (auto command_buffer_handle)
-        {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image::exoprter] blit-src-image-to-save");
-
-            const VkOffset3D blit_size
-            {
-                .x = static_cast<int32_t>(image.width),
-                .y = static_cast<int32_t>(image.height),
-                .z = 1
-            };
-
-            const VkImageBlit2 region
-            {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2,
-                .srcSubresource =
-                {
-                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                    .layerCount = 1
-                },
-                .srcOffsets = {{}, blit_size},
-                .dstSubresource =
-                {
-                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                    .layerCount = 1
-                },
-                .dstOffsets = {{}, blit_size}
-            };
-
-            const VkBlitImageInfo2 blit_info
-            {
-                .sType          = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2,
-                .srcImage       = _ptr_image->handle.handle(),
-                .srcImageLayout = _ptr_image->layout,
-                .dstImage       = image.handle.handle(),
-                .dstImageLayout = image.layout,
-                .regionCount    = 1,
-                .pRegions       = &region,
-                .filter         = VK_FILTER_NEAREST
-            };
-
-            vkCmdBlitImage2(command_buffer_handle, &blit_info);
-        }, "[vk-image::exoprter] blit-src-image-to-save", marker_colors::blit_image);
-
-        _device.submit(command_buffer);
-
-        std::ofstream file (_filename, std::ios::out | std::ios::binary);
-
-        if (!file) [[unlikely]]
-            throw exception::FileOpen("[vk-image::exporter] failed create writer");
-
-        const VkImageSubresource sub_resource
-        {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .mipLevel   = 0,
-            .arrayLayer = 0
-        };
-
-        VkSubresourceLayout sub_resource_layout = { };
-
-        vkGetImageSubresourceLayout(
-            _device.device(),
-            image.handle.handle(),
-            &sub_resource,
-            &sub_resource_layout
-        );
-
-        const auto allocation_handle = image.handle.context<VmaAllocation>();
-
-        uint8_t* ptr_data = nullptr;
-        VK_CHECK(vmaMapMemory(
-            _device.vmaAllocator(),
-            allocation_handle,
-            reinterpret_cast<void**>(&ptr_data)
-        ));
-
-        std::function<void (void*, int)> writer = [this, &file] (void* data, int size)
-        {
-            file.write(reinterpret_cast<char*>(data), size);
-        };
-
-        stbi_write_png_to_func([](void *context, void *data, int size)
-        {
-            (*reinterpret_cast<std::function<void (void*, int)>*>(context))(data, size);
-        }, &writer, width, height, 4, ptr_data + sub_resource_layout.offset, static_cast<int>(sub_resource_layout.rowPitch));
-
-        vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
-#endif
     }
 }
