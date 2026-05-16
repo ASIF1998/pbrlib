@@ -27,7 +27,7 @@ public:
 
         pbrlib::Config config
         {
-            .title          = "scene-importer-tests",
+            .title          = "content-tests",
             .draw_in_window = false
         };
 
@@ -49,8 +49,7 @@ public:
     {
         try
         {
-            bool result = false;
-            _engine->setup([this, &filename, &result, &transform](pbrlib::Scene& scene)
+            _engine->setup([this, &filename, &transform](pbrlib::Scene& scene)
             {
                 scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
             });
@@ -60,13 +59,14 @@ public:
             _engine->run();
 
             const auto ptr_mesh_manager = getter.meshManager();
-            if (!ptr_mesh_manager)
+            if (!ptr_mesh_manager) [[unlikely]]
                 return false;
 
-            result &= ptr_mesh_manager->meshCount() == meshCount;
+            auto temp_mesh_count = ptr_mesh_manager->meshCount();
+            bool result = ptr_mesh_manager->meshCount() == meshCount;
 
             const auto ptr_material_manager = getter.materialManager();
-            if (!ptr_material_manager)
+            if (!ptr_material_manager) [[unlikely]]
                 return false;
 
             result &=
