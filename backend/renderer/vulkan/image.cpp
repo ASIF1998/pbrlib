@@ -4,6 +4,9 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
+#define TINYEXR_USE_STB_ZLIB 1
+#define TINYEXR_USE_MINIZ 0
+
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #define STBI_NO_GIF
@@ -11,6 +14,9 @@
 #define STBI_WRITE_NO_STDIO
 #include <stb_image.h>
 #include <stb_image_write.h>
+
+#define TINYEXR_IMPLEMENTATION
+#include <tinyexr.h>
 
 #include <algorithm>
 #include <array>
@@ -686,6 +692,71 @@ namespace pbrlib::backend::vk::exporters
         }, &file, static_cast<int32_t>(width), static_cast<int32_t>(height), channel_count, data.data(), static_cast<int>(channel_count * width));
     }
 
+    /// @todo format: .exr
+    void writeToExr(const std::filesystem::path& filename, std::span<const uint8_t> data, uint32_t width, uint32_t height, uint8_t channel_count)
+    {
+        /// @todo add support fp16
+        EXRHeader exr_header = { };
+        InitEXRHeader(&exr_header);
+
+        exr_header.compression_type = TINYEXR_COMPRESSIONTYPE_ZIP;
+
+        EXRImage exr_image = { };
+        InitEXRImage(&exr_image);
+        exr_image.num_channels  = static_cast<int32_t>(channel_count);
+        exr_image.width         = static_cast<int>(width);
+        exr_image.height        = static_cast<int>(height);
+
+        std::vector<std::vector<float>> channels (channel_count);
+        for (auto& channel: channels)
+            channel.resize(width * height);
+
+        for (size_t i = 0;i < width * height; ++i)
+        {
+            for (size_t j = 0; j < channel_count; ++j)
+            {
+                channels[j][i] = 0.0f;
+            }
+        }
+
+        std::vector<float*> channel_ptrs(channel_count);
+        for (size_t i = 0; i < channel_count; ++i)
+            channel_ptrs[i] = channels[i].data();
+
+        exr_image.images = reinterpret_cast<uint8_t**>(channel_ptrs.data());
+
+        std::vector<EXRChannelInfo> channel_info (channel_count);
+        exr_header.num_channels = static_cast<int32_t>(channel_count);
+        exr_header.channels     = channel_info.data();
+
+        constexpr std::array channels_names
+        {
+            "A",
+            "B",
+            "G",
+            "R"
+        };
+
+        for (size_t i = 0; i < channel_count; ++i)
+            strcpy(exr_header.channels[i].name, channels_names[i]);
+
+        std::vector<int> pixels_types (channel_count);
+        std::vector<int> requested_pixels_types (channel_count);
+
+        exr_header.pixel_types              = pixels_types.data();
+        exr_header.requested_pixel_types    = requested_pixels_types.data();
+
+        for (size_t i = 0; i < channel_count; ++i)
+        {
+            exr_header.pixel_types[i]           = TINYEXR_PIXELTYPE_FLOAT; // TINYEXR_PIXELTYPE_HALF - тип входных данных
+            exr_header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // - тип выходных данных
+        }
+
+        const char* err = nullptr;
+        if (SaveEXRImageToFile(&exr_image, &exr_header, filename.string().c_str(), &err) != TINYEXR_SUCCESS)
+            throw exception::RuntimeError(std::format("[vk-image::exporter] failed save '{}': {}", filename.string(), err));
+    }
+
     void Image::save()
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -703,10 +774,11 @@ namespace pbrlib::backend::vk::exporters
                 case VK_FORMAT_R8G8B8A8_UNORM:
                     writeToPng(_filename, data, _ptr_image->width, _ptr_image->height, utils::channelCount(_ptr_image->format));
                     break;
-
-                /// @todo add undefined format exception type
+                case VK_FORMAT_R16_SFLOAT:
+                    writeToExr(_filename, data, _ptr_image->width, _ptr_image->height, utils::channelCount(_ptr_image->format));
+                    break;
                 default:
-                    throw exception::InvalidState("[vk-image::exporter] undefined image format");
+                    throw exception::UndefinedPixelFormat(_ptr_image->format);
             }
         });
     }
