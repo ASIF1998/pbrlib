@@ -1,0 +1,9 @@
+[
+  {
+    "label": "Debug Interactive Scene",
+    "program": "$ZED_WORKTREE_ROOT/build/bin/interactive-scene",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "request": "launch",
+    "adapter": "CodeLLDB",
+  },
+]
