@@ -42,7 +42,7 @@ namespace pbrlib::backend::vk
     void sync(VkDevice device_handle, VkFence fence_handle, uint64_t timeout)
     {
         VK_CHECK(vkWaitForFences (
-            device_handle, 
+            device_handle,
             1, &fence_handle,
             VK_TRUE,
             timeout

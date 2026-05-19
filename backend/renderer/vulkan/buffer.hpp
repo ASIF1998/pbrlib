@@ -3,11 +3,8 @@
 #include <backend/renderer/vulkan/utils.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <vector>
-#include <span>
-
-#include <string>
 #include <string_view>
+#include <vector>
 
 #include <concepts>
 

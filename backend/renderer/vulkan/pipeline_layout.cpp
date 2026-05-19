@@ -5,10 +5,6 @@
 
 #include <pbrlib/exceptions.hpp>
 
-#include <ranges>
-
-#include <stdexcept>
-
 namespace pbrlib::backend::vk::builders
 {
     PipelineLayout::PipelineLayout(Device& device) noexcept :

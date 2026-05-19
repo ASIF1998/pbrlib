@@ -69,6 +69,7 @@ The project uses the following libraries:
 - **glslang** - Shader compilation
 - **MoltenVK** - Implementation of Vulkan API graphics and compute functionality for macOS
 - **cpptrace** - Сapturing and printing call stacks
+- **tinyexr** - Loading and saving EXR (.exr) high dynamic range images
 
 ## 🚀 Usage
 

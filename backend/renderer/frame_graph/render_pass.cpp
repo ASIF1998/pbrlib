@@ -4,8 +4,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <ranges>
-
 namespace pbrlib::backend
 {
     RenderPass::RenderPass(vk::Device& device) noexcept :

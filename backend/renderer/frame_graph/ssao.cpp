@@ -23,8 +23,6 @@
 #include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
 
-#include <random>
-
 namespace pbrlib::backend
 {
     SSAO::SSAO(vk::Device& device, BilateralBlur* ptr_blur) :

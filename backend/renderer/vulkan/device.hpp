@@ -120,7 +120,7 @@ namespace pbrlib::backend::vk
 
         void submit (
             const CommandBuffer&    command_buffer,
-            VkSemaphore             wait_semaphore_handle, 
+            VkSemaphore             wait_semaphore_handle,
             VkSemaphore             signal_semaphore_handle,
             VkFence                 fence_handle
         );
@@ -164,7 +164,7 @@ namespace pbrlib::backend::vk
 
         DescriptorPoolHandle _descriptor_pool_handle;
 
-        DebugUtilsMessengerHandle _debug_utils_messenger_handle; 
+        DebugUtilsMessengerHandle _debug_utils_messenger_handle;
 
 #ifdef PBRLIB_ENABLE_PROFILING
         TracyCtxHandle _tracy_ctx_handle;
