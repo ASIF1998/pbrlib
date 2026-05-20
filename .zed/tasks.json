@@ -1,0 +1,12 @@
+[
+  {
+    "label": "Build: Interactive Scene",
+    "command": "/opt/homebrew/bin/cmake --build build --target interactive-scene",
+    "description": "Compile the interactive-scene target",
+  },
+  {
+    "label": "Run: Interactive Scene",
+    "command": "./build/bin/interactive-scene",
+    "description": "Execute the compiled interactive-scene binary",
+  },
+]
