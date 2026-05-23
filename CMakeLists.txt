@@ -210,6 +210,20 @@ add_subdirectory(third_party/entt)
 add_subdirectory(third_party/cpptrace)
 
 #####################################################
+#   tinyexr
+#####################################################
+set(TINYEXR_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinyexr/tinyexr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinyexr/deps/miniz/miniz.c
+)
+
+add_library(tinyexr STATIC ${TINYEXR_SRC})
+target_include_directories(tinyexr PUBLIC third_party/ third_party/tinyexr/deps/miniz)
+
+target_compile_definitions(tinyexr PUBLIC TINYEXR_USE_MINIZ=1)
+target_compile_definitions(tinyexr PUBLIC TINYEXR_USE_STB_ZLIB=0)
+
+#####################################################
 #   tracy
 #####################################################
 if (PBRLIB_BUILD_SAMPLES)
@@ -237,6 +251,7 @@ target_link_libraries(pbrlib PUBLIC
     VulkanMemoryAllocator
     SDL3::SDL3
     cpptrace::cpptrace
+    tinyexr
 )
 
 if (APPLE)
