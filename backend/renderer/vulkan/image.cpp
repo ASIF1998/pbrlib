@@ -499,6 +499,7 @@ namespace pbrlib::backend::vk::decoders
 
         stbi_set_flip_vertically_on_load(true);
 
+        /// @todo move to unique_ptr with custom deleter (stbi_image_free)
         write_data.ptr_data = stbi_load_from_memory(
             _compressed_image.ptr_data,
             static_cast<int>(_compressed_image.size),
@@ -756,9 +757,7 @@ namespace pbrlib::backend::vk::exporters
         exr_header.channels     = channel_info.data();
 
         if (channel_count == 1)
-        {
             strcpy(exr_header.channels[0].name, "Y");
-        }
         else if (channel_count == 2)
         {
             strcpy(exr_header.channels[0].name, "A");
