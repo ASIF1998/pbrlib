@@ -778,6 +778,11 @@ namespace pbrlib::backend::vk::exporters
 
         const utils::ScopeExit exr_header_scope ([&exr_header] ()
         {
+            exr_header.channels                 = nullptr;
+            exr_header.num_channels             = 0;
+            exr_header.pixel_types              = nullptr;
+            exr_header.requested_pixel_types    = nullptr;
+
             FreeEXRHeader(&exr_header);
         });
 
@@ -790,6 +795,8 @@ namespace pbrlib::backend::vk::exporters
 
         const utils::ScopeExit exr_image_scope ([&exr_image] ()
         {
+            exr_image.images = nullptr;
+
             FreeEXRImage(&exr_image);
         });
 
