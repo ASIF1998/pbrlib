@@ -4,9 +4,6 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
-#define TINYEXR_USE_STB_ZLIB 1
-#define TINYEXR_USE_MINIZ 0
-
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #define STBI_NO_GIF
@@ -15,8 +12,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-#define TINYEXR_IMPLEMENTATION
-#include <tinyexr.h>
+#include <tinyexr/tinyexr.h>
 
 #include <algorithm>
 #include <array>
@@ -24,8 +20,29 @@
 
 #include <fstream>
 
+#include <ranges>
+
 namespace pbrlib::backend::utils
 {
+    struct ScopeExit final
+    {
+        explicit ScopeExit(std::function<void()>&& callback) :
+            callback(std::move(callback))
+        { }
+
+        ScopeExit(const ScopeExit& scope_exit) = delete;
+
+        ~ScopeExit()
+        {
+            if (callback) [[likely]]
+                callback();
+        }
+
+        ScopeExit& operator = (const ScopeExit& scope_exit) = delete;
+        
+        std::function<void()> callback;
+    };
+
     constexpr uint8_t formatSize(VkFormat format)
     {
         switch (format)
@@ -63,6 +80,27 @@ namespace pbrlib::backend::utils
                 return 3;
             case VK_FORMAT_R8G8B8A8_UNORM:
             case VK_FORMAT_R16G16B16A16_SFLOAT:
+            case VK_FORMAT_R32G32B32A32_SFLOAT:
+                return 4;
+            default:
+                throw exception::RuntimeError("[vk-image] undefined pixel format");
+        }
+
+        std::unreachable();
+    }
+
+    constexpr uint8_t channelSize(VkFormat format)
+    {
+        switch (format)
+        {
+            case VK_FORMAT_R8_UNORM:
+            case VK_FORMAT_R8G8_UNORM:
+            case VK_FORMAT_R8G8B8_UNORM:
+            case VK_FORMAT_R8G8B8A8_UNORM:
+                return 1;
+            case VK_FORMAT_R16_SFLOAT:
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+                return 2;
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 4;
             default:
@@ -499,7 +537,6 @@ namespace pbrlib::backend::vk::decoders
 
         stbi_set_flip_vertically_on_load(true);
 
-        /// @todo move to unique_ptr with custom deleter (stbi_image_free)
         write_data.ptr_data = stbi_load_from_memory(
             _compressed_image.ptr_data,
             static_cast<int>(_compressed_image.size),
@@ -507,6 +544,11 @@ namespace pbrlib::backend::vk::decoders
             &_channels_per_pixel,
             _channels_per_pixel
         );
+
+        const utils::ScopeExit scope_exit ([ptr_data = write_data.ptr_data]()
+        {
+           stbi_image_free(ptr_data); 
+        });
 
         auto image = builders::Image(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
@@ -517,9 +559,6 @@ namespace pbrlib::backend::vk::decoders
             .build();
 
         image.write(write_data);
-
-        stbi_image_free(write_data.ptr_data);
-
         image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         return image;
@@ -585,6 +624,36 @@ namespace pbrlib::backend::vk::loaders
 
 namespace pbrlib::backend::vk::exporters
 {
+    struct WriteToImageParams final
+    {
+        void validate() const
+        {
+            if (data.empty()) [[unlikely]]
+                throw exception::InvalidArgument("[vk-image::exporter] image data is empty");
+
+            if (pixel_format == VK_FORMAT_UNDEFINED) [[unlikely]]
+                throw exception::InvalidArgument("[vk-image::exporter] undefined pixel format");
+
+            const auto expected_ext = utils::channelSize(pixel_format) > 1 ? ".exr" : ".png";
+            if (const auto ext = filename.extension(); ext != expected_ext) [[unlikely]]
+                throw exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
+
+            const auto channel_count = utils::channelCount(pixel_format);
+            if (!channel_count || channel_count > 4) [[unlikely]]
+                throw exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
+
+            const auto total_size = channel_count * width * height * utils::channelSize(pixel_format);
+            if (total_size != data.size()) [[unlikely]]
+                throw exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, utils::channelSize(pixel_format)));
+        }
+
+        const std::filesystem::path&    filename;
+        std::span<const uint8_t>        data;
+        uint32_t                        width           = 0u;
+        uint32_t                        height          = 0u; 
+        VkFormat                        pixel_format    = VK_FORMAT_UNDEFINED;
+    };
+
     using Fp16 = uint16_t;
     using Fp32 = uint32_t;
 
@@ -674,129 +743,120 @@ namespace pbrlib::backend::vk::exporters
         return buffer;
     }
 
-    void writeToPng(const std::filesystem::path& filename, std::span<const uint8_t> data, uint32_t width, uint32_t height, uint8_t channel_count)
+    void writeToPng(const WriteToImageParams& params)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (data.empty()) [[unlikely]]
-            throw exception::InvalidArgument("[vk-image::exporter] image data is empty");
+        params.validate();
 
-        if (const auto ext = filename.extension(); ext != ".exr") [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
-
-        if (channel_count * width * height == 0) [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}", width, height, channel_count));
-
-        if (channel_count > 4) [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
-
-        std::ofstream file (filename, std::ios::out | std::ios::binary);
+        std::ofstream file (params.filename, std::ios::out | std::ios::binary);
 
         if (!file) [[unlikely]]
             throw exception::FileOpen("[vk-image::exporter] failed create writer");
+
+        const auto width            = static_cast<int32_t>(params.width);
+        const auto height           = static_cast<int32_t>(params.height);
+        const auto channel_count    = static_cast<int>(utils::channelCount(params.pixel_format));
+        const auto stride           = channel_count * width;
 
         stbi_write_png_to_func([](void *context, void *data, int size)
         {
             auto ptr_file = reinterpret_cast<std::ofstream*>(context);
             ptr_file->write(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
-        }, &file, static_cast<int32_t>(width), static_cast<int32_t>(height), channel_count, data.data(), static_cast<int>(channel_count * width));
+        }, &file, width, height, channel_count, params.data.data(), stride);
     }
 
     template<typename FloatPrecision>
-    void writeToExr(const std::filesystem::path& filename, std::span<const uint8_t> data, uint32_t width, uint32_t height, uint8_t channel_count)
+    void writeToExr(const WriteToImageParams& params)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (data.empty()) [[unlikely]]
-            throw exception::InvalidArgument("[vk-image::exporter] image data is empty");
-
-        if (const auto ext = filename.extension(); ext != ".exr") [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
-
-        if (channel_count * width * height == 0) [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}", width, height, channel_count));
-
-        if (channel_count > 4) [[unlikely]]
-            throw exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
+        params.validate();
 
         EXRHeader exr_header = { };
         InitEXRHeader(&exr_header);
 
+        const utils::ScopeExit exr_header_scope ([&exr_header] ()
+        {
+            FreeEXRHeader(&exr_header);
+        });
+
         exr_header.compression_type = TINYEXR_COMPRESSIONTYPE_ZIP;
+
+        const auto channel_count = utils::channelCount(params.pixel_format);
 
         EXRImage exr_image = { };
         InitEXRImage(&exr_image);
+
+        const utils::ScopeExit exr_image_scope ([&exr_image] ()
+        {
+            FreeEXRImage(&exr_image);
+        });
+
         exr_image.num_channels  = static_cast<int32_t>(channel_count);
-        exr_image.width         = static_cast<int>(width);
-        exr_image.height        = static_cast<int>(height);
+        exr_image.width         = static_cast<int>(params.width);
+        exr_image.height        = static_cast<int>(params.height);
 
         using Channel = std::vector<FloatPrecision>;
-        std::vector<Channel> channels(channel_count, Channel(width * height));
+        std::vector<Channel> channels(channel_count, Channel(params.width * params.height));
 
-        const auto src_data = reinterpret_cast<const FloatPrecision*>(data.data());
+        const auto src_data = reinterpret_cast<const FloatPrecision*>(params.data.data());
         if (channel_count == 1)
-            memcpy(channels[0].data(), src_data, width * height * sizeof(FloatPrecision));
+            memcpy(channels[0].data(), src_data, params.width * params.height * sizeof(FloatPrecision));
         else
         {
             for (size_t j = 0; j < channel_count; ++j)
             {
                 auto& channel = channels[j];
-                for (size_t i = 0; i < width * height; ++i)
+                for (size_t i = 0; i < params.width * params.height; ++i)
                     channel[i] = src_data[i * channel_count + j];
             }
         }
 
         std::vector<FloatPrecision*> channel_ptrs(channel_count);
-        for (size_t i = 0; i < channel_count; ++i)
-            channel_ptrs[i] = channels[i].data();
+        for (auto&& [pointer, channel]: std::views::zip(channel_ptrs, channels))
+            pointer = channel.data();
 
         exr_image.images = reinterpret_cast<uint8_t**>(channel_ptrs.data());
 
-        std::vector<EXRChannelInfo> channel_info (channel_count);
+        std::vector<EXRChannelInfo> channel_info (channel_count, EXRChannelInfo { });
         exr_header.num_channels = static_cast<int32_t>(channel_count);
         exr_header.channels     = channel_info.data();
 
         if (channel_count == 1)
-            strcpy(exr_header.channels[0].name, "Y");
+            exr_header.channels[0].name[0] = 'Y';
         else if (channel_count == 2)
         {
-            strcpy(exr_header.channels[0].name, "A");
-            strcpy(exr_header.channels[1].name, "Y");
+            exr_header.channels[0].name[0] = 'A';
+            exr_header.channels[1].name[0] = 'Y';
         }
         else if (channel_count == 3)
         {
-            strcpy(exr_header.channels[0].name, "B");
-            strcpy(exr_header.channels[1].name, "G");
-            strcpy(exr_header.channels[2].name, "R");
+            exr_header.channels[0].name[0] = 'B';
+            exr_header.channels[1].name[0] = 'G';
+            exr_header.channels[2].name[0] = 'R';
         }
         else if (channel_count == 4)
         {
-            strcpy(exr_header.channels[0].name, "A");
-            strcpy(exr_header.channels[1].name, "B");
-            strcpy(exr_header.channels[2].name, "G");
-            strcpy(exr_header.channels[3].name, "R");
+            exr_header.channels[0].name[0] = 'A';
+            exr_header.channels[1].name[0] = 'B';
+            exr_header.channels[2].name[0] = 'G';
+            exr_header.channels[3].name[0] = 'R';
         }
 
-        std::vector<int> pixels_types           (channel_count);
-        std::vector<int> requested_pixels_types (channel_count);
+        constexpr auto type = std::is_same_v<FloatPrecision, Fp32>
+            ?   TINYEXR_PIXELTYPE_FLOAT
+            :   TINYEXR_PIXELTYPE_HALF;
 
-        exr_header.pixel_types              = pixels_types.data();
-        exr_header.requested_pixel_types    = requested_pixels_types.data();
+        std::vector<int> pixels_buffer (channel_count * 2, type);
 
-        for (size_t i = 0; i < channel_count; ++i)
-        {
-            constexpr auto pixel_type = std::is_same_v<FloatPrecision, Fp32>
-                    ?   TINYEXR_PIXELTYPE_FLOAT
-                    :   TINYEXR_PIXELTYPE_HALF;
-
-            exr_header.pixel_types[i]           = pixel_type;
-            exr_header.requested_pixel_types[i] = pixel_type;
-        }
+        exr_header.pixel_types              = pixels_buffer.data();
+        exr_header.requested_pixel_types    = pixels_buffer.data() + channel_count;
 
         const char* err = nullptr;
-        if (SaveEXRImageToFile(&exr_image, &exr_header, filename.string().c_str(), &err) != TINYEXR_SUCCESS) [[unlikely]]
+        if (SaveEXRImageToFile(&exr_image, &exr_header, params.filename.string().c_str(), &err) != TINYEXR_SUCCESS) [[unlikely]]
         {
-            const auto msg = std::format("[vk-image::exporter] failed save '{}': {}", filename.string(), err);
+            const auto msg = std::format("[vk-image::exporter] failed save '{}': {}", params.filename.string(), err);
             FreeEXRErrorMessage(err);
             throw exception::RuntimeError(msg);
         }
@@ -811,16 +871,26 @@ namespace pbrlib::backend::vk::exporters
         auto readback_buffer = fetch(_device, *_ptr_image);
         readback_buffer.map([this] (std::span<const uint8_t> data)
         {
+            const WriteToImageParams write_params
+            {
+                .filename       = _filename,
+                .data           = data,
+                .width          = _ptr_image->width,
+                .height         = _ptr_image->height,
+                .pixel_format   = _ptr_image->format
+
+            };
+
             switch (_ptr_image->format)
             {
                 case VK_FORMAT_R8_UNORM:
                 case VK_FORMAT_R8G8_UNORM:
                 case VK_FORMAT_R8G8B8_UNORM:
                 case VK_FORMAT_R8G8B8A8_UNORM:
-                    writeToPng(_filename, data, _ptr_image->width, _ptr_image->height, utils::channelCount(_ptr_image->format));
+                    writeToPng(write_params);
                     break;
                 case VK_FORMAT_R16_SFLOAT:
-                    writeToExr<Fp16>(_filename, data, _ptr_image->width, _ptr_image->height, utils::channelCount(_ptr_image->format));
+                    writeToExr<Fp16>(write_params);
                     break;
                 default:
                     throw exception::UndefinedPixelFormat(_ptr_image->format);
