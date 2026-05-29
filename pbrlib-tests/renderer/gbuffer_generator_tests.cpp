@@ -19,8 +19,8 @@ TEST_F(GBufferGeneratorTests, JunkShopAttachments)
 
     constexpr std::array attachments
     {
-        std::make_pair("gbuffer_generator/junk-shop-attachment-normal-tangent.png", pbrlib::backend::AttachmentsTraits<pbrlib::backend::GBufferGenerator>::normal_tangent),
-        std::make_pair("gbuffer_generator/junk-shop-attachment-pos-uv.png", pbrlib::backend::AttachmentsTraits<pbrlib::backend::GBufferGenerator>::pos_uv)
+        std::make_pair("gbuffer_generator/junk-shop-attachment-normal-tangent.exr", pbrlib::backend::AttachmentsTraits<pbrlib::backend::GBufferGenerator>::normal_tangent),
+        std::make_pair("gbuffer_generator/junk-shop-attachment-pos-uv.exr", pbrlib::backend::AttachmentsTraits<pbrlib::backend::GBufferGenerator>::pos_uv)
     };
 
     constexpr pbrlib::testing::Settings settings

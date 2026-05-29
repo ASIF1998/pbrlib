@@ -51,7 +51,7 @@ TEST_F(SSAOTests, JunkShopAttachmentsWithBlur)
                 ssao.luminance_sigma = luminance_sigma;
 
                 const auto filename = std::format(
-                    "ssao/junk-shop-with-blur_sample-count={},spatial-sigma={},luminance-sigma={}.exr",
+                    "ssao/junk-shop-with-blur-[sample-count={}][spatial-sigma={}][luminance-sigma={}].exr",
                     sample_count,
                     spatial_sigma,
                     luminance_sigma

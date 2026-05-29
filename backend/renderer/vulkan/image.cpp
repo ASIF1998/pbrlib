@@ -814,7 +814,7 @@ namespace pbrlib::backend::vk::exporters
         {
             for (size_t j = 0; j < channel_count; ++j)
             {
-                auto& channel = channels[j];
+                auto& channel = channels[channel_count - j - 1];
                 for (size_t i = 0; i < params.width * params.height; ++i)
                     channel[i] = src_data[i * channel_count + j];
             }
@@ -897,7 +897,11 @@ namespace pbrlib::backend::vk::exporters
                     writeToPng(write_params);
                     break;
                 case VK_FORMAT_R16_SFLOAT:
+                case VK_FORMAT_R16G16B16A16_SFLOAT:
                     writeToExr<Fp16>(write_params);
+                    break;
+                case VK_FORMAT_R32G32B32A32_SFLOAT:
+                    writeToExr<Fp32>(write_params);
                     break;
                 default:
                     throw exception::UndefinedPixelFormat(_ptr_image->format);
