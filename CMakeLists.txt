@@ -53,8 +53,8 @@ add_subdirectory(backend)
 add_subdirectory(include/pbrlib)
 add_subdirectory(src)
 
-add_library(pbrlib STATIC 
-    ${PBRLIB_BACKEND_SRC} 
+add_library(pbrlib STATIC
+    ${PBRLIB_BACKEND_SRC}
     ${PBRLIB_BACKEND_H}
     ${PBRLIB_BACKEND_INPUT_H}
     ${PBRLIB_BACKEND_LOGGER_H}
@@ -110,10 +110,10 @@ endif()
 #####################################################
 #   Source grouping
 #####################################################
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}
     PREFIX ""
     FILES
-    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_SRC}
     ${PBRLIB_BACKEND_H}
     ${PBRLIB_BACKEND_INPUT_H}
     ${PBRLIB_BACKEND_LOGGER_H}

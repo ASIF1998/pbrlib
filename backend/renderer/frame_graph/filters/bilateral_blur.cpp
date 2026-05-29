@@ -21,9 +21,11 @@ namespace pbrlib::backend
     BilateralBlur::BilateralBlur(vk::Device& device, vk::Image& dst_image, const Settings& settings):
         Filter      ("bilateral-blur", device, dst_image),
         _settings   (settings)
+    { }
+
+    void BilateralBlur::checkSettings() noexcept
     {
-        _settings.sample_count = utils::alignSize(_settings.sample_count, 2u);
-        _settings.sample_count = std::clamp<uint32_t>(_settings.sample_count, 1, 8);
+        _settings.sample_count = std::clamp(_settings.sample_count, 2u, 8u);
     }
 
     bool BilateralBlur::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -79,6 +81,8 @@ namespace pbrlib::backend
     void BilateralBlur::render(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        checkSettings();
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
