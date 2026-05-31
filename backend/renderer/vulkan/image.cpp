@@ -766,10 +766,10 @@ namespace pbrlib::backend::vk::loaders
         const PlanarImageWriteData data
         {
             .channels       = channels,
-            .channel_count  = static_cast<uint8_t>(exr_image.num_channels),
-            .format         = utils::pixelType(exr_pixel_type, exr_image.num_channels),
             .width          = exr_image.width,
-            .height         = exr_image.height
+            .height         = exr_image.height,
+            .channel_count  = static_cast<uint8_t>(exr_image.num_channels),
+            .format         = utils::pixelType(exr_pixel_type, exr_image.num_channels)
         };
 
         auto image = builders::Image(device)
