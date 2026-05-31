@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "**.md"
   push:
-    branches: [master]
+    branches: [master, revive-image-comparator]
     paths-ignore:
       - "**.md"
 jobs:
