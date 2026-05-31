@@ -306,7 +306,7 @@ namespace pbrlib::backend::vk
             std::unreachable();
         };
 
-        if (!is_fp32(data.format) || !is_fp16(data.format)) [[unlikely]]
+        if (!is_fp32(data.format) && !is_fp16(data.format)) [[unlikely]]
             throw exception::UndefinedPixelFormat(data.format);
 
         if (is_fp16(data.format))
@@ -752,15 +752,22 @@ namespace pbrlib::backend::vk::loaders
             throw exception::RuntimeError(msg);
         }
 
-        std::array<const uint8_t*, 4> channels;
+        std::array<const uint8_t*, 4> channels = { };
         for (size_t i = 0; i < exr_image.num_channels; ++i)
-            channels[i] = exr_image.images[i];
+            channels[i] = exr_image.images[exr_image.num_channels - i - 1];
+
+        const auto exr_pixel_type = exr_header.pixel_types[0];
+        for (size_t i = 0; i < exr_image.num_channels; ++i)
+        {
+            if (exr_header.pixel_types[i] != exr_pixel_type)
+                throw exception::UndefinedPixelFormat("[vk-image::loader] incorrect pixel type");
+        }
 
         const PlanarImageWriteData data
         {
             .channels       = channels,
             .channel_count  = static_cast<uint8_t>(exr_image.num_channels),
-            .format         = utils::pixelType(exr_header.pixel_types[0], exr_image.num_channels),
+            .format         = utils::pixelType(exr_pixel_type, exr_image.num_channels),
             .width          = exr_image.width,
             .height         = exr_image.height
         };
