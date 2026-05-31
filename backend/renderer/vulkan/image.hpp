@@ -1,7 +1,6 @@
 #pragma once
 
 #include <backend/renderer/vulkan/unique_handler.hpp>
-
 #include <pbrlib/math/vec4.hpp>
 
 #include <string>
@@ -29,12 +28,21 @@ namespace pbrlib::backend::vk::exporters
 
 namespace pbrlib::backend::vk
 {
-    struct ImageWriteData final
+    struct ChunkyImageWriteData final
     {
-        uint8_t*        ptr_data    = nullptr;
-        int             width       = 0;
-        int             height      = 0;
-        VkFormat        format      = VK_FORMAT_UNDEFINED;
+        uint8_t*    ptr_data    = nullptr;
+        int         width       = 0;
+        int         height      = 0;
+        VkFormat    format      = VK_FORMAT_UNDEFINED;
+    };
+
+    struct PlanarImageWriteData final
+    {
+        std::array<const uint8_t*, 4>   channels;
+        int                             width           = 0;
+        int                             height          = 0;
+        uint8_t                         channel_count   = 0;
+        VkFormat                        format          = VK_FORMAT_UNDEFINED;
     };
 
     class Image final
@@ -52,7 +60,8 @@ namespace pbrlib::backend::vk
         Image& operator = (Image&& image) noexcept;
         Image& operator = (const Image& image) = delete;
 
-        void write(const ImageWriteData& data);
+        void write(const ChunkyImageWriteData& data);
+        void write(const PlanarImageWriteData& data);
 
         void changeLayout (
             VkImageLayout           new_layout,
@@ -177,8 +186,6 @@ namespace pbrlib::backend::vk::loaders
 {
     class Image final
     {
-        void validate();
-
     public:
         explicit Image(Device& device) noexcept;
 

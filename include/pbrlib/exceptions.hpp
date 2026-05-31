@@ -69,5 +69,6 @@ namespace pbrlib::exception
     {
     public:
         explicit UndefinedPixelFormat(VkFormat format);
+        explicit UndefinedPixelFormat(std::string_view msg);
     };
 }

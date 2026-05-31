@@ -89,4 +89,8 @@ namespace pbrlib::exception
     UndefinedPixelFormat::UndefinedPixelFormat(VkFormat format) :
         Exception(std::format("[undefined-pixel-format] {}", toString(format)))
     { }
+
+    UndefinedPixelFormat::UndefinedPixelFormat(std::string_view msg) :
+        Exception(msg)
+    { }
 }

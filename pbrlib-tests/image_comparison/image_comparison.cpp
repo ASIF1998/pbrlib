@@ -15,8 +15,6 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <array>
-
 namespace pbrlib::testing
 {
     ImageComparison::ImageComparison(backend::vk::Device& device) :
