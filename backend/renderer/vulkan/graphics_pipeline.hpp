@@ -18,19 +18,22 @@ namespace pbrlib::backend::vk::shader
 
 namespace pbrlib::backend::vk
 {
-    enum class PrimitiveType
+    enum class PrimitiveType :
+        uint8_t
     {
         eTriangle
     };
 
-    enum class PolygonMode
+    enum class PolygonMode :
+        uint8_t
     {
         eFill,
         eLine,
         ePoint
     };
 
-    enum class CullMode
+    enum class CullMode :
+        uint8_t
     {
         eNone,
         eBack,
@@ -38,13 +41,15 @@ namespace pbrlib::backend::vk
         eFrontAndBack
     };
 
-    enum class FrontFace
+    enum class FrontFace :
+        uint8_t
     {
         eClockwise,
         eCounterClockwise
     };
 
-    enum class SampleCount
+    enum class SampleCount :
+        uint8_t
     {
         e1,
         e2,

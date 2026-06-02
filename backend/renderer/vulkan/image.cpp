@@ -4,6 +4,8 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
+#include <backend/exceptions.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
 #define STBI_NO_GIF
@@ -61,7 +63,7 @@ namespace pbrlib::backend::utils
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 16;
             default:
-                throw exception::RuntimeError("[vk-image] undefined pixel format");
+                throw pbrlib::exception::RuntimeError("[vk-image] undefined pixel format");
         }
 
         std::unreachable();
@@ -83,7 +85,7 @@ namespace pbrlib::backend::utils
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 4;
             default:
-                throw exception::RuntimeError("[vk-image] undefined pixel format");
+                throw pbrlib::exception::RuntimeError("[vk-image] undefined pixel format");
         }
 
         std::unreachable();
@@ -394,16 +396,16 @@ namespace pbrlib::backend::vk::builders
     void Image::validate()
     {
         if (_width == 0 || _height == 0) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] size is zero");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] size is zero");
 
         if (_format == VK_FORMAT_UNDEFINED) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] format is undefined");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] format is undefined");
 
         if (_queues.empty()) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] not queues");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] not queues");
 
         if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] invalid usage");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] invalid usage");
     }
 
     Image& Image::size(uint32_t width, uint32_t height) noexcept
@@ -613,10 +615,10 @@ namespace pbrlib::backend::vk::decoders
     void Image::validate()
     {
         if (_channels_per_pixel < 1 && _channels_per_pixel > 4) [[unlikely]]
-            throw exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
+            throw pbrlib::exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
 
         if (!_compressed_image.ptr_data || !_compressed_image.size) [[unlikely]]
-            throw exception::InvalidState("[vk-image::decoder] compressed image data is empty");
+            throw pbrlib::exception::InvalidState("[vk-image::decoder] compressed image data is empty");
     }
 
     vk::Image Image::decode()
@@ -720,7 +722,7 @@ namespace pbrlib::backend::vk::loaders
 
         EXRVersion exr_version = { };
         if (ParseEXRVersionFromFile(&exr_version, path_to_file.c_str()) || exr_version.multipart) [[unlikely]]
-            throw exception::RuntimeError(std::format("[vk-image::loader] invalid exr file: '{}'", path_to_file));
+            throw pbrlib::exception::RuntimeError(std::format("[vk-image::loader] invalid exr file: '{}'", path_to_file));
 
         EXRHeader exr_header = { };
         InitEXRHeader(&exr_header);
@@ -735,7 +737,7 @@ namespace pbrlib::backend::vk::loaders
         {
             const auto msg = std::format("[vk-image::loader] failed parse '{}' header: {}", path_to_file, err);
             FreeEXRErrorMessage(err);
-            throw exception::RuntimeError(msg);
+            throw pbrlib::exception::RuntimeError(msg);
         }
 
         EXRImage exr_image = { };
@@ -749,7 +751,7 @@ namespace pbrlib::backend::vk::loaders
         {
             const auto msg = std::format("[vk-image::loader] failed load '{}' image: {}", path_to_file, err);
             FreeEXRErrorMessage(err);
-            throw exception::RuntimeError(msg);
+            throw pbrlib::exception::RuntimeError(msg);
         }
 
         std::array<const uint8_t*, 4> channels = { };
@@ -790,7 +792,7 @@ namespace pbrlib::backend::vk::loaders
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         if (!std::filesystem::exists(_filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
+            throw pbrlib::exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
 
         if (_filename.extension() == ".exr")
             return exrReader(_device, _filename);
@@ -806,22 +808,22 @@ namespace pbrlib::backend::vk::exporters
         void validate() const
         {
             if (data.empty()) [[unlikely]]
-                throw exception::InvalidArgument("[vk-image::exporter] image data is empty");
+                throw pbrlib::exception::InvalidArgument("[vk-image::exporter] image data is empty");
 
             if (pixel_format == VK_FORMAT_UNDEFINED) [[unlikely]]
-                throw exception::InvalidArgument("[vk-image::exporter] undefined pixel format");
+                throw pbrlib::exception::InvalidArgument("[vk-image::exporter] undefined pixel format");
 
             const auto expected_ext = utils::channelSize(pixel_format) > 1 ? ".exr" : ".png";
             if (const auto ext = filename.extension(); ext != expected_ext) [[unlikely]]
-                throw exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
 
             const auto channel_count = utils::channelCount(pixel_format);
             if (!channel_count || channel_count > 4) [[unlikely]]
-                throw exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
 
             const auto total_size = channel_count * width * height * utils::channelSize(pixel_format);
             if (total_size != data.size()) [[unlikely]]
-                throw exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, utils::channelSize(pixel_format)));
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, utils::channelSize(pixel_format)));
         }
 
         const std::filesystem::path&    filename;
@@ -853,16 +855,16 @@ namespace pbrlib::backend::vk::exporters
     void Image::validate()
     {
         if (!_ptr_image) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] image is null");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] image is null");
 
         if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] invalid image layout");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] invalid image layout");
 
         if (_filename.empty()) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] didn't set filename");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] didn't set filename");
 
         if (std::filesystem::is_directory(_filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
+            throw pbrlib::exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
 
         if (const auto save_directory = _filename.parent_path(); !std::filesystem::exists(save_directory)) [[unlikely]]
             std::filesystem::create_directory(save_directory);
@@ -873,7 +875,7 @@ namespace pbrlib::backend::vk::exporters
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         if (image.layout != VK_IMAGE_LAYOUT_GENERAL && image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
 
         const auto size = image.width * image.height * utils::formatSize(image.format);
         auto buffer = builders::Buffer(device)
@@ -929,7 +931,7 @@ namespace pbrlib::backend::vk::exporters
         std::ofstream file (params.filename, std::ios::out | std::ios::binary);
 
         if (!file) [[unlikely]]
-            throw exception::FileOpen("[vk-image::exporter] failed create writer");
+            throw pbrlib::exception::FileOpen("[vk-image::exporter] failed create writer");
 
         const auto width            = static_cast<int32_t>(params.width);
         const auto height           = static_cast<int32_t>(params.height);
@@ -1042,7 +1044,7 @@ namespace pbrlib::backend::vk::exporters
         {
             const auto msg = std::format("[vk-image::exporter] failed save '{}': {}", params.filename.string(), err);
             FreeEXRErrorMessage(err);
-            throw exception::RuntimeError(msg);
+            throw pbrlib::exception::RuntimeError(msg);
         }
     }
 

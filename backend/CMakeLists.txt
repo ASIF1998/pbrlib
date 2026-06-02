@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 
 set(PBRLIB_BACKEND_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/profiling.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/exceptions.cpp
     CACHE INTERNAL ""
 )
 
@@ -9,6 +10,7 @@ set(PBRLIB_BACKEND_H
     ${CMAKE_CURRENT_SOURCE_DIR}/events.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/profiling.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/components.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/exceptions.hpp
     CACHE INTERNAL ""
 )
 

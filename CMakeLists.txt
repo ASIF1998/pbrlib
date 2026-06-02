@@ -170,7 +170,7 @@ endif()
 #####################################################
 #   assimp
 #####################################################
-set(ASSIMP_BUILD_TESTS   OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/assimp)
 target_link_libraries(pbrlib PUBLIC assimp::assimp)
 

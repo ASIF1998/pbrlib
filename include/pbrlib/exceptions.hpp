@@ -1,8 +1,5 @@
 #pragma once
 
-/// @todo remove
-#include <vulkan/vulkan.h>
-
 #include <string>
 #include <string_view>
 
@@ -61,14 +58,5 @@ namespace pbrlib::exception
     {
     public:
         explicit MathError(std::string_view msg);
-    };
-
-    /// @todo move to backend exceptions
-    class UndefinedPixelFormat final :
-        public Exception
-    {
-    public:
-        explicit UndefinedPixelFormat(VkFormat format);
-        explicit UndefinedPixelFormat(std::string_view msg);
     };
 }
