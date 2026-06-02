@@ -20,6 +20,6 @@ void main()
     vec4 pixel_1 = texelFetch(image_1, pixel_coord, 0);
     vec4 pixel_2 = texelFetch(image_2, pixel_coord, 0);
 
-    if (all(greaterThan(abs(pixel_1 - pixel_2), vec4(0.01))))
+    if (any(greaterThan(abs(pixel_1 - pixel_2), vec4(0.01))))
         atomicAdd(count_changed_pixels, 1);
 }

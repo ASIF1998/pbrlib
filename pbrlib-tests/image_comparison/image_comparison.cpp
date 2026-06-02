@@ -63,7 +63,7 @@ namespace pbrlib::testing
         _count_changed_pixels_buffer->write(0, 0);
     }
 
-    bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
+    bool ImageComparison::compare(backend::vk::Image& image_1, backend::vk::Image& image_2)
     {
         if (image_1.width != image_2.width || image_1.height != image_2.height) [[unlikely]]
             return false;
@@ -73,6 +73,12 @@ namespace pbrlib::testing
 
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
+        
+        if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         _device.writeDescriptorSet ({
             .view_handle            = image_1.view_handle,
@@ -123,12 +129,15 @@ namespace pbrlib::testing
 
         uint32_t count_changed_pixels = 0;
         _count_changed_pixels_buffer->read(count_changed_pixels, 0);
+        
+        if (count_changed_pixels > 0) [[unlikely]]
+            backend::log::error("[vk-image-comparator] count of dissimilar pixels: {}", count_changed_pixels);
 
         return count_changed_pixels == 0;
     }
 
     bool ImageComparison::compare (
-        const backend::vk::Image&       image,
+        backend::vk::Image&             image,
         const std::filesystem::path&    path_to_reference
     )
     {
@@ -144,12 +153,11 @@ namespace pbrlib::testing
 
             return true;
         }
-
-        return compare(
-            image,
-            backend::vk::loaders::Image(_device)
-                .filename(path_to_reference)
-                .load()
-        );
+        
+        auto reference_image = backend::vk::loaders::Image(_device)
+            .filename(path_to_reference)
+            .load();
+        
+        return compare(image, reference_image);
     }
 }
