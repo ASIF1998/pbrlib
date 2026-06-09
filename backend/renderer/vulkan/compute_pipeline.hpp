@@ -1,17 +1,13 @@
 #pragma once
 
 #include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/shader_compiler.hpp>
 
 #include <filesystem>
 
 namespace pbrlib::backend::vk
 {
     class Device;
-}
-
-namespace pbrlib::backend::vk::shader
-{
-    class SpecializationInfoBase;
 }
 
 namespace pbrlib::backend::vk::builders
@@ -27,10 +23,10 @@ namespace pbrlib::backend::vk::builders
         ComputePipeline& operator = (ComputePipeline&& builder)         = delete;
         ComputePipeline& operator = (const ComputePipeline& builder)    = delete;
 
-        ComputePipeline& shader(const std::filesystem::path& shader_name);
-        ComputePipeline& specializationInfo(shader::SpecializationInfoBase& spec_info);
-
-        ComputePipeline& pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept;
+        ComputePipeline& shader                 (const std::filesystem::path& shader_name);
+        ComputePipeline& addDefine              (const vk::shader::Define& define);
+        ComputePipeline& specializationInfo     (const shader::SpecializationInfoBase& spec_info)   noexcept;
+        ComputePipeline& pipelineLayoutHandle   (VkPipelineLayout layout_handle)                    noexcept;
 
         [[nodiscard]] PipelineHandle build();
 
@@ -42,5 +38,7 @@ namespace pbrlib::backend::vk::builders
         VkPipelineLayout _pipeline_layout_handle = VK_NULL_HANDLE;
 
         VkSpecializationInfo _specialization_info = { };
+
+        vk::shader::Defines _defines;
     };
 }

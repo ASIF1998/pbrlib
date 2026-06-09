@@ -34,10 +34,17 @@ namespace pbrlib::testing
 
         const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
 
-        _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
-            .shader(shader_name)
+        backend::vk::builders::ComputePipeline pipeline_builder (_device);
+        pipeline_builder
             .pipelineLayoutHandle(_pipeline_layout_handle)
-            .build();
+            .shader(shader_name);
+
+        if constexpr (generate_image_diff)
+        {
+            pipeline_builder.addDefine(backend::vk::shader::Define("PBRLIB_GENERATE_DIFF_IMAGE", ""));
+        }
+
+        _pipeline_handle = pipeline_builder.build();
 
         const VkSamplerCreateInfo sampler_create_info
         {
@@ -73,7 +80,7 @@ namespace pbrlib::testing
 
         if (image_1.layer_count != image_2.layer_count) [[unlikely]]
             return false;
-        
+
         if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
             image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -129,7 +136,7 @@ namespace pbrlib::testing
 
         uint32_t count_changed_pixels = 0;
         _count_changed_pixels_buffer->read(count_changed_pixels, 0);
-        
+
         if (count_changed_pixels > 0) [[unlikely]]
             backend::log::error("[vk-image-comparator] count of dissimilar pixels: {}", count_changed_pixels);
 
@@ -153,11 +160,16 @@ namespace pbrlib::testing
 
             return true;
         }
-        
+
+        if constexpr (generate_image_diff)
+        {
+            return true;
+        }
+
         auto reference_image = backend::vk::loaders::Image(_device)
             .filename(path_to_reference)
             .load();
-        
+
         return compare(image, reference_image);
     }
 }

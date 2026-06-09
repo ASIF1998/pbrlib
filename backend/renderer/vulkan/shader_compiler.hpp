@@ -51,6 +51,14 @@ namespace pbrlib::backend::vk::shader
     private:
         const T& _data;
     };
+
+    struct Define final
+    {
+        std::string name;
+        std::string value;
+    };
+
+    using Defines = std::vector<Define>;
 }
 
 namespace pbrlib::backend::vk::shader
@@ -59,5 +67,9 @@ namespace pbrlib::backend::vk::shader
     void finalizeCompiler();
 
     [[nodiscard]]
-    VkShaderModule compile(const Device& device, const std::filesystem::path& filename);
+    VkShaderModule compile(
+        const Device&                   device,
+        const std::filesystem::path&    filename,
+        const Defines&                  defines
+    );
 }

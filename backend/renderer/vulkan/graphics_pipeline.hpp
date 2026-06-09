@@ -1,5 +1,7 @@
 #pragma once
 
+#include <backend/renderer/vulkan/shader_compiler.hpp>
+
 #include <vulkan/vulkan.h>
 
 #include <vector>
@@ -9,11 +11,6 @@
 namespace pbrlib::backend::vk
 {
     class Device;
-}
-
-namespace pbrlib::backend::vk::shader
-{
-    class SpecializationInfoBase;
 }
 
 namespace pbrlib::backend::vk
@@ -92,6 +89,8 @@ namespace pbrlib::backend::vk::builders
 
         GraphicsPipeline& subpass(uint32_t subpass_index) noexcept;
 
+        GraphicsPipeline& addDefine(const vk::shader::Define& define);
+
         [[nodiscard]] PipelineHandle build();
 
     private:
@@ -114,5 +113,7 @@ namespace pbrlib::backend::vk::builders
         std::vector<VkPipelineShaderStageCreateInfo>        _stages;
         std::vector<VkPipelineColorBlendAttachmentState>    _attachments_state;
         std::vector<VkSpecializationInfo>                   _specialization_infos;
+
+        backend::vk::shader::Defines _defines;
     };
 }

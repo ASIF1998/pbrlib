@@ -114,7 +114,7 @@ namespace pbrlib::backend::vk::builders
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
-            .module = shader::compile(_device, shader),
+            .module = shader::compile(_device, shader, _defines),
             .pName  = "main"
         };
 
@@ -204,6 +204,12 @@ namespace pbrlib::backend::vk::builders
     GraphicsPipeline& GraphicsPipeline::subpass(uint32_t subpass_index) noexcept
     {
         _subpass = subpass_index;
+        return *this;
+    }
+
+    GraphicsPipeline& GraphicsPipeline::addDefine(const vk::shader::Define& define)
+    {
+        _defines.push_back(define);
         return *this;
     }
 

@@ -151,10 +151,31 @@ namespace pbrlib::backend::vk::shader::utils
 
 namespace pbrlib::backend::vk::shader
 {
-    std::vector<uint32_t> createIL(const std::filesystem::path& filename)
+    void processDefines(std::string& code, const Defines& defines)
+    {
+        std::string str_defines;
+
+        for (const auto& [name, value]: defines)
+            str_defines += std::format("#define {} {}\n", name, value);
+
+        if (const auto version_pos = code.find("#version"); version_pos != std::string::npos) [[likely]]
+        {
+            if (const auto next_line_pos = code.find("\n", version_pos); next_line_pos != std::string::npos) [[likely]]
+                code.insert(next_line_pos + 1, str_defines);
+            else
+                code += '\n' + str_defines;
+        }
+        else
+            code.insert(0, str_defines);
+    }
+
+    std::vector<uint32_t> createIL(const std::filesystem::path& filename, const Defines& defines)
     {
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
+
+        if (!defines.empty())
+            processDefines(source, defines);
 
         const glsl_include_callbacks_t includer
         {
@@ -206,13 +227,13 @@ namespace pbrlib::backend::vk::shader
         return il;
     }
 
-    VkShaderModule compile(const Device& device, const std::filesystem::path& filename)
+    VkShaderModule compile(const Device& device, const std::filesystem::path& filename, const Defines& defines)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         backend::log::info("[shader-compiler] compile shader: {}", filename.filename().string());
 
-        auto il = createIL(backend::utils::projectRoot() / "backend" / filename);
+        auto il = createIL(backend::utils::projectRoot() / "backend" / filename, defines);
 
         VkShaderModule shader_module_handle = VK_NULL_HANDLE;
 

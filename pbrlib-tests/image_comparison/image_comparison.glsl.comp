@@ -10,6 +10,10 @@ layout(set = 0, binding = 2, std430) buffer CountChangedPxels
     uint count_changed_pixels;
 };
 
+#ifdef PBRLIB_GENERATE_DIFF_IMAGE
+layout(set = 1, binding = 1) uniform writeonly image2D image_diff;
+#endif
+
 #include <gpu_cpu_constants.h>
 layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_SIZE) in;
 
@@ -22,4 +26,8 @@ void main()
 
     if (any(greaterThan(abs(pixel_1 - pixel_2), vec4(0.01))))
         atomicAdd(count_changed_pixels, 1);
+
+#ifdef PBRLIB_GENERATE_DIFF_IMAGE
+    imageStore(image_diff, ivec2(gl_GlobalInvocationID.xy), abs(pixel_1 - pixel_2));
+#endif
 }
