@@ -24,11 +24,16 @@ void main()
     vec4 pixel_1 = texelFetch(image_1, pixel_coord, 0);
     vec4 pixel_2 = texelFetch(image_2, pixel_coord, 0);
 
-    if (any(greaterThan(abs(pixel_1 - pixel_2), vec4(0.01))))
+    bool is_diff = any(greaterThan(abs(pixel_1 - pixel_2), vec4(0.1)));
+
+    if (is_diff)
         atomicAdd(count_changed_pixels, 1);
 
 #ifdef PBRLIB_GENERATE_DIFF_IMAGE
-    vec3 diff = vec3(length(pixel_1 - pixel_2));
-    imageStore(image_diff, ivec2(gl_GlobalInvocationID.xy), vec4(diff, 1.0));
+    vec4 color = vec4(vec3(0), 1);
+    if (is_diff)
+        color = abs(pixel_1 - pixel_2);
+
+    imageStore(image_diff, ivec2(gl_GlobalInvocationID.xy), color);
 #endif
 }

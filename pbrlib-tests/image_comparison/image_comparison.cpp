@@ -50,7 +50,7 @@ namespace pbrlib::testing
 
         _pipeline_handle = pipeline_builder.build();
 
-        const VkSamplerCreateInfo sampler_create_info
+        constexpr VkSamplerCreateInfo sampler_create_info
         {
             .sType      = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
             .magFilter  = VK_FILTER_NEAREST,
@@ -167,24 +167,6 @@ namespace pbrlib::testing
         if (count_changed_pixels > 0) [[unlikely]]
             backend::log::error("[vk-image-comparator] count of dissimilar pixels: {}", count_changed_pixels);
 
-        if constexpr (generate_image_diff)
-        {
-            if (count_changed_pixels > 0) [[unlikely]]
-            {
-                static size_t diff_img_id = 0;
-                const auto filenmae = std::format("pbrlib-tests/references/diff/image-{}.{}", ++diff_img_id, backend::channelSize(image_1.format) == 1 ? ".png" : ".exr");
-
-                _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-
-                pbrlib::backend::vk::exporters::Image(_device)
-                    .filename(backend::utils::projectRoot() / filenmae)
-                    .image(&_images_diff.value())
-                    .save();
-
-                return true;
-            }
-        }
-
         return count_changed_pixels == 0;
     }
 
@@ -210,6 +192,25 @@ namespace pbrlib::testing
             .filename(path_to_reference)
             .load();
 
-        return compare(image, reference_image);
+        const bool is_equal = compare(image, reference_image);
+
+        if constexpr (generate_image_diff)
+        {
+            if (!is_equal && _images_diff) [[unlikely]]
+            {
+                const auto filename             = path_to_reference.stem().string();
+                const auto extension            = backend::channelSize(image.format) == 1 ? ".png" : ".exr";
+                const auto path_to_diff_image   = std::format("pbrlib-tests/references/diffs/{}-diff.{}", filename, extension);
+
+                _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+                pbrlib::backend::vk::exporters::Image(_device)
+                    .filename(backend::utils::projectRoot() / path_to_diff_image)
+                    .image(&_images_diff.value())
+                    .save();
+            }
+        }
+
+        return is_equal;
     }
 }
