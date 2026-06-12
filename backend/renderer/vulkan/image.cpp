@@ -3,8 +3,11 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/pixel_format.hpp>
 
 #include <backend/exceptions.hpp>
+
+#include <backend/utils/scope_exit.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
@@ -23,128 +26,6 @@
 #include <fstream>
 
 #include <ranges>
-
-namespace pbrlib::backend::utils
-{
-    struct ScopeExit final
-    {
-        explicit ScopeExit(std::function<void()>&& callback) :
-            callback(std::move(callback))
-        { }
-
-        ScopeExit(const ScopeExit& scope_exit) = delete;
-
-        ~ScopeExit()
-        {
-            if (callback) [[likely]]
-                callback();
-        }
-
-        ScopeExit& operator = (const ScopeExit& scope_exit) = delete;
-
-        std::function<void()> callback;
-    };
-
-    constexpr uint8_t formatSize(VkFormat format)
-    {
-        switch (format)
-        {
-            case VK_FORMAT_R8_UNORM:
-                return 1;
-            case VK_FORMAT_R8G8_UNORM:
-            case VK_FORMAT_R16_SFLOAT:
-                return 2;
-            case VK_FORMAT_R8G8B8_UNORM:
-                return 3;
-            case VK_FORMAT_R8G8B8A8_UNORM:
-                return 4;
-            case VK_FORMAT_R16G16B16A16_SFLOAT:
-                return 8;
-            case VK_FORMAT_R32G32B32A32_SFLOAT:
-                return 16;
-            default:
-                throw pbrlib::exception::RuntimeError("[vk-image] undefined pixel format");
-        }
-
-        std::unreachable();
-    }
-
-    constexpr uint8_t channelCount(VkFormat format)
-    {
-        switch (format)
-        {
-            case VK_FORMAT_R8_UNORM:
-            case VK_FORMAT_R16_SFLOAT:
-                return 1;
-            case VK_FORMAT_R8G8_UNORM:
-                return 2;
-            case VK_FORMAT_R8G8B8_UNORM:
-                return 3;
-            case VK_FORMAT_R8G8B8A8_UNORM:
-            case VK_FORMAT_R16G16B16A16_SFLOAT:
-            case VK_FORMAT_R32G32B32A32_SFLOAT:
-                return 4;
-            default:
-                throw pbrlib::exception::RuntimeError("[vk-image] undefined pixel format");
-        }
-
-        std::unreachable();
-    }
-
-    constexpr uint8_t channelSize(VkFormat format)
-    {
-        switch (format)
-        {
-            case VK_FORMAT_R8_UNORM:
-            case VK_FORMAT_R8G8_UNORM:
-            case VK_FORMAT_R8G8B8_UNORM:
-            case VK_FORMAT_R8G8B8A8_UNORM:
-                return 1;
-            case VK_FORMAT_R16_SFLOAT:
-            case VK_FORMAT_R16G16B16A16_SFLOAT:
-                return 2;
-            case VK_FORMAT_R32G32B32A32_SFLOAT:
-                return 4;
-            default:
-                throw exception::UndefinedPixelFormat("[vk-image] undefined pixel format");
-        }
-
-        std::unreachable();
-    }
-
-    constexpr VkFormat pixelType(int32_t exr_pixel_type, int32_t channel_count)
-    {
-        if (channel_count == 3 || channel_count == 0 || channel_count > 4) [[unlikely]]
-            throw exception::UndefinedPixelFormat("[vk-image] undefined pixel format");
-
-        if (exr_pixel_type == TINYEXR_PIXELTYPE_FLOAT)
-        {
-            switch (channel_count)
-            {
-                case 1:
-                    return VK_FORMAT_R32_SFLOAT;
-                case 2:
-                    return VK_FORMAT_R32G32_SFLOAT;
-                case 4:
-                    return VK_FORMAT_R32G32B32A32_SFLOAT;
-            }
-        }
-        else if (exr_pixel_type == TINYEXR_PIXELTYPE_HALF)
-        {
-            switch (channel_count)
-            {
-                case 1:
-                    return VK_FORMAT_R16_SFLOAT;
-                case 2:
-                    return VK_FORMAT_R16G16_SFLOAT;
-                case 4:
-                    return VK_FORMAT_R16G16B16A16_SFLOAT;
-            }
-        }
-
-        throw exception::UndefinedPixelFormat("[vk-image] undefined pixel format");
-    }
-}
 
 namespace pbrlib::backend::vk
 {
@@ -186,7 +67,7 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto format_size      = utils::formatSize(data.format);
+        const auto format_size      = formatSize(data.format);
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
@@ -771,7 +652,7 @@ namespace pbrlib::backend::vk::loaders
             .width          = exr_image.width,
             .height         = exr_image.height,
             .channel_count  = static_cast<uint8_t>(exr_image.num_channels),
-            .format         = utils::pixelType(exr_pixel_type, exr_image.num_channels)
+            .format         = pixelType(exr_pixel_type, exr_image.num_channels)
         };
 
         auto image = builders::Image(device)
@@ -813,17 +694,17 @@ namespace pbrlib::backend::vk::exporters
             if (pixel_format == VK_FORMAT_UNDEFINED) [[unlikely]]
                 throw pbrlib::exception::InvalidArgument("[vk-image::exporter] undefined pixel format");
 
-            const auto expected_ext = utils::channelSize(pixel_format) > 1 ? ".exr" : ".png";
+            const auto expected_ext = channelSize(pixel_format) > 1 ? ".exr" : ".png";
             if (const auto ext = filename.extension(); ext != expected_ext) [[unlikely]]
                 throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
 
-            const auto channel_count = utils::channelCount(pixel_format);
+            const auto channel_count = channelCount(pixel_format);
             if (!channel_count || channel_count > 4) [[unlikely]]
                 throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
 
-            const auto total_size = channel_count * width * height * utils::channelSize(pixel_format);
+            const auto total_size = channel_count * width * height * channelSize(pixel_format);
             if (total_size != data.size()) [[unlikely]]
-                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, utils::channelSize(pixel_format)));
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, channelSize(pixel_format)));
         }
 
         const std::filesystem::path&    filename;
@@ -877,7 +758,7 @@ namespace pbrlib::backend::vk::exporters
         if (image.layout != VK_IMAGE_LAYOUT_GENERAL && image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
             throw pbrlib::exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
 
-        const auto size = image.width * image.height * utils::formatSize(image.format);
+        const auto size = image.width * image.height * formatSize(image.format);
         auto buffer = builders::Buffer(device)
             .addQueueFamilyIndex(device.queue().family_index)
             .name("[vk-image::exporter] fetch buffer")
@@ -935,7 +816,7 @@ namespace pbrlib::backend::vk::exporters
 
         const auto width            = static_cast<int32_t>(params.width);
         const auto height           = static_cast<int32_t>(params.height);
-        const auto channel_count    = static_cast<int>(utils::channelCount(params.pixel_format));
+        const auto channel_count    = static_cast<int>(channelCount(params.pixel_format));
         const auto stride           = channel_count * width;
 
         stbi_write_png_to_func([](void *context, void *data, int size)
@@ -967,7 +848,7 @@ namespace pbrlib::backend::vk::exporters
 
         exr_header.compression_type = TINYEXR_COMPRESSIONTYPE_ZIP;
 
-        const auto channel_count = utils::channelCount(params.pixel_format);
+        const auto channel_count = channelCount(params.pixel_format);
 
         EXRImage exr_image = { };
         InitEXRImage(&exr_image);

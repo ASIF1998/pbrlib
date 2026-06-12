@@ -4,6 +4,7 @@
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/pixel_format.hpp>
 
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
@@ -20,11 +21,16 @@ namespace pbrlib::testing
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
+        pbrlib::backend::vk::builders::DescriptorSetLayout descriptor_set_layout_builder (_device);
+        descriptor_set_layout_builder
             .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
             .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
+            .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT);
+
+        if constexpr (generate_image_diff)
+            descriptor_set_layout_builder.addBinding(3, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT);
+
+        _descriptor_set_layout_handle = descriptor_set_layout_builder.build();
 
         _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
             .addSetLayout(_descriptor_set_layout_handle)
@@ -40,9 +46,7 @@ namespace pbrlib::testing
             .shader(shader_name);
 
         if constexpr (generate_image_diff)
-        {
             pipeline_builder.addDefine(backend::vk::shader::Define("PBRLIB_GENERATE_DIFF_IMAGE", ""));
-        }
 
         _pipeline_handle = pipeline_builder.build();
 
@@ -110,6 +114,29 @@ namespace pbrlib::testing
             .binding    = 2
         });
 
+        if constexpr (generate_image_diff)
+        {
+            _images_diff = backend::vk::builders::Image(_device)
+                .size(image_1.width, image_1.height)
+                .format(image_1.format)
+                .usage(VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+                .addQueueFamilyIndex(_device.queue().family_index)
+                .tiling(VK_IMAGE_TILING_OPTIMAL)
+                .name("[vk-image-comparator] diff image")
+                .fillColor(math::vec4(0))
+                .build();
+
+            if (!_images_diff) [[unlikely]]
+                throw exception::RuntimeError("[vk-image-comparator] failed create diff image");
+
+            _device.writeDescriptorSet ({
+                .view_handle            = _images_diff->view_handle,
+                .set_handle             = _descriptor_set_handle,
+                .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                .binding                = 3
+            });
+        }
+
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-image-comparator");
 
         command_buffer.write([&image_1, this] (auto command_buffer_handle)
@@ -140,6 +167,24 @@ namespace pbrlib::testing
         if (count_changed_pixels > 0) [[unlikely]]
             backend::log::error("[vk-image-comparator] count of dissimilar pixels: {}", count_changed_pixels);
 
+        if constexpr (generate_image_diff)
+        {
+            if (count_changed_pixels > 0) [[unlikely]]
+            {
+                static size_t diff_img_id = 0;
+                const auto filenmae = std::format("pbrlib-tests/references/diff/image-{}.{}", ++diff_img_id, backend::channelSize(image_1.format) == 1 ? ".png" : ".exr");
+
+                _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+                pbrlib::backend::vk::exporters::Image(_device)
+                    .filename(backend::utils::projectRoot() / filenmae)
+                    .image(&_images_diff.value())
+                    .save();
+
+                return true;
+            }
+        }
+
         return count_changed_pixels == 0;
     }
 
@@ -158,11 +203,6 @@ namespace pbrlib::testing
                 .image(&image)
                 .save();
 
-            return true;
-        }
-
-        if constexpr (generate_image_diff)
-        {
             return true;
         }
 
