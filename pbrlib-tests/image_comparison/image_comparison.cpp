@@ -82,6 +82,14 @@ namespace pbrlib::testing
         if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
             image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+#if 1
+        image_1.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        image_2.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+        return psnr(image_1, image_2);
+#endif
+
+#if 0
         const VkDeviceSize group_count_x        = image_1.width / _device.workGroupSize();
         const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
         const VkDeviceSize group_errors_count   = group_count_x * group_count_y; 
@@ -185,6 +193,7 @@ namespace pbrlib::testing
 
         constexpr auto psnr_threshold = 45.0;
         return psnr >= psnr_threshold;
+#endif
     }
 
     bool ImageComparison::compare (
@@ -229,5 +238,62 @@ namespace pbrlib::testing
         }
 
         return is_equal;
+    }
+
+    bool ImageComparison::psnr(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
+    {
+        if (image_1.format != VK_FORMAT_R32G32B32A32_SFLOAT)
+            return false;
+
+        const auto image_1_buffer = image_1.fetch("[vk-image-comparator] image 1 buffer");
+        const auto image_2_buffer = image_2.fetch("[vk-image-comparator] image 2 buffer");
+
+        bool all_channels_passed = true;
+
+        image_1_buffer.map([&image_2_buffer , &image_1, &all_channels_passed](std::span<const uint8_t> image_1_src)
+        {
+           image_2_buffer.map([&image_1_src, &image_1, &all_channels_passed](std::span<const uint8_t> image_2_src)
+            {
+                std::span<const pbrlib::math::vec4> img_1 ((const pbrlib::math::vec4*)image_1_src.data(), image_1_src.size() / (sizeof(float) * 4));
+                std::span<const pbrlib::math::vec4> img_2 ((const pbrlib::math::vec4*)image_2_src.data(), image_2_src.size() / (sizeof(float) * 4));
+
+                pbrlib::math::vec4 total_sq_error   (0.0f);
+                pbrlib::math::vec4 max_i            (0.0f);
+
+                for (size_t i = 0; i < img_1.size(); ++i)
+                {
+                    const auto diff = img_1[i] - img_2[i];
+                    
+                    total_sq_error += pbrlib::math::vec4(diff.x * diff.x, diff.y * diff.y, diff.z * diff.z, diff.w * diff.w);
+
+                    max_i.x = std::max(max_i.x, img_1[i].x);
+                    max_i.y = std::max(max_i.y, img_1[i].y);
+                    max_i.z = std::max(max_i.z, img_1[i].z);
+                    max_i.w = std::max(max_i.w, img_1[i].w);
+                }
+
+                constexpr auto psnr_threshold   = 45.0;
+                constexpr auto eps              = 2.2204460492503131e-16;
+                
+                const auto total_pixels = image_1.width * image_1.height;
+
+                const auto mse = total_sq_error * (1.0f / static_cast<float>(total_pixels));
+
+                for (size_t i = 0; i < 4; ++i)
+                {
+                    double psnr_value = 100.0;
+                    if (mse[i] > 1e-10)
+                    {
+                        const auto current_max = (max_i[i] < 1e-5) ? 1.0 : max_i[i];
+                        psnr_value = 20.0 * std::log10(current_max / (std::sqrt(mse[i]) + eps));
+                    }
+
+                    if (psnr_value < psnr_threshold)
+                        all_channels_passed = false;
+                }
+            }); 
+        });
+
+        return all_channels_passed;
     }
 }

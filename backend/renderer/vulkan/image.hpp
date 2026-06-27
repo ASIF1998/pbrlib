@@ -3,6 +3,8 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <pbrlib/math/vec4.hpp>
 
+#include <backend/renderer/vulkan/buffer.hpp>
+
 #include <string>
 #include <string_view>
 
@@ -76,6 +78,8 @@ namespace pbrlib::backend::vk
             VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
         );
+
+        Buffer fetch(std::string_view name) const;
 
         ImageHandle     handle;
         ImageViewHandle view_handle;

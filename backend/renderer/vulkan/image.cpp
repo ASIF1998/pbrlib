@@ -266,6 +266,58 @@ namespace pbrlib::backend::vk
 
         layout = new_layout;
     }
+
+    Buffer Image::fetch(std::string_view name) const
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (layout != VK_IMAGE_LAYOUT_GENERAL && layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
+            throw pbrlib::exception::InvalidState("[vk-image] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
+
+        const auto size = width * height * formatSize(format);
+        auto buffer = builders::Buffer(_device)
+            .addQueueFamilyIndex(_device.queue().family_index)
+            .name(name)
+            .size(size)
+            .type(BufferType::eReadback)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+            .build();
+
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("[vk-image] copy from image to buffer");
+        command_buffer.write([&buffer, this] (const auto command_buffer_handle)
+        {
+            constexpr VkImageSubresourceLayers color_image_subresource
+            {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel       = 0,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            const VkBufferImageCopy2 copy_region
+            {
+                .sType              = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2,
+                .imageSubresource   = color_image_subresource,
+                .imageExtent        = {width, height, 1u}
+            };
+
+            const VkCopyImageToBufferInfo2 copy_image_to_buffer_info
+            {
+                .sType          = VK_STRUCTURE_TYPE_COPY_IMAGE_TO_BUFFER_INFO_2,
+                .srcImage       = handle.handle(),
+                .srcImageLayout = layout,
+                .dstBuffer      = buffer.handle.handle(),
+                .regionCount    = 1,
+                .pRegions       = &copy_region
+            };
+
+            vkCmdCopyImageToBuffer2(command_buffer_handle, &copy_image_to_buffer_info);
+        });
+
+        _device.submit(command_buffer);
+
+        return buffer;
+    }
 }
 
 namespace pbrlib::backend::vk::builders
@@ -751,58 +803,6 @@ namespace pbrlib::backend::vk::exporters
             std::filesystem::create_directory(save_directory);
     }
 
-    Buffer fetch(Device& device, const vk::Image& image)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        if (image.layout != VK_IMAGE_LAYOUT_GENERAL && image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
-            throw pbrlib::exception::InvalidState("[vk-image::exporter] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
-
-        const auto size = image.width * image.height * formatSize(image.format);
-        auto buffer = builders::Buffer(device)
-            .addQueueFamilyIndex(device.queue().family_index)
-            .name("[vk-image::exporter] fetch buffer")
-            .size(size)
-            .type(BufferType::eReadback)
-            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT)
-            .build();
-
-        auto command_buffer = device.oneTimeSubmitCommandBuffer("[vk-image::exporter] copy from image to buffer");
-        command_buffer.write([&buffer, &image] (const auto command_buffer_handle)
-        {
-            constexpr VkImageSubresourceLayers color_image_subresource
-            {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                .mipLevel       = 0,
-                .baseArrayLayer = 0,
-                .layerCount     = 1
-            };
-
-            const VkBufferImageCopy2 copy_region
-            {
-                .sType              = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2,
-                .imageSubresource   = color_image_subresource,
-                .imageExtent        = {image.width, image.height, 1u}
-            };
-
-            const VkCopyImageToBufferInfo2 copy_image_to_buffer_info
-            {
-                .sType          = VK_STRUCTURE_TYPE_COPY_IMAGE_TO_BUFFER_INFO_2,
-                .srcImage       = image.handle.handle(),
-                .srcImageLayout = image.layout,
-                .dstBuffer      = buffer.handle.handle(),
-                .regionCount    = 1,
-                .pRegions       = &copy_region
-            };
-
-            vkCmdCopyImageToBuffer2(command_buffer_handle, &copy_image_to_buffer_info);
-        });
-
-        device.submit(command_buffer);
-
-        return buffer;
-    }
-
     void writeToPng(const WriteToImageParams& params)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
@@ -935,7 +935,7 @@ namespace pbrlib::backend::vk::exporters
 
         validate();
 
-        auto readback_buffer = fetch(_device, *_ptr_image);
+        auto readback_buffer = _ptr_image->fetch("[vk-image::exporter] fetch buffer");
         readback_buffer.map([this] (std::span<const uint8_t> data)
         {
             const WriteToImageParams write_params
