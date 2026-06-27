@@ -48,7 +48,7 @@ namespace pbrlib::testing
 
         backend::vk::SamplerHandle _sampler_handle;
 
-        std::optional<backend::vk::Buffer>  _count_changed_pixels_buffer;
+        std::optional<backend::vk::Buffer>  _group_float_errors;
         std::optional<backend::vk::Image>   _images_diff;
     };
 }

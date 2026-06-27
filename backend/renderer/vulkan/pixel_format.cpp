@@ -7,6 +7,8 @@
 
 #include <utility>
 
+#include <stdfloat>
+
 namespace pbrlib::backend
 {
     uint8_t formatSize(VkFormat format)
@@ -101,5 +103,24 @@ namespace pbrlib::backend
         }
 
         throw exception::UndefinedPixelFormat("[pixel-format] undefined pixel format");
+    }
+
+    ChannelType channelMaxValue(VkFormat format)
+    {
+        switch(format)
+        {
+            case VK_FORMAT_R8_UNORM:
+            case VK_FORMAT_R8G8_UNORM:
+            case VK_FORMAT_R8G8B8_UNORM:
+            case VK_FORMAT_R8G8B8A8_UNORM:
+                return 1.0f;
+            case VK_FORMAT_R16_SFLOAT:
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+                return 65504.0f;
+            case VK_FORMAT_R32G32B32A32_SFLOAT:
+                return std::numeric_limits<float>::max();
+            default:
+                throw pbrlib::exception::RuntimeError("[pixel-format] undefined pixel format");
+        }
     }
 }

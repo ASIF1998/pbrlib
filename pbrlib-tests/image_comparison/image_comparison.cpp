@@ -63,15 +63,6 @@ namespace pbrlib::testing
             nullptr,
             &_sampler_handle.handle())
         );
-
-        _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
-            .addQueueFamilyIndex(_device.queue().family_index)
-            .size(sizeof(uint32_t))
-            .type(pbrlib::backend::vk::BufferType::eReadback)
-            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-            .build();
-
-        _count_changed_pixels_buffer->write(0, 0);
     }
 
     bool ImageComparison::compare(backend::vk::Image& image_1, backend::vk::Image& image_2)
@@ -91,6 +82,20 @@ namespace pbrlib::testing
         if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
             image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+        const VkDeviceSize group_count_x        = image_1.width / _device.workGroupSize();
+        const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
+        const VkDeviceSize group_errors_count   = group_count_x * group_count_y; 
+
+        _group_float_errors = pbrlib::backend::vk::builders::Buffer(_device)
+            .addQueueFamilyIndex(_device.queue().family_index)
+            .size(group_errors_count * sizeof(float))
+            .type(pbrlib::backend::vk::BufferType::eReadback)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+            .build();
+
+        std::vector<float> group_errors_in_ram (group_errors_count, 0.0f);
+        _group_float_errors->write(std::span<const float>(group_errors_in_ram), 0);
+
         _device.writeDescriptorSet ({
             .view_handle            = image_1.view_handle,
             .sampler_handle         = _sampler_handle,
@@ -108,9 +113,9 @@ namespace pbrlib::testing
         });
 
         _device.writeDescriptorSet ({
-            .buffer     = _count_changed_pixels_buffer.value(),
+            .buffer     = _group_float_errors.value(),
             .set_handle = _descriptor_set_handle,
-            .size       = static_cast<uint32_t>(_count_changed_pixels_buffer->size),
+            .size       = static_cast<uint32_t>(_group_float_errors->size),
             .binding    = 2
         });
 
@@ -161,13 +166,25 @@ namespace pbrlib::testing
 
         _device.submit(command_buffer);
 
-        uint32_t count_changed_pixels = 0;
-        _count_changed_pixels_buffer->read(count_changed_pixels, 0);
+        _group_float_errors->read(reinterpret_cast<uint8_t*>(group_errors_in_ram.data()), sizeof(float) * group_errors_in_ram.size(), 0);
 
-        if (count_changed_pixels > 0) [[unlikely]]
-            backend::log::error("[vk-image-comparator] count of dissimilar pixels: {}", count_changed_pixels);
+        double total_error = 0.0;
+        for (const auto error: group_errors_in_ram)
+            total_error += static_cast<double>(error);
 
-        return count_changed_pixels == 0;
+        const auto  mse     = total_error / static_cast<double>(image_1.width * image_1.height * backend::channelCount(image_1.format));
+        double      psnr    = 100.0;
+        if (mse > 1e-10)
+        {
+            std::visit([&psnr, mse](const auto& channel_value)
+            {
+                double max_i = static_cast<double>(channel_value);
+                psnr = 10.0 * std::log10((max_i * max_i) / mse);
+            }, backend::channelMaxValue(image_1.format));
+        }
+
+        constexpr auto psnr_threshold = 45.0;
+        return psnr >= psnr_threshold;
     }
 
     bool ImageComparison::compare (
