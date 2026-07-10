@@ -19,8 +19,6 @@ namespace pbrlib::testing
 {
     class ImageComparison final
     {
-        bool psnr(const backend::vk::Image& image_1, const backend::vk::Image& image_2);
-
     public:
         explicit ImageComparison(pbrlib::backend::vk::Device& device);
 
@@ -31,7 +29,7 @@ namespace pbrlib::testing
         ImageComparison& operator = (const ImageComparison& image_comparison)   = delete;
 
         [[nodiscard]]
-        bool compare(backend::vk::Image& image_1, backend::vk::Image& image_2);
+        bool compare(backend::vk::Image& rendered_image, backend::vk::Image& reference_image);
 
         [[nodiscard]]
         bool compare (

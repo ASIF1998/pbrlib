@@ -18,6 +18,8 @@ namespace pbrlib::math
     template<MathArithmetic T>
     struct Vec4 final
     {
+        using ElementType = T;
+
         inline constexpr Vec4(T xyzw = static_cast<T>(0))                   noexcept;
         inline constexpr Vec4(T x, T y, T z, T w)                           noexcept;
         inline constexpr Vec4(const Vec3<T>& vec3, T w = static_cast<T>(0)) noexcept;
@@ -62,6 +64,8 @@ namespace pbrlib::math
             T xyzw[4];
             T rgba[4];
         };
+
+        static constexpr size_t element_count = 4;
     };
 
     template<MathArithmetic T>
@@ -87,10 +91,22 @@ namespace pbrlib::math
     inline Vec4<T> abs(const Vec4<T>& v) noexcept;
 
     template<MathArithmetic T>
+    inline bool isfinite(const Vec4<T>& v) noexcept;
+    
+    template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (const Vec4<T>& v, T s);
 
     template<MathArithmetic T>
     inline constexpr Vec4<T> operator * (T s, const Vec4<T>& v);
+
+    template<MathArithmetic T>
+    inline constexpr Vec4<T> operator * (const Vec4<T>& v1, const Vec4<T>& v2);
+
+    template<MathArithmetic T>
+    inline constexpr Vec4<T> min (const Vec4<T>& v1, const Vec4<T>& v2);
+    
+    template<MathArithmetic T>
+    inline constexpr Vec4<T> max (const Vec4<T>& v1, const Vec4<T>& v2);
 }
 
 namespace std

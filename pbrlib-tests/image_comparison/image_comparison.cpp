@@ -16,6 +16,80 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <ranges>
+
+namespace pbrlib::testing
+{
+    template<typename PixelType>
+    bool psnr(const backend::vk::Image& rendered_image, const backend::vk::Image& reference_image)
+    {
+        const auto rendered_image_buffer = rendered_image.fetch("[vk-image-comparator] rendered image buffer");
+        const auto reference_image_buffer = reference_image.fetch("[vk-image-comparator] reference image buffer");
+
+        bool all_channels_passed = true;
+
+        rendered_image_buffer.map([&reference_image_buffer, &all_channels_passed](std::span<const uint8_t> rendered_image_src)
+        {
+           reference_image_buffer.map([&rendered_image_src, &all_channels_passed](std::span<const uint8_t> reference_image_src)
+            {
+                using ChannelType = typename PixelType::ElementType;
+
+                std::span<const PixelType> rendered_image (reinterpret_cast<const PixelType*>(rendered_image_src.data()), rendered_image_src.size() / sizeof(PixelType));
+                std::span<const PixelType> reference_image (reinterpret_cast<const PixelType*>(reference_image_src.data()), reference_image_src.size() / sizeof(PixelType));
+
+                PixelType min_value (std::numeric_limits<ChannelType>::max());
+                PixelType max_value (-std::numeric_limits<ChannelType>::max());
+
+                PixelType total_sq_error;
+
+                size_t valid_pixel_count = 0;
+
+                for (const auto& [pixel_1, pixel_2]: std::views::zip(rendered_image, reference_image))
+                {
+                    if (!pbrlib::math::isfinite(pixel_1)) [[unlikely]]
+                        continue;
+
+                    if (!pbrlib::math::isfinite(pixel_2)) [[unlikely]]
+                        continue;
+
+                    const auto diff = pixel_1 - pixel_2;
+
+                    total_sq_error += diff * diff;
+                    ++valid_pixel_count;
+
+                    min_value = pbrlib::math::min(min_value, pixel_2);
+                    max_value = pbrlib::math::max(max_value, pixel_2);
+                }
+
+                if (valid_pixel_count == 0) [[unlikely]]
+                {
+                    all_channels_passed = false;
+                    return ;
+                }
+
+                const auto mse = total_sq_error * (1.0f / static_cast<float>(valid_pixel_count));
+                
+                const auto max_i = max_value - min_value;
+
+                constexpr auto eps              = 2.2204460492503131e-16;
+                constexpr auto psnr_threshold   = 45.0;
+                
+                for (const auto i: std::views::iota(0u, PixelType::element_count))
+                {
+                    auto psnr_value = 100.0;
+                    if (mse[i] > 1e-10)
+                        psnr_value = 20.0 * std::log10(max_i[i] / (std::sqrt(mse[i]) + eps));
+
+                    if (psnr_value < psnr_threshold)
+                        all_channels_passed = false;
+                }
+            }); 
+        });
+
+        return all_channels_passed;
+    }
+}
+
 namespace pbrlib::testing
 {
     ImageComparison::ImageComparison(backend::vk::Device& device) :
@@ -65,33 +139,25 @@ namespace pbrlib::testing
         );
     }
 
-    bool ImageComparison::compare(backend::vk::Image& image_1, backend::vk::Image& image_2)
+    bool ImageComparison::compare(backend::vk::Image& rendered_image, backend::vk::Image& reference_image)
     {
-        if (image_1.width != image_2.width || image_1.height != image_2.height) [[unlikely]]
+        if (rendered_image.width != reference_image.width || rendered_image.height != reference_image.height) [[unlikely]]
             return false;
 
-        if (image_1.level_count != image_2.level_count) [[unlikely]]
+        if (rendered_image.level_count != reference_image.level_count) [[unlikely]]
             return false;
 
-        if (image_1.layer_count != image_2.layer_count) [[unlikely]]
+        if (rendered_image.layer_count != reference_image.layer_count) [[unlikely]]
             return false;
 
-        if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-            image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        if (rendered_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            rendered_image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-            image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        if (reference_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            reference_image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-#if 1
-        image_1.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-        image_2.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-
-        return psnr(image_1, image_2);
-#endif
-
-#if 0
-        const VkDeviceSize group_count_x        = image_1.width / _device.workGroupSize();
-        const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
+        const VkDeviceSize group_count_x        = rendered_image.width / _device.workGroupSize();
+        const VkDeviceSize group_count_y        = rendered_image.height / _device.workGroupSize();
         const VkDeviceSize group_errors_count   = group_count_x * group_count_y; 
 
         _group_float_errors = pbrlib::backend::vk::builders::Buffer(_device)
@@ -105,7 +171,7 @@ namespace pbrlib::testing
         _group_float_errors->write(std::span<const float>(group_errors_in_ram), 0);
 
         _device.writeDescriptorSet ({
-            .view_handle            = image_1.view_handle,
+            .view_handle            = rendered_image.view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -113,7 +179,7 @@ namespace pbrlib::testing
         });
 
         _device.writeDescriptorSet ({
-            .view_handle            = image_2.view_handle,
+            .view_handle            = reference_image.view_handle,
             .sampler_handle         = _sampler_handle,
             .set_handle             = _descriptor_set_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -127,32 +193,9 @@ namespace pbrlib::testing
             .binding    = 2
         });
 
-        if constexpr (generate_image_diff)
-        {
-            _images_diff = backend::vk::builders::Image(_device)
-                .size(image_1.width, image_1.height)
-                .format(image_1.format)
-                .usage(VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT)
-                .addQueueFamilyIndex(_device.queue().family_index)
-                .tiling(VK_IMAGE_TILING_OPTIMAL)
-                .name("[vk-image-comparator] diff image")
-                .fillColor(math::vec4(0))
-                .build();
-
-            if (!_images_diff) [[unlikely]]
-                throw exception::RuntimeError("[vk-image-comparator] failed create diff image");
-
-            _device.writeDescriptorSet ({
-                .view_handle            = _images_diff->view_handle,
-                .set_handle             = _descriptor_set_handle,
-                .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                .binding                = 3
-            });
-        }
-
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-image-comparator");
 
-        command_buffer.write([&image_1, this] (auto command_buffer_handle)
+        command_buffer.write([&rendered_image, this] (auto command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
@@ -166,34 +209,22 @@ namespace pbrlib::testing
                 0, nullptr
             );
 
-            const auto group_count_x = image_1.width / _device.workGroupSize();
-            const auto group_count_y = image_1.height / _device.workGroupSize();
+            const auto group_count_x = rendered_image.width / _device.workGroupSize();
+            const auto group_count_y = rendered_image.height / _device.workGroupSize();
 
             vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
         }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
 
         _device.submit(command_buffer);
 
-        _group_float_errors->read(reinterpret_cast<uint8_t*>(group_errors_in_ram.data()), sizeof(float) * group_errors_in_ram.size(), 0);
+        rendered_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        reference_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        double total_error = 0.0;
-        for (const auto error: group_errors_in_ram)
-            total_error += static_cast<double>(error);
+        if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
+            return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
 
-        const auto  mse     = total_error / static_cast<double>(image_1.width * image_1.height * backend::channelCount(image_1.format));
-        double      psnr    = 100.0;
-        if (mse > 1e-10)
-        {
-            std::visit([&psnr, mse](const auto& channel_value)
-            {
-                double max_i = static_cast<double>(channel_value);
-                psnr = 10.0 * std::log10((max_i * max_i) / mse);
-            }, backend::channelMaxValue(image_1.format));
-        }
-
-        constexpr auto psnr_threshold = 45.0;
-        return psnr >= psnr_threshold;
-#endif
+        backend::log::error("[vk-image-comparator] undefined pixel format: {}", static_cast<uint64_t>(rendered_image.format));
+        return false;
     }
 
     bool ImageComparison::compare (
@@ -238,62 +269,5 @@ namespace pbrlib::testing
         }
 
         return is_equal;
-    }
-
-    bool ImageComparison::psnr(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
-    {
-        if (image_1.format != VK_FORMAT_R32G32B32A32_SFLOAT)
-            return false;
-
-        const auto image_1_buffer = image_1.fetch("[vk-image-comparator] image 1 buffer");
-        const auto image_2_buffer = image_2.fetch("[vk-image-comparator] image 2 buffer");
-
-        bool all_channels_passed = true;
-
-        image_1_buffer.map([&image_2_buffer , &image_1, &all_channels_passed](std::span<const uint8_t> image_1_src)
-        {
-           image_2_buffer.map([&image_1_src, &image_1, &all_channels_passed](std::span<const uint8_t> image_2_src)
-            {
-                std::span<const pbrlib::math::vec4> img_1 ((const pbrlib::math::vec4*)image_1_src.data(), image_1_src.size() / (sizeof(float) * 4));
-                std::span<const pbrlib::math::vec4> img_2 ((const pbrlib::math::vec4*)image_2_src.data(), image_2_src.size() / (sizeof(float) * 4));
-
-                pbrlib::math::vec4 total_sq_error   (0.0f);
-                pbrlib::math::vec4 max_i            (0.0f);
-
-                for (size_t i = 0; i < img_1.size(); ++i)
-                {
-                    const auto diff = img_1[i] - img_2[i];
-                    
-                    total_sq_error += pbrlib::math::vec4(diff.x * diff.x, diff.y * diff.y, diff.z * diff.z, diff.w * diff.w);
-
-                    max_i.x = std::max(max_i.x, img_1[i].x);
-                    max_i.y = std::max(max_i.y, img_1[i].y);
-                    max_i.z = std::max(max_i.z, img_1[i].z);
-                    max_i.w = std::max(max_i.w, img_1[i].w);
-                }
-
-                constexpr auto psnr_threshold   = 45.0;
-                constexpr auto eps              = 2.2204460492503131e-16;
-                
-                const auto total_pixels = image_1.width * image_1.height;
-
-                const auto mse = total_sq_error * (1.0f / static_cast<float>(total_pixels));
-
-                for (size_t i = 0; i < 4; ++i)
-                {
-                    double psnr_value = 100.0;
-                    if (mse[i] > 1e-10)
-                    {
-                        const auto current_max = (max_i[i] < 1e-5) ? 1.0 : max_i[i];
-                        psnr_value = 20.0 * std::log10(current_max / (std::sqrt(mse[i]) + eps));
-                    }
-
-                    if (psnr_value < psnr_threshold)
-                        all_channels_passed = false;
-                }
-            }); 
-        });
-
-        return all_channels_passed;
     }
 }

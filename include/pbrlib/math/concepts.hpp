@@ -13,7 +13,9 @@ namespace pbrlib::math
         { a / b }   -> std::convertible_to<T>;
         { a == b }  -> std::convertible_to<bool>;
         { a != b }  -> std::convertible_to<bool>;
+        { a < b }   -> std::convertible_to<bool>;
+        { a > b }   -> std::convertible_to<bool>;
         { -a }      -> std::convertible_to<T>;
         { +a }      -> std::convertible_to<T>;
-    }; 
+    };
 }
