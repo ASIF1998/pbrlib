@@ -5,13 +5,13 @@
 namespace pbrlib::math
 {
     template <typename T, std::floating_point U>
-    constexpr T lerp(const T& v_min, const T& v_max, U t)
+    [[nodiscard]] constexpr T lerp(const T& v_min, const T& v_max, U t)
     {
         return v_min * (static_cast<U>(1.0) - t) + v_max * t;
     }
 
     template <typename T, std::floating_point U>
-    constexpr T slerp(const T& v_min, const T& v_max, U t)
+    [[nodiscard]] constexpr T slerp(const T& v_min, const T& v_max, U t)
     {
         U cos_theta = dot(v_min, v_max);
 

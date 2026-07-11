@@ -18,27 +18,29 @@ namespace pbrlib::math
     template<MathArithmetic T>
     struct Vec2 final
     {
+        using ElementType = T;
+
         inline constexpr Vec2()                     noexcept;
         inline constexpr Vec2(T xy)                 noexcept;
         inline constexpr Vec2(T x, T y)             noexcept;
         inline constexpr Vec2(const Vec3<T>& vec)   noexcept;
         inline constexpr Vec2(const Vec4<T>& vec)   noexcept;
 
-        inline constexpr bool operator == (const Vec2& v) const noexcept;
-        inline constexpr bool operator != (const Vec2& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Vec2& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Vec2& v) const noexcept;
         
-        inline constexpr Vec2 operator + (const Vec2& v)  const noexcept;
-        inline constexpr Vec2 operator - (const Vec2& v)  const noexcept;
+        [[nodiscard]] inline constexpr Vec2 operator + (const Vec2& v) const noexcept;
+        [[nodiscard]] inline constexpr Vec2 operator - (const Vec2& v) const noexcept;
 
         inline constexpr Vec2& operator += (const Vec2& v)  noexcept;
         inline constexpr Vec2& operator -= (const Vec2& v)  noexcept;
         inline constexpr Vec2& operator *= (T s)            noexcept;
 
-        inline T&            operator [] (size_t i) noexcept;
-        inline constexpr T   operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T&             operator [] (size_t i) noexcept;
+        [[nodiscard]] inline constexpr T    operator [] (size_t i) const noexcept;
 
-        inline T             length()          const noexcept;
-        inline constexpr T   lengthSquared()   const noexcept;
+        [[nodiscard]] inline T              length()        const noexcept;
+        [[nodiscard]] inline constexpr T    lengthSquared() const noexcept;
 
         void normalize();
 
@@ -59,32 +61,46 @@ namespace pbrlib::math
             T xy[2];
             T rg[2];
         };
+
+        static constexpr size_t element_count = 2;
     };
 
     template<MathArithmetic T>
-    Vec2<T> normalize(const Vec2<T>& v);
+    [[nodiscard]] Vec2<T> normalize(const Vec2<T>& v);
 
     template<MathArithmetic T>
-    inline Vec2<T> round(const Vec2<T>& v) noexcept;
+    [[nodiscard]] inline Vec2<T> round(const Vec2<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline Vec2<T> clamp(const Vec2<T>& x, T min_val, T max_val) noexcept;
+    [[nodiscard]] inline Vec2<T> clamp(const Vec2<T>& x, T min_val, T max_val) noexcept;
 
     template<MathArithmetic T>
-    inline Vec2<T> clamp (
+    [[nodiscard]] inline Vec2<T> clamp (
         const Vec2<T>& x, 
         const Vec2<T>& min_val, 
         const Vec2<T>& max_val
     ) noexcept;
 
     template<MathArithmetic T>
-    inline Vec2<T> abs(const Vec2<T>& v) noexcept;
+    [[nodiscard]] inline Vec2<T> abs(const Vec2<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);
+    [[nodiscard]] inline constexpr Vec2<T> operator * (const Vec2<T>& v, T s);
 
     template<MathArithmetic T>
-    inline constexpr Vec2<T> operator * (T s, const Vec2<T>& v);
+    [[nodiscard]] inline constexpr Vec2<T> operator * (T s, const Vec2<T>& v);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec2<T> operator * (const Vec2<T>& v1, const Vec2<T>& v2);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec2<T> min(const Vec2<T>& v1, const Vec2<T>& v2);
+    
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec2<T> max(const Vec2<T>& v1, const Vec2<T>& v2);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Vec2<T>& v) noexcept;
 }
 
 namespace std

@@ -7,8 +7,6 @@
 
 #include <utility>
 
-#include <stdfloat>
-
 namespace pbrlib::backend
 {
     uint8_t formatSize(VkFormat format)

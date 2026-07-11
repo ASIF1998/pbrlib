@@ -310,6 +310,20 @@ namespace pbrlib::math
 
         return res;
     }
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Matrix3x3<T>& mat) noexcept
+    {
+        return      std::isfinite(mat[0][0])
+                &&  std::isfinite(mat[0][1])
+                &&  std::isfinite(mat[0][2])
+                &&  std::isfinite(mat[1][0])
+                &&  std::isfinite(mat[1][1])
+                &&  std::isfinite(mat[1][2])
+                &&  std::isfinite(mat[2][0])
+                &&  std::isfinite(mat[2][1])
+                &&  std::isfinite(mat[2][2]);
+    }
 }
 
 namespace std

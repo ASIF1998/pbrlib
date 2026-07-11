@@ -168,7 +168,7 @@ namespace pbrlib::math
     }
 
     template<MathArithmetic T>
-    inline constexpr Vec4<T> min (const Vec4<T>& v1, const Vec4<T>& v2)
+    inline constexpr Vec4<T> min(const Vec4<T>& v1, const Vec4<T>& v2)
     {
         return Vec4<T>
         (
@@ -180,7 +180,7 @@ namespace pbrlib::math
     }
 
     template<MathArithmetic T>
-    inline constexpr Vec4<T> max (const Vec4<T>& v1, const Vec4<T>& v2)
+    inline constexpr Vec4<T> max(const Vec4<T>& v1, const Vec4<T>& v2)
     {
         return Vec4<T>
         (

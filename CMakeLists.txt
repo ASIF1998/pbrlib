@@ -100,11 +100,11 @@ if (PBRLIB_SETUP_CI)
 endif()
 
 if (APPLE)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_APPLE)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_APPLE)
 elseif(WIN32)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_WINDOWS)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_WINDOWS)
 else()
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_LINUX)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_LINUX)
 endif()
 
 #####################################################

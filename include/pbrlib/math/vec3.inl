@@ -84,6 +84,12 @@ namespace pbrlib::math
     }
 
     template<MathArithmetic T>
+    inline constexpr Vec3<T> operator * (const Vec3<T>& v1, const Vec3<T>& v2)
+    {
+        return Vec3<T>(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
+    }
+
+    template<MathArithmetic T>
     inline constexpr Vec3<T>& Vec3<T>::operator += (const Vec3<T>& v) noexcept
     {
         x += v.x;
@@ -214,6 +220,34 @@ namespace pbrlib::math
     inline Vec3<T> abs(const Vec3<T>& v) noexcept
     {
         return Vec3<T>(std::abs(v.x), std::abs(v.y), std::abs(v.z));
+    }
+
+    template<MathArithmetic T>
+    inline constexpr Vec3<T> min(const Vec3<T>& v1, const Vec3<T>& v2)
+    {
+        return Vec3<T>
+        (
+            std::min(v1.x, v2.x),
+            std::min(v1.y, v2.y),
+            std::min(v1.z, v2.z)
+        );
+    }
+
+    template<MathArithmetic T>
+    inline constexpr Vec3<T> max(const Vec3<T>& v1, const Vec3<T>& v2)
+    {
+        return Vec3<T>
+        (
+            std::max(v1.x, v2.x),
+            std::max(v1.y, v2.y),
+            std::max(v1.z, v2.z)
+        );
+    }
+
+    template<MathArithmetic T>
+    inline bool isfinite(const Vec3<T>& v) noexcept
+    {
+        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
     }
 }
 

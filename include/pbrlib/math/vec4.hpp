@@ -25,21 +25,21 @@ namespace pbrlib::math
         inline constexpr Vec4(const Vec3<T>& vec3, T w = static_cast<T>(0)) noexcept;
         inline constexpr Vec4(const Vec2<T>& v1, const Vec2<T>& v2)         noexcept;
 
-        inline constexpr bool operator == (const Vec4& v) const noexcept;
-        inline constexpr bool operator != (const Vec4& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Vec4& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Vec4& v) const noexcept;
 
-        inline constexpr Vec4 operator + (const Vec4& v)  const noexcept;
-        inline constexpr Vec4 operator - (const Vec4& v)  const noexcept;
+        [[nodiscard]] inline constexpr Vec4 operator + (const Vec4& v) const noexcept;
+        [[nodiscard]] inline constexpr Vec4 operator - (const Vec4& v) const noexcept;
 
         inline constexpr Vec4& operator += (const Vec4& v)  noexcept;
         inline constexpr Vec4& operator -= (const Vec4& v)  noexcept;
         inline constexpr Vec4& operator *= (T s)            noexcept;
 
-        inline T&            operator [] (size_t i) noexcept;
-        inline constexpr T   operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T&             operator [] (size_t i) noexcept;
+        [[nodiscard]] inline constexpr T    operator [] (size_t i) const noexcept;
 
-        inline T             length()        const noexcept;
-        inline constexpr T   lengthSquared() const noexcept;
+        [[nodiscard]] inline T              length()        const noexcept;
+        [[nodiscard]] inline constexpr T    lengthSquared() const noexcept;
 
         inline void normalize();
 
@@ -69,44 +69,44 @@ namespace pbrlib::math
     };
 
     template<MathArithmetic T>
-    inline constexpr T dot(const Vec4<T> v1, const Vec4<T>& v2) noexcept;
+    [[nodiscard]] inline constexpr T dot(const Vec4<T> v1, const Vec4<T>& v2) noexcept;
 
     template<MathArithmetic T>
-    inline Vec4<T> normalize(const Vec4<T>& v);
+    [[nodiscard]] inline Vec4<T> normalize(const Vec4<T>& v);
 
     template<MathArithmetic T>
-    inline Vec4<T> round(const Vec4<T>& v) noexcept;
+    [[nodiscard]] inline Vec4<T> round(const Vec4<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline Vec4<T> clamp(const Vec4<T>& x, T min_val, T max_val) noexcept;
+    [[nodiscard]] inline Vec4<T> clamp(const Vec4<T>& x, T min_val, T max_val) noexcept;
 
     template<MathArithmetic T>
-    inline Vec4<T> clamp (
+    [[nodiscard]] inline Vec4<T> clamp (
         const Vec4<T>& x, 
         const Vec4<T>& min_val, 
         const Vec4<T>& max_val
     ) noexcept;
 
     template<MathArithmetic T>
-    inline Vec4<T> abs(const Vec4<T>& v) noexcept;
+    [[nodiscard]] inline Vec4<T> abs(const Vec4<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline bool isfinite(const Vec4<T>& v) noexcept;
+    [[nodiscard]] inline bool isfinite(const Vec4<T>& v) noexcept;
     
     template<MathArithmetic T>
-    inline constexpr Vec4<T> operator * (const Vec4<T>& v, T s);
+    [[nodiscard]] inline constexpr Vec4<T> operator * (const Vec4<T>& v, T s);
 
     template<MathArithmetic T>
-    inline constexpr Vec4<T> operator * (T s, const Vec4<T>& v);
+    [[nodiscard]] inline constexpr Vec4<T> operator * (T s, const Vec4<T>& v);
 
     template<MathArithmetic T>
-    inline constexpr Vec4<T> operator * (const Vec4<T>& v1, const Vec4<T>& v2);
+    [[nodiscard]] inline constexpr Vec4<T> operator * (const Vec4<T>& v1, const Vec4<T>& v2);
 
     template<MathArithmetic T>
-    inline constexpr Vec4<T> min (const Vec4<T>& v1, const Vec4<T>& v2);
+    [[nodiscard]] inline constexpr Vec4<T> min(const Vec4<T>& v1, const Vec4<T>& v2);
     
     template<MathArithmetic T>
-    inline constexpr Vec4<T> max (const Vec4<T>& v1, const Vec4<T>& v2);
+    [[nodiscard]] inline constexpr Vec4<T> max(const Vec4<T>& v1, const Vec4<T>& v2);
 }
 
 namespace std
@@ -121,6 +121,7 @@ namespace std
     template<pbrlib::math::MathArithmetic T>
     struct hash<pbrlib::math::Vec4<T>> final
     {
+        [[nodiscard]] 
         inline constexpr size_t operator () (const pbrlib::math::Vec4<T>& vec) const noexcept;
     };
 }

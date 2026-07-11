@@ -16,7 +16,77 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <backend/math/float16.hpp>
+
 #include <ranges>
+
+namespace pbrlib::math
+{
+    using half4 = pbrlib::math::Vec4<pbrlib::backend::math::float16_t>;
+
+    template<typename T>
+    struct Scalar final
+    {
+        using ElementType = T;
+
+        explicit Scalar(T init_value = static_cast<T>(0.0f)) :
+            value(init_value)
+        { }
+
+        [[nodiscard]] T operator [] ([[maybe_unused]] size_t i) const noexcept
+        {
+            return value;
+        }
+        
+        [[nodiscard]] Scalar operator - (const Scalar& v)  const noexcept
+        {
+            return Scalar(value - v.value);
+        }
+
+        [[nodiscard]] T& operator [] ([[maybe_unused]] size_t i) noexcept
+        {
+            return value;
+        }
+
+        [[nodiscard]] Scalar operator * (Scalar s) const noexcept
+        {
+            return Scalar(value * s.value);
+        }
+
+        [[nodiscard]] Scalar operator * (T s) const noexcept
+        {
+            return Scalar(value * s);
+        }
+
+        Scalar& operator += (Scalar s) noexcept
+        {
+            value += s.value;
+            return *this;
+        }
+
+        T value;
+
+        static constexpr size_t element_count = 4;
+    };
+
+    template<typename T>
+    [[nodiscard]] bool isfinite(Scalar<T> scalar)
+    {
+        return std::isfinite(static_cast<float>(scalar.value));
+    }
+
+    template<typename T>
+    [[nodiscard]] Scalar<T> min(Scalar<T> s1, Scalar<T> s2)
+    {
+        return Scalar<T>(std::min(static_cast<float>(s1.value), static_cast<float>(s2.value)));
+    }
+
+    template<typename T>
+    [[nodiscard]] Scalar<T> max(Scalar<T> s1, Scalar<T> s2)
+    {
+        return Scalar<T>(std::max(static_cast<float>(s1.value), static_cast<float>(s2.value)));
+    }
+}
 
 namespace pbrlib::testing
 {
@@ -67,7 +137,7 @@ namespace pbrlib::testing
                     return ;
                 }
 
-                const auto mse = total_sq_error * (1.0f / static_cast<float>(valid_pixel_count));
+                const auto mse = total_sq_error * (ChannelType(1.0) / static_cast<ChannelType>(valid_pixel_count));
                 
                 const auto max_i = max_value - min_value;
 
@@ -77,8 +147,8 @@ namespace pbrlib::testing
                 for (const auto i: std::views::iota(0u, PixelType::element_count))
                 {
                     auto psnr_value = 100.0;
-                    if (mse[i] > 1e-10)
-                        psnr_value = 20.0 * std::log10(max_i[i] / (std::sqrt(mse[i]) + eps));
+                    if (mse[i] > ChannelType(1e-10))
+                        psnr_value = 20.0 * std::log10(static_cast<float>(max_i[i]) / (std::sqrt(static_cast<float>(mse[i]))) + static_cast<float>(eps));
 
                     if (psnr_value < psnr_threshold)
                         all_channels_passed = false;
@@ -222,9 +292,15 @@ namespace pbrlib::testing
 
         if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
             return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
+        
+        if (rendered_image.format == VK_FORMAT_R16G16B16A16_SFLOAT)
+            return psnr<math::half4>(rendered_image, reference_image);
+
+        if (rendered_image.format == VK_FORMAT_R16_SFLOAT)
+            return psnr<math::Scalar<pbrlib::backend::math::float16_t>>(rendered_image, reference_image);
 
         backend::log::error("[vk-image-comparator] undefined pixel format: {}", static_cast<uint64_t>(rendered_image.format));
-        return false;
+        return true;
     }
 
     bool ImageComparison::compare (
