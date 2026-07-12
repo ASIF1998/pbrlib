@@ -5,8 +5,6 @@
 
 #include <tinyexr/tinyexr.h>
 
-#include <utility>
-
 namespace pbrlib::backend
 {
     uint8_t formatSize(VkFormat format)

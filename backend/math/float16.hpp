@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <bit>
 
 namespace pbrlib::backend::math
 {
@@ -12,7 +11,7 @@ namespace pbrlib::backend::math
 
         inline constexpr operator float() const noexcept;
 
-        inline constexpr float16_t& operator += (float16_t v) noexcept;   
+        inline constexpr float16_t& operator += (float16_t v) noexcept;
 
     private:
         uint16_t _bits = 0x0000u;

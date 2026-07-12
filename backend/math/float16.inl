@@ -1,3 +1,5 @@
+#include <bit>
+
 namespace pbrlib::backend::math
 {
     inline constexpr float16_t::float16_t(float value) noexcept
@@ -10,9 +12,9 @@ namespace pbrlib::backend::math
 
         if (exponent <= -15)
         {
-            if (exponent < -24) 
+            if (exponent < -24)
                 _bits = static_cast<uint16_t>(sign);
-            else 
+            else
             {
                 const uint32_t sub_mantissa = (mantissa | 0x00800000) >> (-14 - exponent);
                 _bits = static_cast<uint16_t>(sign | (sub_mantissa & 0x3FF));
@@ -61,42 +63,42 @@ namespace pbrlib::backend::math
         return *this;
     }
 
-    inline constexpr float16_t operator + (float16_t a, float16_t b) noexcept 
+    inline constexpr float16_t operator + (float16_t a, float16_t b) noexcept
     {
         return float(a) + float(b);
     }
 
-    inline constexpr float16_t operator - (float16_t a, float16_t b) noexcept 
+    inline constexpr float16_t operator - (float16_t a, float16_t b) noexcept
     {
         return float(a) - float(b);
     }
 
-    inline constexpr float16_t operator * (float16_t a, float16_t b) noexcept 
+    inline constexpr float16_t operator * (float16_t a, float16_t b) noexcept
     {
         return float(a) * float(b);
     }
 
-    inline constexpr float16_t operator / (float16_t a, float16_t b) noexcept 
+    inline constexpr float16_t operator / (float16_t a, float16_t b) noexcept
     {
         return float(a) / float(b);
     }
 
-    inline constexpr bool operator == (float16_t a, float16_t b) noexcept 
+    inline constexpr bool operator == (float16_t a, float16_t b) noexcept
     {
         return float(a) == float(b);
     }
 
-    inline constexpr bool operator != (float16_t a, float16_t b) noexcept 
+    inline constexpr bool operator != (float16_t a, float16_t b) noexcept
     {
         return float(a) != float(b);
     }
 
-    inline constexpr bool operator < (float16_t a, float16_t b) noexcept 
+    inline constexpr bool operator < (float16_t a, float16_t b) noexcept
     {
         return float(a) <  float(b);
     }
 
-    inline constexpr bool operator > (float16_t a, float16_t b) noexcept 
+    inline constexpr bool operator > (float16_t a, float16_t b) noexcept
     {
         return float(a) >  float(b);
     }

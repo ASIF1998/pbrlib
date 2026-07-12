@@ -17,7 +17,7 @@ namespace pbrlib::backend::vk
         ));
 
         if (semaphore_handle == VK_NULL_HANDLE) [[unlikely]]
-            throw pbrlib::exception::InitializeError("failed create semaphore");
+            throw pbrlib::exception::InitializeError("[vk-sync] failed create semaphore");
 
         return SemaphoreHandle(semaphore_handle);
     }
@@ -34,7 +34,7 @@ namespace pbrlib::backend::vk
         ));
 
         if (fence_handle == VK_NULL_HANDLE) [[unlikely]]
-            throw pbrlib::exception::InitializeError("failed create fence");
+            throw pbrlib::exception::InitializeError("[vk-sync] failed create fence");
 
         return FenceHandle(fence_handle);
     }

@@ -17,8 +17,6 @@
 
 #include <pbrlib/math/lerp.hpp>
 
-#include  <algorithm>
-
 namespace pbrlib::backend
 {
     FXAA::FXAA(vk::Device& device, vk::Image& dst_image) :

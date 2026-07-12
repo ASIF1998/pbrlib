@@ -1,5 +1,4 @@
 #include <backend/renderer/frame_graph/render_pass.hpp>
-
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/logger/logger.hpp>

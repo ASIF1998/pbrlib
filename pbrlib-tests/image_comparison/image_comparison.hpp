@@ -19,8 +19,10 @@ namespace pbrlib::testing
 {
     class ImageComparison final
     {
+        void generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2);
+
     public:
-        explicit ImageComparison(pbrlib::backend::vk::Device& device);
+        explicit ImageComparison(backend::vk::Device& device);
 
         ImageComparison(ImageComparison&& image_comparison)         = delete;
         ImageComparison(const ImageComparison& image_comparison)    = delete;
@@ -46,9 +48,7 @@ namespace pbrlib::testing
         backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
         backend::vk::DescriptorSetHandle        _descriptor_set_handle;
 
-        backend::vk::SamplerHandle _sampler_handle;
-
-        std::optional<backend::vk::Buffer>  _group_float_errors;
+        backend::vk::SamplerHandle          _sampler_handle;
         std::optional<backend::vk::Image>   _images_diff;
     };
 }

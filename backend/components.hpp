@@ -7,8 +7,6 @@
 #include <pbrlib/math/vec4.hpp>
 #include <pbrlib/math/aabb.hpp>
 
-#include <vector>
-
 namespace pbrlib
 {
     class SceneItem;
