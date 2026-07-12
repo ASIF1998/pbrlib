@@ -206,7 +206,7 @@ namespace pbrlib::testing::vk
 {
     constexpr inline bool isSupport()
     {
-#ifdef PBRLIB_RUN_FROM_CI
+#if defined(PBRLIB_RUN_FROM_CI) && defined(PBRLIB_OS_WINDOWS)
         /// swiftshader apparently doesn't support float16
         return false;
 #else

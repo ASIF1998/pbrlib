@@ -271,6 +271,15 @@ namespace pbrlib::math
             _array4[3] = a22;
         }
     }
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Matrix2x2<T>& mat) noexcept
+    {
+        return      std::isfinite(mat[0][0])
+                &&  std::isfinite(mat[0][1])
+                &&  std::isfinite(mat[1][0])
+                &&  std::isfinite(mat[1][1]);
+    }
 }
 
 namespace pbrlib::math

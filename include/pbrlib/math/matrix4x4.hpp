@@ -16,6 +16,8 @@ namespace pbrlib::math
     class Matrix4x4 final
     {
     public:
+        using ElementType = T;
+
         inline constexpr Matrix4x4() noexcept;
 
         inline constexpr Matrix4x4(T init_value) noexcept;
@@ -27,29 +29,31 @@ namespace pbrlib::math
             T x3, T y3, T z3, T w3
         ) noexcept;
 
-        inline constexpr bool operator == (const Matrix4x4& mat) const noexcept;
-        inline constexpr bool operator != (const Matrix4x4& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Matrix4x4& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Matrix4x4& mat) const noexcept;
 
-        inline constexpr Matrix4x4  operator + (const Matrix4x4& mat)   const noexcept;
-        inline constexpr Matrix4x4  operator - (const Matrix4x4& mat)   const noexcept;
-        inline constexpr Matrix4x4  operator * (const Matrix4x4& mat)   const noexcept;
-        inline constexpr Vec4<T>    operator * (const Vec4<T>& v)       const noexcept;
+        [[nodiscard]] inline constexpr Matrix4x4  operator + (const Matrix4x4& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix4x4  operator - (const Matrix4x4& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix4x4  operator * (const Matrix4x4& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Vec4<T>    operator * (const Vec4<T>& v)       const noexcept;
 
         inline constexpr Matrix4x4& operator += (const Matrix4x4& mat)  noexcept;
         inline constexpr Matrix4x4& operator -= (const Matrix4x4& mat)  noexcept;
         inline constexpr Matrix4x4& operator *= (const Matrix4x4& mat)  noexcept;
         inline constexpr Matrix4x4& operator *= (T scal)                noexcept;
 
-        inline T*        operator [] (size_t i) noexcept;
-        inline const T*  operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T*         operator [] (size_t i) noexcept;
+        [[nodiscard]] inline const T*   operator [] (size_t i) const noexcept;
 
-        inline T&            at(size_t i, size_t j);
-        inline constexpr T   at(size_t i, size_t j) const;
+        [[nodiscard]] inline T&             at(size_t i, size_t j);
+        [[nodiscard]] inline constexpr T    at(size_t i, size_t j) const;
 
-        inline constexpr T det() const noexcept;
+        [[nodiscard]] inline constexpr T det() const noexcept;
 
         inline void transpose() noexcept;
         inline void inverse()   noexcept;
+
+        static constexpr size_t element_count = 16;
 
     private:
         union
@@ -61,19 +65,22 @@ namespace pbrlib::math
     };
 
     template<MathArithmetic T>
-    inline Matrix4x4<T> transpose(const Matrix4x4<T>& mat) noexcept;
+    [[nodiscard]] inline Matrix4x4<T> transpose(const Matrix4x4<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline Matrix4x4<T> inverse(const Matrix4x4<T>& mat) noexcept;
+    [[nodiscard]] inline Matrix4x4<T> inverse(const Matrix4x4<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline Matrix4x4<T> round(const Matrix4x4<T>& mat) noexcept;
+    [[nodiscard]] inline Matrix4x4<T> round(const Matrix4x4<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Matrix4x4<T> operator * (const Matrix4x4<T>& mat, T s);
+    [[nodiscard]] inline constexpr Matrix4x4<T> operator * (const Matrix4x4<T>& mat, T s);
 
     template<MathArithmetic T>
-    inline constexpr Matrix4x4<T> operator * (T s, const Matrix4x4<T>& mat);
+    [[nodiscard]] inline constexpr Matrix4x4<T> operator * (T s, const Matrix4x4<T>& mat);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Matrix4x4<T>& mat) noexcept;
 }
 
 namespace std

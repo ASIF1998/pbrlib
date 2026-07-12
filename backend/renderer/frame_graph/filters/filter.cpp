@@ -6,8 +6,6 @@
 
 #include <pbrlib/exceptions.hpp>
 
-#include <format>
-
 namespace pbrlib::backend
 {
     Filter::Filter(std::string_view name, vk::Device& device, vk::Image& dst_image) noexcept :

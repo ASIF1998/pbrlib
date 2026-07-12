@@ -17,7 +17,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include <stdexcept>
 #include <array>
 #include <format>
 
@@ -49,9 +48,7 @@ namespace pbrlib::backend::vk
         );
 
         createCommandPools();
-
         createDescriptorPool();
-
         createTracyContext();
     }
 }
@@ -77,7 +74,7 @@ namespace pbrlib::backend::vk
 
         if (is_debug) [[unlikely]]
         {
-            constexpr std::array layers 
+            constexpr std::array layers
             {
                 "VK_LAYER_LUNARG_api_dump",
                 "VK_LAYER_KHRONOS_validation"
@@ -834,16 +831,14 @@ namespace pbrlib::backend::vk
     {
 #ifdef PBRLIB_ENABLE_PROFILING
         auto tracy_setup_command_buffer = oneTimeSubmitCommandBuffer("tracy-setup");
-        auto tracy_ctx_handle = TracyVkContextCalibrated(
+        auto tracy_ctx_handle = TracyVkContext(
             _physical_device_handle,
             _device_handle,
             _general_queue.handle,
-            tracy_setup_command_buffer.handle,
-            VK_NULL_HANDLE,
-            VK_NULL_HANDLE
+            tracy_setup_command_buffer.handle
         );
 
-        if (!tracy_ctx_handle)
+        if (!tracy_ctx_handle) [[unlikely]]
             throw exception::InitializeError("[vk-device] failed create tracy context for profiling");
 
         _tracy_ctx_handle = TracyCtxHandle(tracy_ctx_handle);
@@ -867,7 +862,7 @@ namespace pbrlib::backend::vk
         {
             if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
                 return "validation";
-            
+
             if (type & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
                 return "performance";
 
@@ -875,10 +870,10 @@ namespace pbrlib::backend::vk
         };
 
         std::string header = std::format("[{}]", prefix(type));
-        
+
         if (ptr_callback_data->pMessageIdName)
             header += std::format("[{}]", ptr_callback_data->pMessageIdName);
-        else 
+        else
             header += "[no-id]";
 
         if (severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
@@ -899,8 +894,8 @@ namespace pbrlib::backend::vk
             return ;
         }
 
-        const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info 
-        { 
+        const VkDebugUtilsMessengerCreateInfoEXT messenger_create_info
+        {
             .sType              = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
             .messageSeverity    = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
             .messageType        = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT,
@@ -908,9 +903,9 @@ namespace pbrlib::backend::vk
         };
 
         VK_CHECK(_instance_functions.vkCreateDebugUtilsMessengerEXT(
-            _instance_handle, 
-            &messenger_create_info, 
-            nullptr, 
+            _instance_handle,
+            &messenger_create_info,
+            nullptr,
             &_debug_utils_messenger_handle.handle()
         ));
     }

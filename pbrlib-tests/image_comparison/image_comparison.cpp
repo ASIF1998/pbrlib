@@ -4,6 +4,7 @@
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/pixel_format.hpp>
 
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
@@ -15,65 +16,216 @@
 
 #include <backend/logger/logger.hpp>
 
-#include <array>
+#include <backend/math/float16.hpp>
+
+#include <ranges>
+
+namespace pbrlib::math
+{
+    using half4 = pbrlib::math::Vec4<pbrlib::backend::math::float16_t>;
+
+    template<typename T>
+    struct Scalar final
+    {
+        using ElementType = T;
+
+        explicit Scalar(T init_value = static_cast<T>(0.0f)) :
+            value(init_value)
+        { }
+
+        [[nodiscard]] T operator [] ([[maybe_unused]] size_t i) const noexcept
+        {
+            return value;
+        }
+        
+        [[nodiscard]] Scalar operator - (const Scalar& v)  const noexcept
+        {
+            return Scalar(value - v.value);
+        }
+
+        [[nodiscard]] T& operator [] ([[maybe_unused]] size_t i) noexcept
+        {
+            return value;
+        }
+
+        [[nodiscard]] Scalar operator * (Scalar s) const noexcept
+        {
+            return Scalar(value * s.value);
+        }
+
+        [[nodiscard]] Scalar operator * (T s) const noexcept
+        {
+            return Scalar(value * s);
+        }
+
+        Scalar& operator += (Scalar s) noexcept
+        {
+            value += s.value;
+            return *this;
+        }
+
+        T value;
+
+        static constexpr size_t element_count = 4;
+    };
+
+    template<typename T>
+    [[nodiscard]] bool isfinite(Scalar<T> scalar)
+    {
+        return std::isfinite(static_cast<float>(scalar.value));
+    }
+
+    template<typename T>
+    [[nodiscard]] Scalar<T> min(Scalar<T> s1, Scalar<T> s2)
+    {
+        return Scalar<T>(std::min(static_cast<float>(s1.value), static_cast<float>(s2.value)));
+    }
+
+    template<typename T>
+    [[nodiscard]] Scalar<T> max(Scalar<T> s1, Scalar<T> s2)
+    {
+        return Scalar<T>(std::max(static_cast<float>(s1.value), static_cast<float>(s2.value)));
+    }
+}
+
+namespace pbrlib::testing
+{
+    template<typename PixelType>
+    bool psnr(const backend::vk::Image& rendered_image, const backend::vk::Image& reference_image)
+    {
+        const auto rendered_image_buffer = rendered_image.fetch("[vk-image-comparator] rendered image buffer");
+        const auto reference_image_buffer = reference_image.fetch("[vk-image-comparator] reference image buffer");
+
+        bool all_channels_passed = true;
+
+        rendered_image_buffer.map([&reference_image_buffer, &all_channels_passed](std::span<const uint8_t> rendered_image_src)
+        {
+           reference_image_buffer.map([&rendered_image_src, &all_channels_passed](std::span<const uint8_t> reference_image_src)
+            {
+                using ChannelType = typename PixelType::ElementType;
+
+                std::span<const PixelType> rendered_image (reinterpret_cast<const PixelType*>(rendered_image_src.data()), rendered_image_src.size() / sizeof(PixelType));
+                std::span<const PixelType> reference_image (reinterpret_cast<const PixelType*>(reference_image_src.data()), reference_image_src.size() / sizeof(PixelType));
+
+                PixelType min_value (std::numeric_limits<ChannelType>::max());
+                PixelType max_value (-std::numeric_limits<ChannelType>::max());
+
+                PixelType total_sq_error;
+
+                size_t valid_pixel_count = 0;
+
+                for (const auto& [pixel_1, pixel_2]: std::views::zip(rendered_image, reference_image))
+                {
+                    if (!pbrlib::math::isfinite(pixel_1)) [[unlikely]]
+                        continue;
+
+                    if (!pbrlib::math::isfinite(pixel_2)) [[unlikely]]
+                        continue;
+
+                    const auto diff = pixel_1 - pixel_2;
+
+                    total_sq_error += diff * diff;
+                    ++valid_pixel_count;
+
+                    min_value = pbrlib::math::min(min_value, pixel_2);
+                    max_value = pbrlib::math::max(max_value, pixel_2);
+                }
+
+                if (valid_pixel_count == 0) [[unlikely]]
+                {
+                    all_channels_passed = false;
+                    return ;
+                }
+
+                const auto mse = total_sq_error * (ChannelType(1.0) / static_cast<ChannelType>(valid_pixel_count));
+                
+                const auto max_i = max_value - min_value;
+
+                constexpr auto eps              = 2.2204460492503131e-16;
+                constexpr auto psnr_threshold   = 45.0;
+                
+                for (const auto i: std::views::iota(0u, PixelType::element_count))
+                {
+                    auto psnr_value = 100.0;
+                    if (mse[i] > ChannelType(1e-10))
+                        psnr_value = 20.0 * std::log10(static_cast<float>(max_i[i]) / (std::sqrt(static_cast<float>(mse[i]))) + static_cast<float>(eps));
+
+                    if (psnr_value < psnr_threshold)
+                        all_channels_passed = false;
+                }
+            }); 
+        });
+
+        return all_channels_passed;
+    }
+}
 
 namespace pbrlib::testing
 {
     ImageComparison::ImageComparison(backend::vk::Device& device) :
         _device (device)
     {
-        _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
-            .addSetLayout(_descriptor_set_layout_handle)
-            .build();
-
-        _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-image-comparator] descriptor-set");
-
-        const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_comparison.glsl.comp";
-
-        _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
-            .shader(shader_name)
-            .pipelineLayoutHandle(_pipeline_layout_handle)
-            .build();
-
-        const VkSamplerCreateInfo sampler_create_info
+        if constexpr (testing::generate_image_diff)
         {
-            .sType      = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter  = VK_FILTER_NEAREST,
-            .minFilter  = VK_FILTER_NEAREST
-        };
+            _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .build();
 
-        VK_CHECK(vkCreateSampler(
-            _device.device(),
-            &sampler_create_info,
-            nullptr,
-            &_sampler_handle.handle())
-        );
+            _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
+                .addSetLayout(_descriptor_set_layout_handle)
+                .build();
 
-        _count_changed_pixels_buffer = pbrlib::backend::vk::builders::Buffer(_device)
-            .addQueueFamilyIndex(_device.queue().family_index)
-            .size(sizeof(uint32_t))
-            .type(pbrlib::backend::vk::BufferType::eReadback)
-            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-            .build();
+            _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-diff-image-generator] descriptor-set");
 
-        _count_changed_pixels_buffer->write(0, 0);
+            const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_diff_generator.glsl.comp";
+
+            _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
+                .pipelineLayoutHandle(_pipeline_layout_handle)
+                .shader(shader_name)
+                .build();
+
+            constexpr VkSamplerCreateInfo sampler_create_info
+            {
+                .sType      = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+                .magFilter  = VK_FILTER_NEAREST,
+                .minFilter  = VK_FILTER_NEAREST
+            };
+
+            VK_CHECK(vkCreateSampler(
+                _device.device(),
+                &sampler_create_info,
+                nullptr,
+                &_sampler_handle.handle())
+            );
+        }
     }
 
-    bool ImageComparison::compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2)
+    void ImageComparison::generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2)
     {
-        if (image_1.width != image_2.width || image_1.height != image_2.height) [[unlikely]]
-            return false;
+        if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        if (image_1.level_count != image_2.level_count) [[unlikely]]
-            return false;
+        if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        if (image_1.layer_count != image_2.layer_count) [[unlikely]]
-            return false;
+        _images_diff = backend::vk::builders::Image(_device)
+            .size(image_1.width, image_1.height)
+            .format(image_1.format)
+            .usage(VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+            .addQueueFamilyIndex(_device.queue().family_index)
+            .tiling(VK_IMAGE_TILING_OPTIMAL)
+            .name("[vk-image-comparator] diff image")
+            .fillColor(math::vec4(0))
+            .build();
+
+        if (!_images_diff)
+            throw exception::RuntimeError("[vk-image-comparator] failed create diff image");
+
+        const VkDeviceSize group_count_x        = image_1.width / _device.workGroupSize();
+        const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
+        const VkDeviceSize group_errors_count   = group_count_x * group_count_y; 
 
         _device.writeDescriptorSet ({
             .view_handle            = image_1.view_handle,
@@ -92,13 +244,13 @@ namespace pbrlib::testing
         });
 
         _device.writeDescriptorSet ({
-            .buffer     = _count_changed_pixels_buffer.value(),
-            .set_handle = _descriptor_set_handle,
-            .size       = static_cast<uint32_t>(_count_changed_pixels_buffer->size),
-            .binding    = 2
+            .view_handle            = _images_diff->view_handle,
+            .set_handle             = _descriptor_set_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            .binding                = 2
         });
 
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-image-comparator");
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-diff-image-generator");
 
         command_buffer.write([&image_1, this] (auto command_buffer_handle)
         {
@@ -118,18 +270,46 @@ namespace pbrlib::testing
             const auto group_count_y = image_1.height / _device.workGroupSize();
 
             vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
-        }, "[vk-image-comparator] run-compare-images", backend::vk::marker_colors::compute_pipeline);
+        }, "[vk-image-comparator] run-image-diff-generator", backend::vk::marker_colors::compute_pipeline);
 
         _device.submit(command_buffer);
+    }
 
-        uint32_t count_changed_pixels = 0;
-        _count_changed_pixels_buffer->read(count_changed_pixels, 0);
+    bool ImageComparison::compare(backend::vk::Image& rendered_image, backend::vk::Image& reference_image)
+    {
+        if (rendered_image.width != reference_image.width || rendered_image.height != reference_image.height) [[unlikely]]
+            return false;
 
-        return count_changed_pixels == 0;
+        if (rendered_image.level_count != reference_image.level_count) [[unlikely]]
+            return false;
+
+        if (rendered_image.layer_count != reference_image.layer_count) [[unlikely]]
+            return false;
+
+        if constexpr (pbrlib::testing::generate_image_diff)
+            generateImageDiff(rendered_image, reference_image);
+
+        if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+            rendered_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+        if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+            reference_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+        if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
+            return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
+        
+        if (rendered_image.format == VK_FORMAT_R16G16B16A16_SFLOAT)
+            return psnr<math::half4>(rendered_image, reference_image);
+
+        if (rendered_image.format == VK_FORMAT_R16_SFLOAT)
+            return psnr<math::Scalar<pbrlib::backend::math::float16_t>>(rendered_image, reference_image);
+
+        backend::log::error("[vk-image-comparator] undefined pixel format: {}", static_cast<uint64_t>(rendered_image.format));
+        return true;
     }
 
     bool ImageComparison::compare (
-        const backend::vk::Image&       image_1,
+        backend::vk::Image&             image,
         const std::filesystem::path&    path_to_reference
     )
     {
@@ -140,17 +320,35 @@ namespace pbrlib::testing
         {
             backend::vk::exporters::Image(_device)
                 .filename(path_to_reference)
-                .image(&image_1)
+                .image(&image)
                 .save();
 
             return true;
         }
 
-        return compare(
-            image_1,
-            backend::vk::loaders::Image(_device)
-                .filename(path_to_reference)
-                .load()
-        );
+        auto reference_image = backend::vk::loaders::Image(_device)
+            .filename(path_to_reference)
+            .load();
+
+        const bool is_equal = compare(image, reference_image);
+
+        if constexpr (generate_image_diff)
+        {
+            if (!is_equal && _images_diff) [[unlikely]]
+            {
+                const auto filename             = path_to_reference.stem().string();
+                const auto extension            = backend::channelSize(image.format) == 1 ? "png" : "exr";
+                const auto path_to_diff_image   = std::format("pbrlib-tests/references/diffs/{}-diff.{}", filename, extension);
+
+                _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+                pbrlib::backend::vk::exporters::Image(_device)
+                    .filename(backend::utils::projectRoot() / path_to_diff_image)
+                    .image(&_images_diff.value())
+                    .save();
+            }
+        }
+
+        return is_equal;
     }
 }

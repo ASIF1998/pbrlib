@@ -69,7 +69,7 @@ namespace pbrlib::backend
 
         void initResultDescriptorSet();
 
-        void setupColorAttachmentsLayout();
+        void setupColorAttachmentsLayout(vk::CommandBuffer& command_buffer);
 
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;

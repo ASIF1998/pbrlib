@@ -1,6 +1,5 @@
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/device.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
 
 #include <backend/renderer/vulkan/check.hpp>
 
@@ -18,7 +17,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    ComputePipeline& ComputePipeline::specializationInfo(shader::SpecializationInfoBase& spec_info)
+    ComputePipeline& ComputePipeline::specializationInfo(const shader::SpecializationInfoBase& spec_info) noexcept
     {
         const auto entries  = spec_info.entries();
         const auto data     = spec_info.data();
@@ -31,6 +30,12 @@ namespace pbrlib::backend::vk::builders
             .pData          = data.data()
         };
 
+        return *this;
+    }
+
+    ComputePipeline& ComputePipeline::addDefine(const vk::shader::Define& define)
+    {
+        _defines.push_back(define);
         return *this;
     }
 
@@ -49,7 +54,7 @@ namespace pbrlib::backend::vk::builders
         {
             .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
-            .module                 = shader::compile(_device, _shader_name),
+            .module                 = shader::compile(_device, _shader_name, _defines),
             .pName                  = "main",
             .pSpecializationInfo    = &_specialization_info
         };

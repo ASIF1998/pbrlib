@@ -53,8 +53,8 @@ add_subdirectory(backend)
 add_subdirectory(include/pbrlib)
 add_subdirectory(src)
 
-add_library(pbrlib STATIC 
-    ${PBRLIB_BACKEND_SRC} 
+add_library(pbrlib STATIC
+    ${PBRLIB_BACKEND_SRC}
     ${PBRLIB_BACKEND_H}
     ${PBRLIB_BACKEND_INPUT_H}
     ${PBRLIB_BACKEND_LOGGER_H}
@@ -100,20 +100,20 @@ if (PBRLIB_SETUP_CI)
 endif()
 
 if (APPLE)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_APPLE)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_APPLE)
 elseif(WIN32)
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_WINDOWS)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_WINDOWS)
 else()
-    target_compile_definitions(pbrlib PRIVATE PBRLIB_OS_LINUX)
+    target_compile_definitions(pbrlib PUBLIC PBRLIB_OS_LINUX)
 endif()
 
 #####################################################
 #   Source grouping
 #####################################################
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} 
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}
     PREFIX ""
     FILES
-    ${PBRLIB_BACKEND_SRC} 
+    ${PBRLIB_BACKEND_SRC}
     ${PBRLIB_BACKEND_H}
     ${PBRLIB_BACKEND_INPUT_H}
     ${PBRLIB_BACKEND_LOGGER_H}
@@ -170,7 +170,7 @@ endif()
 #####################################################
 #   assimp
 #####################################################
-set(ASSIMP_BUILD_TESTS   OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/assimp)
 target_link_libraries(pbrlib PUBLIC assimp::assimp)
 
@@ -210,6 +210,20 @@ add_subdirectory(third_party/entt)
 add_subdirectory(third_party/cpptrace)
 
 #####################################################
+#   tinyexr
+#####################################################
+set(TINYEXR_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinyexr/tinyexr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tinyexr/deps/miniz/miniz.c
+)
+
+add_library(tinyexr STATIC ${TINYEXR_SRC})
+target_include_directories(tinyexr PUBLIC third_party/ third_party/tinyexr/deps/miniz)
+
+target_compile_definitions(tinyexr PUBLIC TINYEXR_USE_MINIZ=1)
+target_compile_definitions(tinyexr PUBLIC TINYEXR_USE_STB_ZLIB=0)
+
+#####################################################
 #   tracy
 #####################################################
 if (PBRLIB_BUILD_SAMPLES)
@@ -237,6 +251,7 @@ target_link_libraries(pbrlib PUBLIC
     VulkanMemoryAllocator
     SDL3::SDL3
     cpptrace::cpptrace
+    tinyexr
 )
 
 if (APPLE)

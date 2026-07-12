@@ -19,6 +19,8 @@ namespace pbrlib::math
     class Matrix3x3 final
     {
     public:
+        using ElementType = T;
+
         inline constexpr Matrix3x3()                noexcept;
         inline constexpr Matrix3x3(T init_value)    noexcept;
 
@@ -30,29 +32,31 @@ namespace pbrlib::math
 
         inline constexpr Matrix3x3(const Matrix4x4<T>& mat) noexcept;
 
-        inline constexpr bool operator == (const Matrix3x3& mat) const noexcept;
-        inline constexpr bool operator != (const Matrix3x3& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Matrix3x3& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Matrix3x3& mat) const noexcept;
 
-        inline constexpr Matrix3x3  operator + (const Matrix3x3& mat)   const noexcept;
-        inline constexpr Matrix3x3  operator - (const Matrix3x3& mat)   const noexcept;
-        inline constexpr Matrix3x3  operator * (const Matrix3x3& mat)   const noexcept;
-        inline constexpr Vec3<T>    operator * (const Vec3<T>& v)       const noexcept;
+        [[nodiscard]] inline constexpr Matrix3x3    operator + (const Matrix3x3& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix3x3    operator - (const Matrix3x3& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix3x3    operator * (const Matrix3x3& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Vec3<T>      operator * (const Vec3<T>& v)       const noexcept;
 
         inline constexpr Matrix3x3& operator += (const Matrix3x3& mat)  noexcept;
         inline constexpr Matrix3x3& operator -= (const Matrix3x3& mat)  noexcept;
         inline constexpr Matrix3x3& operator *= (const Matrix3x3& mat)  noexcept;
         inline constexpr Matrix3x3& operator *= (T scal)                noexcept;
 
-        inline T*        operator [] (size_t i) noexcept;
-        inline const T*  operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T*         operator [] (size_t i) noexcept;
+        [[nodiscard]] inline const T*   operator [] (size_t i) const noexcept;
 
-        inline T&            at(size_t i, size_t j);
-        inline constexpr T   at(size_t i, size_t j) const;
+        [[nodiscard]] inline T&             at(size_t i, size_t j);
+        [[nodiscard]] inline constexpr T    at(size_t i, size_t j) const;
 
-        inline constexpr T det() const noexcept;
+        [[nodiscard]] inline constexpr T det() const noexcept;
 
         inline void             inverse()   noexcept;
         inline constexpr void   transpose() noexcept;
+
+        static constexpr size_t element_count = 9;
 
     private:
         union
@@ -63,19 +67,22 @@ namespace pbrlib::math
     };
 
     template<MathArithmetic T>
-    inline constexpr Matrix3x3<T> transpose(const Matrix3x3<T>& mat) noexcept;
+    [[nodiscard]] inline constexpr Matrix3x3<T> transpose(const Matrix3x3<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Matrix3x3<T> inverse(const Matrix3x3<T>& mat) noexcept;
+    [[nodiscard]] inline constexpr Matrix3x3<T> inverse(const Matrix3x3<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline Matrix3x3<T> round(const Matrix3x3<T>& mat) noexcept;
+    [[nodiscard]] inline Matrix3x3<T> round(const Matrix3x3<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Matrix3x3<T> operator * (const Matrix3x3<T>& mat, T s);
+    [[nodiscard]] inline constexpr Matrix3x3<T> operator * (const Matrix3x3<T>& mat, T s);
 
     template<MathArithmetic T>
-    inline constexpr Matrix3x3<T> operator * (T s, const Matrix3x3<T>& mat);
+    [[nodiscard]] inline constexpr Matrix3x3<T> operator * (T s, const Matrix3x3<T>& mat);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Matrix3x3<T>& mat) noexcept;
 }
 
 namespace std

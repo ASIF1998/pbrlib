@@ -32,6 +32,8 @@ namespace pbrlib::backend
         [[nodiscard]]
         std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
 
+        void checkSettings() noexcept;
+
     public:
         struct alignas(16) Settings
         {

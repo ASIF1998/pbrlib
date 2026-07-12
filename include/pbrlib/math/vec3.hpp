@@ -18,26 +18,28 @@ namespace pbrlib::math
     template<MathArithmetic T>
     struct Vec3 final
     {
+        using ElementType = T;
+
         inline constexpr Vec3(T xyz = static_cast<T>(0))                    noexcept;
         inline constexpr Vec3(T x, T y, T z = static_cast<T>(0))            noexcept;
         inline constexpr Vec3(const Vec2<T>& vec, T z = static_cast<T>(0))  noexcept;
         inline constexpr Vec3(const Vec4<T>& vec)                           noexcept;
 
-        inline constexpr bool operator == (const Vec3& v) const noexcept;
-        inline constexpr bool operator != (const Vec3& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Vec3& v) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Vec3& v) const noexcept;
 
-        inline constexpr Vec3 operator + (const Vec3& v) const noexcept;
-        inline constexpr Vec3 operator - (const Vec3& v) const noexcept;
+        [[nodiscard]] inline constexpr Vec3 operator + (const Vec3& v) const noexcept;
+        [[nodiscard]] inline constexpr Vec3 operator - (const Vec3& v) const noexcept;
 
         inline constexpr Vec3& operator += (const Vec3& v)  noexcept;
         inline constexpr Vec3& operator -= (const Vec3& v)  noexcept;
         inline constexpr Vec3& operator *= (T s)            noexcept;
 
-        inline T&           operator [] (size_t i) noexcept;
-        inline constexpr T  operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T&           operator [] (size_t i) noexcept;
+        [[nodiscard]] inline constexpr T  operator [] (size_t i) const noexcept;
 
-        inline T             length()        const noexcept;
-        inline constexpr T   lengthSquared() const noexcept;
+        [[nodiscard]] inline T              length()        const noexcept;
+        [[nodiscard]] inline constexpr T    lengthSquared() const noexcept;
 
         void normalize();
 
@@ -60,41 +62,55 @@ namespace pbrlib::math
             T xyz[3];
             T rgb[3];
         };
+
+        static constexpr size_t element_count = 3;
     };
 
     template<MathArithmetic T>
-    inline constexpr T dot(const Vec3<T> v1, const Vec3<T>& v2) noexcept;
+    [[nodiscard]] inline constexpr T dot(const Vec3<T> v1, const Vec3<T>& v2) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Vec3<T> cross(const Vec3<T> v1, const Vec3<T>& v2) noexcept;
+    [[nodiscard]] inline constexpr Vec3<T> cross(const Vec3<T> v1, const Vec3<T>& v2) noexcept;
 
     template<MathArithmetic T>
-    Vec3<T> normalize(const Vec3<T>& v);
+    [[nodiscard]] Vec3<T> normalize(const Vec3<T>& v);
 
     template<MathArithmetic T>
-    inline Vec3<T> round(const Vec3<T>& v) noexcept;
+    [[nodiscard]] inline Vec3<T> round(const Vec3<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline Vec3<T> round(const Vec3<T>& v) noexcept;
+    [[nodiscard]] inline Vec3<T> round(const Vec3<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline Vec3<T> clamp(const Vec3<T>& x, T min_val, T max_val) noexcept;
+    [[nodiscard]] inline Vec3<T> clamp(const Vec3<T>& x, T min_val, T max_val) noexcept;
 
     template<MathArithmetic T>
-    inline Vec3<T> clamp (
+    [[nodiscard]] inline Vec3<T> clamp (
         const Vec3<T>& x, 
         const Vec3<T>& min_val, 
         const Vec3<T>& max_val
     ) noexcept;
 
     template<MathArithmetic T>
-    inline Vec3<T> abs(const Vec3<T>& v) noexcept;
+    [[nodiscard]] inline Vec3<T> abs(const Vec3<T>& v) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Vec3<T> operator * (const Vec3<T>& v, T s);
+    [[nodiscard]] inline constexpr Vec3<T> operator * (const Vec3<T>& v, T s);
 
     template<MathArithmetic T>
-    inline constexpr Vec3<T> operator * (T s, const Vec3<T>& v);
+    [[nodiscard]] inline constexpr Vec3<T> operator * (T s, const Vec3<T>& v);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec3<T> operator * (const Vec3<T>& v1, const Vec3<T>& v2);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec3<T> min(const Vec3<T>& v1, const Vec3<T>& v2);
+    
+    template<MathArithmetic T>
+    [[nodiscard]] inline constexpr Vec3<T> max(const Vec3<T>& v1, const Vec3<T>& v2);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Vec3<T>& v) noexcept;
 }
 
 namespace std

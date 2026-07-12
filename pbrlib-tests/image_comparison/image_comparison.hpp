@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
@@ -18,8 +19,10 @@ namespace pbrlib::testing
 {
     class ImageComparison final
     {
+        void generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2);
+
     public:
-        explicit ImageComparison(pbrlib::backend::vk::Device& device);
+        explicit ImageComparison(backend::vk::Device& device);
 
         ImageComparison(ImageComparison&& image_comparison)         = delete;
         ImageComparison(const ImageComparison& image_comparison)    = delete;
@@ -28,11 +31,11 @@ namespace pbrlib::testing
         ImageComparison& operator = (const ImageComparison& image_comparison)   = delete;
 
         [[nodiscard]]
-        bool compare(const backend::vk::Image& image_1, const backend::vk::Image& image_2);
+        bool compare(backend::vk::Image& rendered_image, backend::vk::Image& reference_image);
 
         [[nodiscard]]
         bool compare (
-            const backend::vk::Image&       image_1,
+            backend::vk::Image&             image,
             const std::filesystem::path&    path_to_reference
         );
 
@@ -45,8 +48,7 @@ namespace pbrlib::testing
         backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
         backend::vk::DescriptorSetHandle        _descriptor_set_handle;
 
-        backend::vk::SamplerHandle _sampler_handle;
-
-        std::optional<backend::vk::Buffer> _count_changed_pixels_buffer;
+        backend::vk::SamplerHandle          _sampler_handle;
+        std::optional<backend::vk::Image>   _images_diff;
     };
 }

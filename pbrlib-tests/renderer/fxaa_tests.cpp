@@ -24,5 +24,5 @@ TEST_F(FXAATests, JunkShopAttachments)
 
     constexpr auto attahment_name = pbrlib::backend::AttachmentsTraits<pbrlib::backend::FXAA>::result;
     setup("Blender 2.glb", settings);
-    check("fxaa/junk-shop-fxaa-result.png", attahment_name);
+    check("fxaa/junk-shop-fxaa-result.exr", attahment_name);
 }

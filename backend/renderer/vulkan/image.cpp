@@ -3,6 +3,11 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/pixel_format.hpp>
+
+#include <backend/exceptions.hpp>
+
+#include <backend/utils/scope_exit.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
@@ -12,7 +17,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-#include <stdexcept>
+#include <tinyexr/tinyexr.h>
 
 #include <algorithm>
 #include <array>
@@ -20,29 +25,7 @@
 
 #include <fstream>
 
-namespace pbrlib::backend::utils
-{
-    constexpr uint8_t formatSize(VkFormat format)
-    {
-        switch (format)
-        {
-            case VK_FORMAT_R8_UNORM:
-                return 1;
-            case VK_FORMAT_R8G8_UNORM:
-                return 2;
-            case VK_FORMAT_R8G8B8_UNORM:
-                return 3;
-            case VK_FORMAT_R8G8B8A8_UNORM:
-                return 4;
-            case VK_FORMAT_R32G32B32A32_SFLOAT:
-                return 16;
-            default:
-                throw exception::RuntimeError("[vk-image] undefined pixel format");
-        }
-
-        return std::numeric_limits<uint8_t>::max();
-    }
-}
+#include <ranges>
 
 namespace pbrlib::backend::vk
 {
@@ -80,11 +63,11 @@ namespace pbrlib::backend::vk
         return *this;
     }
 
-    void Image::write(const ImageWriteData& data)
+    void Image::write(const ChunkyImageWriteData& data)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto format_size      = utils::formatSize(data.format);
+        const auto format_size      = formatSize(data.format);
         const auto scanline_size    = data.width * format_size;
         const auto image_size       = scanline_size * data.height;
 
@@ -143,6 +126,76 @@ namespace pbrlib::backend::vk
         }, "[vk-image] write-data-in-image", marker_colors::write_data_in_image);
 
         _device.submit(command_buffer);
+    }
+
+    template<typename PixelChannelTypePrecision>
+    void writeToImage(Image& image, const PlanarImageWriteData& src_planar_image)
+    {
+        const auto pixel_count = src_planar_image.width * src_planar_image.height;
+
+        std::vector<PixelChannelTypePrecision> pixels;
+        pixels.reserve(pixel_count * src_planar_image.channel_count);
+
+        const auto src_data = reinterpret_cast<const PixelChannelTypePrecision* const*>(src_planar_image.channels.data());
+
+        for (size_t i = 0; i < pixel_count; ++i)
+        {
+            for (uint8_t j = 0; j < src_planar_image.channel_count; ++j)
+                pixels.push_back(src_data[j][i]);
+        }
+
+        const ChunkyImageWriteData write_data
+        {
+            .ptr_data   = reinterpret_cast<uint8_t*>(pixels.data()),
+            .width      = src_planar_image.width,
+            .height     = src_planar_image.height,
+            .format     = src_planar_image.format
+        };
+
+        image.write(write_data);
+    }
+
+    void Image::write(const PlanarImageWriteData& data)
+    {
+        const auto is_fp16 = [] (VkFormat format)
+        {
+            switch (format)
+            {
+                case VK_FORMAT_R16_SFLOAT:
+                case VK_FORMAT_R16G16_SFLOAT:
+                case VK_FORMAT_R16G16B16_SFLOAT:
+                case VK_FORMAT_R16G16B16A16_SFLOAT:
+                    return true;
+                default:
+                    return false;
+            };
+
+            std::unreachable();
+        };
+
+        const auto is_fp32 = [] (VkFormat format)
+        {
+            switch (format)
+            {
+                case VK_FORMAT_R32_SFLOAT:
+                case VK_FORMAT_R32G32_SFLOAT:
+                case VK_FORMAT_R32G32B32_SFLOAT:
+                case VK_FORMAT_R32G32B32A32_SFLOAT:
+                    return true;
+                default:
+                    return false;
+            };
+
+            std::unreachable();
+        };
+
+        if (!is_fp32(data.format) && !is_fp16(data.format)) [[unlikely]]
+            throw exception::UndefinedPixelFormat(data.format);
+
+        if (is_fp16(data.format))
+            writeToImage<uint16_t>(*this, data);
+        else
+            writeToImage<uint32_t>(*this, data);
     }
 
     void Image::changeLayout (
@@ -213,6 +266,58 @@ namespace pbrlib::backend::vk
 
         layout = new_layout;
     }
+
+    Buffer Image::fetch(std::string_view name) const
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (layout != VK_IMAGE_LAYOUT_GENERAL && layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
+            throw pbrlib::exception::InvalidState("[vk-image] image must be in TRANSFER_SRC_OPTIMAL or GENERAL layout before fetch");
+
+        const auto size = width * height * formatSize(format);
+        auto buffer = builders::Buffer(_device)
+            .addQueueFamilyIndex(_device.queue().family_index)
+            .name(name)
+            .size(size)
+            .type(BufferType::eReadback)
+            .usage(VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+            .build();
+
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("[vk-image] copy from image to buffer");
+        command_buffer.write([&buffer, this] (const auto command_buffer_handle)
+        {
+            constexpr VkImageSubresourceLayers color_image_subresource
+            {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .mipLevel       = 0,
+                .baseArrayLayer = 0,
+                .layerCount     = 1
+            };
+
+            const VkBufferImageCopy2 copy_region
+            {
+                .sType              = VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2,
+                .imageSubresource   = color_image_subresource,
+                .imageExtent        = {width, height, 1u}
+            };
+
+            const VkCopyImageToBufferInfo2 copy_image_to_buffer_info
+            {
+                .sType          = VK_STRUCTURE_TYPE_COPY_IMAGE_TO_BUFFER_INFO_2,
+                .srcImage       = handle.handle(),
+                .srcImageLayout = layout,
+                .dstBuffer      = buffer.handle.handle(),
+                .regionCount    = 1,
+                .pRegions       = &copy_region
+            };
+
+            vkCmdCopyImageToBuffer2(command_buffer_handle, &copy_image_to_buffer_info);
+        });
+
+        _device.submit(command_buffer);
+
+        return buffer;
+    }
 }
 
 namespace pbrlib::backend::vk::builders
@@ -224,16 +329,16 @@ namespace pbrlib::backend::vk::builders
     void Image::validate()
     {
         if (_width == 0 || _height == 0) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] size is zero");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] size is zero");
 
         if (_format == VK_FORMAT_UNDEFINED) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] format is undefined");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] format is undefined");
 
         if (_queues.empty()) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] not queues");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] not queues");
 
         if (_usage == VK_IMAGE_USAGE_FLAG_BITS_MAX_ENUM) [[unlikely]]
-            throw exception::InvalidState("[vk-image::builder] invalid usage");
+            throw pbrlib::exception::InvalidState("[vk-image::builder] invalid usage");
     }
 
     Image& Image::size(uint32_t width, uint32_t height) noexcept
@@ -443,10 +548,10 @@ namespace pbrlib::backend::vk::decoders
     void Image::validate()
     {
         if (_channels_per_pixel < 1 && _channels_per_pixel > 4) [[unlikely]]
-            throw exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
+            throw pbrlib::exception::InvalidState("[vk-image::decoder] invalid count channels per pixel");
 
         if (!_compressed_image.ptr_data || !_compressed_image.size) [[unlikely]]
-            throw exception::InvalidState("[vk-image::decoder] compressed image data is empty");
+            throw pbrlib::exception::InvalidState("[vk-image::decoder] compressed image data is empty");
     }
 
     vk::Image Image::decode()
@@ -463,7 +568,7 @@ namespace pbrlib::backend::vk::decoders
             VK_FORMAT_R8G8B8A8_UNORM
         };
 
-        ImageWriteData write_data
+        ChunkyImageWriteData write_data
         {
             .format = formats[_channels_per_pixel - 1]
         };
@@ -478,6 +583,11 @@ namespace pbrlib::backend::vk::decoders
             _channels_per_pixel
         );
 
+        const utils::ScopeExit scope_exit ([ptr_data = write_data.ptr_data]
+        {
+           stbi_image_free(ptr_data);
+        });
+
         auto image = builders::Image(_device)
             .addQueueFamilyIndex(_device.queue().family_index)
             .format(write_data.format)
@@ -487,9 +597,6 @@ namespace pbrlib::backend::vk::decoders
             .build();
 
         image.write(write_data);
-
-        stbi_image_free(write_data.ptr_data);
-
         image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         return image;
@@ -508,38 +615,30 @@ namespace pbrlib::backend::vk::loaders
         return *this;
     }
 
-    void Image::validate()
+    vk::Image stbReader(Device& device, const std::filesystem::path& filename)
     {
-        if (!std::filesystem::exists(_filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
-    }
-
-    vk::Image Image::load()
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        validate();
-
         int num_channels = 0;
 
-        ImageWriteData data
+        ChunkyImageWriteData data
         {
             .format = VK_FORMAT_R8G8B8A8_UNORM
         };
 
         data.ptr_data = stbi_load(
-            _filename.string().c_str(),
+            filename.string().c_str(),
             &data.width, &data.height,
             &num_channels,
             STBI_rgb_alpha
         );
 
-        if (data.width < 1 || data.height < 1 || !data.ptr_data) [[unlikely]]
-            throw exception::RuntimeError(std::format("[image-loader] failed load image '{}'", _filename.string()));
+        utils::ScopeExit scoped_exit ([ptr_data = data.ptr_data]
+        {
+            stbi_image_free(ptr_data);
+        });
 
-        auto image = builders::Image(_device)
-            .name(_filename.filename().string())
-            .addQueueFamilyIndex(_device.queue().family_index)
+        auto image = builders::Image(device)
+            .name(filename.filename().string())
+            .addQueueFamilyIndex(device.queue().family_index)
             .format(data.format)
             .size(static_cast<uint32_t>(data.width), static_cast<uint32_t>(data.height))
             .usage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT)
@@ -547,14 +646,129 @@ namespace pbrlib::backend::vk::loaders
 
         image.write(data);
 
-        stbi_image_free(data.ptr_data);
+        return image;
+    }
+
+    vk::Image exrReader(Device& device, const std::filesystem::path& filename)
+    {
+        const auto path_to_file = filename.string();
+
+        EXRVersion exr_version = { };
+        if (ParseEXRVersionFromFile(&exr_version, path_to_file.c_str()) || exr_version.multipart) [[unlikely]]
+            throw pbrlib::exception::RuntimeError(std::format("[vk-image::loader] invalid exr file: '{}'", path_to_file));
+
+        EXRHeader exr_header = { };
+        InitEXRHeader(&exr_header);
+        const utils::ScopeExit exr_header_scope ([&exr_header]
+        {
+            FreeEXRHeader(&exr_header);
+        });
+
+        const char* err = nullptr;
+
+        if (ParseEXRHeaderFromFile(&exr_header, &exr_version, path_to_file.c_str(), &err)) [[unlikely]]
+        {
+            const auto msg = std::format("[vk-image::loader] failed parse '{}' header: {}", path_to_file, err);
+            FreeEXRErrorMessage(err);
+            throw pbrlib::exception::RuntimeError(msg);
+        }
+
+        EXRImage exr_image = { };
+        InitEXRImage(&exr_image);
+        const utils::ScopeExit exr_image_scope ([&exr_image]
+        {
+            FreeEXRImage(&exr_image);
+        });
+
+        if (LoadEXRImageFromFile(&exr_image, &exr_header, path_to_file.c_str(), &err)) [[unlikely]]
+        {
+            const auto msg = std::format("[vk-image::loader] failed load '{}' image: {}", path_to_file, err);
+            FreeEXRErrorMessage(err);
+            throw pbrlib::exception::RuntimeError(msg);
+        }
+
+        std::array<const uint8_t*, 4> channels = { };
+        for (size_t i = 0; i < exr_image.num_channels; ++i)
+            channels[i] = exr_image.images[exr_image.num_channels - i - 1];
+
+        const auto exr_pixel_type = exr_header.pixel_types[0];
+        for (size_t i = 0; i < exr_image.num_channels; ++i)
+        {
+            if (exr_header.pixel_types[i] != exr_pixel_type)
+                throw exception::UndefinedPixelFormat("[vk-image::loader] incorrect pixel type");
+        }
+
+        const PlanarImageWriteData data
+        {
+            .channels       = channels,
+            .width          = exr_image.width,
+            .height         = exr_image.height,
+            .channel_count  = static_cast<uint8_t>(exr_image.num_channels),
+            .format         = pixelType(exr_pixel_type, exr_image.num_channels)
+        };
+
+        auto image = builders::Image(device)
+            .name(filename.filename().string())
+            .addQueueFamilyIndex(device.queue().family_index)
+            .format(data.format)
+            .size(static_cast<uint32_t>(data.width), static_cast<uint32_t>(data.height))
+            .usage(VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+            .build();
+
+        image.write(data);
 
         return image;
+    }
+
+    vk::Image Image::load()
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        if (!std::filesystem::exists(_filename)) [[unlikely]]
+            throw pbrlib::exception::InvalidState(std::format("[vk-image::loader] image not found: {}.", _filename.string()));
+
+        if (_filename.extension() == ".exr")
+            return exrReader(_device, _filename);
+
+        return stbReader(_device, _filename);
     }
 }
 
 namespace pbrlib::backend::vk::exporters
 {
+    struct WriteToImageParams final
+    {
+        void validate() const
+        {
+            if (data.empty()) [[unlikely]]
+                throw pbrlib::exception::InvalidArgument("[vk-image::exporter] image data is empty");
+
+            if (pixel_format == VK_FORMAT_UNDEFINED) [[unlikely]]
+                throw pbrlib::exception::InvalidArgument("[vk-image::exporter] undefined pixel format");
+
+            const auto expected_ext = channelSize(pixel_format) > 1 ? ".exr" : ".png";
+            if (const auto ext = filename.extension(); ext != expected_ext) [[unlikely]]
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] invalid file extension: {}", ext.string()));
+
+            const auto channel_count = channelCount(pixel_format);
+            if (!channel_count || channel_count > 4) [[unlikely]]
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] channel count: {}", channel_count));
+
+            const auto total_size = channel_count * width * height * channelSize(pixel_format);
+            if (total_size != data.size()) [[unlikely]]
+                throw pbrlib::exception::InvalidArgument(std::format("[vk-image::exporter] image size:{}x{}, channel count:{}, channel size: {}", width, height, channel_count, channelSize(pixel_format)));
+        }
+
+        const std::filesystem::path&    filename;
+        std::span<const uint8_t>        data;
+        uint32_t                        width           = 0u;
+        uint32_t                        height          = 0u;
+        VkFormat                        pixel_format    = VK_FORMAT_UNDEFINED;
+    };
+
+    using Fp16 = uint16_t;
+    using Fp32 = uint32_t;
+
     Image::Image(Device& device) noexcept :
         _device (device)
     { }
@@ -574,19 +788,145 @@ namespace pbrlib::backend::vk::exporters
     void Image::validate()
     {
         if (!_ptr_image) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] image is null");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] image is null");
 
         if (_ptr_image->layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] invalid image layout");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] invalid image layout");
 
         if (_filename.empty()) [[unlikely]]
-            throw exception::InvalidState("[vk-image::exporter] didn't set filename");
+            throw pbrlib::exception::InvalidState("[vk-image::exporter] didn't set filename");
 
         if (std::filesystem::is_directory(_filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
+            throw pbrlib::exception::InvalidState(std::format("[vk-image::exporter] filename is directory: {}", _filename.string()));
 
         if (const auto save_directory = _filename.parent_path(); !std::filesystem::exists(save_directory)) [[unlikely]]
             std::filesystem::create_directory(save_directory);
+    }
+
+    void writeToPng(const WriteToImageParams& params)
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        params.validate();
+
+        std::ofstream file (params.filename, std::ios::out | std::ios::binary);
+
+        if (!file) [[unlikely]]
+            throw pbrlib::exception::FileOpen("[vk-image::exporter] failed create writer");
+
+        const auto width            = static_cast<int32_t>(params.width);
+        const auto height           = static_cast<int32_t>(params.height);
+        const auto channel_count    = static_cast<int>(channelCount(params.pixel_format));
+        const auto stride           = channel_count * width;
+
+        stbi_write_png_to_func([](void *context, void *data, int size)
+        {
+            auto ptr_file = reinterpret_cast<std::ofstream*>(context);
+            ptr_file->write(reinterpret_cast<char*>(data), static_cast<std::streamsize>(size));
+        }, &file, width, height, channel_count, params.data.data(), stride);
+    }
+
+    template<typename FloatPrecision>
+    void writeToExr(const WriteToImageParams& params)
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
+        params.validate();
+
+        EXRHeader exr_header = { };
+        InitEXRHeader(&exr_header);
+
+        const utils::ScopeExit exr_header_scope ([&exr_header]
+        {
+            exr_header.channels                 = nullptr;
+            exr_header.num_channels             = 0;
+            exr_header.pixel_types              = nullptr;
+            exr_header.requested_pixel_types    = nullptr;
+
+            FreeEXRHeader(&exr_header);
+        });
+
+        exr_header.compression_type = TINYEXR_COMPRESSIONTYPE_ZIP;
+
+        const auto channel_count = channelCount(params.pixel_format);
+
+        EXRImage exr_image = { };
+        InitEXRImage(&exr_image);
+
+        const utils::ScopeExit exr_image_scope ([&exr_image]
+        {
+            exr_image.images = nullptr;
+
+            FreeEXRImage(&exr_image);
+        });
+
+        exr_image.num_channels  = static_cast<int32_t>(channel_count);
+        exr_image.width         = static_cast<int>(params.width);
+        exr_image.height        = static_cast<int>(params.height);
+
+        using Channel = std::vector<FloatPrecision>;
+        std::vector<Channel> channels(channel_count, Channel(params.width * params.height));
+
+        const auto src_data = reinterpret_cast<const FloatPrecision*>(params.data.data());
+        if (channel_count == 1)
+            memcpy(channels[0].data(), src_data, params.width * params.height * sizeof(FloatPrecision));
+        else
+        {
+            for (size_t j = 0; j < channel_count; ++j)
+            {
+                auto& channel = channels[channel_count - j - 1];
+                for (size_t i = 0; i < params.width * params.height; ++i)
+                    channel[i] = src_data[i * channel_count + j];
+            }
+        }
+
+        std::vector<FloatPrecision*> channel_ptrs(channel_count);
+        for (auto&& [pointer, channel]: std::views::zip(channel_ptrs, channels))
+            pointer = channel.data();
+
+        exr_image.images = reinterpret_cast<uint8_t**>(channel_ptrs.data());
+
+        std::vector<EXRChannelInfo> channel_info (channel_count, EXRChannelInfo { });
+        exr_header.num_channels = static_cast<int32_t>(channel_count);
+        exr_header.channels     = channel_info.data();
+
+        if (channel_count == 1)
+            exr_header.channels[0].name[0] = 'Y';
+        else if (channel_count == 2)
+        {
+            exr_header.channels[0].name[0] = 'A';
+            exr_header.channels[1].name[0] = 'Y';
+        }
+        else if (channel_count == 3)
+        {
+            exr_header.channels[0].name[0] = 'B';
+            exr_header.channels[1].name[0] = 'G';
+            exr_header.channels[2].name[0] = 'R';
+        }
+        else if (channel_count == 4)
+        {
+            exr_header.channels[0].name[0] = 'A';
+            exr_header.channels[1].name[0] = 'B';
+            exr_header.channels[2].name[0] = 'G';
+            exr_header.channels[3].name[0] = 'R';
+        }
+
+        constexpr auto type = std::is_same_v<FloatPrecision, Fp32>
+            ?   TINYEXR_PIXELTYPE_FLOAT
+            :   TINYEXR_PIXELTYPE_HALF;
+
+        std::vector<int> pixels_buffer (channel_count * 2, type);
+
+        exr_header.pixel_types              = pixels_buffer.data();
+        exr_header.requested_pixel_types    = pixels_buffer.data() + channel_count;
+
+        const char* err = nullptr;
+        if (SaveEXRImageToFile(&exr_image, &exr_header, params.filename.string().c_str(), &err) != TINYEXR_SUCCESS) [[unlikely]]
+        {
+            const auto msg = std::format("[vk-image::exporter] failed save '{}': {}", params.filename.string(), err);
+            FreeEXRErrorMessage(err);
+            throw pbrlib::exception::RuntimeError(msg);
+        }
     }
 
     void Image::save()
@@ -595,107 +935,37 @@ namespace pbrlib::backend::vk::exporters
 
         validate();
 
-        auto width  = static_cast<int>(_ptr_image->width);
-        auto height = static_cast<int>(_ptr_image->height);
-
-        auto image = builders::Image(_device)
-            .size(_ptr_image->width, _ptr_image->height)
-            .format(VK_FORMAT_R8G8B8A8_UNORM)
-            .usage(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
-            .addQueueFamilyIndex(_device.queue().family_index)
-            .tiling(VK_IMAGE_TILING_LINEAR)
-            .fillColor(pbrlib::math::vec3(std::numeric_limits<float>::max()))
-            .name("[vk-image::exporter] src-image")
-            .build();
-
-        image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer();
-        command_buffer.write([&image, this] (auto command_buffer_handle)
+        auto readback_buffer = _ptr_image->fetch("[vk-image::exporter] fetch buffer");
+        readback_buffer.map([this] (std::span<const uint8_t> data)
         {
-            PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image::exoprter] blit-src-image-to-save");
-
-            const VkOffset3D blit_size
+            const WriteToImageParams write_params
             {
-                .x = static_cast<int32_t>(image.width),
-                .y = static_cast<int32_t>(image.height),
-                .z = 1
+                .filename       = _filename,
+                .data           = data,
+                .width          = _ptr_image->width,
+                .height         = _ptr_image->height,
+                .pixel_format   = _ptr_image->format
+
             };
 
-            const VkImageBlit2 region
+            switch (_ptr_image->format)
             {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_BLIT_2,
-                .srcSubresource =
-                {
-                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                    .layerCount = 1
-                },
-                .srcOffsets = {{}, blit_size},
-                .dstSubresource =
-                {
-                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                    .layerCount = 1
-                },
-                .dstOffsets = {{}, blit_size}
-            };
-
-            const VkBlitImageInfo2 blit_info
-            {
-                .sType          = VK_STRUCTURE_TYPE_BLIT_IMAGE_INFO_2,
-                .srcImage       = _ptr_image->handle.handle(),
-                .srcImageLayout = _ptr_image->layout,
-                .dstImage       = image.handle.handle(),
-                .dstImageLayout = image.layout,
-                .regionCount    = 1,
-                .pRegions       = &region,
-                .filter         = VK_FILTER_NEAREST
-            };
-
-            vkCmdBlitImage2(command_buffer_handle, &blit_info);
-        }, "[vk-image::exoprter] blit-src-image-to-save", marker_colors::blit_image);
-
-        _device.submit(command_buffer);
-
-        std::ofstream file (_filename, std::ios::out | std::ios::binary);
-
-        if (!file) [[unlikely]]
-            throw exception::FileOpen("[vk-image::exporter] failed create writer");
-
-        const VkImageSubresource sub_resource
-        {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .mipLevel   = 0,
-            .arrayLayer = 0
-        };
-
-        VkSubresourceLayout sub_resource_layout = { };
-
-        vkGetImageSubresourceLayout(
-            _device.device(),
-            image.handle.handle(),
-            &sub_resource,
-            &sub_resource_layout
-        );
-
-        const auto allocation_handle = image.handle.context<VmaAllocation>();
-
-        uint8_t* ptr_data = nullptr;
-        VK_CHECK(vmaMapMemory(
-            _device.vmaAllocator(),
-            allocation_handle,
-            reinterpret_cast<void**>(&ptr_data)
-        ));
-
-        std::function<void (void*, int)> writer = [this, &file] (void* data, int size)
-        {
-            file.write(reinterpret_cast<char*>(data), size);
-        };
-
-        stbi_write_png_to_func([](void *context, void *data, int size)
-        {
-            (*reinterpret_cast<std::function<void (void*, int)>*>(context))(data, size);
-        }, &writer, width, height, 4, ptr_data + sub_resource_layout.offset, static_cast<int>(sub_resource_layout.rowPitch));
-
-        vmaUnmapMemory(_device.vmaAllocator(), allocation_handle);
+                case VK_FORMAT_R8_UNORM:
+                case VK_FORMAT_R8G8_UNORM:
+                case VK_FORMAT_R8G8B8_UNORM:
+                case VK_FORMAT_R8G8B8A8_UNORM:
+                    writeToPng(write_params);
+                    break;
+                case VK_FORMAT_R16_SFLOAT:
+                case VK_FORMAT_R16G16B16A16_SFLOAT:
+                    writeToExr<Fp16>(write_params);
+                    break;
+                case VK_FORMAT_R32G32B32A32_SFLOAT:
+                    writeToExr<Fp32>(write_params);
+                    break;
+                default:
+                    throw exception::UndefinedPixelFormat(_ptr_image->format);
+            }
+        });
     }
 }

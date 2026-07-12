@@ -1,5 +1,9 @@
 #pragma once
 
+#include <backend/renderer/vulkan/shader_compiler.hpp>
+
+#include <vulkan/vulkan.h>
+
 #include <vector>
 #include <filesystem>
 #include <limits>
@@ -9,26 +13,24 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
-namespace pbrlib::backend::vk::shader
-{
-    class SpecializationInfoBase;
-}
-
 namespace pbrlib::backend::vk
 {
-    enum class PrimitiveType
+    enum class PrimitiveType :
+        uint8_t
     {
         eTriangle
     };
 
-    enum class PolygonMode
+    enum class PolygonMode :
+        uint8_t
     {
         eFill,
         eLine,
         ePoint
     };
 
-    enum class CullMode
+    enum class CullMode :
+        uint8_t
     {
         eNone,
         eBack,
@@ -36,13 +38,15 @@ namespace pbrlib::backend::vk
         eFrontAndBack
     };
 
-    enum class FrontFace
+    enum class FrontFace :
+        uint8_t
     {
         eClockwise,
         eCounterClockwise
     };
 
-    enum class SampleCount
+    enum class SampleCount :
+        uint8_t
     {
         e1,
         e2,
@@ -85,6 +89,8 @@ namespace pbrlib::backend::vk::builders
 
         GraphicsPipeline& subpass(uint32_t subpass_index) noexcept;
 
+        GraphicsPipeline& addDefine(const vk::shader::Define& define);
+
         [[nodiscard]] PipelineHandle build();
 
     private:
@@ -107,5 +113,7 @@ namespace pbrlib::backend::vk::builders
         std::vector<VkPipelineShaderStageCreateInfo>        _stages;
         std::vector<VkPipelineColorBlendAttachmentState>    _attachments_state;
         std::vector<VkSpecializationInfo>                   _specialization_infos;
+
+        backend::vk::shader::Defines _defines;
     };
 }

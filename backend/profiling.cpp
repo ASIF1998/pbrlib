@@ -2,7 +2,6 @@
 
 #ifdef PBRLIB_ENABLE_PROFILING
 
-#include <stdexcept>
 #include <stdlib.h>
 
 void* operator new(std::size_t count)

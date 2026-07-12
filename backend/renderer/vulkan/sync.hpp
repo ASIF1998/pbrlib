@@ -6,8 +6,8 @@
 
 namespace pbrlib::backend::vk
 {
-    [[nodiscard]] vk::SemaphoreHandle create(VkDevice device_handle, const VkSemaphoreCreateInfo& create_info);
-    [[nodiscard]] vk::FenceHandle     create(VkDevice device_handle, const VkFenceCreateInfo& create_info);
-    
+    [[nodiscard]] SemaphoreHandle create(VkDevice device_handle, const VkSemaphoreCreateInfo& create_info);
+    [[nodiscard]] FenceHandle     create(VkDevice device_handle, const VkFenceCreateInfo& create_info);
+
     void sync(VkDevice device_handle, VkFence fence_handle, uint64_t timeout = std::numeric_limits<uint64_t>::max());
 }

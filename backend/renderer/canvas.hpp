@@ -37,11 +37,8 @@ namespace pbrlib::backend
 
         void present(const vk::Image* ptr_result, VkSemaphore wait_semaphore);
 
-        [[nodiscard]]
-        Size size() const;
-
-        [[nodiscard]]
-        uint8_t framesInFlight() const noexcept;
+        [[nodiscard]] Size      size()              const;
+        [[nodiscard]] uint8_t   framesInFlight()    const noexcept;
 
     private:
         vk::Device& _device;

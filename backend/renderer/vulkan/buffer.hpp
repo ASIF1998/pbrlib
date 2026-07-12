@@ -3,11 +3,10 @@
 #include <backend/renderer/vulkan/utils.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <vector>
-#include <span>
-
-#include <string>
 #include <string_view>
+#include <vector>
+
+#include <concepts>
 
 namespace pbrlib::backend::vk
 {
@@ -77,6 +76,14 @@ namespace pbrlib::backend::vk
 
         void read(uint8_t* ptr_dst, VkDeviceSize size, VkDeviceSize offset_in_src);
 
+        template<typename Callback>
+        requires std::invocable<Callback, std::span<uint8_t>>
+        void map(Callback&& callback);
+
+        template<typename Callback>
+        requires std::invocable<Callback, std::span<const uint8_t>>
+        void map(Callback&& callback) const;
+
         VkDeviceAddress address() const;
 
         BufferHandle handle;
@@ -130,3 +137,5 @@ namespace pbrlib::backend::vk::builders
         std::string _name;
     };
 }
+
+#include <backend/renderer/vulkan/buffer.inl>

@@ -188,18 +188,18 @@ namespace pbrlib::backend
 
 namespace pbrlib::backend
 {
-    void GBufferGenerator::setupColorAttachmentsLayout()
+    void GBufferGenerator::setupColorAttachmentsLayout(vk::CommandBuffer& command_buffer)
     {
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     }
 
     void GBufferGenerator::beginPass(vk::CommandBuffer& command_buffer)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        setupColorAttachmentsLayout();
+        setupColorAttachmentsLayout(command_buffer);
 
         _push_constant_block.projection_view = context().projection * context().view;
 

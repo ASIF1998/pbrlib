@@ -20,6 +20,8 @@ namespace pbrlib::math
     class Matrix2x2 final
     {
     public:
+        using ElementType = T;
+
         inline constexpr Matrix2x2()                noexcept;
         inline constexpr Matrix2x2(T init_value)    noexcept;
 
@@ -31,29 +33,31 @@ namespace pbrlib::math
         inline constexpr Matrix2x2(const Matrix3x3<T>& mat) noexcept;
         inline constexpr Matrix2x2(const Matrix4x4<T>& mat) noexcept;
 
-        inline constexpr bool operator == (const Matrix2x2& mat) const noexcept;
-        inline constexpr bool operator != (const Matrix2x2& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator == (const Matrix2x2& mat) const noexcept;
+        [[nodiscard]] inline constexpr bool operator != (const Matrix2x2& mat) const noexcept;
 
-        inline constexpr Matrix2x2  operator + (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Matrix2x2  operator - (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Matrix2x2  operator * (const Matrix2x2& mat)   const noexcept;
-        inline constexpr Vec2<T>    operator * (const Vec2<T>& v)       const noexcept;
+        [[nodiscard]] inline constexpr Matrix2x2    operator + (const Matrix2x2& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix2x2    operator - (const Matrix2x2& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Matrix2x2    operator * (const Matrix2x2& mat)   const noexcept;
+        [[nodiscard]] inline constexpr Vec2<T>      operator * (const Vec2<T>& v)       const noexcept;
 
         inline constexpr Matrix2x2& operator += (const Matrix2x2& mat)  noexcept;
         inline constexpr Matrix2x2& operator -= (const Matrix2x2& mat)  noexcept;
         inline constexpr Matrix2x2& operator *= (const Matrix2x2& mat)  noexcept;
         inline constexpr Matrix2x2& operator *= (T scal)                noexcept;
 
-        inline T*       operator [] (size_t i) noexcept;
-        inline const T* operator [] (size_t i) const noexcept;
+        [[nodiscard]] inline T*         operator [] (size_t i) noexcept;
+        [[nodiscard]] inline const T*   operator [] (size_t i) const noexcept;
 
-        inline T&           at(size_t i, size_t j);
-        inline constexpr T  at(size_t i, size_t j) const;
+        [[nodiscard]] inline T&             at(size_t i, size_t j);
+        [[nodiscard]] inline constexpr T    at(size_t i, size_t j) const;
 
-        inline constexpr T det() const noexcept;
+        [[nodiscard]] inline constexpr T det() const noexcept;
 
         inline void             inverse()   noexcept;
         inline constexpr void   transpose() noexcept;
+
+        static constexpr size_t element_count = 4;
 
     private:
         union
@@ -64,19 +68,22 @@ namespace pbrlib::math
     };
 
     template<MathArithmetic T>
-    inline constexpr Matrix2x2<T> transpose(const Matrix2x2<T>& mat) noexcept;
+    [[nodiscard]] inline constexpr Matrix2x2<T> transpose(const Matrix2x2<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Matrix2x2<T> inverse(const Matrix2x2<T>& mat) noexcept;
+    [[nodiscard]] inline constexpr Matrix2x2<T> inverse(const Matrix2x2<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline Matrix2x2<T> round(const Matrix2x2<T>& mat) noexcept;
+    [[nodiscard]] inline Matrix2x2<T> round(const Matrix2x2<T>& mat) noexcept;
 
     template<MathArithmetic T>
-    inline constexpr Matrix2x2<T> operator * (const Matrix2x2<T>& mat, T s);
+    [[nodiscard]] inline constexpr Matrix2x2<T> operator * (const Matrix2x2<T>& mat, T s);
 
     template<MathArithmetic T>
-    inline constexpr Matrix2x2<T> operator * (T s, const Matrix2x2<T>& mat);
+    [[nodiscard]] inline constexpr Matrix2x2<T> operator * (T s, const Matrix2x2<T>& mat);
+
+    template<MathArithmetic T>
+    [[nodiscard]] inline bool isfinite(const Matrix2x2<T>& mat) noexcept;
 }
 
 namespace std

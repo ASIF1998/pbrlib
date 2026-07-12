@@ -1,6 +1,5 @@
 #include <pbrlib/math/casts.hpp>
 
-#include <algorithm>
 #include <cmath>
 
 namespace pbrlib::math

@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::backend::vk

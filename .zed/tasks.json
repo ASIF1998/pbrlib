@@ -1,7 +1,7 @@
 [
   {
     "label": "Build: Interactive Scene",
-    "command": "/opt/homebrew/bin/cmake --build build --target interactive-scene",
+    "command": "mkdir -p build && cd build && /opt/homebrew/bin/cmake .. && /opt/homebrew/bin/cmake --build .",
     "description": "Compile the interactive-scene target",
   },
   {

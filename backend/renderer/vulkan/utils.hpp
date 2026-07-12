@@ -1,7 +1,6 @@
 #pragma once
 
 #include <span>
-#include <concepts>
 
 namespace pbrlib::backend::vk
 {

@@ -15,6 +15,7 @@ set(PBRLIB_BACKEND_VULKAN_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/framebuffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sync.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pixel_format.cpp
     CACHE INTERNAL ""
 )
 
@@ -37,5 +38,6 @@ set(PBRLIB_BACKEND_VULKAN_H
     ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sync.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pixel_format.hpp
     CACHE INTERNAL ""
 )
