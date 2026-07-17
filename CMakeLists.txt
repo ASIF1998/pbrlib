@@ -247,7 +247,7 @@ target_link_libraries(pbrlib PUBLIC
     glslang-default-resource-limits
     assimp
     EnTT::EnTT
-    spdlog::spdlog_header_only
+    spdlog::spdlog
     VulkanMemoryAllocator
     SDL3::SDL3
     cpptrace::cpptrace

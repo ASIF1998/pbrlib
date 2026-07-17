@@ -11,6 +11,7 @@
 #include <glslang/Public/resource_limits_c.h>
 
 #include <fstream>
+#include <map>
 
 #define CHECK(fn, log_fn, log_fn_arg)                                                               \
     do                                                                                              \
