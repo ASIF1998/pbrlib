@@ -1,6 +1,8 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/ansicolor_sink.h>
+#include <spdlog/sinks/wincolor_sink.h>
 
 #include <memory>
 
