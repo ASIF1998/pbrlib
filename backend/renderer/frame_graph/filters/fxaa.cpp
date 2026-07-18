@@ -72,7 +72,7 @@ namespace pbrlib::backend
     {
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .pipelineLayoutHandle(_pipeline_layout_handle)
-            .shader("shaders/fxaa.glsl.comp")
+            .shader("shaders/fxaa.comp.glsl")
             .build();
 
         _pipeline_handle = std::move(new_pipeline);

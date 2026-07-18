@@ -62,28 +62,28 @@ namespace pbrlib::backend::vk::shader::utils
 
     static glslang_stage_t getStage(const std::filesystem::path& filename)
     {
-        const auto extension = filename.extension().string();
+        const auto str_filename = filename.string();
 
-#define RETURN_STAGE(ext, vulkan_stage) if (std::strcmp(extension.data(), ext) == 0) return vulkan_stage
+#define RETURN_STAGE(ext, vulkan_stage) if (str_filename.find(ext) != std::string::npos) return vulkan_stage
 
-        RETURN_STAGE(".vert", GLSLANG_STAGE_VERTEX);
-        RETURN_STAGE(".tesc", GLSLANG_STAGE_TESSCONTROL);
-        RETURN_STAGE(".tesc", GLSLANG_STAGE_TESSEVALUATION);
-        RETURN_STAGE(".geom", GLSLANG_STAGE_GEOMETRY);
+        RETURN_STAGE(".vert.glsl", GLSLANG_STAGE_VERTEX);
+        RETURN_STAGE(".tesc.glsl", GLSLANG_STAGE_TESSCONTROL);
+        RETURN_STAGE(".tesc.glsl", GLSLANG_STAGE_TESSEVALUATION);
+        RETURN_STAGE(".geom.glsl", GLSLANG_STAGE_GEOMETRY);
 
-        RETURN_STAGE(".task", GLSLANG_STAGE_TASK);
-        RETURN_STAGE(".mesh", GLSLANG_STAGE_MESH);
+        RETURN_STAGE(".task.glsl", GLSLANG_STAGE_TASK);
+        RETURN_STAGE(".mesh.glsl", GLSLANG_STAGE_MESH);
 
-        RETURN_STAGE(".frag", GLSLANG_STAGE_FRAGMENT);
+        RETURN_STAGE(".frag.glsl", GLSLANG_STAGE_FRAGMENT);
 
-        RETURN_STAGE(".comp", GLSLANG_STAGE_COMPUTE);
+        RETURN_STAGE(".comp.glsl", GLSLANG_STAGE_COMPUTE);
 
-        RETURN_STAGE(".rgen", GLSLANG_STAGE_RAYGEN);
-        RETURN_STAGE(".rint", GLSLANG_STAGE_INTERSECT);
-        RETURN_STAGE(".rahit", GLSLANG_STAGE_ANYHIT);
-        RETURN_STAGE(".rchit", GLSLANG_STAGE_CLOSESTHIT);
-        RETURN_STAGE(".rmiss", GLSLANG_STAGE_MISS);
-        RETURN_STAGE(".rcall", GLSLANG_STAGE_CALLABLE);
+        RETURN_STAGE(".rgen.glsl", GLSLANG_STAGE_RAYGEN);
+        RETURN_STAGE(".rint.glsl", GLSLANG_STAGE_INTERSECT);
+        RETURN_STAGE(".rahit.glsl", GLSLANG_STAGE_ANYHIT);
+        RETURN_STAGE(".rchit.glsl", GLSLANG_STAGE_CLOSESTHIT);
+        RETURN_STAGE(".rmiss.glsl", GLSLANG_STAGE_MISS);
+        RETURN_STAGE(".rcall.glsl", GLSLANG_STAGE_CALLABLE);
 
 #undef RETURN_STAGE
 

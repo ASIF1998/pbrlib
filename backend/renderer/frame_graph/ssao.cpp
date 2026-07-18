@@ -116,7 +116,7 @@ namespace pbrlib::backend
             .binding    = 1
         });
 
-        constexpr auto ssao_shader = "shaders/ssao/ssao.glsl.comp";
+        constexpr auto ssao_shader = "shaders/ssao/ssao.comp.glsl";
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)
