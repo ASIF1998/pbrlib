@@ -125,8 +125,8 @@ namespace pbrlib::backend
         [[nodiscard]] vk::Image*        colorOutputAttach(std::string_view name);
         [[nodiscard]] const vk::Image*  depthStencil() const noexcept;
 
-        [[nodiscard]] vk::Device&           device() noexcept;
-        [[nodiscard]] const RenderContext&  context() const noexcept;
+        [[nodiscard]] vk::Device&           device()    noexcept;
+        [[nodiscard]] const RenderContext&  context()   const noexcept;
 
         [[nodiscard]] std::pair<uint32_t, uint32_t> size() const noexcept;
 

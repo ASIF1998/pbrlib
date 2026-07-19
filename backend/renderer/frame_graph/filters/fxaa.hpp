@@ -39,7 +39,7 @@ namespace pbrlib::backend
 {
     class FXAA final :
         public Filter,
-        public pbrlib::EventSystem
+        public EventSystem
     {
         struct Settings final
         {
