@@ -6,6 +6,7 @@ set(PBRLIB_BACKEND_FRAME_GRAPH_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/render_pass.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ssao.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/physically_based_lighting.cpp
     CACHE INTERNAL ""
 )
 
@@ -15,6 +16,7 @@ set(PBRLIB_BACKEND_FRAME_GRAPH_H
     ${CMAKE_CURRENT_SOURCE_DIR}/render_pass.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ssao.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/physically_based_lighting.hpp
     CACHE INTERNAL ""
 )
 

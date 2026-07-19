@@ -1,0 +1,33 @@
+#pragma once
+
+#include <backend/renderer/frame_graph/render_pass.hpp>
+#include <backend/renderer/vulkan/unique_handler.hpp>
+
+#include <pbrlib/event_system.hpp>
+
+namespace pbrlib::backend
+{
+    class PhysicallyBasedLighting final :
+        public RenderPass,
+        public EventSystem
+    {
+        bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
+        void render(vk::CommandBuffer& command_buffer)                              override;
+        void sync(Transition& transition)                                           override;
+
+        VkPipelineStageFlags2 srcStage() const noexcept override;
+        VkPipelineStageFlags2 dstStage() const noexcept override;
+
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
+
+        bool createPipeline();
+
+    public:
+        explicit PhysicallyBasedLighting(vk::Device& device, vk::Image& dst_image) noexcept;
+
+    private:
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        vk::PipelineHandle          _pipeline_handle;
+    };
+}
