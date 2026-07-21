@@ -27,8 +27,8 @@ The code is distributed under the GNU General Public License v3.0.
 
 ## 💻 Platforms
 
-- **Windows** (SDL3)
-- **Vulkan 1.3** required
+- **Windows**
+- **MacOS**
 
 ## 🔨 Building
 
