@@ -1,4 +1,5 @@
 #include <backend/renderer/frame_graph/filters/filter.hpp>
+
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
@@ -8,24 +9,25 @@
 
 namespace pbrlib::backend
 {
-    Filter::Filter(std::string_view name, vk::Device& device, vk::Image& dst_image) noexcept :
+    Filter::Filter(std::string_view name, vk::Device& device, vk::Image& dst_image) :
         RenderPass      (device),
         _name           (name),
         _ptr_dst_image  (&dst_image)
     {
-        _io_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _io_descriptor_set_handle = device.allocateDescriptorSet (
-            _io_descriptor_set_layout_handle,
-            std::format("[{}] input descriptor set", _name)
+        _io_descriptor_group.emplace(
+            device,
+            vk::builders::DescriptorSetLayout(device)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            std::format("[{}] io descriptor set", name)
         );
+
+        if (!_io_descriptor_group) [[unlikely]]
+            throw exception::InitializeError(std::format("[{}] failed create io descriptor set", name));
 
         device.writeDescriptorSet ({
             .view_handle            = _ptr_dst_image->view_handle.handle(),
-            .set_handle             = _io_descriptor_set_handle,
+            .set_handle             = _io_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
         });
@@ -54,7 +56,7 @@ namespace pbrlib::backend
         device().writeDescriptorSet ({
             .view_handle            = srcImage().view_handle.handle(),
             .sampler_handle         = _input_image_sampler_handle,
-            .set_handle             = _io_descriptor_set_handle,
+            .set_handle             = _io_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
         });
@@ -73,9 +75,9 @@ namespace pbrlib::backend
         return *_ptr_dst_image;
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> Filter::IODescriptorSet() noexcept
+    vk::DescriptorGroup* Filter::IODescriptorGroup() noexcept
     {
-        return std::make_pair(_io_descriptor_set_handle.handle(), _io_descriptor_set_layout_handle.handle());
+        return &_io_descriptor_group.value();
     }
 
     void Filter::dispatchCompute(VkCommandBuffer command_buffer_handle)

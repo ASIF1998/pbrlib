@@ -144,17 +144,19 @@ namespace pbrlib::backend
     {
         const auto src_stage = ptr_gbuffer->dstStage();
 
-        const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
+        // const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
 
-        return builders::SSAO(_device)
-            .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
-            .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
-            .settings(_config.ssao)
-            .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
-            .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
-            .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)
-            .gbufferDescriptorSet(gbuffer_set_handle, gbuffer_set_layout_handle)
-            .build();
+        // return builders::SSAO(_device)
+        //     .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
+        //     .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
+        //     .settings(_config.ssao)
+        //     .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
+        //     .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
+        //     .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)
+        //     .gbufferDescriptorSet(gbuffer_set_handle, gbuffer_set_layout_handle)
+        //     .build();
+
+        return nullptr;
     }
 
     void FrameGraph::setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa)

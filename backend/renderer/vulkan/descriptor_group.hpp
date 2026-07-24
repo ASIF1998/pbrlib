@@ -1,8 +1,6 @@
 #pragma once
 
 #include <backend/renderer/vulkan/unique_handler.hpp>
-#include <backend/renderer/vulkan/image.hpp>
-#include <backend/renderer/vulkan/buffer.hpp>
 
 #include <map>
 #include <variant>
@@ -17,6 +15,9 @@ namespace pbrlib::backend::vk::builders
 namespace pbrlib::backend::vk
 {
     class CommandBuffer;
+    class Image;
+    class Buffer;
+    class Device;
 }
 
 namespace pbrlib::backend::vk
@@ -27,8 +28,8 @@ namespace pbrlib::backend::vk
 
     public:
         explicit DescriptorGroup (
-            Device&                                 device, 
-            const builders::DescriptorSetLayout&    descriptor_set_layout_builder, 
+            Device&                                 device,
+            const builders::DescriptorSetLayout&    descriptor_set_layout_builder,
             std::string_view                        name = ""
         );
 
@@ -39,6 +40,9 @@ namespace pbrlib::backend::vk
         void modify(std::function<void(uint32_t, vk::Buffer&)> modifier);
 
         void changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout);
+
+        [[nodiscard]] VkDescriptorSet       descriptorSetHandle()       noexcept;
+        [[nodiscard]] VkDescriptorSetLayout descriptorSetLayoutHandle() noexcept;
 
     private:
         vk::DescriptorSetLayoutHandle   _set_layout;

@@ -11,10 +11,7 @@ namespace pbrlib::backend::vk::builders
         _device (device)
     { }
 
-    RenderPass& RenderPass::addColorAttachment (
-        const vk::Image*    ptr_image,
-        VkImageLayout       final_layout
-    )
+    RenderPass& RenderPass::addColorAttachment(const vk::Image* ptr_image, VkImageLayout final_layout)
     {
         _attachments.emplace_back
         (
@@ -44,10 +41,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    RenderPass& RenderPass::depthAttachment (
-        const vk::Image*    ptr_image,
-        VkImageLayout       final_layout
-    )
+    RenderPass& RenderPass::depthAttachment(const vk::Image* ptr_image, VkImageLayout final_layout)
     {
         _attachments.emplace_back
         (

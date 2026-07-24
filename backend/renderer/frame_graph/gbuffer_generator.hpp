@@ -74,7 +74,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup* descriptorGroup() noexcept override;
 
     public:
         explicit GBufferGenerator(vk::Device& device);
@@ -88,8 +88,8 @@ namespace pbrlib::backend
 
         GBufferPushConstantBlock _push_constant_block;
 
-        vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
-        vk::DescriptorSetHandle         _result_descriptor_set_handle;
+        // vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
+        // vk::DescriptorSetHandle         _result_descriptor_set_handle;
 
         vk::SamplerHandle _sampler_handle;
 

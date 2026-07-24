@@ -1,5 +1,7 @@
 #include <backend/renderer/vulkan/descriptor_group.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/image.hpp>
+#include <backend/renderer/vulkan/buffer.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -8,8 +10,8 @@
 namespace pbrlib::backend::vk
 {
     DescriptorGroup::DescriptorGroup (
-        Device&                                 device, 
-        const builders::DescriptorSetLayout&    descriptor_set_layout_builder, 
+        Device&                                 device,
+        const builders::DescriptorSetLayout&    descriptor_set_layout_builder,
         std::string_view                        name
     ) :
         _set_layout(descriptor_set_layout_builder.build()),
@@ -94,5 +96,15 @@ namespace pbrlib::backend::vk
             if (!isDepthImage(image.format)) [[likely]]
                 image.changeLayout(command_buffer, new_layout);
         });
+    }
+
+    VkDescriptorSet DescriptorGroup::descriptorSetHandle() noexcept
+    {
+        return _set_handle;
+    }
+
+    VkDescriptorSetLayout DescriptorGroup::descriptorSetLayoutHandle() noexcept
+    {
+        return _set_layout;
     }
 }

@@ -97,7 +97,7 @@ namespace pbrlib::backend::builders
             );
         }
 
-        ptr_ssao->descriptorSet(InputDescriptorSetTraits<backend::SSAO>::gbuffer, _gbuffer_set_handle, _gbuffer_set_layout_handle);
+        // ptr_ssao->descriptorSet(InputDescriptorSetTraits<backend::SSAO>::gbuffer, _gbuffer_set_handle, _gbuffer_set_layout_handle);
 
         auto ptr_compound_render_pass = std::make_unique<CompoundRenderPass>(_device);
         ptr_compound_render_pass->add(std::move(ptr_ssao));

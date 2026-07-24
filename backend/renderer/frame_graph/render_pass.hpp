@@ -1,8 +1,8 @@
 #pragma once
 
-#include <pbrlib/math/matrix4x4.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
-#include <vulkan/vulkan.h>
+#include <pbrlib/math/matrix4x4.hpp>
 
 #include <map>
 #include <span>
@@ -50,10 +50,6 @@ namespace pbrlib::backend
     {
         {AttachmentsTraits<RenderPass>::metadata()} -> std::convertible_to<std::span<const AttachmentMetadata>>;
     };
-
-    template<typename T>
-    struct InputDescriptorSetTraits final
-    { };
 }
 
 namespace pbrlib::backend
@@ -84,11 +80,6 @@ namespace pbrlib::backend
             std::string,
             vk::Image*,
             std::less<void>
-        >;
-
-        using InputDescriptorSets = std::unordered_map <
-            uint32_t,
-            std::pair<VkDescriptorSet, VkDescriptorSetLayout>
         >;
 
         void sync(vk::CommandBuffer& command_buffer);
@@ -130,13 +121,10 @@ namespace pbrlib::backend
 
         [[nodiscard]] std::pair<uint32_t, uint32_t> size() const noexcept;
 
-        void descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout);
+        void descriptorGroup(vk::DescriptorGroup& descriptor_group);
 
         [[nodiscard]]
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet(uint32_t set_id) const;
-
-        [[nodiscard]]
-        virtual std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept = 0;
+        virtual vk::DescriptorGroup* descriptorGroup() noexcept = 0;
 
     protected:
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
@@ -154,6 +142,6 @@ namespace pbrlib::backend
         uint32_t _width     = 0;
         uint32_t _height    = 0;
 
-        InputDescriptorSets _input_descriptor_sets;
+        std::vector<vk::DescriptorGroup*> _input_groups;
     };
 }

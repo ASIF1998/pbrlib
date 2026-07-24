@@ -51,7 +51,7 @@ namespace pbrlib::backend
             _settings.reduce_mul    = math::lerp(1.0f / 16.0f, 1.0f / 4.0f, reduce_mul);
         });
 
-        const auto [_, io_set_layout_handle] = IODescriptorSet();
+        // const auto [_, io_set_layout_handle] = IODescriptorSet();
 
         constexpr VkPushConstantRange push_constant_range =
         {
@@ -60,10 +60,10 @@ namespace pbrlib::backend
             .size       = sizeof(Config)
         };
 
-        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(io_set_layout_handle)
-            .pushConstant(push_constant_range)
-            .build();
+        // _pipeline_layout_handle = vk::builders::PipelineLayout(device())
+        //     .addSetLayout(io_set_layout_handle)
+        //     .pushConstant(push_constant_range)
+        //     .build();
 
         return createPipeline();
     }
@@ -89,14 +89,14 @@ namespace pbrlib::backend
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[fxaa] run-pipeline");
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
-            const auto [io_set_handle, _] = IODescriptorSet();
-            vkCmdBindDescriptorSets(
-                command_buffer_handle,
-                VK_PIPELINE_BIND_POINT_COMPUTE,
-                _pipeline_layout_handle,
-                0, 1, &io_set_handle,
-                0, nullptr
-            );
+            // const auto [io_set_handle, _] = IODescriptorSet();
+            // vkCmdBindDescriptorSets(
+            //     command_buffer_handle,
+            //     VK_PIPELINE_BIND_POINT_COMPUTE,
+            //     _pipeline_layout_handle,
+            //     0, 1, &io_set_handle,
+            //     0, nullptr
+            // );
 
             vkCmdPushConstants(
                 command_buffer_handle,
@@ -119,8 +119,8 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> FXAA::resultDescriptorSet() const noexcept
+    vk::DescriptorGroup* FXAA::descriptorGroup() noexcept
     {
-        return std::make_pair(VK_NULL_HANDLE, VK_NULL_HANDLE);
+        return nullptr;
     }
 }

@@ -84,17 +84,8 @@ namespace pbrlib::backend
         return std::make_pair(_width, _height);
     }
 
-    void RenderPass::descriptorSet(uint32_t set_id, VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout)
+    void RenderPass::descriptorGroup(vk::DescriptorGroup& descriptor_group)
     {
-        _input_descriptor_sets.emplace(set_id, std::make_pair(set_handle, set_layout));
-    }
-
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> RenderPass::descriptorSet(uint32_t set_id) const
-    {
-        if (auto res = _input_descriptor_sets.find(set_id); res != std::end(_input_descriptor_sets)) [[likely]]
-            return res->second;
-
-        throw exception::RuntimeError("[render-pass] failed find input descriptor set");
-        std::unreachable();
+        _input_groups.emplace_back(&descriptor_group);
     }
 }

@@ -24,14 +24,6 @@ namespace pbrlib::backend
                 }
             }
 
-            if (!_subpasses.empty()) [[likely]]
-            {
-                const auto [descriptor_set_handle, descriptor_set_layout_handle] = _subpasses.back()->resultDescriptorSet();
-
-                _descriptor_set_handle          = descriptor_set_handle;
-                _descriptor_set_layout_handle   = descriptor_set_layout_handle;
-            }
-
             return true;
         }
 
@@ -67,8 +59,9 @@ namespace pbrlib::backend
         return _subpasses.back()->dstStage();
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> CompoundRenderPass::resultDescriptorSet() const noexcept
+    vk::DescriptorGroup* CompoundRenderPass::descriptorGroup() noexcept
     {
-        return std::make_pair(_descriptor_set_handle, _descriptor_set_layout_handle);
+        /// @todo
+        return nullptr;
     }
 }

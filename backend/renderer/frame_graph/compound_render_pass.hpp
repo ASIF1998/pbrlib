@@ -20,7 +20,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup* descriptorGroup() noexcept override;
 
     public:
         explicit CompoundRenderPass(vk::Device& device) noexcept;
@@ -33,8 +33,5 @@ namespace pbrlib::backend
 
     private:
         std::vector<std::unique_ptr<RenderPass>> _subpasses;
-
-        VkDescriptorSet         _descriptor_set_handle          = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _descriptor_set_layout_handle   = VK_NULL_HANDLE;
     };
 }

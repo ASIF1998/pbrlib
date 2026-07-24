@@ -32,14 +32,14 @@ namespace pbrlib::backend
         if (!ptr_blur) [[unlikely]]
             throw exception::InvalidArgument("[ssao] pointer to blur is null");
 
-        _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
+        // _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(device)
+        //     .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        //     .build();
 
-        _result_image_desc_set = device.allocateDescriptorSet(
-            _result_image_desc_set_layout,
-            "[ssao] descritor set with results"
-        );
+        // _result_image_desc_set = device.allocateDescriptorSet(
+        //     _result_image_desc_set_layout,
+        //     "[ssao] descritor set with results"
+        // );
     }
 
     bool SSAO::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -81,7 +81,7 @@ namespace pbrlib::backend
         bindResultDescriptorSet();
         createSSAODescriptorSet();
 
-        const auto gbuffer_set_layout          = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).second;
+        // const auto gbuffer_set_layout          = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).second;
         const auto material_manager_set_layout = context.ptr_material_manager->descriptorSet().second;
 
         constexpr VkPushConstantRange push_constant_range =
@@ -91,12 +91,12 @@ namespace pbrlib::backend
             .size       = 2 * sizeof(pbrlib::math::mat4)
         };
 
-        _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(gbuffer_set_layout)
-            .addSetLayout(_ssao_desc_set_layout)
-            .addSetLayout(material_manager_set_layout)
-            .pushConstant(push_constant_range)
-            .build();
+        // _pipeline_layout_handle = vk::builders::PipelineLayout(device())
+        //     .addSetLayout(gbuffer_set_layout)
+        //     .addSetLayout(_ssao_desc_set_layout)
+        //     .addSetLayout(material_manager_set_layout)
+        //     .pushConstant(push_constant_range)
+        //     .build();
 
         return createPipeline(width, height);
     }
@@ -109,12 +109,12 @@ namespace pbrlib::backend
         _params.noise_scale.x = static_cast<float>(width) / noise_width;
         _params.noise_scale.y = static_cast<float>(height) / noise_height;
 
-        device().writeDescriptorSet ({
-            .buffer     = _params_buffer.value(),
-            .set_handle = _ssao_desc_set,
-            .size       = static_cast<uint32_t>(_params_buffer->size),
-            .binding    = 1
-        });
+        // device().writeDescriptorSet ({
+        //     .buffer     = _params_buffer.value(),
+        //     .set_handle = _ssao_desc_set,
+        //     .size       = static_cast<uint32_t>(_params_buffer->size),
+        //     .binding    = 1
+        // });
 
         constexpr auto ssao_shader = "shaders/ssao/ssao.comp.glsl";
 
@@ -138,20 +138,20 @@ namespace pbrlib::backend
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
-            const std::array sets_descriptors
-            {
-                descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
-                _ssao_desc_set.handle(),
-                context().ptr_material_manager->descriptorSet().first
-            };
+            // const std::array sets_descriptors
+            // {
+            //     descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
+            //     _ssao_desc_set.handle(),
+            //     context().ptr_material_manager->descriptorSet().first
+            // };
 
-            vkCmdBindDescriptorSets (
-                command_buffer_handle,
-                VK_PIPELINE_BIND_POINT_COMPUTE,
-                _pipeline_layout_handle, 0,
-                static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(),
-                0, nullptr
-            );
+            // vkCmdBindDescriptorSets (
+            //     command_buffer_handle,
+            //     VK_PIPELINE_BIND_POINT_COMPUTE,
+            //     _pipeline_layout_handle, 0,
+            //     static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(),
+            //     0, nullptr
+            // );
 
             const std::array matrices
             {
@@ -185,9 +185,9 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
+    vk::DescriptorGroup* SSAO::descriptorGroup() noexcept
     {
-        return std::make_pair(_result_image_desc_set.handle(), _result_image_desc_set_layout.handle());
+        return nullptr;
     }
 
     void SSAO::bindResultDescriptorSet()
@@ -196,40 +196,40 @@ namespace pbrlib::backend
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_result_image->view_handle,
-            .sampler_handle         = _result_image_sampler,
-            .set_handle             = _result_image_desc_set,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .binding                = 0
-        });
+        // device().writeDescriptorSet ({
+        //     .view_handle            = ptr_result_image->view_handle,
+        //     .sampler_handle         = _result_image_sampler,
+        //     .set_handle             = _result_image_desc_set,
+        //     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        //     .binding                = 0
+        // });
     }
 
     void SSAO::createSSAODescriptorSet()
     {
-        _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(device())
-            .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
+        // _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(device())
+        //     .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        //     .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        //     .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+        //     .build();
 
-        _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor-set-with-data-for-compute");
+        // _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor-set-with-data-for-compute");
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_result_image->view_handle,
-            .set_handle             = _ssao_desc_set,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
-            .binding                = 0
-        });
+        // device().writeDescriptorSet ({
+        //     .view_handle            = ptr_result_image->view_handle,
+        //     .set_handle             = _ssao_desc_set,
+        //     .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
+        //     .binding                = 0
+        // });
 
-        device().writeDescriptorSet ({
-            .buffer     = _samples_buffer.value(),
-            .set_handle = _ssao_desc_set,
-            .size       = static_cast<uint32_t>(_samples_buffer->size),
-            .binding    = 2
-        });
+        // device().writeDescriptorSet ({
+        //     .buffer     = _samples_buffer.value(),
+        //     .set_handle = _ssao_desc_set,
+        //     .size       = static_cast<uint32_t>(_samples_buffer->size),
+        //     .binding    = 2
+        // });
     }
 
     void SSAO::createParamsBuffer()

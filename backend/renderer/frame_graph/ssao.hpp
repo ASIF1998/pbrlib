@@ -45,12 +45,6 @@ namespace pbrlib::backend
         constexpr static auto ssao = "ssao-result";
         constexpr static auto blur = "ssao-blur";
     };
-
-    template<>
-    struct InputDescriptorSetTraits<SSAO> final
-    {
-        constexpr static uint8_t gbuffer = 0;
-    };
 }
 
 namespace pbrlib::backend
@@ -75,7 +69,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup* descriptorGroup() noexcept override;
 
         void bindResultDescriptorSet();
 
@@ -91,13 +85,13 @@ namespace pbrlib::backend
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
 
-        vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
-        vk::DescriptorSetHandle         _result_image_desc_set;
+        // vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
+        // vk::DescriptorSetHandle         _result_image_desc_set;
 
         vk::SamplerHandle _result_image_sampler;
 
-        vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
-        vk::DescriptorSetHandle         _ssao_desc_set;
+        // vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
+        // vk::DescriptorSetHandle         _ssao_desc_set;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;
