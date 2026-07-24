@@ -8,6 +8,11 @@ namespace pbrlib::settings
     struct SSAO;
 }
 
+namespace pbrlib::backend::vk
+{
+    class DescriptorGroup;
+}
+
 namespace pbrlib::backend::builders
 {
     class SSAO final
@@ -34,7 +39,7 @@ namespace pbrlib::backend::builders
             VkPipelineStageFlags2   src_stage
         );
 
-        SSAO& gbufferDescriptorSet(VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout_handle) noexcept;
+        SSAO& gbufferDescriptorGroup(vk::DescriptorGroup* gbuffer_descriptor_group) noexcept;
 
         [[nodiscard]] std::unique_ptr<CompoundRenderPass> build();
 
@@ -46,8 +51,7 @@ namespace pbrlib::backend::builders
 
         std::vector<SyncData> _sync;
 
-        VkDescriptorSet         _gbuffer_set_handle         = VK_NULL_HANDLE;
-        VkDescriptorSetLayout   _gbuffer_set_layout_handle  = VK_NULL_HANDLE;
+        vk::DescriptorGroup* _gbuffer_descriptor_group = nullptr;
 
         BilateralBlur::Settings _blur_settings;
     };

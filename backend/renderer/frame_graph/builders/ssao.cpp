@@ -45,10 +45,9 @@ namespace pbrlib::backend::builders
         return *this;
     }
 
-    SSAO& SSAO::gbufferDescriptorSet(VkDescriptorSet set_handle, VkDescriptorSetLayout set_layout_handle) noexcept
+    SSAO& SSAO::gbufferDescriptorGroup(vk::DescriptorGroup* gbuffer_descriptor_group) noexcept
     {
-        _gbuffer_set_handle         = set_handle;
-        _gbuffer_set_layout_handle  = set_layout_handle;
+        _gbuffer_descriptor_group = gbuffer_descriptor_group;
         return *this;
     }
 
@@ -63,7 +62,7 @@ namespace pbrlib::backend::builders
         if (_sync.empty()) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] didn't set gbuffer sync data");
 
-        if (_gbuffer_set_handle == VK_NULL_HANDLE || _gbuffer_set_layout_handle == VK_NULL_HANDLE) [[unlikely]]
+        if (_gbuffer_descriptor_group == nullptr) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] didn't set gbuffer descriptor set");
     }
 
@@ -97,7 +96,7 @@ namespace pbrlib::backend::builders
             );
         }
 
-        // ptr_ssao->descriptorSet(InputDescriptorSetTraits<backend::SSAO>::gbuffer, _gbuffer_set_handle, _gbuffer_set_layout_handle);
+        ptr_ssao->descriptorGroup(backend::SSAO::gbuffer_set_id, *_gbuffer_descriptor_group);
 
         auto ptr_compound_render_pass = std::make_unique<CompoundRenderPass>(_device);
         ptr_compound_render_pass->add(std::move(ptr_ssao));

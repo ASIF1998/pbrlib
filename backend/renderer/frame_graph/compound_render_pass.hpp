@@ -5,6 +5,11 @@
 #include <vector>
 #include <memory>
 
+namespace pbrlib::backend::vk
+{
+    class DescriptorGroup;
+}
+
 namespace pbrlib::backend
 {
     template<typename T>
@@ -20,7 +25,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        vk::DescriptorGroup* descriptorGroup() noexcept override;
+        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
 
     public:
         explicit CompoundRenderPass(vk::Device& device) noexcept;
@@ -33,5 +38,7 @@ namespace pbrlib::backend
 
     private:
         std::vector<std::unique_ptr<RenderPass>> _subpasses;
+
+        const vk::DescriptorGroup* _result_descriptor_group = nullptr;
     };
 }

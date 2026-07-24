@@ -1,7 +1,7 @@
 #pragma once
 
 #include <backend/renderer/frame_graph/filters/filter.hpp>
-#include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
 #include <pbrlib/event_system.hpp>
 
@@ -29,7 +29,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        vk::DescriptorGroup* descriptorGroup() noexcept override;
+        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
 
         void checkSettings() noexcept;
 

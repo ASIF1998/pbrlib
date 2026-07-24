@@ -24,6 +24,9 @@ namespace pbrlib::backend
                 }
             }
 
+            if (!_subpasses.empty()) [[likely]]
+                _result_descriptor_group = _subpasses.back()->resultDescriptorGroup();
+
             return true;
         }
 
@@ -59,9 +62,8 @@ namespace pbrlib::backend
         return _subpasses.back()->dstStage();
     }
 
-    vk::DescriptorGroup* CompoundRenderPass::descriptorGroup() noexcept
+     const vk::DescriptorGroup* CompoundRenderPass::resultDescriptorGroup() const noexcept
     {
-        /// @todo
-        return nullptr;
+        return _result_descriptor_group;
     }
 }

@@ -84,8 +84,21 @@ namespace pbrlib::backend
         return std::make_pair(_width, _height);
     }
 
-    void RenderPass::descriptorGroup(vk::DescriptorGroup& descriptor_group)
+    void RenderPass::descriptorGroup(uint32_t set_id, vk::DescriptorGroup& descriptor_group)
     {
-        _input_groups.emplace_back(&descriptor_group);
+        _input_groups.emplace(set_id, &descriptor_group);
+    }
+
+    vk::DescriptorGroup* RenderPass::descriptorGroup(uint32_t set_id)
+    {
+        return _input_groups[set_id];
+    }
+
+    const vk::DescriptorGroup* RenderPass::descriptorGroup(uint32_t set_id) const
+    {
+        if (const auto it = _input_groups.find(set_id); it != std::end(_input_groups))
+            return it->second;
+
+        return nullptr;
     }
 }

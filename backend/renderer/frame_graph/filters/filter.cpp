@@ -80,6 +80,11 @@ namespace pbrlib::backend
         return &_io_descriptor_group.value();
     }
 
+    const vk::DescriptorGroup* Filter::IODescriptorGroup() const noexcept
+    {
+        return &_io_descriptor_group.value();
+    }
+
     void Filter::dispatchCompute(VkCommandBuffer command_buffer_handle)
     {
         const auto [width, height] = size();

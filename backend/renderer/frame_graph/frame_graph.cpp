@@ -146,6 +146,8 @@ namespace pbrlib::backend
 
         // const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
 
+        auto gbuffer_descriptor_group = ptr_gbuffer->resultDescriptorGroup();
+
         // return builders::SSAO(_device)
         //     .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
         //     .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))

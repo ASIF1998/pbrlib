@@ -121,10 +121,13 @@ namespace pbrlib::backend
 
         [[nodiscard]] std::pair<uint32_t, uint32_t> size() const noexcept;
 
-        void descriptorGroup(vk::DescriptorGroup& descriptor_group);
+        void descriptorGroup(uint32_t set_id, vk::DescriptorGroup& descriptor_group);
+
+        vk::DescriptorGroup*        descriptorGroup(uint32_t set_id);
+        const vk::DescriptorGroup*  descriptorGroup(uint32_t set_id) const;
 
         [[nodiscard]]
-        virtual vk::DescriptorGroup* descriptorGroup() noexcept = 0;
+        virtual const vk::DescriptorGroup* resultDescriptorGroup() const noexcept = 0;
 
     protected:
         virtual void render(vk::CommandBuffer& command_buffer) = 0;
@@ -142,6 +145,6 @@ namespace pbrlib::backend
         uint32_t _width     = 0;
         uint32_t _height    = 0;
 
-        std::vector<vk::DescriptorGroup*> _input_groups;
+        std::map<uint32_t, vk::DescriptorGroup*> _input_groups;
     };
 }

@@ -98,13 +98,13 @@ namespace pbrlib::backend::vk
         });
     }
 
-    VkDescriptorSet DescriptorGroup::descriptorSetHandle() noexcept
+    VkDescriptorSet& DescriptorGroup::descriptorSetHandle() noexcept
     {
-        return _set_handle;
+        return _set_handle.handle();
     }
 
-    VkDescriptorSetLayout DescriptorGroup::descriptorSetLayoutHandle() noexcept
+    VkDescriptorSetLayout& DescriptorGroup::descriptorSetLayoutHandle() noexcept
     {
-        return _set_layout;
+        return _set_layout.handle();
     }
 }

@@ -2,9 +2,10 @@
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
-#include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/frame_graph/render_pass.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
+#include <cstdint>
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/event_system.hpp>
@@ -69,7 +70,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        vk::DescriptorGroup* descriptorGroup() noexcept override;
+        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
 
         void bindResultDescriptorSet();
 
@@ -79,19 +80,19 @@ namespace pbrlib::backend
         void createSamplesBuffer();
 
     public:
+        static constexpr uint32_t gbuffer_set_id = 0;
+
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
 
-        // vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
-        // vk::DescriptorSetHandle         _result_image_desc_set;
+        std::optional<vk::DescriptorGroup> _result_descriptor_group;
 
         vk::SamplerHandle _result_image_sampler;
 
-        // vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
-        // vk::DescriptorSetHandle         _ssao_desc_set;
+        std::optional<vk::DescriptorGroup> _ssao_descriptor_group;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;

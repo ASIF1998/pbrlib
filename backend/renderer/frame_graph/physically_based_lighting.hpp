@@ -18,7 +18,7 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        vk::DescriptorGroup* descriptorGroup() noexcept override;
+        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
 
         bool createPipeline();
 

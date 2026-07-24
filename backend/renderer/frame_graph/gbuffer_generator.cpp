@@ -54,37 +54,37 @@ namespace pbrlib::backend
 
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        // device().writeDescriptorSet ({
-        //     .view_handle            = ptr_pos_uv_image->view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _result_descriptor_set_handle,
-        //     .expected_image_layout  = expected_image_layout,
-        //     .binding                = GBufferDescriptorSetBindings::ePosUv
-        // });
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_pos_uv_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::ePosUv
+        });
 
-        // device().writeDescriptorSet ({
-        //     .view_handle            = ptr_normal_tangent_image->view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _result_descriptor_set_handle,
-        //     .expected_image_layout  = expected_image_layout,
-        //     .binding                = GBufferDescriptorSetBindings::eNormalTangent
-        // });
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_normal_tangent_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eNormalTangent
+        });
 
-        // device().writeDescriptorSet ({
-        //     .view_handle            = ptr_material_index_image->view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _result_descriptor_set_handle,
-        //     .expected_image_layout  = expected_image_layout,
-        //     .binding                = GBufferDescriptorSetBindings::eMaterialIndices
-        // });
+        device().writeDescriptorSet ({
+            .view_handle            = ptr_material_index_image->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
+            .expected_image_layout  = expected_image_layout,
+            .binding                = GBufferDescriptorSetBindings::eMaterialIndices
+        });
 
-        // device().writeDescriptorSet ({
-        //     .view_handle            = depthStencil()->view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _result_descriptor_set_handle,
-        //     .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-        //     .binding                = GBufferDescriptorSetBindings::eDepthBuffer
-        // });
+        device().writeDescriptorSet ({
+            .view_handle            = depthStencil()->view_handle,
+            .sampler_handle         = _sampler_handle,
+            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
+            .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            .binding                = GBufferDescriptorSetBindings::eDepthBuffer
+        });
     }
 
     bool GBufferGenerator::init(const RenderContext& context, uint32_t width, uint32_t height)
@@ -355,22 +355,19 @@ namespace pbrlib::backend
 
     void GBufferGenerator::createResultDescriptorSet()
     {
-        // _result_descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(device())
-        //     .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //     .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //     .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //     .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-        //     .build();
-
-        // _result_descriptor_set_handle = device().allocateDescriptorSet (
-        //     _result_descriptor_set_layout_handle,
-        //     "[gbuffer-generator] descritor set with results"
-        // );
+        _result_descriptor_group.emplace(
+            device(),
+            vk::builders::DescriptorSetLayout(device())
+                .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            "[gbuffer-generator] descritor set with results"
+        );
     }
 
-    vk::DescriptorGroup* GBufferGenerator::descriptorGroup() noexcept
+    const vk::DescriptorGroup* GBufferGenerator::resultDescriptorGroup() const  noexcept
     {
-        /// @todo
-        return nullptr;
+        return &_result_descriptor_group.value();
     }
 }

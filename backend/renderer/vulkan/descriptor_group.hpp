@@ -41,8 +41,8 @@ namespace pbrlib::backend::vk
 
         void changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout);
 
-        [[nodiscard]] VkDescriptorSet       descriptorSetHandle()       noexcept;
-        [[nodiscard]] VkDescriptorSetLayout descriptorSetLayoutHandle() noexcept;
+        [[nodiscard]] VkDescriptorSet&          descriptorSetHandle()       noexcept;
+        [[nodiscard]] VkDescriptorSetLayout&    descriptorSetLayoutHandle() noexcept;
 
     private:
         vk::DescriptorSetLayoutHandle   _set_layout;

@@ -26,7 +26,8 @@ namespace pbrlib::backend
         [[nodiscard]] vk::Image& srcImage();
         [[nodiscard]] vk::Image& dstImage() noexcept;
 
-        [[nodiscard]] vk::DescriptorGroup* IODescriptorGroup() noexcept;
+        [[nodiscard]] vk::DescriptorGroup*          IODescriptorGroup() noexcept;
+        [[nodiscard]] const vk::DescriptorGroup*    IODescriptorGroup() const noexcept;
 
     protected:
         void dispatchCompute(VkCommandBuffer command_buffer_handle);
