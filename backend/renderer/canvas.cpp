@@ -91,7 +91,7 @@ namespace pbrlib::backend
         if (!nextImage(wait_semaphore)) [[unlikely]]
             return ;
 
-        _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _surface.ptr_image->transition(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("present");
 
@@ -137,7 +137,7 @@ namespace pbrlib::backend
 
         _device.submit(command_buffer);
 
-        _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        _surface.ptr_image->transition(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
         VkResult result = VK_SUCCESS;
 

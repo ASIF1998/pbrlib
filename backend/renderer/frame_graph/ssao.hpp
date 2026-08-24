@@ -70,7 +70,8 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
 
         void bindResultDescriptorSet();
 
@@ -79,10 +80,16 @@ namespace pbrlib::backend
         void createParamsBuffer();
         void createSamplesBuffer();
 
+        void sync(Transition& transition) override;
+
     public:
-        static constexpr uint32_t gbuffer_set_id = 0;
+        static constexpr uint32_t gbuffer_set_id    = 0;
+        static constexpr uint32_t ssao_set_id       = 1;
+        static constexpr uint32_t material_set_id   = 2;
 
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
+
+        void srcStage(VkPipelineStageFlags2 src_stage) noexcept;
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
@@ -100,6 +107,8 @@ namespace pbrlib::backend
         std::optional<vk::Buffer> _samples_buffer;
 
         BilateralBlur* _ptr_blur = nullptr;
+
+        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE; 
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };

@@ -18,6 +18,8 @@ namespace pbrlib::backend
     class Filter :
         public RenderPass
     {
+        void sync(Transition& transition) override;
+
     public:
         explicit Filter(std::string_view name, vk::Device& device, vk::Image& dst_image);
 

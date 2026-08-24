@@ -25,6 +25,9 @@ namespace pbrlib::backend
         if (!_io_descriptor_group) [[unlikely]]
             throw exception::InitializeError(std::format("[{}] failed create io descriptor set", name));
 
+        descriptorGroup(0, *_io_descriptor_group);
+        _io_descriptor_group->add(1, *_ptr_dst_image);
+
         device.writeDescriptorSet ({
             .view_handle            = _ptr_dst_image->view_handle.handle(),
             .set_handle             = _io_descriptor_group->descriptorSetHandle(),
@@ -37,19 +40,21 @@ namespace pbrlib::backend
     {
         _ptr_src_image = &image;
 
-        constexpr auto dst_stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        // constexpr auto dst_stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
 
-        addSyncImage (
-            _ptr_src_image,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, dst_stage
-        );
+        // addSyncImage (
+        //     _ptr_src_image,
+        //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        //     VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, dst_stage
+        // );
 
-        addSyncImage (
-            _ptr_dst_image,
-            VK_IMAGE_LAYOUT_GENERAL,
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
-        );
+        // addSyncImage (
+        //     _ptr_dst_image,
+        //     VK_IMAGE_LAYOUT_GENERAL,
+        //     VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
+        // );
+
+        _io_descriptor_group->add(0, image);
 
         _input_image_sampler_handle = device().createLinearSampler();
 
@@ -93,5 +98,14 @@ namespace pbrlib::backend
         const auto group_count_y = height / device().workGroupSize();
 
         vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
+    }
+
+    void Filter::sync(Transition& transition)
+    {
+        constexpr auto dst_stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+        transition
+            .addSet(0)
+                .bind(0, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, dst_stage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                .bind(1, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage, VK_IMAGE_LAYOUT_GENERAL);
     }
 }

@@ -11,6 +11,7 @@
 namespace pbrlib::backend::vk
 {
     class Device;
+    class CommandBuffer;
 }
 
 namespace pbrlib::backend::vk::builders
@@ -85,6 +86,12 @@ namespace pbrlib::backend::vk
         void map(Callback&& callback) const;
 
         VkDeviceAddress address() const;
+
+        void transition (
+            CommandBuffer&          command_buffer,
+            VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
+            VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
+        );
 
         BufferHandle handle;
         VkDeviceSize size   = 0;

@@ -73,8 +73,18 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
 
-    const vk::DescriptorGroup* PhysicallyBasedLighting::resultDescriptorGroup() const  noexcept
+    const vk::DescriptorGroup* PhysicallyBasedLighting::resultDescriptorGroup() const noexcept
     {
         return nullptr;
+    }
+
+    vk::DescriptorGroup* PhysicallyBasedLighting::resultDescriptorGroup() noexcept
+    {
+        return nullptr;
+    }
+
+    void PhysicallyBasedLighting::sync(Transition& transition)
+    {
+        /// @todo
     }
 }

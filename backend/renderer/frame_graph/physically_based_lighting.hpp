@@ -18,9 +18,12 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
 
         bool createPipeline();
+
+        void sync(Transition& transition) override;
 
     public:
         explicit PhysicallyBasedLighting(vk::Device& device, vk::Image& dst_image) noexcept;

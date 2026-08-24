@@ -78,21 +78,34 @@ namespace pbrlib::backend
 
         bindResultDescriptorSet();
         createSSAODescriptorSet();
-
+        
         constexpr VkPushConstantRange push_constant_range =
         {
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
             .offset     = 0,
             .size       = 2 * sizeof(pbrlib::math::mat4)
         };
+        
+        auto ptr_gbuffer_set            = descriptorGroup(gbuffer_set_id);
+        auto ptr_material_manager_set   = context.ptr_material_manager->descriptorGroup();
 
-        const auto gbuffer_set                  = descriptorGroup(gbuffer_set_id);
-        const auto material_manager_set_layout  = context.ptr_material_manager->descriptorSet().second;
+        if (!ptr_gbuffer_set) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - gbuffer descriptor group is empty");
+
+        if (!_ssao_descriptor_group) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - ssao descriptor group is empty");
+
+        if (!ptr_material_manager_set) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - material manager descriptor group is empty");
+
+        descriptorGroup(gbuffer_set_id, *ptr_gbuffer_set);
+        descriptorGroup(ssao_set_id, *_ssao_descriptor_group);
+        descriptorGroup(material_set_id, *ptr_material_manager_set);
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(gbuffer_set->descriptorSetLayoutHandle())
+            .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
             .addSetLayout(_ssao_descriptor_group->descriptorSetLayoutHandle())
-            .addSetLayout(material_manager_set_layout)
+            .addSetLayout(ptr_material_manager_set->descriptorSetLayoutHandle())
             .pushConstant(push_constant_range)
             .build();
 
@@ -140,7 +153,7 @@ namespace pbrlib::backend
             {
                 descriptorGroup(gbuffer_set_id)->descriptorSetHandle(),
                 _ssao_descriptor_group->descriptorSetHandle(),
-                context().ptr_material_manager->descriptorSet().first
+                context().ptr_material_manager->descriptorGroup()->descriptorSetHandle()
             };
 
             vkCmdBindDescriptorSets (
@@ -188,6 +201,11 @@ namespace pbrlib::backend
         return &_result_descriptor_group.value();
     }
 
+    vk::DescriptorGroup* SSAO::resultDescriptorGroup() noexcept
+    {
+        return &_result_descriptor_group.value();
+    }
+
     void SSAO::bindResultDescriptorSet()
     {
         _result_image_sampler = device().createNearestSampler();
@@ -214,7 +232,13 @@ namespace pbrlib::backend
             "[ssao] descritor-set-with-data-for-compute"
         );
 
+        /// @todo remove
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
+        _ssao_descriptor_group->add(0, *ptr_result_image);
+        _ssao_descriptor_group->add(1, *_params_buffer);
+        _ssao_descriptor_group->add(2, *_samples_buffer);
+
+        descriptorGroup(ssao_set_id, _ssao_descriptor_group.value());
 
         device().writeDescriptorSet ({
             .view_handle            = ptr_result_image->view_handle,
@@ -325,5 +349,24 @@ namespace pbrlib::backend
         _samples_buffer->write(std::span<const pbrlib::math::vec4>(samples), 0);
 
         _params.sample_count = static_cast<uint32_t>(samples.size());
+    }
+
+    void SSAO::sync(Transition& transition)
+    {
+        transition.addSet(gbuffer_set_id)
+            .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(1, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(2, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(3, _src_stage, dstStage(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+
+        transition.addSet(ssao_set_id)
+            .bind(0, srcStage(), dstStage(), VK_IMAGE_LAYOUT_GENERAL)
+            .bind(1, srcStage(), dstStage())
+            .bind(2, srcStage(), dstStage());
+    }
+
+    void SSAO::srcStage(VkPipelineStageFlags2 src_stage) noexcept
+    {
+        _src_stage = src_stage;
     }
 }

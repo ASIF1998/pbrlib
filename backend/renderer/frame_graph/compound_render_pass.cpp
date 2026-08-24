@@ -62,8 +62,16 @@ namespace pbrlib::backend
         return _subpasses.back()->dstStage();
     }
 
-     const vk::DescriptorGroup* CompoundRenderPass::resultDescriptorGroup() const noexcept
+    const vk::DescriptorGroup* CompoundRenderPass::resultDescriptorGroup() const noexcept
     {
         return _result_descriptor_group;
     }
+
+    vk::DescriptorGroup* CompoundRenderPass::resultDescriptorGroup() noexcept
+    {
+        return _result_descriptor_group;
+    }
+
+    void CompoundRenderPass::sync(Transition& transition)
+    { }
 }

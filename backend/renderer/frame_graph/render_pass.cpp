@@ -5,6 +5,27 @@
 
 namespace pbrlib::backend
 {
+    vk::DescriptorGroupTransition* Transition::set(uint32_t set_id)
+    {
+        if (!has(set_id))
+            return nullptr;
+
+        return &_sets[set_id];
+    }
+
+    vk::DescriptorGroupTransition& Transition::addSet(uint32_t set_id)
+    {
+        if (has(set_id)) [[unlikely]]
+            throw exception::InvalidArgument("[vk-descriptor-group-transition] add set id again");
+
+        return _sets[set_id];
+    }
+
+    bool Transition::has(uint32_t set_id) const
+    {
+        return _sets.find(set_id) != std::end(_sets);
+    }
+
     RenderPass::RenderPass(vk::Device& device) noexcept :
         _ptr_device (&device)
     { }
@@ -21,16 +42,6 @@ namespace pbrlib::backend
         return true;
     }
 
-    void RenderPass::addSyncImage (
-        vk::Image*              ptr_image,
-        VkImageLayout           new_layout,
-        VkPipelineStageFlags2   src_stage,
-        VkPipelineStageFlags2   dst_stage
-    )
-    {
-        _sync_images.emplace_back(ptr_image, new_layout, src_stage, dst_stage);
-    }
-
     void RenderPass::addColorOutput(std::string_view name, vk::Image* ptr_image)
     {
         _color_output_images.emplace(name, ptr_image);
@@ -45,9 +56,14 @@ namespace pbrlib::backend
         return it->second;
     }
 
-    void RenderPass::depthStencil(const vk::Image* ptr_image)
+    void RenderPass::depthStencil(vk::Image* ptr_image)
     {
         _ptr_depth_stencil_image = ptr_image;
+    }
+
+    vk::Image* RenderPass::depthStencil() noexcept
+    {
+        return _ptr_depth_stencil_image;
     }
 
     const vk::Image* RenderPass::depthStencil() const noexcept
@@ -59,14 +75,15 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        sync(command_buffer);
+        Transition transition;
+        sync(transition);
+        for (const auto [set_id, descriptor_group]: _descriptor_groups)
+        {
+            if (const auto ptr_set_transition = transition.set(set_id))
+                descriptor_group->transition(command_buffer, *ptr_set_transition);
+        }
+        
         render(command_buffer);
-    }
-
-    void RenderPass::sync(vk::CommandBuffer& command_buffer)
-    {
-        for (auto [ptr_image, new_layout, src_stage, dst_stage]: _sync_images)
-            ptr_image->changeLayout(command_buffer, new_layout, src_stage, dst_stage);
     }
 
     vk::Device& RenderPass::device() noexcept
@@ -84,19 +101,14 @@ namespace pbrlib::backend
         return std::make_pair(_width, _height);
     }
 
-    void RenderPass::descriptorGroup(uint32_t set_id, vk::DescriptorGroup& descriptor_group)
+    void RenderPass::descriptorGroup(uint32_t set_id, const vk::DescriptorGroup& descriptor_group)
     {
-        _input_groups.emplace(set_id, &descriptor_group);
-    }
-
-    vk::DescriptorGroup* RenderPass::descriptorGroup(uint32_t set_id)
-    {
-        return _input_groups[set_id];
+        _descriptor_groups.emplace(set_id, &descriptor_group);
     }
 
     const vk::DescriptorGroup* RenderPass::descriptorGroup(uint32_t set_id) const
     {
-        if (const auto it = _input_groups.find(set_id); it != std::end(_input_groups))
+        if (const auto it = _descriptor_groups.find(set_id); it != std::end(_descriptor_groups)) [[likely]]
             return it->second;
 
         return nullptr;

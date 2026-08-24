@@ -2,6 +2,7 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
 #include <limits>
 
@@ -68,7 +69,7 @@ namespace pbrlib::backend
 
         void update();
 
-        [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet() const noexcept;
+        [[nodiscard]] const vk::DescriptorGroup* descriptorGroup() const noexcept;
 
         [[nodiscard]] size_t imageCount()       const noexcept;
         [[nodiscard]] size_t materialCount()    const noexcept;
@@ -85,7 +86,6 @@ namespace pbrlib::backend
 
         bool _descriptor_set_is_changed = true;
 
-        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
-        vk::DescriptorSetHandle         _descriptor_set_handle;
+        std::optional<vk::DescriptorGroup> _descriptor_group;
     };
 }

@@ -25,7 +25,10 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        const vk::DescriptorGroup* resultDescriptorGroup() const noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+
+        void sync(Transition& transition) override;
 
     public:
         explicit CompoundRenderPass(vk::Device& device) noexcept;
@@ -39,6 +42,6 @@ namespace pbrlib::backend
     private:
         std::vector<std::unique_ptr<RenderPass>> _subpasses;
 
-        const vk::DescriptorGroup* _result_descriptor_group = nullptr;
+        vk::DescriptorGroup* _result_descriptor_group = nullptr;
     };
 }

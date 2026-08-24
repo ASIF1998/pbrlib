@@ -29,16 +29,10 @@ namespace pbrlib::backend::builders
     public:
         explicit SSAO(vk::Device& device) noexcept;
 
-        SSAO& ssaoImage(vk::Image& image)                       noexcept;
-        SSAO& blurImage(vk::Image& image)                       noexcept;
-        SSAO& settings(const pbrlib::settings::SSAO& config)    noexcept;
-
-        SSAO& addSync (
-            vk::Image*              ptr_image,
-            VkImageLayout           expected_layout,
-            VkPipelineStageFlags2   src_stage
-        );
-
+        SSAO& ssaoImage(vk::Image& image)                                           noexcept;
+        SSAO& blurImage(vk::Image& image)                                           noexcept;
+        SSAO& settings(const pbrlib::settings::SSAO& config)                        noexcept;
+        SSAO& srcStage(VkPipelineStageFlags2 src_stage)                             noexcept;
         SSAO& gbufferDescriptorGroup(vk::DescriptorGroup* gbuffer_descriptor_group) noexcept;
 
         [[nodiscard]] std::unique_ptr<CompoundRenderPass> build();
@@ -49,10 +43,10 @@ namespace pbrlib::backend::builders
         vk::Image* _ptr_ssao_image = nullptr;
         vk::Image* _ptr_blur_image = nullptr;
 
-        std::vector<SyncData> _sync;
-
         vk::DescriptorGroup* _gbuffer_descriptor_group = nullptr;
 
         BilateralBlur::Settings _blur_settings;
+        
+        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE;
     };
 }

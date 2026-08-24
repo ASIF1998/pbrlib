@@ -45,13 +45,6 @@ namespace pbrlib::backend
 
         std::unique_ptr<RenderPass> buildGBufferGeneratorSubpass();
 
-        std::unique_ptr<RenderPass> buildSSAOSubpass (
-            vk::Image*              ptr_pos_uv,
-            vk::Image*              ptr_normal_tangent,
-            vk::Image*              ptr_depth_buffer,
-            const RenderPass*       ptr_gbuffer
-        );
-
         void setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa);
 
         void updatePerFrameData(const Camera& camera, std::span<const SceneItem*> items);

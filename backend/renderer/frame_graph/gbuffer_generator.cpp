@@ -41,7 +41,17 @@ namespace pbrlib::backend
     GBufferGenerator::GBufferGenerator(vk::Device& device) :
         RenderPass(device)
     {
-        createResultDescriptorSet();
+        _result_descriptor_group.emplace(
+            device,
+            vk::builders::DescriptorSetLayout(device)
+                .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            "[gbuffer-generator] descritor-set-with-results"
+        );
+
+        descriptorGroup(ReservedSetSlots::result_descriptor_set_id, *_result_descriptor_group);
     }
 
     void GBufferGenerator::initResultDescriptorSet()
@@ -52,8 +62,14 @@ namespace pbrlib::backend
         const auto ptr_normal_tangent_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
         const auto ptr_material_index_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
+        
+        _result_descriptor_group->add(0, *ptr_pos_uv_image);
+        _result_descriptor_group->add(1, *ptr_normal_tangent_image);
+        _result_descriptor_group->add(2, *ptr_material_index_image);
+        _result_descriptor_group->add(3, *depthStencil());
+        
+        /// @todo подумать надо этим
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
         device().writeDescriptorSet ({
             .view_handle            = ptr_pos_uv_image->view_handle,
             .sampler_handle         = _sampler_handle,
@@ -193,9 +209,9 @@ namespace pbrlib::backend
 {
     void GBufferGenerator::setupColorAttachmentsLayout(vk::CommandBuffer& command_buffer)
     {
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->changeLayout(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv)->transition(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage());
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent)->transition(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage());
+        colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index)->transition(command_buffer, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage());
     }
 
     void GBufferGenerator::beginPass(vk::CommandBuffer& command_buffer)
@@ -271,7 +287,7 @@ namespace pbrlib::backend
             {
                 .sType      = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO,
                 .contents   = VK_SUBPASS_CONTENTS_INLINE
-            };
+        };
 
             const VkViewport viewport
             {
@@ -353,21 +369,23 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
     }
 
-    void GBufferGenerator::createResultDescriptorSet()
-    {
-        _result_descriptor_group.emplace(
-            device(),
-            vk::builders::DescriptorSetLayout(device())
-                .addBinding(GBufferDescriptorSetBindings::ePosUv, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(GBufferDescriptorSetBindings::eNormalTangent, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(GBufferDescriptorSetBindings::eMaterialIndices, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(GBufferDescriptorSetBindings::eDepthBuffer, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT),
-            "[gbuffer-generator] descritor set with results"
-        );
-    }
-
-    const vk::DescriptorGroup* GBufferGenerator::resultDescriptorGroup() const  noexcept
+    const vk::DescriptorGroup* GBufferGenerator::resultDescriptorGroup() const noexcept
     {
         return &_result_descriptor_group.value();
+    }
+
+    vk::DescriptorGroup* GBufferGenerator::resultDescriptorGroup() noexcept
+    {
+        return &_result_descriptor_group.value();
+    }
+
+    void GBufferGenerator::sync(Transition& transition)
+    {
+        transition 
+            .addSet(ReservedSetSlots::result_descriptor_set_id)
+                .bind(GBufferDescriptorSetBindings::ePosUv, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+                .bind(GBufferDescriptorSetBindings::eNormalTangent, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+                .bind(GBufferDescriptorSetBindings::eMaterialIndices, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+                .bind(GBufferDescriptorSetBindings::eDepthBuffer, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
     }
 }

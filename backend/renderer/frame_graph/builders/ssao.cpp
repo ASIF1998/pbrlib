@@ -29,19 +29,15 @@ namespace pbrlib::backend::builders
         return *this;
     }
 
-    SSAO& SSAO::blurImage(vk::Image& ptr_result) noexcept
+    SSAO& SSAO::srcStage(VkPipelineStageFlags2 src_stage) noexcept
     {
-        _ptr_blur_image = &ptr_result;
+        _src_stage = src_stage;
         return *this;
     }
 
-    SSAO& SSAO::addSync (
-        vk::Image*              ptr_image,
-        VkImageLayout           expected_layout,
-        VkPipelineStageFlags2   src_stage
-    )
+    SSAO& SSAO::blurImage(vk::Image& ptr_result) noexcept
     {
-        _sync.emplace_back(ptr_image, expected_layout, src_stage);
+        _ptr_blur_image = &ptr_result;
         return *this;
     }
 
@@ -59,11 +55,11 @@ namespace pbrlib::backend::builders
         if (!_ptr_blur_image) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] image for blur didn't set");
 
-        if (_sync.empty()) [[unlikely]]
-            throw exception::InvalidState("[ssao::builder] didn't set gbuffer sync data");
-
         if (_gbuffer_descriptor_group == nullptr) [[unlikely]]
             throw exception::InvalidState("[ssao::builder] didn't set gbuffer descriptor set");
+    
+        if (_src_stage == VK_PIPELINE_STAGE_2_NONE)
+            throw exception::InvalidState("[ssao::builder] didn't set src stage");
     }
 
     std::unique_ptr<CompoundRenderPass> SSAO::build()
@@ -73,29 +69,10 @@ namespace pbrlib::backend::builders
         auto ptr_blur = std::make_unique<BilateralBlur>(_device, *_ptr_blur_image, _blur_settings);
         ptr_blur->apply(*_ptr_ssao_image);
 
-        std::unique_ptr<RenderPass> ptr_ssao = std::make_unique<backend::SSAO>(_device, ptr_blur.get());
-
-        ptr_ssao->addSyncImage (
-            _ptr_ssao_image,
-            VK_IMAGE_LAYOUT_GENERAL,
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT
-        );
+        auto ptr_ssao = std::make_unique<backend::SSAO>(_device, ptr_blur.get());
+        ptr_ssao->srcStage(_src_stage);
 
         ptr_ssao->addColorOutput(AttachmentsTraits<backend::SSAO>::ssao, _ptr_ssao_image);
-
-        for (const auto& [ptr_image, expected_layout, src_stage]: _sync)
-        {
-            const auto dst_stage = expected_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-                ?   ptr_ssao->srcStage()
-                :   ptr_ssao->dstStage();
-
-            ptr_ssao->addSyncImage (
-                ptr_image,
-                expected_layout,
-                src_stage, dst_stage
-            );
-        }
-
         ptr_ssao->descriptorGroup(backend::SSAO::gbuffer_set_id, *_gbuffer_descriptor_group);
 
         auto ptr_compound_render_pass = std::make_unique<CompoundRenderPass>(_device);

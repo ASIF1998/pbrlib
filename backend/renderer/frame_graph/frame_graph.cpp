@@ -111,7 +111,7 @@ namespace pbrlib::backend
         if (_present_to_display_callback)
             _present_to_display_callback();
 
-        ptr_result->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        ptr_result->transition(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
         const auto available_semaphore = _image_available_semaphores[frame_index].handle();
         _canvas.present(ptr_result, available_semaphore);
@@ -133,32 +133,6 @@ namespace pbrlib::backend
             .materialIndexImage(*ptr_mat_index_image)
             .depthStencilImage(*ptr_depth_stencil_image)
             .build();
-    }
-
-    std::unique_ptr<RenderPass> FrameGraph::buildSSAOSubpass (
-        vk::Image*              ptr_pos_uv,
-        vk::Image*              ptr_normal_tangent,
-        vk::Image*              ptr_depth_buffer,
-        const RenderPass*       ptr_gbuffer
-    )
-    {
-        const auto src_stage = ptr_gbuffer->dstStage();
-
-        // const auto [gbuffer_set_handle, gbuffer_set_layout_handle] = ptr_gbuffer->resultDescriptorSet();
-
-        auto gbuffer_descriptor_group = ptr_gbuffer->resultDescriptorGroup();
-
-        // return builders::SSAO(_device)
-        //     .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
-        //     .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
-        //     .settings(_config.ssao)
-        //     .addSync(ptr_pos_uv, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
-        //     .addSync(ptr_normal_tangent, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src_stage)
-        //     .addSync(ptr_depth_buffer, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, src_stage)
-        //     .gbufferDescriptorSet(gbuffer_set_handle, gbuffer_set_layout_handle)
-        //     .build();
-
-        return nullptr;
     }
 
     void FrameGraph::setupAA(CompoundRenderPass& compound_render_pass, vk::Image& image, settings::AA aa)
@@ -195,12 +169,13 @@ namespace pbrlib::backend
         auto ptr_pos_uv         = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
         auto ptr_normal_tangent = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
-        auto ptr_ssao = buildSSAOSubpass (
-            ptr_pos_uv,
-            ptr_normal_tangent,
-            &_depth_buffer.value(),
-            ptr_gbuffer_generator.get()
-        );
+        auto ptr_ssao =  builders::SSAO(_device)
+            .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
+            .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
+            .gbufferDescriptorGroup(ptr_gbuffer_generator->resultDescriptorGroup())
+            .settings(_config.ssao)
+            .srcStage(ptr_gbuffer_generator->dstStage())
+            .build();
 
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
@@ -293,7 +268,7 @@ namespace pbrlib::backend
     void FrameGraph::clearImages(vk::CommandBuffer& command_buffer)
     {
         for (auto& [_, image]: _render_passes_images)
-            image.changeLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            image.transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {

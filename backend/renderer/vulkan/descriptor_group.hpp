@@ -3,7 +3,9 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <variant>
+#include <tuple>
 
 #include <functional>
 
@@ -22,6 +24,27 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk
 {
+    class DescriptorGroupTransition final
+    {
+        static constexpr auto NoImageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
+
+    public:
+        using StageConfig  = std::tuple<VkPipelineStageFlags2, VkPipelineStageFlags2, VkImageLayout>;
+        
+        DescriptorGroupTransition& bind (
+            uint32_t                bind_id, 
+            VkPipelineStageFlags2   src_stage, 
+            VkPipelineStageFlags2   dst_stage, 
+            VkImageLayout           image_layout = NoImageLayout
+        );
+
+        [[nodiscard]] std::optional<StageConfig>    config(int32_t bind_id)     const;
+        [[nodiscard]] bool                          hasBind(uint32_t bind_id)   const;
+
+    private:
+        std::unordered_map<uint32_t, StageConfig> _binds;
+    };
+
     class DescriptorGroup final
     {
         using DescriptorBinderResource = std::variant<vk::Buffer*, vk::Image*>;
@@ -39,10 +62,13 @@ namespace pbrlib::backend::vk
         void modify(std::function<void(uint32_t, vk::Image&)> modifier);
         void modify(std::function<void(uint32_t, vk::Buffer&)> modifier);
 
+        /// @todo remove
         void changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout);
 
-        [[nodiscard]] VkDescriptorSet&          descriptorSetHandle()       noexcept;
-        [[nodiscard]] VkDescriptorSetLayout&    descriptorSetLayoutHandle() noexcept;
+        void transition(CommandBuffer& command_buffer, const DescriptorGroupTransition& descriptor_group_transition) const;
+
+        [[nodiscard]] const VkDescriptorSet&        descriptorSetHandle()       const noexcept;
+        [[nodiscard]] const VkDescriptorSetLayout&  descriptorSetLayoutHandle() const noexcept;
 
     private:
         vk::DescriptorSetLayoutHandle   _set_layout;

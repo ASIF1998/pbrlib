@@ -5,6 +5,7 @@
 #include <pbrlib/math/matrix4x4.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <span>
 #include <vector>
 #include <tuple>
@@ -13,6 +14,8 @@
 #include <string_view>
 
 #include <functional>
+
+#include <limits>
 
 namespace pbrlib
 {
@@ -67,24 +70,32 @@ namespace pbrlib::backend
         uint8_t flight_frame_index = std::numeric_limits<uint8_t>::max() - 1;
     };
 
+    class Transition final
+    {
+    public:
+        [[nodiscard]] vk::DescriptorGroupTransition* set(uint32_t set_id);
+        [[nodiscard]] vk::DescriptorGroupTransition& addSet(uint32_t set_id);
+        
+        [[nodiscard]] bool has(uint32_t set_id) const; 
+
+    private:
+        std::unordered_map<uint32_t, vk::DescriptorGroupTransition> _sets;
+    };
+
     class RenderPass
     {
-        using SyncData = std::tuple <
-            vk::Image*,
-            VkImageLayout,
-            VkPipelineStageFlags2,
-            VkPipelineStageFlags2
-        >;
-
         using ColorOutputImages = std::map <
             std::string,
             vk::Image*,
             std::less<void>
         >;
 
-        void sync(vk::CommandBuffer& command_buffer);
-
     public:
+        struct ReservedSetSlots final
+        {
+            static constexpr uint32_t result_descriptor_set_id = std::numeric_limits<uint32_t>::max();
+        };
+
         explicit RenderPass(vk::Device& device) noexcept;
 
         RenderPass(RenderPass&& render_pass)        = delete;
@@ -103,17 +114,10 @@ namespace pbrlib::backend
         [[nodiscard]] virtual VkPipelineStageFlags2 dstStage() const noexcept = 0;
 
         void addColorOutput(std::string_view name, vk::Image* ptr_image);
-
-        void addSyncImage (
-            vk::Image*              ptr_image,
-            VkImageLayout           new_layout,
-            VkPipelineStageFlags2   src_stage,
-            VkPipelineStageFlags2   dst_stage
-        );
-
-        void depthStencil(const vk::Image* ptr_image);
+        void depthStencil(vk::Image* ptr_image);
 
         [[nodiscard]] vk::Image*        colorOutputAttach(std::string_view name);
+        [[nodiscard]] vk::Image*        depthStencil() noexcept;
         [[nodiscard]] const vk::Image*  depthStencil() const noexcept;
 
         [[nodiscard]] vk::Device&           device()    noexcept;
@@ -121,23 +125,21 @@ namespace pbrlib::backend
 
         [[nodiscard]] std::pair<uint32_t, uint32_t> size() const noexcept;
 
-        void descriptorGroup(uint32_t set_id, vk::DescriptorGroup& descriptor_group);
+        void descriptorGroup(uint32_t set_id, const vk::DescriptorGroup& descriptor_group);
 
-        vk::DescriptorGroup*        descriptorGroup(uint32_t set_id);
-        const vk::DescriptorGroup*  descriptorGroup(uint32_t set_id) const;
+        [[nodiscard]] const vk::DescriptorGroup* descriptorGroup(uint32_t set_id) const;
 
-        [[nodiscard]]
-        virtual const vk::DescriptorGroup* resultDescriptorGroup() const noexcept = 0;
+        [[nodiscard]] virtual vk::DescriptorGroup*          resultDescriptorGroup() noexcept        = 0;
+        [[nodiscard]] virtual const vk::DescriptorGroup*    resultDescriptorGroup() const noexcept  = 0;
 
     protected:
-        virtual void render(vk::CommandBuffer& command_buffer) = 0;
+        virtual void render(vk::CommandBuffer& command_buffer)  = 0;
+        virtual void sync(Transition& transition)               = 0;
 
     private:
         ColorOutputImages _color_output_images;
 
-        std::vector<SyncData> _sync_images;
-
-        const vk::Image* _ptr_depth_stencil_image = nullptr;
+        vk::Image* _ptr_depth_stencil_image = nullptr;
 
         const RenderContext*    _ptr_context    = nullptr;
         vk::Device*             _ptr_device     = nullptr;
@@ -145,6 +147,6 @@ namespace pbrlib::backend
         uint32_t _width     = 0;
         uint32_t _height    = 0;
 
-        std::map<uint32_t, vk::DescriptorGroup*> _input_groups;
+        std::map<uint32_t, const vk::DescriptorGroup*> _descriptor_groups;
     };
 }

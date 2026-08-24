@@ -63,11 +63,13 @@ namespace pbrlib::backend::builders
         ptr_gbuffer_generator->addColorOutput(material_index, _ptr_mat_index_image);
         ptr_gbuffer_generator->depthStencil(_ptr_depth_stencil_image);
 
-        ptr_gbuffer_generator->addSyncImage (
-            _ptr_depth_stencil_image,
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-            VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , ptr_gbuffer_generator->srcStage()
-        );
+        /// @todo add sync depth/stencil buffer
+
+        // ptr_gbuffer_generator->addSyncImage (
+        //     _ptr_depth_stencil_image,
+        //     VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        //     VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT , ptr_gbuffer_generator->srcStage()
+        // );
 
         return ptr_gbuffer_generator;
     }

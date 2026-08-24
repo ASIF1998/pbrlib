@@ -125,6 +125,11 @@ namespace pbrlib::backend
         return nullptr;
     }
 
+    vk::DescriptorGroup* BilateralBlur::resultDescriptorGroup() noexcept
+    {
+        return nullptr;
+    }
+
     BilateralBlur::Settings& BilateralBlur::settings() noexcept
     {
         return _settings;

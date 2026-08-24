@@ -55,7 +55,7 @@ namespace pbrlib::backend
         public RenderPass,
         public pbrlib::EventSystem
     {
-        void createResultDescriptorSet();
+        // void createResultDescriptorSet();
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
 
@@ -75,7 +75,10 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        const vk::DescriptorGroup* resultDescriptorGroup() const  noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
+
+        void sync(Transition& transition) override;
 
     public:
         explicit GBufferGenerator(vk::Device& device);

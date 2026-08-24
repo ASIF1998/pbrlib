@@ -122,4 +122,9 @@ namespace pbrlib::backend
     {
         return nullptr;
     }
+
+    vk::DescriptorGroup* FXAA::resultDescriptorGroup() noexcept
+    {
+        return nullptr;
+    }
 }

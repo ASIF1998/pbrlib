@@ -125,6 +125,7 @@ namespace pbrlib::backend::vk
             VkFence                 fence_handle
         );
 
+        /// @todo move to descriptor group
         void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
         void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;
 
