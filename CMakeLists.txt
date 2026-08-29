@@ -187,6 +187,7 @@ target_include_directories(pbrlib PUBLIC third_party/stb)
 #####################################################
 #   glslang
 #####################################################
+set(ENABLE_HLSL OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/glslang)
 
 #####################################################
@@ -235,6 +236,36 @@ if (PBRLIB_BUILD_SAMPLES)
 endif()
 
 #####################################################
+#   slang
+#####################################################
+set(SLANG_LIB_TYPE STATIC CACHE STRING "" FORCE)
+set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_GFX OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGD OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGC OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGRT OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANG_RHI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANG_PROXY OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_DXIL OFF CACHE BOOL "" FORCE)
+set(SLANG_SLANG_LLVM_FLAVOR DISABLE CACHE STRING "" FORCE)
+set(SLANG_ENABLE_SLANG_GLSLANG OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_MINIZ OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_LZ4 OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_GLSLANG OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_VULKAN_HEADERS OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_SPIRV_TOOLS OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_SPIRV_HEADERS OFF CACHE BOOL "" FORCE)
+
+set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/slang/external/spirv-headers/include)
+
+add_subdirectory(third_party/slang)
+
+#####################################################
 #   add libs
 #####################################################
 target_link_libraries(pbrlib PUBLIC
@@ -245,6 +276,7 @@ target_link_libraries(pbrlib PUBLIC
     SPIRV
     SPIRV-Headers
     glslang-default-resource-limits
+    slang
     assimp
     EnTT::EnTT
     spdlog::spdlog
