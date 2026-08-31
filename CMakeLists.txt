@@ -268,6 +268,10 @@ set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/slang/external/spirv-headers/include)
 
+if(APPLE)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/slang/generators/${CMAKE_BUILD_TYPE}")
+endif()
+
 add_subdirectory(third_party/slang)
 
 #####################################################
