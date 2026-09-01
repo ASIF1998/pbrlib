@@ -15,7 +15,7 @@
 #include <backend/profiling.hpp>
 #include <backend/utils/align_size.hpp>
 #include <backend/logger/logger.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
 #include <backend/scene/assimp_importer.hpp>
 
 #include <pbrlib/input/input_stay.hpp>

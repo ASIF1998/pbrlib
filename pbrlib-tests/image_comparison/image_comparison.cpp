@@ -9,7 +9,7 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
 
 #include <backend/utils/paths.hpp>
 #include <backend/renderer/vulkan/check.hpp>

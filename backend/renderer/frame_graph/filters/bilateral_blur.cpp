@@ -5,7 +5,7 @@
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>

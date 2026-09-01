@@ -1,6 +1,5 @@
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
 #include <backend/renderer/vulkan/render_pass.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>

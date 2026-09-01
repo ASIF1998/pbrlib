@@ -7,8 +7,6 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/config.hpp>
 
-#include <backend/renderer/vulkan/shader_compiler.hpp>
-
 #include <backend/renderer/vulkan/buffer.hpp>
 
 #include <backend/renderer/vulkan/sync.hpp>

@@ -12,7 +12,6 @@ set(PBRLIB_BACKEND_VULKAN_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/command_buffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/image.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/framebuffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sync.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pixel_format.cpp
@@ -35,9 +34,10 @@ set(PBRLIB_BACKEND_VULKAN_H
     ${CMAKE_CURRENT_SOURCE_DIR}/unique_handler.inl
     ${CMAKE_CURRENT_SOURCE_DIR}/command_buffer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/image.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sync.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pixel_format.hpp
     CACHE INTERNAL ""
 )
+
+add_subdirectory(shader_copilers)
