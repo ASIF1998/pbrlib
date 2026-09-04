@@ -126,5 +126,9 @@ TEST_F(GlslCompilerTests, FileNotFound)
 
 TEST_F(SlangCompileTests, CompileShader)
 {
+    const std::vector<backend::vk::shader::Define> defines;
 
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.comp", "pbrlib-tests/references/shaders/simple_shader.slang.comp.spv", defines);
+    });
 }

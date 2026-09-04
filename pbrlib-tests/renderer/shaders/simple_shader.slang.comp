@@ -1,0 +1,11 @@
+StructuredBuffer<float>     buffer_0;
+StructuredBuffer<float>     buffer_1;
+RWStructuredBuffer<float>   result;
+
+[shader("compute")]
+[numthreads(16, 16, 1)]
+void compute_main(uint3 thread_id: SV_DispatchThreadID)
+{
+    uint index = thread_id.x;
+    result[index] = buffer_0[index] + buffer_1[index];
+}
