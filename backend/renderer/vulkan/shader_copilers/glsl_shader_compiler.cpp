@@ -1,4 +1,6 @@
 #include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_copilers/shader_compiler.hpp>
+
 #include <backend/renderer/vulkan/check.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
@@ -12,6 +14,7 @@
 
 #include <fstream>
 #include <map>
+#include <span>
 
 #define CHECK(fn, log_fn, log_fn_arg)                                                               \
     do                                                                                              \
@@ -150,9 +153,9 @@ namespace pbrlib::backend::vk::shader::utils
     }
 }
 
-namespace pbrlib::backend::vk::shader
+namespace pbrlib::backend::vk::shader::glsl
 {
-    void processDefines(std::string& code, const Defines& defines)
+    void processDefines(std::string& code, std::span<const Define> defines)
     {
         std::string str_defines;
 
@@ -170,7 +173,7 @@ namespace pbrlib::backend::vk::shader
             code.insert(0, str_defines);
     }
 
-    std::vector<uint32_t> createIL(const std::filesystem::path& filename, const Defines& defines)
+    std::vector<uint32_t> createIL(const std::filesystem::path& filename, std::span<const Define>& defines)
     {
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
@@ -228,13 +231,23 @@ namespace pbrlib::backend::vk::shader
         return il;
     }
 
-    VkShaderModule compile(const Device& device, const std::filesystem::path& filename, const Defines& defines)
+    void dumpShader(std::span<const uint32_t> spv, const std::filesystem::path& filename)
+    {
+        std::ofstream file (filename, std::ios::binary);
+        if (file) [[likely]]
+            file.write(reinterpret_cast<const char*>(spv.data()), spv.size_bytes());
+    }
+
+    VkShaderModule compile(const Device& device, const std::filesystem::path& filename, std::span<const Define> defines, bool dump)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         backend::log::info("[shader-compiler] compile shader: {}", filename.filename().string());
 
-        auto il = createIL(backend::utils::projectRoot() / "backend" / filename, defines);
+        auto il = createIL(filename, defines);
+
+        if (dump) [[unlikely]]
+            dumpShader(std::span(il), std::filesystem::path(filename) += ".spv");
 
         VkShaderModule shader_module_handle = VK_NULL_HANDLE;
 
@@ -256,21 +269,7 @@ namespace pbrlib::backend::vk::shader
     }
 }
 
-namespace pbrlib::backend::vk::shader
-{
-    std::span<const VkSpecializationMapEntry> SpecializationInfoBase::entries() const noexcept
-    {
-        return _entries;
-    }
-
-    SpecializationInfoBase& SpecializationInfoBase::addEntry(uint32_t constant_id, uint32_t offset, size_t size)
-    {
-        _entries.emplace_back(constant_id, offset, size);
-        return *this;
-    }
-}
-
-namespace pbrlib::backend::vk::shader
+namespace pbrlib::backend::vk::shader::glsl
 {
     bool is_init = false;
 

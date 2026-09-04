@@ -5,7 +5,7 @@
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
-#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
+
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <backend/utils/align_size.hpp>
@@ -15,6 +15,8 @@
 
 #include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
+
+#include <backend/utils/private/info.hpp>
 
 namespace pbrlib::backend
 {
@@ -61,7 +63,7 @@ namespace pbrlib::backend
 
     bool BilateralBlur::createPipeline()
     {
-        constexpr auto blur_shader = "shaders/bilateral_blur.glsl.comp";
+        const auto blur_shader = PBRLIB_ABS_PATH("backend/shaders/bilateral_blur.glsl.comp");
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(blur_shader)

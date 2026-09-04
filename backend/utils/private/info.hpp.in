@@ -23,3 +23,5 @@ namespace pbrlib::backend::priv
 {
     const std::filesystem::path PathToRoot = "@PBRLIB_PATH_TO_ROOT@";
 }
+
+#define PBRLIB_ABS_PATH(filename) pbrlib::backend::priv::PathToRoot / filename

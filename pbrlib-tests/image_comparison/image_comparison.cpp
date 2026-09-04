@@ -9,7 +9,6 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
-#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
 
 #include <backend/utils/paths.hpp>
 #include <backend/renderer/vulkan/check.hpp>
@@ -37,7 +36,7 @@ namespace pbrlib::math
         {
             return value;
         }
-        
+
         [[nodiscard]] Scalar operator - (const Scalar& v)  const noexcept
         {
             return Scalar(value - v.value);
@@ -138,12 +137,12 @@ namespace pbrlib::testing
                 }
 
                 const auto mse = total_sq_error * (ChannelType(1.0) / static_cast<ChannelType>(valid_pixel_count));
-                
+
                 const auto max_i = max_value - min_value;
 
                 constexpr auto eps              = 2.2204460492503131e-16;
                 constexpr auto psnr_threshold   = 45.0;
-                
+
                 for (const auto i: std::views::iota(0u, PixelType::element_count))
                 {
                     auto psnr_value = 100.0;
@@ -153,7 +152,7 @@ namespace pbrlib::testing
                     if (psnr_value < psnr_threshold)
                         all_channels_passed = false;
                 }
-            }); 
+            });
         });
 
         return all_channels_passed;
@@ -225,7 +224,7 @@ namespace pbrlib::testing
 
         const VkDeviceSize group_count_x        = image_1.width / _device.workGroupSize();
         const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
-        const VkDeviceSize group_errors_count   = group_count_x * group_count_y; 
+        const VkDeviceSize group_errors_count   = group_count_x * group_count_y;
 
         _device.writeDescriptorSet ({
             .view_handle            = image_1.view_handle,
@@ -297,7 +296,7 @@ namespace pbrlib::testing
 
         if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
             return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
-        
+
         if (rendered_image.format == VK_FORMAT_R16G16B16A16_SFLOAT)
             return psnr<math::half4>(rendered_image, reference_image);
 

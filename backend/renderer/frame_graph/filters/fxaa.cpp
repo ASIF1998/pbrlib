@@ -15,6 +15,8 @@
 
 #include <backend/logger/logger.hpp>
 
+#include <backend/utils/private/info.hpp>
+
 #include <pbrlib/math/lerp.hpp>
 
 namespace pbrlib::backend
@@ -72,7 +74,7 @@ namespace pbrlib::backend
     {
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .pipelineLayoutHandle(_pipeline_layout_handle)
-            .shader("shaders/fxaa.glsl.comp")
+            .shader(PBRLIB_ABS_PATH("backend/shaders/fxaa.glsl.comp"))
             .build();
 
         _pipeline_handle = std::move(new_pipeline);

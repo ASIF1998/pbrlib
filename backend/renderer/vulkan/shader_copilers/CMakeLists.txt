@@ -2,10 +2,14 @@ cmake_minimum_required(VERSION 3.27)
 
 set(PBRLIB_BACKEND_VULKAN_SHADER_COPILERS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/glsl_shader_compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/slang_shader_compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.cpp
     CACHE INTERNAL ""
 )
 
 set(PBRLIB_BACKEND_VULKAN_SHADER_COPILERS_H
     ${CMAKE_CURRENT_SOURCE_DIR}/glsl_shader_compiler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/slang_shader_compiler.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler.hpp
     CACHE INTERNAL ""
 )

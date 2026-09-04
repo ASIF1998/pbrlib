@@ -1,4 +1,5 @@
 #include "render_test.hpp"
+#include <backend/utils/paths.hpp>
 
 namespace pbrlib::testing
 {

@@ -13,15 +13,11 @@ namespace pbrlib::backend::vk
     class Device;
 }
 
-namespace pbrlib::backend::vk::shader::glsl
+namespace pbrlib::backend::vk::shader::slang
 {
-    void initCompiler();
-    void finalizeCompiler();
-
-    [[nodiscard]]
-    VkShaderModule compile(
-        const Device&                   device,
-        const std::filesystem::path&    filename,
+    [[nodiscard]] VkShaderModule compile(
+        Device&                         device, 
+        const std::filesystem::path&    filename, 
         std::span<const Define>         defines,
         bool                            dump = false
     );

@@ -124,8 +124,8 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        constexpr auto vert_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.vert";
-        constexpr auto frag_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.frag";
+        const auto vert_shader = PBRLIB_ABS_PATH("backend/shaders/gbuffer_generator/gbuffer_generator.glsl.vert");
+        const auto frag_shader = PBRLIB_ABS_PATH("backend/shaders/gbuffer_generator/gbuffer_generator.glsl.frag");
 
         auto new_pipeline = vk::builders::GraphicsPipeline(device())
             .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)

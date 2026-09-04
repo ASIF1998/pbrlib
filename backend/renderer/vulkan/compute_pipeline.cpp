@@ -1,6 +1,8 @@
 #include <backend/renderer/vulkan/compute_pipeline.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
+#include <backend/renderer/vulkan/shader_copilers/shader_compiler.hpp>
+
 #include <backend/renderer/vulkan/check.hpp>
 
 #include <pbrlib/exceptions.hpp>
