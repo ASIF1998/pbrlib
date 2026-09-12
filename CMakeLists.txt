@@ -274,6 +274,15 @@ if(APPLE)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/slang/generators/${CMAKE_BUILD_TYPE}")
 endif()
 
+# fix: copy slang's runtime dll next to executables so windows can locate it at runtime
+if (WIN32)
+    add_custom_command(TARGET pbrlib POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:slang>
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+    )
+endif()
+
 add_subdirectory(third_party/slang)
 
 #####################################################
