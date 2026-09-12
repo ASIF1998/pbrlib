@@ -1,5 +1,5 @@
-#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
-#include <backend/renderer/vulkan/shader_copilers/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/glsl_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/utils.hpp>
 
 #include <backend/renderer/vulkan/check.hpp>
 #include <backend/renderer/vulkan/device.hpp>
@@ -46,22 +46,6 @@ namespace pbrlib::backend::vk::shader::utils
     };
 
     std::map<std::string, IncludeProcessData> includes_data;
-
-    static std::string getSource(const std::filesystem::path& filename)
-    {
-        if (!std::filesystem::exists(filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[shader-compiler] not find file: {}", filename.string()));
-
-        std::ifstream file(filename);
-
-        if (!file) [[unlikely]]
-            throw exception::FileOpen(std::format("[shader-compiler] {}", filename.string()));
-
-        std::ostringstream contents;
-        contents << file.rdbuf();
-
-        return contents.str();
-    }
 
     static glslang_stage_t getStage(const std::filesystem::path& filename)
     {

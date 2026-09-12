@@ -1,6 +1,6 @@
-#include <backend/renderer/vulkan/shader_copilers/shader_compiler.hpp>
-#include <backend/renderer/vulkan/shader_copilers/glsl_shader_compiler.hpp>
-#include <backend/renderer/vulkan/shader_copilers/slang_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/glsl_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/slang_shader_compiler.hpp>
 
 namespace pbrlib::backend::vk::shader
 {

@@ -40,4 +40,4 @@ set(PBRLIB_BACKEND_VULKAN_H
     CACHE INTERNAL ""
 )
 
-add_subdirectory(shader_copilers)
+add_subdirectory(shader_compilers)

@@ -1,6 +1,6 @@
 #include "../utils.hpp"
 
-#include <backend/renderer/vulkan/shader_copilers/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 
 #include <backend/renderer/vulkan/device.hpp>
 
@@ -54,7 +54,11 @@ public:
         return std::nullopt;
     }
 
-    void compareShaders(const std::filesystem::path& shader_name, const std::filesystem::path& reference_compiled_shader, const std::vector<backend::vk::shader::Define>& defines)
+    void compareShaders(
+        const std::filesystem::path&                    shader_name, 
+        const std::filesystem::path&                    reference_compiled_shader, 
+        const std::vector<backend::vk::shader::Define>& defines
+    )
     {
         const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), defines, true);
 
@@ -65,8 +69,8 @@ public:
 
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";
 
-        const auto compiled_shader_binary = getFileSource(compiled_shader_binary_filename);
-        const auto reference_shader_binary = getFileSource(PBRLIB_ABS_PATH(reference_compiled_shader));
+        const auto compiled_shader_binary   = getFileSource(compiled_shader_binary_filename);
+        const auto reference_shader_binary  = getFileSource(PBRLIB_ABS_PATH(reference_compiled_shader));
         if (compiled_shader_binary && reference_shader_binary) [[likely]]
         {
             pbrlib::testing::equality(compiled_shader_binary->size(), reference_shader_binary->size());
