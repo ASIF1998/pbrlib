@@ -55,8 +55,8 @@ public:
     }
 
     void compareShaders(
-        const std::filesystem::path&                    shader_name, 
-        const std::filesystem::path&                    reference_compiled_shader, 
+        const std::filesystem::path&                    shader_name,
+        const std::filesystem::path&                    reference_compiled_shader,
         const std::vector<backend::vk::shader::Define>& defines
     )
     {
@@ -75,9 +75,9 @@ public:
         {
             pbrlib::testing::equality(compiled_shader_binary->size(), reference_shader_binary->size());
 
-            const auto ptr_data_1 = compiled_shader_binary->data();
-            const auto ptr_data_2 = reference_shader_binary->data();
-            const auto size = reference_shader_binary->size();
+            const auto ptr_data_1   = compiled_shader_binary->data();
+            const auto ptr_data_2   = reference_shader_binary->data();
+            const auto size         = reference_shader_binary->size();
 
             constexpr int memcpy_success_code = 0;
             pbrlib::testing::equality(std::memcmp(ptr_data_1, ptr_data_2, size), memcpy_success_code);

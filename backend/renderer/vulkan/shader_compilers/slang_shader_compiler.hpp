@@ -16,8 +16,8 @@ namespace pbrlib::backend::vk
 namespace pbrlib::backend::vk::shader::slang
 {
     [[nodiscard]] VkShaderModule compile(
-        Device&                         device, 
-        const std::filesystem::path&    filename, 
+        Device&                         device,
+        const std::filesystem::path&    filename,
         std::span<const Define>         defines,
         bool                            dump = false
     );
