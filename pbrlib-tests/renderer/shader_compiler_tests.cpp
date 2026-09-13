@@ -60,7 +60,7 @@ public:
         const std::vector<backend::vk::shader::Define>& defines
     )
     {
-        const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), defines, true);
+        const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), root_directory, defines, true);
 
         const ScopeExit scope_destroy_shader_module([this, shader_module]
         {
@@ -93,7 +93,11 @@ public:
     }
 
     std::optional<vk::Device> device;
+
+    static const std::filesystem::path root_directory;
 };
+
+const std::filesystem::path ShaderCompiler::root_directory = PBRLIB_ABS_PATH("pbrlib-tests/renderer/shaders");
 
 class GlslCompilerTests : public ShaderCompiler
 { };
@@ -115,7 +119,8 @@ TEST_F(GlslCompilerTests, CompileInvalidShader)
     const std::vector<backend::vk::shader::Define> defines;
 
     EXPECT_THROW({
-        const auto shader_handle = vk::shader::compile(*device, PBRLIB_ABS_PATH("pbrlib-tests/renderer/shaders/invalid_shader.glsl.comp"), defines);
+        const auto shader_name = root_directory / "invalid_shader.glsl.comp";
+        const auto shader_handle = vk::shader::compile(*device, shader_name, root_directory, defines);
     }, exception::RuntimeError);
 }
 
@@ -124,7 +129,8 @@ TEST_F(GlslCompilerTests, FileNotFound)
     const std::vector<backend::vk::shader::Define> defines;
 
     EXPECT_THROW({
-        const auto shader_handle = vk::shader::compile(*device, PBRLIB_ABS_PATH("pbrlib-tests/renderer/shaders/non_existent_shader.glsl.comp"), defines);
+        const auto shader_name      = root_directory / "non_existent_shader.glsl.comp";
+        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, defines);
     }, exception::InvalidState);
 }
 

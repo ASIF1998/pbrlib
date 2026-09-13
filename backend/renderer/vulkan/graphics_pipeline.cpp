@@ -1,8 +1,8 @@
 #include <backend/renderer/vulkan/device.hpp>
-
 #include <backend/renderer/vulkan/graphics_pipeline.hpp>
-
 #include <backend/renderer/vulkan/check.hpp>
+
+#include <backend/utils/paths.hpp>
 
 #include <pbrlib/exceptions.hpp>
 
@@ -109,11 +109,13 @@ namespace pbrlib::backend::vk::builders
 
     GraphicsPipeline& GraphicsPipeline::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info)
     {
+        const auto root_directory = PBRLIB_ABS_PATH("backend/shaders");
+
         VkPipelineShaderStageCreateInfo pipeline_stage =
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
-            .module = shader::compile(_device, shader, _defines),
+            .module = shader::compile(_device, shader, root_directory, _defines),
             .pName  = "main"
         };
 

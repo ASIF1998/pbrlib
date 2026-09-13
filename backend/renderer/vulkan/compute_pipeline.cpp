@@ -5,6 +5,8 @@
 
 #include <backend/renderer/vulkan/check.hpp>
 
+#include <backend/utils/paths.hpp>
+
 #include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::backend::vk::builders
@@ -52,11 +54,13 @@ namespace pbrlib::backend::vk::builders
         if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
 
+        const auto root_directory = PBRLIB_ABS_PATH("backend/shaders");
+
         const VkPipelineShaderStageCreateInfo stage
         {
             .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
-            .module                 = shader::compile(_device, _shader_name, _defines),
+            .module                 = shader::compile(_device, _shader_name, root_directory, _defines),
             .pName                  = "main",
             .pSpecializationInfo    = &_specialization_info
         };

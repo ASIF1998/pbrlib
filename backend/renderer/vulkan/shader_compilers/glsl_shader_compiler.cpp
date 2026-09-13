@@ -12,9 +12,7 @@
 
 #include <glslang/Public/resource_limits_c.h>
 
-#include <fstream>
 #include <map>
-#include <span>
 
 #define CHECK(fn, log_fn, log_fn_arg)                                                               \
     do                                                                                              \
@@ -80,10 +78,10 @@ namespace pbrlib::backend::vk::shader::utils
     }
 
     static glsl_include_result_t* localInclude (
-        void*       ctx,
-        const char* header_name,
-        const char* includer_name,
-        size_t      include_depth
+        [[maybe_unused]] void*       ptr_ctx,
+        [[maybe_unused]] const char* header_name,
+        [[maybe_unused]] const char* includer_name,
+        [[maybe_unused]] size_t      include_depth
     )
     {
         backend::log::error("[shader-compiler] don't process local include files");
@@ -91,10 +89,10 @@ namespace pbrlib::backend::vk::shader::utils
     }
 
     static glsl_include_result_t* systemInclude (
-        void*       ctx,
-        const char* header_name,
-        const char* includer_name,
-        size_t      include_depth
+        void*                           ptr_ctx,
+        const char*                     header_name,
+        [[maybe_unused]] const char*    includer_name,
+        [[maybe_unused]] size_t         include_depth
     )
     {
         if (!header_name) [[unlikely]]
@@ -103,10 +101,10 @@ namespace pbrlib::backend::vk::shader::utils
         if (auto return_value = includes_data.find(header_name); return_value != std::end(includes_data))
             return return_value->second.ptr_include_result.get();
 
-        static const auto src_root_directory = pbrlib::backend::utils::projectRoot() / "backend/shaders";
+        auto ptr_root_directory = reinterpret_cast<const std::filesystem::path*>(ptr_ctx);
 
         std::string key     = header_name;
-        std::string code    = getSource(src_root_directory / header_name);
+        std::string code    = getSource(*ptr_root_directory / header_name);
 
         auto ptr_include_data = std::make_unique<glsl_include_result_t>();
 
@@ -125,7 +123,7 @@ namespace pbrlib::backend::vk::shader::utils
         return iter->second.ptr_include_result.get();
     }
 
-    static int freeInclude(void* ctx, glsl_include_result_t* ptr_result)
+    static int freeInclude([[maybe_unused]] void* ptr_ctx, glsl_include_result_t* ptr_result)
     {
         if (ptr_result) [[likely]]
         {
@@ -157,7 +155,7 @@ namespace pbrlib::backend::vk::shader::glsl
             code.insert(0, str_defines);
     }
 
-    std::vector<uint32_t> createIL(const std::filesystem::path& filename, std::span<const Define>& defines)
+    std::vector<uint32_t> createIL(const std::filesystem::path& filename, std::filesystem::path root_directory, std::span<const Define>& defines)
     {
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
@@ -187,7 +185,8 @@ namespace pbrlib::backend::vk::shader::glsl
             .forward_compatible                 = false,
             .messages                           = GLSLANG_MSG_DEFAULT_BIT,
             .resource                           = glslang_default_resource(),
-            .callbacks                          = includer
+            .callbacks                          = includer,
+            .callbacks_ctx                      = &root_directory
         };
 
         auto ptr_shader = glslang_shader_create(&input);
@@ -222,13 +221,19 @@ namespace pbrlib::backend::vk::shader::glsl
             file.write(reinterpret_cast<const char*>(spv.data()), spv.size_bytes());
     }
 
-    VkShaderModule compile(const Device& device, const std::filesystem::path& filename, std::span<const Define> defines, bool dump)
+    VkShaderModule compile(
+        const Device&                   device,
+        const std::filesystem::path&    filename,
+        const std::filesystem::path&    root_directory,
+        std::span<const Define>         defines,
+        bool                            dump
+    )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
         backend::log::info("[shader-compiler] compile shader: {}", filename.filename().string());
 
-        auto il = createIL(filename, defines);
+        auto il = createIL(filename, root_directory, defines);
 
         if (dump) [[unlikely]]
             dumpShader(std::span(il), std::filesystem::path(filename) += ".spv");

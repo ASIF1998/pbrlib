@@ -21,14 +21,15 @@ namespace pbrlib::backend::vk::shader
     VkShaderModule compile(
         Device&                         device,
         const std::filesystem::path&    filename,
+        const std::filesystem::path&    root_directory,
         std::span<const Define>         defines,
         bool                            dump
     )
     {
         if (const auto path_to_file = filename.string(); path_to_file.contains("glsl"))
-            return glsl::compile(device, filename, defines, dump);
+            return glsl::compile(device, filename, root_directory, defines, dump);
 
-        return slang::compile(device, filename, defines, dump);
+        return slang::compile(device, filename, root_directory, defines, dump);
     }
 
     void initCompiler()
