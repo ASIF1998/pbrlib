@@ -12,6 +12,8 @@
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
 
+#include <array>
+
 namespace pbrlib::backend::vk::shader::slang
 {
     VkShaderModule createShaderModule(Device& device, std::span<const uint8_t> spv)

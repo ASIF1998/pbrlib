@@ -26,7 +26,7 @@ namespace pbrlib::backend::vk::shader
         bool                            dump
     )
     {
-        if (const auto path_to_file = filename.string(); path_to_file.contains("glsl"))
+        if (const auto path_to_file = filename.string(); path_to_file.contains(".glsl"))
             return glsl::compile(device, filename, root_directory, defines, dump);
 
         return slang::compile(device, filename, root_directory, defines, dump);

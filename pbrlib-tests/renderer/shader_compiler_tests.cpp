@@ -102,7 +102,7 @@ const std::filesystem::path ShaderCompiler::root_directory = PBRLIB_ABS_PATH("pb
 class GlslCompilerTests : public ShaderCompiler
 { };
 
-class SlangCompileTests : public ShaderCompiler
+class SlangCompilerTests : public ShaderCompiler
 { };
 
 TEST_F(GlslCompilerTests, CompileComputeShader)
@@ -156,11 +156,29 @@ TEST_F(GlslCompilerTests, FileNotFound)
     }, exception::InvalidState);
 }
 
-TEST_F(SlangCompileTests, CompileShader)
+TEST_F(SlangCompilerTests, CompileComputeShader)
 {
     const std::vector<backend::vk::shader::Define> defines;
 
     EXPECT_NO_THROW({
         compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.comp", "pbrlib-tests/references/shaders/simple_shader.slang.comp.spv", defines);
+    });
+}
+
+TEST_F(SlangCompilerTests, CompileVertexShader)
+{
+    const std::vector<backend::vk::shader::Define> defines;
+
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.vert", "pbrlib-tests/references/shaders/simple_shader.slang.vert.spv", defines);
+    });
+}
+
+TEST_F(SlangCompilerTests, CompileFragmentShader)
+{
+    const std::vector<backend::vk::shader::Define> defines;
+
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.frag", "pbrlib-tests/references/shaders/simple_shader.slang.frag.spv", defines);
     });
 }
