@@ -83,7 +83,7 @@ namespace pbrlib::backend::vk::shader::slang
     Slang::ComPtr<::slang::IEntryPoint> createEntryPoint(::slang::IModule* ptr_module, const std::filesystem::path& filename)
     {
         Slang::ComPtr<::slang::IEntryPoint> ptr_entry_point;
-        ptr_module->findEntryPointByName("compute_main", ptr_entry_point.writeRef());
+        ptr_module->findEntryPointByName("main", ptr_entry_point.writeRef());
 
         if (!ptr_entry_point) [[unlikely]]
             throw exception::RuntimeError(std::format("[slang-shader-compiler] failed find entry point: {}", filename.string()));

@@ -17,7 +17,7 @@
 #define CHECK(fn, log_fn, log_fn_arg)                                                               \
     do                                                                                              \
     {                                                                                               \
-        if(!fn)                                                                                     \
+        if (!fn) [[unlikely]]                                                                       \
             throw exception::RuntimeError(std::format("[shader-compiler] {}", log_fn(log_fn_arg))); \
     } while (false)
 

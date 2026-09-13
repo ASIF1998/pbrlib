@@ -27,8 +27,8 @@ namespace pbrlib::backend::vk::shader
         SpecializationInfoBase& operator = (SpecializationInfoBase&& specialization_info)       = delete;
         SpecializationInfoBase& operator = (const SpecializationInfoBase& specialization_info)  = delete;
 
-        virtual std::span<const uint8_t>            data()      const noexcept = 0;
-        std::span<const VkSpecializationMapEntry>   entries()   const noexcept;
+        [[nodiscard]] virtual std::span<const uint8_t>          data()      const noexcept = 0;
+        [[nodiscard]] std::span<const VkSpecializationMapEntry> entries()   const noexcept;
 
         SpecializationInfoBase& addEntry(uint32_t constant_id, uint32_t offset, size_t size);
 
@@ -45,7 +45,7 @@ namespace pbrlib::backend::vk::shader
             _data(data)
         { }
 
-        std::span<const uint8_t> data() const noexcept override
+        [[nodiscard]] std::span<const uint8_t> data() const noexcept override
         {
             return std::span(reinterpret_cast<const uint8_t*>(&_data), sizeof(T));
         }
