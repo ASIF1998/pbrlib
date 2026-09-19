@@ -204,3 +204,19 @@ TEST_F(SlangCompilerTests, IncludeModule)
         compareShaders("pbrlib-tests/renderer/shaders/module_test.slang.comp", "pbrlib-tests/references/shaders/module_test.slang.comp.spv", defines);
     });
 }
+
+TEST_F(SlangCompilerTests, Defines)
+{
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/define_test.slang.comp", "pbrlib-tests/references/shaders/test_without_define.slang.comp.spv", {});
+    });
+
+    EXPECT_NO_THROW({
+        const std::vector define
+        {
+            backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
+        };
+
+        compareShaders("pbrlib-tests/renderer/shaders/define_test.slang.comp", "pbrlib-tests/references/shaders/test_with_define.slang.comp.spv", define);
+    });
+}

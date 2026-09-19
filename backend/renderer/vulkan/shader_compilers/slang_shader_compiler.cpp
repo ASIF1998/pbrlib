@@ -137,6 +137,19 @@ namespace pbrlib::backend::vk::shader::slang
         return ptr_spirv_code;
     }
 
+    std::vector<::slang::PreprocessorMacroDesc> castToSlangDefines(const std::span<const Define> defines)
+    {
+        std::vector<::slang::PreprocessorMacroDesc> slang_defines;
+        if (!defines.empty())
+        {
+            slang_defines.reserve(defines.size());
+            for (const auto& [name, value]: defines)
+                slang_defines.emplace_back(name.c_str(), value.c_str());
+        }
+
+        return slang_defines;
+    }
+
     VkShaderModule compile(
         Device&                         device,
         const std::filesystem::path&    filename,
@@ -169,13 +182,7 @@ namespace pbrlib::backend::vk::shader::slang
             )
         };
 
-#if 0
-        std::array macros
-        {
-            ::slang::PreprocessorMacroDesc("BIAS_VALUE", "1138"),
-            ::slang::PreprocessorMacroDesc("OTHER_MACRO", "float")
-        };
-#endif
+        const auto slang_defines = castToSlangDefines(defines);
 
         const auto search_path      = root_directory.string();
         const auto ptr_search_path  = search_path.c_str();
@@ -187,11 +194,9 @@ namespace pbrlib::backend::vk::shader::slang
             .compilerOptionEntries      = options.data(),
             .compilerOptionEntryCount   = static_cast<uint32_t>(options.size()),
             .searchPaths                = &ptr_search_path,
-            .searchPathCount = 1
-#if 0
-            .preprocessorMacros         = macros.data(),
-            .preprocessorMacroCount     = static_cast<SlangInt>(macros.size())
-#endif
+            .searchPathCount            = 1,
+            .preprocessorMacros         = slang_defines.data(),
+            .preprocessorMacroCount     = static_cast<SlangInt>(slang_defines.size())
         };
 
         Slang::ComPtr<::slang::ISession> ptr_session;
