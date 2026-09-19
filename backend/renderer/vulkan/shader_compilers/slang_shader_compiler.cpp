@@ -191,12 +191,12 @@ namespace pbrlib::backend::vk::shader::slang
         {
             .targets                    = &target_desc,
             .targetCount                = 1,
-            .compilerOptionEntries      = options.data(),
-            .compilerOptionEntryCount   = static_cast<uint32_t>(options.size()),
             .searchPaths                = &ptr_search_path,
             .searchPathCount            = 1,
             .preprocessorMacros         = slang_defines.data(),
-            .preprocessorMacroCount     = static_cast<SlangInt>(slang_defines.size())
+            .preprocessorMacroCount     = static_cast<SlangInt>(slang_defines.size()),
+            .compilerOptionEntries      = options.data(),
+            .compilerOptionEntryCount   = static_cast<uint32_t>(options.size())
         };
 
         Slang::ComPtr<::slang::ISession> ptr_session;

@@ -160,37 +160,29 @@ TEST_F(GlslCompilerTests, Defines)
 
 TEST_F(SlangCompilerTests, CompileComputeShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.comp", "pbrlib-tests/references/shaders/simple_shader.slang.comp.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.comp", "pbrlib-tests/references/shaders/simple_shader.slang.comp.spv", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileVertexShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.vert", "pbrlib-tests/references/shaders/simple_shader.slang.vert.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.vert", "pbrlib-tests/references/shaders/simple_shader.slang.vert.spv", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileFragmentShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.frag", "pbrlib-tests/references/shaders/simple_shader.slang.frag.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.frag", "pbrlib-tests/references/shaders/simple_shader.slang.frag.spv", {});
     });
 }
 
 TEST_F(SlangCompilerTests, IncludeModule)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/module_test.slang.comp", "pbrlib-tests/references/shaders/module_test.slang.comp.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/module_test.slang.comp", "pbrlib-tests/references/shaders/module_test.slang.comp.spv", {});
     });
 }
 
