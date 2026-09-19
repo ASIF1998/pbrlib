@@ -107,38 +107,30 @@ class SlangCompilerTests : public ShaderCompiler
 
 TEST_F(GlslCompilerTests, CompileComputeShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.comp", "pbrlib-tests/references/shaders/simple_shader.glsl.comp.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.comp", "pbrlib-tests/references/shaders/simple_shader.glsl.comp.spv", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileVertexShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.vert", "pbrlib-tests/references/shaders/simple_shader.glsl.vert.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.vert", "pbrlib-tests/references/shaders/simple_shader.glsl.vert.spv", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileFragmentShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.frag", "pbrlib-tests/references/shaders/simple_shader.glsl.frag.spv", defines);
+        compareShaders("pbrlib-tests/renderer/shaders/simple_shader.glsl.frag", "pbrlib-tests/references/shaders/simple_shader.glsl.frag.spv", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileInvalidShader)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_THROW({
         const auto shader_name      = root_directory / "invalid_shader.glsl.comp";
-        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, defines);
+        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, {});
 
         vkDestroyShaderModule(device->device(), shader_handle, nullptr);
     }, exception::RuntimeError);
@@ -146,11 +138,9 @@ TEST_F(GlslCompilerTests, CompileInvalidShader)
 
 TEST_F(GlslCompilerTests, FileNotFound)
 {
-    const std::vector<backend::vk::shader::Define> defines;
-
     EXPECT_THROW({
         const auto shader_name      = root_directory / "non_existent_shader.glsl.comp";
-        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, defines);
+        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, {});
 
         vkDestroyShaderModule(device->device(), shader_handle, nullptr);
     }, exception::InvalidState);
@@ -158,10 +148,24 @@ TEST_F(GlslCompilerTests, FileNotFound)
 
 TEST_F(GlslCompilerTests, IncludeDirective)
 {
-    const std::vector<backend::vk::shader::Define> defines;
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/include_test.glsl.comp", "pbrlib-tests/references/shaders/include_test.glsl.comp.spv", {});
+    });
+}
+
+TEST_F(GlslCompilerTests, Defines)
+{
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/define_test.glsl.comp", "pbrlib-tests/references/shaders/test_without_define.glsl.comp.spv", {});
+    });
 
     EXPECT_NO_THROW({
-        compareShaders("pbrlib-tests/renderer/shaders/include_test.glsl.comp", "pbrlib-tests/references/shaders/include_test.glsl.comp.spv", defines);
+        const std::vector define
+        {
+            backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
+        };
+
+        compareShaders("pbrlib-tests/renderer/shaders/define_test.glsl.comp", "pbrlib-tests/references/shaders/test_with_define.glsl.comp.spv", define);
     });
 }
 
