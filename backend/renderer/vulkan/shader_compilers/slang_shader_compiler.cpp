@@ -177,12 +177,17 @@ namespace pbrlib::backend::vk::shader::slang
         };
 #endif
 
+        const auto search_path      = root_directory.string();
+        const auto ptr_search_path  = search_path.c_str();
+
         const ::slang::SessionDesc session_desc
         {
             .targets                    = &target_desc,
             .targetCount                = 1,
             .compilerOptionEntries      = options.data(),
-            .compilerOptionEntryCount   = static_cast<uint32_t>(options.size())
+            .compilerOptionEntryCount   = static_cast<uint32_t>(options.size()),
+            .searchPaths                = &ptr_search_path,
+            .searchPathCount = 1
 #if 0
             .preprocessorMacros         = macros.data(),
             .preprocessorMacroCount     = static_cast<SlangInt>(macros.size())

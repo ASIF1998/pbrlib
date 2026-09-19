@@ -191,3 +191,12 @@ TEST_F(SlangCompilerTests, CompileFragmentShader)
         compareShaders("pbrlib-tests/renderer/shaders/simple_shader.slang.frag", "pbrlib-tests/references/shaders/simple_shader.slang.frag.spv", defines);
     });
 }
+
+TEST_F(SlangCompilerTests, IncludeModule)
+{
+    const std::vector<backend::vk::shader::Define> defines;
+
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/module_test.slang.comp", "pbrlib-tests/references/shaders/module_test.slang.comp.spv", defines);
+    });
+}
