@@ -89,7 +89,7 @@ namespace pbrlib
         {
             if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) [[unlikely]]
             {
-                std::string error_msg = SDL_GetError();
+                const std::string error_msg = SDL_GetError();
                 SDL_ClearError();
 
                 throw exception::InitializeError(std::format("[window] SDL: {}", error_msg));
@@ -134,7 +134,7 @@ namespace pbrlib
                     .transform(event.transform)
                     .import();
 
-                if (!res)
+                if (!res) [[unlikely]]
                     throw exception::RuntimeError(std::format("[importer] failed load model: {}", event.filename.string()));
             });
         });

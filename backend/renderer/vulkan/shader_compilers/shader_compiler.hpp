@@ -54,7 +54,10 @@ namespace pbrlib::backend::vk::shader
         const T& _data;
     };
 
+    /// @todo rename initCompiler to initCompilers
     void initCompiler();
+
+    /// @todo rename finalizeCompiler to finalizeCompilers
     void finalizeCompiler();
 
     [[nodiscard]] VkShaderModule compile(

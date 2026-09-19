@@ -156,6 +156,15 @@ TEST_F(GlslCompilerTests, FileNotFound)
     }, exception::InvalidState);
 }
 
+TEST_F(GlslCompilerTests, IncludeDirective)
+{
+    const std::vector<backend::vk::shader::Define> defines;
+
+    EXPECT_NO_THROW({
+        compareShaders("pbrlib-tests/renderer/shaders/include_test.glsl.comp", "pbrlib-tests/references/shaders/include_test.glsl.comp.spv", defines);
+    });
+}
+
 TEST_F(SlangCompilerTests, CompileComputeShader)
 {
     const std::vector<backend::vk::shader::Define> defines;
