@@ -109,12 +109,12 @@ namespace pbrlib
 
         on([] ([[maybe_unused]] const backend::events::Initialize& event)
         {
-            backend::vk::shader::initCompiler();
+            backend::vk::shader::init();
         });
 
         on([] ([[maybe_unused]] const backend::events::Finalize& event)
         {
-            backend::vk::shader::finalizeCompiler();
+            backend::vk::shader::finalize();
         });
 
         on([this] ([[maybe_unused]] const backend::events::Initialize& event)

@@ -20,7 +20,7 @@ namespace pbrlib::backend::vk::shader
 {
     VkShaderModule compile(
         Device&                         device,
-        const std::filesystem::path&    filename,
+        const std::filesystem::path&     filename,
         const std::filesystem::path&    root_directory,
         std::span<const Define>         defines,
         bool                            dump
@@ -32,13 +32,13 @@ namespace pbrlib::backend::vk::shader
         return slang::compile(device, filename, root_directory, defines, dump);
     }
 
-    void initCompiler()
+    void init()
     {
-        glsl::initCompiler();
+        glsl::init();
     }
 
-    void finalizeCompiler()
+    void finalize()
     {
-        glsl::finalizeCompiler();
+        glsl::finalize();
     }
 }

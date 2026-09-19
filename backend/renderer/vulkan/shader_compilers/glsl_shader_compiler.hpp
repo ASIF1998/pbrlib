@@ -15,8 +15,8 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk::shader::glsl
 {
-    void initCompiler();
-    void finalizeCompiler();
+    void init();
+    void finalize();
 
     [[nodiscard]]
     VkShaderModule compile(

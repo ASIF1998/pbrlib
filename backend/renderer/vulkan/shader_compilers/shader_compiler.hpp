@@ -54,14 +54,11 @@ namespace pbrlib::backend::vk::shader
         const T& _data;
     };
 
-    /// @todo rename initCompiler to initCompilers
-    void initCompiler();
-
-    /// @todo rename finalizeCompiler to finalizeCompilers
-    void finalizeCompiler();
+    void init();
+    void finalize();
 
     [[nodiscard]] VkShaderModule compile(
-        Device&                         device,
+         Device&                         device,
         const std::filesystem::path&    filename,
         const std::filesystem::path&    root_directory,
         std::span<const Define>         defines,

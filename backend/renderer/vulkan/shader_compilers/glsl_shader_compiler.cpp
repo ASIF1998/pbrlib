@@ -262,7 +262,7 @@ namespace pbrlib::backend::vk::shader::glsl
 {
     bool is_init = false;
 
-    void initCompiler()
+    void init()
     {
         if (!glslang_initialize_process()) [[unlikely]]
             backend::log::error("[shader-compiler] failed initialize glslang.");
@@ -270,7 +270,7 @@ namespace pbrlib::backend::vk::shader::glsl
         is_init = true;
     }
 
-    void finalizeCompiler()
+    void finalize()
     {
         if (is_init) [[likely]]
             glslang_finalize_process();
