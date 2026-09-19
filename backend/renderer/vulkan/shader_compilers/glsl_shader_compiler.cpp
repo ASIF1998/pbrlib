@@ -221,7 +221,7 @@ namespace pbrlib::backend::vk::shader::glsl
             file.write(reinterpret_cast<const char*>(spv.data()), spv.size_bytes());
     }
 
-    VkShaderModule compile(
+    vk::ShaderModuleHandle compile(
         const Device&                   device,
         const std::filesystem::path&    filename,
         const std::filesystem::path&    root_directory,
@@ -254,7 +254,7 @@ namespace pbrlib::backend::vk::shader::glsl
             &shader_module_handle
         ));
 
-        return shader_module_handle;
+        return vk::ShaderModuleHandle(shader_module_handle);
     }
 }
 

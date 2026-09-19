@@ -101,21 +101,17 @@ namespace pbrlib::backend::vk::builders
         _device (device)
     { }
 
-    GraphicsPipeline::~GraphicsPipeline()
-    {
-        for (const auto& stage: _stages)
-            vkDestroyShaderModule(_device.device(), stage.module, nullptr);
-    }
-
     GraphicsPipeline& GraphicsPipeline::addStage(const std::filesystem::path& shader, VkShaderStageFlagBits stage, const shader::SpecializationInfoBase* ptr_spec_info)
     {
         const auto root_directory = PBRLIB_ABS_PATH("backend/shaders");
+
+        _shaders.emplace_back(shader::compile(_device, shader, root_directory, _defines));
 
         VkPipelineShaderStageCreateInfo pipeline_stage =
         {
             .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .stage  = stage,
-            .module = shader::compile(_device, shader, root_directory, _defines),
+            .module = _shaders.back(),
             .pName  = "main"
         };
 

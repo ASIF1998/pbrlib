@@ -60,12 +60,7 @@ public:
         const std::vector<backend::vk::shader::Define>& defines
     )
     {
-        const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), root_directory, defines, true);
-
-        const ScopeExit scope_destroy_shader_module([this, shader_module]
-        {
-            vkDestroyShaderModule(device->device(), shader_module, nullptr);
-        });
+        [[maybe_unused]] const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), root_directory, defines, true);
 
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";
 
@@ -129,20 +124,14 @@ TEST_F(GlslCompilerTests, CompileFragmentShader)
 TEST_F(GlslCompilerTests, CompileInvalidShader)
 {
     EXPECT_THROW({
-        const auto shader_name      = root_directory / "invalid_shader.glsl.comp";
-        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, {});
-
-        vkDestroyShaderModule(device->device(), shader_handle, nullptr);
+        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "invalid_shader.glsl.comp", root_directory, {});
     }, exception::RuntimeError);
 }
 
 TEST_F(GlslCompilerTests, FileNotFound)
 {
     EXPECT_THROW({
-        const auto shader_name      = root_directory / "non_existent_shader.glsl.comp";
-        const auto shader_handle    = vk::shader::compile(*device, shader_name, root_directory, {});
-
-        vkDestroyShaderModule(device->device(), shader_handle, nullptr);
+        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "non_existent_shader.glsl.comp", root_directory, {});
     }, exception::InvalidState);
 }
 

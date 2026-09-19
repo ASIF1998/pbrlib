@@ -18,7 +18,7 @@ namespace pbrlib::backend::vk::shader
 
 namespace pbrlib::backend::vk::shader
 {
-    VkShaderModule compile(
+    vk::ShaderModuleHandle compile(
         Device&                         device,
         const std::filesystem::path&     filename,
         const std::filesystem::path&    root_directory,

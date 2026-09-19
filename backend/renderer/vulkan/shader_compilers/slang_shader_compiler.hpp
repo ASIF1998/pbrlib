@@ -1,8 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/shader_compilers/define.hpp>
-
-#include <vulkan/vulkan.h>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <filesystem>
 
@@ -15,7 +14,7 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk::shader::slang
 {
-    [[nodiscard]] VkShaderModule compile(
+    [[nodiscard]] vk::ShaderModuleHandle compile(
         Device&                         device,
         const std::filesystem::path&    filename,
         const std::filesystem::path&    root_directory,

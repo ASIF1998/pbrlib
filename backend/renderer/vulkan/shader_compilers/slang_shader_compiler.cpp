@@ -150,7 +150,7 @@ namespace pbrlib::backend::vk::shader::slang
         return slang_defines;
     }
 
-    VkShaderModule compile(
+    vk::ShaderModuleHandle compile(
         Device&                         device,
         const std::filesystem::path&    filename,
         const std::filesystem::path&    root_directory,
@@ -213,6 +213,6 @@ namespace pbrlib::backend::vk::shader::slang
         if (dump) [[unlikely]]
             dumpShader(spv, std::filesystem::path(filename) += ".spv");
 
-        return createShaderModule(device, spv);
+        return vk::ShaderModuleHandle(createShaderModule(device, spv));
     }
 }
