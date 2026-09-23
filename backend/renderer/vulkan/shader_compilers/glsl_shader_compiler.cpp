@@ -15,11 +15,11 @@
 
 #include <map>
 
-#define CHECK(fn, log_fn, log_fn_arg)                                                               \
-    do                                                                                              \
-    {                                                                                               \
-        if (!fn) [[unlikely]]                                                                       \
-            throw exception::RuntimeError(std::format("[shader-compiler] {}", log_fn(log_fn_arg))); \
+#define CHECK(fn, log_fn, log_fn_arg)                                                                   \
+    do                                                                                                  \
+    {                                                                                                   \
+        if (!fn) [[unlikely]]                                                                           \
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler] {}", log_fn(log_fn_arg)));\
     } while (false)
 
 #define CHECK_SHADER(fn)    CHECK(fn, glslang_shader_get_info_log, ptr_shader)
@@ -73,7 +73,7 @@ namespace pbrlib::backend::vk::shader::utils
 
 #undef RETURN_STAGE
 
-        backend::log::error("[shader-compiler] undefined shader type: {}", filename.string());
+        backend::log::error("[glsl-shader-compiler] undefined shader type: {}", filename.string());
 
         return GLSLANG_STAGE_COUNT;
     }
@@ -85,7 +85,7 @@ namespace pbrlib::backend::vk::shader::utils
         [[maybe_unused]] size_t      include_depth
     )
     {
-        backend::log::error("[shader-compiler] don't process local include files");
+        backend::log::error("[glsl-shader-compiler] don't process local include files");
         return nullptr;
     }
 
@@ -115,7 +115,7 @@ namespace pbrlib::backend::vk::shader::utils
         );
 
         if (!inserted) [[unlikely]]
-            throw exception::RuntimeError(std::format("[shader-compiler] failed to insert include file '{}': entry already exists in cache", header_name));
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler] failed to insert include file '{}': entry already exists in cache", header_name));
 
         iter->second.ptr_include_result->header_name   = iter->first.c_str();
         iter->second.ptr_include_result->header_data   = iter->second.header_data.c_str();
@@ -203,7 +203,7 @@ namespace pbrlib::backend::vk::shader::glsl
         glslang_program_SPIRV_generate(ptr_program, stage);
 
         if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program)) [[unlikely]]
-            throw exception::RuntimeError(std::format("[sahder-compiler]: {}", spirv_message));
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler]: {}", spirv_message));
 
         std::vector<uint8_t> il (glslang_program_SPIRV_get_size(ptr_program) * sizeof(uint32_t));
 
@@ -225,7 +225,7 @@ namespace pbrlib::backend::vk::shader::glsl
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        backend::log::info("[shader-compiler] compile shader: {}", filename.filename().string());
+        backend::log::info("[glsl-shader-compiler] compile shader: {}", filename.filename().string());
 
         auto il = createIL(filename, root_directory, defines);
 
@@ -243,7 +243,7 @@ namespace pbrlib::backend::vk::shader::glsl
     void init()
     {
         if (!glslang_initialize_process()) [[unlikely]]
-            backend::log::error("[shader-compiler] failed initialize glslang.");
+            backend::log::error("[glsl-shader-compiler] failed initialize glslang");
 
         is_init = true;
     }
