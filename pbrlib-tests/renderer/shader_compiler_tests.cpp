@@ -35,7 +35,7 @@ public:
         EventSystem::emit(events::Finalize());
     }
 
-    static std::optional<std::vector<uint8_t>> getFileSource(const std::filesystem::path& filename)
+    [[nodiscard]] static std::optional<std::vector<uint8_t>> getFileSource(const std::filesystem::path& filename)
     {
         if (!std::filesystem::exists(filename)) [[unlikely]]
             return std::nullopt;
@@ -76,7 +76,7 @@ public:
      * @param defines the span of shader defines to hash
      * @return deterministic 64-bit hash value
      */
-    [[nodiscard]] static uint64_t calcHash(std::span<const backend::vk::shader::Define> defines)
+    [[nodiscard]] static uint64_t calcHash(std::span<const backend::vk::shader::Define> defines) noexcept
     {
         auto hash = 0xcbf29ce484222325ull;
         for (const auto& define: defines)
@@ -109,13 +109,10 @@ public:
         const auto references_directory         = PBRLIB_ABS_PATH("pbrlib-tests/references/shaders"); 
         const auto reference_compiled_shader    = references_directory / (platform_prefix + std::to_string(calcHash(defines)) + '-' + shader_name.filename().string() + ".spv");
 
-        if constexpr (pbrlib::testing::generate_shaders_spvs)
-        {
-            const auto src_spv_name = PBRLIB_ABS_PATH(shader_name) += ".spv";
-            std::filesystem::copy_file(src_spv_name, reference_compiled_shader, std::filesystem::copy_options::overwrite_existing);
-        }
-
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";
+
+        if constexpr (pbrlib::testing::generate_shaders_spvs)
+            std::filesystem::copy_file(compiled_shader_binary_filename, reference_compiled_shader, std::filesystem::copy_options::overwrite_existing);
 
         const auto compiled_shader_binary   = getFileSource(compiled_shader_binary_filename);
         const auto reference_shader_binary  = getFileSource(PBRLIB_ABS_PATH(reference_compiled_shader));
