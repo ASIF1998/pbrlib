@@ -44,7 +44,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-configure_file(backend/utils/private/info.hpp.in ../backend/utils/private/info.hpp)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/utils/private/info.hpp.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/backend/utils/private/info.hpp
+)
 
 #####################################################
 #   Create pbrlib library
@@ -72,6 +75,8 @@ add_library(pbrlib STATIC
     ${PBRLIB_BACKEND_SCENE_H}
     ${PBRLIB_BACKEND_UTILS_SRC}
     ${PBRLIB_BACKEND_UTILS_H}
+    ${PBRLIB_BACKEND_VULKAN_SHADER_COMPILERS_SRC}
+    ${PBRLIB_BACKEND_VULKAN_SHADER_COMPILERS_H}
 
     ${PBRLIB_H}
     ${PBRLIB_SRC}
@@ -187,6 +192,7 @@ target_include_directories(pbrlib PUBLIC third_party/stb)
 #####################################################
 #   glslang
 #####################################################
+set(ENABLE_HLSL OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/glslang)
 
 #####################################################
@@ -235,6 +241,51 @@ if (PBRLIB_BUILD_SAMPLES)
 endif()
 
 #####################################################
+#   slang
+#####################################################
+set(SLANG_LIB_TYPE SHARED CACHE STRING "" FORCE)
+set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_GFX OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGD OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGC OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANGRT OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANG_RHI OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_SLANG_PROXY ON CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_DXIL OFF CACHE BOOL "" FORCE)
+set(SLANG_SLANG_LLVM_FLAVOR DISABLE CACHE STRING "" FORCE)
+set(SLANG_ENABLE_SLANG_GLSLANG OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_MINIZ OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_LZ4 OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_GLSLANG OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_VULKAN_HEADERS OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_SPIRV_TOOLS OFF CACHE BOOL "" FORCE)
+set(SLANG_USE_SYSTEM_SPIRV_HEADERS OFF CACHE BOOL "" FORCE)
+set(SLANG_EXCLUDE_DAWN ON CACHE BOOL "" FORCE)
+set(SLANG_EXCLUDE_TINT ON CACHE BOOL "" FORCE)
+
+set(CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/slang/external/spirv-headers/include)
+
+if(APPLE)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/third_party/slang/generators/${CMAKE_BUILD_TYPE}")
+endif()
+
+# fix: copy slang's runtime dll next to executables so windows can locate it at runtime
+if (WIN32)
+    add_custom_command(TARGET pbrlib POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:slang>
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+    )
+endif()
+
+add_subdirectory(third_party/slang)
+
+#####################################################
 #   add libs
 #####################################################
 target_link_libraries(pbrlib PUBLIC
@@ -245,6 +296,7 @@ target_link_libraries(pbrlib PUBLIC
     SPIRV
     SPIRV-Headers
     glslang-default-resource-limits
+    slang
     assimp
     EnTT::EnTT
     spdlog::spdlog

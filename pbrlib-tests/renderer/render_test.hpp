@@ -5,7 +5,6 @@
 
 #include "framegraph_resources_getter.hpp"
 
-#include <backend/utils/paths.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 
 #include <pbrlib/config.hpp>

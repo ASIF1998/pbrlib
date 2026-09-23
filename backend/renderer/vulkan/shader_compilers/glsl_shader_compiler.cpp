@@ -1,4 +1,7 @@
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/glsl_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/utils.hpp>
+
 #include <backend/renderer/vulkan/check.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 
@@ -10,14 +13,13 @@
 
 #include <glslang/Public/resource_limits_c.h>
 
-#include <fstream>
 #include <map>
 
-#define CHECK(fn, log_fn, log_fn_arg)                                                               \
-    do                                                                                              \
-    {                                                                                               \
-        if(!fn)                                                                                     \
-            throw exception::RuntimeError(std::format("[shader-compiler] {}", log_fn(log_fn_arg))); \
+#define CHECK(fn, log_fn, log_fn_arg)                                                                   \
+    do                                                                                                  \
+    {                                                                                                   \
+        if (!fn) [[unlikely]]                                                                           \
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler] {}", log_fn(log_fn_arg)));\
     } while (false)
 
 #define CHECK_SHADER(fn)    CHECK(fn, glslang_shader_get_info_log, ptr_shader)
@@ -43,22 +45,6 @@ namespace pbrlib::backend::vk::shader::utils
     };
 
     std::map<std::string, IncludeProcessData> includes_data;
-
-    static std::string getSource(const std::filesystem::path& filename)
-    {
-        if (!std::filesystem::exists(filename)) [[unlikely]]
-            throw exception::InvalidState(std::format("[shader-compiler] not find file: {}", filename.string()));
-
-        std::ifstream file(filename);
-
-        if (!file) [[unlikely]]
-            throw exception::FileOpen(std::format("[shader-compiler] {}", filename.string()));
-
-        std::ostringstream contents;
-        contents << file.rdbuf();
-
-        return contents.str();
-    }
 
     static glslang_stage_t getStage(const std::filesystem::path& filename)
     {
@@ -87,27 +73,27 @@ namespace pbrlib::backend::vk::shader::utils
 
 #undef RETURN_STAGE
 
-        backend::log::error("[shader-compiler] undefined shader type: {}", filename.string());
+        backend::log::error("[glsl-shader-compiler] undefined shader type: {}", filename.string());
 
         return GLSLANG_STAGE_COUNT;
     }
 
     static glsl_include_result_t* localInclude (
-        void*       ctx,
-        const char* header_name,
-        const char* includer_name,
-        size_t      include_depth
+        [[maybe_unused]] void*       ptr_ctx,
+        [[maybe_unused]] const char* header_name,
+        [[maybe_unused]] const char* includer_name,
+        [[maybe_unused]] size_t      include_depth
     )
     {
-        backend::log::error("[shader-compiler] don't process local include files");
+        backend::log::error("[glsl-shader-compiler] don't process local include files");
         return nullptr;
     }
 
     static glsl_include_result_t* systemInclude (
-        void*       ctx,
-        const char* header_name,
-        const char* includer_name,
-        size_t      include_depth
+        void*                           ptr_ctx,
+        const char*                     header_name,
+        [[maybe_unused]] const char*    includer_name,
+        [[maybe_unused]] size_t         include_depth
     )
     {
         if (!header_name) [[unlikely]]
@@ -116,10 +102,10 @@ namespace pbrlib::backend::vk::shader::utils
         if (auto return_value = includes_data.find(header_name); return_value != std::end(includes_data))
             return return_value->second.ptr_include_result.get();
 
-        static const auto src_root_directory = pbrlib::backend::utils::projectRoot() / "backend/shaders";
+        auto ptr_root_directory = reinterpret_cast<const std::filesystem::path*>(ptr_ctx);
 
         std::string key     = header_name;
-        std::string code    = getSource(src_root_directory / header_name);
+        std::string code    = getSource(*ptr_root_directory / header_name);
 
         auto ptr_include_data = std::make_unique<glsl_include_result_t>();
 
@@ -129,7 +115,7 @@ namespace pbrlib::backend::vk::shader::utils
         );
 
         if (!inserted) [[unlikely]]
-            throw exception::RuntimeError(std::format("[shader-compiler] failed to insert include file '{}': entry already exists in cache", header_name));
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler] failed to insert include file '{}': entry already exists in cache", header_name));
 
         iter->second.ptr_include_result->header_name   = iter->first.c_str();
         iter->second.ptr_include_result->header_data   = iter->second.header_data.c_str();
@@ -138,7 +124,7 @@ namespace pbrlib::backend::vk::shader::utils
         return iter->second.ptr_include_result.get();
     }
 
-    static int freeInclude(void* ctx, glsl_include_result_t* ptr_result)
+    static int freeInclude([[maybe_unused]] void* ptr_ctx, glsl_include_result_t* ptr_result)
     {
         if (ptr_result) [[likely]]
         {
@@ -150,9 +136,9 @@ namespace pbrlib::backend::vk::shader::utils
     }
 }
 
-namespace pbrlib::backend::vk::shader
+namespace pbrlib::backend::vk::shader::glsl
 {
-    void processDefines(std::string& code, const Defines& defines)
+    void processDefines(std::string& code, std::span<const Define> defines)
     {
         std::string str_defines;
 
@@ -170,7 +156,7 @@ namespace pbrlib::backend::vk::shader
             code.insert(0, str_defines);
     }
 
-    std::vector<uint32_t> createIL(const std::filesystem::path& filename, const Defines& defines)
+    std::vector<uint8_t> createIL(const std::filesystem::path& filename, std::filesystem::path root_directory, std::span<const Define>& defines)
     {
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
@@ -200,7 +186,8 @@ namespace pbrlib::backend::vk::shader
             .forward_compatible                 = false,
             .messages                           = GLSLANG_MSG_DEFAULT_BIT,
             .resource                           = glslang_default_resource(),
-            .callbacks                          = includer
+            .callbacks                          = includer,
+            .callbacks_ctx                      = &root_directory
         };
 
         auto ptr_shader = glslang_shader_create(&input);
@@ -216,11 +203,11 @@ namespace pbrlib::backend::vk::shader
         glslang_program_SPIRV_generate(ptr_program, stage);
 
         if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program)) [[unlikely]]
-            throw exception::RuntimeError(std::format("[sahder-compiler]: {}", spirv_message));
+            throw exception::RuntimeError(std::format("[glsl-shader-compiler]: {}", spirv_message));
 
-        std::vector<uint32_t> il (glslang_program_SPIRV_get_size(ptr_program));
+        std::vector<uint8_t> il (glslang_program_SPIRV_get_size(ptr_program) * sizeof(uint32_t));
 
-        glslang_program_SPIRV_get(ptr_program, il.data());
+        glslang_program_SPIRV_get(ptr_program, reinterpret_cast<uint32_t*>(il.data()));
 
         glslang_program_delete(ptr_program);
         glslang_shader_delete(ptr_shader);
@@ -228,61 +215,40 @@ namespace pbrlib::backend::vk::shader
         return il;
     }
 
-    VkShaderModule compile(const Device& device, const std::filesystem::path& filename, const Defines& defines)
+    vk::ShaderModuleHandle compile(
+        const Device&                   device,
+        const std::filesystem::path&    filename,
+        const std::filesystem::path&    root_directory,
+        std::span<const Define>         defines,
+        bool                            dump
+    )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        backend::log::info("[shader-compiler] compile shader: {}", filename.filename().string());
+        backend::log::info("[glsl-shader-compiler] compile shader: {}", filename.filename().string());
 
-        auto il = createIL(backend::utils::projectRoot() / "backend" / filename, defines);
+        auto il = createIL(filename, root_directory, defines);
 
-        VkShaderModule shader_module_handle = VK_NULL_HANDLE;
+        if (dump) [[unlikely]]
+            utils::dumpShader(il, std::filesystem::path(filename) += ".spv");
 
-        const VkShaderModuleCreateInfo shader_module_create_info
-        {
-            .sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-            .codeSize   = il.size() * sizeof(uint32_t),
-            .pCode      = il.data()
-        };
-
-        VK_CHECK(vkCreateShaderModule(
-            device.device(),
-            &shader_module_create_info,
-            nullptr,
-            &shader_module_handle
-        ));
-
-        return shader_module_handle;
+        return utils::createShaderModule(device, il);
     }
 }
 
-namespace pbrlib::backend::vk::shader
-{
-    std::span<const VkSpecializationMapEntry> SpecializationInfoBase::entries() const noexcept
-    {
-        return _entries;
-    }
-
-    SpecializationInfoBase& SpecializationInfoBase::addEntry(uint32_t constant_id, uint32_t offset, size_t size)
-    {
-        _entries.emplace_back(constant_id, offset, size);
-        return *this;
-    }
-}
-
-namespace pbrlib::backend::vk::shader
+namespace pbrlib::backend::vk::shader::glsl
 {
     bool is_init = false;
 
-    void initCompiler()
+    void init()
     {
         if (!glslang_initialize_process()) [[unlikely]]
-            backend::log::error("[shader-compiler] failed initialize glslang.");
+            backend::log::error("[glsl-shader-compiler] failed initialize glslang");
 
         is_init = true;
     }
 
-    void finalizeCompiler()
+    void finalize()
     {
         if (is_init) [[likely]]
             glslang_finalize_process();

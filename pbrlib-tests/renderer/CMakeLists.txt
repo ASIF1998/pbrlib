@@ -10,6 +10,7 @@ set(PBRLIB_TESTS_RENDERER_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/canvas_tests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/vulkan_device_tests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/shader_compiler_tests.cpp
     CACHE INTERNAL ""
     )
     

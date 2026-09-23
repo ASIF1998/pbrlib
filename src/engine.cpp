@@ -15,7 +15,7 @@
 #include <backend/profiling.hpp>
 #include <backend/utils/align_size.hpp>
 #include <backend/logger/logger.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 #include <backend/scene/assimp_importer.hpp>
 
 #include <pbrlib/input/input_stay.hpp>
@@ -89,7 +89,7 @@ namespace pbrlib
         {
             if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) [[unlikely]]
             {
-                std::string error_msg = SDL_GetError();
+                const std::string error_msg = SDL_GetError();
                 SDL_ClearError();
 
                 throw exception::InitializeError(std::format("[window] SDL: {}", error_msg));
@@ -109,12 +109,12 @@ namespace pbrlib
 
         on([] ([[maybe_unused]] const backend::events::Initialize& event)
         {
-            backend::vk::shader::initCompiler();
+            backend::vk::shader::init();
         });
 
         on([] ([[maybe_unused]] const backend::events::Finalize& event)
         {
-            backend::vk::shader::finalizeCompiler();
+            backend::vk::shader::finalize();
         });
 
         on([this] ([[maybe_unused]] const backend::events::Initialize& event)
@@ -134,7 +134,7 @@ namespace pbrlib
                     .transform(event.transform)
                     .import();
 
-                if (!res)
+                if (!res) [[unlikely]]
                     throw exception::RuntimeError(std::format("[importer] failed load model: {}", event.filename.string()));
             });
         });

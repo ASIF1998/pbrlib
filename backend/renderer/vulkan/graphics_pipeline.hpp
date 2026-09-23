@@ -1,6 +1,6 @@
 #pragma once
 
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 
 #include <vulkan/vulkan.h>
 
@@ -68,8 +68,6 @@ namespace pbrlib::backend::vk::builders
         GraphicsPipeline(GraphicsPipeline&& builder)        = delete;
         GraphicsPipeline(const GraphicsPipeline& builder)   = delete;
 
-        ~GraphicsPipeline();
-
         GraphicsPipeline& operator = (GraphicsPipeline&& builder)       = delete;
         GraphicsPipeline& operator = (const GraphicsPipeline& builder)  = delete;
 
@@ -114,6 +112,8 @@ namespace pbrlib::backend::vk::builders
         std::vector<VkPipelineColorBlendAttachmentState>    _attachments_state;
         std::vector<VkSpecializationInfo>                   _specialization_infos;
 
-        backend::vk::shader::Defines _defines;
+        std::vector<vk::ShaderModuleHandle> _shaders;
+
+        std::vector<backend::vk::shader::Define> _defines;
     };
 }

@@ -14,6 +14,8 @@
 
 #include <backend/renderer/vulkan/check.hpp>
 
+#include <backend/utils/private/info.hpp>
+
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>
 #include <pbrlib/math/lerp.hpp>
@@ -116,7 +118,7 @@ namespace pbrlib::backend
             .binding    = 1
         });
 
-        constexpr auto ssao_shader = "shaders/ssao/ssao.glsl.comp";
+        const auto ssao_shader = PBRLIB_ABS_PATH("backend/shaders/ssao/ssao.glsl.comp");
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)

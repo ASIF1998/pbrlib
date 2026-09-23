@@ -1,7 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/unique_handler.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 
 #include <filesystem>
 
@@ -39,6 +39,6 @@ namespace pbrlib::backend::vk::builders
 
         VkSpecializationInfo _specialization_info = { };
 
-        vk::shader::Defines _defines;
+        std::vector<backend::vk::shader::Define> _defines; 
     };
 }

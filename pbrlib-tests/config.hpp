@@ -4,4 +4,6 @@ namespace pbrlib::testing
 {
     constexpr bool generate_image_reference = false;
     constexpr bool generate_image_diff      = false;
+
+    constexpr bool generate_shaders_spvs = false;
 }

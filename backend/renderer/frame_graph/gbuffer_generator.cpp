@@ -1,6 +1,5 @@
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
 #include <backend/renderer/vulkan/render_pass.hpp>
-#include <backend/renderer/vulkan/shader_compiler.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
@@ -125,8 +124,8 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        constexpr auto vert_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.vert";
-        constexpr auto frag_shader = "shaders/gbuffer_generator/gbuffer_generator.glsl.frag";
+        const auto vert_shader = PBRLIB_ABS_PATH("backend/shaders/gbuffer_generator/gbuffer_generator.glsl.vert");
+        const auto frag_shader = PBRLIB_ABS_PATH("backend/shaders/gbuffer_generator/gbuffer_generator.glsl.frag");
 
         auto new_pipeline = vk::builders::GraphicsPipeline(device())
             .addStage(vert_shader, VK_SHADER_STAGE_VERTEX_BIT)

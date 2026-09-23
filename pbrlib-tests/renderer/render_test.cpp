@@ -1,4 +1,5 @@
 #include "render_test.hpp"
+#include <backend/utils/paths.hpp>
 
 namespace pbrlib::testing
 {
@@ -25,7 +26,7 @@ namespace pbrlib::testing
 
     void RenderTest::setup(const std::filesystem::path& content, const Settings& settings)
     {
-        if (_engine)
+        if (_engine) [[unlikely]]
             return ;
 
         _engine.emplace(_config);

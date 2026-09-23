@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
-
-#include <filesystem>
+#include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <span>
 #include <vector>
+
+#include <filesystem>
 
 namespace pbrlib::backend::vk
 {
@@ -14,6 +14,12 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk::shader
 {
+    struct Define final
+    {
+        std::string name;
+        std::string value;
+    };
+
     class SpecializationInfoBase
     {
     public:
@@ -25,8 +31,8 @@ namespace pbrlib::backend::vk::shader
         SpecializationInfoBase& operator = (SpecializationInfoBase&& specialization_info)       = delete;
         SpecializationInfoBase& operator = (const SpecializationInfoBase& specialization_info)  = delete;
 
-        virtual std::span<const uint8_t>            data()      const noexcept = 0;
-        std::span<const VkSpecializationMapEntry>   entries()   const noexcept;
+        [[nodiscard]] virtual std::span<const uint8_t>          data()      const noexcept = 0;
+        [[nodiscard]] std::span<const VkSpecializationMapEntry> entries()   const noexcept;
 
         SpecializationInfoBase& addEntry(uint32_t constant_id, uint32_t offset, size_t size);
 
@@ -43,7 +49,7 @@ namespace pbrlib::backend::vk::shader
             _data(data)
         { }
 
-        std::span<const uint8_t> data() const noexcept override
+        [[nodiscard]] std::span<const uint8_t> data() const noexcept override
         {
             return std::span(reinterpret_cast<const uint8_t*>(&_data), sizeof(T));
         }
@@ -52,24 +58,14 @@ namespace pbrlib::backend::vk::shader
         const T& _data;
     };
 
-    struct Define final
-    {
-        std::string name;
-        std::string value;
-    };
+    void init();
+    void finalize();
 
-    using Defines = std::vector<Define>;
-}
-
-namespace pbrlib::backend::vk::shader
-{
-    void initCompiler();
-    void finalizeCompiler();
-
-    [[nodiscard]]
-    VkShaderModule compile(
-        const Device&                   device,
+    [[nodiscard]] vk::ShaderModuleHandle compile(
+         Device&                         device,
         const std::filesystem::path&    filename,
-        const Defines&                  defines
+        const std::filesystem::path&    root_directory,
+        std::span<const Define>         defines,
+        bool                            dump = false
     );
 }
