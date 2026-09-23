@@ -16,34 +16,6 @@
 
 namespace pbrlib::backend::vk::shader::slang
 {
-    VkShaderModule createShaderModule(Device& device, std::span<const uint8_t> spv)
-    {
-        VkShaderModule shader_module_handle = VK_NULL_HANDLE;
-
-        const VkShaderModuleCreateInfo shader_module_create_info
-        {
-            .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-            .codeSize = spv.size_bytes(),
-            .pCode = reinterpret_cast<const uint32_t*>(spv.data())
-        };
-
-        VK_CHECK(vkCreateShaderModule(
-            device.device(),
-            &shader_module_create_info,
-            nullptr,
-            &shader_module_handle
-        ));
-
-        return shader_module_handle;
-    }
-
-    void dumpShader(std::span<const uint8_t> spv, const std::filesystem::path& filename)
-    {
-        std::ofstream file (filename, std::ios::binary);
-        if (file) [[likely]]
-            file.write(reinterpret_cast<const char*>(spv.data()), spv.size_bytes());
-    }
-
     void throwExcetion(const std::string_view msg, ::slang::IBlob* ptr_diagnostics_blob)
     {
         std::string throw_msg (msg);
@@ -211,8 +183,8 @@ namespace pbrlib::backend::vk::shader::slang
         std::span spv (reinterpret_cast<const uint8_t*>(ptr_spirv_code->getBufferPointer()), ptr_spirv_code->getBufferSize());
 
         if (dump) [[unlikely]]
-            dumpShader(spv, std::filesystem::path(filename) += ".spv");
+            utils::dumpShader(spv, std::filesystem::path(filename) += ".spv");
 
-        return vk::ShaderModuleHandle(createShaderModule(device, spv));
+        return utils::createShaderModule(device, spv);
     }
 }

@@ -156,7 +156,7 @@ namespace pbrlib::backend::vk::shader::glsl
             code.insert(0, str_defines);
     }
 
-    std::vector<uint32_t> createIL(const std::filesystem::path& filename, std::filesystem::path root_directory, std::span<const Define>& defines)
+    std::vector<uint8_t> createIL(const std::filesystem::path& filename, std::filesystem::path root_directory, std::span<const Define>& defines)
     {
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
@@ -205,21 +205,14 @@ namespace pbrlib::backend::vk::shader::glsl
         if (auto spirv_message = glslang_program_SPIRV_get_messages(ptr_program)) [[unlikely]]
             throw exception::RuntimeError(std::format("[sahder-compiler]: {}", spirv_message));
 
-        std::vector<uint32_t> il (glslang_program_SPIRV_get_size(ptr_program));
+        std::vector<uint8_t> il (glslang_program_SPIRV_get_size(ptr_program) * sizeof(uint32_t));
 
-        glslang_program_SPIRV_get(ptr_program, il.data());
+        glslang_program_SPIRV_get(ptr_program, reinterpret_cast<uint32_t*>(il.data()));
 
         glslang_program_delete(ptr_program);
         glslang_shader_delete(ptr_shader);
 
         return il;
-    }
-
-    void dumpShader(std::span<const uint32_t> spv, const std::filesystem::path& filename)
-    {
-        std::ofstream file (filename, std::ios::binary);
-        if (file) [[likely]]
-            file.write(reinterpret_cast<const char*>(spv.data()), spv.size_bytes());
     }
 
     vk::ShaderModuleHandle compile(
@@ -237,25 +230,9 @@ namespace pbrlib::backend::vk::shader::glsl
         auto il = createIL(filename, root_directory, defines);
 
         if (dump) [[unlikely]]
-            dumpShader(std::span(il), std::filesystem::path(filename) += ".spv");
+            utils::dumpShader(il, std::filesystem::path(filename) += ".spv");
 
-        VkShaderModule shader_module_handle = VK_NULL_HANDLE;
-
-        const VkShaderModuleCreateInfo shader_module_create_info
-        {
-            .sType      = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-            .codeSize   = il.size() * sizeof(uint32_t),
-            .pCode      = il.data()
-        };
-
-        VK_CHECK(vkCreateShaderModule(
-            device.device(),
-            &shader_module_create_info,
-            nullptr,
-            &shader_module_handle
-        ));
-
-        return vk::ShaderModuleHandle(shader_module_handle);
+        return utils::createShaderModule(device, il);
     }
 }
 
