@@ -55,7 +55,7 @@ public:
         return std::nullopt;
     }
 
-    [[nodiscard]] static uint64_t fnv1a_hash(std::string_view str) noexcept 
+    [[nodiscard]] static uint64_t fnv1a_hash(std::string_view str) noexcept
     {
         auto hash = 0xcbf29ce484222325ull;
         for (char c : str) {
@@ -68,11 +68,11 @@ public:
 
     /**
      * @brief сomputes a deterministic 64-bit FNV-1a hash of a defines
-     * 
-     * unlike std::hash, this implementation is guaranteed to yield identical 
-     * results across different compilers, standard libraries, and target 
+     *
+     * unlike std::hash, this implementation is guaranteed to yield identical
+     * results across different compilers, standard libraries, and target
      * platforms, ensuring stable reference filenames during CI testing
-     * 
+     *
      * @param defines the span of shader defines to hash
      * @return deterministic 64-bit hash value
      */
@@ -93,8 +93,8 @@ public:
     {
         [[maybe_unused]] const auto shader_module = vk::shader::compile(*device, PBRLIB_ABS_PATH(shader_name), root_directory, defines, true);
 
-        // Shader compilers (like Slang) can produce slightly different SPIR-V bytecode 
-        // across different operating systems. OS-specific prefixes prevent 
+        // Shader compilers (like Slang) can produce slightly different SPIR-V bytecode
+        // across different operating systems. OS-specific prefixes prevent
         // byte-for-byte comparison failures on CI.
 #ifdef PBRLIB_OS_WINDOWS
             const auto platform_prefix  = "windows-";
@@ -102,11 +102,11 @@ public:
             const auto platform_prefix  = "apple-";
 #elif PBRLIB_OS_LINUX
             const auto platform_prefix  = "linux-";
-#else 
+#else
     #error "Unsupported platform for shader testing"
 #endif
 
-        const auto references_directory         = PBRLIB_ABS_PATH("pbrlib-tests/references/shaders"); 
+        const auto references_directory         = PBRLIB_ABS_PATH("pbrlib-tests/references/shaders");
         const auto reference_compiled_shader    = references_directory / (platform_prefix + std::to_string(calcHash(defines)) + '-' + shader_name.filename().string() + ".spv");
 
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";

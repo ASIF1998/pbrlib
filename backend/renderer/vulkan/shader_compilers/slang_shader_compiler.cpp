@@ -1,10 +1,10 @@
 #include <backend/renderer/vulkan/shader_compilers/slang_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/utils.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/profiling.hpp>
-
-#include <backend/renderer/vulkan/shader_compilers/utils.hpp>
 
 #include <pbrlib/exceptions.hpp>
 

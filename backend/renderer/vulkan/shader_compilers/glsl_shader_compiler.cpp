@@ -1,4 +1,5 @@
 #include <backend/renderer/vulkan/shader_compilers/glsl_shader_compiler.hpp>
+#include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 #include <backend/renderer/vulkan/shader_compilers/utils.hpp>
 
 #include <backend/renderer/vulkan/check.hpp>

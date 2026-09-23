@@ -1,6 +1,5 @@
 #pragma once
 
-#include <backend/renderer/vulkan/shader_compilers/define.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <span>
@@ -15,6 +14,12 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk::shader
 {
+    struct Define final
+    {
+        std::string name;
+        std::string value;
+    };
+
     class SpecializationInfoBase
     {
     public:

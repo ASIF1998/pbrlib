@@ -1,6 +1,5 @@
 #pragma once
 
-#include <backend/renderer/vulkan/shader_compilers/define.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <filesystem>
@@ -10,6 +9,11 @@
 namespace pbrlib::backend::vk
 {
     class Device;
+}
+
+namespace pbrlib::backend::vk::shader
+{
+    struct Define;
 }
 
 namespace pbrlib::backend::vk::shader::glsl
