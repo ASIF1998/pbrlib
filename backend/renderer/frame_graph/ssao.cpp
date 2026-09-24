@@ -34,13 +34,11 @@ namespace pbrlib::backend
         if (!ptr_blur) [[unlikely]]
             throw exception::InvalidArgument("[ssao] pointer to blur is null");
 
-        _result_image_desc_set_layout = vk::builders::DescriptorSetLayout(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
-
-        _result_image_desc_set = device.allocateDescriptorSet(
-            _result_image_desc_set_layout,
-            "[ssao] descritor set with results"
+        _result_descriptor_group.emplace(
+            device,
+            vk::builders::DescriptorSetLayout(device)
+                .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            "[ssao] result descriptor set"
         );
     }
 
@@ -82,21 +80,34 @@ namespace pbrlib::backend
 
         bindResultDescriptorSet();
         createSSAODescriptorSet();
-
-        const auto gbuffer_set_layout          = descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).second;
-        const auto material_manager_set_layout = context.ptr_material_manager->descriptorSet().second;
-
+        
         constexpr VkPushConstantRange push_constant_range =
         {
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
             .offset     = 0,
             .size       = 2 * sizeof(pbrlib::math::mat4)
         };
+        
+        auto ptr_gbuffer_set            = descriptorGroup(gbuffer_set_id);
+        auto ptr_material_manager_set   = context.ptr_material_manager->descriptorGroup();
+
+        if (!ptr_gbuffer_set) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - gbuffer descriptor group is empty");
+
+        if (!_ssao_descriptor_group) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - ssao descriptor group is empty");
+
+        if (!ptr_material_manager_set) [[unlikely]]
+            throw exception::InvalidState("[ssao] failed initialize - material manager descriptor group is empty");
+
+        descriptorGroup(gbuffer_set_id, *ptr_gbuffer_set);
+        descriptorGroup(ssao_set_id, *_ssao_descriptor_group);
+        descriptorGroup(material_set_id, *ptr_material_manager_set);
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(gbuffer_set_layout)
-            .addSetLayout(_ssao_desc_set_layout)
-            .addSetLayout(material_manager_set_layout)
+            .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
+            .addSetLayout(_ssao_descriptor_group->descriptorSetLayoutHandle())
+            .addSetLayout(ptr_material_manager_set->descriptorSetLayoutHandle())
             .pushConstant(push_constant_range)
             .build();
 
@@ -113,7 +124,7 @@ namespace pbrlib::backend
 
         device().writeDescriptorSet ({
             .buffer     = _params_buffer.value(),
-            .set_handle = _ssao_desc_set,
+            .set_handle = _ssao_descriptor_group->descriptorSetHandle(),
             .size       = static_cast<uint32_t>(_params_buffer->size),
             .binding    = 1
         });
@@ -142,9 +153,9 @@ namespace pbrlib::backend
 
             const std::array sets_descriptors
             {
-                descriptorSet(InputDescriptorSetTraits<SSAO>::gbuffer).first,
-                _ssao_desc_set.handle(),
-                context().ptr_material_manager->descriptorSet().first
+                descriptorGroup(gbuffer_set_id)->descriptorSetHandle(),
+                _ssao_descriptor_group->descriptorSetHandle(),
+                context().ptr_material_manager->descriptorGroup()->descriptorSetHandle()
             };
 
             vkCmdBindDescriptorSets (
@@ -187,9 +198,14 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> SSAO::resultDescriptorSet() const noexcept
+    const vk::DescriptorGroup* SSAO::resultDescriptorGroup() const noexcept
     {
-        return std::make_pair(_result_image_desc_set.handle(), _result_image_desc_set_layout.handle());
+        return &_result_descriptor_group.value();
+    }
+
+    vk::DescriptorGroup* SSAO::resultDescriptorGroup() noexcept
+    {
+        return &_result_descriptor_group.value();
     }
 
     void SSAO::bindResultDescriptorSet()
@@ -201,7 +217,7 @@ namespace pbrlib::backend
         device().writeDescriptorSet ({
             .view_handle            = ptr_result_image->view_handle,
             .sampler_handle         = _result_image_sampler,
-            .set_handle             = _result_image_desc_set,
+            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
         });
@@ -209,26 +225,33 @@ namespace pbrlib::backend
 
     void SSAO::createSSAODescriptorSet()
     {
-        _ssao_desc_set_layout = vk::builders::DescriptorSetLayout(device())
-            .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-            .build();
+        _ssao_descriptor_group.emplace(
+            device(),
+            vk::builders::DescriptorSetLayout(device())
+                .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
+                .addBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            "[ssao] descritor-set-with-data-for-compute"
+        );
 
-        _ssao_desc_set = device().allocateDescriptorSet(_ssao_desc_set_layout, "[ssao] descritor-set-with-data-for-compute");
-
+        /// @todo remove
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
+        _ssao_descriptor_group->add(0, *ptr_result_image);
+        _ssao_descriptor_group->add(1, *_params_buffer);
+        _ssao_descriptor_group->add(2, *_samples_buffer);
+
+        descriptorGroup(ssao_set_id, _ssao_descriptor_group.value());
 
         device().writeDescriptorSet ({
             .view_handle            = ptr_result_image->view_handle,
-            .set_handle             = _ssao_desc_set,
+            .set_handle             = _ssao_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
         device().writeDescriptorSet ({
             .buffer     = _samples_buffer.value(),
-            .set_handle = _ssao_desc_set,
+            .set_handle = _ssao_descriptor_group->descriptorSetHandle(),
             .size       = static_cast<uint32_t>(_samples_buffer->size),
             .binding    = 2
         });
@@ -328,5 +351,24 @@ namespace pbrlib::backend
         _samples_buffer->write(std::span<const pbrlib::math::vec4>(samples), 0);
 
         _params.sample_count = static_cast<uint32_t>(samples.size());
+    }
+
+    void SSAO::sync(Transition& transition)
+    {
+        transition.addSet(gbuffer_set_id)
+            .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(1, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(2, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            .bind(3, _src_stage, dstStage(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+
+        transition.addSet(ssao_set_id)
+            .bind(0, srcStage(), dstStage(), VK_IMAGE_LAYOUT_GENERAL)
+            .bind(1, srcStage(), dstStage())
+            .bind(2, srcStage(), dstStage());
+    }
+
+    void SSAO::srcStage(VkPipelineStageFlags2 src_stage) noexcept
+    {
+        _src_stage = src_stage;
     }
 }
