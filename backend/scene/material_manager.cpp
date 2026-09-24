@@ -41,14 +41,12 @@ namespace pbrlib::backend
 
         constexpr auto max_image_count = 2500;
 
-        _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
-            .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, max_image_count, stages)
-            .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages)
-            .build();
-
-        _descriptor_set_handle = _device.allocateDescriptorSet (
-            _descriptor_set_layout_handle,
-            "[material-system] images"
+        _descriptor_group.emplace (
+            device,
+            vk::builders::DescriptorSetLayout(_device)
+                .addBinding(Bindings::eImages, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, max_image_count, stages)
+                .addBinding(Bindings::eMaterial, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, stages),
+            "[material-system] descriptor-set-group"
         );
     }
 
@@ -109,7 +107,7 @@ namespace pbrlib::backend
                 _device.writeDescriptorSet ({
                     .view_handle            = _images[i].view_handle,
                     .sampler_handle         = _sampler_handle,
-                    .set_handle             = _descriptor_set_handle,
+                    .set_handle             = _descriptor_group->descriptorSetHandle(),
                     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                     .binding                = Bindings::eImages,
                     .array_element          = i
@@ -128,7 +126,7 @@ namespace pbrlib::backend
 
             _device.writeDescriptorSet ({
                 .buffer     = _materials_indices_buffer.value(),
-                .set_handle = _descriptor_set_handle,
+                .set_handle = _descriptor_group->descriptorSetHandle(),
                 .size       = static_cast<uint32_t>(_materials_indices_buffer->size),
                 .binding    = Bindings::eMaterial
             });
@@ -137,9 +135,12 @@ namespace pbrlib::backend
         }
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> MaterialManager::descriptorSet() const noexcept
+    const vk::DescriptorGroup* MaterialManager::descriptorGroup() const noexcept
     {
-        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
+        if (_descriptor_group) [[likely]]
+            return &_descriptor_group.value();
+
+        return nullptr;
     }
 
     size_t MaterialManager::imageCount() const noexcept

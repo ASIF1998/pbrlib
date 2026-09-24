@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backend/renderer/vulkan/buffer.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
 #include <pbrlib/math/vec4.hpp>
 #include <pbrlib/math/vec2.hpp>
@@ -71,6 +72,9 @@ namespace pbrlib::backend
 
         void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
 
+        /// @todo add descriptor group getter (how material manager)
+
+        /// @todo remove
         [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet() const noexcept;
 
         [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t instance_id)   const;
@@ -89,8 +93,7 @@ namespace pbrlib::backend
         std::vector<Instance>       _instances;
         std::optional<vk::Buffer>   _instances_buffer;
 
-        vk::DescriptorSetLayoutHandle   _descriptor_set_layout_handle;
-        vk::DescriptorSetHandle         _descriptor_set_handle;
+        std::optional<vk::DescriptorGroup> _descriptor_group;
 
         bool _descriptor_set_is_changed = true;
 

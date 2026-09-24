@@ -39,7 +39,7 @@ namespace pbrlib::backend
 {
     class FXAA final :
         public Filter,
-        public pbrlib::EventSystem
+        public EventSystem
     {
         struct Settings final
         {
@@ -55,7 +55,8 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
 
         bool createPipeline();
 

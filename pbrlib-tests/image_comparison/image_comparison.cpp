@@ -203,11 +203,11 @@ namespace pbrlib::testing
 
     void ImageComparison::generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2)
     {
-        if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-            image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        // if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+        //     image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-            image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        // if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+        //     image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         _images_diff = backend::vk::builders::Image(_device)
             .size(image_1.width, image_1.height)
@@ -288,11 +288,11 @@ namespace pbrlib::testing
         if constexpr (pbrlib::testing::generate_image_diff)
             generateImageDiff(rendered_image, reference_image);
 
-        if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
-            rendered_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        // if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+        //     rendered_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
-            reference_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        // if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+        //     reference_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
         if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
             return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
@@ -339,7 +339,7 @@ namespace pbrlib::testing
                 const auto extension            = backend::channelSize(image.format) == 1 ? "png" : "exr";
                 const auto path_to_diff_image   = std::format("pbrlib-tests/references/diffs/{}-diff.{}", filename, extension);
 
-                _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                // _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
                 pbrlib::backend::vk::exporters::Image(_device)
                     .filename(backend::utils::projectRoot() / path_to_diff_image)

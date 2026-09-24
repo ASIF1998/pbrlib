@@ -2,9 +2,10 @@
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
-#include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/frame_graph/render_pass.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
+#include <cstdint>
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/event_system.hpp>
@@ -45,12 +46,6 @@ namespace pbrlib::backend
         constexpr static auto ssao = "ssao-result";
         constexpr static auto blur = "ssao-blur";
     };
-
-    template<>
-    struct InputDescriptorSetTraits<SSAO> final
-    {
-        constexpr static uint8_t gbuffer = 0;
-    };
 }
 
 namespace pbrlib::backend
@@ -75,7 +70,8 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
 
         void bindResultDescriptorSet();
 
@@ -84,20 +80,26 @@ namespace pbrlib::backend
         void createParamsBuffer();
         void createSamplesBuffer();
 
+        void sync(Transition& transition) override;
+
     public:
+        static constexpr uint32_t gbuffer_set_id    = 0;
+        static constexpr uint32_t ssao_set_id       = 1;
+        static constexpr uint32_t material_set_id   = 2;
+
         explicit SSAO(vk::Device& device, BilateralBlur* ptr_blur);
+
+        void srcStage(VkPipelineStageFlags2 src_stage) noexcept;
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
 
-        vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
-        vk::DescriptorSetHandle         _result_image_desc_set;
+        std::optional<vk::DescriptorGroup> _result_descriptor_group;
 
         vk::SamplerHandle _result_image_sampler;
 
-        vk::DescriptorSetLayoutHandle   _ssao_desc_set_layout;
-        vk::DescriptorSetHandle         _ssao_desc_set;
+        std::optional<vk::DescriptorGroup> _ssao_descriptor_group;
 
         Params                      _params;
         std::optional<vk::Buffer>   _params_buffer;
@@ -105,6 +107,8 @@ namespace pbrlib::backend
         std::optional<vk::Buffer> _samples_buffer;
 
         BilateralBlur* _ptr_blur = nullptr;
+
+        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE; 
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };

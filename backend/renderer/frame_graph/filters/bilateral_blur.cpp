@@ -51,10 +51,10 @@ namespace pbrlib::backend
             .size       = sizeof(Settings)
         };
 
-        const auto [_, io_set_layout_handle] = IODescriptorSet();
+        const auto io_descriptor_group = IODescriptorGroup();
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
-            .addSetLayout(io_set_layout_handle)
+            .addSetLayout(io_descriptor_group->descriptorSetLayoutHandle())
             .pushConstant(push_constant_range)
             .build();
 
@@ -92,12 +92,12 @@ namespace pbrlib::backend
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
-            const auto [io_set_handle, _] = IODescriptorSet();
+            const auto io_descriptor_group = IODescriptorGroup();
             vkCmdBindDescriptorSets(
                 command_buffer_handle,
                 VK_PIPELINE_BIND_POINT_COMPUTE,
                 _pipeline_layout_handle,
-                0, 1, &io_set_handle,
+                0, 1, &io_descriptor_group->descriptorSetHandle(),
                 0, nullptr
             );
 
@@ -122,9 +122,14 @@ namespace pbrlib::backend
         return VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
     }
 
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> BilateralBlur::resultDescriptorSet() const noexcept
+    const vk::DescriptorGroup* BilateralBlur::resultDescriptorGroup() const noexcept
     {
-        return std::make_pair(VK_NULL_HANDLE, VK_NULL_HANDLE);
+        return nullptr;
+    }
+
+    vk::DescriptorGroup* BilateralBlur::resultDescriptorGroup() noexcept
+    {
+        return nullptr;
     }
 
     BilateralBlur::Settings& BilateralBlur::settings() noexcept

@@ -3,8 +3,9 @@
 #include <backend/renderer/frame_graph/render_pass.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
-#include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
+#include <optional>
 #include <pbrlib/event_system.hpp>
 
 #include <array>
@@ -54,7 +55,7 @@ namespace pbrlib::backend
         public RenderPass,
         public pbrlib::EventSystem
     {
-        void createResultDescriptorSet();
+        // void createResultDescriptorSet();
 
         bool init(const RenderContext& context, uint32_t width, uint32_t height) override;
 
@@ -74,7 +75,10 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 srcStage() const noexcept override;
         VkPipelineStageFlags2 dstStage() const noexcept override;
 
-        std::pair<VkDescriptorSet, VkDescriptorSetLayout> resultDescriptorSet() const noexcept override;
+        vk::DescriptorGroup*        resultDescriptorGroup() noexcept override;
+        const vk::DescriptorGroup*  resultDescriptorGroup() const noexcept override;
+
+        void sync(Transition& transition) override;
 
     public:
         explicit GBufferGenerator(vk::Device& device);
@@ -88,8 +92,7 @@ namespace pbrlib::backend
 
         GBufferPushConstantBlock _push_constant_block;
 
-        vk::DescriptorSetLayoutHandle   _result_descriptor_set_layout_handle;
-        vk::DescriptorSetHandle         _result_descriptor_set_handle;
+        std::optional<vk::DescriptorGroup> _result_descriptor_group;
 
         vk::SamplerHandle _sampler_handle;
 
