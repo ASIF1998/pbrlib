@@ -58,42 +58,33 @@ namespace pbrlib::backend
         const auto ptr_normal_tangent_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
         const auto ptr_material_index_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
-        
-        _result_descriptor_group->add(0, *ptr_pos_uv_image);
-        _result_descriptor_group->add(1, *ptr_normal_tangent_image);
-        _result_descriptor_group->add(2, *ptr_material_index_image);
-        _result_descriptor_group->add(3, *depthStencil());
-        
-        /// @todo подумать надо этим
+        /// @todo подумать над этим
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_pos_uv_image->view_handle,
+
+        _result_descriptor_group->writeDescriptorSet ({
+            .image                  = *ptr_pos_uv_image,
             .sampler_handle         = _sampler_handle,
-            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::ePosUv
         });
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_normal_tangent_image->view_handle,
+        _result_descriptor_group->writeDescriptorSet ({
+            .image                  = *ptr_normal_tangent_image,
             .sampler_handle         = _sampler_handle,
-            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eNormalTangent
         });
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_material_index_image->view_handle,
+        _result_descriptor_group->writeDescriptorSet ({
+            .image                  = *ptr_material_index_image,
             .sampler_handle         = _sampler_handle,
-            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eMaterialIndices
         });
 
-        device().writeDescriptorSet ({
-            .view_handle            = depthStencil()->view_handle,
+        _result_descriptor_group->writeDescriptorSet ({
+            .image                  = *depthStencil(),
             .sampler_handle         = _sampler_handle,
-            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
             .binding                = GBufferDescriptorSetBindings::eDepthBuffer
         });
@@ -123,11 +114,13 @@ namespace pbrlib::backend
             .size       = sizeof(GBufferPushConstantBlock)
         };
 
-        const auto [_, mesh_manager_set_layout] = context.ptr_mesh_manager->descriptorSet();
+        const auto ptr_mesh_descriptor_group = context.ptr_mesh_manager->descriptorGroup();
+        if (!ptr_mesh_descriptor_group) [[unlikely]]
+            throw exception::InvalidState("[gbuffer-generator] failed get mesh descriptor set");
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .pushConstant(push_constant_range)
-            .addSetLayout(mesh_manager_set_layout)
+            .addSetLayout(ptr_mesh_descriptor_group->descriptorSetLayoutHandle())
             .build();
 
         createFramebuffer();
@@ -293,11 +286,13 @@ namespace pbrlib::backend
                 .maxDepth   = 1.0
             };
 
-            const auto [descriptor_set, _] = context().ptr_mesh_manager->descriptorSet();
+            const auto ptr_descriptor_group = context().ptr_mesh_manager->descriptorGroup();
+            if (!ptr_descriptor_group) [[unlikely]]
+                throw exception::InvalidState("[gbuffer-generator] failed get mesh descriptor group");
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
-            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &descriptor_set, 0, nullptr);
+            vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &ptr_descriptor_group->descriptorSetHandle(), 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);
         }, "[gbuffer-generator] begin-pass", vk::marker_colors::graphics_pipeline);
@@ -377,7 +372,7 @@ namespace pbrlib::backend
 
     void GBufferGenerator::sync(Transition& transition)
     {
-        transition 
+        transition
             .addSet(ReservedSetSlots::result_descriptor_set_id)
                 .bind(GBufferDescriptorSetBindings::ePosUv, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
                 .bind(GBufferDescriptorSetBindings::eNormalTangent, VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, srcStage(), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)

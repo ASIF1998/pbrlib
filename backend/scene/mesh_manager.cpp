@@ -149,16 +149,14 @@ namespace pbrlib::backend
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
 
-            _device.writeDescriptorSet ({
+            _descriptor_group->writeDescriptorSet ({
                 .buffer     = _vbos_refs.value(),
-                .set_handle = _descriptor_group->descriptorSetHandle(),
                 .size       = static_cast<uint32_t>(_vbos_refs->size),
                 .binding    = Bindings::eVertexBuffers
             });
 
-            _device.writeDescriptorSet ({
+            _descriptor_group->writeDescriptorSet ({
                 .buffer     = _instances_buffer.value(),
-                .set_handle = _descriptor_group->descriptorSetHandle(),
                 .size       = static_cast<uint32_t>(_instances_buffer->size),
                 .binding    = Bindings::eInstances
             });
@@ -167,11 +165,6 @@ namespace pbrlib::backend
         }
 
         _instances_buffer->write(std::span<const Instance>(_instances), 0);
-    }
-
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> MeshManager::descriptorSet() const noexcept
-    {
-        return std::make_pair(_descriptor_group->descriptorSetHandle(), _descriptor_group->descriptorSetLayoutHandle());
     }
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const
@@ -205,5 +198,13 @@ namespace pbrlib::backend
             instance.model     = transform;
             instance.normal    = math::transpose(math::inverse(transform));
         }
+    }
+
+    const vk::DescriptorGroup* MeshManager::descriptorGroup() const noexcept
+    {
+        if (_descriptor_group) [[likely]]
+            return &_descriptor_group.value();
+
+        return nullptr;
     }
 }

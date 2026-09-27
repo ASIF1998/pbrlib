@@ -26,11 +26,9 @@ namespace pbrlib::backend
             throw exception::InitializeError(std::format("[{}] failed create io descriptor set", name));
 
         descriptorGroup(0, *_io_descriptor_group);
-        _io_descriptor_group->add(1, *_ptr_dst_image);
 
-        device.writeDescriptorSet ({
-            .view_handle            = _ptr_dst_image->view_handle.handle(),
-            .set_handle             = _io_descriptor_group->descriptorSetHandle(),
+        _io_descriptor_group->writeDescriptorSet ({
+            .image                  = *_ptr_dst_image,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
         });
@@ -54,14 +52,11 @@ namespace pbrlib::backend
         //     VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
         // );
 
-        _io_descriptor_group->add(0, image);
-
         _input_image_sampler_handle = device().createLinearSampler();
 
-        device().writeDescriptorSet ({
-            .view_handle            = srcImage().view_handle.handle(),
+        _io_descriptor_group->writeDescriptorSet ({
+            .image                  = srcImage(),
             .sampler_handle         = _input_image_sampler_handle,
-            .set_handle             = _io_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
         });

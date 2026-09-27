@@ -67,10 +67,7 @@ namespace pbrlib::backend
 
         void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
 
-        /// @todo add descriptor group getter (how material manager)
-
-        /// @todo remove
-        [[nodiscard]] std::pair<VkDescriptorSet, VkDescriptorSetLayout> descriptorSet() const noexcept;
+        [[nodiscard]] const vk::DescriptorGroup* descriptorGroup() const noexcept;
 
         [[nodiscard]] const vk::Buffer& indexBuffer(uint32_t instance_id)   const;
         [[nodiscard]] const vk::Buffer& vertexBuffer(uint32_t instance_id)  const;

@@ -80,14 +80,14 @@ namespace pbrlib::backend
 
         bindResultDescriptorSet();
         createSSAODescriptorSet();
-        
+
         constexpr VkPushConstantRange push_constant_range =
         {
             .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
             .offset     = 0,
             .size       = 2 * sizeof(pbrlib::math::mat4)
         };
-        
+
         auto ptr_gbuffer_set            = descriptorGroup(gbuffer_set_id);
         auto ptr_material_manager_set   = context.ptr_material_manager->descriptorGroup();
 
@@ -122,9 +122,8 @@ namespace pbrlib::backend
         _params.noise_scale.x = static_cast<float>(width) / noise_width;
         _params.noise_scale.y = static_cast<float>(height) / noise_height;
 
-        device().writeDescriptorSet ({
+        _ssao_descriptor_group->writeDescriptorSet ({
             .buffer     = _params_buffer.value(),
-            .set_handle = _ssao_descriptor_group->descriptorSetHandle(),
             .size       = static_cast<uint32_t>(_params_buffer->size),
             .binding    = 1
         });
@@ -214,10 +213,9 @@ namespace pbrlib::backend
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_result_image->view_handle,
+        _result_descriptor_group->writeDescriptorSet ({
+            .image                  = *ptr_result_image,
             .sampler_handle         = _result_image_sampler,
-            .set_handle             = _result_descriptor_group->descriptorSetHandle(),
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
         });
@@ -234,24 +232,16 @@ namespace pbrlib::backend
             "[ssao] descritor-set-with-data-for-compute"
         );
 
-        /// @todo remove
-        const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
-        _ssao_descriptor_group->add(0, *ptr_result_image);
-        _ssao_descriptor_group->add(1, *_params_buffer);
-        _ssao_descriptor_group->add(2, *_samples_buffer);
-
         descriptorGroup(ssao_set_id, _ssao_descriptor_group.value());
 
-        device().writeDescriptorSet ({
-            .view_handle            = ptr_result_image->view_handle,
-            .set_handle             = _ssao_descriptor_group->descriptorSetHandle(),
+        _ssao_descriptor_group->writeDescriptorSet ({
+            .image                  = *colorOutputAttach(AttachmentsTraits<SSAO>::ssao),
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
-        device().writeDescriptorSet ({
+        _ssao_descriptor_group->writeDescriptorSet ({
             .buffer     = _samples_buffer.value(),
-            .set_handle = _ssao_descriptor_group->descriptorSetHandle(),
             .size       = static_cast<uint32_t>(_samples_buffer->size),
             .binding    = 2
         });
