@@ -202,7 +202,7 @@ namespace pbrlib::backend::vk
         VkImageLayout           new_layout,
         VkPipelineStageFlags2   src_stage,
         VkPipelineStageFlags2   dst_stage
-    )
+    ) const
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -217,7 +217,7 @@ namespace pbrlib::backend::vk
         VkImageLayout           new_layout,
         VkPipelineStageFlags2   src_stage,
         VkPipelineStageFlags2   dst_stage
-    )
+    ) const
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 

@@ -226,28 +226,29 @@ namespace pbrlib::testing
         const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
         const VkDeviceSize group_errors_count   = group_count_x * group_count_y;
 
-        _device.writeDescriptorSet ({
-            .view_handle            = image_1.view_handle,
-            .sampler_handle         = _sampler_handle,
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .binding                = 0
-        });
+        /// @todo
+        // _descriptor_set_handle.writeDescriptorSet ({
+        //     .view_handle            = image_1.view_handle,
+        //     .sampler_handle         = _sampler_handle,
+        //     .set_handle             = _descriptor_set_handle,
+        //     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        //     .binding                = 0
+        // });
 
-        _device.writeDescriptorSet ({
-            .view_handle            = image_2.view_handle,
-            .sampler_handle         = _sampler_handle,
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .binding                = 1
-        });
+        // _device.writeDescriptorSet ({
+        //     .view_handle            = image_2.view_handle,
+        //     .sampler_handle         = _sampler_handle,
+        //     .set_handle             = _descriptor_set_handle,
+        //     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        //     .binding                = 1
+        // });
 
-        _device.writeDescriptorSet ({
-            .view_handle            = _images_diff->view_handle,
-            .set_handle             = _descriptor_set_handle,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            .binding                = 2
-        });
+        // _device.writeDescriptorSet ({
+        //     .view_handle            = _images_diff->view_handle,
+        //     .set_handle             = _descriptor_set_handle,
+        //     .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        //     .binding                = 2
+        // });
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-diff-image-generator");
 

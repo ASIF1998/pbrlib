@@ -37,25 +37,12 @@ namespace pbrlib::backend::vk
         const builders::DescriptorSetLayout&    descriptor_set_layout_builder,
         std::string_view                        name
     ) :
-        _set_layout(descriptor_set_layout_builder.build()),
-        _set_handle(device.allocateDescriptorSet(_set_layout, name))
+        _device     (device),
+        _set_layout (descriptor_set_layout_builder.build()),
+        _set_handle (device.allocateDescriptorSet(_set_layout, name))
     { }
 
-    void DescriptorGroup::add(uint32_t bind_id, vk::Buffer& buffer)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        _resources.emplace(bind_id, &buffer);
-    }
-
-    void DescriptorGroup::add(uint32_t bind_id, vk::Image& image)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        _resources.emplace(bind_id, &image);
-    }
-
-    void DescriptorGroup::modify(std::function<void(uint32_t, vk::Image&)> modifier)
+    void DescriptorGroup::modify(std::function<void(uint32_t, const vk::Image&)> modifier)
     {
         PBRLIB_ENABLE_PROFILING;
 
@@ -67,15 +54,15 @@ namespace pbrlib::backend::vk
 
         for (auto& [bind_id, resource]: _resources)
         {
-            if (std::holds_alternative<vk::Image*>(resource))
+            if (std::holds_alternative<const vk::Image*>(resource))
             {
-                if (auto ptr_image = std::get<vk::Image*>(resource))
+                if (auto ptr_image = std::get<const vk::Image*>(resource))
                     modifier(bind_id, *ptr_image);
             }
         }
     }
 
-    void DescriptorGroup::modify(std::function<void(uint32_t, vk::Buffer&)> modifier)
+    void DescriptorGroup::modify(std::function<void(uint32_t, const vk::Buffer&)> modifier)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -87,9 +74,9 @@ namespace pbrlib::backend::vk
 
         for (auto& [bind_id, resource]: _resources)
         {
-            if (std::holds_alternative<vk::Buffer*>(resource))
+            if (std::holds_alternative<const vk::Buffer*>(resource))
             {
-                if (auto ptr_buffer = std::get<vk::Buffer*>(resource))
+                if (auto ptr_buffer = std::get<const vk::Buffer*>(resource))
                     modifier(bind_id, *ptr_buffer);
             }
         }
@@ -114,7 +101,7 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        modify([new_layout, &command_buffer] ([[maybe_unused]] uint32_t bind_id, vk::Image& image)
+        modify([new_layout, &command_buffer] ([[maybe_unused]] uint32_t bind_id, const vk::Image& image)
         {
             if (!isDepthImage(image.format)) [[likely]]
                 image.transition(command_buffer, new_layout);
@@ -137,7 +124,7 @@ namespace pbrlib::backend::vk
 
         for (auto& [bind_id, resource]: _resources)
         {
-            if (auto result = std::get_if<vk::Image*>(&resource))
+            if (auto result = std::get_if<const vk::Image*>(&resource))
             {
                 if (auto ptr_image = *result)
                 {
@@ -148,16 +135,89 @@ namespace pbrlib::backend::vk
                     }
                 }
             }
-            else if (auto result = std::get_if<vk::Buffer*>(&resource)) [[likely]]
+            else if (auto result = std::get_if<const vk::Buffer*>(&resource)) [[likely]]
             {
                 auto ptr_buffer = *result;
-                if (descriptor_group_transition.hasBind(bind_id) && ptr_buffer) 
-                {
+                if (descriptor_group_transition.hasBind(bind_id) && ptr_buffer)
                     ptr_buffer->transition(command_buffer);
-                }                
             }
             else
                 throw exception::RuntimeError("[vk-descriptor-group] invalid resource");
         }
+    }
+
+    void DescriptorGroup::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)
+    {
+        if (descriptor_image_info.image.view_handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[vk-descriptor-group] descriptor_image_info.view_handle is null");
+
+        if (descriptor_image_info.expected_image_layout == VK_IMAGE_LAYOUT_UNDEFINED) [[unlikely]]
+            throw exception::InvalidArgument("[vk-descriptor-group] descriptor_image_info.expected_image_layout is undefined");
+
+        const auto descriptor_type = descriptor_image_info.sampler_handle == VK_NULL_HANDLE
+            ?   VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
+            :   VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+
+        const VkDescriptorImageInfo image_info
+        {
+            .sampler        = descriptor_image_info.sampler_handle,
+            .imageView      = descriptor_image_info.image.view_handle,
+            .imageLayout    = descriptor_image_info.expected_image_layout
+        };
+
+        const VkWriteDescriptorSet write_info
+        {
+            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet             = _set_handle,
+            .dstBinding         = descriptor_image_info.binding,
+            .dstArrayElement    = descriptor_image_info.array_element,
+            .descriptorCount    = 1,
+            .descriptorType     = descriptor_type,
+            .pImageInfo         = &image_info
+        };
+
+        vkUpdateDescriptorSets (
+            _device.device(),
+            1, &write_info,
+            0, nullptr
+        );
+
+        _resources[descriptor_image_info.binding] = &descriptor_image_info.image;
+    }
+
+    void DescriptorGroup::writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info)
+    {
+        if (descriptor_buffer_info.buffer.handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidArgument("[vk-descriptor-group] descriptor_buffer_info.buffer.handle is null");
+
+        const VkDescriptorBufferInfo buffer_info
+        {
+            .buffer	= descriptor_buffer_info.buffer.handle,
+            .offset	= descriptor_buffer_info.offset,
+            .range	= descriptor_buffer_info.size
+        };
+
+        const auto descriptor_type = descriptor_buffer_info.buffer.usage & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+            ?   VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+            :   VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+
+        const VkWriteDescriptorSet write_info
+        {
+            .sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet             = _set_handle,
+            .dstBinding         = descriptor_buffer_info.binding,
+            .dstArrayElement    = descriptor_buffer_info.array_element,
+            .descriptorCount    = 1,
+            .descriptorType     = descriptor_type,
+            .pBufferInfo        = &buffer_info
+        };
+
+        vkUpdateDescriptorSets (
+            _device.device(),
+            1, &write_info,
+            0, nullptr
+        );
+
+        _resources[descriptor_buffer_info.binding] = &descriptor_buffer_info.buffer;
     }
 }

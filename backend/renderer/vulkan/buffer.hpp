@@ -91,7 +91,7 @@ namespace pbrlib::backend::vk
             CommandBuffer&          command_buffer,
             VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
-        );
+        ) const;
 
         BufferHandle handle;
         VkDeviceSize size   = 0;

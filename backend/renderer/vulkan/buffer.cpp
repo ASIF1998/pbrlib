@@ -138,7 +138,8 @@ namespace pbrlib::backend::vk
         CommandBuffer&          command_buffer,
         VkPipelineStageFlags2   src_stage,
         VkPipelineStageFlags2   dst_stage
-    )    {
+    ) const
+    {
         command_buffer.write([this, src_stage, dst_stage](const auto command_buffer_handle)
         {
             const auto family_index = _device.queue().family_index;

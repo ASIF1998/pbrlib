@@ -66,21 +66,23 @@ namespace pbrlib::backend::vk
         void write(const ChunkyImageWriteData& data);
         void write(const PlanarImageWriteData& data);
 
+        /// @todo remove
         void transition (
             VkImageLayout           new_layout,
             VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
-        );
+        ) const;
 
         void transition (
             CommandBuffer&          command_buffer,
             VkImageLayout           new_layout,
             VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
             VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
-        );
+        ) const;
 
         Buffer fetch(std::string_view name) const;
 
+        /// @todo move to private
         ImageHandle     handle;
         ImageViewHandle view_handle;
 
@@ -91,7 +93,7 @@ namespace pbrlib::backend::vk
         uint8_t     level_count = 1;
         uint16_t    layer_count = 1;
 
-        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        mutable VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     private:
         Device& _device;

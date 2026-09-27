@@ -24,17 +24,35 @@ namespace pbrlib::backend::vk
 
 namespace pbrlib::backend::vk
 {
+    struct DescriptorImageInfo final
+    {
+        const Image&    image;
+        VkSampler       sampler_handle          = VK_NULL_HANDLE;
+        VkImageLayout   expected_image_layout   = VK_IMAGE_LAYOUT_UNDEFINED;
+        uint32_t        binding                 = 0;
+        uint32_t        array_element           = 0;
+    };
+
+    struct DescriptorBufferInfo final
+    {
+        const Buffer&   buffer;
+        uint32_t        offset          = 0;
+        uint32_t        size            = 0;
+        uint32_t        binding         = 0;
+        uint32_t        array_element   = 0;
+    };
+
     class DescriptorGroupTransition final
     {
         static constexpr auto NoImageLayout = VK_IMAGE_LAYOUT_MAX_ENUM;
 
     public:
         using StageConfig  = std::tuple<VkPipelineStageFlags2, VkPipelineStageFlags2, VkImageLayout>;
-        
+
         DescriptorGroupTransition& bind (
-            uint32_t                bind_id, 
-            VkPipelineStageFlags2   src_stage, 
-            VkPipelineStageFlags2   dst_stage, 
+            uint32_t                bind_id,
+            VkPipelineStageFlags2   src_stage,
+            VkPipelineStageFlags2   dst_stage,
             VkImageLayout           image_layout = NoImageLayout
         );
 
@@ -47,7 +65,7 @@ namespace pbrlib::backend::vk
 
     class DescriptorGroup final
     {
-        using DescriptorBinderResource = std::variant<vk::Buffer*, vk::Image*>;
+        using DescriptorBinderResource = std::variant<const Buffer*, const Image*>;
 
     public:
         explicit DescriptorGroup (
@@ -56,11 +74,8 @@ namespace pbrlib::backend::vk
             std::string_view                        name = ""
         );
 
-        void add(uint32_t bind_id, vk::Buffer& buffer);
-        void add(uint32_t bind_id, vk::Image& image);
-
-        void modify(std::function<void(uint32_t, vk::Image&)> modifier);
-        void modify(std::function<void(uint32_t, vk::Buffer&)> modifier);
+        void modify(std::function<void(uint32_t, const Image&)> modifier);
+        void modify(std::function<void(uint32_t, const Buffer&)> modifier);
 
         /// @todo remove
         void changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout);
@@ -70,9 +85,14 @@ namespace pbrlib::backend::vk
         [[nodiscard]] const VkDescriptorSet&        descriptorSetHandle()       const noexcept;
         [[nodiscard]] const VkDescriptorSetLayout&  descriptorSetLayoutHandle() const noexcept;
 
+        void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info);
+        void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info);
+
     private:
-        vk::DescriptorSetLayoutHandle   _set_layout;
-        vk::DescriptorSetHandle         _set_handle;
+        Device& _device;
+
+        DescriptorSetLayoutHandle   _set_layout;
+        DescriptorSetHandle         _set_handle;
 
         std::map<uint32_t, DescriptorBinderResource> _resources;
     };
