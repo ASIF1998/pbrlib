@@ -48,6 +48,7 @@ namespace pbrlib::backend::vk
         static void destroy(VkFence fence_handle)                                                           noexcept;
         static void destroy(VkSemaphore semaphore_handle)                                                   noexcept;
         static void destroy(VkDebugUtilsMessengerEXT debug_utils_messenger_handle)                          noexcept;
+        static void destroy(VkPipelineCache pipeline_cache)                                                 noexcept;
 
 #ifdef PBRLIB_ENABLE_PROFILING
         static void destroy(TracyVkCtx tracy_ctx_handle) noexcept;
@@ -138,6 +139,7 @@ namespace pbrlib::backend::vk
     using FenceHandle               = UniqueHandle<VkFence>;
     using SemaphoreHandle           = UniqueHandle<VkSemaphore>;
     using DebugUtilsMessengerHandle = UniqueHandle<VkDebugUtilsMessengerEXT>;
+    using PipelineCacheHandle       = UniqueHandle<VkPipelineCache>;
 
 #ifdef PBRLIB_ENABLE_PROFILING
     using TracyCtxHandle = UniqueHandle<TracyVkCtx>;

@@ -182,6 +182,12 @@ namespace pbrlib::backend::vk
             _ptr_instance_functions->vkDestroyDebugUtilsMessengerEXT(_instance_handle, debug_utils_messenger_handle, nullptr);
     }
 
+    void ResourceDestroyer::destroy(VkPipelineCache pipeline_cache) noexcept
+    {
+        if (pipeline_cache != VK_NULL_HANDLE)
+            vkDestroyPipelineCache(_device_handle, pipeline_cache, nullptr);
+    }
+
 #ifdef PBRLIB_ENABLE_PROFILING
     void ResourceDestroyer::destroy(TracyVkCtx tracy_ctx_handle) noexcept
     {

@@ -1,15 +1,20 @@
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
-
 #include <backend/utils/paths.hpp>
+#include <backend/logger/logger.hpp>
 
-#include <pbrlib/exceptions.hpp>
-
-#include <array>
+#include <fstream>
 
 namespace pbrlib::backend::vk::utils
 {
+    struct PipelineCache final
+    {
+        vk::PipelineCacheHandle handle;
+        bool                    has_on_disk = false;
+        std::string             filename;
+    };
+
     VkPrimitiveTopology cast(PrimitiveType type) noexcept
     {
         switch (type)
@@ -93,6 +98,78 @@ namespace pbrlib::backend::vk::utils
     {
         return v ? VK_TRUE : VK_FALSE;
     }
+
+    PipelineCache createPipelineCache(Device& device, std::span<const std::string> shaders)
+    {
+        PipelineCache pipeline_cache { };
+
+        size_t final_hash = 0;
+
+        std::hash<std::string_view> hasher;
+        for (const std::string_view shader_name: shaders)
+        {
+            const auto hash = static_cast<uint32_t>(hasher(shader_name));
+            final_hash ^= hash + 0x9e3779b9 + (final_hash  << 6) + (final_hash >> 2);
+        }
+
+        if (!final_hash) [[unlikely]]
+            return pipeline_cache;
+
+        const auto pipelines_caches_directory = PBRLIB_ABS_PATH("pipelines-caches");
+        if (!std::filesystem::exists(pipelines_caches_directory)) [[unlikely]]
+            std::filesystem::create_directory(pipelines_caches_directory);
+
+        pipeline_cache.filename = pipelines_caches_directory / (std::to_string(final_hash) + ".pbrlib-pipe-cache");
+
+        std::ifstream file (pipeline_cache.filename, std::ios::binary);
+        if (!file) [[unlikely]]
+            return pipeline_cache;
+
+        file.seekg(0, file.end);
+        const auto size = file.tellg();
+        file.seekg(0, file.beg);
+
+        std::vector<char> cache (size);
+        file.read(cache.data(), size);
+
+        const VkPipelineCacheCreateInfo pipeline_cache_create_info
+        {
+            .sType              = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+            .flags              = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR,
+            .initialDataSize    = cache.size(),
+            .pInitialData       = cache.data()
+        };
+
+        VkPipelineCache vk_pipeline_cache = VK_NULL_HANDLE;
+
+        VK_CHECK(vkCreatePipelineCache(device.device(), &pipeline_cache_create_info, nullptr, &vk_pipeline_cache));
+
+        pipeline_cache.handle       = vk::PipelineCacheHandle(vk_pipeline_cache);
+        pipeline_cache.has_on_disk  = true;
+
+        return pipeline_cache;
+    }
+
+    void savePipelineCache(Device& device, const PipelineCache& pipeline_cache)
+    {
+        if (pipeline_cache.has_on_disk) [[likely]]
+            return ;
+
+        size_t size = 0;
+        VK_CHECK(vkGetPipelineCacheData(device.device(), pipeline_cache.handle, &size, nullptr));
+
+        std::vector<char> data (size);
+        VK_CHECK(vkGetPipelineCacheData(device.device(), pipeline_cache.handle, &size, data.data()));
+
+        std::ofstream file (pipeline_cache.filename, std::ios::binary);
+        if (!file) [[unlikely]]
+        {
+            backend::log::error("[pipeline-cache] failed save cache: {}", pipeline_cache.filename);
+            return;
+        }
+
+        file.write(data.data(), data.size());
+    }
 }
 
 namespace pbrlib::backend::vk::builders
@@ -106,6 +183,7 @@ namespace pbrlib::backend::vk::builders
         const auto root_directory = PBRLIB_ABS_PATH("backend/shaders");
 
         _shaders.emplace_back(shader::compile(_device, shader, root_directory, _defines));
+        _shaders_names.emplace_back(shader.string());
 
         VkPipelineShaderStageCreateInfo pipeline_stage =
         {
@@ -291,6 +369,8 @@ namespace pbrlib::backend::vk::builders
             .pDynamicStates     = dynamic_states.data()
         };
 
+        auto pipeline_cache = utils::createPipelineCache(_device, _shaders_names);
+
         VkGraphicsPipelineCreateInfo pipeline_create_info =
         {
             .sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -315,11 +395,13 @@ namespace pbrlib::backend::vk::builders
 
         VK_CHECK(vkCreateGraphicsPipelines(
             _device.device(),
-            VK_NULL_HANDLE,
+            pipeline_cache.handle,
             1, &pipeline_create_info,
             nullptr,
             &pipeline_handle
         ));
+
+        utils::savePipelineCache(_device, pipeline_cache);
 
         return PipelineHandle(pipeline_handle);
     }
@@ -381,6 +463,8 @@ namespace pbrlib::backend::vk::builders
             .pSpecializationInfo    = &_specialization_info
         };
 
+        auto pipeline_cache = utils::createPipelineCache(_device, std::span<const std::string>({_shader_name}));
+
         const VkComputePipelineCreateInfo pipeline_info
         {
             .sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
@@ -397,6 +481,8 @@ namespace pbrlib::backend::vk::builders
             nullptr,
             &pipeline_handle
         ));
+
+        utils::savePipelineCache(_device, pipeline_cache);
 
         return PipelineHandle(pipeline_handle);
     }
