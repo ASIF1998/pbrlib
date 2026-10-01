@@ -1,7 +1,7 @@
 #include <backend/renderer/frame_graph/filters/fxaa.hpp>
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
-#include <backend/renderer/vulkan/compute_pipeline.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>

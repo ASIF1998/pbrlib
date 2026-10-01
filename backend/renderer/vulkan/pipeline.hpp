@@ -116,4 +116,34 @@ namespace pbrlib::backend::vk::builders
 
         std::vector<backend::vk::shader::Define> _defines;
     };
+
+    class ComputePipeline final
+    {
+    public:
+        explicit ComputePipeline(Device& device) noexcept;
+
+        ComputePipeline(ComputePipeline&& builder)      = delete;
+        ComputePipeline(const ComputePipeline& builder) = delete;
+
+        ComputePipeline& operator = (ComputePipeline&& builder)         = delete;
+        ComputePipeline& operator = (const ComputePipeline& builder)    = delete;
+
+        ComputePipeline& shader                 (const std::filesystem::path& shader_name);
+        ComputePipeline& addDefine              (const vk::shader::Define& define);
+        ComputePipeline& specializationInfo     (const shader::SpecializationInfoBase& spec_info)   noexcept;
+        ComputePipeline& pipelineLayoutHandle   (VkPipelineLayout layout_handle)                    noexcept;
+
+        [[nodiscard]] PipelineHandle build();
+
+    private:
+        Device& _device;
+
+        std::filesystem::path _shader_name;
+
+        VkPipelineLayout _pipeline_layout_handle = VK_NULL_HANDLE;
+
+        VkSpecializationInfo _specialization_info = { };
+
+        std::vector<backend::vk::shader::Define> _defines;
+    };
 }

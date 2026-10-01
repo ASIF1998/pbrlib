@@ -1,5 +1,5 @@
 #include <backend/renderer/vulkan/device.hpp>
-#include <backend/renderer/vulkan/graphics_pipeline.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/utils/paths.hpp>
@@ -317,6 +317,83 @@ namespace pbrlib::backend::vk::builders
             _device.device(),
             VK_NULL_HANDLE,
             1, &pipeline_create_info,
+            nullptr,
+            &pipeline_handle
+        ));
+
+        return PipelineHandle(pipeline_handle);
+    }
+}
+
+namespace pbrlib::backend::vk::builders
+{
+    ComputePipeline::ComputePipeline(Device& device) noexcept :
+        _device (device)
+    { }
+
+    ComputePipeline& ComputePipeline::shader(const std::filesystem::path& shader_name)
+    {
+        _shader_name = shader_name;
+        return *this;
+    }
+
+    ComputePipeline& ComputePipeline::specializationInfo(const shader::SpecializationInfoBase& spec_info) noexcept
+    {
+        const auto entries  = spec_info.entries();
+        const auto data     = spec_info.data();
+
+        _specialization_info =
+        {
+            .mapEntryCount  = static_cast<uint32_t>(entries.size()),
+            .pMapEntries    = entries.data(),
+            .dataSize       = static_cast<uint32_t>(data.size()),
+            .pData          = data.data()
+        };
+
+        return *this;
+    }
+
+    ComputePipeline& ComputePipeline::addDefine(const vk::shader::Define& define)
+    {
+        _defines.push_back(define);
+        return *this;
+    }
+
+    ComputePipeline& ComputePipeline::pipelineLayoutHandle(VkPipelineLayout layout_handle) noexcept
+    {
+        _pipeline_layout_handle = layout_handle;
+        return *this;
+    }
+
+    PipelineHandle ComputePipeline::build()
+    {
+        if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
+            throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
+
+        const auto shader_module = shader::compile(_device, _shader_name, PBRLIB_ABS_PATH("backend/shaders"), _defines);
+
+        const VkPipelineShaderStageCreateInfo stage
+        {
+            .sType                  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+            .stage                  = VK_SHADER_STAGE_COMPUTE_BIT,
+            .module                 = shader_module,
+            .pName                  = "main",
+            .pSpecializationInfo    = &_specialization_info
+        };
+
+        const VkComputePipelineCreateInfo pipeline_info
+        {
+            .sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+            .stage  = stage,
+            .layout = _pipeline_layout_handle
+        };
+
+        VkPipeline pipeline_handle = VK_NULL_HANDLE;
+
+        VK_CHECK(vkCreateComputePipelines(
+            _device.device(),
+            VK_NULL_HANDLE,
+            1, &pipeline_info,
             nullptr,
             &pipeline_handle
         ));

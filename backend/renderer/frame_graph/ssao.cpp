@@ -4,7 +4,7 @@
 
 #include <backend/renderer/vulkan/device.hpp>
 #include <backend/renderer/vulkan/render_pass.hpp>
-#include <backend/renderer/vulkan/compute_pipeline.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 

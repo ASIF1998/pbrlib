@@ -4,7 +4,7 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/framebuffer.hpp>
-#include <backend/renderer/vulkan/graphics_pipeline.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 #include <backend/scene/mesh_manager.hpp>
 #include <backend/components.hpp>
