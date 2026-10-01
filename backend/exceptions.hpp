@@ -1,8 +1,11 @@
 #pragma once
 
 #include <pbrlib/exceptions.hpp>
-#include <string_view>
+
 #include <vulkan/vulkan.h>
+
+#include <string_view>
+#include <source_location>
 
 namespace pbrlib::backend::exception
 {
@@ -10,7 +13,7 @@ namespace pbrlib::backend::exception
         public pbrlib::exception::Exception
     {
     public:
-        explicit UndefinedPixelFormat(VkFormat format);
-        explicit UndefinedPixelFormat(std::string_view msg);
+        explicit UndefinedPixelFormat(VkFormat format, const std::source_location location = std::source_location::current());
+        explicit UndefinedPixelFormat(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 }
