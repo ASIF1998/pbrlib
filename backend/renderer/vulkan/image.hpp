@@ -177,7 +177,7 @@ namespace pbrlib::backend::vk::decoders
 
         std::string _name;
 
-        int32_t _channels_per_pixel = 4;
+        int8_t _channels_per_pixel = 4;
 
         struct
         {

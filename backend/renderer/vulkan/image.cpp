@@ -575,13 +575,16 @@ namespace pbrlib::backend::vk::decoders
 
         stbi_set_flip_vertically_on_load(true);
 
+        int channels_count = 0;
         write_data.ptr_data = stbi_load_from_memory(
             _compressed_image.ptr_data,
             static_cast<int>(_compressed_image.size),
             &write_data.width, &write_data.height,
-            &_channels_per_pixel,
+            &channels_count,
             _channels_per_pixel
         );
+
+        _channels_per_pixel = static_cast<int8_t>(channels_count);
 
         const utils::ScopeExit scope_exit ([ptr_data = write_data.ptr_data]
         {
