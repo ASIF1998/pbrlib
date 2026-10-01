@@ -30,11 +30,11 @@ namespace pbrlib::backend::exception
         std::unreachable();
     }
 
-    UndefinedPixelFormat::UndefinedPixelFormat(VkFormat format) :
-        Exception(std::format("[undefined-pixel-format] {}", toString(format)))
+    UndefinedPixelFormat::UndefinedPixelFormat(VkFormat format, const std::source_location location) :
+        Exception(std::format("[undefined-pixel-format] {}", toString(format)), location)
     { }
 
-    UndefinedPixelFormat::UndefinedPixelFormat(std::string_view msg) :
-        Exception(msg)
+    UndefinedPixelFormat::UndefinedPixelFormat(std::string_view msg, const std::source_location location) :
+        Exception(msg, location)
     { }
 }

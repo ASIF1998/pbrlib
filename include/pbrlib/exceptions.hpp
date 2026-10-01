@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include <exception>
+#include <source_location>
 
 namespace pbrlib::exception
 {
@@ -11,7 +12,7 @@ namespace pbrlib::exception
         public std::exception
     {
     protected:
-        explicit Exception(std::string_view msg);
+        explicit Exception(std::string_view msg, const std::source_location& location);
 
         const char* what() const noexcept override;
 
@@ -22,41 +23,41 @@ namespace pbrlib::exception
         public Exception
     {
     public:
-        explicit InvalidArgument(std::string_view msg);
+        explicit InvalidArgument(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 
     class RuntimeError final :
         public Exception
     {
     public:
-        explicit RuntimeError(std::string_view msg);
+        explicit RuntimeError(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 
     class InitializeError final :
         public Exception
     {
     public:
-        explicit InitializeError(std::string_view msg);
+        explicit InitializeError(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 
     class InvalidState final :
         public Exception
     {
     public:
-        explicit InvalidState(std::string_view msg);
+        explicit InvalidState(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 
     class FileOpen final :
         public Exception
     {
     public:
-        explicit FileOpen(std::string_view msg);
+        explicit FileOpen(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 
     class MathError final :
         public Exception
     {
     public:
-        explicit MathError(std::string_view msg);
+        explicit MathError(std::string_view msg, const std::source_location location = std::source_location::current());
     };
 }
