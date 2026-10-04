@@ -4,6 +4,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 
 #include <pbrlib/event_system.hpp>
 
@@ -82,9 +83,9 @@ namespace pbrlib::backend
     private:
         vk::FramebufferHandle _framebuffer_handle;
 
-        vk::PipelineLayoutHandle            _pipeline_layout_handle;
-        vk::RenderPassHandle                _render_pass_handle;
-        vk::PipelineHandle                  _pipeline_handle;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        vk::RenderPassHandle        _render_pass_handle;
+        std::optional<vk::Pipeline> _pipeline;
 
         GBufferPushConstantBlock _push_constant_block;
 

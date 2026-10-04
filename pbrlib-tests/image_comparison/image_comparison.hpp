@@ -4,6 +4,7 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 
 #include <optional>
 
@@ -42,8 +43,8 @@ namespace pbrlib::testing
     private:
         backend::vk::Device& _device;
 
-        backend::vk::PipelineLayoutHandle   _pipeline_layout_handle;
-        backend::vk::PipelineHandle         _pipeline_handle;
+        backend::vk::PipelineLayoutHandle       _pipeline_layout_handle;
+        std::optional<backend::vk::Pipeline>    _pipeline;
 
         backend::vk::DescriptorSetLayoutHandle  _descriptor_set_layout_handle;
         backend::vk::DescriptorSetHandle        _descriptor_set_handle;

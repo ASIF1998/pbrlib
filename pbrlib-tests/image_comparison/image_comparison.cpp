@@ -180,7 +180,7 @@ namespace pbrlib::testing
 
             const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_diff_generator.glsl.comp";
 
-            _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
+            _pipeline = backend::vk::builders::ComputePipeline(_device)
                 .pipelineLayoutHandle(_pipeline_layout_handle)
                 .shader(shader_name)
                 .build();
@@ -255,7 +255,7 @@ namespace pbrlib::testing
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image-comparator] run-compare-images");
 
-            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline->handle());
 
             vkCmdBindDescriptorSets(
                 command_buffer_handle,

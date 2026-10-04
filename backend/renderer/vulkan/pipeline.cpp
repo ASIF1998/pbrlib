@@ -4,16 +4,9 @@
 #include <backend/utils/paths.hpp>
 #include <backend/logger/logger.hpp>
 
-#include <fstream>
-
 namespace pbrlib::backend::vk::utils
 {
-    struct PipelineCache final
-    {
-        vk::PipelineCacheHandle handle;
-        bool                    has_on_disk = false;
-        std::string             filename;
-    };
+    static const auto pipelines_caches_directory = PBRLIB_ABS_PATH("pipelines-caches");
 
     VkPrimitiveTopology cast(PrimitiveType type) noexcept
     {
@@ -99,10 +92,8 @@ namespace pbrlib::backend::vk::utils
         return v ? VK_TRUE : VK_FALSE;
     }
 
-    PipelineCache createPipelineCache(Device& device, std::span<const std::string> shaders)
+    std::optional<PipelineCache> createPipelineCache(Device& device, std::span<const std::string> shaders)
     {
-        PipelineCache pipeline_cache { };
-
         size_t final_hash = 0;
 
         std::hash<std::string_view> hasher;
@@ -113,62 +104,120 @@ namespace pbrlib::backend::vk::utils
         }
 
         if (!final_hash) [[unlikely]]
-            return pipeline_cache;
+            return std::nullopt;
 
-        const auto pipelines_caches_directory = PBRLIB_ABS_PATH("pipelines-caches");
-        if (!std::filesystem::exists(pipelines_caches_directory)) [[unlikely]]
-            std::filesystem::create_directory(pipelines_caches_directory);
-
-        pipeline_cache.filename = pipelines_caches_directory / (std::to_string(final_hash) + ".pbrlib-pipe-cache");
-
-        std::ifstream file (pipeline_cache.filename, std::ios::binary);
-        if (!file) [[unlikely]]
-            return pipeline_cache;
-
-        file.seekg(0, file.end);
-        const auto size = file.tellg();
-        file.seekg(0, file.beg);
-
-        std::vector<char> cache (size);
-        file.read(cache.data(), size);
-
-        const VkPipelineCacheCreateInfo pipeline_cache_create_info
+        PipelineCache pipeline_cache
         {
-            .sType              = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
-            .flags              = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR,
-            .initialDataSize    = cache.size(),
-            .pInitialData       = cache.data()
+            .filename = utils::pipelines_caches_directory / (std::to_string(final_hash) + ".pbrlib-cache")
         };
 
-        VkPipelineCache vk_pipeline_cache = VK_NULL_HANDLE;
+        VkPipelineCacheCreateInfo pipeline_cache_create_info
+        {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+            .flags = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR
+        };
 
-        VK_CHECK(vkCreatePipelineCache(device.device(), &pipeline_cache_create_info, nullptr, &vk_pipeline_cache));
+        std::ifstream       file (pipeline_cache.filename, std::ios::binary);
+        std::vector<char>   cache;
+        if (file) [[likely]]
+        {
+            file.seekg(0, file.end);
+            const auto size = file.tellg();
+            file.seekg(0, file.beg);
 
-        pipeline_cache.handle       = vk::PipelineCacheHandle(vk_pipeline_cache);
-        pipeline_cache.has_on_disk  = true;
+            cache.resize(size);
+            if (!file.read(cache.data(), size)) [[unlikely]]
+            {
+                backend::log::error("[pipeline-cache] failed to read cache file: {}", pipeline_cache.filename);
+                return std::nullopt;
+            }
+
+            // important: some vulkan drivers have a bug where passing a non-null pInitialData
+            // with initialDataSize == 0 causes pipeline cache creation to fail
+            if (cache.size() > 0) [[likely]]
+            {
+                pipeline_cache.has_on_disk = true;
+
+                pipeline_cache_create_info.pInitialData     = cache.data();
+                pipeline_cache_create_info.initialDataSize  = cache.size();
+            }
+        }
+
+        VK_CHECK(vkCreatePipelineCache(device.device(), &pipeline_cache_create_info, nullptr, &pipeline_cache.handle.handle()));
 
         return pipeline_cache;
     }
+}
 
-    void savePipelineCache(Device& device, const PipelineCache& pipeline_cache)
+namespace pbrlib::backend::vk
+{
+    Pipeline::Pipeline(Device& device, PipelineHandle&& pipeline_handle) noexcept :
+        _device             (device),
+        _pipeline_handle    (std::move(pipeline_handle))
+    { }
+
+    Pipeline::Pipeline(Device& device, PipelineHandle&& pipeline_handle, PipelineCache&& pipeline_cache) noexcept :
+        _device             (device),
+        _pipeline_handle    (std::move(pipeline_handle)),
+        _pipeline_cache     (std::move(pipeline_cache))
+    { }
+
+    Pipeline::Pipeline(Pipeline&& pipeline) noexcept :
+        _device(pipeline._device)
     {
-        if (pipeline_cache.has_on_disk) [[likely]]
+        std::swap(_pipeline_cache, pipeline._pipeline_cache);
+        std::swap(_pipeline_handle, pipeline._pipeline_handle);
+    }
+
+    Pipeline& Pipeline::operator = (Pipeline&& pipeline) noexcept
+    {
+        std::swap(_pipeline_cache, pipeline._pipeline_cache);
+        std::swap(_pipeline_handle, pipeline._pipeline_handle);
+
+        return *this;
+    }
+
+    Pipeline::~Pipeline()
+    {
+        if (!_pipeline_cache || _pipeline_cache->has_on_disk || _pipeline_cache->handle == VK_NULL_HANDLE) [[likely]]
             return ;
 
-        size_t size = 0;
-        VK_CHECK(vkGetPipelineCacheData(device.device(), pipeline_cache.handle, &size, nullptr));
-
-        std::vector<char> data (size);
-        VK_CHECK(vkGetPipelineCacheData(device.device(), pipeline_cache.handle, &size, data.data()));
-
-        std::ofstream file (pipeline_cache.filename, std::ios::binary);
-        if (!file) [[unlikely]]
+        std::error_code create_directory_error_code;
+        if (!std::filesystem::exists(utils::pipelines_caches_directory, create_directory_error_code)) [[unlikely]]
         {
-            backend::log::error("[pipeline-cache] failed save cache: {}", pipeline_cache.filename);
+            std::filesystem::create_directory(utils::pipelines_caches_directory, create_directory_error_code);
+
+            if (create_directory_error_code) [[unlikely]]
+            {
+                backend::log::error("[pipeline] failed to create cache directory: {}", create_directory_error_code.message());
+                return ;
+            }
+        }
+
+        size_t size = 0;
+        if (vkGetPipelineCacheData(_device.device(), _pipeline_cache->handle, &size, nullptr) != VK_SUCCESS) [[unlikely]]
+        {
+            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
             return;
         }
 
-        file.write(data.data(), data.size());
+        std::vector<char> data (size);
+        if (vkGetPipelineCacheData(_device.device(), _pipeline_cache->handle, &size, data.data()) != VK_SUCCESS) [[unlikely]]
+        {
+            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+            return;
+        }
+
+        std::ofstream file (_pipeline_cache->filename, std::ios::binary);
+        if (file) [[likely]]
+            file.write(data.data(), data.size());
+        else
+            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+    }
+
+    VkPipeline Pipeline::handle() const noexcept
+    {
+        return _pipeline_handle.handle();
     }
 }
 
@@ -288,7 +337,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    PipelineHandle GraphicsPipeline::build()
+    Pipeline GraphicsPipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-graphics-pipeline-builder] pipeline layout handle is null");
@@ -371,6 +420,10 @@ namespace pbrlib::backend::vk::builders
 
         auto pipeline_cache = utils::createPipelineCache(_device, _shaders_names);
 
+        VkPipelineCache pipeline_cache_handle = VK_NULL_HANDLE;
+        if (pipeline_cache && pipeline_cache->handle != VK_NULL_HANDLE) [[likely]]
+            pipeline_cache_handle = pipeline_cache->handle;
+
         VkGraphicsPipelineCreateInfo pipeline_create_info =
         {
             .sType                  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -395,15 +448,16 @@ namespace pbrlib::backend::vk::builders
 
         VK_CHECK(vkCreateGraphicsPipelines(
             _device.device(),
-            pipeline_cache.handle,
+            pipeline_cache_handle,
             1, &pipeline_create_info,
             nullptr,
             &pipeline_handle
         ));
 
-        utils::savePipelineCache(_device, pipeline_cache);
+        if (pipeline_cache) [[likely]]
+            return Pipeline(_device, PipelineHandle(pipeline_handle), std::move(pipeline_cache.value()));
 
-        return PipelineHandle(pipeline_handle);
+        return Pipeline(_device, PipelineHandle(pipeline_handle));
     }
 }
 
@@ -447,7 +501,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    PipelineHandle ComputePipeline::build()
+    Pipeline ComputePipeline::build()
     {
         if (_pipeline_layout_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidState("[vk-compute-pipeline-builder] pipeline layout handle is null");
@@ -465,6 +519,10 @@ namespace pbrlib::backend::vk::builders
 
         auto pipeline_cache = utils::createPipelineCache(_device, std::span<const std::string>({_shader_name}));
 
+        VkPipelineCache pipeline_cache_handle = VK_NULL_HANDLE;
+        if (pipeline_cache && pipeline_cache->handle) [[likely]]
+            pipeline_cache_handle = pipeline_cache->handle;
+
         const VkComputePipelineCreateInfo pipeline_info
         {
             .sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
@@ -476,14 +534,15 @@ namespace pbrlib::backend::vk::builders
 
         VK_CHECK(vkCreateComputePipelines(
             _device.device(),
-            VK_NULL_HANDLE,
+            pipeline_cache_handle,
             1, &pipeline_info,
             nullptr,
             &pipeline_handle
         ));
 
-        utils::savePipelineCache(_device, pipeline_cache);
+        if (pipeline_cache) [[likely]]
+            return Pipeline(_device, PipelineHandle(pipeline_handle), std::move(pipeline_cache.value()));
 
-        return PipelineHandle(pipeline_handle);
+        return Pipeline(_device, PipelineHandle(pipeline_handle));
     }
 }

@@ -125,7 +125,7 @@ namespace pbrlib::backend
             .pipelineLayoutHandle(_pipeline_layout_handle)
             .build();
 
-        _pipeline_handle = std::move(new_pipeline);
+        _pipeline = std::move(new_pipeline);
 
         return true;
     }
@@ -138,7 +138,7 @@ namespace pbrlib::backend
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[ssao] run-pipeline");
 
-            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline->handle());
 
             const std::array sets_descriptors
             {

@@ -4,7 +4,6 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/framebuffer.hpp>
-#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 #include <backend/scene/mesh_manager.hpp>
 #include <backend/components.hpp>
@@ -139,7 +138,7 @@ namespace pbrlib::backend
             .subpass(0)
             .build();
 
-        _pipeline_handle = std::move(new_pipeline);
+        _pipeline = std::move(new_pipeline);
 
         return true;
     }
@@ -280,7 +279,7 @@ namespace pbrlib::backend
             const auto [descriptor_set, _] = context().ptr_mesh_manager->descriptorSet();
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
-            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->handle());
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &descriptor_set, 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);

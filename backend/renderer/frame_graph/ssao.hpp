@@ -4,6 +4,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/frame_graph/render_pass.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 
 #include <pbrlib/math/vec2.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
@@ -89,7 +90,7 @@ namespace pbrlib::backend
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
-        vk::PipelineHandle          _pipeline_handle;
+        std::optional<vk::Pipeline> _pipeline;
 
         vk::DescriptorSetLayoutHandle   _result_image_desc_set_layout;
         vk::DescriptorSetHandle         _result_image_desc_set;
