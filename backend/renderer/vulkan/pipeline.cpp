@@ -6,6 +6,17 @@
 
 namespace pbrlib::backend::vk::utils
 {
+    /// @link https://zeux.io/2019/07/17/serializing-pipeline-cache/
+    struct PipelineCachePrefixHeader final
+    {
+        uint32_t    magic               = 0x5042524c;
+        uint32_t    vendor_id           = 0;
+        uint32_t    device_id           = 0;
+        uint32_t    driver_version      = 0;
+        uint64_t    size                = 0;
+        uint8_t     uuid [VK_UUID_SIZE] = { };
+    };
+
     static const auto pipelines_caches_directory = PBRLIB_ABS_PATH("pipelines-caches");
 
     VkPrimitiveTopology cast(PrimitiveType type) noexcept
@@ -92,6 +103,28 @@ namespace pbrlib::backend::vk::utils
         return v ? VK_TRUE : VK_FALSE;
     }
 
+    bool checkPipelineCacheHeader(const Device& device, const utils::PipelineCachePrefixHeader& header) noexcept
+    {
+        if (header.magic != utils::PipelineCachePrefixHeader().magic) [[unlikely]]
+            return false;
+
+        const auto& gpu_properties = device.gpuProperties().properties;
+
+        if (header.vendor_id != gpu_properties.vendorID) [[unlikely]]
+            return false;
+
+        if (header.device_id != gpu_properties.deviceID) [[unlikely]]
+            return false;
+
+        if (header.driver_version != gpu_properties.driverVersion) [[unlikely]]
+            return false;
+
+        if (memcmp(header.uuid, gpu_properties.pipelineCacheUUID, VK_UUID_SIZE)) [[unlikely]]
+            return false;
+
+        return true;
+    }
+
     std::optional<PipelineCache> createPipelineCache(Device& device, std::span<const std::string> shaders)
     {
         size_t final_hash = 0;
@@ -121,26 +154,31 @@ namespace pbrlib::backend::vk::utils
         std::vector<char>   cache;
         if (file) [[likely]]
         {
-            file.seekg(0, file.end);
-            const auto size = file.tellg();
-            file.seekg(0, file.beg);
+            utils::PipelineCachePrefixHeader header;
+            file.read(reinterpret_cast<char*>(&header), static_cast<std::streamsize>(sizeof(utils::PipelineCachePrefixHeader)));
 
-            cache.resize(size);
-            if (!file.read(cache.data(), size)) [[unlikely]]
+            if (checkPipelineCacheHeader(device, header)) [[likely]]
             {
-                backend::log::error("[pipeline-cache] failed to read cache file: {}", pipeline_cache.filename);
-                return std::nullopt;
-            }
+                cache.resize(header.size);
+                if (file.read(cache.data(), header.size)) [[likely]]
+                {
+                    /// @note some vulkan drivers have a bug where passing a non-null pInitialData
+                    /// with initialDataSize == 0 causes pipeline cache creation to fail
+                    if (cache.size() > 0) [[likely]]
+                    {
+                        pipeline_cache.has_on_disk = true;
 
-            // important: some vulkan drivers have a bug where passing a non-null pInitialData
-            // with initialDataSize == 0 causes pipeline cache creation to fail
-            if (cache.size() > 0) [[likely]]
-            {
-                pipeline_cache.has_on_disk = true;
-
-                pipeline_cache_create_info.pInitialData     = cache.data();
-                pipeline_cache_create_info.initialDataSize  = cache.size();
+                        pipeline_cache_create_info.pInitialData     = cache.data();
+                        pipeline_cache_create_info.initialDataSize  = cache.size();
+                    }
+                    else
+                        backend::log::warning("[pipeline-cache] failed to read cache file: {}", pipeline_cache.filename);
+                }
+                else
+                    backend::log::warning("[pipeline-cache] failed to read cache file: {}", pipeline_cache.filename);
             }
+            else
+                backend::log::warning("[pipeline-cache] invalid pipeline cache header, file: {}", pipeline_cache.filename);
         }
 
         VK_CHECK(vkCreatePipelineCache(device.device(), &pipeline_cache_create_info, nullptr, &pipeline_cache.handle.handle()));
@@ -189,7 +227,7 @@ namespace pbrlib::backend::vk
 
             if (create_directory_error_code) [[unlikely]]
             {
-                backend::log::error("[pipeline] failed to create cache directory: {}", create_directory_error_code.message());
+                backend::log::warning("[pipeline] failed to create pipeline cache directory: {}", create_directory_error_code.message());
                 return ;
             }
         }
@@ -197,22 +235,38 @@ namespace pbrlib::backend::vk
         size_t size = 0;
         if (vkGetPipelineCacheData(_device.device(), _pipeline_cache->handle, &size, nullptr) != VK_SUCCESS) [[unlikely]]
         {
-            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+            backend::log::warning("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
             return;
         }
 
         std::vector<char> data (size);
         if (vkGetPipelineCacheData(_device.device(), _pipeline_cache->handle, &size, data.data()) != VK_SUCCESS) [[unlikely]]
         {
-            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+            backend::log::warning("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
             return;
         }
 
+        const auto& gpu_properties = _device.gpuProperties().properties;
+
+        utils::PipelineCachePrefixHeader header
+        {
+            .size           = size,
+            .vendor_id      = gpu_properties.vendorID,
+            .device_id      = gpu_properties.deviceID,
+            .driver_version = gpu_properties.driverVersion,
+        };
+        memcpy(header.uuid, gpu_properties.pipelineCacheUUID, VK_UUID_SIZE);
+
         std::ofstream file (_pipeline_cache->filename, std::ios::binary);
         if (file) [[likely]]
-            file.write(data.data(), data.size());
+        {
+            const auto ptr_header   = reinterpret_cast<const char*>(&header);
+            const auto header_size  = static_cast<std::streamsize>(sizeof(utils::PipelineCachePrefixHeader));
+            file.write(ptr_header, header_size);
+            file.write(data.data(), static_cast<std::streamsize>(data.size()));
+        }
         else
-            backend::log::error("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+            backend::log::warning("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
     }
 
     VkPipeline Pipeline::handle() const noexcept
