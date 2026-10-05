@@ -150,6 +150,7 @@ namespace pbrlib::backend::vk::utils
             .flags = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR
         };
 
+#   ifndef PBRLIB_ENABLE_DEVELOPER_MODE
         std::ifstream       file (pipeline_cache.filename, std::ios::binary);
         std::vector<char>   cache;
         if (file) [[likely]]
@@ -180,6 +181,7 @@ namespace pbrlib::backend::vk::utils
             else
                 backend::log::warning("[pipeline-cache] invalid pipeline cache header, file: {}", pipeline_cache.filename);
         }
+#   endif
 
         VK_CHECK(vkCreatePipelineCache(device.device(), &pipeline_cache_create_info, nullptr, &pipeline_cache.handle.handle()));
 
@@ -217,6 +219,7 @@ namespace pbrlib::backend::vk
 
     Pipeline::~Pipeline()
     {
+#   ifndef PBRLIB_ENABLE_DEVELOPER_MODE
         if (!_pipeline_cache || _pipeline_cache->has_on_disk || _pipeline_cache->handle == VK_NULL_HANDLE) [[likely]]
             return ;
 
@@ -267,6 +270,7 @@ namespace pbrlib::backend::vk
         }
         else
             backend::log::warning("[pipeline] failed save pipeline cache: {}", _pipeline_cache->filename);
+#   endif
     }
 
     VkPipeline Pipeline::handle() const noexcept
