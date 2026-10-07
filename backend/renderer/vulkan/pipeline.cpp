@@ -141,7 +141,7 @@ namespace pbrlib::backend::vk::utils
 
         PipelineCache pipeline_cache
         {
-            .filename = utils::pipelines_caches_directory / (std::to_string(final_hash) + ".pbrlib-cache")
+            .filename = (utils::pipelines_caches_directory / (std::to_string(final_hash) + ".pbrlib-cache")).string()
         };
 
         VkPipelineCacheCreateInfo pipeline_cache_create_info
@@ -575,7 +575,8 @@ namespace pbrlib::backend::vk::builders
             .pSpecializationInfo    = &_specialization_info
         };
 
-        auto pipeline_cache = utils::createPipelineCache(_device, std::span<const std::string>({_shader_name}));
+        std::array shaders = { _shader_name.string() };
+        auto pipeline_cache = utils::createPipelineCache(_device, shaders);
 
         VkPipelineCache pipeline_cache_handle = VK_NULL_HANDLE;
         if (pipeline_cache && pipeline_cache->handle) [[likely]]
