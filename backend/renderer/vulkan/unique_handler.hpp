@@ -5,6 +5,11 @@
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
 
+#include <concepts>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+
 namespace pbrlib::backend::vk
 {
     struct InstanceFunctions;

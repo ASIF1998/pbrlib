@@ -3,6 +3,7 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <vector>
+#include <optional>
 
 namespace pbrlib::backend::vk
 {

@@ -967,7 +967,6 @@ namespace pbrlib::backend::vk
         const VkPipelineCacheCreateInfo pipeline_cache_create_info
         {
             .sType              = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
-            .flags              = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR,
             .initialDataSize    = cache.size(),
             .pInitialData       = !cache.empty() ? cache.data() : nullptr
         };
