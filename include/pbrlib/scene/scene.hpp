@@ -7,6 +7,7 @@
 
 #include <list>
 #include <functional>
+#include <filesystem>
 
 namespace pbrlib
 {
