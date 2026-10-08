@@ -109,7 +109,6 @@ namespace pbrlib::backend::vk::builders
         std::vector<VkSpecializationInfo>                   _specialization_infos;
 
         std::vector<vk::ShaderModuleHandle> _shaders;
-        std::vector<std::string>            _shaders_names;
 
         std::vector<backend::vk::shader::Define> _defines;
     };

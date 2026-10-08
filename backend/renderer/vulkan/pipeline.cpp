@@ -104,7 +104,6 @@ namespace pbrlib::backend::vk::builders
         const auto root_directory = PBRLIB_ABS_PATH("backend/shaders");
 
         _shaders.emplace_back(shader::compile(_device, shader, root_directory, _defines));
-        _shaders_names.emplace_back(shader.string());
 
         VkPipelineShaderStageCreateInfo pipeline_stage =
         {
