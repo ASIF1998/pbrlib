@@ -26,6 +26,8 @@ namespace pbrlib::backend::vk
     {
         if (_device_handle != VK_NULL_HANDLE) [[likely]]
             vkDeviceWaitIdle(_device_handle);
+
+        serializeGlobalPipelineCache();
     }
 
     void Device::init()
@@ -35,6 +37,7 @@ namespace pbrlib::backend::vk
         createInstance(config::enable_vulkan_debug_print);
         getPhysicalDevice();
         createDevice();
+        createGlobalPipelineCache();
         createGpuAllocator();
 
         ResourceDestroyer::initForDeviceResources(
@@ -906,5 +909,127 @@ namespace pbrlib::backend::vk
             nullptr,
             &_debug_utils_messenger_handle.handle()
         ));
+    }
+}
+
+namespace pbrlib::backend::vk
+{
+    /// @link https://zeux.io/2019/07/17/serializing-pipeline-cache/
+    struct PipelineCachePrefixHeader final
+    {
+        uint32_t    magic               = 0x5042524c;
+        uint32_t    vendor_id           = 0;
+        uint32_t    device_id           = 0;
+        uint32_t    driver_version      = 0;
+        uint64_t    size                = 0;
+        uint8_t     uuid [VK_UUID_SIZE] = { };
+    };
+
+    static const std::string global_pipeline_cache_name = "global.pbrlib-pso-cache";
+
+    bool checkPipelineCacheHeader(const Device& device, const PipelineCachePrefixHeader& header) noexcept
+    {
+        if (header.magic != PipelineCachePrefixHeader().magic) [[unlikely]]
+            return false;
+
+        const auto& gpu_properties = device.gpuProperties().properties;
+
+        if (header.vendor_id != gpu_properties.vendorID) [[unlikely]]
+            return false;
+
+        if (header.device_id != gpu_properties.deviceID) [[unlikely]]
+            return false;
+
+        if (header.driver_version != gpu_properties.driverVersion) [[unlikely]]
+            return false;
+
+        if (memcmp(header.uuid, gpu_properties.pipelineCacheUUID, VK_UUID_SIZE)) [[unlikely]]
+            return false;
+
+        return true;
+    }
+
+    void Device::createGlobalPipelineCache()
+    {
+        std::vector<char> cache;
+        if (std::ifstream pso_cache(global_pipeline_cache_name, std::ios::binary); pso_cache) [[likely]]
+        {
+            PipelineCachePrefixHeader header;
+            pso_cache.read(reinterpret_cast<char*>(&header), static_cast<std::streamsize>(sizeof(PipelineCachePrefixHeader)));
+            if (checkPipelineCacheHeader(*this, header)) [[likely]]
+            {
+                cache.resize(header.size);
+                if (!pso_cache.read(cache.data(), header.size)) [[likely]]
+                {
+                    log::warning("[device] failed to read cache file: {}", global_pipeline_cache_name);
+                    cache.clear();
+                }
+            }
+        }
+
+        const VkPipelineCacheCreateInfo pipeline_cache_create_info
+        {
+            .sType              = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+            .flags              = VK_PIPELINE_CACHE_CREATE_INTERNALLY_SYNCHRONIZED_MERGE_BIT_KHR,
+            .initialDataSize    = cache.size(),
+            .pInitialData       = !cache.empty() ? cache.data() : nullptr
+        };
+
+        VK_CHECK(vkCreatePipelineCache(
+            _device_handle,
+            &pipeline_cache_create_info,
+            nullptr,
+            &_global_pipeline_cache_handle.handle()
+        ));
+    }
+
+    void Device::serializeGlobalPipelineCache()
+    {
+        if (!_global_pipeline_cache_handle) [[unlikely]]
+        {
+            log::warning("[device] failed to serialize pipeline cache: handle is null");
+            return ;
+        }
+
+        size_t size = 0;
+        if (vkGetPipelineCacheData(_device_handle, _global_pipeline_cache_handle, &size, nullptr) != VK_SUCCESS) [[unlikely]]
+        {
+            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+            return;
+        }
+
+        std::vector<char> data (size);
+        if (vkGetPipelineCacheData(_device_handle, _global_pipeline_cache_handle, &size, data.data()) != VK_SUCCESS) [[unlikely]]
+        {
+            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+            return;
+        }
+
+        const auto& gpu_properties = _gpu_properties.properties;
+
+        PipelineCachePrefixHeader header
+        {
+            .vendor_id      = gpu_properties.vendorID,
+            .device_id      = gpu_properties.deviceID,
+            .driver_version = gpu_properties.driverVersion,
+            .size           = size
+        };
+        memcpy(header.uuid, gpu_properties.pipelineCacheUUID, VK_UUID_SIZE);
+
+        std::ofstream file (global_pipeline_cache_name, std::ios::binary | std::ios::trunc);
+        if (file) [[likely]]
+        {
+            const auto ptr_header   = reinterpret_cast<const char*>(&header);
+            const auto header_size  = static_cast<std::streamsize>(sizeof(PipelineCachePrefixHeader));
+            file.write(ptr_header, header_size);
+            file.write(data.data(), static_cast<std::streamsize>(data.size()));
+        }
+        else
+            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+    }
+
+    VkPipelineCache Device::globalPipelineCache() const noexcept
+    {
+        return _global_pipeline_cache_handle;
     }
 }

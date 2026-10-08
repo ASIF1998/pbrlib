@@ -5,4 +5,3 @@ gtest/
 *build*/
 info.hpp
 CMakePresets.json
-pipelines-caches/*

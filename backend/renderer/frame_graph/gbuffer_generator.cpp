@@ -5,6 +5,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/framebuffer.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/scene/mesh_manager.hpp>
 #include <backend/components.hpp>
 #include <backend/utils/paths.hpp>
@@ -138,7 +139,7 @@ namespace pbrlib::backend
             .subpass(0)
             .build();
 
-        _pipeline = std::move(new_pipeline);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }
@@ -150,9 +151,9 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto* ptr_pos_uv_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
-        const auto* ptr_nor_tan_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
-        const auto* ptr_mat_idx_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
+        const auto ptr_pos_uv_attach    = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        const auto ptr_nor_tan_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        const auto ptr_mat_idx_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
         _render_pass_handle = vk::builders::RenderPass(device())
             .addColorAttachment(ptr_pos_uv_attach, _final_attachments_layout)
@@ -279,7 +280,7 @@ namespace pbrlib::backend
             const auto [descriptor_set, _] = context().ptr_mesh_manager->descriptorSet();
 
             vkCmdBeginRenderPass2(command_buffer_handle, &render_pass_begin_info, &subpass_begin_info);
-            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->handle());
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_handle);
             vkCmdBindDescriptorSets(command_buffer_handle, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_layout_handle, 0, 1, &descriptor_set, 0, nullptr);
             vkCmdSetViewport(command_buffer_handle, 0, 1, &viewport);
             vkCmdSetScissor(command_buffer_handle, 0, 1, &area);

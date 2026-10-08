@@ -56,34 +56,6 @@ namespace pbrlib::backend::vk
         e32,
         e64
     };
-
-    struct PipelineCache final
-    {
-        vk::PipelineCacheHandle handle;
-        bool                    has_on_disk = false;
-        std::string             filename;
-    };
-
-    class Pipeline final
-    {
-    public:
-        explicit Pipeline(Device& device, PipelineHandle&& pipeline_handle)                                 noexcept;
-        explicit Pipeline(Device& device, PipelineHandle&& pipeline_handle, PipelineCache&& pipeline_cache) noexcept;
-
-        Pipeline(Pipeline&& pipeline) noexcept;
-
-        ~Pipeline();
-
-        Pipeline& operator = (Pipeline&& pipeline) noexcept;
-
-        [[nodiscard]] VkPipeline handle() const noexcept;
-
-    private:
-        Device& _device;
-
-        PipelineHandle                  _pipeline_handle;
-        std::optional<PipelineCache>    _pipeline_cache;
-    };
 }
 
 namespace pbrlib::backend::vk::builders
@@ -117,7 +89,7 @@ namespace pbrlib::backend::vk::builders
 
         GraphicsPipeline& addDefine(const vk::shader::Define& define);
 
-        [[nodiscard]] Pipeline build();
+        [[nodiscard]] PipelineHandle build();
 
     private:
         Device& _device;
@@ -162,7 +134,7 @@ namespace pbrlib::backend::vk::builders
         ComputePipeline& specializationInfo     (const shader::SpecializationInfoBase& spec_info)   noexcept;
         ComputePipeline& pipelineLayoutHandle   (VkPipelineLayout layout_handle)                    noexcept;
 
-        [[nodiscard]] Pipeline build();
+        [[nodiscard]] PipelineHandle build();
 
     private:
         Device& _device;

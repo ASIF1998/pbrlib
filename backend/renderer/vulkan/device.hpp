@@ -82,6 +82,9 @@ namespace pbrlib::backend::vk
 
         std::vector<const char*> instanceExtensions();
 
+        void createGlobalPipelineCache();
+        void serializeGlobalPipelineCache();
+
     public:
         Device() = default;
 
@@ -137,6 +140,8 @@ namespace pbrlib::backend::vk
         [[nodiscard]] vk::SamplerHandle createLinearSampler();
         [[nodiscard]] vk::SamplerHandle createNearestSampler();
 
+        [[nodiscard]] VkPipelineCache globalPipelineCache() const noexcept;
+
 #ifdef PBRLIB_ENABLE_PROFILING
         [[nodiscard]] auto tracyContext() const noexcept
         {
@@ -165,6 +170,8 @@ namespace pbrlib::backend::vk
         DescriptorPoolHandle _descriptor_pool_handle;
 
         DebugUtilsMessengerHandle _debug_utils_messenger_handle;
+
+        vk::PipelineCacheHandle _global_pipeline_cache_handle;
 
 #ifdef PBRLIB_ENABLE_PROFILING
         TracyCtxHandle _tracy_ctx_handle;

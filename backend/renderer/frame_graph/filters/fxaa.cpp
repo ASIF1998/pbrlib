@@ -77,7 +77,7 @@ namespace pbrlib::backend
             .shader(PBRLIB_ABS_PATH("backend/shaders/fxaa.glsl.comp"))
             .build();
 
-        _pipeline = std::move(new_pipeline);
+        _pipeline_handle = std::move(new_pipeline);
 
         return true;
     }
@@ -89,7 +89,7 @@ namespace pbrlib::backend
         command_buffer.write([this] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[fxaa] run-pipeline");
-            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline->handle());
+            vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
             const auto [io_set_handle, _] = IODescriptorSet();
             vkCmdBindDescriptorSets(
