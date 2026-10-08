@@ -991,14 +991,14 @@ namespace pbrlib::backend::vk
         size_t size = 0;
         if (vkGetPipelineCacheData(_device_handle, _global_pipeline_cache_handle, &size, nullptr) != VK_SUCCESS) [[unlikely]]
         {
-            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+            log::warning("[device] failed save pipeline cache: {}", global_pipeline_cache_name);
             return;
         }
 
         std::vector<char> data (size);
         if (vkGetPipelineCacheData(_device_handle, _global_pipeline_cache_handle, &size, data.data()) != VK_SUCCESS) [[unlikely]]
         {
-            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+            log::warning("[device] failed save pipeline cache: {}", global_pipeline_cache_name);
             return;
         }
 
@@ -1022,7 +1022,7 @@ namespace pbrlib::backend::vk
             file.write(data.data(), static_cast<std::streamsize>(data.size()));
         }
         else
-            log::warning("[pipeline] failed save pipeline cache: {}", global_pipeline_cache_name);
+            log::warning("[device] failed save pipeline cache: {}", global_pipeline_cache_name);
     }
 
     VkPipelineCache Device::globalPipelineCache() const noexcept
