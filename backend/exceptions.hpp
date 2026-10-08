@@ -1,7 +1,7 @@
 #pragma once
 
 #include <pbrlib/exceptions.hpp>
-#include <string_view>
+
 #include <vulkan/vulkan.h>
 
 namespace pbrlib::backend::exception

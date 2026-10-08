@@ -15,9 +15,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include <array>
-#include <format>
-
 #include <ranges>
 
 namespace pbrlib::backend::vk

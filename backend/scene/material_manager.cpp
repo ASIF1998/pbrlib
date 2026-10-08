@@ -11,11 +11,6 @@
 
 #include <pbrlib/math/vec3.hpp>
 
-#include <format>
-
-#include <array>
-#include <ranges>
-
 namespace pbrlib::backend
 {
     MaterialManager::MaterialManager(vk::Device& device) :

@@ -7,8 +7,6 @@
 
 #include <pbrlib/event_system.hpp>
 
-#include <array>
-
 namespace pbrlib::backend
 {
     class GBufferGenerator;

@@ -3,8 +3,6 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 #include <backend/renderer/vulkan/command_buffer.hpp>
 
-#include <string_view>
-
 #include <vector>
 
 namespace pbrlib::backend

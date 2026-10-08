@@ -7,8 +7,6 @@
 
 #include <pbrlib/exceptions.hpp>
 
-#include <algorithm>
-
 namespace pbrlib::backend::vk
 {
     CommandBuffer::CommandBuffer(const Device& device, VkCommandPool command_pool_handle) :

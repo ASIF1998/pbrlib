@@ -5,8 +5,6 @@
 
 #include <pbrlib/event_system.hpp>
 
-#include <optional>
-
 namespace pbrlib
 {
     struct Config;

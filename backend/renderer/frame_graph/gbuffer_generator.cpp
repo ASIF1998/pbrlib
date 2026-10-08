@@ -15,8 +15,6 @@
 #include <pbrlib/math/matrix4x4.hpp>
 #include <backend/events.hpp>
 
-#include <array>
-
 namespace pbrlib::backend
 {
     struct GBufferDescriptorSetBindings final

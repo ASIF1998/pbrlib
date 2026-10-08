@@ -19,7 +19,6 @@
 
 #include <tinyexr/tinyexr.h>
 
-#include <algorithm>
 #include <array>
 #include <unordered_set>
 

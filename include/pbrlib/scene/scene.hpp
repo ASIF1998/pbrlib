@@ -5,18 +5,8 @@
 
 #include <entt/entt.hpp>
 
-#include <memory>
 #include <list>
-#include <map>
-
-#include <string>
-#include <string_view>
-
 #include <functional>
-
-#include <optional>
-
-#include <filesystem>
 
 namespace pbrlib
 {

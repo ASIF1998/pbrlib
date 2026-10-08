@@ -3,10 +3,7 @@
 #include <backend/renderer/vulkan/utils.hpp>
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <string_view>
 #include <vector>
-
-#include <concepts>
 
 namespace pbrlib::backend::vk
 {

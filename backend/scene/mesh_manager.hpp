@@ -7,12 +7,7 @@
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/math/aabb.hpp>
 
-#include <optional>
-
 #include <vector>
-#include <unordered_map>
-
-#include <string_view>
 
 namespace pbrlib
 {

@@ -4,10 +4,6 @@
 
 #include <vulkan/vulkan.h>
 
-#include <vector>
-#include <filesystem>
-#include <limits>
-
 namespace pbrlib::backend::vk
 {
     class Device;

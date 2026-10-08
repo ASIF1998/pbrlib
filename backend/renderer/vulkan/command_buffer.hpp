@@ -6,8 +6,6 @@
 
 #include <functional>
 
-#include <string_view>
-
 namespace pbrlib::backend::vk
 {
     class   Device;
