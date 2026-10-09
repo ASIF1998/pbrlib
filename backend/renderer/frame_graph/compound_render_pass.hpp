@@ -2,9 +2,6 @@
 
 #include <backend/renderer/frame_graph/render_pass.hpp>
 
-#include <vector>
-#include <memory>
-
 namespace pbrlib::backend
 {
     template<typename T>

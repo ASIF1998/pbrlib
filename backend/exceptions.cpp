@@ -1,7 +1,6 @@
 #include <backend/exceptions.hpp>
 
 #include <format>
-#include <utility>
 
 namespace pbrlib::backend::exception
 {

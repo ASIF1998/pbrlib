@@ -7,11 +7,6 @@
 #include <pbrlib/camera.hpp>
 #include <pbrlib/event_system.hpp>
 
-#include <string>
-#include <memory>
-#include <map>
-#include <optional>
-
 namespace pbrlib::testing
 {
     class FrameGraphResourcesGetter;

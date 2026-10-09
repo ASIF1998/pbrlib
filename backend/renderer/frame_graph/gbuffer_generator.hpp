@@ -7,8 +7,6 @@
 
 #include <pbrlib/event_system.hpp>
 
-#include <array>
-
 namespace pbrlib::backend
 {
     class GBufferGenerator;
@@ -82,9 +80,9 @@ namespace pbrlib::backend
     private:
         vk::FramebufferHandle _framebuffer_handle;
 
-        vk::PipelineLayoutHandle            _pipeline_layout_handle;
-        vk::RenderPassHandle                _render_pass_handle;
-        vk::PipelineHandle                  _pipeline_handle;
+        vk::PipelineLayoutHandle    _pipeline_layout_handle;
+        vk::RenderPassHandle        _render_pass_handle;
+        vk::PipelineHandle          _pipeline_handle;
 
         GBufferPushConstantBlock _push_constant_block;
 

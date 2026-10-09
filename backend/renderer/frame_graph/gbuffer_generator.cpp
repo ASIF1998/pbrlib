@@ -4,8 +4,8 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/framebuffer.hpp>
-#include <backend/renderer/vulkan/graphics_pipeline.hpp>
 #include <backend/renderer/vulkan/check.hpp>
+#include <backend/renderer/vulkan/pipeline.hpp>
 #include <backend/scene/mesh_manager.hpp>
 #include <backend/components.hpp>
 #include <backend/utils/paths.hpp>
@@ -14,8 +14,6 @@
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/math/matrix4x4.hpp>
 #include <backend/events.hpp>
-
-#include <array>
 
 namespace pbrlib::backend
 {
@@ -151,9 +149,9 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        const auto* ptr_pos_uv_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
-        const auto* ptr_nor_tan_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
-        const auto* ptr_mat_idx_attach  = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
+        const auto ptr_pos_uv_attach    = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::pos_uv);
+        const auto ptr_nor_tan_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
+        const auto ptr_mat_idx_attach   = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
         _render_pass_handle = vk::builders::RenderPass(device())
             .addColorAttachment(ptr_pos_uv_attach, _final_attachments_layout)

@@ -188,3 +188,8 @@ TEST_F(VulkanDeviceTests, WriteDescriptorSetBuffer)
         });
     });
 }
+
+TEST_F(VulkanDeviceTests, HasGlobalPipelineCache)
+{
+    pbrlib::testing::notEquality<VkPipelineCache>(device->globalPipelineCache(), VK_NULL_HANDLE);
+}

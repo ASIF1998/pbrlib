@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.27)
 
 set(PBRLIB_BACKEND_VULKAN_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/compute_pipeline.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pipeline_layout.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/surface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/vma_usage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/buffer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/graphics_pipeline.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pipeline.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render_pass.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/unique_handler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/device.cpp
@@ -20,14 +19,13 @@ set(PBRLIB_BACKEND_VULKAN_SRC
 
 set(PBRLIB_BACKEND_VULKAN_H
     ${CMAKE_CURRENT_SOURCE_DIR}/framebuffer.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/compute_pipeline.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/gpu_marker_colors.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pipeline_layout.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/surface.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/buffer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/check.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/graphics_pipeline.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/pipeline.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/render_pass.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/unique_handler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/device.hpp

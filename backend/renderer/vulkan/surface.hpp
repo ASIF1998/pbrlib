@@ -2,9 +2,6 @@
 
 #include <backend/renderer/vulkan/image.hpp>
 
-#include <vector>
-#include <optional>
-
 namespace pbrlib
 {
     class Window;

@@ -7,8 +7,6 @@
 
 #include <assimp/scene.h>
 
-#include <filesystem>
-
 namespace pbrlib
 {
     class Scene;

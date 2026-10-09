@@ -2,8 +2,6 @@
 
 #include <backend/logger/console.hpp>
 
-#include <format>
-
 namespace pbrlib::log
 {
     template<typename ...Args>
@@ -17,7 +15,7 @@ namespace pbrlib::log
     {
         backend::log::priv::AppLogger::getLogger().warn("{}", std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...)));
     }
-    
+
     template<typename ...Args>
     void error(const std::string_view fmt, Args&& ...args)
     {

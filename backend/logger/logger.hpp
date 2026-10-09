@@ -2,8 +2,6 @@
 
 #include <backend/logger/console.hpp>
 
-#include <format>
-
 namespace pbrlib::backend::log
 {
     template<typename ...Args>

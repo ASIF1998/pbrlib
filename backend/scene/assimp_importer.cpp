@@ -18,8 +18,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-#include <span>
-
 namespace pbrlib::backend::utils
 {
     union FloatBits

@@ -6,9 +6,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 
 #include <string>
-#include <string_view>
 
-#include <vector>
 #include <array>
 
 #include <filesystem>

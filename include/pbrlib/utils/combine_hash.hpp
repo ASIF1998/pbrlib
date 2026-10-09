@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 namespace pbrlib::utils
 {
     template<typename T>

@@ -4,8 +4,6 @@
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/wincolor_sink.h>
 
-#include <memory>
-
 namespace spdlog::sinks
 {
 #ifdef _WIN32

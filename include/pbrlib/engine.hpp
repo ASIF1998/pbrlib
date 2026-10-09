@@ -5,7 +5,6 @@
 #include <pbrlib/event_system.hpp>
 
 #include <functional>
-#include <optional>
 #include <memory>
 
 namespace pbrlib

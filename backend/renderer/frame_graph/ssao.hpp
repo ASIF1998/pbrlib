@@ -9,9 +9,6 @@
 #include <pbrlib/math/matrix4x4.hpp>
 #include <pbrlib/event_system.hpp>
 
-#include <optional>
-#include <array>
-
 namespace pbrlib::backend
 {
     class BilateralBlur;

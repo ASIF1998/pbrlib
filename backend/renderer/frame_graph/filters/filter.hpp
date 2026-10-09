@@ -4,7 +4,6 @@
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
 #include <string>
-#include <string_view>
 
 namespace pbrlib::backend::vk
 {

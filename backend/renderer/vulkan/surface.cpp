@@ -12,8 +12,6 @@
 
 #include <SDL3/SDL_vulkan.h>
 
-#include <ranges>
-
 namespace pbrlib::backend::vk
 {
     bool formatIsRgb(VkFormat format)

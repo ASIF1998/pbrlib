@@ -6,12 +6,7 @@
 
 #include <map>
 #include <span>
-#include <vector>
-#include <tuple>
-
 #include <string>
-#include <string_view>
-
 #include <functional>
 
 namespace pbrlib

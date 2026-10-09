@@ -2,8 +2,6 @@
 
 #include <backend/renderer/vulkan/unique_handler.hpp>
 
-#include <limits>
-
 namespace pbrlib::backend::vk
 {
     [[nodiscard]] SemaphoreHandle create(VkDevice device_handle, const VkSemaphoreCreateInfo& create_info);
