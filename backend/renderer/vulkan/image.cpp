@@ -220,11 +220,6 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (src_stage == VK_PIPELINE_STAGE_2_NONE || dst_stage == VK_PIPELINE_STAGE_2_NONE)
-        {
-            printf("demo log");
-        }
-
         command_buffer.write([this, new_layout, src_stage, dst_stage] (VkCommandBuffer command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(_device, command_buffer_handle, "[vk-image] changle-image-layout");

@@ -128,7 +128,7 @@ namespace pbrlib::backend
             .binding    = 1
         });
 
-        const auto ssao_shader = PBRLIB_ABS_PATH("backend/shaders/ssao/ssao.glsl.comp");
+        const auto ssao_shader = PBRLIB_ABS_PATH("backend/shaders/ssao/ssao.comp.glsl");
 
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .shader(ssao_shader)
