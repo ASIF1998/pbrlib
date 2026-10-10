@@ -122,7 +122,7 @@ namespace pbrlib::backend
         _params.noise_scale.x = static_cast<float>(width) / noise_width;
         _params.noise_scale.y = static_cast<float>(height) / noise_height;
 
-        _ssao_descriptor_group->writeDescriptorSet ({
+        _ssao_descriptor_group->write ({
             .buffer     = _params_buffer.value(),
             .size       = static_cast<uint32_t>(_params_buffer->size),
             .binding    = 1
@@ -213,7 +213,7 @@ namespace pbrlib::backend
 
         const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<SSAO>::ssao);
 
-        _result_descriptor_group->writeDescriptorSet ({
+        _result_descriptor_group->write ({
             .image                  = *ptr_result_image,
             .sampler_handle         = _result_image_sampler,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -234,13 +234,13 @@ namespace pbrlib::backend
 
         descriptorGroup(ssao_set_id, _ssao_descriptor_group.value());
 
-        _ssao_descriptor_group->writeDescriptorSet ({
+        _ssao_descriptor_group->write ({
             .image                  = *colorOutputAttach(AttachmentsTraits<SSAO>::ssao),
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
-        _ssao_descriptor_group->writeDescriptorSet ({
+        _ssao_descriptor_group->write ({
             .buffer     = _samples_buffer.value(),
             .size       = static_cast<uint32_t>(_samples_buffer->size),
             .binding    = 2

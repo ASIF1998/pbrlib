@@ -42,46 +42,6 @@ namespace pbrlib::backend::vk
         _set_handle (device.allocateDescriptorSet(_set_layout, name))
     { }
 
-    void DescriptorGroup::modify(std::function<void(uint32_t, const vk::Image&)> modifier)
-    {
-        PBRLIB_ENABLE_PROFILING;
-
-        if (!modifier) [[unlikely]]
-        {
-            log::warning("[vk-descriptor-group] image modifier is empty");
-            return ;
-        }
-
-        for (auto& [bind_id, resource]: _resources)
-        {
-            if (std::holds_alternative<const vk::Image*>(resource))
-            {
-                if (auto ptr_image = std::get<const vk::Image*>(resource))
-                    modifier(bind_id, *ptr_image);
-            }
-        }
-    }
-
-    void DescriptorGroup::modify(std::function<void(uint32_t, const vk::Buffer&)> modifier)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        if (!modifier) [[unlikely]]
-        {
-            log::warning("[vk-descriptor-group] buffer modifier is empty");
-            return ;
-        }
-
-        for (auto& [bind_id, resource]: _resources)
-        {
-            if (std::holds_alternative<const vk::Buffer*>(resource))
-            {
-                if (auto ptr_buffer = std::get<const vk::Buffer*>(resource))
-                    modifier(bind_id, *ptr_buffer);
-            }
-        }
-    }
-
     bool isDepthImage(VkFormat format) noexcept
     {
         switch (format)
@@ -95,17 +55,6 @@ namespace pbrlib::backend::vk
             default:
                 return false;
         };
-    }
-
-    void DescriptorGroup::changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout)
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        modify([new_layout, &command_buffer] ([[maybe_unused]] uint32_t bind_id, const vk::Image& image)
-        {
-            if (!isDepthImage(image.format)) [[likely]]
-                image.transition(command_buffer, new_layout);
-        });
     }
 
     const VkDescriptorSet& DescriptorGroup::descriptorSetHandle() const noexcept
@@ -146,8 +95,10 @@ namespace pbrlib::backend::vk
         }
     }
 
-    void DescriptorGroup::writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)
+    void DescriptorGroup::write(const DescriptorImageInfo& descriptor_image_info)
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (descriptor_image_info.image.view_handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-descriptor-group] descriptor_image_info.view_handle is null");
 
@@ -185,8 +136,10 @@ namespace pbrlib::backend::vk
         _resources[descriptor_image_info.binding] = &descriptor_image_info.image;
     }
 
-    void DescriptorGroup::writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info)
+    void DescriptorGroup::write(const DescriptorBufferInfo& descriptor_buffer_info)
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (descriptor_buffer_info.buffer.handle == VK_NULL_HANDLE) [[unlikely]]
             throw exception::InvalidArgument("[vk-descriptor-group] descriptor_buffer_info.buffer.handle is null");
 

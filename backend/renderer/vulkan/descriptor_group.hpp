@@ -74,19 +74,13 @@ namespace pbrlib::backend::vk
             std::string_view                        name = ""
         );
 
-        void modify(std::function<void(uint32_t, const Image&)> modifier);
-        void modify(std::function<void(uint32_t, const Buffer&)> modifier);
-
-        /// @todo remove
-        void changeColorImagesLayout(CommandBuffer& command_buffer, VkImageLayout new_layout);
-
         void transition(CommandBuffer& command_buffer, const DescriptorGroupTransition& descriptor_group_transition) const;
 
         [[nodiscard]] const VkDescriptorSet&        descriptorSetHandle()       const noexcept;
         [[nodiscard]] const VkDescriptorSetLayout&  descriptorSetLayoutHandle() const noexcept;
 
-        void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info);
-        void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info);
+        void write(const DescriptorImageInfo& descriptor_image_info);
+        void write(const DescriptorBufferInfo& descriptor_buffer_info);
 
     private:
         Device& _device;

@@ -99,7 +99,7 @@ namespace pbrlib::backend
         {
             for (const auto i: std::views::iota(0u, _images.size()))
             {
-                _descriptor_group->writeDescriptorSet ({
+                _descriptor_group->write ({
                     .image                  = _images[i],
                     .sampler_handle         = _sampler_handle,
                     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -118,7 +118,7 @@ namespace pbrlib::backend
 
             _materials_indices_buffer->write(std::span<const Material>(_materials), 0);
 
-            _descriptor_group->writeDescriptorSet ({
+            _descriptor_group->write ({
                 .buffer     = _materials_indices_buffer.value(),
                 .size       = static_cast<uint32_t>(_materials_indices_buffer->size),
                 .binding    = Bindings::eMaterial

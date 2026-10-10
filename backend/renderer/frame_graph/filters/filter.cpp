@@ -27,7 +27,7 @@ namespace pbrlib::backend
 
         descriptorGroup(0, *_io_descriptor_group);
 
-        _io_descriptor_group->writeDescriptorSet ({
+        _io_descriptor_group->write ({
             .image                  = *_ptr_dst_image,
             .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 1
@@ -54,7 +54,7 @@ namespace pbrlib::backend
 
         _input_image_sampler_handle = device().createLinearSampler();
 
-        _io_descriptor_group->writeDescriptorSet ({
+        _io_descriptor_group->write ({
             .image                  = srcImage(),
             .sampler_handle         = _input_image_sampler_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

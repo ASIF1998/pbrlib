@@ -61,28 +61,28 @@ namespace pbrlib::backend
         /// @todo подумать над этим
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-        _result_descriptor_group->writeDescriptorSet ({
+        _result_descriptor_group->write ({
             .image                  = *ptr_pos_uv_image,
             .sampler_handle         = _sampler_handle,
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::ePosUv
         });
 
-        _result_descriptor_group->writeDescriptorSet ({
+        _result_descriptor_group->write ({
             .image                  = *ptr_normal_tangent_image,
             .sampler_handle         = _sampler_handle,
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eNormalTangent
         });
 
-        _result_descriptor_group->writeDescriptorSet ({
+        _result_descriptor_group->write ({
             .image                  = *ptr_material_index_image,
             .sampler_handle         = _sampler_handle,
             .expected_image_layout  = expected_image_layout,
             .binding                = GBufferDescriptorSetBindings::eMaterialIndices
         });
 
-        _result_descriptor_group->writeDescriptorSet ({
+        _result_descriptor_group->write ({
             .image                  = *depthStencil(),
             .sampler_handle         = _sampler_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,

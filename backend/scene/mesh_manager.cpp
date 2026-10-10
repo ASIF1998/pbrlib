@@ -149,13 +149,13 @@ namespace pbrlib::backend
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
 
-            _descriptor_group->writeDescriptorSet ({
+            _descriptor_group->write ({
                 .buffer     = _vbos_refs.value(),
                 .size       = static_cast<uint32_t>(_vbos_refs->size),
                 .binding    = Bindings::eVertexBuffers
             });
 
-            _descriptor_group->writeDescriptorSet ({
+            _descriptor_group->write ({
                 .buffer     = _instances_buffer.value(),
                 .size       = static_cast<uint32_t>(_instances_buffer->size),
                 .binding    = Bindings::eInstances
