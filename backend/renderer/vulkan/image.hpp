@@ -73,7 +73,6 @@ namespace pbrlib::backend::vk
 
         Buffer fetch(std::string_view name) const;
 
-        /// @todo move to private
         ImageHandle     handle;
         ImageViewHandle view_handle;
 
