@@ -298,7 +298,7 @@ namespace pbrlib::backend::vk
         }
     }
 
-    std::optional<NextImageInfo> Surface::nextImage(VkSemaphore wait_semaphore)
+    std::optional<NextImageInfo> Surface::nextImage(VkSemaphore image_available_semaphore)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -316,7 +316,7 @@ namespace pbrlib::backend::vk
             _device.device(),
             _swapchain_handle,
             std::numeric_limits<uint64_t>::max(),
-            wait_semaphore, _next_image_fence_handle,
+            image_available_semaphore, _next_image_fence_handle,
             &_current_image_index
         );
 

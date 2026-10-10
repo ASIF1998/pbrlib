@@ -68,11 +68,11 @@ namespace pbrlib::backend
         });
     }
 
-    bool Canvas::nextImage(VkSemaphore wait_semaphore)
+    bool Canvas::nextImage(VkSemaphore image_available_semaphore)
     {
         if (_surface.vk_surface) [[likely]]
         {
-            if (const auto next_image = _surface.vk_surface->nextImage(wait_semaphore)) [[likely]]
+            if (const auto next_image = _surface.vk_surface->nextImage(image_available_semaphore)) [[likely]]
             {
                 _surface.index      = next_image->index;
                 _surface.ptr_image  = next_image->ptr_image;
@@ -84,16 +84,16 @@ namespace pbrlib::backend
         return false;
     }
 
-    void Canvas::present(const vk::Image* ptr_result, VkSemaphore wait_semaphore)
+    void Canvas::present(const vk::Image* ptr_result, VkSemaphore image_available_semaphore, VkSemaphore render_finished_semaphores)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!nextImage(wait_semaphore)) [[unlikely]]
+        if (!nextImage(image_available_semaphore)) [[unlikely]]
             return ;
 
-        _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("present");
+
+        _surface.ptr_image->transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([this, ptr_result] (VkCommandBuffer command_buffer_handle)
         {
@@ -135,19 +135,21 @@ namespace pbrlib::backend
             );
         }, "present-result-upload", vk::marker_colors::write_data_in_image);
 
-        _device.submit(command_buffer);
+        _surface.ptr_image->transition(command_buffer, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-        _surface.ptr_image->changeLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+        _device.submit(command_buffer, image_available_semaphore, render_finished_semaphores);
 
         VkResult result = VK_SUCCESS;
 
         const VkPresentInfoKHR present_info
         {
-            .sType          = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .swapchainCount = 1,
-            .pSwapchains    = &_surface.vk_surface->_swapchain_handle.handle(),
-            .pImageIndices  = &_surface.index,
-            .pResults       = &result
+            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores    = &render_finished_semaphores,
+            .swapchainCount     = 1,
+            .pSwapchains        = &_surface.vk_surface->_swapchain_handle.handle(),
+            .pImageIndices      = &_surface.index,
+            .pResults           = &result
         };
 
         const auto present_result = vkQueuePresentKHR(_device.queue().handle, &present_info);

@@ -21,7 +21,7 @@ namespace pbrlib::backend
     class Canvas final :
         public pbrlib::EventSystem
     {
-        [[nodiscard]] bool nextImage(VkSemaphore wait_semaphore);
+        [[nodiscard]] bool nextImage(VkSemaphore image_available_semaphore);
 
     public:
         explicit Canvas(vk::Device& device, const pbrlib::Window* ptr_window);
@@ -33,7 +33,7 @@ namespace pbrlib::backend
         Canvas& operator = (Canvas&& canvas)        = delete;
         Canvas& operator = (const Canvas& canvas)   = delete;
 
-        void present(const vk::Image* ptr_result, VkSemaphore wait_semaphore);
+        void present(const vk::Image* ptr_result, VkSemaphore image_available_semaphore, VkSemaphore render_finished_semaphores);
 
         [[nodiscard]] Size      size()              const;
         [[nodiscard]] uint8_t   framesInFlight()    const noexcept;

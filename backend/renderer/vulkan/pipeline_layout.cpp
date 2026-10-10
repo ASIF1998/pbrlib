@@ -82,7 +82,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    DescriptorSetLayoutHandle DescriptorSetLayout::build()
+    DescriptorSetLayoutHandle DescriptorSetLayout::build() const
     {
         if (_bindings.empty()) [[unlikely]]
             throw exception::InvalidState("[vk-descritor-set-layout::builder] bindings count is 0");
@@ -116,4 +116,4 @@ namespace pbrlib::backend::vk::builders
 
         return sets_layout;
     }
-}
+} 

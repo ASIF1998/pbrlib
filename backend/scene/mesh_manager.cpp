@@ -16,14 +16,12 @@ namespace pbrlib::backend
     MeshManager::MeshManager(vk::Device& device) :
         _device (device)
     {
-        _descriptor_set_layout_handle = vk::builders::DescriptorSetLayout(_device)
-            .addBinding(Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-            .addBinding(Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-            .build();
-
-        _descriptor_set_handle = _device.allocateDescriptorSet (
-            _descriptor_set_layout_handle,
-            "[mesh-manager] descriptor-set-layout"
+        _descriptor_group.emplace (
+            device,
+            vk::builders::DescriptorSetLayout(_device)
+                .addBinding(Bindings::eVertexBuffers, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
+                .addBinding(Bindings::eInstances, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT),
+            "[mesh-manager] descriptor-set-group"
         );
     }
 
@@ -151,16 +149,14 @@ namespace pbrlib::backend
 
             _vbos_refs->write(std::span<const VkDeviceAddress>(buffres_address), 0);
 
-            _device.writeDescriptorSet ({
+            _descriptor_group->write ({
                 .buffer     = _vbos_refs.value(),
-                .set_handle = _descriptor_set_handle,
                 .size       = static_cast<uint32_t>(_vbos_refs->size),
                 .binding    = Bindings::eVertexBuffers
             });
 
-            _device.writeDescriptorSet ({
+            _descriptor_group->write ({
                 .buffer     = _instances_buffer.value(),
-                .set_handle = _descriptor_set_handle,
                 .size       = static_cast<uint32_t>(_instances_buffer->size),
                 .binding    = Bindings::eInstances
             });
@@ -169,11 +165,6 @@ namespace pbrlib::backend
         }
 
         _instances_buffer->write(std::span<const Instance>(_instances), 0);
-    }
-
-    std::pair<VkDescriptorSet, VkDescriptorSetLayout> MeshManager::descriptorSet() const noexcept
-    {
-        return std::make_pair(_descriptor_set_handle.handle(), _descriptor_set_layout_handle.handle());
     }
 
     const vk::Buffer& MeshManager::indexBuffer(uint32_t instance_id) const
@@ -207,5 +198,13 @@ namespace pbrlib::backend
             instance.model     = transform;
             instance.normal    = math::transpose(math::inverse(transform));
         }
+    }
+
+    const vk::DescriptorGroup* MeshManager::descriptorGroup() const noexcept
+    {
+        if (_descriptor_group) [[likely]]
+            return &_descriptor_group.value();
+
+        return nullptr;
     }
 }
