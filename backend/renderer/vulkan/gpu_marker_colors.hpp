@@ -18,7 +18,6 @@ namespace pbrlib::backend::vk::marker_colors
 
     constexpr auto bilateral_blur   = generateColor(8);
     constexpr auto fxaa             = generateColor(9);
-    constexpr auto pbl              = generateColor(10);
 
-    constexpr auto clear = generateColor(11);
+    constexpr auto clear = generateColor(10);
 }

@@ -5,6 +5,7 @@
 #include <backend/renderer/vulkan/buffer.hpp>
 
 #include <backend/renderer/vulkan/pipeline_layout.hpp>
+#include <backend/renderer/vulkan/descriptor_group.hpp>
 
 #include <pbrlib/event_system.hpp>
 #include <backend/events.hpp>
@@ -142,4 +143,17 @@ TEST_F(VulkanDeviceTests, AllocateDescriptorSet)
 TEST_F(VulkanDeviceTests, HasGlobalPipelineCache)
 {
     pbrlib::testing::notEquality<VkPipelineCache>(device->globalPipelineCache(), VK_NULL_HANDLE);
+}
+
+TEST_F(VulkanDeviceTests, DescriptorGroup)
+{
+    const pbrlib::backend::vk::DescriptorGroup descriptor_group(
+        *device,
+        pbrlib::backend::vk::builders::DescriptorSetLayout(*device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT)
+    );
+
+    pbrlib::testing::notEquality<VkDescriptorSet>(descriptor_group.descriptorSetHandle(), VK_NULL_HANDLE);
+    pbrlib::testing::notEquality<VkDescriptorSetLayout>(descriptor_group.descriptorSetLayoutHandle(), VK_NULL_HANDLE);
 }

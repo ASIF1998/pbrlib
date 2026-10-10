@@ -38,24 +38,10 @@ namespace pbrlib::backend
     {
         _ptr_src_image = &image;
 
-        // constexpr auto dst_stage = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
-
-        // addSyncImage (
-        //     _ptr_src_image,
-        //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        //     VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT, dst_stage
-        // );
-
-        // addSyncImage (
-        //     _ptr_dst_image,
-        //     VK_IMAGE_LAYOUT_GENERAL,
-        //     VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT, dst_stage
-        // );
-
         _input_image_sampler_handle = device().createLinearSampler();
 
         _io_descriptor_group->write ({
-            .image                  = srcImage(),
+            .image                  = *_ptr_src_image,
             .sampler_handle         = _input_image_sampler_handle,
             .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             .binding                = 0
