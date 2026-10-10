@@ -58,7 +58,6 @@ namespace pbrlib::backend
         const auto ptr_normal_tangent_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::normal_tangent);
         const auto ptr_material_index_image = colorOutputAttach(AttachmentsTraits<GBufferGenerator>::material_index);
 
-        /// @todo подумать над этим
         constexpr auto expected_image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         _result_descriptor_group->write ({
@@ -276,7 +275,7 @@ namespace pbrlib::backend
             {
                 .sType      = VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO,
                 .contents   = VK_SUBPASS_CONTENTS_INLINE
-        };
+            };
 
             const VkViewport viewport
             {

@@ -166,17 +166,18 @@ namespace pbrlib::testing
     {
         if constexpr (testing::generate_image_diff)
         {
-            _descriptor_set_layout_handle = pbrlib::backend::vk::builders::DescriptorSetLayout(_device)
+            _descriptor_group.emplace(
+                device,
+                backend::vk::builders::DescriptorSetLayout(device)
                 .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
                 .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT)
-                .build();
-
+                .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+                "[vk-diff-image-generator] descriptor-set"
+            );
+            
             _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
-                .addSetLayout(_descriptor_set_layout_handle)
+                .addSetLayout(_descriptor_group->descriptorSetLayoutHandle())
                 .build();
-
-            _descriptor_set_handle = _device.allocateDescriptorSet(_descriptor_set_layout_handle, "[vk-diff-image-generator] descriptor-set");
 
             const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_diff_generator.glsl.comp";
 
@@ -203,11 +204,13 @@ namespace pbrlib::testing
 
     void ImageComparison::generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2)
     {
-        // if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-        //     image_1.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-diff-image-generator");
+        
+        if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_1.transition(command_buffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        // if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
-        //     image_2.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        if (image_2.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
+            image_2.transition(command_buffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         _images_diff = backend::vk::builders::Image(_device)
             .size(image_1.width, image_1.height)
@@ -226,31 +229,25 @@ namespace pbrlib::testing
         const VkDeviceSize group_count_y        = image_1.height / _device.workGroupSize();
         const VkDeviceSize group_errors_count   = group_count_x * group_count_y;
 
-        /// @todo
-        // _descriptor_set_handle.writeDescriptorSet ({
-        //     .view_handle            = image_1.view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _descriptor_set_handle,
-        //     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        //     .binding                = 0
-        // });
+        _descriptor_group->write ({
+            .image                  = image_1,
+            .sampler_handle         = _sampler_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 0
+        });
 
-        // _device.writeDescriptorSet ({
-        //     .view_handle            = image_2.view_handle,
-        //     .sampler_handle         = _sampler_handle,
-        //     .set_handle             = _descriptor_set_handle,
-        //     .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        //     .binding                = 1
-        // });
+        _descriptor_group->write ({
+            .image                  = image_2,
+            .sampler_handle         = _sampler_handle,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .binding                = 1
+        });
 
-        // _device.writeDescriptorSet ({
-        //     .view_handle            = _images_diff->view_handle,
-        //     .set_handle             = _descriptor_set_handle,
-        //     .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        //     .binding                = 2
-        // });
-
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-diff-image-generator");
+        _descriptor_group->write ({
+            .image                  = *_images_diff,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            .binding                = 2
+        });
 
         command_buffer.write([&image_1, this] (auto command_buffer_handle)
         {
@@ -262,7 +259,7 @@ namespace pbrlib::testing
                 command_buffer_handle,
                 VK_PIPELINE_BIND_POINT_COMPUTE,
                 _pipeline_layout_handle,
-                0, 1, &_descriptor_set_handle.handle(),
+                0, 1, &_descriptor_group->descriptorSetHandle(),
                 0, nullptr
             );
 
@@ -289,11 +286,19 @@ namespace pbrlib::testing
         if constexpr (pbrlib::testing::generate_image_diff)
             generateImageDiff(rendered_image, reference_image);
 
-        // if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
-        //     rendered_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+            
+        if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL || reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+        {
+            auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-compare-images");
 
-        // if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
-        //     reference_image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+            if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+                rendered_image.transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+    
+            if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
+                reference_image.transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+            _device.submit(command_buffer);
+        }
 
         if (rendered_image.format == VK_FORMAT_R32G32B32A32_SFLOAT)
             return psnr<pbrlib::math::vec4>(rendered_image, reference_image);
@@ -340,7 +345,9 @@ namespace pbrlib::testing
                 const auto extension            = backend::channelSize(image.format) == 1 ? "png" : "exr";
                 const auto path_to_diff_image   = std::format("pbrlib-tests/references/diffs/{}-diff.{}", filename, extension);
 
-                // _images_diff->changeLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-change-diff-image-layout");
+                _images_diff->transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                _device.submit(command_buffer);
 
                 pbrlib::backend::vk::exporters::Image(_device)
                     .filename(backend::utils::projectRoot() / path_to_diff_image)
