@@ -21,9 +21,6 @@ namespace pbrlib::backend::vk
 {
     Device::~Device()
     {
-        if (_device_handle != VK_NULL_HANDLE) [[likely]]
-            vkDeviceWaitIdle(_device_handle);
-
         serializeGlobalPipelineCache();
     }
 
@@ -476,6 +473,17 @@ namespace pbrlib::backend::vk
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
+        submit(command_buffer, VK_NULL_HANDLE, VK_NULL_HANDLE);
+    }
+
+    void Device::submit (
+        const CommandBuffer&    command_buffer,
+        VkSemaphore             wait_semaphore_handle,
+        VkSemaphore             signal_semaphore_handle
+    )
+    {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (_submit_fence_handle == VK_NULL_HANDLE) [[unlikely]]
         {
             constexpr VkFenceCreateInfo fence_create_info
@@ -486,7 +494,7 @@ namespace pbrlib::backend::vk
             _submit_fence_handle = create(_device_handle, fence_create_info);
         }
 
-        submit(command_buffer, VK_NULL_HANDLE, VK_NULL_HANDLE, _submit_fence_handle);
+        submit(command_buffer, wait_semaphore_handle, signal_semaphore_handle, _submit_fence_handle);
         sync(_device_handle, _submit_fence_handle);
     }
 

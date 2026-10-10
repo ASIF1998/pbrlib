@@ -212,6 +212,9 @@ namespace pbrlib
 
             draw();
         } while (!is_close);
+
+        if (_ptr_frame_graph) [[likely]]
+            _ptr_frame_graph->drain();
     }
 
     Camera& Engine::camera() noexcept

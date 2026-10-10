@@ -102,6 +102,12 @@ namespace pbrlib::backend::vk
         void submit (
             const CommandBuffer&    command_buffer,
             VkSemaphore             wait_semaphore_handle,
+            VkSemaphore             signal_semaphore_handle
+        );
+
+        void submit (
+            const CommandBuffer&    command_buffer,
+            VkSemaphore             wait_semaphore_handle,
             VkSemaphore             signal_semaphore_handle,
             VkFence                 fence_handle
         );

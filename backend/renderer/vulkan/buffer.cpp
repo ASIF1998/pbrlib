@@ -48,7 +48,7 @@ namespace pbrlib::backend::vk
 
         staging_buffer.writeToRam(ptr_data, data_size, 0);
 
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer("uplaod-data-to-buffer");
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("upload-data-to-buffer");
 
         command_buffer.write([&staging_buffer, offset, data_size, this](VkCommandBuffer command_buffer_handle)
         {

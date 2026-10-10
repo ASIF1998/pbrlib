@@ -115,8 +115,14 @@ namespace pbrlib::backend
         ptr_result->transition(change_layout_command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         _device.submit(change_layout_command_buffer);
 
-        const auto available_semaphore = _image_available_semaphores[frame_index].handle();
-        _canvas.present(ptr_result, available_semaphore);
+        const auto available_semaphore          = _image_available_semaphores[frame_index].handle();
+        const auto render_finished_semaphores   = _render_finished_semaphores[frame_index].handle();
+        _canvas.present(ptr_result, available_semaphore, render_finished_semaphores);
+    }
+
+    void FrameGraph::drain()
+    {
+        VK_CHECK(vkDeviceWaitIdle(_device.device()));
     }
 }
 

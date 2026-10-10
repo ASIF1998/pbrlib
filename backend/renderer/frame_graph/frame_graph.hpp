@@ -69,6 +69,8 @@ namespace pbrlib::backend
         void postRenderCallback(const std::function<void()>& callback);
         void presentToDisplayCallback(const std::function<void()>& callback);
 
+        void drain();
+
     private:
         vk::Device& _device;
         Canvas&     _canvas;
