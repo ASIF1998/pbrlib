@@ -91,9 +91,9 @@ namespace pbrlib::backend
         if (!nextImage(wait_semaphore)) [[unlikely]]
             return ;
 
-        _surface.ptr_image->transition(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("present");
+
+        _surface.ptr_image->transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([this, ptr_result] (VkCommandBuffer command_buffer_handle)
         {
@@ -135,9 +135,10 @@ namespace pbrlib::backend
             );
         }, "present-result-upload", vk::marker_colors::write_data_in_image);
 
+        _surface.ptr_image->transition(command_buffer, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
         _device.submit(command_buffer);
 
-        _surface.ptr_image->transition(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
         VkResult result = VK_SUCCESS;
 

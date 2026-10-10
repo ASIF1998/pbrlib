@@ -64,13 +64,6 @@ namespace pbrlib::backend::vk
         void write(const ChunkyImageWriteData& data);
         void write(const PlanarImageWriteData& data);
 
-        /// @todo remove
-        void transition (
-            VkImageLayout           new_layout,
-            VkPipelineStageFlags2   src_stage = VK_PIPELINE_STAGE_2_NONE,
-            VkPipelineStageFlags2   dst_stage = VK_PIPELINE_STAGE_2_NONE
-        ) const;
-
         void transition (
             CommandBuffer&          command_buffer,
             VkImageLayout           new_layout,
@@ -107,6 +100,8 @@ namespace pbrlib::backend::vk::builders
         void validate();
 
         [[nodiscard]] VkSharingMode sharingMode();
+
+        void setImageLayout(vk::Image& image, VkImageLayout start_image_layout);
 
     public:
         explicit Image(Device& device) noexcept;
