@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 
 if (APPLE)
-    set(CMAKE_OSX_ARCHITECTURES arm64)
+  set(CMAKE_OSX_ARCHITECTURES arm64)
 endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)

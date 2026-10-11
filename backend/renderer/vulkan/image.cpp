@@ -84,7 +84,7 @@ namespace pbrlib::backend::vk
 
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-copy-buffer-to-image");
 
-        changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         command_buffer.write([&data, &staging_buffer, this] (VkCommandBuffer command_buffer_handle)
         {
@@ -197,26 +197,12 @@ namespace pbrlib::backend::vk
             writeToImage<uint32_t>(*this, data);
     }
 
-    void Image::changeLayout (
-        VkImageLayout           new_layout,
-        VkPipelineStageFlags2   src_stage,
-        VkPipelineStageFlags2   dst_stage
-    )
-    {
-        PBRLIB_PROFILING_ZONE_SCOPED;
-
-        auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-change-image-layout");
-
-        changeLayout(command_buffer, new_layout, src_stage, dst_stage);
-        _device.submit(command_buffer);
-    }
-
-    void Image::changeLayout (
+    void Image::transition (
         CommandBuffer&          command_buffer,
         VkImageLayout           new_layout,
         VkPipelineStageFlags2   src_stage,
         VkPipelineStageFlags2   dst_stage
-    )
+    ) const
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
@@ -401,6 +387,13 @@ namespace pbrlib::backend::vk::builders
         return families.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
     }
 
+    void Image::setImageLayout(vk::Image& image, VkImageLayout start_image_layout)
+    {
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-set-start-image-layout");
+        image.transition(command_buffer, start_image_layout);
+        _device.submit(command_buffer);
+    }
+
     vk::Image Image::build()
     {
         validate();
@@ -452,13 +445,13 @@ namespace pbrlib::backend::vk::builders
         image.handle = ImageHandle(image_handle, allocation_handle, true);
 
         if (_usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-            image.changeLayout(VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+            setImageLayout(image, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
         else if (_usage & VK_IMAGE_USAGE_SAMPLED_BIT)
-            image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            setImageLayout(image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         else if (_usage & VK_IMAGE_USAGE_TRANSFER_DST_BIT)
-            image.changeLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            setImageLayout(image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         else if (_usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-            image.changeLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            setImageLayout(image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         const auto aspect = _format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
 
@@ -599,7 +592,10 @@ namespace pbrlib::backend::vk::decoders
             .build();
 
         image.write(write_data);
-        image.changeLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-set-start-image-layout");
+        image.transition(command_buffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        _device.submit(command_buffer);
 
         return image;
     }

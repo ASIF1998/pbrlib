@@ -39,7 +39,7 @@ namespace pbrlib::backend::vk
 
         Surface(Surface&& surface);
 
-        [[nodiscard]] std::optional<NextImageInfo> nextImage(VkSemaphore wait_semaphore);
+        [[nodiscard]] std::optional<NextImageInfo> nextImage(VkSemaphore image_available_semaphore);
 
         [[nodiscard]] constexpr static uint8_t framesInFlight() noexcept
         {

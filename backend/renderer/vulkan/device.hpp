@@ -38,26 +38,6 @@ namespace pbrlib::backend::vk
         PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = VK_NULL_HANDLE;
     };
 
-    struct DescriptorImageInfo final
-    {
-        VkImageView     view_handle             = VK_NULL_HANDLE;
-        VkSampler       sampler_handle          = VK_NULL_HANDLE;
-        VkDescriptorSet set_handle              = VK_NULL_HANDLE;
-        VkImageLayout   expected_image_layout   = VK_IMAGE_LAYOUT_UNDEFINED;
-        uint32_t        binding                 = 0;
-        uint32_t        array_element           = 0;
-    };
-
-    struct DescriptorBufferInfo final
-    {
-        const Buffer&   buffer;
-        VkDescriptorSet set_handle      = VK_NULL_HANDLE;
-        uint32_t        offset          = 0;
-        uint32_t        size            = 0;
-        uint32_t        binding         = 0;
-        uint32_t        array_element   = 0;
-    };
-
     class Device final
     {
         void getGeneralQueueIndex();
@@ -122,12 +102,15 @@ namespace pbrlib::backend::vk
         void submit (
             const CommandBuffer&    command_buffer,
             VkSemaphore             wait_semaphore_handle,
+            VkSemaphore             signal_semaphore_handle
+        );
+
+        void submit (
+            const CommandBuffer&    command_buffer,
+            VkSemaphore             wait_semaphore_handle,
             VkSemaphore             signal_semaphore_handle,
             VkFence                 fence_handle
         );
-
-        void writeDescriptorSet(const DescriptorImageInfo& descriptor_image_info)   const;
-        void writeDescriptorSet(const DescriptorBufferInfo& descriptor_buffer_info) const;
 
         [[nodiscard]]
         const VkPhysicalDeviceLimits& limits() const noexcept;

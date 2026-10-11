@@ -153,49 +153,49 @@ class SlangCompilerTests : public ShaderCompiler
 TEST_F(GlslCompilerTests, CompileComputeShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.glsl.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.comp.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileVertexShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.glsl.vert", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.vert.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileFragmentShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.glsl.frag", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.frag.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileInvalidShader)
 {
     EXPECT_THROW({
-        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "invalid_shader.glsl.comp", root_directory, {});
+        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "invalid_shader.comp.glsl", root_directory, {});
     }, exception::RuntimeError);
 }
 
 TEST_F(GlslCompilerTests, FileNotFound)
 {
     EXPECT_THROW({
-        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "non_existent_shader.glsl.comp", root_directory, {});
+        [[maybe_unused]] const auto shader_handle = vk::shader::compile(*device, root_directory / "non_existent_shader.comp.glsl", root_directory, {});
     }, exception::InvalidState);
 }
 
 TEST_F(GlslCompilerTests, IncludeDirective)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/include_test.glsl.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/include_test.comp.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, Defines)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/define_test.glsl.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.glsl", {});
     });
 
     EXPECT_NO_THROW({
@@ -204,42 +204,42 @@ TEST_F(GlslCompilerTests, Defines)
             backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
         };
 
-        checkShader("pbrlib-tests/renderer/shaders/define_test.glsl.comp", define);
+        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.glsl", define);
     });
 }
 
 TEST_F(SlangCompilerTests, CompileComputeShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.slang.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.comp.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileVertexShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.slang.vert", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.vert.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileFragmentShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.slang.frag", {});
+        checkShader("pbrlib-tests/renderer/shaders/simple_shader.frag.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, IncludeModule)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/module_test.slang.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/module_test.comp.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, Defines)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/define_test.slang.comp", {});
+        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.slang", {});
     });
 
     EXPECT_NO_THROW({
@@ -248,6 +248,6 @@ TEST_F(SlangCompilerTests, Defines)
             backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
         };
 
-        checkShader("pbrlib-tests/renderer/shaders/define_test.slang.comp", define);
+        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.slang", define);
     });
 }

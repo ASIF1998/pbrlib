@@ -27,8 +27,8 @@ The code is distributed under the GNU General Public License v3.0.
 
 ## 💻 Platforms
 
-- **Windows** (SDL3)
-- **Vulkan 1.3** required
+- **Windows**
+- **MacOS**
 
 ## 🔨 Building
 
@@ -66,7 +66,7 @@ The project uses the following libraries:
 - **VulkanMemoryAllocator** - Vulkan memory management
 - **Tracy** - Profiling
 - **STB** - Image loading
-- **glslang** - Shader compilation
+- **glslang/Slang** - Shader compilation
 - **MoltenVK** - Implementation of Vulkan API graphics and compute functionality for macOS
 - **cpptrace** - Сapturing and printing call stacks
 - **tinyexr** - Loading and saving EXR (.exr) high dynamic range images

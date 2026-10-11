@@ -54,7 +54,7 @@ namespace pbrlib::backend::vk::builders
             VkShaderStageFlags  stages
         );
 
-        DescriptorSetLayoutHandle build();
+        DescriptorSetLayoutHandle build() const;
 
     private:
         Device& _device;
