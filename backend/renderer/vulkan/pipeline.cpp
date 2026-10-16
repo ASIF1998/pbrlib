@@ -94,22 +94,25 @@ namespace pbrlib::backend::vk::utils
         return v ? VK_TRUE : VK_FALSE;
     }
 
-    void logPipelineCreationInfo(const VkPipelineCreationFeedback& total_creation_info, std::span<const VkPipelineCreationFeedback> stages_creation_info, std::span<const VkPipelineShaderStageCreateInfo> stages)
+    void logPipelineCreationInfo(
+        const VkPipelineCreationFeedback&                   total_creation_info,
+        std::span<const VkPipelineCreationFeedback>         stages_creation_info,
+        std::span<const VkPipelineShaderStageCreateInfo>    stages
+    )
     {
         const auto print_creation_feedback = [] (std::string_view title, const VkPipelineCreationFeedback& feedback)
         {
-            log::info("[pipeline-creation-info] {}", title);
-
             std::string str_flags;
             if (feedback.flags) [[likely]]
             {
-                auto add_flag = [&](const char* flag_name) 
+                auto add_flag = [&](const char* flag_name)
                 {
                     if (!str_flags.empty())
                         str_flags += " | ";
 
                     str_flags += flag_name;
                 };
+
                 if (feedback.flags & VK_PIPELINE_CREATION_FEEDBACK_VALID_BIT)
                     add_flag("VALID");
 
@@ -119,17 +122,18 @@ namespace pbrlib::backend::vk::utils
                 if (feedback.flags & VK_PIPELINE_CREATION_FEEDBACK_BASE_PIPELINE_ACCELERATION_BIT)
                     add_flag("BASE_PIPELINE_ACCEL");
             }
-            
+
             if (str_flags.empty()) [[unlikely]]
                 str_flags = "NONE";
 
+            log::info("[pipeline-creation-info] {}", title);
             log::info("[pipeline-creation-info] \t- compile time: {:.3f} ms", static_cast<double>(feedback.duration) / 1000000.0);
             log::info("[pipeline-creation-info] \t- flags: [{}]", str_flags);
         };
 
         const auto castToString = [] (VkShaderStageFlagBits current_stage)
         {
-            constexpr std::array stages 
+            constexpr std::array stages
             {
                 std::make_pair(VK_SHADER_STAGE_VERTEX_BIT, "vertex"),
                 std::make_pair(VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, "tess-control"),
@@ -146,7 +150,6 @@ namespace pbrlib::backend::vk::utils
                 std::make_pair(VK_SHADER_STAGE_TASK_BIT_EXT, "task"),
                 std::make_pair(VK_SHADER_STAGE_MESH_BIT_EXT, "mesh")
             };
-
 
             for (const auto [stage, name]: stages)
             {
@@ -361,7 +364,7 @@ namespace pbrlib::backend::vk::builders
 
 #if defined(PBRLIB_ENABLE_DEVELOPER_MODE) || defined(PBRLIB_RUN_FROM_CI)
         VkPipelineCreationFeedback              pipeline_creation_feedback = {};
-        std::vector<VkPipelineCreationFeedback> stages_creation_info (_stages.size(), {});
+        std::vector<VkPipelineCreationFeedback> stages_creation_info (_stages.size(), VkPipelineCreationFeedback{});
 
         const VkPipelineCreationFeedbackCreateInfo pipeline_creation_feedback_create_info
         {
@@ -475,7 +478,7 @@ namespace pbrlib::backend::vk::builders
 
         const VkPipelineCreationFeedbackCreateInfo pipeline_creation_feedback_create_info
         {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_CREATION_FEEDBACK_CREATE_INFO,
+            .sType                              = VK_STRUCTURE_TYPE_PIPELINE_CREATION_FEEDBACK_CREATE_INFO,
             .pPipelineCreationFeedback          = &pipeline_creation_feedback,
             .pipelineStageCreationFeedbackCount = 1,
             .pPipelineStageCreationFeedbacks    = &stage_creation_feedback
