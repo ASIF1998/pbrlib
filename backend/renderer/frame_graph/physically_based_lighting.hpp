@@ -7,6 +7,34 @@
 
 namespace pbrlib::backend
 {
+    class PhysicallyBasedLighting;
+
+    template<>
+    struct AttachmentsTraits<PhysicallyBasedLighting>
+    {
+        static constexpr auto metadata()
+        {
+            constexpr auto usage_flags =
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+            |   VK_IMAGE_USAGE_SAMPLED_BIT
+            |   VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            |   VK_IMAGE_USAGE_TRANSFER_DST_BIT
+            |   VK_IMAGE_USAGE_STORAGE_BIT;
+
+            constexpr std::array metadata
+            {
+                AttachmentMetadata(dst_image, VK_FORMAT_R32G32B32A32_SFLOAT, usage_flags),
+            };
+
+            return metadata;
+        }
+
+        constexpr static auto dst_image = "pbl-dst-image";
+    };
+}
+
+namespace pbrlib::backend
+{
     class PhysicallyBasedLighting final :
         public RenderPass,
         public EventSystem

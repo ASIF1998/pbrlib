@@ -8,6 +8,8 @@
 
 #include <pbrlib/exceptions.hpp>
 
+#include <backend/logger/logger.hpp>
+
 #include <slang.h>
 #include <slang-com-ptr.h>
 #include <slang-com-helper.h>
@@ -131,6 +133,8 @@ namespace pbrlib::backend::vk::shader::slang
     )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
+
+        log::info("[slang-shader-compiler] compile shader: {}", filename.filename().string());
 
         const ::SlangGlobalSessionDesc global_session_desc
         {

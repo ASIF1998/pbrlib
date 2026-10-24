@@ -73,7 +73,7 @@ namespace pbrlib::backend::vk::shader::utils
 
 #undef RETURN_STAGE
 
-        backend::log::error("[glsl-shader-compiler] undefined shader type: {}", filename.string());
+        log::error("[glsl-shader-compiler] undefined shader type: {}", filename.string());
 
         return GLSLANG_STAGE_COUNT;
     }
@@ -85,7 +85,7 @@ namespace pbrlib::backend::vk::shader::utils
         [[maybe_unused]] size_t      include_depth
     )
     {
-        backend::log::error("[glsl-shader-compiler] don't process local include files");
+        log::error("[glsl-shader-compiler] don't process local include files");
         return nullptr;
     }
 
@@ -225,7 +225,7 @@ namespace pbrlib::backend::vk::shader::glsl
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        backend::log::info("[glsl-shader-compiler] compile shader: {}", filename.filename().string());
+        log::info("[glsl-shader-compiler] compile shader: {}", filename.filename().string());
 
         auto il = createIL(filename, root_directory, defines);
 
@@ -243,7 +243,7 @@ namespace pbrlib::backend::vk::shader::glsl
     void init()
     {
         if (!glslang_initialize_process()) [[unlikely]]
-            backend::log::error("[glsl-shader-compiler] failed initialize glslang");
+            log::error("[glsl-shader-compiler] failed initialize glslang");
 
         is_init = true;
     }
