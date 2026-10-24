@@ -145,6 +145,8 @@ namespace pbrlib::backend::vk::shader::glsl
         for (const auto& [name, value]: defines)
             str_defines += std::format("#define {} {}\n", name, value);
 
+        str_defines += "#define PBRLIB_SHADER_GLSL\n";
+
         if (const auto version_pos = code.find("#version"); version_pos != std::string::npos) [[likely]]
         {
             if (const auto next_line_pos = code.find("\n", version_pos); next_line_pos != std::string::npos) [[likely]]
@@ -161,8 +163,7 @@ namespace pbrlib::backend::vk::shader::glsl
         auto source = utils::getSource(filename);
         auto stage  = utils::getStage(filename);
 
-        if (!defines.empty())
-            processDefines(source, defines);
+        processDefines(source, defines);
 
         const glsl_include_callbacks_t includer
         {

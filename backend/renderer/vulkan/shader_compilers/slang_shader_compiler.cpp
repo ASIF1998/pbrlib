@@ -121,6 +121,8 @@ namespace pbrlib::backend::vk::shader::slang
                 slang_defines.emplace_back(name.c_str(), value.c_str());
         }
 
+        slang_defines.emplace_back("PBRLIB_SHADER_SLANG", "");
+
         return slang_defines;
     }
 
