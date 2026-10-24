@@ -10,11 +10,11 @@
 #include <backend/renderer/frame_graph/compound_render_pass.hpp>
 #include <backend/renderer/frame_graph/gbuffer_generator.hpp>
 #include <backend/renderer/frame_graph/ssao.hpp>
+#include <backend/renderer/frame_graph/filters/fxaa.hpp>
+#include <backend/renderer/frame_graph/physically_based_lighting.hpp>
 
 #include <backend/renderer/frame_graph/builders/ssao.hpp>
 #include <backend/renderer/frame_graph/builders/gbuffer_generator.hpp>
-
-#include <backend/renderer/frame_graph/filters/fxaa.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -177,7 +177,7 @@ namespace pbrlib::backend
         auto ptr_pos_uv         = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::pos_uv);
         auto ptr_normal_tangent = &_render_passes_images.at(AttachmentsTraits<GBufferGenerator>::normal_tangent);
 
-        auto ptr_ssao =  builders::SSAO(_device)
+        auto ptr_ssao = builders::SSAO(_device)
             .ssaoImage(_render_passes_images.at(AttachmentsTraits<SSAO>::ssao))
             .blurImage(_render_passes_images.at(AttachmentsTraits<SSAO>::blur))
             .gbufferDescriptorGroup(ptr_gbuffer_generator->resultDescriptorGroup())
@@ -185,8 +185,11 @@ namespace pbrlib::backend
             .srcStage(ptr_gbuffer_generator->dstStage())
             .build();
 
+        auto ptr_pbl = std::make_unique<PhysicallyBasedLighting>(_device, _render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image));
+
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
+        ptr_render_pass->add(std::move(ptr_pbl));
 
         setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
 
@@ -229,6 +232,7 @@ namespace pbrlib::backend
         createRenderPassImages<GBufferGenerator>(_device, _render_passes_images, width, height);
         createRenderPassImages<SSAO>(_device, _render_passes_images, width, height);
         createRenderPassImages<FXAA>(_device, _render_passes_images, width, height);
+        createRenderPassImages<PhysicallyBasedLighting>(_device, _render_passes_images, width, height);
     }
 
     void FrameGraph::initFrameSync()

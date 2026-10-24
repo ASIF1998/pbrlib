@@ -10,6 +10,7 @@
 #include <backend/profiling.hpp>
 
 #include <backend/logger/logger.hpp>
+#include <backend/utils/paths.hpp>
 
 namespace pbrlib::backend
 {
@@ -43,7 +44,7 @@ namespace pbrlib::backend
     {
         auto new_pipeline = vk::builders::ComputePipeline(device())
             .pipelineLayoutHandle(_pipeline_layout_handle)
-            .shader("shaders/physically_based_lighting.comp.glsl")
+            .shader(PBRLIB_ABS_PATH("backend/shaders/physically_based_lighting.comp.slang"))
             .build();
 
         _pipeline_handle = std::move(new_pipeline);
