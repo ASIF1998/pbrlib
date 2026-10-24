@@ -8,7 +8,7 @@ set(PBRLIB_SHADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/generation.glsl
     ${CMAKE_CURRENT_SOURCE_DIR}/math.glsl
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/exports.glsl
+    ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/exports.h
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/gbuffer_generator.vert.glsl
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/gbuffer_generator.frag.glsl
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/packing.glsl

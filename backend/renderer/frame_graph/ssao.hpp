@@ -105,7 +105,7 @@ namespace pbrlib::backend
 
         BilateralBlur* _ptr_blur = nullptr;
 
-        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE; 
+        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE;
 
         static constexpr auto final_attachments_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     };
