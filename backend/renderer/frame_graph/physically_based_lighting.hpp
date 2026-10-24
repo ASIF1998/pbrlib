@@ -51,11 +51,19 @@ namespace pbrlib::backend
 
         bool createPipeline();
 
+        static constexpr uint32_t gbuffer_set_id = 0;
+
     public:
         explicit PhysicallyBasedLighting(vk::Device& device, vk::Image& dst_image) noexcept;
+
+        void srcStage(VkPipelineStageFlags2 src_stage) noexcept;
 
     private:
         vk::PipelineLayoutHandle    _pipeline_layout_handle;
         vk::PipelineHandle          _pipeline_handle;
+
+        VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE;
+
+        std::optional<vk::DescriptorGroup> _result_descriptor_group;
     };
 }

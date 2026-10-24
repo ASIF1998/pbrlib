@@ -9,7 +9,7 @@ layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_
 #include <generation.glsl>
 
 #define PBRLIB_GBUFFER_GENERATOR_EXPORTS_SET_ID 0
-#include <gbuffer_generator/exports.glsl>
+#include <gbuffer_generator/exports.h>
 #include <gbuffer_generator/packing.glsl>
 
 #define PBRLIB_MATERIAL_MANAGER_SET_ID 2

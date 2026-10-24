@@ -100,6 +100,7 @@ namespace pbrlib::backend
         if (!ptr_material_manager_set) [[unlikely]]
             throw exception::InvalidState("[ssao] failed initialize - material manager descriptor group is empty");
 
+        /// @todo а точно нужно это вызывать для gbuffer_set_id ? мы же ведь получаем это тут descriptorGroup(gbuffer_set_id);
         descriptorGroup(gbuffer_set_id, *ptr_gbuffer_set);
         descriptorGroup(ssao_set_id, *_ssao_descriptor_group);
         descriptorGroup(material_set_id, *ptr_material_manager_set);
