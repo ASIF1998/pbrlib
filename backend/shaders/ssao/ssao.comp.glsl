@@ -13,7 +13,7 @@ layout (local_size_x = PBRLIB_WORK_GROUP_SIZE, local_size_y = PBRLIB_WORK_GROUP_
 #include <gbuffer_generator/packing.glsl>
 
 #define PBRLIB_MATERIAL_MANAGER_SET_ID 2
-#include <material_manager/exports.glsl>
+#include <material_manager/exports.h>
 
 layout(set = 1, binding = 0, r16f) uniform writeonly image2D result;
 

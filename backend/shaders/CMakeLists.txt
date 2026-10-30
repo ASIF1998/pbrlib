@@ -13,7 +13,7 @@ set(PBRLIB_SHADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/gbuffer_generator.frag.glsl
     ${CMAKE_CURRENT_SOURCE_DIR}/gbuffer_generator/packing.glsl
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/material_manager/exports.glsl
+    ${CMAKE_CURRENT_SOURCE_DIR}/material_manager/exports.h
     ${CMAKE_CURRENT_SOURCE_DIR}/mesh_manager/exports.glsl
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ssao/exports.glsl
