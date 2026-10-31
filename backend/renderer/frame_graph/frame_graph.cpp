@@ -188,6 +188,7 @@ namespace pbrlib::backend
         auto ptr_pbl = std::make_unique<PhysicallyBasedLighting>(_device, _render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image));
         ptr_pbl->descriptorGroup(0, *ptr_gbuffer_generator->resultDescriptorGroup());
         ptr_pbl->srcStage(reinterpret_cast<const RenderPass*>(ptr_ssao.get())->dstStage());
+        ptr_pbl->addColorOutput(AttachmentsTraits<PhysicallyBasedLighting>::dst_image, &_render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image));
 
         ptr_render_pass->add(std::move(ptr_gbuffer_generator));
         ptr_render_pass->add(std::move(ptr_ssao));
