@@ -186,7 +186,7 @@ namespace pbrlib::backend
             .build();
 
         auto ptr_pbl = std::make_unique<PhysicallyBasedLighting>(_device, _render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image));
-        ptr_pbl->descriptorGroup(0, *ptr_gbuffer_generator->resultDescriptorGroup());
+        ptr_pbl->descriptorGroup(1, *ptr_gbuffer_generator->resultDescriptorGroup());
         ptr_pbl->srcStage(reinterpret_cast<const RenderPass*>(ptr_ssao.get())->dstStage());
         ptr_pbl->addColorOutput(AttachmentsTraits<PhysicallyBasedLighting>::dst_image, &_render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image));
 
@@ -194,7 +194,7 @@ namespace pbrlib::backend
         ptr_render_pass->add(std::move(ptr_ssao));
         ptr_render_pass->add(std::move(ptr_pbl));
 
-        setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<SSAO>::blur), _config.aa);
+        setupAA(*ptr_render_pass, _render_passes_images.at(AttachmentsTraits<PhysicallyBasedLighting>::dst_image), _config.aa);
 
         _ptr_render_pass = std::move(ptr_render_pass);
 

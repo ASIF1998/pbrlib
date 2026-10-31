@@ -31,7 +31,7 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!RenderPass::init(context, width, height))
+        if (!RenderPass::init(context, width, height)) [[unlikely]]
         {
             log::error("[pbl] failed initialize");
             return false;
@@ -61,7 +61,7 @@ namespace pbrlib::backend
 
         _pbl_descriptor_group->write ({
             .image                  = *ptr_result_image,
-            .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_GENERAL,
             .binding                = 0
         });
 
@@ -69,9 +69,9 @@ namespace pbrlib::backend
         descriptorGroup(result_set_id, *_pbl_descriptor_group);
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
+            .addSetLayout(_pbl_descriptor_group->descriptorSetLayoutHandle())
             .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
             .addSetLayout(ptr_material_descriptor_group->descriptorSetLayoutHandle())
-            .addSetLayout(_pbl_descriptor_group->descriptorSetLayoutHandle())
             .build();
 
         return createPipeline();
@@ -101,7 +101,9 @@ namespace pbrlib::backend
 
             const std::array sets_descriptors
             {
-                descriptorGroup(gbuffer_set_id)->descriptorSetHandle()
+                _pbl_descriptor_group->descriptorSetHandle(),
+                descriptorGroup(gbuffer_set_id)->descriptorSetHandle(),
+                context().ptr_material_manager->descriptorGroup()->descriptorSetHandle()
             };
 
             vkCmdBindDescriptorSets (
@@ -143,14 +145,18 @@ namespace pbrlib::backend
 
     void PhysicallyBasedLighting::sync(Transition& transition)
     {
+        transition.addSet(result_set_id)
+            .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_GENERAL);
+
         transition.addSet(gbuffer_set_id)
             .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
             .bind(1, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
             .bind(2, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
             .bind(3, _src_stage, dstStage(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
 
-        transition.addSet(result_set_id)
-            .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        transition.addSet(material_manager_set_id)
+            .bind(0, _src_stage, dstStage())
+            .bind(1, _src_stage, dstStage());
     }
 
     void PhysicallyBasedLighting::srcStage(VkPipelineStageFlags2 src_stage) noexcept
