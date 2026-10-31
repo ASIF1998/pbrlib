@@ -17,7 +17,7 @@ struct Material
         Material materials[];
     };
 #elif defined(PBRLIB_SHADER_SLANG)
-    [[vk::binding(0, PBRLIB_MATERIAL_MANAGER_SET_ID)]] StructuredBuffer<Sampler2D>  materials_images;
+    [[vk::binding(0, PBRLIB_MATERIAL_MANAGER_SET_ID)]] Sampler2D  materials_images[];
     [[vk::binding(1, PBRLIB_MATERIAL_MANAGER_SET_ID)]] StructuredBuffer<Material>   materials;
 #endif
 

@@ -51,7 +51,9 @@ namespace pbrlib::backend
 
         bool createPipeline();
 
-        static constexpr uint32_t gbuffer_set_id = 0;
+        static constexpr uint32_t gbuffer_set_id            = 0;
+        static constexpr uint32_t material_manager_set_id   = 1;
+        static constexpr uint32_t result_set_id             = 2;
 
     public:
         explicit PhysicallyBasedLighting(vk::Device& device, vk::Image& dst_image) noexcept;
@@ -65,5 +67,6 @@ namespace pbrlib::backend
         VkPipelineStageFlags2 _src_stage = VK_PIPELINE_STAGE_2_NONE;
 
         std::optional<vk::DescriptorGroup> _result_descriptor_group;
+        std::optional<vk::DescriptorGroup> _pbl_descriptor_group;
     };
 }

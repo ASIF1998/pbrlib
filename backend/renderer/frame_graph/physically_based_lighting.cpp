@@ -7,6 +7,8 @@
 #include <backend/renderer/vulkan/command_buffer.hpp>
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
+#include <backend/scene/material_manager.hpp>
+
 #include <backend/profiling.hpp>
 
 #include <backend/logger/logger.hpp>
@@ -46,8 +48,30 @@ namespace pbrlib::backend
         if (!ptr_gbuffer_set) [[unlikely]]
             throw exception::InvalidState("[pbl] failed initialize - gbuffer descriptor group is empty");
 
+        const auto ptr_material_descriptor_group = context.ptr_material_manager->descriptorGroup();
+
+        _pbl_descriptor_group.emplace(
+            device(),
+            vk::builders::DescriptorSetLayout(device())
+                .addBinding(0, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT),
+            "[pbl] read/write result descriptor set"
+        );
+
+        const auto ptr_result_image = colorOutputAttach(AttachmentsTraits<PhysicallyBasedLighting>::dst_image);
+
+        _pbl_descriptor_group->write ({
+            .image                  = *ptr_result_image,
+            .expected_image_layout  = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            .binding                = 0
+        });
+
+        descriptorGroup(material_manager_set_id, *ptr_material_descriptor_group);
+        descriptorGroup(result_set_id, *_pbl_descriptor_group);
+
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
+            .addSetLayout(ptr_material_descriptor_group->descriptorSetLayoutHandle())
+            .addSetLayout(_pbl_descriptor_group->descriptorSetLayoutHandle())
             .build();
 
         return createPipeline();
@@ -124,6 +148,9 @@ namespace pbrlib::backend
             .bind(1, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
             .bind(2, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
             .bind(3, _src_stage, dstStage(), VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+
+        transition.addSet(result_set_id)
+            .bind(0, _src_stage, dstStage(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     void PhysicallyBasedLighting::srcStage(VkPipelineStageFlags2 src_stage) noexcept
