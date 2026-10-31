@@ -51,9 +51,9 @@ namespace pbrlib::backend
 
         bool createPipeline();
 
-        static constexpr uint32_t gbuffer_set_id            = 0;
-        static constexpr uint32_t material_manager_set_id   = 1;
-        static constexpr uint32_t result_set_id             = 2;
+        static constexpr uint32_t result_set_id             = 0;
+        static constexpr uint32_t gbuffer_set_id            = 1;
+        static constexpr uint32_t material_manager_set_id   = 2;
 
     public:
         explicit PhysicallyBasedLighting(vk::Device& device, vk::Image& dst_image) noexcept;
