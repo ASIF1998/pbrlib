@@ -12,7 +12,7 @@ layout(location = 0) out vec4 gbuffer_pos_uv;
 layout(location = 1) out vec4 gbuffer_normal_tangent;
 layout(location = 2) out uint gbuffer_material_index;
 
-#include <gbuffer_generator/packing.glsl>
+#include <gbuffer_generator/packing.h>
 
 void main()
 {
