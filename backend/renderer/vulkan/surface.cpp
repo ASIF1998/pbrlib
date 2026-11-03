@@ -320,7 +320,13 @@ namespace pbrlib::backend::vk
             &_current_image_index
         );
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) [[unlikely]]
+        constexpr std::array permissible_errors
+        {
+            VK_ERROR_OUT_OF_DATE_KHR,
+            VK_ERROR_SURFACE_LOST_KHR
+        };
+
+        if (std::ranges::contains(permissible_errors, result)) [[unlikely]]
         {
             VK_CHECK(vkResetFences(
                 _device.device(),
@@ -330,8 +336,14 @@ namespace pbrlib::backend::vk
             return std::nullopt;
         }
 
-        if (result != VK_SUCCESS) [[unlikely]]
-            throw exception::RuntimeError("[vk-surface] failed get next image");
+        constexpr std::array success_results
+        {
+            VK_SUCCESS,
+            VK_SUBOPTIMAL_KHR
+        };
+
+        if (!std::ranges::contains(success_results, result)) [[unlikely]]
+            throw exception::RuntimeError(std::format("[vk-surface] failed get next image: VkResult = {}", static_cast<int32_t>(result)));
 
         sync(_device.device(), _next_image_fence_handle);
 
