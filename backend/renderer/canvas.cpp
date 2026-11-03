@@ -154,7 +154,14 @@ namespace pbrlib::backend
 
         const auto present_result = vkQueuePresentKHR(_device.queue().handle, &present_info);
 
-        if (present_result == VK_ERROR_OUT_OF_DATE_KHR) [[unlikely]]
+        constexpr std::array retry_present_results
+        {
+            VK_ERROR_OUT_OF_DATE_KHR, 
+            VK_ERROR_SURFACE_LOST_KHR, 
+            VK_SUBOPTIMAL_KHR
+        };
+
+        if (std::ranges::contains(retry_present_results, present_result)) [[unlikely]]
             return ;
 
         VK_CHECK(present_result);
