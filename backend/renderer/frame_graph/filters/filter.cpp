@@ -5,6 +5,8 @@
 #include <backend/renderer/vulkan/image.hpp>
 #include <backend/renderer/vulkan/check.hpp>
 
+#include <backend/utils/align_size.hpp>
+
 #include <pbrlib/exceptions.hpp>
 
 namespace pbrlib::backend
@@ -73,10 +75,11 @@ namespace pbrlib::backend
 
     void Filter::dispatchCompute(VkCommandBuffer command_buffer_handle)
     {
-        const auto [width, height] = size();
+        const auto [width, height]     = size();
+        const auto work_group_size     = static_cast<uint32_t>(device().workGroupSize());
 
-        const auto group_count_x = width / device().workGroupSize();
-        const auto group_count_y = height / device().workGroupSize();
+        const auto group_count_x = backend::utils::alignSize(width, work_group_size) / work_group_size;
+        const auto group_count_y = backend::utils::alignSize(height, work_group_size) / work_group_size;
 
         vkCmdDispatch(command_buffer_handle, group_count_x, group_count_y, 1);
     }

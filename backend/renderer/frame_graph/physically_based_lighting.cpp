@@ -13,6 +13,7 @@
 
 #include <backend/logger/logger.hpp>
 #include <backend/utils/paths.hpp>
+#include <backend/utils/align_size.hpp>
 
 namespace pbrlib::backend
 {
@@ -114,10 +115,11 @@ namespace pbrlib::backend
                 0, nullptr
             );
 
-            const auto [width, height] = size();
+            const auto [width, height]     = size();
+            const auto work_group_size     = static_cast<uint32_t>(device().workGroupSize());
 
-            const auto local_size_x = width / device().workGroupSize();
-            const auto local_size_y = height / device().workGroupSize();
+            const auto local_size_x = backend::utils::alignSize(width, work_group_size) / work_group_size;
+            const auto local_size_y = backend::utils::alignSize(height, work_group_size) / work_group_size;
 
             vkCmdDispatch(command_buffer_handle, local_size_x, local_size_y, 1);
         }, "[pbl] run-pipeline", vk::marker_colors::pbl);

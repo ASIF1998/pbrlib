@@ -15,6 +15,7 @@
 #include <backend/renderer/vulkan/check.hpp>
 
 #include <backend/utils/private/info.hpp>
+#include <backend/utils/align_size.hpp>
 
 #include <pbrlib/math/vec3.hpp>
 #include <pbrlib/math/vec4.hpp>
@@ -179,10 +180,11 @@ namespace pbrlib::backend
                 0, static_cast<uint32_t>(sizeof(pbrlib::math::mat4) * matrices.size()), matrices.data()
             );
 
-            const auto [width, height] = size();
+            const auto [width, height]     = size();
+            const auto work_group_size     = static_cast<uint32_t>(device().workGroupSize());
 
-            const auto local_size_x = width / device().workGroupSize();
-            const auto local_size_y = height / device().workGroupSize();
+            const auto local_size_x = backend::utils::alignSize(width, work_group_size) / work_group_size;
+            const auto local_size_y = backend::utils::alignSize(height, work_group_size) / work_group_size;
 
             vkCmdDispatch(command_buffer_handle, local_size_x, local_size_y, 1);
         }, "[ssao] run-pipeline", vk::marker_colors::compute_pipeline);
