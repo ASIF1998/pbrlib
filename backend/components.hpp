@@ -28,4 +28,9 @@ namespace pbrlib::backend::components
 
         pbrlib::math::AABB bbox;
     };
+
+    struct PointLight final
+    {
+        size_t light_id = std::numeric_limits<size_t>::max();
+    };
 }

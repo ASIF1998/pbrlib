@@ -29,15 +29,18 @@ namespace pbrlib::backend
         std::string_view                    name,
         std::span<const VertexAttribute>    attributes,
         std::span<const uint32_t>           indices,
-        SceneItem*                          ptr_item
+        SceneItem&                          item
     )
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (!ptr_item || !ptr_item->hasComponent<components::Renderable>()) [[unlikely]]
-            throw exception::InvalidArgument("[mesh-manager] ptr_item");
+        if (!item.hasComponent<components::Renderable>()) [[unlikely]]
+        {
+            const auto& tag = item.getComponent<pbrlib::components::Tag>();
+            throw exception::InvalidState(std::format("[mesh-manager] scene item '{}' doesn't have renderable component", tag.name));
+        }
 
-        auto& renderable = ptr_item->getComponent<components::Renderable>();
+        auto& renderable = item.getComponent<components::Renderable>();
 
         renderable.instance_id  = static_cast<uint32_t>(_instances.size());
         renderable.vertex_count = attributes.size();
@@ -68,7 +71,7 @@ namespace pbrlib::backend
         _vbos.back().write(attributes, 0);
         _ibos.back().write(indices, 0);
 
-        const auto& transform = ptr_item->getComponent<pbrlib::components::Transform>();
+        const auto& transform = item.getComponent<pbrlib::components::Transform>();
 
         const Instance instance
         {
@@ -77,20 +80,17 @@ namespace pbrlib::backend
             .mesh_id    = static_cast<uint32_t>(_vbos.size() - 1)
         };
 
-        _item_to_instance_id.emplace(ptr_item, _instances.size());
+        _item_to_instance_id.emplace(&item, _instances.size());
         _instances.push_back(instance);
 
         _descriptor_set_is_changed = true;
     }
 
-    void MeshManager::addInstance(const SceneItem* ptr_src_item, SceneItem* ptr_dst_item)
+    void MeshManager::addInstance(const SceneItem& src_item, SceneItem& dst_item)
     {
-        if (!ptr_src_item || !ptr_dst_item) [[unlikely]]
-            throw exception::InvalidArgument("[mesh-manager] pointers to items is null");
+        const auto mesh_id = _instances[_item_to_instance_id[&src_item]].mesh_id;
 
-        const auto mesh_id = _instances[_item_to_instance_id[ptr_src_item]].mesh_id;
-
-        const auto& transform = ptr_dst_item->getComponent<pbrlib::components::Transform>();
+        const auto& transform = dst_item.getComponent<pbrlib::components::Transform>();
 
         const Instance dst_instance
         {
@@ -101,16 +101,16 @@ namespace pbrlib::backend
 
         const auto dst_instance_id = static_cast<uint32_t>(_instances.size());
 
-        _item_to_instance_id.emplace(ptr_dst_item, dst_instance_id);
+        _item_to_instance_id.emplace(&dst_item, dst_instance_id);
         _instances.push_back(dst_instance);
 
-        const auto& src_renderable = ptr_src_item->getComponent<components::Renderable>();
-        auto&       dst_renderable = ptr_dst_item->getComponent<components::Renderable>();
+        const auto& src_renderable = src_item.getComponent<components::Renderable>();
+        auto&       dst_renderable = dst_item.getComponent<components::Renderable>();
 
         dst_renderable = src_renderable;
 
         dst_renderable.instance_id  = dst_instance_id;
-        dst_renderable.ptr_item     = ptr_dst_item;
+        dst_renderable.ptr_item     = &dst_item;
 
         _descriptor_set_is_changed = true;
     }
@@ -188,11 +188,11 @@ namespace pbrlib::backend
         return _ibos.size();
     }
 
-    void MeshManager::updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform)
+    void MeshManager::updateItemTransform(const SceneItem& item, const math::mat4& transform)
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
-        if (auto index = _item_to_instance_id.find(ptr_item); index != std::end(_item_to_instance_id))
+        if (auto index = _item_to_instance_id.find(&item); index != std::end(_item_to_instance_id))
         {
             auto& instance      = _instances[index->second];
             instance.model     = transform;

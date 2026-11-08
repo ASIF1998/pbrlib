@@ -82,7 +82,7 @@ namespace pbrlib::backend
             if (const auto ptr_set_transition = transition.set(set_id))
                 descriptor_group->transition(command_buffer, *ptr_set_transition);
         }
-        
+
         render(command_buffer);
     }
 

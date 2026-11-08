@@ -6,6 +6,7 @@
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 
 #include <backend/scene/mesh_manager.hpp>
+#include <backend/scene/light_manager.hpp>
 
 #include <backend/logger/logger.hpp>
 
@@ -88,7 +89,7 @@ namespace pbrlib
         const auto  transform       = world_transform * local_transform;
 
         if (auto ptr_mesh_manager = _ptr_scene->_ptr_mesh_manager) [[likely]]
-            ptr_mesh_manager->updateItemTransform(this, transform);
+            ptr_mesh_manager->updateItemTransform(*this, transform);
 
         for (auto& child: _children)
             child.update(input_stay, delta_time, transform);
@@ -191,7 +192,7 @@ namespace pbrlib
         if (ptr_item->hasComponent<backend::components::Renderable>())
         {
             instance_node.addComponent<backend::components::Renderable>();
-            _ptr_mesh_manager->addInstance(ptr_item, &instance_node);
+            _ptr_mesh_manager->addInstance(*ptr_item, instance_node);
         }
 
         items.push(&instance_node);
@@ -228,5 +229,23 @@ namespace pbrlib
     void Scene::meshManager(backend::MeshManager* ptr_mesh_manager) noexcept
     {
         _ptr_mesh_manager = ptr_mesh_manager;
+    }
+
+    void Scene::lightManager (backend::LightManager* ptr_light_manager) noexcept
+    {
+        _ptr_light_manager = ptr_light_manager;
+    }
+
+    SceneItem& Scene::addLight(const PointLightDesc& point_light_desc)
+    {
+        SceneItem* ptr_item = nullptr;
+        if (point_light_desc.ptr_root_item)
+            ptr_item = &point_light_desc.ptr_root_item->addItem(point_light_desc.name);
+        else
+            ptr_item = &addItem(point_light_desc.name);
+
+        _ptr_light_manager->add(*ptr_item, point_light_desc.color, point_light_desc.intensity);
+
+        return *ptr_item;
     }
 }

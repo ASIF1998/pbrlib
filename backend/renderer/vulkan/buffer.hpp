@@ -120,9 +120,9 @@ namespace pbrlib::backend::vk::builders
         Buffer& operator = (const Buffer& builder)    = delete;
 
         Buffer& addQueueFamilyIndex(uint32_t index);
-        Buffer& size(VkDeviceSize size)                noexcept;
-        Buffer& usage(VkImageUsageFlags usage)         noexcept;
-        Buffer& type(BufferType buffer_type)           noexcept;
+        Buffer& size(VkDeviceSize size)                 noexcept;
+        Buffer& usage(VkBufferUsageFlags usage)         noexcept;
+        Buffer& type(BufferType buffer_type)            noexcept;
 
         Buffer& name(std::string_view buffer_name);
 

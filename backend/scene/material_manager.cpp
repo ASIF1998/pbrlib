@@ -46,7 +46,7 @@ namespace pbrlib::backend
     }
 
     void MaterialManager::add (
-        SceneItem*                  ptr_scene_item,
+        SceneItem&                  scene_item,
         std::string_view            material_name,
         const CompressedImageData&  albedo,
         const CompressedImageData&  normal_map,
@@ -58,14 +58,16 @@ namespace pbrlib::backend
 
         _descriptor_set_is_changed = true;
 
-        if (ptr_scene_item && ptr_scene_item->hasComponent<components::Renderable>()) [[likely]]
+        if (scene_item.hasComponent<components::Renderable>()) [[likely]]
         {
-            auto& renderable = ptr_scene_item->getComponent<components::Renderable>();
-
-            renderable.material_id = static_cast<uint32_t>(_materials.size());
+            auto& renderable        = scene_item.getComponent<components::Renderable>();
+            renderable.material_id  = static_cast<uint32_t>(_materials.size());
         }
         else [[unlikely]]
-            throw exception::InvalidState("[material-material] scene item doesn't have component::Renderable");
+        {
+            const auto& tag = scene_item.getComponent<pbrlib::components::Tag>();
+            throw exception::InvalidState(std::format("[material-material] scene item '{}' doesn't have component::Renderable", tag.name));
+        }
 
         auto& material = _materials.emplace_back();
 

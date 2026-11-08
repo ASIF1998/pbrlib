@@ -2,7 +2,6 @@
 
 #include <pbrlib/components.hpp>
 #include <pbrlib/scene/visitor.hpp>
-
 #include <entt/entt.hpp>
 
 #include <list>
@@ -21,10 +20,19 @@ namespace pbrlib
 namespace pbrlib::backend
 {
     class MeshManager;
+    class LightManager;
 }
 
 namespace pbrlib
 {
+    struct PointLightDesc final
+    {
+        std::string_view    name;
+        math::vec3          color;
+        float               intensity       = 0.0f;
+        SceneItem*          ptr_root_item   = nullptr;
+    };
+
     class SceneItem final
     {
         friend class Scene;
@@ -88,7 +96,8 @@ namespace pbrlib
         friend class SceneItem;
         friend class Engine;
 
-        void meshManager(backend::MeshManager* ptr_mesh_manager) noexcept;
+        void meshManager    (backend::MeshManager* ptr_mesh_manager)    noexcept;
+        void lightManager   (backend::LightManager* ptr_light_manager)  noexcept;
 
     public:
         explicit Scene(std::string_view name);
@@ -122,13 +131,16 @@ namespace pbrlib
 
         void visit(SceneVisitor* ptr_visitor);
 
+        SceneItem& addLight(const PointLightDesc& point_light_desc);
+
     private:
         entt::registry              _registry;
         std::optional<SceneItem>    _root;
 
         std::map<std::string, SceneItem*, std::less<void>> _items;
 
-        backend::MeshManager* _ptr_mesh_manager = nullptr;
+        backend::MeshManager*   _ptr_mesh_manager   = nullptr;
+        backend::LightManager*  _ptr_light_manager  = nullptr;
     };
 }
 

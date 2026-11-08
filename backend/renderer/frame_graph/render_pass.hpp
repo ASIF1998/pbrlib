@@ -70,8 +70,8 @@ namespace pbrlib::backend
     public:
         [[nodiscard]] vk::DescriptorGroupTransition* set(uint32_t set_id);
         [[nodiscard]] vk::DescriptorGroupTransition& addSet(uint32_t set_id);
-        
-        [[nodiscard]] bool has(uint32_t set_id) const; 
+
+        [[nodiscard]] bool has(uint32_t set_id) const;
 
     private:
         std::unordered_map<uint32_t, vk::DescriptorGroupTransition> _sets;
