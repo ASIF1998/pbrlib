@@ -11,6 +11,9 @@
 #define PBRLIB_MATERIAL_MANAGER_SET_ID 2
 #include <material_manager/exports.h>
 
+#define PBRLIB_LIGHT_MANAGER_EXPORTS_SET_ID 3
+#include <lights_manager/exports.h>
+
 [shader("compute")]
 [numthreads(PBRLIB_WORK_GROUP_SIZE, PBRLIB_WORK_GROUP_SIZE, 1)]
 void main(uint3 thread_id: SV_DispatchThreadID)
@@ -27,4 +30,13 @@ void main(uint3 thread_id: SV_DispatchThreadID)
     let color           = materials_images[material.albedo].Sample(mesh_uv);
 
     result[thread_id.xy] = color;
+
+    uint stride = 0;
+    uint count = 0;
+    point_lights.GetDimensions(count, stride);
+    if (count > 0)
+    {
+        let point_light = point_lights[0];
+        result[thread_id.xy].xyz = lerp(result[thread_id.xy].xyz, point_light.color, 0.6);
+    }
 }

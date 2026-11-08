@@ -17,6 +17,7 @@ namespace pbrlib::backend
     class Canvas;
     class MaterialManager;
     class MeshManager;
+    class LightManager;
     class CompoundRenderPass;
 }
 
@@ -54,7 +55,8 @@ namespace pbrlib::backend
             const pbrlib::Config&   config,
             Canvas&                 canvas,
             MaterialManager&        material_manager,
-            MeshManager&            mesh_manager
+            MeshManager&            mesh_manager,
+            LightManager&           light_manager
         );
 
         FrameGraph(FrameGraph&& frame_graph)        = delete;

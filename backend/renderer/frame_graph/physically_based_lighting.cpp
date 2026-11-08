@@ -8,6 +8,7 @@
 #include <backend/renderer/vulkan/gpu_marker_colors.hpp>
 
 #include <backend/scene/material_manager.hpp>
+#include <backend/scene/light_manager.hpp>
 
 #include <backend/profiling.hpp>
 
@@ -49,7 +50,8 @@ namespace pbrlib::backend
         if (!ptr_gbuffer_set) [[unlikely]]
             throw exception::InvalidState("[pbl] failed initialize - gbuffer descriptor group is empty");
 
-        const auto ptr_material_descriptor_group = context.ptr_material_manager->descriptorGroup();
+        const auto ptr_material_descriptor_group        = context.ptr_material_manager->descriptorGroup();
+        const auto ptr_light_manager_descriptor_group   = context.ptr_light_manager->descriptorGroup();
 
         _pbl_descriptor_group.emplace(
             device(),
@@ -68,11 +70,13 @@ namespace pbrlib::backend
 
         descriptorGroup(material_manager_set_id, *ptr_material_descriptor_group);
         descriptorGroup(result_set_id, *_pbl_descriptor_group);
+        descriptorGroup(light_manager_set_id, *ptr_light_manager_descriptor_group);
 
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(_pbl_descriptor_group->descriptorSetLayoutHandle())
             .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
             .addSetLayout(ptr_material_descriptor_group->descriptorSetLayoutHandle())
+            .addSetLayout(ptr_light_manager_descriptor_group->descriptorSetLayoutHandle())
             .build();
 
         return createPipeline();
@@ -94,6 +98,9 @@ namespace pbrlib::backend
     {
         PBRLIB_PROFILING_ZONE_SCOPED;
 
+        if (context().ptr_light_manager->empty()) [[unlikely]]
+            return ;
+
         command_buffer.write([this] (const auto command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[pbl] run-pipeline");
@@ -104,7 +111,8 @@ namespace pbrlib::backend
             {
                 _pbl_descriptor_group->descriptorSetHandle(),
                 descriptorGroup(gbuffer_set_id)->descriptorSetHandle(),
-                context().ptr_material_manager->descriptorGroup()->descriptorSetHandle()
+                context().ptr_material_manager->descriptorGroup()->descriptorSetHandle(),
+                context().ptr_light_manager->descriptorGroup()->descriptorSetHandle()
             };
 
             vkCmdBindDescriptorSets (
@@ -159,6 +167,9 @@ namespace pbrlib::backend
         transition.addSet(material_manager_set_id)
             .bind(0, _src_stage, dstStage())
             .bind(1, _src_stage, dstStage());
+
+        transition.addSet(light_manager_set_id)
+            .bind(0, _src_stage, dstStage());
     }
 
     void PhysicallyBasedLighting::srcStage(VkPipelineStageFlags2 src_stage) noexcept

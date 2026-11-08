@@ -21,6 +21,7 @@ namespace pbrlib::backend
 {
     class MaterialManager;
     class MeshManager;
+    class LightManager;
 }
 
 namespace pbrlib::backend::vk
@@ -61,6 +62,7 @@ namespace pbrlib::backend
 
         const MaterialManager*  ptr_material_manager    = nullptr;
         const MeshManager*      ptr_mesh_manager        = nullptr;
+        const LightManager*     ptr_light_manager       = nullptr;
 
         uint8_t flight_frame_index = std::numeric_limits<uint8_t>::max() - 1;
     };

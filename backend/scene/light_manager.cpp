@@ -7,6 +7,8 @@
 #include <backend/components.hpp>
 #include <pbrlib/components.hpp>
 
+#include <backend/profiling.hpp>
+
 namespace pbrlib::backend
 {
     LightManager::LightManager(vk::Device& device) :
@@ -22,6 +24,8 @@ namespace pbrlib::backend
 
     void LightManager::add(SceneItem& scene_item, const math::vec3& color, float intensity)
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         const auto& transform = scene_item.getComponent<pbrlib::components::Transform>();
 
         auto& point_light = _point_lights.emplace_back();
@@ -37,6 +41,8 @@ namespace pbrlib::backend
 
     void LightManager::update()
     {
+        PBRLIB_PROFILING_ZONE_SCOPED;
+
         if (_point_lights.empty()) [[unlikely]]
             return;
 
@@ -63,5 +69,18 @@ namespace pbrlib::backend
             _point_lights_buffer->write(std::span<const pbrlib::gpu_cpu_interrop::PointLight>(_point_lights), 0);
             _point_buffer_is_dirty = false;
         }
+    }
+
+    const vk::DescriptorGroup* LightManager::descriptorGroup() const noexcept
+    {
+        if (_descriptor_group) [[likely]]
+            return &_descriptor_group.value();
+
+        return nullptr;
+    }
+
+    bool LightManager::empty() const noexcept
+    {
+        return _point_lights.empty();
     }
 }
