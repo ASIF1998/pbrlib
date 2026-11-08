@@ -54,7 +54,7 @@ namespace pbrlib::backend
         MaterialManager& operator = (const MaterialManager& material_manager)   = delete;
 
         void add (
-            SceneItem*                  ptr_scene_item,
+            SceneItem&                  scene_item,
             std::string_view            material_name,
             const CompressedImageData&  albedo,
             const CompressedImageData&  normal_map,

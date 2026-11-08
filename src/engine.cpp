@@ -7,8 +7,6 @@
 
 #include <backend/renderer/frame_graph/frame_graph.hpp>
 #include <backend/renderer/vulkan/device.hpp>
-#include <backend/scene/material_manager.hpp>
-#include <backend/scene/mesh_manager.hpp>
 #include <backend/shaders/gpu_cpu_constants.h>
 #include <backend/renderer/canvas.hpp>
 #include <backend/components.hpp>
@@ -17,6 +15,10 @@
 #include <backend/logger/logger.hpp>
 #include <backend/renderer/vulkan/shader_compilers/shader_compiler.hpp>
 #include <backend/scene/assimp_importer.hpp>
+
+#include <backend/scene/material_manager.hpp>
+#include <backend/scene/mesh_manager.hpp>
+#include <backend/scene/light_manager.hpp>
 
 #include <pbrlib/input/input_stay.hpp>
 #include <pbrlib/scene/scene.hpp>
@@ -70,10 +72,12 @@ namespace pbrlib
 
         _ptr_material_manager   = std::make_unique<backend::MaterialManager>(*_ptr_device);
         _ptr_mesh_manager       = std::make_unique<backend::MeshManager>(*_ptr_device);
+        _ptr_light_manager      = std::make_unique<backend::LightManager>(*_ptr_device);
         _ptr_scene              = std::make_unique<Scene>(config.title);
         _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, config, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
 
         _ptr_scene->meshManager(_ptr_mesh_manager.get());
+        _ptr_scene->lightManager(_ptr_light_manager.get());
     }
 
     Engine::~Engine()
@@ -209,6 +213,7 @@ namespace pbrlib
 
             _ptr_material_manager->update();
             _ptr_mesh_manager->update();
+            _ptr_light_manager->update();
 
             draw();
         } while (!is_close);
@@ -247,10 +252,9 @@ namespace pbrlib
 
         std::vector<const SceneItem*> items;
 
-        auto view = _ptr_scene->_registry.view<backend::components::Renderable>();
-
-        for (auto entity: view)
-            items.push_back(view.get<backend::components::Renderable>(entity).ptr_item);
+        auto renderable_view = _ptr_scene->_registry.view<backend::components::Renderable>();
+        for (auto entity: renderable_view)
+            items.push_back(renderable_view.get<backend::components::Renderable>(entity).ptr_item);
 
         if (_ptr_frame_graph) [[likely]]
             _ptr_frame_graph->draw(_camera, items);

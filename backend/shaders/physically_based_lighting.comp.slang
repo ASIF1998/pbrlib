@@ -6,7 +6,7 @@
 
 #define PBRLIB_GBUFFER_GENERATOR_EXPORTS_SET_ID 1
 #include <gbuffer_generator/exports.h>
-#include <gbuffer_generator/exports.h>
+#include <gbuffer_generator/packing.h>
 
 #define PBRLIB_MATERIAL_MANAGER_SET_ID 2
 #include <material_manager/exports.h>

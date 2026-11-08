@@ -309,7 +309,7 @@ namespace pbrlib::backend
                     component.ptr_item = &item;
 
                     _ptr_material_manager->add (
-                        &item,
+                        item,
                         ptr_material->GetName().C_Str(),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_DIFFUSE, 4),
                         getComressedImage(ptr_scene, ptr_material, aiTextureType_NORMALS, 4),
@@ -354,7 +354,7 @@ namespace pbrlib::backend
                 auto& transform = item.getComponent<pbrlib::components::Transform>();
                 transform.transform = _current_state.transform;
 
-                _ptr_mesh_manager->add(name, attributes, indices, &item);
+                _ptr_mesh_manager->add(name, attributes, indices, item);
 
                 attributes.clear();
                 indices.clear();

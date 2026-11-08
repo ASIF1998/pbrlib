@@ -60,12 +60,12 @@ namespace pbrlib::backend
             std::string_view                    name,
             std::span<const VertexAttribute>    attributes,
             std::span<const uint32_t>           indices,
-            SceneItem*                          ptr_item
+            SceneItem&                          item
         );
 
-        void addInstance(const SceneItem* ptr_src_item, SceneItem* ptr_dst_item);
+        void addInstance(const SceneItem& src_item, SceneItem& dst_item);
 
-        void updateItemTransform(const SceneItem* ptr_item, const math::mat4& transform);
+        void updateItemTransform(const SceneItem& item, const math::mat4& transform);
 
         [[nodiscard]] const vk::DescriptorGroup* descriptorGroup() const noexcept;
 

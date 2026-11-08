@@ -213,6 +213,12 @@ add_subdirectory(third_party/entt)
 #####################################################
 #   cpptrace
 #####################################################
+# cpptrace's default zstd URL (github.com/facebook/zstd/releases/download/...) points at a
+# GitHub release-asset that currently 504s; the archive/refs/tags endpoint serves the same
+# source tree (verified: still has build/cmake/CMakeLists.txt) through GitHub's separate
+# codeload infrastructure, so it isn't affected by the same outage.
+set(CPPTRACE_ZSTD_URL "https://github.com/facebook/zstd/archive/refs/tags/v1.5.7.tar.gz" CACHE STRING "" FORCE)
+
 add_subdirectory(third_party/cpptrace)
 
 #####################################################

@@ -27,6 +27,7 @@ namespace pbrlib::backend
     class Canvas;
     class MaterialManager;
     class MeshManager;
+    class LightManager;
 }
 
 namespace pbrlib::backend::vk
@@ -101,6 +102,7 @@ namespace pbrlib
 
         std::unique_ptr<backend::MaterialManager>   _ptr_material_manager;
         std::unique_ptr<backend::MeshManager>       _ptr_mesh_manager;
+        std::unique_ptr<backend::LightManager>      _ptr_light_manager;
 
         std::unique_ptr<Scene> _ptr_scene;
 

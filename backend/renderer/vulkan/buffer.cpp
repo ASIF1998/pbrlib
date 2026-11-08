@@ -185,7 +185,7 @@ namespace pbrlib::backend::vk::builders
         return *this;
     }
 
-    Buffer& Buffer::usage(VkImageUsageFlags usage) noexcept
+    Buffer& Buffer::usage(VkBufferUsageFlags usage) noexcept
     {
         _usage = usage;
         return *this;

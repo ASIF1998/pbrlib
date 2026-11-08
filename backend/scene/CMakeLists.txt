@@ -4,6 +4,7 @@ set(PBRLIB_BACKEND_SCENE_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/assimp_importer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/material_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mesh_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/light_manager.cpp
     CACHE INTERNAL ""
 )
 
@@ -11,5 +12,6 @@ set(PBRLIB_BACKEND_SCENE_H
     ${CMAKE_CURRENT_SOURCE_DIR}/assimp_importer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/material_manager.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mesh_manager.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/light_manager.hpp
     CACHE INTERNAL ""
 )

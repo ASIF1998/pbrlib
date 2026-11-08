@@ -117,16 +117,15 @@ int main()
                 const auto instance_transform = pbrlib::transforms::translate(pbrlib::math::vec3(-2, 2, 3));
 
                 scene.createInstance("Extended", "Extended - 2", instance_transform);
-            }
 
-            // auto ptr_light = ptr_scene->addLight(
-            //     pbrlib::PointLight::Builder()
-            //         .setPosition(pbrlib::math::vec3(0, 10, 10))
-            //         .setName("point-light")
-            //         .setIntensity(100.0)
-            //         .setColor(pbrlib::math::vec3(0.32, 0.43, 0.12))
-            //         .build()
-            // );
+                [[maybe_unused]] const auto& point_light = scene.addLight(pbrlib::PointLightDesc
+                {
+                    .name           = "main-light",
+                    .color          = pbrlib::math::vec3(0.43, 0.65, 0.12),
+                    .intensity      = 100.0,
+                    .ptr_root_item  = ptr_root_item
+                });
+            }
         });
 
         engine.update([&config] (pbrlib::Engine& engine, const pbrlib::InputStay& input_stay, float delta_time)
