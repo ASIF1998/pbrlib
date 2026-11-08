@@ -74,7 +74,7 @@ namespace pbrlib
         _ptr_mesh_manager       = std::make_unique<backend::MeshManager>(*_ptr_device);
         _ptr_light_manager      = std::make_unique<backend::LightManager>(*_ptr_device);
         _ptr_scene              = std::make_unique<Scene>(config.title);
-        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, config, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager);
+        _ptr_frame_graph        = std::make_unique<backend::FrameGraph>(*_ptr_device, config, *_ptr_canvas, *_ptr_material_manager, *_ptr_mesh_manager, *_ptr_light_manager);
 
         _ptr_scene->meshManager(_ptr_mesh_manager.get());
         _ptr_scene->lightManager(_ptr_light_manager.get());

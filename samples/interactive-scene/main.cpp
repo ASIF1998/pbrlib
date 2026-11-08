@@ -121,7 +121,7 @@ int main()
                 [[maybe_unused]] const auto& point_light = scene.addLight(pbrlib::PointLightDesc
                 {
                     .name           = "main-light",
-                    .color          = pbrlib::math::vec3(0.43, 0.65, 0.12),
+                    .color          = pbrlib::math::vec3(1, 1, 0),
                     .intensity      = 100.0,
                     .ptr_root_item  = ptr_root_item
                 });

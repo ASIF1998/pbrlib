@@ -37,7 +37,8 @@ namespace pbrlib::backend
         const pbrlib::Config&   config,
         Canvas&                 canvas,
         MaterialManager&        material_manager,
-        MeshManager&            mesh_manager
+        MeshManager&            mesh_manager,
+        LightManager&           light_manager
     ) :
         _device (device),
         _canvas (canvas),
@@ -45,6 +46,7 @@ namespace pbrlib::backend
     {
         _render_context.ptr_material_manager    = &material_manager;
         _render_context.ptr_mesh_manager        = &mesh_manager;
+        _render_context.ptr_light_manager       = &light_manager;
 
         const auto [width, height] = _canvas.size();
         build(width, height);

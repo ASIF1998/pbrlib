@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pbrlib/math/vec3.hpp"
-#include <backend/shaders/lights.h>
+#include <backend/shaders/lights_manager/lights.h>
 
 #include <backend/renderer/vulkan/buffer.hpp>
 #include <backend/renderer/vulkan/descriptor_group.hpp>
@@ -45,6 +45,10 @@ namespace pbrlib::backend
         void add(SceneItem& scene_item, const math::vec3& color, float intensity);
 
         void update();
+
+        [[nodiscard]] const vk::DescriptorGroup* descriptorGroup() const noexcept;
+
+        [[nodiscard]] bool empty() const noexcept;
 
     private:
         vk::Device& _device;
