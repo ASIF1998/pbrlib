@@ -10,7 +10,7 @@
 #include <pbrlib/exceptions.hpp>
 
 #include <pbrlib/event_system.hpp>
-#include <backend/events.hpp>
+#include <pbrlib/events.hpp>
 
 namespace pbrlib::backend
 {

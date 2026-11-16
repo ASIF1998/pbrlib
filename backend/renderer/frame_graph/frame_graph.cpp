@@ -25,7 +25,7 @@
 #include <pbrlib/exceptions.hpp>
 
 #include <pbrlib/event_system.hpp>
-#include <backend/events.hpp>
+#include <pbrlib/events.hpp>
 
 #include <backend/utils/align_size.hpp>
 #include <backend/shaders/gpu_cpu_constants.h>
