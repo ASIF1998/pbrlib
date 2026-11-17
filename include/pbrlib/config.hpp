@@ -40,7 +40,7 @@ namespace pbrlib
         uint32_t width  = 800;
         uint32_t height = 600;
 
-        bool resible        = false;
+        bool resizable      = false;
         bool draw_in_window = true;
 
         settings::SSAO  ssao;

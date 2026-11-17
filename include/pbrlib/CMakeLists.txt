@@ -9,6 +9,7 @@ set(PBRLIB_H
     ${CMAKE_CURRENT_SOURCE_DIR}/camera.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/event_system.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/events.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/exceptions.hpp
     CACHE INTERNAL ""
 )

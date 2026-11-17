@@ -17,7 +17,7 @@
 #include <pbrlib/math/matrix3x3.hpp>
 #include <pbrlib/math/casts.hpp>
 
-#include <cmath>
+#include <pbrlib/events.hpp>
 
 #include <backend/utils/paths.hpp>
 
@@ -26,7 +26,29 @@ struct RotateComponent
     float angle = 0.0f;
 };
 
-auto mouseMotionPorcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir)
+class ResizeWindowHandler : public pbrlib::EventSystem
+{
+public:
+    explicit ResizeWindowHandler(pbrlib::Config& config, pbrlib::Camera& camera) :
+        _config (config),
+        _camera (camera)
+    {
+        on([this] (const pbrlib::events::ResizeWindow& resize_window)
+        {
+            _config.width   = resize_window.width;
+            _config.height  = resize_window.height;
+
+            _camera.width(resize_window.width);
+            _camera.height(resize_window.height);
+        });
+    }
+
+private:
+    pbrlib::Config& _config;
+    pbrlib::Camera& _camera;
+};
+
+auto mouseMotionProcess(const pbrlib::Config& config, const pbrlib::MouseMotionStay& motion, const pbrlib::math::vec3& dir)
     -> pbrlib::math::vec3
 {
     const auto move_dir = motion.relativeMotion();
@@ -71,10 +93,10 @@ int main()
     try
     {
         pbrlib::Config config;
-        config.title    = "interactive-scene";
-        config.width    = 800;
-        config.height   = 600;
-        config.resible  = true;
+        config.title        = "interactive-scene";
+        config.width        = 800;
+        config.height       = 600;
+        config.resizable    = true;
 
         config.ssao =
         {
@@ -84,6 +106,8 @@ int main()
         config.aa = pbrlib::settings::AA::eFXAA;
 
         pbrlib::Engine engine (config);
+
+        [[maybe_unused]] ResizeWindowHandler resize_window_handler (config, engine.camera());
 
         engine.setup([&engine, &config] (pbrlib::Scene& scene)
         {
@@ -136,7 +160,7 @@ int main()
             const auto dir = pbrlib::math::normalize(camera.eye() - camera.pos());
 
             if (input_stay.mouse_buttons.isDown(pbrlib::MouseButton::eLeft) && input_stay.mouse_motion.isMotion())
-                camera.moveEye(mouseMotionPorcess(config, input_stay.mouse_motion, dir));
+                camera.moveEye(mouseMotionProcess(config, input_stay.mouse_motion, dir));
 
             camera.translate(keyboardProcess(input_stay.keyboard, dir, camera.up()));
         });

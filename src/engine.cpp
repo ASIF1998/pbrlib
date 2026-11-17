@@ -21,6 +21,7 @@
 #include <pbrlib/input/input_stay.hpp>
 #include <pbrlib/scene/scene.hpp>
 #include <pbrlib/event_system.hpp>
+#include <pbrlib/events.hpp>
 #include <backend/events.hpp>
 
 #include <SDL3/SDL.h>
@@ -60,7 +61,7 @@ namespace pbrlib
             _window = Window::Builder()
                 .title(config.title)
                 .size(width, height)
-                .resizable(config.resible)
+                .resizable(config.resizable)
                 .build();
 
             _ptr_canvas = std::make_unique<backend::Canvas>(*_ptr_device, &_window.value());
@@ -146,7 +147,7 @@ namespace pbrlib
         _camera.width(width);
         _camera.height(height);
 
-        EventSystem::emit(backend::events::ResizeWindow {
+        EventSystem::emit(events::ResizeWindow {
             .width  = width,
             .height = height
         });
