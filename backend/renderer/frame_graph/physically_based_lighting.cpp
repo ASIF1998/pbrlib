@@ -72,11 +72,19 @@ namespace pbrlib::backend
         descriptorGroup(result_set_id, *_pbl_descriptor_group);
         descriptorGroup(light_manager_set_id, *ptr_light_manager_descriptor_group);
 
+        constexpr VkPushConstantRange push_constant_range =
+        {
+            .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+            .offset     = 0,
+            .size       = sizeof(PushConstants)
+        };
+
         _pipeline_layout_handle = vk::builders::PipelineLayout(device())
             .addSetLayout(_pbl_descriptor_group->descriptorSetLayoutHandle())
             .addSetLayout(ptr_gbuffer_set->descriptorSetLayoutHandle())
             .addSetLayout(ptr_material_descriptor_group->descriptorSetLayoutHandle())
             .addSetLayout(ptr_light_manager_descriptor_group->descriptorSetLayoutHandle())
+            .pushConstant(push_constant_range)
             .build();
 
         return createPipeline();
@@ -101,6 +109,8 @@ namespace pbrlib::backend
         if (context().ptr_light_manager->empty()) [[unlikely]]
             return ;
 
+        _push_constants.camera_direction = math::vec3(-context().view[0][2], -context().view[1][2], -context().view[2][2]);
+
         command_buffer.write([this] (const auto command_buffer_handle)
         {
             PBRLIB_PROFILING_VK_ZONE_SCOPED(device(), command_buffer_handle, "[pbl] run-pipeline");
@@ -122,6 +132,17 @@ namespace pbrlib::backend
                 static_cast<uint32_t>(sets_descriptors.size()), sets_descriptors.data(),
                 0, nullptr
             );
+
+            const VkPushConstantsInfo push_contants_info
+            {
+                .sType      = VK_STRUCTURE_TYPE_PUSH_CONSTANTS_INFO,
+                .layout     = _pipeline_layout_handle,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .size       = sizeof(PushConstants),
+                .pValues    = &_push_constants
+            };
+
+            vkCmdPushConstants2(command_buffer_handle, &push_contants_info);
 
             const auto [width, height]     = size();
             const auto work_group_size     = static_cast<uint32_t>(device().workGroupSize());

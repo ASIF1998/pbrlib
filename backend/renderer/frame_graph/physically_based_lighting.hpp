@@ -39,6 +39,11 @@ namespace pbrlib::backend
         public RenderPass,
         public EventSystem
     {
+        struct alignas(16) PushConstants final
+        {
+            math::vec3 camera_direction;
+        };
+
         bool init(const RenderContext& context, uint32_t width, uint32_t height)    override;
         void render(vk::CommandBuffer& command_buffer)                              override;
         void sync(Transition& transition)                                           override;
@@ -69,5 +74,7 @@ namespace pbrlib::backend
 
         std::optional<vk::DescriptorGroup> _result_descriptor_group;
         std::optional<vk::DescriptorGroup> _pbl_descriptor_group;
+
+        PushConstants _push_constants;
     };
 }

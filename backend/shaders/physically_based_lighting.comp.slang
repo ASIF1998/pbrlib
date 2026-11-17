@@ -14,22 +14,33 @@
 #define PBRLIB_LIGHT_MANAGER_EXPORTS_SET_ID 3
 #include <lights_manager/exports.h>
 
+struct PushConstants
+{
+    float3 camera_direction;
+};
+
 [shader("compute")]
 [numthreads(PBRLIB_WORK_GROUP_SIZE, PBRLIB_WORK_GROUP_SIZE, 1)]
-void main(uint3 thread_id: SV_DispatchThreadID)
+void main(uint3 thread_id: SV_DispatchThreadID, uniform PushConstants push_constants)
 {
     uint width  = 0;
     uint height = 0;
 
     gbuffer_pos_uv.GetDimensions(width, height);
 
-    let screen_uv       = float2(thread_id.xy) / float2(width, height);
-    let mesh_uv         = unpack(asuint(gbuffer_pos_uv.Sample(screen_uv).w));
+    let screen_uv = float2(thread_id.xy) / float2(width, height);
+
+    let gbuffer_data = unpack (
+        gbuffer_pos_uv.Sample(screen_uv),
+        gbuffer_normal_tangent.Sample(screen_uv),
+        gbuffer_material_index.Sample(screen_uv)
+    );
+
     let material_index  = gbuffer_material_index.Sample(screen_uv);
     let material        = materials[material_index];
-    let color           = materials_images[material.albedo].Sample(mesh_uv);
+    let color           = materials_images[material.albedo].Sample(gbuffer_data.uv);
 
-    result[thread_id.xy] = color;
+    result[thread_id.xy] = color * dot(push_constants.camera_direction, gbuffer_data.normal);
 
     uint stride = 0;
     uint count = 0;
