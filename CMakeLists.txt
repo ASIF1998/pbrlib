@@ -319,7 +319,7 @@ endif()
 #   tests
 #####################################################
 if (PBRLIB_ENABLE_TESTS)
-    add_subdirectory(pbrlib-tests)
+    add_subdirectory(tests)
 endif()
 
 #####################################################

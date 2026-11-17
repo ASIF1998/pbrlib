@@ -11,6 +11,8 @@
 #include <backend/utils/paths.hpp>
 #include <backend/utils/scope_exit.hpp>
 
+#include <fstream>
+
 using namespace pbrlib;
 using namespace pbrlib::backend;
 using namespace pbrlib::backend::utils;

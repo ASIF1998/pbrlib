@@ -2,6 +2,8 @@
 
 #include <entt/entt.hpp>
 
+#include <list>
+
 namespace pbrlib
 {
     template<typename Callback>
