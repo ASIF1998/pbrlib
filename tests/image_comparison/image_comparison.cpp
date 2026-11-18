@@ -179,7 +179,7 @@ namespace pbrlib::testing
                 .addSetLayout(_descriptor_group->descriptorSetLayoutHandle())
                 .build();
 
-            const static auto shader_name = backend::utils::projectRoot() / "pbrlib-tests/image_comparison/image_diff_generator.glsl.comp";
+            const static auto shader_name = backend::utils::projectRoot() / "tests/image_comparison/image_diff_generator.glsl.comp";
 
             _pipeline_handle = backend::vk::builders::ComputePipeline(_device)
                 .pipelineLayoutHandle(_pipeline_layout_handle)
@@ -343,7 +343,7 @@ namespace pbrlib::testing
             {
                 const auto filename             = path_to_reference.stem().string();
                 const auto extension            = backend::channelSize(image.format) == 1 ? "png" : "exr";
-                const auto path_to_diff_image   = std::format("pbrlib-tests/references/diffs/{}-diff.{}", filename, extension);
+                const auto path_to_diff_image   = std::format("tests/references/diffs/{}-diff.{}", filename, extension);
 
                 auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-for-change-diff-image-layout");
                 _images_diff->transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);

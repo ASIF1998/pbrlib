@@ -333,4 +333,4 @@ vec3 max_point = box3.p_max;
 
 ## Additional Information
 
-For more detailed information about the implementation, see the source code in the `include/pbrlib/math/` directory. Tests can be found in `pbrlib-tests/math/`.
+For more detailed information about the implementation, see the source code in the `include/pbrlib/math/` directory. Tests can be found in `tests/math/`.

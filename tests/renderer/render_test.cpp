@@ -44,13 +44,13 @@ namespace pbrlib::testing
             camera.width(_config.width);
             camera.height(_config.height);
 
-            scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / content.string());
+            scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "tests/content" / content.string());
         });
     }
 
     void RenderTest::check(const std::filesystem::path& reference_image, std::string_view attachment_name)
     {
-        static const auto refs_root_dir = pbrlib::backend::utils::projectRoot() / "pbrlib-tests/references";
+        static const auto refs_root_dir = pbrlib::backend::utils::projectRoot() / "tests/references";
 
         backend::log::info("[render-test] starting render for {}", reference_image.filename().string());
 

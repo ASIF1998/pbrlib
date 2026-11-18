@@ -108,7 +108,7 @@ public:
     #error "Unsupported platform for shader testing"
 #endif
 
-        const auto references_directory         = PBRLIB_ABS_PATH("pbrlib-tests/references/shaders");
+        const auto references_directory         = PBRLIB_ABS_PATH("tests/references/shaders");
         const auto reference_compiled_shader    = references_directory / (platform_prefix + std::to_string(calcHash(defines)) + '-' + shader_name.filename().string() + ".spv");
 
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";
@@ -144,7 +144,7 @@ public:
     static const std::filesystem::path root_directory;
 };
 
-const std::filesystem::path ShaderCompiler::root_directory = PBRLIB_ABS_PATH("pbrlib-tests/renderer/shaders");
+const std::filesystem::path ShaderCompiler::root_directory = PBRLIB_ABS_PATH("tests/renderer/shaders");
 
 class GlslCompilerTests : public ShaderCompiler
 { };
@@ -155,21 +155,21 @@ class SlangCompilerTests : public ShaderCompiler
 TEST_F(GlslCompilerTests, CompileComputeShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.comp.glsl", {});
+        checkShader("tests/renderer/shaders/simple_shader.comp.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileVertexShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.vert.glsl", {});
+        checkShader("tests/renderer/shaders/simple_shader.vert.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, CompileFragmentShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.frag.glsl", {});
+        checkShader("tests/renderer/shaders/simple_shader.frag.glsl", {});
     });
 }
 
@@ -190,14 +190,14 @@ TEST_F(GlslCompilerTests, FileNotFound)
 TEST_F(GlslCompilerTests, IncludeDirective)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/include_test.comp.glsl", {});
+        checkShader("tests/renderer/shaders/include_test.comp.glsl", {});
     });
 }
 
 TEST_F(GlslCompilerTests, Defines)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.glsl", {});
+        checkShader("tests/renderer/shaders/define_test.comp.glsl", {});
     });
 
     EXPECT_NO_THROW({
@@ -206,42 +206,42 @@ TEST_F(GlslCompilerTests, Defines)
             backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
         };
 
-        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.glsl", define);
+        checkShader("tests/renderer/shaders/define_test.comp.glsl", define);
     });
 }
 
 TEST_F(SlangCompilerTests, CompileComputeShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.comp.slang", {});
+        checkShader("tests/renderer/shaders/simple_shader.comp.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileVertexShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.vert.slang", {});
+        checkShader("tests/renderer/shaders/simple_shader.vert.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, CompileFragmentShader)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/simple_shader.frag.slang", {});
+        checkShader("tests/renderer/shaders/simple_shader.frag.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, IncludeModule)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/module_test.comp.slang", {});
+        checkShader("tests/renderer/shaders/module_test.comp.slang", {});
     });
 }
 
 TEST_F(SlangCompilerTests, Defines)
 {
     EXPECT_NO_THROW({
-        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.slang", {});
+        checkShader("tests/renderer/shaders/define_test.comp.slang", {});
     });
 
     EXPECT_NO_THROW({
@@ -250,6 +250,6 @@ TEST_F(SlangCompilerTests, Defines)
             backend::vk::shader::Define("PBRLIB_DEFINE_TEST", "")
         };
 
-        checkShader("pbrlib-tests/renderer/shaders/define_test.comp.slang", define);
+        checkShader("tests/renderer/shaders/define_test.comp.slang", define);
     });
 }

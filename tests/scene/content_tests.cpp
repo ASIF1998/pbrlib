@@ -51,7 +51,7 @@ public:
         {
             _engine->setup([this, &filename, &transform](pbrlib::Scene& scene)
             {
-                scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content" / filename, transform);
+                scene.import(*_engine, pbrlib::backend::utils::projectRoot() / "tests/content" / filename, transform);
             });
 
             pbrlib::testing::FrameGraphResourcesGetter getter (_engine.value());
