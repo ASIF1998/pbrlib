@@ -176,6 +176,11 @@ endif()
 #   assimp
 #####################################################
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+# @fixme: remove after updating assimp. Since assimp commit 0404c8758 its
+# CMakeLists.txt enables -Wunsafe-buffer-usage before project(), so the flag only
+# takes effect when assimp is added via add_subdirectory. Together with -Werror
+# this breaks the build on clang (~8.4k warnings in assimp and its contrib)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/assimp)
 target_link_libraries(pbrlib PUBLIC assimp::assimp)
 
@@ -277,9 +282,11 @@ endif()
 # fix: copy slang's runtime dll next to executables so windows can locate it at runtime
 if (WIN32)
     add_custom_command(TARGET pbrlib POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:slang>
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/$<TARGET_FILE_NAME:slang>
     )
 endif()
 
