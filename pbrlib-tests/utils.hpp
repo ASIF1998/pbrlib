@@ -206,12 +206,7 @@ namespace pbrlib::testing::vk
 {
     constexpr inline bool isSupport()
     {
-#if defined(PBRLIB_RUN_FROM_CI) && defined(PBRLIB_OS_WINDOWS)
-        /// swiftshader apparently doesn't support float16
-        return false;
-#else
         return true;
-#endif
     }
 
     inline void isSuccess(VkResult result)

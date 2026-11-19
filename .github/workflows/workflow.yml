@@ -94,11 +94,12 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: install vulkan sdk
-        uses: jakoch/install-vulkan-sdk-action@v1.0.0
+        uses: jakoch/install-vulkan-sdk-action@v1
         with:
           vulkan_version: 1.4.304.0
           optional_components: com.lunarg.vulkan.vma
           install_runtime: true
+          install_lavapipe: true
           cache: true
           stripdown: true
 
@@ -113,20 +114,6 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DPBRLIB_ENABLE_TESTS=ON -DPBRLIB_SETUP_CI=ON ..
           cmake --build . --config Release --target pbrlib-tests
-
-      # - name: setup swiftshader
-      #   run: |
-      #     mkdir CI
-      #     cd CI
-      #     git clone https://github.com/google/swiftshader.git
-      #     cd swiftshader
-      #     git submodule update --init --recursive
-      #     cd build
-      #     cmake .. -DREACTOR_BACKEND=Subzero -Thost=x64
-      #     cmake --build . --config Release --target vk_swiftshader
-      #     cp "${{github.workspace}}/CI/swiftshader/build/Windows/vk_swiftshader.dll" "${{github.workspace}}/build/bin/Release/vk_swiftshader.dll"
-      #     cp "${{github.workspace}}/CI/swiftshader/build/Windows/vk_swiftshader_icd.json" "${{github.workspace}}/build/bin/Release/vk_swiftshader_icd.json"
-      #     cp "${{github.workspace}}/CI/swiftshader/build/Windows/vulkan-1.dll" "${{github.workspace}}/build/bin/Release/vulkan-1.dll"
 
       - name: run tests
         run: |
