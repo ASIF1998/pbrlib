@@ -119,7 +119,7 @@ int main()
             camera.width(config.width);
             camera.height(config.height);
 
-            scene.import(engine, pbrlib::backend::utils::projectRoot() / "pbrlib-tests/content/Blender 2.glb");
+            scene.import(engine, pbrlib::backend::utils::projectRoot() / "tests/content/Blender 2.glb");
 
             if (auto ptr_root_item = scene.item("Extended")) [[likely]]
             {
