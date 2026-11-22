@@ -11,12 +11,7 @@ namespace pbrlib::backend::utils
         { }
 
         ScopeExit(const ScopeExit& scope_exit) = delete;
-
-        ~ScopeExit()
-        {
-            if (callback) [[likely]]
-                callback();
-        }
+        ~ScopeExit();
 
         ScopeExit& operator = (const ScopeExit& scope_exit) = delete;
 

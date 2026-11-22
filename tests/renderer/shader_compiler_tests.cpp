@@ -113,6 +113,12 @@ public:
 
         const auto compiled_shader_binary_filename = PBRLIB_ABS_PATH(shader_name) += ".spv";
 
+        [[maybe_unused]] const pbrlib::backend::utils::ScopeExit scope_remove_compiled_shader_binary_filename([&compiled_shader_binary_filename]
+        {
+            if(!std::filesystem::remove(compiled_shader_binary_filename)) [[unlikely]]
+                pbrlib::backend::log::warning("[shader-compiler-tests] spv not found: '{}'", compiled_shader_binary_filename.string());
+        });
+
         if constexpr (pbrlib::testing::generate_shaders_spvs)
             std::filesystem::copy_file(compiled_shader_binary_filename, reference_compiled_shader, std::filesystem::copy_options::overwrite_existing);
 
@@ -134,9 +140,6 @@ public:
             const auto msg = std::format("[shader-compiler-tests] failed load shaders binary: '{}' and '{}'", compiled_shader_binary_filename.string(), reference_compiled_shader.string());
             pbrlib::testing::thisTrue(false, msg);
         }
-
-        if (std::filesystem::exists(compiled_shader_binary_filename)) [[likely]]
-            std::filesystem::remove(compiled_shader_binary_filename);
     }
 
     std::optional<vk::Device> device;

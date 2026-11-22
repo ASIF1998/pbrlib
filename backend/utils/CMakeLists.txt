@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 
 set(PBRLIB_BACKEND_UTILS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/memory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/scope_exit.cpp
     CACHE INTERNAL ""
 )
 
