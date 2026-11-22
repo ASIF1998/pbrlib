@@ -61,7 +61,8 @@ TEST(AABBTests, Corner)
 
 TEST(AABBTests, Diagonal)
 {
-    constexpr pbrlib::math::AABB aabb (
+    constexpr pbrlib::math::AABB aabb
+    (
         pbrlib::math::vec3(12.21, 43.23, 54.76),
         pbrlib::math::vec3(65.11, 98.73, 83.12)
     );
@@ -73,7 +74,8 @@ TEST(AABBTests, Diagonal)
 
 TEST(AABBTests, SurfaceArea)
 {
-    constexpr pbrlib::math::AABB aabb (
+    constexpr pbrlib::math::AABB aabb
+    (
         pbrlib::math::vec3(12.21, 43.23, 54.76),
         pbrlib::math::vec3(65.11, 98.73, 83.12)
     );
@@ -85,7 +87,8 @@ TEST(AABBTests, SurfaceArea)
 
 TEST(AABBTests, Volume)
 {
-    constexpr pbrlib::math::AABB aabb (
+    constexpr pbrlib::math::AABB aabb
+    (
         pbrlib::math::vec3(12.21, 43.23, 54.76),
         pbrlib::math::vec3(65.11, 98.73, 83.12)
     );

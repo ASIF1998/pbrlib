@@ -118,10 +118,12 @@ TYPED_TEST(Vec2Tests, Lerp)
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
         constexpr Vec2 result (static_cast<TypeParam>(0.75f));
-        pbrlib::testing::equality(result, lerp (
-            Vec2(static_cast<TypeParam>(0)),
-            Vec2(static_cast<TypeParam>(1)),
-            static_cast<TypeParam>(0.75))
+        pbrlib::testing::equality(result, lerp
+            (
+                Vec2(static_cast<TypeParam>(0)),
+                Vec2(static_cast<TypeParam>(1)),
+                static_cast<TypeParam>(0.75)
+            )
         );
     }
 }

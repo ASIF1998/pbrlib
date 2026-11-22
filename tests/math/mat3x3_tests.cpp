@@ -17,25 +17,29 @@ TYPED_TEST(Mat3Tests, Ctor)
 {
     constexpr Matrix3x3<TypeParam>  m1;
     constexpr Matrix3x3             m2 (static_cast<TypeParam>(23));
-    constexpr Matrix3x3             m3 (
+    constexpr Matrix3x3             m3
+    (
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
         static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
         static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     );
 
-    constexpr TypeParam r1[9] {
+    constexpr TypeParam r1[9]
+    {
         static_cast<TypeParam>(1), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(1), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(1)
     };
 
-    constexpr TypeParam r2[9] {
+    constexpr TypeParam r2[9]
+    {
         static_cast<TypeParam>(23), static_cast<TypeParam>(0), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(23), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(0), static_cast<TypeParam>(23)
     };
 
-    constexpr TypeParam r3[9] {
+    constexpr TypeParam r3[9]
+    {
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
         static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
         static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
@@ -48,13 +52,15 @@ TYPED_TEST(Mat3Tests, Ctor)
 
 TYPED_TEST(Mat3Tests, EqualAndNotEqual)
 {
-    constexpr Matrix3x3 m1 (
+    constexpr Matrix3x3 m1
+    (
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
         static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
         static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
     );
 
-    Matrix3x3 m2 (
+    Matrix3x3 m2
+    (
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
         static_cast<TypeParam>(2), static_cast<TypeParam>(3), static_cast<TypeParam>(4),
         static_cast<TypeParam>(3), static_cast<TypeParam>(4), static_cast<TypeParam>(5)
@@ -102,7 +108,8 @@ TYPED_TEST(Mat3Tests, ScalarMultiplication)
 
 TYPED_TEST(Mat3Tests, MatrixMultiplication)
 {
-    constexpr Matrix3x3 m1 {
+    constexpr Matrix3x3 m1
+    {
         static_cast<TypeParam>(13),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
@@ -114,7 +121,8 @@ TYPED_TEST(Mat3Tests, MatrixMultiplication)
         static_cast<TypeParam>(2)
     };
 
-    constexpr Matrix3x3 m2 {
+    constexpr Matrix3x3 m2
+    {
         static_cast<TypeParam>(5),
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(8),
@@ -127,7 +135,8 @@ TYPED_TEST(Mat3Tests, MatrixMultiplication)
     };
 
     auto r = m1 * m2;
-    constexpr Matrix3x3 res {
+    constexpr Matrix3x3 res
+    {
         static_cast<TypeParam>(585),
         static_cast<TypeParam>(112),
         static_cast<TypeParam>(49),
@@ -148,19 +157,22 @@ TYPED_TEST(Mat3Tests, MatrixMultiplication)
 
 TYPED_TEST(Mat3Tests, MatrixAndVectorMultiplication)
 {
-    constexpr Matrix3x3 m {
+    constexpr Matrix3x3 m
+    {
         static_cast<TypeParam>(1), static_cast<TypeParam>(2), static_cast<TypeParam>(3),
         static_cast<TypeParam>(6), static_cast<TypeParam>(4), static_cast<TypeParam>(3),
         static_cast<TypeParam>(9), static_cast<TypeParam>(7), static_cast<TypeParam>(3)
     };
 
-    constexpr Vec3<TypeParam> v (
+    constexpr Vec3<TypeParam> v
+    (
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(23)
     );
 
-    constexpr Vec3<TypeParam> res (
+    constexpr Vec3<TypeParam> res
+    (
         static_cast<TypeParam>(226),
         static_cast<TypeParam>(175),
         static_cast<TypeParam>(81)
@@ -171,7 +183,8 @@ TYPED_TEST(Mat3Tests, MatrixAndVectorMultiplication)
 
 TYPED_TEST(Mat3Tests, AccessToElement)
 {
-    constexpr Matrix3x3 m {
+    constexpr Matrix3x3 m
+    {
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
@@ -183,7 +196,8 @@ TYPED_TEST(Mat3Tests, AccessToElement)
         static_cast<TypeParam>(3)
     };
 
-    constexpr TypeParam r[9] {
+    constexpr TypeParam r[9]
+    {
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
@@ -210,7 +224,8 @@ TYPED_TEST(Mat3Tests, AccessToElement)
 
 TYPED_TEST(Mat3Tests, Determinant)
 {
-    constexpr Matrix3x3 m {
+    constexpr Matrix3x3 m
+    {
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(5),
@@ -229,7 +244,8 @@ TYPED_TEST(Mat3Tests, Determinant)
 
 TYPED_TEST(Mat3Tests, Transpose)
 {
-    constexpr Matrix3x3 res {
+    constexpr Matrix3x3 res
+    {
         pbrlib::testing::roundForInteger<TypeParam>(1.0),
         pbrlib::testing::roundForInteger<TypeParam>(2.0),
         pbrlib::testing::roundForInteger<TypeParam>(3.5),
@@ -241,7 +257,8 @@ TYPED_TEST(Mat3Tests, Transpose)
         pbrlib::testing::roundForInteger<TypeParam>(12.3)
     };
 
-    Matrix3x3 m {
+    Matrix3x3 m
+    {
         pbrlib::testing::roundForInteger<TypeParam>(1.0),
         pbrlib::testing::roundForInteger<TypeParam>(2.2),
         pbrlib::testing::roundForInteger<TypeParam>(8.50),
@@ -263,7 +280,8 @@ TYPED_TEST(Mat3Tests, Inverse)
 {
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
-        constexpr Matrix3x3 res {
+        constexpr Matrix3x3 res
+        {
             static_cast<TypeParam>(1.0),
             static_cast<TypeParam>(2.0),
             static_cast<TypeParam>(3.5),
@@ -275,7 +293,8 @@ TYPED_TEST(Mat3Tests, Inverse)
             static_cast<TypeParam>(12.3)
         };
 
-        Matrix3x3 m {
+        const Matrix3x3 m
+        {
             static_cast<TypeParam>(-0.488362006),
             static_cast<TypeParam>(0.224085586236808),
             static_cast<TypeParam>(0.117102790226977),
@@ -293,7 +312,8 @@ TYPED_TEST(Mat3Tests, Inverse)
 
 TYPED_TEST(Mat3Tests, AtMethodEdgeCase)
 {
-    constexpr Matrix3x3 mat {
+    constexpr Matrix3x3 mat
+    {
         pbrlib::testing::roundForInteger<TypeParam>(1.0),
         pbrlib::testing::roundForInteger<TypeParam>(2.0),
         pbrlib::testing::roundForInteger<TypeParam>(3.5),
@@ -323,10 +343,12 @@ TYPED_TEST(Mat3Tests, Lerp)
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
         constexpr Matrix3x3 result (pbrlib::testing::roundForInteger<TypeParam>(0.75));
-        pbrlib::testing::equality(result, lerp (
-            Matrix3x3(static_cast<TypeParam>(0.0)),
-            Matrix3x3(static_cast<TypeParam>(1.0)),
-            pbrlib::testing::roundForInteger<TypeParam>(0.75))
+        pbrlib::testing::equality(result, lerp
+            (
+                Matrix3x3(static_cast<TypeParam>(0.0)),
+                Matrix3x3(static_cast<TypeParam>(1.0)),
+                pbrlib::testing::roundForInteger<TypeParam>(0.75)
+            )
         );
     }
 }

@@ -17,7 +17,6 @@
 #include <vulkan/vulkan.h>
 
 #include <string_view>
-#include <concepts>
 
 using namespace testing;
 

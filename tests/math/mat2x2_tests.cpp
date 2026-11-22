@@ -17,24 +17,28 @@ TYPED_TEST_SUITE(Mat2Tests, MathTestingTypes);
 
 TYPED_TEST(Mat2Tests, Ctor)
 {
-    constexpr TypeParam r1[4] {
+    constexpr TypeParam r1[4]
+    {
         static_cast<TypeParam>(1), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(1)
     };
 
-    constexpr TypeParam r2[4] {
+    constexpr TypeParam r2[4]
+    {
         static_cast<TypeParam>(23), static_cast<TypeParam>(0),
         static_cast<TypeParam>(0), static_cast<TypeParam>(23)
     };
 
-    constexpr TypeParam r3[4] {
+    constexpr TypeParam r3[4]
+    {
         static_cast<TypeParam>(1), static_cast<TypeParam>(2),
         static_cast<TypeParam>(3), static_cast<TypeParam>(23)
     };
 
     constexpr Matrix2x2<TypeParam>  m1;
     constexpr Matrix2x2             m2(static_cast<TypeParam>(23));
-    constexpr Matrix2x2             m3 (
+    constexpr Matrix2x2             m3
+    (
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
@@ -48,14 +52,16 @@ TYPED_TEST(Mat2Tests, Ctor)
 
 TYPED_TEST(Mat2Tests, EqualAndNotEqual)
 {
-    constexpr Matrix2x2 m1 (
+    constexpr Matrix2x2 m1
+    (
         pbrlib::testing::roundForInteger<TypeParam>(1.12),
         pbrlib::testing::roundForInteger<TypeParam>(12.2),
         pbrlib::testing::roundForInteger<TypeParam>(45.345),
         pbrlib::testing::roundForInteger<TypeParam>(4.545)
     );
 
-    Matrix2x2 m2 (
+    Matrix2x2 m2
+    (
         pbrlib::testing::roundForInteger<TypeParam>(1.12),
         pbrlib::testing::roundForInteger<TypeParam>(12.2),
         pbrlib::testing::roundForInteger<TypeParam>(45.345),
@@ -105,21 +111,24 @@ TYPED_TEST(Mat2Tests, ScalarMultiplication)
 
 TYPED_TEST(Mat2Tests, MatrixMultiplication)
 {
-    constexpr Matrix2x2 res1 (
+    constexpr Matrix2x2 res1
+    (
         static_cast<TypeParam>(115),
         static_cast<TypeParam>(1885),
         static_cast<TypeParam>(30),
         static_cast<TypeParam>(270)
     );
 
-    constexpr Matrix2x2 m1 (
+    constexpr Matrix2x2 m1
+    (
         static_cast<TypeParam>(12),
         static_cast<TypeParam>(4),
         static_cast<TypeParam>(43),
         static_cast<TypeParam>(6)
     );
 
-    constexpr Matrix2x2 m2 (
+    constexpr Matrix2x2 m2
+    (
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
@@ -136,19 +145,22 @@ TYPED_TEST(Mat2Tests, MatrixMultiplication)
 
 TYPED_TEST(Mat2Tests, MatrixAndVectorMultiplication)
 {
-    constexpr Vec2 res1 (
+    constexpr Vec2 res1
+    (
         static_cast<TypeParam>(103),
         static_cast<TypeParam>(247)
     );
 
-    constexpr Matrix2x2 m (
+    constexpr Matrix2x2 m
+    (
         static_cast<TypeParam>(13),
         static_cast<TypeParam>(32),
         static_cast<TypeParam>(5),
         static_cast<TypeParam>(11)
     );
 
-    constexpr Vec2 v (
+    constexpr Vec2 v
+    (
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(5)
     );
@@ -159,14 +171,16 @@ TYPED_TEST(Mat2Tests, MatrixAndVectorMultiplication)
 
 TYPED_TEST(Mat2Tests, AccessToElement)
 {
-    constexpr Matrix2x2 m (
+    constexpr Matrix2x2 m
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(4)
     );
 
-    constexpr TypeParam r[4] {
+    constexpr TypeParam r[4]
+    {
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
@@ -188,7 +202,8 @@ TYPED_TEST(Mat2Tests, AccessToElement)
 
 TYPED_TEST(Mat2Tests, Determinant)
 {
-    constexpr Matrix2x2 m (
+    constexpr Matrix2x2 m
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
@@ -202,14 +217,16 @@ TYPED_TEST(Mat2Tests, Determinant)
 
 TYPED_TEST(Mat2Tests, Transpose)
 {
-    Matrix2x2 m (
+    Matrix2x2 m
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(4)
     );
 
-    constexpr Matrix2x2 res1 (
+    constexpr Matrix2x2 res1
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(1),
@@ -227,14 +244,16 @@ TYPED_TEST(Mat2Tests, Inverse)
 {
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
-        constexpr Matrix2x2 res1 (
+        constexpr Matrix2x2 res1
+        (
             static_cast<TypeParam>(1),
             static_cast<TypeParam>(0),
             static_cast<TypeParam>(-2),
             static_cast<TypeParam>(1)
         );
 
-        Matrix2x2 m (
+        Matrix2x2 m
+        (
             static_cast<TypeParam>(1),
             static_cast<TypeParam>(2),
             static_cast<TypeParam>(0),
@@ -251,7 +270,8 @@ TYPED_TEST(Mat2Tests, Inverse)
 
 TYPED_TEST(Mat2Tests, AtMethodEdgeCase)
 {
-    const Matrix2x2 mat (
+    const Matrix2x2 mat
+    (
         static_cast<TypeParam>(-2.0),
         static_cast<TypeParam>(1.0),
         static_cast<TypeParam>(1.5),
@@ -276,10 +296,12 @@ TYPED_TEST(Mat2Tests, Lerp)
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
         constexpr Matrix2x2 result (pbrlib::testing::roundForInteger<TypeParam>(0.75));
-        pbrlib::testing::equality(result, lerp (
-            Matrix2x2(static_cast<TypeParam>(0.0)),
-            Matrix2x2(static_cast<TypeParam>(1.0)),
-            pbrlib::testing::roundForInteger<TypeParam>(0.75))
+        pbrlib::testing::equality(result, lerp
+            (
+                Matrix2x2(static_cast<TypeParam>(0.0)),
+                Matrix2x2(static_cast<TypeParam>(1.0)),
+                pbrlib::testing::roundForInteger<TypeParam>(0.75)
+            )
         );
     }
 }

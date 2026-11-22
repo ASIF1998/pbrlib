@@ -103,8 +103,8 @@ namespace pbrlib::testing
             {
                 using ChannelType = typename PixelType::ElementType;
 
-                std::span<const PixelType> rendered_image (reinterpret_cast<const PixelType*>(rendered_image_src.data()), rendered_image_src.size() / sizeof(PixelType));
-                std::span<const PixelType> reference_image (reinterpret_cast<const PixelType*>(reference_image_src.data()), reference_image_src.size() / sizeof(PixelType));
+                std::span<const PixelType> rendered_image   (reinterpret_cast<const PixelType*>(rendered_image_src.data()), rendered_image_src.size() / sizeof(PixelType));
+                std::span<const PixelType> reference_image  (reinterpret_cast<const PixelType*>(reference_image_src.data()), reference_image_src.size() / sizeof(PixelType));
 
                 PixelType min_value (std::numeric_limits<ChannelType>::max());
                 PixelType max_value (-std::numeric_limits<ChannelType>::max());
@@ -166,7 +166,8 @@ namespace pbrlib::testing
     {
         if constexpr (testing::generate_image_diff)
         {
-            _descriptor_group.emplace(
+            _descriptor_group.emplace
+            (
                 device,
                 backend::vk::builders::DescriptorSetLayout(device)
                     .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT)
@@ -174,7 +175,7 @@ namespace pbrlib::testing
                     .addBinding(2, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT),
                 "[vk-diff-image-generator] descriptor-set"
             );
-            
+
             _pipeline_layout_handle = pbrlib::backend::vk::builders::PipelineLayout(_device)
                 .addSetLayout(_descriptor_group->descriptorSetLayoutHandle())
                 .build();
@@ -205,7 +206,7 @@ namespace pbrlib::testing
     void ImageComparison::generateImageDiff(backend::vk::Image& image_1, backend::vk::Image& image_2)
     {
         auto command_buffer = _device.oneTimeSubmitCommandBuffer("vk-diff-image-generator");
-        
+
         if (image_1.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) [[likely]]
             image_1.transition(command_buffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -255,7 +256,8 @@ namespace pbrlib::testing
 
             vkCmdBindPipeline(command_buffer_handle, VK_PIPELINE_BIND_POINT_COMPUTE, _pipeline_handle);
 
-            vkCmdBindDescriptorSets(
+            vkCmdBindDescriptorSets
+            (
                 command_buffer_handle,
                 VK_PIPELINE_BIND_POINT_COMPUTE,
                 _pipeline_layout_handle,
@@ -286,14 +288,14 @@ namespace pbrlib::testing
         if constexpr (pbrlib::testing::generate_image_diff)
             generateImageDiff(rendered_image, reference_image);
 
-            
+
         if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL || reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
         {
             auto command_buffer = _device.oneTimeSubmitCommandBuffer("command-buffer-compare-images");
 
             if (rendered_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
                 rendered_image.transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-    
+
             if (reference_image.layout != VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) [[likely]]
                 reference_image.transition(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
