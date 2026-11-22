@@ -60,7 +60,8 @@ public:
     [[nodiscard]] static uint64_t fnv1a_hash(std::string_view str) noexcept
     {
         auto hash = 0xcbf29ce484222325ull;
-        for (char c : str) {
+        for (char c : str)
+        {
             hash ^= static_cast<uint8_t>(c);
             hash *= 0x00000100000001b3ull;
         }

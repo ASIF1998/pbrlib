@@ -8,8 +8,9 @@
 
 TEST(SceneItemTests, Ctor)
 {
-    pbrlib::Scene       scene("scene");
-    pbrlib::math::mat4  transform (1.0f);
+    pbrlib::Scene scene("scene");
+
+    constexpr pbrlib::math::mat4 transform (1.0f);
 
     const auto& item = scene.addItem("scene-item");
 

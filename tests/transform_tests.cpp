@@ -9,7 +9,8 @@ TEST(MovingTransform, Translate)
 
     const auto transform = pbrlib::transforms::translate(t);
 
-    constexpr pbrlib::math::mat4 res (
+    constexpr pbrlib::math::mat4 res
+    (
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
@@ -25,7 +26,8 @@ TEST(MovingTransform, Scale)
 
     const auto transform = pbrlib::transforms::scale(t);
 
-    constexpr pbrlib::math::mat4 res (
+    constexpr pbrlib::math::mat4 res
+    (
         0.5f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.5f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.5f, 0.0f,
@@ -65,7 +67,8 @@ TEST(MovingTransform, Rotates)
 
 TEST(MovingTransform, LookAt)
 {
-    constexpr pbrlib::math::mat4 res (
+    constexpr pbrlib::math::mat4 res
+    (
         -0.0995037183f, -0.6638135910f, -0.7412493230f, 0.0f,
         0.00000000000f, 0.74494636100f, -0.6671243910f, 0.0f,
         0.99503719800f, -0.0663813576f, -0.0741249323f, 0.0f,

@@ -15,16 +15,15 @@ TEST(FrameGraphTests, Ctor)
     if constexpr (!pbrlib::testing::vk::isSupport())
         GTEST_SKIP();
 
+    const pbrlib::Config config
+    {
+        .width          = 800,
+        .height         = 600,
+        .draw_in_window = false
+    };
+
     ASSERT_NO_THROW(
     {
-        constexpr uint32_t width    = 800;
-        constexpr uint32_t height   = 600;
-
-        pbrlib::Config config;
-        config.width            = width;
-        config.height           = height;
-        config.draw_in_window   = false;
-
         pbrlib::backend::vk::Device device;
         device.init();
 

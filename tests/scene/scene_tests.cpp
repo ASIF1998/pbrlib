@@ -2,8 +2,6 @@
 
 #include <pbrlib/scene/scene.hpp>
 
-#include <optional>
-
 TEST(SceneTests, Ctor)
 {
     pbrlib::Scene scene ("scene-tests");

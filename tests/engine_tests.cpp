@@ -8,9 +8,11 @@ TEST(EngineTests, PreRenderCallback)
     if constexpr (!pbrlib::testing::vk::isSupport())
         GTEST_SKIP() << "skipped: vulkan support is not available on this platform";
 
-    pbrlib::Config config;
-    config.title            = "engine-pre-render-callback-test";
-    config.draw_in_window   = false;
+    const pbrlib::Config config
+    {
+        .title          = "engine-pre-render-callback-test",
+        .draw_in_window = false
+    };
 
     pbrlib::Engine engine (config);
 
@@ -30,9 +32,11 @@ TEST(EngineTests, PostRenderCallback)
     if constexpr (!pbrlib::testing::vk::isSupport())
         GTEST_SKIP() << "skipped: vulkan support is not available on this platform";
 
-    pbrlib::Config config;
-    config.title            = "engine-post-render-callback-test";
-    config.draw_in_window   = false;
+    const pbrlib::Config config
+    {
+        .title          = "engine-post-render-callback-test",
+        .draw_in_window = false
+    };
 
     pbrlib::Engine engine (config);
 
@@ -52,9 +56,11 @@ TEST(EngineTests, PresentToDisplayCallback)
     if constexpr (!pbrlib::testing::vk::isSupport())
         GTEST_SKIP() << "skipped: vulkan support is not available on this platform";
 
-    pbrlib::Config config;
-    config.title            = "engine-present-to-display-callback-test";
-    config.draw_in_window   = false;
+    const pbrlib::Config config
+    {
+        .title          = "engine-present-to-display-callback-test",
+        .draw_in_window = false
+    };
 
     pbrlib::Engine engine (config);
 

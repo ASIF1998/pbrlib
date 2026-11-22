@@ -130,7 +130,8 @@ TEST(QuatTests, Normalize)
 
 TEST(QuatTests, Inverse)
 {
-    constexpr pbrlib::math::quat res (
+    constexpr pbrlib::math::quat res
+    (
         -0.0588235334f,
         -0.0784313753f,
         -0.0980392172f,
@@ -183,7 +184,8 @@ TEST(QuatTests, Slerp)
 
 TEST(QuatTests, ToTransform)
 {
-    constexpr pbrlib::math::mat4 res (
+    constexpr pbrlib::math::mat4 res
+    (
         1.0f, 0.00f, 0.00f, 0.0f,
         0.0f, -1.0f, 0.00f, 0.0f,
         0.0f, 0.00f, -1.0f, 0.0f,

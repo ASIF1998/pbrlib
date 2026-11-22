@@ -25,7 +25,7 @@ public:
         if constexpr (!pbrlib::testing::vk::isSupport())
             GTEST_SKIP();
 
-        pbrlib::Config config
+        const pbrlib::Config config
         {
             .title          = "content-tests",
             .draw_in_window = false
@@ -62,7 +62,6 @@ public:
             if (!ptr_mesh_manager) [[unlikely]]
                 return false;
 
-            auto temp_mesh_count = ptr_mesh_manager->meshCount();
             bool result = ptr_mesh_manager->meshCount() == meshCount;
 
             const auto ptr_material_manager = getter.materialManager();

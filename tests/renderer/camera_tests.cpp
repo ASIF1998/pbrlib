@@ -63,7 +63,8 @@ TEST(CameraTests, ViewMatrix)
     camera.pos(pbrlib::math::vec3(43, 65, -45));
     camera.up(pbrlib::math::vec3(0.43, 0.65, 0.12));
 
-    constexpr pbrlib::math::mat4 view_matrix {
+    constexpr pbrlib::math::mat4 view_matrix
+    {
         -0.7572f, 0.4176f, -0.5021f, 0.0000f,
         0.4065f, 0.9031f, 0.1380f, 0.0000f,
         0.5111f, -0.0995f, -0.8536f, 0.0000f,
@@ -81,7 +82,8 @@ TEST(CameraTests, ProjectionMatrix)
     camera.width(800);
     camera.height(600);
 
-    constexpr pbrlib::math::mat4 projection_matrix = {
+    constexpr pbrlib::math::mat4 projection_matrix
+    {
         1.7486f, 0.0000f, 0.0000f, 0.0000f,
         0.0000f, 2.3314f, 0.0000f, 0.0000f,
         0.0000f, 0.0000f, -1.0000f, -1.0000f,

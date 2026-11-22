@@ -24,28 +24,32 @@ TYPED_TEST(Vec4Tests, EqualAndNotEqual)
 
 TYPED_TEST(Vec4Tests, AdditionAndSubtraction)
 {
-    constexpr Vec4 v1 (
+    constexpr Vec4 v1
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(5),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(7)
     );
 
-    constexpr Vec4 v2 (
+    constexpr Vec4 v2
+    (
         static_cast<TypeParam>(4),
         static_cast<TypeParam>(7),
         static_cast<TypeParam>(10),
         static_cast<TypeParam>(8)
     );
 
-    constexpr Vec4 r1 (
+    constexpr Vec4 r1
+    (
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(12),
         static_cast<TypeParam>(12),
         static_cast<TypeParam>(15)
     );
 
-    constexpr Vec4 r2 (
+    constexpr Vec4 r2
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(8),
@@ -58,14 +62,16 @@ TYPED_TEST(Vec4Tests, AdditionAndSubtraction)
 
 TYPED_TEST(Vec4Tests, Multiplication)
 {
-    Vec4 v (
+    Vec4 v
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(9)
     );
 
-    constexpr Vec4 res (
+    constexpr Vec4 res
+    (
         static_cast<TypeParam>(4),
         static_cast<TypeParam>(6),
         static_cast<TypeParam>(12),
@@ -84,7 +90,8 @@ TYPED_TEST(Vec4Tests, Multiplication)
 
 TYPED_TEST(Vec4Tests, AccessToElement)
 {
-    constexpr Vec4  v (
+    constexpr Vec4 v
+    (
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(4),
         static_cast<TypeParam>(54),
@@ -104,14 +111,16 @@ TYPED_TEST(Vec4Tests, AccessToElement)
 
 TYPED_TEST(Vec4Tests, Length)
 {
-    constexpr Vec4 v (
+    constexpr Vec4 v
+    (
         static_cast<TypeParam>(1),
         static_cast<TypeParam>(2),
         static_cast<TypeParam>(3),
         static_cast<TypeParam>(4)
     );
 
-    pbrlib::testing::equality (
+    pbrlib::testing::equality
+    (
         pbrlib::testing::roundForInteger<TypeParam>(5.47722578),
         v.length()
     );
@@ -121,14 +130,16 @@ TYPED_TEST(Vec4Tests, Normalize)
 {
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
-        constexpr Vec4  v1 (
+        constexpr Vec4 v1
+        (
             static_cast<TypeParam>(1.2),
             static_cast<TypeParam>(3.3),
             static_cast<TypeParam>(0.32),
             static_cast<TypeParam>(10.4)
         );
 
-        constexpr Vec4 res1 (
+        constexpr Vec4 res1
+        (
             static_cast<TypeParam>(0.109275125f),
             static_cast<TypeParam>(0.300506569437f),
             static_cast<TypeParam>(0.0291400309757f),
@@ -141,7 +152,8 @@ TYPED_TEST(Vec4Tests, Normalize)
 
 TYPED_TEST(Vec4Tests, ZeroVectorNormalization)
 {
-    Vec4 v (
+    Vec4 v
+    (
         static_cast<TypeParam>(0),
         static_cast<TypeParam>(0),
         static_cast<TypeParam>(0),
@@ -162,10 +174,12 @@ TYPED_TEST(Vec4Tests, Lerp)
     if constexpr (std::is_floating_point<TypeParam>::value)
     {
         constexpr Vec4 result (static_cast<TypeParam>(0.75));
-        pbrlib::testing::equality(result, lerp (
-            Vec4(static_cast<TypeParam>(0)),
-            Vec4(static_cast<TypeParam>(1)),
-            static_cast<TypeParam>(0.75))
+        pbrlib::testing::equality(result, lerp
+            (
+                Vec4(static_cast<TypeParam>(0)),
+                Vec4(static_cast<TypeParam>(1)),
+                static_cast<TypeParam>(0.75)
+            )
         );
     }
 }

@@ -38,12 +38,14 @@ TEST_F(EventSystemTests, EmmitOn)
 
     int received_value = -1;
 
-    pbrlib::EventSystem::on([this, &received_value] (const EmmitOnTestEvent& event) {
+    pbrlib::EventSystem::on([this, &received_value] (const EmmitOnTestEvent& event)
+    {
         received_value = event.value;
         ++_call_count;
     });
 
-    const EmmitOnTestEvent event {
+    const EmmitOnTestEvent event
+    {
         .value = value
     };
 
@@ -62,17 +64,20 @@ TEST_F(EventSystemTests, MultipleListeners)
     bool event_2 = false;
     bool event_3 = false;
 
-    pbrlib::EventSystem::on([this, &event_1] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_1] ([[maybe_unused]] const MultipleListenersTestEvent& event)
+    {
         event_1 = true;
         ++_call_count;
     });
 
-    pbrlib::EventSystem::on([this, &event_2] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_2] ([[maybe_unused]] const MultipleListenersTestEvent& event)
+    {
         event_2 = true;
         ++_call_count;
     });
 
-    pbrlib::EventSystem::on([this, &event_3] ([[maybe_unused]] const MultipleListenersTestEvent& event) {
+    pbrlib::EventSystem::on([this, &event_3] ([[maybe_unused]] const MultipleListenersTestEvent& event)
+    {
         event_3 = true;
         ++_call_count;
     });
@@ -98,11 +103,13 @@ TEST_F(EventSystemTests, DifferentEventTypes)
     uint8_t test_event_1 = 0;
     uint8_t test_event_2 = 0;
 
-    pbrlib::EventSystem::on([&test_event_1] ([[maybe_unused]] const TestEvent1& event) {
+    pbrlib::EventSystem::on([&test_event_1] ([[maybe_unused]] const TestEvent1& event)
+    {
         ++test_event_1;
     });
 
-    pbrlib::EventSystem::on([&test_event_2] ([[maybe_unused]] const TestEvent2& event) {
+    pbrlib::EventSystem::on([&test_event_2] ([[maybe_unused]] const TestEvent2& event)
+    {
         ++test_event_2;
     });
 
@@ -126,13 +133,15 @@ TEST_F(EventSystemTests, EventWithComplexData)
     static constexpr float      value_2 = 0.4534;
     static constexpr auto       str     = "Hello World"sv;
 
-    pbrlib::EventSystem::on([](const ComplexDataTestEvent& event) {
+    pbrlib::EventSystem::on([](const ComplexDataTestEvent& event)
+    {
         pbrlib::testing::equality(event.value_1, value_1);
         pbrlib::testing::equality(event.value_2, value_2);
         pbrlib::testing::equality(event.str, str);
     });
 
-    constexpr ComplexDataTestEvent event = {
+    constexpr ComplexDataTestEvent event
+    {
         .value_1    = value_1,
         .value_2    = value_2,
         .str        = str

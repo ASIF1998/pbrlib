@@ -2,9 +2,8 @@
 
 #include "../utils.hpp"
 
-#include <concepts>
-
-using MathTestingTypes = ::testing::Types <
+using MathTestingTypes = ::testing::Types
+<
     float,
     double,
     int32_t,
